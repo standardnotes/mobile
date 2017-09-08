@@ -1,7 +1,6 @@
 import Crypto from "./crypto"
-import Lodash from "./lodash"
 import DBManager from "./dbManager"
-var _ = new Lodash();
+var _ = require('lodash')
 
 import Item from "../models/api/item"
 import Note from "../models/app/note"
@@ -196,11 +195,10 @@ export default class ModelManager {
     items.forEach(function(item){
       if(item.content_type == "Tag") {
         if(!_.find(this.tags, {uuid: item.uuid})) {
-          // this.tags.splice(_.sortedIndexBy(this.tags, item, function(item){
-          //   if (item.title) return item.title.toLowerCase();
-          //   else return ''
-          // }), 0, item);
-          this.tags.push(item);
+          this.tags.splice(_.sortedIndexBy(this.tags, item, function(item){
+            if (item.title) return item.title.toLowerCase();
+            else return ''
+          }), 0, item);
         }
       } else if(item.content_type == "Note") {
         if(!_.find(this.notes, {uuid: item.uuid})) {
@@ -242,7 +240,7 @@ export default class ModelManager {
         item.addItemAsRelationship(referencedItem);
         referencedItem.addItemAsRelationship(item);
       } else {
-        // console.log("Unable to find reference:", reference.uuid, "for item:", item);
+        // console.error("Unable to find reference:", reference.uuid, "for item:", item);
       }
     }
   }

@@ -66,11 +66,10 @@ export default class Notes extends Component {
         id: 'new',
         showAsAction: 'ifRoom',
         buttonColor: GlobalStyles.constants.mainTintColor,
-      },)
+      })
     }
 
     this.props.navigator.setButtons({
-      leftButtons: [],
       rightButtons: rightButtons,
       leftButtons: [
         {
@@ -125,7 +124,9 @@ export default class Notes extends Component {
     })
 
     this.reloadList();
-    if(reloadNavBar) {
+    // this function may be triggled asyncrounsly even when on a different screen
+    // we dont want to update the nav bar unless we are the present screen
+    if(reloadNavBar && this.activeScreen) {
       this.configureNavBar();
     }
   }
@@ -137,6 +138,20 @@ export default class Notes extends Component {
   }
 
   onNavigatorEvent(event) {
+
+    switch(event.id) {
+      case 'willAppear':
+       this.forceUpdate();
+       break;
+      case 'didAppear':
+        this.activeScreen = true;
+        break;
+      case 'willDisappear':
+        this.activeScreen = false;
+        break;
+      case 'didDisappear':
+        break;
+      }
 
     if (event.type == 'NavBarButtonPress') {
       if (event.id == 'new') {

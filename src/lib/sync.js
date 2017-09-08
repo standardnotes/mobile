@@ -9,8 +9,7 @@ import Encryptor from './encryptor'
 import Item from "../models/api/item"
 import ItemParams from "../models/local/itemParams"
 
-import Lodash from "./lodash"
-var _ = new Lodash();
+var _ = require('lodash')
 
 export default class Sync {
 

@@ -1,7 +1,6 @@
 import Item from "../api/item"
 
-import Lodash from "../../lib/lodash"
-var _ = new Lodash();
+var _ = require('lodash')
 
 export default class Tag extends Item {
 

@@ -1,8 +1,7 @@
 import Crypto from "../../lib/crypto"
 import Encryptor from '../../lib/encryptor'
 
-import Lodash from "../../lib/lodash"
-var _ = new Lodash();
+var _ = require('lodash')
 
 export default class ItemParams {
 

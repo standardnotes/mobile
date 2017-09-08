@@ -32,6 +32,58 @@ export default class Compose extends Component {
       this.note.dummy = true;
     }
     this.state = {title: this.note.title, text: this.note.text};
+    this.configureNavBar();
+  }
+
+  configureNavBar() {
+    var title = "Tags";
+    if(this.note.tags.length > 0) {
+      title += ` (${this.note.tags.length})`;
+    }
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    this.props.navigator.setButtons({
+      rightButtons: [
+        {
+          title: title,
+          id: 'tags',
+          showAsAction: 'ifRoom',
+          buttonColor: GlobalStyles.constants.mainTintColor,
+        },
+      ],
+      animated: false
+    });
+  }
+
+  onNavigatorEvent(event) {
+    if(event.id == 'didAppear') {
+        if(this.note.dirty) {
+          this.changesMade();
+          this.configureNavBar();
+        }
+    }
+    if (event.type == 'NavBarButtonPress') {
+      if (event.id == 'tags') {
+        this.showTags();
+      }
+    }
+  }
+
+  showTags() {
+    console.log("Showing tags for note", this.note)
+    this.props.navigator.push({
+      screen: 'sn.Filter',
+      title: 'Options',
+      animationType: 'slide-up',
+      passProps: {
+        forNoteTags: true,
+        options: {selectedTags: this.note.tags.map(function(tag){return tag.uuid})},
+        onOptionsChange: (options) => {
+          var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
+          this.note.replaceTags(tags);
+          this.note.setDirty(true);
+        }
+      }
+    });
   }
 
   onTitleChange = (text) => {

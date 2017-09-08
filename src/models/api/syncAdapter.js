@@ -1,7 +1,6 @@
 import Item from "./item"
 
-import Lodash from "../../lib/lodash"
-var _ = new Lodash();
+var _ = require('lodash')
 
 export default class SyncAdapter extends Item {
 

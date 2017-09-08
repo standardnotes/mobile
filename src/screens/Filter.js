@@ -25,7 +25,21 @@ export default class Filter extends Component {
     } else {
       selectedTags = [];
     }
+
     this.state = {tags: ModelManager.getInstance().tags, selectedTags: selectedTags};
+
+    var leftButtons = [];
+    if(!this.props.forNoteTags) {
+      // tags only means we're presenting horizontally, only want left button on modal
+      leftButtons.push({
+        title: 'Done',
+        id: 'accept',
+        showAsAction: 'ifRoom',
+        buttonColor: GlobalStyles.constants.mainTintColor,
+        buttonFontWeight: "bold",
+        buttonFontSize: 17
+      })
+    }
 
     this.props.navigator.setButtons({
       rightButtons: [
@@ -36,16 +50,7 @@ export default class Filter extends Component {
           buttonColor: GlobalStyles.constants.mainTintColor,
         },
       ],
-      leftButtons: [
-        {
-          title: 'Done',
-          id: 'accept',
-          showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants.mainTintColor,
-          buttonFontWeight: "bold",
-          buttonFontSize: 17
-        },
-      ],
+      leftButtons: leftButtons,
       animated: false
     });
   }
@@ -76,7 +81,12 @@ export default class Filter extends Component {
               title: 'New Tag',
               placeholder: "New tag name",
               onSave: (text) => {
-                this.createTag(text);
+                this.createTag(text, function(tag){
+                  if(this.props.forNoteTags) {
+                    // select this tag
+                    this.onTagSelect(tag)
+                  }
+                }.bind(this));
               }
             }
           });
@@ -84,12 +94,13 @@ export default class Filter extends Component {
       }
   }
 
-  createTag(text) {
+  createTag(text, callback) {
     var tag = new Tag({title: text});
     tag.init(function(){
       tag.setDirty(true);
       ModelManager.getInstance().addItem(tag);
       Sync.getInstance().sync();
+      callback(tag);
     })
   }
 
@@ -119,13 +130,21 @@ export default class Filter extends Component {
     return this.tags.indexOf(tag.uuid) !== -1;
   }
 
+  shouldDisplaySortSection() {
+    if(this.props.forNoteTags) {
+      return false;
+    }
+    return true;
+  }
+
   render() {
 
     return (
       <View style={GlobalStyles.rules.container}>
         <ScrollView>
-
-          <SortSection sortBy={this.options.sortBy} onSortChange={this.onSortChange} title={"Sort By"} />
+          {this.shouldDisplaySortSection() &&
+            <SortSection sortBy={this.options.sortBy} onSortChange={this.onSortChange} title={"Sort By"} />
+          }
           <TagsSection tags={this.state.tags} selected={this.state.selectedTags} onTagSelect={this.onTagSelect} title={"Tags"} />
 
         </ScrollView>
