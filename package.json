@@ -1,0 +1,25 @@
+{
+  "name": "sn_react",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "base-64": "^0.1.0",
+    "react": "16.0.0-alpha.12",
+    "react-native": "0.48.1",
+    "react-native-navigation": "^1.1.213",
+    "react-native-vector-icons": "^4.3.0"
+  },
+  "devDependencies": {
+    "babel-jest": "21.0.0",
+    "babel-preset-react-native": "3.0.2",
+    "jest": "21.0.1",
+    "react-test-renderer": "16.0.0-alpha.12"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
