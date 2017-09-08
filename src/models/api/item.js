@@ -6,15 +6,15 @@ var _ = new Lodash();
 export default class Item {
 
   constructor(json_obj) {
-
     this.updateFromJSON(json_obj);
-
     this.observers = [];
+  }
 
+  init(callback) {
     if(!this.uuid) {
       Crypto.generateUUID().then(function(uuid){
         this.uuid = uuid;
-        console.log("Generated Random UUID", this.uuid);
+        callback.bind(this)();
       }.bind(this))
     }
   }

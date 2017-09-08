@@ -4,6 +4,7 @@ import Notes from './Notes'
 import Compose from './Compose'
 import Account from './Account'
 import Filter from './Filter'
+import InputModal from './InputModal'
 import Sync from '../lib/sync'
 
 export function registerScreens() {
@@ -11,6 +12,7 @@ export function registerScreens() {
   Navigation.registerComponent('sn.Compose', () => Compose);
   Navigation.registerComponent('sn.Account', () => Account);
   Navigation.registerComponent('sn.Filter', () => Filter);
+  Navigation.registerComponent('sn.InputModal', () => InputModal);
 }
 
 export function registerScreenVisibilityListener() {
@@ -31,8 +33,8 @@ export function registerScreenVisibilityListener() {
 }
 
 Sync.getInstance().loadLocalItems(function(items) {
-  Sync.getInstance().sync(null);
-  // refresh every 30s
+  // Initial sync is done from Auth user load constructor
+  // Refresh every 30s
   setInterval(function () {
     // Sync.getInstance().sync(null);
   }, 30000);

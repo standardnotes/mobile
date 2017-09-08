@@ -3,6 +3,15 @@ import { StyleSheet } from 'react-native';
 let mainTintColor = "#fb0206";
 let PaddingLeft = 14;
 
+const constants = {
+  themeColor: "#086DD6",
+  mainBackgroundColor: "white",
+  mainTintColor: mainTintColor,
+  plainCellBorderColor: "#efefef",
+  sectionedCellHorizontalPadding: PaddingLeft,
+  textColor: "black",
+}
+
 const styles = {
   rules: StyleSheet.create({
 
@@ -36,7 +45,6 @@ const styles = {
     },
 
     sectionedTableCellTextInput: {
-      paddingTop: 0,
       fontSize: 16,
       height: "100%"
     },
@@ -53,7 +61,8 @@ const styles = {
 
     sectionedAccessoryTableCellLabel: {
       paddingTop: 12,
-      fontSize: 16
+      fontSize: 16,
+      color: constants.textColor
     },
 
     textInputCell: {
@@ -85,13 +94,7 @@ const styles = {
 
   }),
 
-  constants: {
-    themeColor: "#086DD6",
-    mainBackgroundColor: "white",
-    mainTintColor: mainTintColor,
-    plainCellBorderColor: "#efefef",
-    sectionedCellHorizontalPadding: PaddingLeft
-  }
+  constants: constants
 }
 
 export default styles;

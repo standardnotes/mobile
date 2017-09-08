@@ -1,5 +1,6 @@
 import Crypto from "./crypto"
 import Lodash from "./lodash"
+import DBManager from "./dbManager"
 var _ = new Lodash();
 
 import Item from "../models/api/item"
@@ -312,7 +313,7 @@ export default class ModelManager {
       _.pull(this._extensions, item);
     }
 
-    this.dbManager.deleteItem(item, callback);
+    DBManager.deleteItem(item, callback);
   }
 
   /*

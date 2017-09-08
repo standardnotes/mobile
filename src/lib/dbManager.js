@@ -23,6 +23,10 @@ export default class DBManager {
     this.saveItems([item]);
   }
 
+  static keyForItem(item) {
+    return "Item-" + item.uuid;
+  }
+
   static saveItems(items, callback) {
 
     if(items.length == 0) {
@@ -33,27 +37,27 @@ export default class DBManager {
     }
 
     Promise.all(items.map(function(item){
-      AsyncStorage.setItem("Item-" + item.uuid, JSON.stringify(item));
+      AsyncStorage.setItem(DBManager.keyForItem(item), JSON.stringify(item));
     })).then(function(){
       if(callback) {
         callback();
       }
     })
 
-    /* multiset is not working properly; returns with error */
-
-    // AsyncStorage.multiSet(data, function(error){
-    //   console.log("Save items error:", error);
-    //   if(callback) {
-    //     callback();
-    //   }
-    // })
+    // multiset is not working properly; returns with error
+    /*
+      AsyncStorage.multiSet(data, function(error){
+        callback();
+      })
+    */
 
   }
 
   static deleteItem(item, callback) {
-    AsyncStorage.removeItem(item.uuid, function(error){
+    AsyncStorage.removeItem(DBManager.keyForItem(item), function(error){
+      if(callback) {
         callback();
+      }
     })
   }
 

@@ -228,6 +228,10 @@ export default class Sync {
     params.items = [];
 
     for(var item of subItems) {
+      if(!item.uuid) {
+        console.error("Item doesn't have uuid!", item);
+        return;
+      }
       var itemParams = new ItemParams(item, keys, version);
       itemParams.additionalFields = options.additionalFields;
       var result = await itemParams.paramsForSync();

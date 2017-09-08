@@ -8,7 +8,8 @@ import {
   FlatList,
   TouchableHighlight,
   TouchableWithoutFeedback,
-  RefreshControl
+  RefreshControl,
+  Platform
 } from 'react-native';
 
 import ModelManager from '../lib/modelManager'
@@ -17,14 +18,17 @@ import Sync from '../lib/sync'
 
 import GlobalStyles from "../Styles"
 
+import {iconsMap, iconsLoaded} from '../Icons';
+import Search from 'react-native-search-box';
+
 export default class Notes extends Component {
 
   constructor(props) {
     super(props);
     this.state = {date: Date.now(), refreshing: false};
+    this.options = {selectedTags: []};
 
     Sync.getInstance().registerSyncObserver(function(changesMade){
-      console.log("Sync completed with changes?", changesMade);
       if(changesMade) {
         this.loadNotes();
       } else {
@@ -38,7 +42,7 @@ export default class Notes extends Component {
 
   getOptionsAndLoadNotes() {
     Storage.getItem("options").then(function(result){
-      this.options = JSON.parse(result);
+      this.options = JSON.parse(result) || {selectedTags: []};
       this.loadNotes();
     }.bind(this))
   }
@@ -46,43 +50,69 @@ export default class Notes extends Component {
   configureNavBar() {
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
 
+    var notesTitle = "Notes";
+    var filterTitle = "Filter";
+    var numFilters = this.options.selectedTags.length;
+    if(numFilters > 0) {
+      filterTitle += ` (${numFilters})`
+      notesTitle = "Filtered Notes";
+    }
+    this.props.navigator.setTitle({title: notesTitle});
+
+    var rightButtons = [];
+    if(Platform.OS == "ios") {
+      rightButtons.push({
+        title: 'New',
+        id: 'new',
+        showAsAction: 'ifRoom',
+        buttonColor: GlobalStyles.constants.mainTintColor,
+      },)
+    }
+
     this.props.navigator.setButtons({
       leftButtons: [],
-      rightButtons: [
-        {
-          title: 'New',
-          id: 'new',
-          showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants.mainTintColor,
-        },
-      ],
+      rightButtons: rightButtons,
       leftButtons: [
         {
-          title: 'Filter',
-          id: 'filter',
+          title: filterTitle,
+          id: 'sideMenu',
           showAsAction: 'ifRoom',
           buttonColor: GlobalStyles.constants.mainTintColor,
         },
       ],
+      fab: {
+        collapsedId: 'new',
+        collapsedIcon: iconsMap['md-add'],
+        backgroundColor: GlobalStyles.constants.mainTintColor
+      },
       animated: false
     });
   }
 
-  loadNotes = () => {
-    console.log("Load notes with options", this.options);
+  loadNotes = (reloadNavBar = true) => {
     var notes;
     if(this.options.selectedTags && this.options.selectedTags.length > 0) {
       var tags = ModelManager.getInstance().getItemsWithIds(this.options.selectedTags);
-      var taggedNotes = new Set();
-      for(var tag of tags) {
-        taggedNotes = new Set([...taggedNotes, ...new Set(tag.notes)])
+      console.log("Found tags", tags);
+      if(tags.length > 0) {
+        var taggedNotes = new Set();
+        for(var tag of tags) {
+          taggedNotes = new Set([...taggedNotes, ...new Set(tag.notes)])
+        }
+        notes = Array.from(taggedNotes);
       }
-      notes = Array.from(taggedNotes);
-    } else {
+    }
+
+    if(!notes) {
       notes = ModelManager.getInstance().notes;
     }
 
-    console.log("Loaded notes", notes);
+    var searchTerm = this.options.searchTerm;
+    if(searchTerm) {
+      notes = notes.filter(function(note){
+        return note.safeTitle().includes(searchTerm) || note.safeText().includes(searchTerm);
+      })
+    }
 
     var sortBy = this.options.sortBy;
     this.notes = notes.sort(function(a, b){
@@ -95,6 +125,9 @@ export default class Notes extends Component {
     })
 
     this.reloadList();
+    if(reloadNavBar) {
+      this.configureNavBar();
+    }
   }
 
   reloadList() {
@@ -113,7 +146,7 @@ export default class Notes extends Component {
         });
       }
 
-      else if (event.id == 'filter') {
+      else if (event.id == 'sideMenu') {
         this.props.navigator.showModal({
           screen: 'sn.Filter',
           title: 'Options',
@@ -167,9 +200,31 @@ export default class Notes extends Component {
     />
   )
 
-  render() {
-    console.log("Rendering notes list", this.state, this.notes);
+  onSearchTextChange = (text) => {
+    this.options.searchTerm = text;
+    this.loadNotes(false);
+  }
 
+  onSearchCancel = () => {
+    this.options.searchTerm = null;
+    this.loadNotes(false);
+  }
+
+  renderHeader = () => {
+    return (
+      <View style={{paddingLeft: 5, paddingRight: 5, paddingTop: 5}}>
+        <Search
+          onChangeText={this.onSearchTextChange}
+          onCancel={this.onSearchCancel}
+          onDelete={this.onSearchCancel}
+          backgroundColor={GlobalStyles.constants.mainBackgroundColor}
+          titleCancelColor={GlobalStyles.constants.mainTintColor}
+        />
+      </View>
+    );
+  };
+
+  render() {
     return (
       <View style={styles.container}>
         <View>
@@ -183,6 +238,7 @@ export default class Notes extends Component {
             removeClippedSubviews={false}
             data={this.notes}
             renderItem={this._renderItem}
+            ListHeaderComponent={this.renderHeader}
           />
         </View>
       </View>

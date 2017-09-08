@@ -34,7 +34,7 @@ export default class Auth {
           this.user = JSON.parse(userData);
 
           Sync.getInstance().sync(function(){
-            console.log("Auth manager: Sync completed");
+
           })
         }
       } catch(e) {
