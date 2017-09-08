@@ -28,10 +28,6 @@ export default class Sync {
     this.syncObservers = [];
   }
 
-  async serverURL() {
-    return await Storage.getItem("server") || Auth.defaultServer();
-  }
-
   async masterKey() {
     return await Storage.getItem("mk");
   }
@@ -295,7 +291,7 @@ export default class Sync {
     }.bind(this);
 
     try {
-      var url = Auth.getInstance().serverUrl() + "items/sync";
+      var url = await Auth.getInstance().urlForPath("items/sync");
       Server.getInstance().postAbsolute(url, params, function(response){
 
         try {
@@ -305,7 +301,7 @@ export default class Sync {
         }
 
       }.bind(this), function(response){
-        // console.log("Sync error: ", response);
+        console.log("Sync error: ", response);
         var error = response ? response.error : {message: "Could not connect to server."};
 
         this.syncStatus.syncOpInProgress = false;

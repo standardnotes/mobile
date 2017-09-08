@@ -11,7 +11,11 @@ import {
   TextInput,
   View,
   FlatList,
-  TouchableHighlight
+  TouchableHighlight,
+  ScrollView,
+  Text,
+  Keyboard,
+  KeyboardAvoidingView
 } from 'react-native';
 
 import {Platform} from 'react-native';
@@ -105,7 +109,13 @@ export default class Compose extends Component {
     if(this.statusTimeout) clearTimeout(this.statusTimeout);
     this.saveTimeout = setTimeout(function(){
       this.setNavBarSubtitle("Saving...");
-      this.save();
+      if(!this.note.uuid) {
+        this.note.init(function(){
+          this.save();
+        }.bind(this))
+      } else {
+        this.save();
+      }
     }.bind(this), 275)
   }
 
@@ -179,18 +189,23 @@ export default class Compose extends Component {
           value={this.state.title}
           placeholder={"Add Title"}
           selectionColor={"red"}
-          underlineColorAndroid='transparent'
+          underlineColorAndroid={'transparent'}
         />
 
-        <TextInput
-            style={styles.noteText}
-            onChangeText={this.onTextChange}
-            multiline = {true}
-            value={this.note.text}
-            autoFocus={true}
-            selectionColor={"red"}
-            underlineColorAndroid='transparent'
-          />
+        <ScrollView keyboardDismissMode={'interactive'}>
+          <TextInput
+              style={styles.noteText}
+              onChangeText={this.onTextChange}
+              multiline = {true}
+              value={this.note.text}
+              autoFocus={!this.note.uuid}
+              selectionColor={"red"}
+              underlineColorAndroid={'transparent'}
+              keyboardDismissMode={'interactive'}
+            >
+            </TextInput>
+          </ScrollView>
+
       </View>
     );
   }
@@ -214,17 +229,21 @@ const styles = StyleSheet.create({
     borderBottomColor: "#F5F5F5",
     borderBottomWidth: 1,
     paddingTop: Platform.OS === "ios" ? 5 : 12,
-    paddingLeft: PaddingLeft
+    paddingLeft: PaddingLeft,
+    paddingRight: PaddingLeft,
   },
 
   noteText: {
-    fontSize: 16,
+    fontSize: 17,
     marginTop: 0,
     paddingTop: 10,
     color: "black",
     paddingLeft: PaddingLeft,
+    paddingRight: PaddingLeft,
     flexGrow: 1,
-    textAlignVertical: 'top'
+    textAlignVertical: 'top',
+    paddingVertical: 0,
+    lineHeight: 22
   },
 
 

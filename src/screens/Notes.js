@@ -268,6 +268,7 @@ class NoteCell extends React.PureComponent {
   }
 
   _onPress = () => {
+    console.log("On press");
     this.setState({selected: true});
     this.props.onPressItem(this.props.item);
     this.setState({selected: false});

@@ -6,6 +6,7 @@ import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
+var _ = require('lodash')
 
 import GlobalStyles from "../Styles"
 
@@ -13,19 +14,29 @@ import {
   TextInput,
   SectionList,
   ScrollView,
-  View
+  View,
+  Alert
 } from 'react-native';
 
 export default class Account extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {params: {}};
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
   }
 
+  componentDidMount() {
+    Auth.getInstance().serverUrl().then(function(server){
+      this.setState(function(prevState) {
+        var params = prevState.params;
+        params.server = server;
+        return _.merge(prevState, {params: params});
+      })
+    }.bind(this))
+  }
+
   onNavigatorEvent(event) {
-    // console.log("Navigator event", event);
     switch(event.id) {
       case 'willAppear':
        this.forceUpdate();
@@ -39,12 +50,23 @@ export default class Account extends Component {
       }
   }
 
-  onSignInPress = (email, password) => {
-    console.log("SIgn in press", email, password);
+  onSignInPress = (params) => {
+    var email = params.email;
+    var password = params.password;
+
+    if(!email) {
+      Alert.alert('Missing Email', "Please enter a valid email address.", [{text: 'OK', onPress: () => console.log('OK Pressed')}])
+      return;
+    }
+
+    if(!password) {
+      Alert.alert('Missing Password', "Please enter your password.", [{text: 'OK', onPress: () => console.log('OK Pressed')}])
+      return;
+    }
 
     var root = this;
 
-    Auth.getInstance().login(email, password, "http://localhost:3000", function(user, error) {
+    Auth.getInstance().login(email, password, params.server, function(user, error) {
       if(error) {
         Alert.alert(
           'Oops', error.message, [{text: 'OK', onPress: () => console.log('OK Pressed')},]
@@ -61,13 +83,13 @@ export default class Account extends Component {
     })
   }
 
-  onRegisterPress(email, password) {
-
+  onRegisterPress = (params) => {
+    var email = params.email;
+    var password = params.password;
   }
 
   onSignOutPress = () => {
     Auth.getInstance().signout(() => {
-      console.log("Signed out");
       this.forceUpdate();
     })
   }
@@ -83,7 +105,7 @@ export default class Account extends Component {
         <ScrollView>
 
           {!signedIn &&
-            <AuthSection title={"Account"} onSignInPress={this.onSignInPress} onRegisterPress={this.onRegisterPress} />
+            <AuthSection params={this.state.params} title={"Account"} onSignInPress={this.onSignInPress} onRegisterPress={this.onRegisterPress} />
           }
 
           <OptionsSection signedIn={signedIn} title={"Options"} onSignOutPress={this.onSignOutPress} onExportPress={this.onExportPress} />
@@ -97,7 +119,13 @@ export default class Account extends Component {
 class AuthSection extends Component {
   constructor(props) {
     super(props);
-    this.state = {email: "a@bitar.io", password: "password"};
+    this.state = props.params;
+  }
+
+  showAdvanced = () => {
+    this.setState(function(prevState){
+      return _.merge(prevState, {showAdvanced: true});
+    })
   }
 
   render() {
@@ -127,17 +155,34 @@ class AuthSection extends Component {
           />
         </SectionedTableCell>
 
+        {this.state.showAdvanced &&
+          <SectionedTableCell textInputCell={true}>
+            <TextInput
+              style={GlobalStyles.rules.sectionedTableCellTextInput}
+              placeholder={"Sync Server"}
+              onChangeText={(text) => this.setState({server: text})}
+              value={this.state.server}
+              autoCorrect={false}
+              autoCapitalize={'none'}
+              keyboardType={'url'}
+            />
+          </SectionedTableCell>
+        }
+
         <SectionedTableCell buttonCell={true}>
-          <ButtonCell title="Sign In" bold={true} onPress={() => this.props.onSignInPress(this.state.email, this.state.password)} />
+          <ButtonCell title="Sign In" bold={true} onPress={() => this.props.onSignInPress(this.state)} />
         </SectionedTableCell>
 
         <SectionedTableCell buttonCell={true}>
-          <ButtonCell title="Register" bold={true}  onPress={this.props.onRegisterPress} />
+          <ButtonCell title="Register" bold={true}  onPress={() => this.props.onRegisterPress(this.state)} />
         </SectionedTableCell>
 
-        <SectionedTableCell buttonCell={true}>
-          <ButtonCell title="Advanced Options" onPress={this.props.onRegisterPress} />
-        </SectionedTableCell>
+        {!this.state.showAdvanced &&
+          <SectionedTableCell buttonCell={true}>
+            <ButtonCell title="Advanced Options" onPress={() => this.showAdvanced()} />
+          </SectionedTableCell>
+        }
+
 
       </TableSection>
     );

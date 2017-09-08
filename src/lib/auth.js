@@ -18,7 +18,7 @@ export default class Auth {
     return this.instance;
   }
 
-  static defaultServer() {
+  static _defaultServer() {
     if(Platform.OS === "android") {
       return "http://10.0.2.2:3000/"
     } else {
@@ -45,12 +45,26 @@ export default class Auth {
     loadUser();
   }
 
-  serverUrl() {
-    return Auth.defaultServer();
+  async serverUrl() {
+    if(this.server) {
+      return this.server;
+    }
+    this.server = await Storage.getItem("server");
+    if(!this.server) {
+      this.server = Auth._defaultServer();
+    }
+    return this.server;
   }
 
-  urlForPath(path) {
-    return this.serverUrl() + path;
+  async urlForPath(path) {
+    function joinPaths(parts){
+       var separator = "/";
+       var replace = new RegExp(separator+'{1,}', 'g');
+       return parts.join(separator).replace(replace, separator);
+    }
+
+    var serverUrl = await this.serverUrl();
+    return joinPaths([serverUrl, path]);
   }
 
   offline() {
@@ -101,6 +115,8 @@ export default class Auth {
   }
 
   login = (email, inputtedPassword, server, callback) => {
+    this.server = server;
+
     var root = this;
 
     this.getAuthParams(email, function(authParams, error){
@@ -127,7 +143,8 @@ export default class Auth {
   }
 
   async performLoginRequest(email, pw, server, callback) {
-    Server.getInstance().postAbsolute(this.urlForPath("auth/sign_in"), {email: email, password: pw}, function(response){
+    var url = await this.urlForPath("auth/sign_in");
+    Server.getInstance().postAbsolute(url, {email: email, password: pw}, function(response){
       callback(response, null);
     }, function(error){
       callback(null, error.error);
@@ -160,11 +177,12 @@ export default class Auth {
     }
   }
 
-  getAuthParams(email, callback) {
-    Server.getInstance().getAbsolute(this.urlForPath("auth/params"), {email: email}, function(response){
+  async getAuthParams(email, callback) {
+    var url = await this.urlForPath("auth/params");
+    Server.getInstance().getAbsolute(url, {email: email}, function(response){
       callback(response, null);
     }, function(response){
-      console.error("Error getting auth params", response);
+      console.log("Error getting auth params", response);
       callback(null, response.error);
     })
   }
