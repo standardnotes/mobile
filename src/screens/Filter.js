@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { TextInput, SectionList, ScrollView, View, Text } from 'react-native';
+var _ = require('lodash')
 
 import Sync from '../lib/sync'
 import ModelManager from '../lib/modelManager'
+import AlertManager from '../lib/alertManager'
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
+import ManageNote from "../containers/ManageNote";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 
 import Tag from "../models/app/tag"
@@ -26,10 +29,14 @@ export default class Filter extends Component {
       selectedTags = [];
     }
 
+    if(this.props.noteId) {
+      this.note = ModelManager.getInstance().findItem(this.props.noteId);
+    }
+
     this.state = {tags: ModelManager.getInstance().tags, selectedTags: selectedTags};
 
     var leftButtons = [];
-    if(!this.props.forNoteTags) {
+    if(!this.note) {
       // tags only means we're presenting horizontally, only want left button on modal
       leftButtons.push({
         title: 'Done',
@@ -81,7 +88,7 @@ export default class Filter extends Component {
               placeholder: "New tag name",
               onSave: (text) => {
                 this.createTag(text, function(tag){
-                  if(this.props.forNoteTags) {
+                  if(this.note) {
                     // select this tag
                     this.onTagSelect(tag)
                   }
@@ -125,15 +132,58 @@ export default class Filter extends Component {
     this.props.onOptionsChange(this.options);
   }
 
+  onTagLongPress = (tag) => {
+    AlertManager.showConfirmationAlert(
+      "Delete Tag", "Long pressing on a tag presents this option. Are you sure you want to delete this tag?", "Delete",
+      function(){
+        // confirm
+        this.deleteTag(tag);
+      }.bind(this)
+    )
+  }
+
   isTagSelected(tag) {
     return this.tags.indexOf(tag.uuid) !== -1;
   }
 
   shouldDisplaySortSection() {
-    if(this.props.forNoteTags) {
+    if(this.note) {
       return false;
     }
     return true;
+  }
+
+  deleteTag = (tag) => {
+    ModelManager.getInstance().setItemToBeDeleted(tag);
+    Sync.getInstance().sync(function(){
+      this.setState(function(prevState){
+        return _.merge(prevState, {tags : prevState.tags});
+      })
+    }.bind(this));
+  }
+
+  deleteThisNote = () => {
+    ModelManager.getInstance().setItemToBeDeleted(this.note);
+    Sync.getInstance().sync();
+    this.props.navigator.popToRoot({
+      animated: true
+    });
+  }
+
+  onManageNoteEvent(event) {
+    if(event == "delete") {
+      AlertManager.showConfirmationAlert(
+        "Delete Note", "Are you sure you want to delete this note?", "Delete",
+        function(){
+          // confirm
+          this.deleteThisNote();
+        }.bind(this)
+      )
+    } else if("event" == "pin") {
+
+    } else if("event" == "archive") {
+
+    }
   }
 
   render() {
@@ -144,7 +194,18 @@ export default class Filter extends Component {
           {this.shouldDisplaySortSection() &&
             <SortSection sortBy={this.options.sortBy} onSortChange={this.onSortChange} title={"Sort By"} />
           }
-          <TagsSection tags={this.state.tags} selected={this.state.selectedTags} onTagSelect={this.onTagSelect} title={"Tags"} />
+
+          { this.note &&
+              <ManageNote title={"Manage Note"} onEvent={this.onManageNoteEvent.bind(this)}/>
+          }
+
+          <TagsSection
+            tags={this.state.tags}
+            selected={this.state.selectedTags}
+            onTagSelect={this.onTagSelect}
+            onTagLongPress={this.onTagLongPress}
+            title={"Tags"}
+           />
 
         </ScrollView>
       </View>
@@ -162,6 +223,10 @@ class TagsSection extends Component {
     this.props.onTagSelect(tag);
   }
 
+  onLongPress = (tag) => {
+    this.props.onTagLongPress(tag);
+  }
+
   render() {
     let root = this;
     return (
@@ -171,6 +236,7 @@ class TagsSection extends Component {
           return (
             <SectionedAccessoryTableCell
               onPress={() => {root.onPress(tag)}}
+              onLongPress={() => root.onLongPress(tag)}
               text={tag.title}
               key={tag.uuid}
               first={i == 0}

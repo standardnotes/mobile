@@ -22,7 +22,7 @@ export default class Account extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {params: {}};
+    this.state = {params: {email: "a@bitar.io", password: "password"}};
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
   }
 

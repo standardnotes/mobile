@@ -40,7 +40,7 @@ export default class Compose extends Component {
   }
 
   configureNavBar() {
-    var title = "Tags";
+    var title = "Options";
     if(this.note.tags.length > 0) {
       title += ` (${this.note.tags.length})`;
     }
@@ -78,7 +78,7 @@ export default class Compose extends Component {
       title: 'Options',
       animationType: 'slide-up',
       passProps: {
-        forNoteTags: true,
+        noteId: this.note.uuid,
         options: {selectedTags: this.note.tags.map(function(tag){return tag.uuid})},
         onOptionsChange: (options) => {
           var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);

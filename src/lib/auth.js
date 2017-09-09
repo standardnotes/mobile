@@ -43,6 +43,11 @@ export default class Auth {
     }
 
     loadUser();
+    this.signoutObservers = [];
+  }
+
+  onSignOut(callback) {
+    this.signoutObservers.push(callback);
   }
 
   async serverUrl() {
@@ -195,10 +200,13 @@ export default class Auth {
     ModelManager.getInstance().handleSignout();
     DBManager.clearAllItems(function(){
       Sync.getInstance().handleSignout();
+      this.signoutObservers.forEach(function(observer){
+        observer();
+      })
       if(callback) {
         callback();
       }
-    });
+    }.bind(this));
   }
 
 }

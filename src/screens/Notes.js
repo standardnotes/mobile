@@ -15,6 +15,7 @@ import {
 import ModelManager from '../lib/modelManager'
 import Storage from '../lib/storage'
 import Sync from '../lib/sync'
+import Auth from '../lib/auth'
 
 import GlobalStyles from "../Styles"
 
@@ -35,6 +36,11 @@ export default class Notes extends Component {
         this.setState({refreshing: false});
       }
     }.bind(this))
+
+    Auth.getInstance().onSignOut(function(){
+      this.options = {selectedTags: []};
+      this.loadNotes();
+    }.bind(this));
 
     this.getOptionsAndLoadNotes();
     this.configureNavBar();
