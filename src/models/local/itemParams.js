@@ -50,10 +50,6 @@ export default class ItemParams {
       }
     }
 
-    if(this.forExportFile) {
-      console.log("Saving params", params);
-    }
-
     if(this.additionalFields) {
       _.merge(params, _.pick(this.item, this.additionalFields));
     }

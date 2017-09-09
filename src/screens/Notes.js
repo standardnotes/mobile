@@ -13,7 +13,7 @@ import Abstract from "./Abstract"
 export default class Notes extends Abstract {
 
   defaultOptions() {
-    return {selectedTags: [], sortBy: "created_at", notes: ModelManager.getInstance().notes};
+    return {selectedTags: [], sortBy: "created_at"};
   }
 
   constructor(props) {
@@ -127,6 +127,8 @@ export default class Notes extends Abstract {
 
     switch(event.id) {
       case 'willAppear':
+      // required since changes can be made in composer
+      this.forceUpdate();
        if(this.loadNotesOnVisible) {
          this.loadNotesOnVisible = false;
          this.loadNotes();
@@ -278,7 +280,6 @@ export default class Notes extends Abstract {
             onSearchChange={this.onSearchTextChange}
             onSearchCancel={this.onSearchCancel}
             notes={this.notes}
-            watch={this.state.notes}
           />
         }
       </View>
