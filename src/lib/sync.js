@@ -36,22 +36,6 @@ export default class Sync {
     return await Storage.getItem("pw");
   }
 
-  async writeItemsToStorage(items, offlineOnly, callback) {
-    var version = await Auth.getInstance().protocolVersion();
-    var params = [];
-
-    for(var item of items) {
-      var itemParams = new ItemParams(item, null, version);
-      itemParams = await itemParams.paramsForLocalStorage();
-      if(offlineOnly) {
-        delete itemParams.dirty;
-      }
-      params.push(itemParams);
-    }
-
-    DBManager.saveItems(params, callback);
-  }
-
   registerSyncObserver(observer) {
     this.syncObservers.push(observer);
   }
@@ -61,9 +45,6 @@ export default class Sync {
       this.handleItemsResponse(items, null, null).then(function(mappedItems){
         Item.sortItemsByDate(mappedItems);
         callback(mappedItems);
-        this.syncObservers.forEach(function(observer){
-          observer(true);
-        })
       }.bind(this))
     }.bind(this))
   }
@@ -81,7 +62,22 @@ export default class Sync {
         callback({success: true});
       }
     }.bind(this))
+  }
 
+  async writeItemsToStorage(items, offlineOnly, callback) {
+    var version = await Auth.getInstance().protocolVersion();
+    var params = [];
+
+    for(var item of items) {
+      var itemParams = new ItemParams(item, Auth.getInstance().keys(), version);
+      itemParams = await itemParams.paramsForLocalStorage();
+      if(offlineOnly) {
+        delete itemParams.dirty;
+      }
+      params.push(itemParams);
+    }
+
+    DBManager.saveItems(params, callback);
   }
 
   markAllItemsDirtyAndSaveOffline(callback) {
@@ -215,22 +211,25 @@ export default class Sync {
       this.allRetreivedItems = [];
     }
 
-    var version = await Auth.getInstance().protocolVersion();
-    var keys = await Auth.getInstance().keys();
 
     var params = {};
     params.limit = 150;
     params.items = [];
 
-    for(var item of subItems) {
-      if(!item.uuid) {
-        console.error("Item doesn't have uuid!", item);
-        return;
+    if(subItems.length > 0) {
+      var version = await Auth.getInstance().protocolVersion();
+      var keys = Auth.getInstance().keys();
+
+      for(var item of subItems) {
+        if(!item.uuid) {
+          console.error("Item doesn't have uuid!", item);
+          return;
+        }
+        var itemParams = new ItemParams(item, keys, version);
+        itemParams.additionalFields = options.additionalFields;
+        var result = await itemParams.paramsForSync();
+        params.items.push(result);
       }
-      var itemParams = new ItemParams(item, keys, version);
-      itemParams.additionalFields = options.additionalFields;
-      var result = await itemParams.paramsForSync();
-      params.items.push(result);
     }
 
     params.sync_token = await this.getSyncToken();
@@ -321,7 +320,7 @@ export default class Sync {
   }
 
   async handleItemsResponse(responseItems, omitFields) {
-    var keys = await Auth.getInstance().keys();
+    var keys = Auth.getInstance().keys();
     await Encryptor.decryptMultipleItems(responseItems, keys);
     var items = ModelManager.getInstance().mapResponseItemsToLocalModelsOmittingFields(responseItems, omitFields);
     return items;

@@ -3,6 +3,8 @@ package com.sn_react;
 import android.app.Application;
 
 //import com.facebook.react.ReactApplication;
+import com.reactnativenavigation.NavigationReactPackage;
+import com.oblador.keychain.KeychainPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.tectiv3.aes.RCTAesPackage;
 import com.facebook.react.ReactNativeHost;
@@ -28,9 +30,11 @@ public class MainApplication extends NavigationApplication {
 
     protected List<ReactPackage> getPackages() {
       return Arrays.asList(
-              new MainReactPackage(),
+            new MainReactPackage(),
+            new NavigationReactPackage(),
+            new KeychainPackage(),
             new VectorIconsPackage(),
-              new RCTAesPackage()
+            new RCTAesPackage()
       );
     }
 

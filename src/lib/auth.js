@@ -5,6 +5,8 @@ import DBManager from './dbManager'
 import Sync from './sync'
 import ModelManager from './modelManager'
 import {Platform} from 'react-native';
+import Keychain from "./keychain"
+var _ = require('lodash')
 
 export default class Auth {
 
@@ -27,23 +29,20 @@ export default class Auth {
   }
 
   constructor() {
-    loadUser = async () => {
-      try {
-        var userData = await Storage.getItem("user");
+    this.loadUser();
+    this.signoutObservers = [];
+  }
+
+  loadUser() {
+    try {
+      Storage.getItem("user").then(function(userData){
         if(userData) {
           this.user = JSON.parse(userData);
-
-          Sync.getInstance().sync(function(){
-
-          })
         }
-      } catch(e) {
-
-      }
+      }.bind(this));
+    } catch(e) {
+      console.log("Error loading user:", e);
     }
-
-    loadUser();
-    this.signoutObservers = [];
   }
 
   onSignOut(callback) {
@@ -73,7 +72,7 @@ export default class Auth {
   }
 
   offline() {
-    return !this.user;
+    return !this.keys();
   }
 
   async savedAuthParams() {
@@ -98,24 +97,16 @@ export default class Auth {
     }
   }
 
-  async keys() {
-    if(this._keys) {
-      return this._keys;
+  async loadKeys() {
+    return Keychain.getKeys().then(function(keys){
+      this._keys = keys;
+    }.bind(this))
+  }
+
+  keys() {
+    if(!this._keys) {
+      // console.log("===Warning: Keys not loaded===")
     }
-
-    var result = await Promise.all([
-      Storage.getItem("mk"),
-      Storage.getItem("ak")
-    ]);
-
-    var mk = result[0];
-    var ak = result[1];
-
-    if(!mk) {
-      return null;
-    }
-
-    this._keys = {mk: mk, ak: ak};
     return this._keys;
   }
 
@@ -156,20 +147,13 @@ export default class Auth {
     })
   }
 
-  async saveKeys(keys) {
-    return await Promise.all([
-      Storage.setItem("pw", keys.pw),
-      Storage.setItem("mk", keys.mk),
-      Storage.setItem("ak", keys.ak)
-    ]);
-  }
-
   async saveAuthParameters(user, token, email, server, authParams, keys) {
     try {
-      await this.saveKeys(keys);
+      this._keys = keys;
       this.user = user;
 
       return await Promise.all([
+        Keychain.setKeys(_.merge(keys, {jwt: token})),
         Storage.setItem("user", JSON.stringify(user)),
         Storage.setItem("auth_params", JSON.stringify(authParams)),
         Storage.setItem("jwt", token),
@@ -197,12 +181,16 @@ export default class Auth {
     this.user = null;
     this.authParams = null;
 
+    Keychain.clearKeys();
     ModelManager.getInstance().handleSignout();
+
     DBManager.clearAllItems(function(){
       Sync.getInstance().handleSignout();
+
       this.signoutObservers.forEach(function(observer){
         observer();
       })
+
       if(callback) {
         callback();
       }

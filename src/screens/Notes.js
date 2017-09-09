@@ -18,19 +18,24 @@ import Sync from '../lib/sync'
 import Auth from '../lib/auth'
 import Icon from 'react-native-vector-icons/Ionicons';
 import GlobalStyles from "../Styles"
-
-import {iconsMap, iconsLoaded} from '../Icons';
+import Keychain from "../lib/keychain"
 import Search from 'react-native-search-box';
+import {iconsMap, iconsLoaded} from '../Icons';
 
 export default class Notes extends Component {
+
+  defaultOptions() {
+    return {selectedTags: [], sortBy: "created_at"};
+  }
 
   constructor(props) {
     super(props);
     this.state = {date: Date.now(), refreshing: false};
-    this.options = {selectedTags: []};
+    this.options = this.defaultOptions();
 
     Sync.getInstance().registerSyncObserver(function(changesMade){
       if(changesMade) {
+        console.log("===Changes Made===");
         this.loadNotes();
       } else {
         this.setState({refreshing: false});
@@ -38,23 +43,50 @@ export default class Notes extends Component {
     }.bind(this))
 
     Auth.getInstance().onSignOut(function(){
-      this.options = {selectedTags: []};
+      this.options = this.defaultOptions();
       this.loadNotes();
     }.bind(this));
 
-    this.getOptionsAndLoadNotes();
+    this.initializeOptionsAndNotes();
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     this.configureNavBar();
+
+    iconsLoaded.then(() => {
+      this.props.navigator.setTabButton({
+        tabIndex: 0,
+        icon: iconsMap['ios-menu-outline']
+      });
+      this.props.navigator.setTabButton({
+        tabIndex: 1,
+        icon: iconsMap['ios-contact-outline']
+      });
+    })
+
+    // Refresh every 30s
+    setInterval(function () {
+      // Sync.getInstance().sync(null);
+    }, 30000);
   }
 
-  getOptionsAndLoadNotes() {
-    Storage.getItem("options").then(function(result){
-      this.options = JSON.parse(result) || {selectedTags: []};
-      this.loadNotes();
+
+  initializeOptionsAndNotes() {
+    Promise.all([
+      Storage.getItem("options").then(function(result){
+        this.options = JSON.parse(result) || this.defaultOptions();
+      }.bind(this)),
+      Auth.getInstance().loadKeys()
+    ]).then(function(){
+      console.log("===Keys and options loaded===");
+      // options and keys loaded
+      Sync.getInstance().loadLocalItems(function(items) {
+        this.loadNotes();
+      }.bind(this));
+      // perform initial sync
+      Sync.getInstance().sync(null);
     }.bind(this))
   }
 
   configureNavBar() {
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
 
     var notesTitle = "Notes";
     var filterTitle = "Filter";
@@ -63,7 +95,7 @@ export default class Notes extends Component {
       filterTitle += ` (${numFilters})`
       notesTitle = "Filtered Notes";
     }
-    this.props.navigator.setTitle({title: notesTitle});
+    this.props.navigator.setTitle({title: notesTitle, animated: false});
 
     var rightButtons = [];
     if(Platform.OS == "ios") {
@@ -145,6 +177,8 @@ export default class Notes extends Component {
       this.needsLoadNotes = true;
       return;
     }
+
+    console.log("===Load Notes===");
 
     var notes;
     if(this.options.selectedTags && this.options.selectedTags.length > 0) {
@@ -271,20 +305,25 @@ export default class Notes extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View>
-          <FlatList style={{height: "100%"}}
-            refreshControl={
-              <RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={this._onRefresh.bind(this)}
-              />
-            }
-            removeClippedSubviews={false}
-            data={this.notes}
-            renderItem={this._renderItem}
-            ListHeaderComponent={this.renderHeader}
-          />
+        <View style={styles.decryptNoticeContainer}>
+          <Text style={styles.decryptNotice}>Decrypting notes...</Text>
         </View>
+        {this.notes &&
+          <View style={styles.tableContainer}>
+            <FlatList style={{height: "100%"}}
+              refreshControl={
+                <RefreshControl
+                  refreshing={this.state.refreshing}
+                  onRefresh={this._onRefresh.bind(this)}
+                />
+              }
+              removeClippedSubviews={false}
+              data={this.notes}
+              renderItem={this._renderItem}
+              ListHeaderComponent={this.renderHeader}
+            />
+          </View>
+        }
       </View>
     );
   }
@@ -374,17 +413,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
 
-  navBar: {
-    backgroundColor: "#086DD6",
-    height: 62
+  tableContainer: {
+    backgroundColor: 'white',
   },
 
-  navBarTitle: {
-    textAlign: "center",
-    color: "white",
-    fontWeight: "bold",
-    marginTop: 28,
-    fontSize: 19
+  decryptNoticeContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: -1,
+  },
+
+  decryptNotice: {
+    position: "absolute",
+    opacity: 0.5
   },
 
   noteCell: {

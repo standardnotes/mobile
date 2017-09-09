@@ -31,11 +31,3 @@ export function registerScreenVisibilityListener() {
     }
   }).register();
 }
-
-Sync.getInstance().loadLocalItems(function(items) {
-  // Initial sync is done from Auth user load constructor
-  // Refresh every 30s
-  setInterval(function () {
-    // Sync.getInstance().sync(null);
-  }, 30000);
-});
