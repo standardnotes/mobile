@@ -10,9 +10,9 @@ export default class NoteList extends Component {
     return (
       <View style={{paddingLeft: 5, paddingRight: 5, paddingTop: 5}}>
         <Search
-          onChangeText={this.onSearchTextChange}
-          onCancel={this.onSearchCancel}
-          onDelete={this.onSearchCancel}
+          onChangeText={this.props.onSearchChange}
+          onCancel={this.props.onSearchCancel}
+          onDelete={this.props.onSearchCancel}
           backgroundColor={GlobalStyles.constants.mainBackgroundColor}
           titleCancelColor={GlobalStyles.constants.mainTintColor}
         />
@@ -29,6 +29,7 @@ export default class NoteList extends Component {
       text={item.text}
       tags={item.tags}
       pinned={item.pinned}
+      deleted={item.deleted}
     />
   )
 

@@ -8,11 +8,12 @@ import GlobalStyles from "../Styles"
 import Keychain from "../lib/keychain"
 import {iconsMap, iconsLoaded} from '../Icons';
 import NoteList from "../containers/NoteList"
+import Abstract from "./Abstract"
 
-export default class Notes extends Component {
+export default class Notes extends Abstract {
 
   defaultOptions() {
-    return {selectedTags: [], sortBy: "created_at"};
+    return {selectedTags: [], sortBy: "created_at", notes: ModelManager.getInstance().notes};
   }
 
   constructor(props) {
@@ -47,8 +48,6 @@ export default class Notes extends Component {
       this.options = this.defaultOptions();
       this.loadNotes();
     }.bind(this));
-
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
   }
 
   loadTabbarIcons() {
@@ -82,6 +81,8 @@ export default class Notes extends Component {
   }
 
   configureNavBar() {
+    super.configureNavBar();
+
     var notesTitle = "Notes";
     var filterTitle = "Filter";
     var numFilters = this.options.selectedTags.length;
@@ -122,23 +123,15 @@ export default class Notes extends Component {
 
   onNavigatorEvent(event) {
 
+    super.onNavigatorEvent(event);
+
     switch(event.id) {
       case 'willAppear':
-       this.activeScreen = true;
-       this.forceUpdate();
-       this.configureNavBar();
-       if(this.needsLoadNotes) {
-         this.needsLoadNotes = false;
+       if(this.loadNotesOnVisible) {
+         this.loadNotesOnVisible = false;
          this.loadNotes();
        }
        break;
-      case 'didAppear':
-        break;
-      case 'willDisappear':
-        this.activeScreen = false;
-        break;
-      case 'didDisappear':
-        break;
       }
 
     if (event.type == 'NavBarButtonPress') {
@@ -146,7 +139,7 @@ export default class Notes extends Component {
         this.presentNewComposer();
       }
       else if (event.id == 'sideMenu') {
-        this.presentNewComposer();
+        this.presentFilterScreen();
       }
     }
   }
@@ -158,7 +151,7 @@ export default class Notes extends Component {
     });
   }
 
-  this.presentFilterScreen() {
+  presentFilterScreen() {
     this.props.navigator.showModal({
       screen: 'sn.Filter',
       title: 'Options',
@@ -174,14 +167,59 @@ export default class Notes extends Component {
 
 
   loadNotes = (reloadNavBar = true) => {
-    if(!this.activeScreen) {
-      this.needsLoadNotes = true;
+    if(!this.visible) {
+      this.loadNotesOnVisible = true;
       return;
     }
 
     console.log("===Load Notes===");
 
-    this.notes = ModelManager.getInstance().getNotes(this.options);
+    var notes;
+    if(this.options.selectedTags && this.options.selectedTags.length > 0) {
+      var tags = ModelManager.getInstance().getItemsWithIds(this.options.selectedTags);
+      if(tags.length > 0) {
+        var taggedNotes = new Set();
+        for(var tag of tags) {
+          taggedNotes = new Set([...taggedNotes, ...new Set(tag.notes)])
+        }
+        notes = Array.from(taggedNotes);
+      }
+    }
+
+    if(!notes) {
+      notes = ModelManager.getInstance().notes;
+    }
+
+    var searchTerm = this.options.searchTerm;
+    if(searchTerm) {
+      notes = notes.filter(function(note){
+        return note.safeTitle().includes(searchTerm) || note.safeText().includes(searchTerm);
+      })
+    }
+
+    var sortBy = this.options.sortBy;
+
+    notes = notes.filter(function(note){
+      if(this.options.archivedOnly) {
+        return note.archived;
+      } else {
+        return !note.archived;
+      }
+    }.bind(this))
+
+    this.notes = notes.sort(function(a, b){
+      if(a.pinned) { return -1; }
+      if(b.pinned) { return 1; }
+
+      let vector = sortBy == "title" ? -1 : 1;
+      var aValue = a[sortBy] || "";
+      var bValue = b[sortBy] || "";
+      if(aValue > bValue) { return -1 * vector;}
+      else if(aValue < bValue) { return 1 * vector;}
+      return 0;
+    })
+
+    this.reloadList();
 
     this.reloadList();
     // this function may be triggled asyncrounsly even when on a different screen
@@ -233,7 +271,15 @@ export default class Notes extends Component {
           <Text style={styles.decryptNotice}>Decrypting notes...</Text>
         </View>
         {this.notes &&
-          <NoteList onRefresh={this._onRefresh.bind(this)} onPressItem={this._onPressItem} refreshing={this.state.refreshing} notes={this.notes} />
+          <NoteList
+            onRefresh={this._onRefresh.bind(this)}
+            onPressItem={this._onPressItem}
+            refreshing={this.state.refreshing}
+            onSearchChange={this.onSearchTextChange}
+            onSearchCancel={this.onSearchCancel}
+            notes={this.notes}
+            watch={this.state.notes}
+          />
         }
       </View>
     );

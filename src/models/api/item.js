@@ -7,6 +7,7 @@ let AppDomain = "org.standardnotes.sn";
 export default class Item {
 
   constructor(json_obj) {
+    this.appData = {};
     this.updateFromJSON(json_obj);
     this.observers = [];
   }

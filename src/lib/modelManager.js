@@ -317,7 +317,7 @@ export default class ModelManager {
   getNotes(options = {}) {
     var notes;
     if(options.selectedTags && options.selectedTags.length > 0) {
-      var tags = ModelManager.getInstance().getItemsWithIds(this.selectedTags);
+      var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
       if(tags.length > 0) {
         var taggedNotes = new Set();
         for(var tag of tags) {
@@ -346,7 +346,7 @@ export default class ModelManager {
       } else {
         return !note.archived;
       }
-    }.bind(this))
+    })
 
     notes = notes.sort(function(a, b){
       if(a.pinned) { return -1; }
