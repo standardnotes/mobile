@@ -56,7 +56,6 @@ export default class Filter extends Component {
   }
 
   onNavigatorEvent(event) {
-    // console.log("Navigator event", event);
     switch(event.id) {
       case 'willAppear':
        this.forceUpdate();
@@ -156,31 +155,15 @@ export default class Filter extends Component {
 class TagsSection extends Component {
   constructor(props) {
     super(props);
+    this.state = {selected: props.selected};
   }
 
   onPress = (tag) => {
-    // this.setState(function(prevState){
-      this.props.onTagSelect(tag);
-      this.forceUpdate();
-      // this.setState(function(prevState){
-      //   return Object.assign({tags: this.props.tags, selected: this.props.selected});
-      // }.bind(this))
-      // return state;
-    // }.bind(this))
-  }
-
-  accessoryForTag(tag) {
-
-    if(this.props.selected.includes(tag.uuid)) {
-      return "chosen";
-    } else {
-      return "not-chosen";
-    }
+    this.props.onTagSelect(tag);
   }
 
   render() {
     let root = this;
-    console.log("Rendering tags with selected", this.props.selected);
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
@@ -190,9 +173,8 @@ class TagsSection extends Component {
               onPress={() => {root.onPress(tag)}}
               text={tag.title}
               key={tag.uuid}
-              selected={root.props.selected.includes(tag.uuid)}
               first={i == 0}
-              accessory={root.accessoryForTag(tag)}
+              selected={() => {return root.state.selected.includes(tag.uuid)}}
               buttonCell={true}
             />
           )
@@ -240,7 +222,7 @@ class SortSection extends Component {
               text={option.label}
               key={option.key}
               first={i == 0}
-              accessory={root.accessoryForKey(option.key)}
+              selected={() => {option.key == root.state.sortBy}}
               buttonCell={true}
             />
           )

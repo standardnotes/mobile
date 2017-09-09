@@ -88,11 +88,61 @@ export default class Notes extends Component {
     });
   }
 
+  onNavigatorEvent(event) {
+
+    switch(event.id) {
+      case 'willAppear':
+       this.activeScreen = true;
+       this.forceUpdate();
+       this.configureNavBar();
+       if(this.needsLoadNotes) {
+         this.needsLoadNotes = false;
+         this.loadNotes();
+       }
+       break;
+      case 'didAppear':
+        break;
+      case 'willDisappear':
+        this.activeScreen = false;
+        break;
+      case 'didDisappear':
+        break;
+      }
+
+    if (event.type == 'NavBarButtonPress') {
+      if (event.id == 'new') {
+        this.props.navigator.push({
+          screen: 'sn.Compose',
+          title: 'Compose',
+        });
+      }
+
+      else if (event.id == 'sideMenu') {
+        this.props.navigator.showModal({
+          screen: 'sn.Filter',
+          title: 'Options',
+          animationType: 'slide-up',
+          passProps: {
+            options: this.options,
+            onOptionsChange: (options) => {
+              this.setOptions(options);
+            }
+          }
+        });
+      }
+    }
+  }
+
+
   loadNotes = (reloadNavBar = true) => {
+    if(!this.activeScreen) {
+      this.needsLoadNotes = true;
+      return;
+    }
+
     var notes;
     if(this.options.selectedTags && this.options.selectedTags.length > 0) {
       var tags = ModelManager.getInstance().getItemsWithIds(this.options.selectedTags);
-      console.log("Found tags", tags);
       if(tags.length > 0) {
         var taggedNotes = new Set();
         for(var tag of tags) {
@@ -135,47 +185,6 @@ export default class Notes extends Component {
     this.setState((prevState, props) => {
       return {date: Date.now(), refreshing: false};
     });
-  }
-
-  onNavigatorEvent(event) {
-
-    switch(event.id) {
-      case 'willAppear':
-       this.forceUpdate();
-       break;
-      case 'didAppear':
-        this.activeScreen = true;
-        break;
-      case 'willDisappear':
-        this.activeScreen = false;
-        break;
-      case 'didDisappear':
-        break;
-      }
-
-    if (event.type == 'NavBarButtonPress') {
-      if (event.id == 'new') {
-        this.props.navigator.push({
-          screen: 'sn.Compose',
-          title: 'Compose',
-        });
-      }
-
-      else if (event.id == 'sideMenu') {
-        this.props.navigator.showModal({
-          screen: 'sn.Filter',
-          title: 'Options',
-          animationType: 'slide-up',
-          passProps: {
-            options: this.options,
-            onOptionsChange: (options) => {
-              this.setOptions(options);
-              console.log("Options changed", options);
-            }
-          }
-        });
-      }
-    }
   }
 
   setOptions(options) {
@@ -268,7 +277,6 @@ class NoteCell extends React.PureComponent {
   }
 
   _onPress = () => {
-    console.log("On press");
     this.setState({selected: true});
     this.props.onPressItem(this.props.item);
     this.setState({selected: false});

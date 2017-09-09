@@ -34,7 +34,6 @@ iconsLoaded.then(() => {
 });
 
 function startApp() {
-  console.log("Icons loaded");
   const tabs = [{
     label: 'Notes',
     screen: 'sn.Notes',

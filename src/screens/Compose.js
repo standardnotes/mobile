@@ -73,7 +73,6 @@ export default class Compose extends Component {
   }
 
   showTags() {
-    console.log("Showing tags for note", this.note)
     this.props.navigator.push({
       screen: 'sn.Filter',
       title: 'Options',
@@ -170,7 +169,6 @@ export default class Compose extends Component {
   }
 
   setNavBarSubtitle(title) {
-    console.log("setting subtitle", title);
     this.props.navigator.setSubTitle({
       subtitle: title
     });

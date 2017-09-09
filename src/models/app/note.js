@@ -45,7 +45,6 @@ export default class Note extends Item {
   }
 
   removeItemAsRelationship(item) {
-    console.error("Removing item as relationship", item);
     if(item.content_type == "Tag") {
       _.pull(this.tags, item);
     }
@@ -53,7 +52,6 @@ export default class Note extends Item {
   }
 
   removeAllRelationships() {
-    console.error("Removing all tags");
     this.tags.forEach(function(tag){
       _.pull(tag.notes, this);
       tag.setDirty(true);

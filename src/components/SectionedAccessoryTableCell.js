@@ -13,16 +13,17 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
   }
 
   iconName() {
-    return {
-      "chosen" : "ios-checkmark-circle",
-      "not-choosen" : "ios-radio-button-off",
-      "selected" : "ios-checkmark-circle"
-    }[this.props.accessory]
+    return this.props.selected() ? "ios-checkmark-circle" : "ios-radio-button-off";
+  }
+
+  onPress = () => {
+    this.props.onPress();
+    this.forceUpdate();
   }
 
   render() {
     return (
-      <TouchableHighlight onPress={this.props.onPress}>
+      <TouchableHighlight onPress={this.onPress}>
         <View style={this.rules()}>
           <Text style={GlobalStyles.rules.sectionedAccessoryTableCellLabel}>{this.props.text}</Text>
           <View style={{position: "absolute", right: GlobalStyles.constants.sectionedCellHorizontalPadding, top: 6}}>
