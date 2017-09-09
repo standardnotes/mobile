@@ -341,6 +341,9 @@ export default class ModelManager {
     var sortBy = options.sortBy;
 
     notes = notes.filter(function(note){
+      if(note.deleted) {
+        return false;
+      }
       if(options.archivedOnly) {
         return note.archived;
       } else {

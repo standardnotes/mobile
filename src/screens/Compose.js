@@ -179,6 +179,7 @@ export default class Compose extends Component {
   }
 
   render() {
+    console.log("ehe", styles.noteTitle.height);
     return (
       <View style={styles.container}>
         <TextInput
@@ -190,7 +191,8 @@ export default class Compose extends Component {
           underlineColorAndroid={'transparent'}
         />
 
-        <ScrollView keyboardDismissMode={'interactive'}>
+        <KeyboardAvoidingView style={{flexGrow: 1}} keyboardVerticalOffset={rawStyles.noteTitle.height + rawStyles.noteText.paddingTop} behavior={'padding'}>
+        <ScrollView style={styles.textContainer} contentContainerStyle={styles.contentContainer} keyboardDismissMode={'interactive'}>
           <TextInput
               style={styles.noteText}
               onChangeText={this.onTextChange}
@@ -203,6 +205,7 @@ export default class Compose extends Component {
             >
             </TextInput>
           </ScrollView>
+          </KeyboardAvoidingView>
 
       </View>
     );
@@ -211,7 +214,7 @@ export default class Compose extends Component {
 
 let PaddingLeft = 14;
 
-const styles = StyleSheet.create({
+const rawStyles = {
   container: {
     flex: 1,
     backgroundColor: 'white',
@@ -231,18 +234,29 @@ const styles = StyleSheet.create({
     paddingRight: PaddingLeft,
   },
 
+  textContainer: {
+    flexGrow: 1,
+    flex: 1,
+  },
+
+  contentContainer: {
+    flexGrow: 1
+  },
+
   noteText: {
+    height: "100%",
+    flexGrow: 1,
     fontSize: 17,
     marginTop: 0,
     paddingTop: 10,
+    paddingBottom: 10,
     color: "black",
     paddingLeft: PaddingLeft,
     paddingRight: PaddingLeft,
-    flexGrow: 1,
     textAlignVertical: 'top',
     paddingVertical: 0,
-    lineHeight: 22
+    lineHeight: 22,
   },
+}
 
-
-});
+const styles = StyleSheet.create(rawStyles);

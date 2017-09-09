@@ -10,12 +10,12 @@ import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import ManageNote from "../containers/ManageNote";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
-
+import Abstract from "./Abstract"
 import Tag from "../models/app/tag"
 
 import GlobalStyles from "../Styles"
 
-export default class Filter extends Component {
+export default class Filter extends Abstract {
 
   constructor(props) {
     super(props);
@@ -34,6 +34,12 @@ export default class Filter extends Component {
     }
 
     this.state = {tags: ModelManager.getInstance().tags, selectedTags: selectedTags};
+
+    this.configureNavBar();
+  }
+
+  configureNavBar() {
+    super.configureNavBar();
 
     var leftButtons = [];
     if(!this.note) {
@@ -63,16 +69,13 @@ export default class Filter extends Component {
   }
 
   onNavigatorEvent(event) {
+
+    super.onNavigatorEvent(event);
+
     switch(event.id) {
       case 'willAppear':
        this.forceUpdate();
        break;
-      case 'didAppear':
-        break;
-      case 'willDisappear':
-        break;
-      case 'didDisappear':
-        break;
       }
 
       if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
@@ -133,6 +136,9 @@ export default class Filter extends Component {
   }
 
   onTagLongPress = (tag) => {
+    if(this.willBeVisible == false) {
+      return;
+    }
     AlertManager.showConfirmationAlert(
       "Delete Tag", "Long pressing on a tag presents this option. Are you sure you want to delete this tag?", "Delete",
       function(){
@@ -163,18 +169,17 @@ export default class Filter extends Component {
           ModelManager.getInstance().setItemToBeDeleted(this.note);
           Sync.getInstance().sync();
           this.props.navigator.popToRoot({
-            animated: true
+            animated: true,
+             animationType: 'fade'
           });
         }.bind(this)
       )
     } else if(event == "pin" || event == "unpin") {
       this.note.setAppDataItem("pinned", event == "pin");
       this.note.setDirty(true);
-      Sync.getInstance().sync();
     } else if(event == "archive" || event == "unarchive") {
       this.note.setAppDataItem("archived", event == "archive");
       this.note.setDirty(true);
-      Sync.getInstance().sync();
     } else if(event == "share") {
 
     }
@@ -266,7 +271,6 @@ class OptionsSection extends Component {
       var state = prevState;
       state.options.archivedOnly = !state.options.archivedOnly;
       this.props.onOptionsChange(state.options);
-      console.log("Options change", state.options);
       return state;
     }.bind(this))
   }

@@ -45,6 +45,10 @@ export default class NoteCell extends React.PureComponent {
        <TouchableWithoutFeedback onPress={this._onPress} onPressIn={this._onPressIn} onPressOut={this._onPressOut}>
         <View style={this.aggregateStyles(styles.noteCell, styles.noteCellSelected, this.state.selected)} onPress={this._onPress}>
 
+          {note.deleted &&
+            <Text style={styles.deleting}>Deleting...</Text>
+          }
+
           {note.pinned &&
             <View style={styles.pinnedView}>
               <Icon name={"ios-bookmark"} size={14} color={GlobalStyles.constants.mainTintColor} />
@@ -54,11 +58,15 @@ export default class NoteCell extends React.PureComponent {
 
           {note.tags.length > 0 &&
             <View style={styles.noteTags}>
+              <Text numberOfLines={1} style={this.aggregateStyles(styles.noteTag)}>
               {note.tags.map(function(tag, i){
-                return (
-                  <Text key={tag.uuid} numberOfLines={1} style={this.aggregateStyles(styles.noteTag)}>{"#" + tag.title}</Text>
-                )
-              }.bind(this))}
+                var text = "#" + tag.title;
+                if(i != note.tags.length - 1) {
+                  text += " ";
+                }
+                return text;
+              })}
+              </Text>
             </View>
           }
 
@@ -141,12 +149,9 @@ const styles = StyleSheet.create({
     opacity: 0.5
   },
 
+  deleting: {
+    color: GlobalStyles.constants.mainTintColor,
+    marginBottom: 5,
 
-  noteTitleSelected: {
-
-  },
-
-  noteTextSelected: {
-
-  },
+  }
 });

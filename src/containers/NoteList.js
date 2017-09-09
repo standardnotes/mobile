@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, FlatList, RefreshControl } from 'react-native';
+import { StyleSheet, View, FlatList, RefreshControl, ScrollView } from 'react-native';
 import NoteCell from "./NoteCell"
 import Search from 'react-native-search-box'
 import GlobalStyles from "../Styles"
@@ -15,6 +15,7 @@ export default class NoteList extends Component {
           onDelete={this.props.onSearchCancel}
           backgroundColor={GlobalStyles.constants.mainBackgroundColor}
           titleCancelColor={GlobalStyles.constants.mainTintColor}
+          keyboardDismissMode={'interactive'}
         />
       </View>
     );
@@ -37,6 +38,7 @@ export default class NoteList extends Component {
     return (
       <View style={styles.tableContainer}>
         <FlatList style={{height: "100%"}}
+          keyboardDismissMode={'interactive'} 
           refreshControl={
             <RefreshControl
               refreshing={this.props.refreshing}

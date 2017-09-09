@@ -80,6 +80,25 @@ export default class Notes extends Abstract {
     }.bind(this))
   }
 
+  loadNotes = (reloadNavBar = true) => {
+    if(!this.visible && !this.willBeVisible) {
+      console.log("===Scheduling Load Notes===");
+      this.loadNotesOnVisible = true;
+      return;
+    }
+
+    console.log("===Load Notes===");
+
+    this.notes = ModelManager.getInstance().getNotes(this.options);
+
+    this.reloadList();
+    // this function may be triggled asyncrounsly even when on a different screen
+    // we dont want to update the nav bar unless we are the present screen
+    if(reloadNavBar && this.visible) {
+      this.configureNavBar();
+    }
+  }
+
   configureNavBar() {
     super.configureNavBar();
 
@@ -90,6 +109,16 @@ export default class Notes extends Abstract {
       filterTitle += ` (${numFilters})`
       notesTitle = "Filtered Notes";
     }
+
+    if(notesTitle === this.notesTitle || filterTitle === this.filterTitle) {
+      // no changes, return. We do this so when swiping back from compose to here,
+      // we don't change the title while a transition is taking place
+      return;
+    }
+
+    this.notesTitle = notesTitle;
+    this.filterTitle = filterTitle;
+
     this.props.navigator.setTitle({title: notesTitle, animated: false});
 
     var rightButtons = [];
@@ -125,16 +154,15 @@ export default class Notes extends Abstract {
 
     super.onNavigatorEvent(event);
 
-    switch(event.id) {
-      case 'willAppear':
-      // required since changes can be made in composer
-      this.forceUpdate();
-       if(this.loadNotesOnVisible) {
-         this.loadNotesOnVisible = false;
-         this.loadNotes();
-       }
-       break;
+    if(event.id == "willAppear" || event.id == "didAppear") {
+      if(event.id == "willAppear") {
+        this.forceUpdate();
       }
+      if(this.loadNotesOnVisible) {
+        this.loadNotesOnVisible = false;
+        this.loadNotes();
+      }
+    }
 
     if (event.type == 'NavBarButtonPress') {
       if (event.id == 'new') {
@@ -165,70 +193,6 @@ export default class Notes extends Abstract {
         }
       }
     });
-  }
-
-
-  loadNotes = (reloadNavBar = true) => {
-    if(!this.visible) {
-      this.loadNotesOnVisible = true;
-      return;
-    }
-
-    console.log("===Load Notes===");
-
-    var notes;
-    if(this.options.selectedTags && this.options.selectedTags.length > 0) {
-      var tags = ModelManager.getInstance().getItemsWithIds(this.options.selectedTags);
-      if(tags.length > 0) {
-        var taggedNotes = new Set();
-        for(var tag of tags) {
-          taggedNotes = new Set([...taggedNotes, ...new Set(tag.notes)])
-        }
-        notes = Array.from(taggedNotes);
-      }
-    }
-
-    if(!notes) {
-      notes = ModelManager.getInstance().notes;
-    }
-
-    var searchTerm = this.options.searchTerm;
-    if(searchTerm) {
-      notes = notes.filter(function(note){
-        return note.safeTitle().includes(searchTerm) || note.safeText().includes(searchTerm);
-      })
-    }
-
-    var sortBy = this.options.sortBy;
-
-    notes = notes.filter(function(note){
-      if(this.options.archivedOnly) {
-        return note.archived;
-      } else {
-        return !note.archived;
-      }
-    }.bind(this))
-
-    this.notes = notes.sort(function(a, b){
-      if(a.pinned) { return -1; }
-      if(b.pinned) { return 1; }
-
-      let vector = sortBy == "title" ? -1 : 1;
-      var aValue = a[sortBy] || "";
-      var bValue = b[sortBy] || "";
-      if(aValue > bValue) { return -1 * vector;}
-      else if(aValue < bValue) { return 1 * vector;}
-      return 0;
-    })
-
-    this.reloadList();
-
-    this.reloadList();
-    // this function may be triggled asyncrounsly even when on a different screen
-    // we dont want to update the nav bar unless we are the present screen
-    if(reloadNavBar && this.activeScreen) {
-      this.configureNavBar();
-    }
   }
 
   reloadList() {
