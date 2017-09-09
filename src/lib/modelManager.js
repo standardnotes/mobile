@@ -314,23 +314,52 @@ export default class ModelManager {
     DBManager.deleteItem(item, callback);
   }
 
-  /*
-  Relationships
-  */
+  getNotes(options = {}) {
+    var notes;
+    if(options.selectedTags && options.selectedTags.length > 0) {
+      var tags = ModelManager.getInstance().getItemsWithIds(this.selectedTags);
+      if(tags.length > 0) {
+        var taggedNotes = new Set();
+        for(var tag of tags) {
+          taggedNotes = new Set([...taggedNotes, ...new Set(tag.notes)])
+        }
+        notes = Array.from(taggedNotes);
+      }
+    }
 
-  createRelationshipBetweenItems(itemOne, itemTwo) {
-    itemOne.addItemAsRelationship(itemTwo);
-    itemTwo.addItemAsRelationship(itemOne);
+    if(!notes) {
+      notes = this.notes;
+    }
 
-    itemOne.setDirty(true);
-    itemTwo.setDirty(true);
-  }
+    var searchTerm = options.searchTerm;
+    if(searchTerm) {
+      notes = notes.filter(function(note){
+        return note.safeTitle().includes(searchTerm) || note.safeText().includes(searchTerm);
+      })
+    }
 
-  removeRelationshipBetweenItems(itemOne, itemTwo) {
-    itemOne.removeItemAsRelationship(itemTwo);
-    itemTwo.removeItemAsRelationship(itemOne);
+    var sortBy = options.sortBy;
 
-    itemOne.setDirty(true);
-    itemTwo.setDirty(true);
+    notes = notes.filter(function(note){
+      if(options.archivedOnly) {
+        return note.archived;
+      } else {
+        return !note.archived;
+      }
+    }.bind(this))
+
+    notes = notes.sort(function(a, b){
+      if(a.pinned) { return -1; }
+      if(b.pinned) { return 1; }
+
+      let vector = sortBy == "title" ? -1 : 1;
+      var aValue = a[sortBy] || "";
+      var bValue = b[sortBy] || "";
+      if(aValue > bValue) { return -1 * vector;}
+      else if(aValue < bValue) { return 1 * vector;}
+      return 0;
+    })
+
+    return notes;
   }
 }
