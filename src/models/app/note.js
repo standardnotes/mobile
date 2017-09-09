@@ -94,6 +94,8 @@ export default class Note extends Item {
     for(var oldTag of this.tags) {
       if(!newTags.includes(oldTag)) {
         oldTag.setDirty(true);
+        this.removeItemAsRelationship(oldTag);
+        oldTag.removeItemAsRelationship(this);
       }
     }
 
@@ -123,5 +125,13 @@ export default class Note extends Item {
 
   get content_type() {
     return "Note";
+  }
+
+  get pinned() {
+    return this.getAppDataItem("pinned");
+  }
+
+  get archived() {
+    return this.getAppDataItem("archived");
   }
 }

@@ -48,7 +48,9 @@ export default class ItemParams {
         params.enc_item_key = null;
         params.auth_hash = null;
       }
+      console.log("Saving local params", params);
     }
+
 
     if(this.additionalFields) {
       _.merge(params, _.pick(this.item, this.additionalFields));

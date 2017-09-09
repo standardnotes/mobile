@@ -16,7 +16,7 @@ import ModelManager from '../lib/modelManager'
 import Storage from '../lib/storage'
 import Sync from '../lib/sync'
 import Auth from '../lib/auth'
-
+import Icon from 'react-native-vector-icons/Ionicons';
 import GlobalStyles from "../Styles"
 
 import {iconsMap, iconsLoaded} from '../Icons';
@@ -59,7 +59,7 @@ export default class Notes extends Component {
     var notesTitle = "Notes";
     var filterTitle = "Filter";
     var numFilters = this.options.selectedTags.length;
-    if(numFilters > 0) {
+    if(numFilters > 0 || this.options.archivedOnly) {
       filterTitle += ` (${numFilters})`
       notesTitle = "Filtered Notes";
     }
@@ -170,7 +170,19 @@ export default class Notes extends Component {
     }
 
     var sortBy = this.options.sortBy;
+
+    notes = notes.filter(function(note){
+      if(this.options.archivedOnly) {
+        return note.archived;
+      } else {
+        return !note.archived;
+      }
+    }.bind(this))
+
     this.notes = notes.sort(function(a, b){
+      if(a.pinned) { return -1; }
+      if(b.pinned) { return 1; }
+
       let vector = sortBy == "title" ? -1 : 1;
       var aValue = a[sortBy] || "";
       var bValue = b[sortBy] || "";
@@ -220,16 +232,6 @@ export default class Notes extends Component {
     });
   }
 
-  // must pass title and text as props so that it re-renders when either of those change
-  _renderItem = ({item}) => (
-    <NoteCell
-      item={item}
-      onPressItem={this._onPressItem}
-      title={item.title}
-      text={item.text}
-    />
-  )
-
   onSearchTextChange = (text) => {
     this.options.searchTerm = text;
     this.loadNotes(false);
@@ -253,6 +255,18 @@ export default class Notes extends Component {
       </View>
     );
   };
+
+  // must pass title, text, and tags as props so that it re-renders when either of those change
+  _renderItem = ({item}) => (
+    <NoteCell
+      item={item}
+      onPressItem={this._onPressItem}
+      title={item.title}
+      text={item.text}
+      tags={item.tags}
+      pinned={item.pinned}
+    />
+  )
 
   render() {
     return (
@@ -313,23 +327,45 @@ class NoteCell extends React.PureComponent {
   }
 
   render() {
+    var note = this.props.item;
     return (
        <TouchableWithoutFeedback onPress={this._onPress} onPressIn={this._onPressIn} onPressOut={this._onPressOut}>
         <View style={this.aggregateStyles(styles.noteCell, styles.noteCellSelected, this.state.selected)} onPress={this._onPress}>
 
-          {this.props.item.safeTitle().length > 0 &&
-            <Text style={this.aggregateStyles(styles.noteTitle, styles.noteTitleSelected, this.state.selected)}>{this.props.item.title}</Text>
+          {note.pinned &&
+            <View style={styles.pinnedView}>
+              <Icon name={"ios-bookmark"} size={14} color={GlobalStyles.constants.mainTintColor} />
+              <Text style={styles.pinnedText}>Pinned</Text>
+            </View>
           }
 
-          {this.props.item.safeText().length > 0 &&
-            <Text numberOfLines={2} style={this.aggregateStyles(styles.noteText, styles.noteTextSelected, this.state.selected)}>{this.props.item.text}</Text>
+          {note.tags.length > 0 &&
+            <View style={styles.noteTags}>
+              {note.tags.map(function(tag, i){
+                return (
+                  <Text key={tag.uuid} numberOfLines={1} style={this.aggregateStyles(styles.noteTag)}>{"#" + tag.title}</Text>
+                )
+              }.bind(this))}
+            </View>
           }
+
+          {note.safeTitle().length > 0 &&
+            <Text style={this.aggregateStyles(styles.noteTitle, styles.noteTitleSelected, this.state.selected)}>{note.title}</Text>
+          }
+
+          {note.safeText().length > 0 &&
+            <Text numberOfLines={2} style={this.aggregateStyles(styles.noteText, styles.noteTextSelected, this.state.selected)}>{note.text}</Text>
+          }
+
+          <Text numberOfLines={1} style={this.aggregateStyles(styles.noteDate, styles.noteDateSelected, this.state.selected)}>{note.createdAt()}</Text>
 
         </View>
       </TouchableWithoutFeedback>
     )
   }
 }
+
+let Padding = 14;
 
 
 const styles = StyleSheet.create({
@@ -352,14 +388,41 @@ const styles = StyleSheet.create({
   },
 
   noteCell: {
-    padding: 14,
-    paddingRight: 28,
+    padding: Padding,
+    paddingRight: Padding * 2,
     borderBottomColor: GlobalStyles.constants.plainCellBorderColor,
-    borderBottomWidth: 1,
+    borderBottomWidth: 1
   },
 
   noteCellSelected: {
     backgroundColor: "#efefef",
+  },
+
+  noteTags: {
+    flex: 1,
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+
+
+  pinnedView: {
+    flex: 1,
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+
+  pinnedText: {
+    color: GlobalStyles.constants.mainTintColor,
+    marginLeft: 8,
+    fontWeight: "bold",
+    fontSize: 12
+  },
+
+  noteTag: {
+    marginRight: 2,
+    fontSize: 12,
+    color: "black",
+    opacity: 0.5,
   },
 
   noteTitle: {
@@ -368,14 +431,24 @@ const styles = StyleSheet.create({
     color: "black"
   },
 
-  noteTitleSelected: {
-
-  },
 
   noteText: {
     fontSize: 15,
-    marginTop: 5,
+    marginTop: 4,
     color: "black"
+  },
+
+
+  noteDate: {
+    marginTop: 5,
+    fontSize: 12,
+    color: "black",
+    opacity: 0.5
+  },
+
+
+  noteTitleSelected: {
+
   },
 
   noteTextSelected: {

@@ -2,6 +2,8 @@ import Crypto from "../../lib/crypto"
 
 var _ = require('lodash')
 
+let AppDomain = "org.standardnotes.sn";
+
 export default class Item {
 
   constructor(json_obj) {
@@ -92,7 +94,10 @@ export default class Item {
   }
 
   mapContentToLocalProperties(contentObj) {
-
+    this.appData = contentObj.appData;
+    if(!this.appData) {
+      this.appData = {};
+    }
   }
 
   createContentJSONFromProperties() {
@@ -104,7 +109,10 @@ export default class Item {
   }
 
   structureParams() {
-    return {references: this.referenceParams()}
+    return {
+      references: this.referenceParams(),
+      appData: this.appData
+    }
   }
 
   addItemAsRelationship(item) {
@@ -145,7 +153,36 @@ export default class Item {
     return [];
   }
 
+  createdAt() {
+    var date = this.created_at;
+    var string = date.toLocaleDateString() + ", " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    return string;
+  }
+
   doNotEncrypt() {
     return false;
+  }
+
+  /*
+  App Data
+  */
+
+  setAppDataItem(key, value) {
+    var data = this.appData[AppDomain];
+    if(!data) {
+      data = {}
+    }
+    data[key] = value;
+    this.appData[AppDomain] = data;
+  }
+
+  getAppDataItem(key) {
+    var data = this.appData[AppDomain];
+    if(data) {
+      return data[key];
+    } else {
+      return null;
+    }
   }
 }

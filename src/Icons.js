@@ -3,7 +3,7 @@ const Ionicons = require('react-native-vector-icons/Ionicons');
 const icons = {
   "ios-menu-outline": [Ionicons, 25, '#FFFFFF'],
   "ios-contact-outline": [Ionicons, 25, '#FFFFFF'],
-  "md-add" : [Ionicons, 25, '#FFFFFF'],
+  "md-add" : [Ionicons, 25, '#FFFFFF']
 };
 
 let iconsMap = {};

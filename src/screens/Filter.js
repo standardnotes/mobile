@@ -146,13 +146,6 @@ export default class Filter extends Component {
     return this.tags.indexOf(tag.uuid) !== -1;
   }
 
-  shouldDisplaySortSection() {
-    if(this.note) {
-      return false;
-    }
-    return true;
-  }
-
   deleteTag = (tag) => {
     ModelManager.getInstance().setItemToBeDeleted(tag);
     Sync.getInstance().sync(function(){
@@ -162,41 +155,51 @@ export default class Filter extends Component {
     }.bind(this));
   }
 
-  deleteThisNote = () => {
-    ModelManager.getInstance().setItemToBeDeleted(this.note);
-    Sync.getInstance().sync();
-    this.props.navigator.popToRoot({
-      animated: true
-    });
-  }
-
   onManageNoteEvent(event) {
     if(event == "delete") {
       AlertManager.showConfirmationAlert(
         "Delete Note", "Are you sure you want to delete this note?", "Delete",
         function(){
-          // confirm
-          this.deleteThisNote();
+          ModelManager.getInstance().setItemToBeDeleted(this.note);
+          Sync.getInstance().sync();
+          this.props.navigator.popToRoot({
+            animated: true
+          });
         }.bind(this)
       )
-    } else if("event" == "pin") {
-
-    } else if("event" == "archive") {
+    } else if(event == "pin" || event == "unpin") {
+      this.note.setAppDataItem("pinned", event == "pin");
+      this.note.setDirty(true);
+      Sync.getInstance().sync();
+    } else if(event == "archive" || event == "unarchive") {
+      this.note.setAppDataItem("archived", event == "archive");
+      this.note.setDirty(true);
+      Sync.getInstance().sync();
+    } else if(event == "share") {
 
     }
   }
 
-  render() {
+  onOptionsChange = (options) => {
+    _.merge(this.options, options);
+    this.props.onOptionsChange(this.options);
+  }
 
+  render() {
     return (
       <View style={GlobalStyles.rules.container}>
         <ScrollView>
-          {this.shouldDisplaySortSection() &&
+
+          {!this.note &&
             <SortSection sortBy={this.options.sortBy} onSortChange={this.onSortChange} title={"Sort By"} />
           }
 
+          {!this.note &&
+            <OptionsSection options={this.options} onOptionsChange={this.onOptionsChange} title={"Options"} />
+          }
+
           { this.note &&
-              <ManageNote title={"Manage Note"} onEvent={this.onManageNoteEvent.bind(this)}/>
+              <ManageNote note={this.note} title={"Manage Note"} onEvent={this.onManageNoteEvent.bind(this)}/>
           }
 
           <TagsSection
@@ -252,6 +255,41 @@ class TagsSection extends Component {
   }
 }
 
+class OptionsSection extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {options: props.options}
+  }
+
+  onPressArchive = () => {
+    this.setState(function(prevState){
+      var state = prevState;
+      state.options.archivedOnly = !state.options.archivedOnly;
+      this.props.onOptionsChange(state.options);
+      console.log("Options change", state.options);
+      return state;
+    }.bind(this))
+  }
+
+  render() {
+    let root = this;
+    return (
+      <TableSection>
+        <SectionHeader title={this.props.title} />
+
+        <SectionedAccessoryTableCell
+          onPress={root.onPressArchive}
+          text={"Show only archived notes"}
+          first={true}
+          selected={() => {return root.state.options.archivedOnly}}
+          buttonCell={true}
+        />
+
+      </TableSection>
+    );
+  }
+}
+
 class SortSection extends Component {
   constructor(props) {
     super(props);
@@ -268,14 +306,6 @@ class SortSection extends Component {
     this.props.onSortChange(key);
   }
 
-  accessoryForKey(key) {
-    if(key == this.state.sortBy) {
-      return "chosen";
-    } else {
-      return "not-chosen";
-    }
-  }
-
   render() {
     let root = this;
     return (
@@ -288,7 +318,7 @@ class SortSection extends Component {
               text={option.label}
               key={option.key}
               first={i == 0}
-              selected={() => {option.key == root.state.sortBy}}
+              selected={() => {return option.key == root.state.sortBy}}
               buttonCell={true}
             />
           )
