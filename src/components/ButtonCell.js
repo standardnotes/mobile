@@ -9,12 +9,13 @@ export default class ButtonCell extends Component {
     var rules = [GlobalStyles.rules.buttonCellButton];
     if(this.props.leftAligned) { rules.push(GlobalStyles.rules.buttonCellButtonLeft) }
     if(this.props.bold) { rules.push(GlobalStyles.rules.bold) }
+    if(this.props.disabled) { rules.push({color: "gray", opacity: 0.6}) }
     return rules;
   }
 
   render() {
     return (
-        <TouchableOpacity onPress={this.props.onPress}>
+        <TouchableOpacity disabled={this.props.disabled} onPress={this.props.onPress}>
           <Text style={this.rules()}>{this.props.title}</Text>
         </TouchableOpacity>
     )

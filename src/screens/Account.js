@@ -16,7 +16,8 @@ import {
   SectionList,
   ScrollView,
   View,
-  Alert
+  Alert,
+  Keyboard
 } from 'react-native';
 
 export default class Account extends Abstract {
@@ -46,7 +47,9 @@ export default class Account extends Abstract {
       }
   }
 
-  onSignInPress = (params) => {
+  onSignInPress = (params, callback) => {
+    Keyboard.dismiss();
+
     var email = params.email;
     var password = params.password;
 
@@ -65,25 +68,26 @@ export default class Account extends Abstract {
         Alert.alert(
           'Oops', error.message, [{text: 'OK', onPress: () => console.log('OK Pressed')},]
         )
+        callback();
         return;
       }
 
       console.log("Logged in user: ", user);
 
       this.onAuthSuccess();
-
+      callback();
     }.bind(this));
   }
 
   onAuthSuccess = () => {
     Sync.getInstance().markAllItemsDirtyAndSaveOffline();
     Sync.getInstance().sync(function(response){
-      console.log("Sync response:", response);
       this.forceUpdate();
     }.bind(this));
   }
 
   onRegisterPress = (params) => {
+    Keyboard.dismiss();
     var email = params.email;
     var password = params.password;
   }
@@ -102,7 +106,7 @@ export default class Account extends Abstract {
     let signedIn = !Auth.getInstance().offline();
     return (
       <View style={GlobalStyles.rules.container}>
-        <ScrollView>
+        <ScrollView keyboardShouldPersistTaps={'always'}>
 
           {!signedIn &&
             <AuthSection params={this.state.params} title={"Account"} onSignInPress={this.onSignInPress} onRegisterPress={this.onRegisterPress} />
@@ -119,13 +123,25 @@ export default class Account extends Abstract {
 class AuthSection extends Component {
   constructor(props) {
     super(props);
-    this.state = props.params;
+    this.state = _.merge(props.params, {signingIn: false});
   }
 
   showAdvanced = () => {
     this.setState(function(prevState){
       return _.merge(prevState, {showAdvanced: true});
     })
+  }
+
+  onSignInPress() {
+    this.setState(function(prevState){
+      return _.merge(prevState, {signingIn: true});
+    })
+
+    this.props.onSignInPress(this.state, function(){
+      this.setState(function(prevState){
+        return _.merge(prevState, {signingIn: false});
+      })
+    }.bind(this))
   }
 
   render() {
@@ -170,7 +186,7 @@ class AuthSection extends Component {
         }
 
         <SectionedTableCell buttonCell={true}>
-          <ButtonCell title="Sign In" bold={true} onPress={() => this.props.onSignInPress(this.state)} />
+          <ButtonCell disabled={this.state.signingIn} title={this.state.signingIn ? "Signing in..." : "Sign In"} bold={true} onPress={() => this.onSignInPress()} />
         </SectionedTableCell>
 
         <SectionedTableCell buttonCell={true}>

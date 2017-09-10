@@ -38,16 +38,12 @@ export default class Compose extends Abstract {
     }
     this.state = {note: note, text: note.text};
     this.configureNavBar();
-  }
 
-  shouldComponentUpdate(nextProps, nextState){
-    console.log("Should update?", nextProps, nextState);
-    return this.state.note.text !== nextState.note.text;
-     // and compare any props that might cause an update
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log("Will receive props", nextProps);
+    Sync.getInstance().registerSyncObserver(function(changesMade){
+      if(changesMade) {
+        this.forceUpdate();
+      }
+    }.bind(this))
   }
 
   configureNavBar() {
@@ -205,7 +201,7 @@ export default class Compose extends Abstract {
         <TextInput
           style={styles.noteTitle}
           onChangeText={this.onTitleChange}
-          value={this.state.title}
+          value={this.state.note.title}
           placeholder={"Add Title"}
           selectionColor={"red"}
           underlineColorAndroid={'transparent'}
@@ -222,7 +218,6 @@ export default class Compose extends Abstract {
                 selectionColor={"red"}
                 underlineColorAndroid={'transparent'}
                 keyboardDismissMode={'interactive'}
-                extraData={this.state.text}
               >
               </TextInput>
             </ScrollView>
