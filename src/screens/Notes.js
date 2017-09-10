@@ -105,12 +105,15 @@ export default class Notes extends Abstract {
     var notesTitle = "Notes";
     var filterTitle = "Filter";
     var numFilters = this.options.selectedTags.length;
+
     if(numFilters > 0 || this.options.archivedOnly) {
-      filterTitle += ` (${numFilters})`
+      if(numFilters > 0) {
+        filterTitle += ` (${numFilters})`
+      }
       notesTitle = "Filtered Notes";
     }
 
-    if(notesTitle === this.notesTitle || filterTitle === this.filterTitle) {
+    if(notesTitle === this.notesTitle && filterTitle === this.filterTitle) {
       // no changes, return. We do this so when swiping back from compose to here,
       // we don't change the title while a transition is taking place
       return;

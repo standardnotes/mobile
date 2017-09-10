@@ -31,6 +31,7 @@ export default class NoteList extends Component {
       tags={item.tags}
       pinned={item.pinned}
       deleted={item.deleted}
+      archived={item.archived}
     />
   )
 
@@ -38,7 +39,7 @@ export default class NoteList extends Component {
     return (
       <View style={styles.tableContainer}>
         <FlatList style={{height: "100%"}}
-          keyboardDismissMode={'interactive'} 
+          keyboardDismissMode={'interactive'}
           refreshControl={
             <RefreshControl
               refreshing={this.props.refreshing}

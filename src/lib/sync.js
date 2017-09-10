@@ -58,6 +58,11 @@ export default class Sync {
         }
       }
 
+      this.syncObservers.forEach(function(observer){
+        var changesMade = true;
+        observer(changesMade);
+      })
+
       if(callback) {
         callback({success: true});
       }

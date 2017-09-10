@@ -3,6 +3,7 @@ import Sync from '../lib/sync'
 import Auth from '../lib/auth'
 import ModelManager from '../lib/modelManager'
 import Note from '../models/app/note'
+import Abstract from "./Abstract"
 
 import {
   AppRegistry,
@@ -22,7 +23,7 @@ import {Platform} from 'react-native';
 
 import GlobalStyles from "../Styles"
 
-export default class Compose extends Component {
+export default class Compose extends Abstract {
 
   static navigatorStyle = {
     tabBarHidden: true
@@ -40,11 +41,13 @@ export default class Compose extends Component {
   }
 
   configureNavBar() {
+    super.configureNavBar();
+
     var title = "Options";
     if(this.note.tags.length > 0) {
       title += ` (${this.note.tags.length})`;
     }
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+
     this.props.navigator.setButtons({
       rightButtons: [
         {
@@ -59,6 +62,8 @@ export default class Compose extends Component {
   }
 
   onNavigatorEvent(event) {
+    super.onNavigatorEvent(event);
+
     if(event.id == 'didAppear') {
         if(this.note.dirty) {
           this.changesMade();
@@ -169,17 +174,21 @@ export default class Compose extends Component {
   }
 
   setNavBarSubtitle(title) {
+    if(!this.visible || !this.willBeVisible) {
+      return;
+    }
+    
     this.props.navigator.setSubTitle({
       subtitle: title
     });
+
     this.props.navigator.setStyle({
       navBarSubtitleColor: 'gray',
       navBarSubtitleFontSize: 12
-    })
+    });
   }
 
   render() {
-    console.log("ehe", styles.noteTitle.height);
     return (
       <View style={styles.container}>
         <TextInput
@@ -192,19 +201,19 @@ export default class Compose extends Component {
         />
 
         <KeyboardAvoidingView style={{flexGrow: 1}} keyboardVerticalOffset={rawStyles.noteTitle.height + rawStyles.noteText.paddingTop} behavior={'padding'}>
-        <ScrollView style={styles.textContainer} contentContainerStyle={styles.contentContainer} keyboardDismissMode={'interactive'}>
-          <TextInput
-              style={styles.noteText}
-              onChangeText={this.onTextChange}
-              multiline = {true}
-              value={this.note.text}
-              autoFocus={!this.note.uuid}
-              selectionColor={"red"}
-              underlineColorAndroid={'transparent'}
-              keyboardDismissMode={'interactive'}
-            >
-            </TextInput>
-          </ScrollView>
+          <ScrollView style={styles.textContainer} contentContainerStyle={styles.contentContainer} keyboardDismissMode={'interactive'}>
+            <TextInput
+                style={styles.noteText}
+                onChangeText={this.onTextChange}
+                multiline = {true}
+                value={this.note.text}
+                autoFocus={!this.note.uuid}
+                selectionColor={"red"}
+                underlineColorAndroid={'transparent'}
+                keyboardDismissMode={'interactive'}
+              >
+              </TextInput>
+            </ScrollView>
           </KeyboardAvoidingView>
 
       </View>

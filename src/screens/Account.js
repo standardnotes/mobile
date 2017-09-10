@@ -6,6 +6,7 @@ import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
+import Abstract from "./Abstract"
 var _ = require('lodash')
 
 import GlobalStyles from "../Styles"
@@ -18,12 +19,11 @@ import {
   Alert
 } from 'react-native';
 
-export default class Account extends Component {
+export default class Account extends Abstract {
 
   constructor(props) {
     super(props);
     this.state = {params: {email: "a@bitar.io", password: "password"}};
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
   }
 
   componentDidMount() {
@@ -37,16 +37,12 @@ export default class Account extends Component {
   }
 
   onNavigatorEvent(event) {
+    super.onNavigatorEvent(event);
+
     switch(event.id) {
       case 'willAppear':
        this.forceUpdate();
        break;
-      case 'didAppear':
-        break;
-      case 'willDisappear':
-        break;
-      case 'didDisappear':
-        break;
       }
   }
 
@@ -64,8 +60,6 @@ export default class Account extends Component {
       return;
     }
 
-    var root = this;
-
     Auth.getInstance().login(email, password, params.server, function(user, error) {
       if(error) {
         Alert.alert(
@@ -76,11 +70,17 @@ export default class Account extends Component {
 
       console.log("Logged in user: ", user);
 
-      Sync.getInstance().sync(function(response){
-        console.log("Sync response:", response);
-        root.forceUpdate();
-      });
-    })
+      this.onAuthSuccess();
+
+    }.bind(this));
+  }
+
+  onAuthSuccess = () => {
+    Sync.getInstance().markAllItemsDirtyAndSaveOffline();
+    Sync.getInstance().sync(function(response){
+      console.log("Sync response:", response);
+      this.forceUpdate();
+    }.bind(this));
   }
 
   onRegisterPress = (params) => {
