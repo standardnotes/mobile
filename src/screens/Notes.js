@@ -30,8 +30,8 @@ export default class Notes extends Abstract {
   beginSyncTimer() {
     // Refresh every 30s
     setInterval(function () {
-      // Sync.getInstance().sync(null);
-    }, 30000);
+      Sync.getInstance().sync(null);
+    }, 1000);
   }
 
   registerObservers() {

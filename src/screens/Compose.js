@@ -31,21 +31,31 @@ export default class Compose extends Abstract {
 
   constructor(props) {
     super(props);
-    this.note = ModelManager.getInstance().findItem(this.props.noteId);
-    if(!this.note) {
-      this.note = new Note({});
-      this.note.dummy = true;
+    var note = ModelManager.getInstance().findItem(this.props.noteId);
+    if(!note) {
+      note = new Note({});
+      note.dummy = true;
     }
-    this.state = {title: this.note.title, text: this.note.text};
+    this.state = {note: note, text: note.text};
     this.configureNavBar();
+  }
+
+  shouldComponentUpdate(nextProps, nextState){
+    console.log("Should update?", nextProps, nextState);
+    return this.state.note.text !== nextState.note.text;
+     // and compare any props that might cause an update
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log("Will receive props", nextProps);
   }
 
   configureNavBar() {
     super.configureNavBar();
 
     var title = "Options";
-    if(this.note.tags.length > 0) {
-      title += ` (${this.note.tags.length})`;
+    if(this.state.note.tags.length > 0) {
+      title += ` (${this.state.note.tags.length})`;
     }
 
     this.props.navigator.setButtons({
@@ -65,7 +75,7 @@ export default class Compose extends Abstract {
     super.onNavigatorEvent(event);
 
     if(event.id == 'didAppear') {
-        if(this.note.dirty) {
+        if(this.state.note.dirty) {
           this.changesMade();
           this.configureNavBar();
         }
@@ -83,12 +93,12 @@ export default class Compose extends Abstract {
       title: 'Options',
       animationType: 'slide-up',
       passProps: {
-        noteId: this.note.uuid,
-        options: {selectedTags: this.note.tags.map(function(tag){return tag.uuid})},
+        noteId: this.state.note.uuid,
+        options: {selectedTags: this.state.note.tags.map(function(tag){return tag.uuid})},
         onOptionsChange: (options) => {
           var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
-          this.note.replaceTags(tags);
-          this.note.setDirty(true);
+          this.state.note.replaceTags(tags);
+          this.state.note.setDirty(true);
         }
       }
     });
@@ -96,25 +106,25 @@ export default class Compose extends Abstract {
 
   onTitleChange = (text) => {
     this.setState({title: text});
-    this.note.title = text;
+    this.state.note.title = text;
     this.changesMade();
   }
 
   onTextChange = (text) => {
     this.setState({text: text});
-    this.note.text = text;
+    this.state.note.text = text;
     this.changesMade();
   }
 
   changesMade() {
-    this.note.hasChanges = true;
+    this.state.note.hasChanges = true;
 
     if(this.saveTimeout) clearTimeout(this.saveTimeout);
     if(this.statusTimeout) clearTimeout(this.statusTimeout);
     this.saveTimeout = setTimeout(function(){
       this.setNavBarSubtitle("Saving...");
-      if(!this.note.uuid) {
-        this.note.init(function(){
+      if(!this.state.note.uuid) {
+        this.state.note.init(function(){
           this.save();
         }.bind(this))
       } else {
@@ -145,7 +155,7 @@ export default class Compose extends Abstract {
   }
 
   save() {
-    var note = this.note;
+    var note = this.state.note;
     if(note.dummy) {
       note.dummy = false;
       ModelManager.getInstance().addItem(note);
@@ -177,7 +187,7 @@ export default class Compose extends Abstract {
     if(!this.visible || !this.willBeVisible) {
       return;
     }
-    
+
     this.props.navigator.setSubTitle({
       subtitle: title
     });
@@ -189,6 +199,7 @@ export default class Compose extends Abstract {
   }
 
   render() {
+    console.log("Rendering compose", this.state.note);
     return (
       <View style={styles.container}>
         <TextInput
@@ -206,11 +217,12 @@ export default class Compose extends Abstract {
                 style={styles.noteText}
                 onChangeText={this.onTextChange}
                 multiline = {true}
-                value={this.note.text}
-                autoFocus={!this.note.uuid}
+                value={this.state.note.text}
+                autoFocus={!this.state.note.uuid}
                 selectionColor={"red"}
                 underlineColorAndroid={'transparent'}
                 keyboardDismissMode={'interactive'}
+                extraData={this.state.text}
               >
               </TextInput>
             </ScrollView>
