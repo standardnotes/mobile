@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import Sync from '../lib/sync'
 import Auth from '../lib/auth'
+import AlertManager from '../lib/alertManager'
 import ModelManager from '../lib/modelManager'
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import Abstract from "./Abstract"
+import {Authenticate, AuthenticationState} from "./Authenticate"
 var _ = require('lodash')
 
 import GlobalStyles from "../Styles"
@@ -27,7 +29,15 @@ export default class Account extends Abstract {
     this.state = {params: {email: "a@bitar.io", password: "password"}};
   }
 
+  loadPasscodeStatus() {
+    var hasPasscode = AuthenticationState.get().hasPasscode()
+    this.setState(function(prevState){
+      return _.merge(prevState, {hasPasscode: hasPasscode});
+    })
+  }
+
   componentDidMount() {
+    this.loadPasscodeStatus();
     Auth.getInstance().serverUrl().then(function(server){
       this.setState(function(prevState) {
         var params = prevState.params;
@@ -42,6 +52,7 @@ export default class Account extends Abstract {
 
     switch(event.id) {
       case 'willAppear':
+       this.loadPasscodeStatus();
        this.forceUpdate();
        break;
       }
@@ -102,6 +113,31 @@ export default class Account extends Abstract {
 
   }
 
+  onPasscodeEnable = () => {
+    this.props.navigator.showModal({
+      screen: 'sn.Authenticate',
+      title: 'Setup Passcode',
+      animationType: 'slide-up',
+      passProps: {
+        mode: "setup",
+        onSetupSuccess: () => {}
+      }
+    });
+  }
+
+  onPasscodeDisable = () => {
+    AlertManager.showConfirmationAlert(
+      "Disable Passcode", "Are you sure you want to disable your local passcode?", "Disable Passcode",
+      function(){
+        AuthenticationState.get().clearPasscode();
+        this.setState(function(prevState){
+          return _.merge(prevState, {hasPasscode: false})
+        })
+        this.forceUpdate();
+      }.bind(this)
+    )
+  }
+
   render() {
     let signedIn = !Auth.getInstance().offline();
     return (
@@ -113,6 +149,12 @@ export default class Account extends Abstract {
           }
 
           <OptionsSection signedIn={signedIn} title={"Options"} onSignOutPress={this.onSignOutPress} onExportPress={this.onExportPress} />
+
+          <PasscodeSection
+          hasPasscode={this.state.hasPasscode}
+          onEnable={this.onPasscodeEnable}
+          onDisable={this.onPasscodeDisable}
+          title={"Local Passcode"} />
 
         </ScrollView>
       </View>
@@ -221,6 +263,35 @@ class OptionsSection extends Component {
         <SectionedTableCell buttonCell={true} first={!this.props.signedIn}>
           <ButtonCell leftAligned={true} title="Export Data" onPress={this.props.onExportPress} />
         </SectionedTableCell>
+
+      </TableSection>
+    );
+  }
+}
+
+class PasscodeSection extends Component {
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <TableSection>
+
+        <SectionHeader title={this.props.title} />
+
+        {this.props.hasPasscode &&
+          <SectionedTableCell buttonCell={true} first={true}>
+            <ButtonCell leftAligned={true} title="Disable Passcode Lock" onPress={this.props.onDisable} />
+          </SectionedTableCell>
+        }
+
+        {!this.props.hasPasscode &&
+          <SectionedTableCell buttonCell={true} first={true}>
+            <ButtonCell leftAligned={true} title="Enable Passcode Lock" onPress={this.props.onEnable} />
+          </SectionedTableCell>
+        }
 
       </TableSection>
     );

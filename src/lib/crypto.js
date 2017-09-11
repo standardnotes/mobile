@@ -18,6 +18,12 @@ export default class Crypto {
     });
   }
 
+  static async pbkdf2(password, salt, cost, length) {
+    return Aes.pbkdf2(password, salt, cost, length).then(key => {
+      return key;
+    });
+  }
+
   static async generateRandomKey(length) {
     return Aes.randomKey(length);
   }

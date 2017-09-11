@@ -11,6 +11,17 @@ export default class Storage {
     }
   }
 
+  static async getMultiItems(keys) {
+    return AsyncStorage.multiGet(keys, (err, stores) => {
+     stores.map((result, i, store) => {
+       let key = store[i][0];
+       let value = store[i][1];
+       items.push(value);
+      });
+      return items;
+    });
+  }
+
   static async setItem(key, value) {
     if(value == null || value == undefined || key == null || key == undefined) {
       return;

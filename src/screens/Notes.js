@@ -9,6 +9,7 @@ import Keychain from "../lib/keychain"
 import {iconsMap, iconsLoaded} from '../Icons';
 import NoteList from "../containers/NoteList"
 import Abstract from "./Abstract"
+import {Authenticate, AuthenticationState} from "./Authenticate"
 
 export default class Notes extends Abstract {
 
@@ -31,7 +32,7 @@ export default class Notes extends Abstract {
     // Refresh every 30s
     setInterval(function () {
       Sync.getInstance().sync(null);
-    }, 1000);
+    }, 30000);
   }
 
   registerObservers() {
@@ -68,16 +69,38 @@ export default class Notes extends Abstract {
       Storage.getItem("options").then(function(result){
         this.options = JSON.parse(result) || this.defaultOptions();
       }.bind(this)),
+      AuthenticationState.get().load(),
       Auth.getInstance().loadKeys()
     ]).then(function(){
-      console.log("===Keys and options loaded===");
       // options and keys loaded
-      Sync.getInstance().loadLocalItems(function(items) {
-        this.loadNotes();
-      }.bind(this));
-      // perform initial sync
-      Sync.getInstance().sync(null);
+      console.log("===Keys and options loaded===");
+
+      var run = function() {
+        Sync.getInstance().loadLocalItems(function(items) {
+          this.loadNotes();
+        }.bind(this));
+        // perform initial sync
+        Sync.getInstance().sync(null);
+      }.bind(this)
+
+      if(AuthenticationState.get().hasPasscode()) {
+        this.presentPasscodeAuther(run);
+      } else {
+        run();
+      }
     }.bind(this))
+  }
+
+  presentPasscodeAuther(onAuthenticate) {
+    this.props.navigator.showModal({
+      screen: 'sn.Authenticate',
+      title: 'Passcode Required',
+      animationType: 'slide-up',
+      passProps: {
+        mode: "authenticate",
+        onAuthenticateSuccess: onAuthenticate
+      }
+    });
   }
 
   loadNotes = (reloadNavBar = true) => {
