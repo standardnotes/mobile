@@ -97,7 +97,7 @@ export default class Authenticate extends Abstract {
             title: 'Cancel',
             id: 'cancel',
             showAsAction: 'ifRoom',
-            buttonColor: GlobalStyles.constants.mainTintColor,
+            buttonColor: GlobalStyles.constants().mainTintColor,
             buttonFontSize: 17
           }
         ],
@@ -160,7 +160,7 @@ export default class Authenticate extends Abstract {
 
   render() {
     return (
-      <View style={GlobalStyles.rules.container}>
+      <View style={GlobalStyles.styles().container}>
         <TableSection>
           {this.props.mode == "authenticate" &&
             <View>
@@ -168,7 +168,7 @@ export default class Authenticate extends Abstract {
 
               <SectionedTableCell textInputCell={true} first={true}>
                 <TextInput
-                  style={GlobalStyles.rules.sectionedTableCellTextInput}
+                  style={GlobalStyles.styles().sectionedTableCellTextInput}
                   placeholder={"Local passcode"}
                   onChangeText={(text) => this.setState({passcode: text})}
                   value={this.state.passcode}
@@ -191,7 +191,7 @@ export default class Authenticate extends Abstract {
 
               <SectionedTableCell textInputCell={true} first={true}>
                 <TextInput
-                  style={GlobalStyles.rules.sectionedTableCellTextInput}
+                  style={GlobalStyles.styles().sectionedTableCellTextInput}
                   placeholder={"Local passcode"}
                   onChangeText={(text) => this.setState({passcode: text})}
                   value={this.state.passcode}

@@ -13,8 +13,8 @@ export default class NoteList extends Component {
           onChangeText={this.props.onSearchChange}
           onCancel={this.props.onSearchCancel}
           onDelete={this.props.onSearchCancel}
-          backgroundColor={GlobalStyles.constants.mainBackgroundColor}
-          titleCancelColor={GlobalStyles.constants.mainTintColor}
+          backgroundColor={GlobalStyles.constants().mainBackgroundColor}
+          titleCancelColor={GlobalStyles.constants().mainTintColor}
           keyboardDismissMode={'interactive'}
         />
       </View>

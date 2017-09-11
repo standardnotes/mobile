@@ -9,7 +9,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
   rules() {
-    return super.rules().concat([GlobalStyles.rules.sectionedAccessoryTableCell]);
+    return super.rules().concat([GlobalStyles.styles().sectionedAccessoryTableCell]);
   }
 
   onPress = () => {
@@ -28,10 +28,10 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     return (
       <TouchableHighlight onPress={this.onPress} onLongPress={this.onLongPress}>
         <View style={this.rules()}>
-          <Text style={GlobalStyles.rules.sectionedAccessoryTableCellLabel}>{this.props.text}</Text>
+          <Text style={GlobalStyles.styles().sectionedAccessoryTableCellLabel}>{this.props.text}</Text>
           {iconName &&
-            <View style={{position: "absolute", right: GlobalStyles.constants.sectionedCellHorizontalPadding, top: 6}}>
-              <Icon name={iconName} size={30} color={GlobalStyles.constants.mainTintColor} />
+            <View style={{position: "absolute", right: GlobalStyles.constants().sectionedCellHorizontalPadding, top: 6}}>
+              <Icon name={iconName} size={30} color={GlobalStyles.constants().mainTintColor} />
             </View>
           }
         </View>

@@ -6,7 +6,7 @@ import GlobalStyles from "../Styles"
 export default class TableSection extends Component {
   render() {
     return (
-      <View style={GlobalStyles.rules.tableSection}>
+      <View style={GlobalStyles.styles().tableSection}>
         {this.props.children}
       </View>
     )

@@ -141,7 +141,7 @@ export default class Account extends Abstract {
   render() {
     let signedIn = !Auth.getInstance().offline();
     return (
-      <View style={GlobalStyles.rules.container}>
+      <View style={GlobalStyles.styles().container}>
         <ScrollView keyboardShouldPersistTaps={'always'}>
 
           {!signedIn &&
@@ -193,7 +193,7 @@ class AuthSection extends Component {
 
         <SectionedTableCell textInputCell={true} first={true}>
           <TextInput
-            style={GlobalStyles.rules.sectionedTableCellTextInput}
+            style={GlobalStyles.styles().sectionedTableCellTextInput}
             placeholder={"Email"}
             onChangeText={(text) => this.setState({email: text})}
             value={this.state.email}
@@ -205,7 +205,7 @@ class AuthSection extends Component {
 
         <SectionedTableCell textInputCell={true}>
           <TextInput
-            style={GlobalStyles.rules.sectionedTableCellTextInput}
+            style={GlobalStyles.styles().sectionedTableCellTextInput}
             placeholder={"Password"}
             onChangeText={(text) => this.setState({password: text})}
             value={this.state.password}
@@ -216,7 +216,7 @@ class AuthSection extends Component {
         {this.state.showAdvanced &&
           <SectionedTableCell textInputCell={true}>
             <TextInput
-              style={GlobalStyles.rules.sectionedTableCellTextInput}
+              style={GlobalStyles.styles().sectionedTableCellTextInput}
               placeholder={"Sync Server"}
               onChangeText={(text) => this.setState({server: text})}
               value={this.state.server}

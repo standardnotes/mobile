@@ -45,8 +45,14 @@ export default class Auth {
     }
   }
 
-  onSignOut(callback) {
-    this.signoutObservers.push(callback);
+  addSignoutObserver(callback) {
+    var observer = {key: new Date(), callback: callback};
+    this.signoutObservers.push(observer);
+    return observer;
+  }
+
+  removeSignoutObserver(observer) {
+    _.pull(this.signoutObservers, observer);
   }
 
   async serverUrl() {

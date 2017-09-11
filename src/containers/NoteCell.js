@@ -51,7 +51,7 @@ export default class NoteCell extends React.PureComponent {
 
           {note.pinned &&
             <View style={styles.pinnedView}>
-              <Icon name={"ios-bookmark"} size={14} color={GlobalStyles.constants.mainTintColor} />
+              <Icon name={"ios-bookmark"} size={14} color={GlobalStyles.constants().mainTintColor} />
               <Text style={styles.pinnedText}>Pinned</Text>
             </View>
           }
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   noteCell: {
     padding: Padding,
     paddingRight: Padding * 2,
-    borderBottomColor: GlobalStyles.constants.plainCellBorderColor,
+    borderBottomColor: GlobalStyles.constants().plainCellBorderColor,
     borderBottomWidth: 1
   },
 
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
 
   pinnedText: {
-    color: GlobalStyles.constants.mainTintColor,
+    color: GlobalStyles.constants().mainTintColor,
     marginLeft: 8,
     fontWeight: "bold",
     fontSize: 12
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   deleting: {
-    color: GlobalStyles.constants.mainTintColor,
+    color: GlobalStyles.constants().mainTintColor,
     marginBottom: 5,
 
   }

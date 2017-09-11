@@ -39,11 +39,15 @@ export default class Compose extends Abstract {
     this.state = {note: note, text: note.text};
     this.configureNavBar();
 
-    Sync.getInstance().registerSyncObserver(function(changesMade){
+    this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade){
       if(changesMade) {
         this.forceUpdate();
       }
     }.bind(this))
+  }
+
+  componentWillUnmount() {
+    Sync.getInstance().removeSyncObserver(this.syncObserver);
   }
 
   configureNavBar() {
@@ -60,7 +64,7 @@ export default class Compose extends Abstract {
           title: title,
           id: 'tags',
           showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants.mainTintColor,
+          buttonColor: GlobalStyles.constants().mainTintColor,
         },
       ],
       animated: false
@@ -195,7 +199,6 @@ export default class Compose extends Abstract {
   }
 
   render() {
-    console.log("Rendering compose", this.state.note);
     return (
       <View style={styles.container}>
         <TextInput

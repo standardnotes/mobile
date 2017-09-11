@@ -48,7 +48,7 @@ export default class Filter extends Abstract {
         title: 'Done',
         id: 'accept',
         showAsAction: 'ifRoom',
-        buttonColor: GlobalStyles.constants.mainTintColor,
+        buttonColor: GlobalStyles.constants().mainTintColor,
         buttonFontWeight: "bold",
         buttonFontSize: 17
       })
@@ -60,7 +60,7 @@ export default class Filter extends Abstract {
           title: 'New Tag',
           id: 'new-tag',
           showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants.mainTintColor,
+          buttonColor: GlobalStyles.constants().mainTintColor,
         },
       ],
       leftButtons: leftButtons,
@@ -192,7 +192,7 @@ export default class Filter extends Abstract {
 
   render() {
     return (
-      <View style={GlobalStyles.rules.container}>
+      <View style={GlobalStyles.styles().container}>
         <ScrollView>
 
           {!this.note &&

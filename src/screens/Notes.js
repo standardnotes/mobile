@@ -26,17 +26,34 @@ export default class Notes extends Abstract {
     this.loadTabbarIcons();
     this.initializeOptionsAndNotes();
     this.beginSyncTimer();
+
+    setTimeout(function () {
+      // this.forceUpdate();
+    }.bind(this), 1500);
+  }
+
+  componentWillUnmount() {
+    console.log("Notes component will unmount");
+    Sync.getInstance().removeSyncObserver(this.syncObserver);
+    Auth.getInstance().removeSignoutObserver(this.signoutObserver);
+    clearInterval(this.syncTimer);
+  }
+
+  componentDidMount() {
+    console.log("Componeng Did Mount");
   }
 
   beginSyncTimer() {
     // Refresh every 30s
-    setInterval(function () {
+    this.syncTimer = setInterval(function () {
       Sync.getInstance().sync(null);
     }, 30000);
   }
 
   registerObservers() {
-    Sync.getInstance().registerSyncObserver(function(changesMade){
+    console.log("Registering observers");
+    this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade){
+      console.log("Note sync observer");
       if(changesMade) {
         console.log("===Changes Made===");
         this.loadNotes();
@@ -45,7 +62,7 @@ export default class Notes extends Abstract {
       }
     }.bind(this))
 
-    Auth.getInstance().onSignOut(function(){
+    this.signoutObserver = Auth.getInstance().addSignoutObserver(function(){
       this.options = this.defaultOptions();
       this.loadNotes();
     }.bind(this));
@@ -153,7 +170,7 @@ export default class Notes extends Abstract {
         title: 'New',
         id: 'new',
         showAsAction: 'ifRoom',
-        buttonColor: GlobalStyles.constants.mainTintColor,
+        buttonColor: GlobalStyles.constants().mainTintColor,
       })
     }
 
@@ -164,13 +181,13 @@ export default class Notes extends Abstract {
           title: filterTitle,
           id: 'sideMenu',
           showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants.mainTintColor,
+          buttonColor: GlobalStyles.constants().mainTintColor,
         },
       ],
       fab: {
         collapsedId: 'new',
         collapsedIcon: iconsMap['md-add'],
-        backgroundColor: GlobalStyles.constants.mainTintColor
+        backgroundColor: GlobalStyles.constants().mainTintColor
       },
       animated: false
     });

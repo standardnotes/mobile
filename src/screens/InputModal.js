@@ -21,7 +21,7 @@ export default class InputModal extends Component {
           title: 'Save',
           id: 'save',
           showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants.mainTintColor,
+          buttonColor: GlobalStyles.constants().mainTintColor,
           buttonFontWeight: "bold",
           buttonFontSize: 17
         },
@@ -31,7 +31,7 @@ export default class InputModal extends Component {
           title: 'Cancel',
           id: 'cancel',
           showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants.mainTintColor,
+          buttonColor: GlobalStyles.constants().mainTintColor,
         },
       ],
       animated: false
@@ -55,13 +55,13 @@ export default class InputModal extends Component {
 
   render() {
     return (
-      <View style={GlobalStyles.rules.container}>
+      <View style={GlobalStyles.styles().container}>
         <TableSection>
           <SectionHeader title={this.props.title} />
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
               underlineColorAndroid='transparent'
-              style={GlobalStyles.rules.sectionedTableCellTextInput}
+              style={GlobalStyles.styles().sectionedTableCellTextInput}
               placeholder={this.props.placeholder}
               onChangeText={this.onTextChange}
               value={this.state.text}

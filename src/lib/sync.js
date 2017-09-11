@@ -36,8 +36,14 @@ export default class Sync {
     return await Storage.getItem("pw");
   }
 
-  registerSyncObserver(observer) {
+  registerSyncObserver(callback) {
+    var observer = {key: new Date(), callback: callback};
     this.syncObservers.push(observer);
+    return observer;
+  }
+
+  removeSyncObserver(observer) {
+    _.pull(this.syncObservers, observer);
   }
 
   async loadLocalItems(callback) {
@@ -58,9 +64,9 @@ export default class Sync {
         }
       }
 
-      this.syncObservers.forEach(function(observer){
+      this.syncObservers.forEach(function(mapping){
         var changesMade = true;
-        observer(changesMade);
+        mapping.callback(changesMade);
       })
 
       if(callback) {
@@ -287,9 +293,9 @@ export default class Sync {
 
         this.callQueuedCallbacksAndCurrent(callback, response);
 
-        this.syncObservers.forEach(function(observer){
+        this.syncObservers.forEach(function(mapping){
           var changesMade = retrieved.length > 0 || saved.length > 0 || response.unsaved.length > 0;
-          observer(changesMade);
+          mapping.callback(changesMade);
         })
       }
     }.bind(this);
@@ -381,8 +387,8 @@ export default class Sync {
     this._cursorToken = null;
     this._queuedCallbacks = [];
     this.syncStatus = {};
-    this.syncObservers.forEach(function(observer){
-      observer();
+    this.syncObservers.forEach(function(mapping){
+      mapping.callback();
     })
   }
 }

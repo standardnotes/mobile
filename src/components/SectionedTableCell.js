@@ -6,10 +6,10 @@ import GlobalStyles from "../Styles"
 export default class SectionedTableCell extends Component {
 
   rules() {
-    var rules = [GlobalStyles.rules.sectionedTableCell];
-    if(this.props.buttonCell) { rules.push(GlobalStyles.rules.buttonCell); }
-    if(this.props.first) { rules.push(GlobalStyles.rules.sectionedTableCellFirst); }
-    if(this.props.textInputCell) {rules.push(GlobalStyles.rules.textInputCell); }
+    var rules = [GlobalStyles.styles().sectionedTableCell];
+    if(this.props.buttonCell) { rules.push(GlobalStyles.styles().buttonCell); }
+    if(this.props.first) { rules.push(GlobalStyles.styles().sectionedTableCellFirst); }
+    if(this.props.textInputCell) {rules.push(GlobalStyles.styles().textInputCell); }
     return rules;
   }
 

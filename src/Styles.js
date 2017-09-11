@@ -1,4 +1,45 @@
+var _ = require('lodash')
+
 import { StyleSheet } from 'react-native';
+
+export default class Styles {
+
+  static instance = null;
+
+  static get() {
+    if (this.instance == null) {
+      this.instance = new Styles();
+    }
+
+    return this.instance;
+  }
+
+  static styles() {
+    return this.get()._styles.rules;
+  }
+
+  static constants() {
+    return this.get()._styles.constants;
+  }
+
+  constructor() {
+    this._styles = defaultStyles;
+
+    setTimeout(function () {
+      this.changeTheme();
+    }.bind(this), 1000);
+  }
+
+  changeTheme() {
+    var theme = {
+      constants: {
+        mainTintColor: "green"
+      }
+    }
+
+    this._styles = _.merge(defaultStyles, theme);
+  }
+}
 
 let mainTintColor = "#fb0206";
 let PaddingLeft = 14;
@@ -12,14 +53,12 @@ const constants = {
   textColor: "black",
 }
 
-const styles = {
+const defaultStyles = {
   rules: StyleSheet.create({
 
     container: {
       backgroundColor: "white",
       height: "100%",
-      // flex: 1,
-      // flexDirection: "column"
     },
 
     tableSection: {
@@ -96,5 +135,3 @@ const styles = {
 
   constants: constants
 }
-
-export default styles;
