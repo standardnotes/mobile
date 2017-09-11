@@ -8,7 +8,7 @@ export default class NoteList extends Component {
 
   renderHeader = () => {
     return (
-      <View style={{paddingLeft: 5, paddingRight: 5, paddingTop: 5}}>
+      <View style={{paddingLeft: 5, paddingRight: 5, paddingTop: 5, backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
         <Search
           onChangeText={this.props.onSearchChange}
           onCancel={this.props.onSearchCancel}
@@ -37,7 +37,7 @@ export default class NoteList extends Component {
 
   render() {
     return (
-      <View style={styles.tableContainer}>
+      <View style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
         <FlatList style={{height: "100%"}}
           keyboardDismissMode={'interactive'}
           refreshControl={
@@ -55,13 +55,3 @@ export default class NoteList extends Component {
     )
   }
 }
-
-let Padding = 14;
-
-const styles = StyleSheet.create({
-
-  tableContainer: {
-    backgroundColor: 'white',
-  },
-
-});

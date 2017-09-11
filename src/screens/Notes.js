@@ -26,14 +26,9 @@ export default class Notes extends Abstract {
     this.loadTabbarIcons();
     this.initializeOptionsAndNotes();
     this.beginSyncTimer();
-
-    setTimeout(function () {
-      // this.forceUpdate();
-    }.bind(this), 1500);
   }
 
   componentWillUnmount() {
-    console.log("Notes component will unmount");
     Sync.getInstance().removeSyncObserver(this.syncObserver);
     Auth.getInstance().removeSignoutObserver(this.signoutObserver);
     clearInterval(this.syncTimer);
@@ -275,7 +270,7 @@ export default class Notes extends Abstract {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View style={styles.container, GlobalStyles.styles().container}>
         <View style={styles.decryptNoticeContainer}>
           <Text style={styles.decryptNotice}>Decrypting notes...</Text>
         </View>
@@ -298,7 +293,6 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: 'white',
   },
 
   decryptNoticeContainer: {

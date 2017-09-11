@@ -8,7 +8,6 @@ import Abstract from "./Abstract"
 import {
   AppRegistry,
   StyleSheet,
-  StatusBar,
   TextInput,
   View,
   FlatList,
@@ -38,6 +37,7 @@ export default class Compose extends Abstract {
     }
     this.state = {note: note, text: note.text};
     this.configureNavBar();
+    this.loadStyles();
 
     this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade){
       if(changesMade) {
@@ -200,9 +200,9 @@ export default class Compose extends Abstract {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View style={[this.styles.container, GlobalStyles.styles().container]}>
         <TextInput
-          style={styles.noteTitle}
+          style={this.styles.noteTitle}
           onChangeText={this.onTitleChange}
           value={this.state.note.title}
           placeholder={"Add Title"}
@@ -210,10 +210,10 @@ export default class Compose extends Abstract {
           underlineColorAndroid={'transparent'}
         />
 
-        <KeyboardAvoidingView style={{flexGrow: 1}} keyboardVerticalOffset={rawStyles.noteTitle.height + rawStyles.noteText.paddingTop} behavior={'padding'}>
-          <ScrollView style={styles.textContainer} contentContainerStyle={styles.contentContainer} keyboardDismissMode={'interactive'}>
+        <KeyboardAvoidingView style={{flexGrow: 1}} keyboardVerticalOffset={this.rawStyles.noteTitle.height + this.rawStyles.noteText.paddingTop} behavior={'padding'}>
+          <ScrollView style={this.styles.textContainer} contentContainerStyle={this.styles.contentContainer} keyboardDismissMode={'interactive'}>
             <TextInput
-                style={styles.noteText}
+                style={this.styles.noteText}
                 onChangeText={this.onTextChange}
                 multiline = {true}
                 value={this.state.note.text}
@@ -229,53 +229,53 @@ export default class Compose extends Abstract {
       </View>
     );
   }
+
+  loadStyles() {
+    this.rawStyles = {
+      container: {
+        flex: 1,
+        flexDirection: 'column',
+        height: "100%",
+      },
+
+      noteTitle: {
+        fontWeight: "600",
+        fontSize: 16,
+        color: GlobalStyles.constants().mainTextColor,
+        height: 50,
+        borderBottomColor: GlobalStyles.constants().composeBorderColor,
+        borderBottomWidth: 1,
+        paddingTop: Platform.OS === "ios" ? 5 : 12,
+        paddingLeft: GlobalStyles.constants().paddingLeft,
+        paddingRight: GlobalStyles.constants().paddingLeft,
+      },
+
+      textContainer: {
+        flexGrow: 1,
+        flex: 1,
+      },
+
+      contentContainer: {
+        flexGrow: 1
+      },
+
+      noteText: {
+        height: "100%",
+        flexGrow: 1,
+        fontSize: 17,
+        marginTop: 0,
+        paddingTop: 10,
+        paddingBottom: 10,
+        color: GlobalStyles.constants().mainTextColor,
+        paddingLeft: GlobalStyles.constants().paddingLeft,
+        paddingRight: GlobalStyles.constants().paddingLeft,
+        textAlignVertical: 'top',
+        paddingVertical: 0,
+        lineHeight: 22,
+      }
+    }
+
+    this.styles = StyleSheet.create(this.rawStyles);
+
+  }
 }
-
-let PaddingLeft = 14;
-
-const rawStyles = {
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-    flexDirection: 'column',
-    height: "100%",
-  },
-
-  noteTitle: {
-    fontWeight: "600",
-    fontSize: 16,
-    color: "black",
-    height: 50,
-    borderBottomColor: "#F5F5F5",
-    borderBottomWidth: 1,
-    paddingTop: Platform.OS === "ios" ? 5 : 12,
-    paddingLeft: PaddingLeft,
-    paddingRight: PaddingLeft,
-  },
-
-  textContainer: {
-    flexGrow: 1,
-    flex: 1,
-  },
-
-  contentContainer: {
-    flexGrow: 1
-  },
-
-  noteText: {
-    height: "100%",
-    flexGrow: 1,
-    fontSize: 17,
-    marginTop: 0,
-    paddingTop: 10,
-    paddingBottom: 10,
-    color: "black",
-    paddingLeft: PaddingLeft,
-    paddingRight: PaddingLeft,
-    textAlignVertical: 'top',
-    paddingVertical: 0,
-    lineHeight: 22,
-  },
-}
-
-const styles = StyleSheet.create(rawStyles);

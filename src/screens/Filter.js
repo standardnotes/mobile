@@ -193,7 +193,7 @@ export default class Filter extends Abstract {
   render() {
     return (
       <View style={GlobalStyles.styles().container}>
-        <ScrollView>
+        <ScrollView style={GlobalStyles.styles().view}>
 
           {!this.note &&
             <SortSection sortBy={this.options.sortBy} onSortChange={this.onSortChange} title={"Sort By"} />
@@ -221,6 +221,7 @@ export default class Filter extends Abstract {
   }
 }
 
+
 class TagsSection extends Component {
   constructor(props) {
     super(props);
@@ -238,7 +239,7 @@ class TagsSection extends Component {
   render() {
     let root = this;
     return (
-      <TableSection>
+      <TableSection style={GlobalStyles.styles().view}>
         <SectionHeader title={this.props.title} />
         {this.props.tags.map(function(tag, i){
           return (

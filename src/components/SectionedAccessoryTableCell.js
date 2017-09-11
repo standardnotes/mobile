@@ -9,7 +9,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
   rules() {
-    return super.rules().concat([GlobalStyles.styles().sectionedAccessoryTableCell]);
+    return super.rules().concat([GlobalStyles.styles().view, GlobalStyles.styles().sectionedAccessoryTableCell]);
   }
 
   onPress = () => {
@@ -26,7 +26,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
   render() {
     var iconName = (this.props.selected && this.props.selected()) ? "ios-checkmark-circle" : null;
     return (
-      <TouchableHighlight onPress={this.onPress} onLongPress={this.onLongPress}>
+      <TouchableHighlight style={GlobalStyles.styles().view} onPress={this.onPress} onLongPress={this.onLongPress}>
         <View style={this.rules()}>
           <Text style={GlobalStyles.styles().sectionedAccessoryTableCellLabel}>{this.props.text}</Text>
           {iconName &&

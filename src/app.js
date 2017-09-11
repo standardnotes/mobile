@@ -8,14 +8,11 @@ import React, { Component } from 'react';
 import {
   AppRegistry,
   StyleSheet,
-  StatusBar,
   Text,
   View,
   FlatList
 } from 'react-native';
 import {Platform} from 'react-native';
-
-StatusBar.setBarStyle('dark-content', true);
 
 import {Navigation} from 'react-native-navigation';
 import {registerScreens, registerScreenVisibilityListener} from './screens';
@@ -24,9 +21,6 @@ import Auth from './lib/auth'
 import Sync from './lib/sync'
 
 import GlobalStyles from "./Styles"
-
-registerScreens();
-registerScreenVisibilityListener();
 
 const tabs = [{
   label: 'Notes',
@@ -40,31 +34,53 @@ const tabs = [{
   }
 ];
 
-function startApp() {
-  Navigation.startTabBasedApp({
-    tabs,
-    animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
-
-    tabsStyle: {
-      tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
-      tabBarButtonColor: 'gray',
-      tabBarSelectedButtonColor: GlobalStyles.constants().mainTintColor,
-      statusBarColor: 'black',
-      tabFontFamily: 'BioRhyme-Bold',
-    },
-
-    appStyle: {
-      navBarButtonColor: GlobalStyles.constants().mainTintColor,
-      navBarTextColor: GlobalStyles.constants().mainTintColor,
-      navigationBarColor: 'black', // android built in bar
-      navBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor, // actual top nav bar
-      statusBarColor: '#002b4c',
-    },
-  });
+// android will fail to load if icon is not specified here
+if(Platform.OS === "android") {
+  tabs.forEach(function(tab){
+    tab.icon = require("./img/placeholder.png")
+  })
 }
 
-startApp();
+registerScreens();
+registerScreenVisibilityListener();
 
-setTimeout(function () {
-  // startApp();
-}, 1500);
+export default class App {
+
+  static instance = null;
+
+  static get() {
+    if (this.instance == null) {
+      this.instance = new App();
+    }
+
+    return this.instance;
+  }
+
+  start() {
+    Navigation.startTabBasedApp({
+      tabs,
+      animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
+
+      tabsStyle: {
+        tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
+        tabBarButtonColor: 'gray',
+        tabBarSelectedButtonColor: GlobalStyles.constants().mainTintColor,
+        statusBarColor: 'black',
+        tabFontFamily: 'BioRhyme-Bold',
+      },
+
+      appStyle: {
+        navBarButtonColor: GlobalStyles.constants().mainTintColor,
+        navBarTextColor: GlobalStyles.constants().mainTintColor,
+        navigationBarColor: 'black', // android built in bar
+        navBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor, // actual top nav bar
+        statusBarColor: '#002b4c',
+        screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
+      },
+    });
+  }
+
+  reload() {
+    this.start();
+  }
+}

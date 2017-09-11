@@ -142,7 +142,7 @@ export default class Account extends Abstract {
     let signedIn = !Auth.getInstance().offline();
     return (
       <View style={GlobalStyles.styles().container}>
-        <ScrollView keyboardShouldPersistTaps={'always'}>
+        <ScrollView style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}} keyboardShouldPersistTaps={'always'}>
 
           {!signedIn &&
             <AuthSection params={this.state.params} title={"Account"} onSignInPress={this.onSignInPress} onRegisterPress={this.onRegisterPress} />
@@ -151,10 +151,11 @@ export default class Account extends Abstract {
           <OptionsSection signedIn={signedIn} title={"Options"} onSignOutPress={this.onSignOutPress} onExportPress={this.onExportPress} />
 
           <PasscodeSection
-          hasPasscode={this.state.hasPasscode}
-          onEnable={this.onPasscodeEnable}
-          onDisable={this.onPasscodeDisable}
-          title={"Local Passcode"} />
+            hasPasscode={this.state.hasPasscode}
+            onEnable={this.onPasscodeEnable}
+            onDisable={this.onPasscodeDisable}
+            title={"Local Passcode"}
+          />
 
         </ScrollView>
       </View>
@@ -200,6 +201,7 @@ class AuthSection extends Component {
             autoCorrect={false}
             autoCapitalize={'none'}
             keyboardType={'email-address'}
+            underlineColorAndroid={'transparent'}
           />
         </SectionedTableCell>
 
@@ -210,6 +212,7 @@ class AuthSection extends Component {
             onChangeText={(text) => this.setState({password: text})}
             value={this.state.password}
             secureTextEntry={true}
+            underlineColorAndroid={'transparent'}
           />
         </SectionedTableCell>
 
@@ -223,6 +226,7 @@ class AuthSection extends Component {
               autoCorrect={false}
               autoCapitalize={'none'}
               keyboardType={'url'}
+              underlineColorAndroid={'transparent'}
             />
           </SectionedTableCell>
         }
