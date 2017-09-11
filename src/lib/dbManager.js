@@ -54,7 +54,11 @@ export default class DBManager {
   }
 
   static deleteItem(item, callback) {
+    console.log("===Deleting item===");
     AsyncStorage.removeItem(DBManager.keyForItem(item), function(error){
+      if(error) {
+        console.error("Error deleting item", item);
+      }
       if(callback) {
         callback();
       }

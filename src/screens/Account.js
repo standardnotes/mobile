@@ -7,6 +7,7 @@ import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
+import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
 import {Authenticate, AuthenticationState} from "./Authenticate"
 var _ = require('lodash')
@@ -113,6 +114,19 @@ export default class Account extends Abstract {
 
   }
 
+  onThemeSelect = (theme) => {
+    GlobalStyles.get().activateTheme(theme);
+  }
+
+  onThemeLongPress = (theme) => {
+    AlertManager.showConfirmationAlert(
+      "Redownload Theme", "Themes are cached when downloaded. To retrieve the latest version, press Redownload.", "Redownload",
+      function(){
+        GlobalStyles.get().downloadThemeAndReload(theme);
+      }.bind(this)
+    )
+  }
+
   onPasscodeEnable = () => {
     this.props.navigator.showModal({
       screen: 'sn.Authenticate',
@@ -149,6 +163,8 @@ export default class Account extends Abstract {
           }
 
           <OptionsSection signedIn={signedIn} title={"Options"} onSignOutPress={this.onSignOutPress} onExportPress={this.onExportPress} />
+
+          <ThemesSection themes={GlobalStyles.get().themes()} title={"Themes"} onThemeSelect={this.onThemeSelect} onThemeLongPress={this.onThemeLongPress} />
 
           <PasscodeSection
             hasPasscode={this.state.hasPasscode}
@@ -272,6 +288,34 @@ class OptionsSection extends Component {
     );
   }
 }
+
+class ThemesSection extends Component {
+  render() {
+    console.log("Rendering with themes", this.props.themes);
+    return (
+      <TableSection>
+
+        <SectionHeader title={this.props.title} />
+
+        {this.props.themes.map(function(theme, i) {
+          return (
+            <SectionedAccessoryTableCell
+              onPress={() => this.props.onThemeSelect(theme)}
+              onLongPress={() => this.props.onThemeLongPress(theme)}
+              text={theme.mobileRules.name}
+              key={theme.mobileRules.name}
+              first={i == 0}
+              selected={() => {return theme.active}}
+              buttonCell={true}
+            />
+          )
+        }.bind(this))}
+
+      </TableSection>
+    );
+  }
+}
+
 
 class PasscodeSection extends Component {
 

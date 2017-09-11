@@ -34,10 +34,6 @@ export default class Notes extends Abstract {
     clearInterval(this.syncTimer);
   }
 
-  componentDidMount() {
-    console.log("Componeng Did Mount");
-  }
-
   beginSyncTimer() {
     // Refresh every 30s
     this.syncTimer = setInterval(function () {
@@ -46,9 +42,7 @@ export default class Notes extends Abstract {
   }
 
   registerObservers() {
-    console.log("Registering observers");
     this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade){
-      console.log("Note sync observer");
       if(changesMade) {
         console.log("===Changes Made===");
         this.loadNotes();

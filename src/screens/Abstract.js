@@ -15,12 +15,12 @@ export default class Abstract extends Component {
 
     switch(event.id) {
       case 'willAppear':
-        console.log("===Will Appear===");
+        // console.log("===Will Appear===");
         this.willBeVisible = true;
         this.configureNavBar();
        break;
       case 'didAppear':
-        console.log("===Did Appear===");
+        // console.log("===Did Appear===");
         this.visible = true;
         break;
       case 'willDisappear':

@@ -5,6 +5,7 @@ var _ = require('lodash')
 import Item from "../models/api/item"
 import Note from "../models/app/note"
 import Tag from "../models/app/tag"
+import Theme from "../models/app/theme"
 
 export default class ModelManager {
 
@@ -163,6 +164,8 @@ export default class ModelManager {
       item = new Note(json_obj);
     } else if(json_obj.content_type == "Tag") {
       item = new Tag(json_obj);
+    } else if(json_obj.content_type == "SN|Theme") {
+      item = new Theme(json_obj);
     }
 
     else {

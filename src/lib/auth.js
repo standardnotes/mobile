@@ -194,7 +194,7 @@ export default class Auth {
       Sync.getInstance().handleSignout();
 
       this.signoutObservers.forEach(function(observer){
-        observer();
+        observer.callback();
       })
 
       if(callback) {

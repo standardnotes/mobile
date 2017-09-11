@@ -13,16 +13,16 @@ export default class Server {
     return this.instance;
   }
 
-  postAbsolute(url, params, onsuccess, onerror) {
-    this.httpRequest("post", url, params, onsuccess, onerror);
+  async postAbsolute(url, params, onsuccess, onerror) {
+    return this.httpRequest("post", url, params, onsuccess, onerror);
   }
 
-  patchAbsolute(url, params, onsuccess, onerror) {
-    this.httpRequest("patch", url, params, onsuccess, onerror);
+  async patchAbsolute(url, params, onsuccess, onerror) {
+    return this.httpRequest("patch", url, params, onsuccess, onerror);
   }
 
-  getAbsolute(url, params, onsuccess, onerror) {
-    this.httpRequest("get", url, params, onsuccess, onerror);
+  async getAbsolute(url, params, onsuccess, onerror) {
+    return this.httpRequest("get", url, params, onsuccess, onerror);
   }
 
   async httpRequest(verb, url, params, onsuccess, onerror) {
@@ -62,6 +62,8 @@ export default class Server {
     } else {
       xmlhttp.send();
     }
+
+    return xmlhttp;
   }
 
   formatParams(params) {
