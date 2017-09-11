@@ -198,6 +198,7 @@ export default class Authenticate extends Abstract {
                   autoCorrect={false}
                   autoCapitalize={'none'}
                   autoFocus={true}
+                  secureTextEntry={true}
                 />
               </SectionedTableCell>
 

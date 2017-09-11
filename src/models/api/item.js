@@ -9,7 +9,6 @@ export default class Item {
   constructor(json_obj) {
     this.appData = {};
     this.updateFromJSON(json_obj);
-    this.observers = [];
   }
 
   init(callback) {
@@ -67,31 +66,12 @@ export default class Item {
 
   setDirty(dirty) {
     this.dirty = dirty;
-
-    if(dirty) {
-      this.notifyObserversOfChange();
-    }
   }
 
   markAllReferencesDirty() {
     this.allReferencedObjects().forEach(function(reference){
       reference.setDirty(true);
     })
-  }
-  addObserver(observer, callback) {
-    if(!_.find(this.observers, observer)) {
-      this.observers.push({observer: observer, callback: callback});
-    }
-  }
-
-  removeObserver(observer) {
-    _.remove(this.observers, {observer: observer})
-  }
-
-  notifyObserversOfChange() {
-    for(var observer of this.observers) {
-      observer.callback(this);
-    }
   }
 
   mapContentToLocalProperties(contentObj) {

@@ -24,7 +24,6 @@ export default class ModelManager {
     this.items = [];
 
     this.itemSyncObservers = [];
-    this.itemChangeObservers = [];
 
     this._extensions = [];
     this.acceptableContentTypes = ["Note", "Tag", "Extension", "SN|Editor", "SN|Theme", "SN|Component"];
@@ -158,18 +157,6 @@ export default class ModelManager {
     }
   }
 
-  notifyItemChangeObserversOfModels(models) {
-    for(var observer of this.itemChangeObservers) {
-      var relevantItems = models.filter(function(item){
-        return _.includes(observer.content_types, item.content_type) || _.includes(observer.content_types, "*");
-      });
-
-      if(relevantItems.length > 0) {
-        observer.callback(relevantItems);
-      }
-    }
-  }
-
   createItem(json_obj) {
     var item;
     if(json_obj.content_type == "Note") {
@@ -181,10 +168,6 @@ export default class ModelManager {
     else {
       item = new Item(json_obj);
     }
-
-    item.addObserver(this, function(changedItem){
-      this.notifyItemChangeObserversOfModels([changedItem]);
-    }.bind(this));
 
     return item;
   }
@@ -251,14 +234,6 @@ export default class ModelManager {
 
   removeItemSyncObserver(id) {
     _.remove(this.itemSyncObservers, _.find(this.itemSyncObservers, {id: id}));
-  }
-
-  addItemChangeObserver(id, content_types, callback) {
-    this.itemChangeObservers.push({id: id, content_types: content_types, callback: callback});
-  }
-
-  removeItemChangeObserver(id) {
-    _.remove(this.itemChangeObservers, _.find(this.itemChangeObservers, {id: id}));
   }
 
   get filteredNotes() {
