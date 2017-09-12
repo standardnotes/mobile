@@ -20,19 +20,37 @@ export default class SortSection extends Component {
     let root = this;
     var pinAction = this.props.note.pinned ? "Unpin" : "Pin";
     var archiveOption = this.props.note.archived ? "Unarchive" : "Archive";
+
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
           <SectionedAccessoryTableCell
+            iconName={"ios-flag-outline"}
             onPress={() => {this.onPress(pinAction.toLowerCase())}}
             first={true} text={pinAction} buttonCell={true}
+            leftAlignIcon={true}
           />
+
           <SectionedAccessoryTableCell
+            iconName={"ios-archive-outline"}
             onPress={() => {this.onPress(archiveOption.toLowerCase())}}
             text={archiveOption} buttonCell={true}
+            leftAlignIcon={true}
           />
-          <SectionedAccessoryTableCell onPress={() => {this.onPress("share")}} text={"Share"} buttonCell={true} />
-          <SectionedAccessoryTableCell onPress={() => {this.onPress("delete")}} text={"Delete"} buttonCell={true} />
+
+          <SectionedAccessoryTableCell
+          iconName={"ios-share-outline"}
+          onPress={() => {this.onPress("share")}}
+          text={"Share"} buttonCell={true}
+          leftAlignIcon={true}
+          />
+
+          <SectionedAccessoryTableCell
+          iconName={"ios-trash-outline"}
+          onPress={() => {this.onPress("delete")}}
+          text={"Delete"} buttonCell={true}
+          leftAlignIcon={true}
+          />
       </TableSection>
     );
   }

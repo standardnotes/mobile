@@ -291,7 +291,6 @@ class OptionsSection extends Component {
 
 class ThemesSection extends Component {
   render() {
-    console.log("Rendering with themes", this.props.themes);
     return (
       <TableSection>
 
@@ -303,10 +302,11 @@ class ThemesSection extends Component {
               onPress={() => this.props.onThemeSelect(theme)}
               onLongPress={() => this.props.onThemeLongPress(theme)}
               text={theme.mobileRules.name}
-              key={theme.mobileRules.name}
+              key={theme.uuid}
               first={i == 0}
               selected={() => {return theme.active}}
               buttonCell={true}
+              tinted={true}
             />
           )
         }.bind(this))}

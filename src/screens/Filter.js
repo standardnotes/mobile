@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, SectionList, ScrollView, View, Text } from 'react-native';
+import { TextInput, SectionList, ScrollView, View, Text, Share } from 'react-native';
 var _ = require('lodash')
 
 import Sync from '../lib/sync'
@@ -181,7 +181,10 @@ export default class Filter extends Abstract {
       this.note.setAppDataItem("archived", event == "archive");
       this.note.setDirty(true);
     } else if(event == "share") {
-
+      Share.share({
+        title: this.note.title,
+        message: this.note.text,
+      })
     }
   }
 

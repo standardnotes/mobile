@@ -37,6 +37,7 @@ export default class GlobalStyles {
     this._systemTheme = new Theme({
       name: "Default",
       default: true,
+      uuid: 0,
       mobileRules: {
         name: "Default",
         rules: this.defaultRules(constants),
@@ -182,6 +183,11 @@ export default class GlobalStyles {
       container: {
         backgroundColor: constants.mainBackgroundColor,
         height: "100%",
+      },
+
+      flexContainer: {
+        flex: 1,
+        flexDirection: 'row',
       },
 
       view: {
