@@ -39,6 +39,7 @@ export default class Note extends Item {
     if(item.content_type == "Tag") {
       if(!_.find(this.tags, item)) {
         this.tags.push(item);
+        this.tags = Array.from(this.tags);
       }
     }
     super.addItemAsRelationship(item);
@@ -67,6 +68,7 @@ export default class Note extends Item {
       if(!uuids.includes(tag.uuid)) {
         _.pull(tag.notes, this);
         _.pull(this.tags, tag);
+        this.tags = Array.from(this.tags);
       }
     }.bind(this))
   }

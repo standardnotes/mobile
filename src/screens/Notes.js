@@ -10,6 +10,7 @@ import {iconsMap, iconsLoaded} from '../Icons';
 import NoteList from "../containers/NoteList"
 import Abstract from "./Abstract"
 import {Authenticate, AuthenticationState} from "./Authenticate"
+var _ = require('lodash')
 
 export default class Notes extends Abstract {
 
@@ -19,7 +20,7 @@ export default class Notes extends Abstract {
 
   constructor(props) {
     super(props);
-    this.state = {date: Date.now(), refreshing: false};
+    this.state = {date: Date.now(), refreshing: false, notes: ModelManager.getInstance().notes, decrypting: true};
     this.options = this.defaultOptions();
     this.registerObservers();
     this.configureNavBar();
@@ -45,7 +46,7 @@ export default class Notes extends Abstract {
     this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade){
       if(changesMade) {
         console.log("===Changes Made===");
-        this.loadNotes();
+        this.reloadList();
       } else {
         this.setState({refreshing: false});
       }
@@ -53,7 +54,7 @@ export default class Notes extends Abstract {
 
     this.signoutObserver = Auth.getInstance().addSignoutObserver(function(){
       this.options = this.defaultOptions();
-      this.loadNotes();
+      this.reloadList();
     }.bind(this));
   }
 
@@ -83,7 +84,10 @@ export default class Notes extends Abstract {
 
       var run = function() {
         Sync.getInstance().loadLocalItems(function(items) {
-          this.loadNotes();
+          this.reloadList();
+          this.setState(function(prevState){
+            return _.merge(prevState, {decrypting: false});
+          })
         }.bind(this));
         // perform initial sync
         Sync.getInstance().sync(null);
@@ -107,25 +111,6 @@ export default class Notes extends Abstract {
         onAuthenticateSuccess: onAuthenticate
       }
     });
-  }
-
-  loadNotes = (reloadNavBar = true) => {
-    if(!this.visible && !this.willBeVisible) {
-      console.log("===Scheduling Load Notes===");
-      this.loadNotesOnVisible = true;
-      return;
-    }
-
-    console.log("===Load Notes===");
-
-    this.notes = ModelManager.getInstance().getNotes(this.options);
-
-    this.reloadList();
-    // this function may be triggled asyncrounsly even when on a different screen
-    // we dont want to update the nav bar unless we are the present screen
-    if(reloadNavBar && this.visible) {
-      this.configureNavBar();
-    }
   }
 
   configureNavBar() {
@@ -192,7 +177,7 @@ export default class Notes extends Abstract {
       }
       if(this.loadNotesOnVisible) {
         this.loadNotesOnVisible = false;
-        this.loadNotes();
+        this.reloadList();
       }
     }
 
@@ -227,16 +212,31 @@ export default class Notes extends Abstract {
     });
   }
 
-  reloadList() {
+  reloadList(reloadNavBar = true) {
+    if(!this.visible && !this.willBeVisible) {
+      console.log("===Scheduling Notes Render Update===");
+      this.loadNotesOnVisible = true;
+      return;
+    }
+
+    console.log("===Reload Notes List===");
+
+    this.forceUpdate();
     this.setState((prevState, props) => {
-      return {date: Date.now(), refreshing: false};
+      return {refreshing: false};
     });
+
+    // this function may be triggled asyncrounsly even when on a different screen
+    // we dont want to update the nav bar unless we are the present screen
+    if(reloadNavBar && this.visible) {
+      this.configureNavBar();
+    }
   }
 
   setOptions(options) {
     this.options = options;
     Storage.setItem("options", JSON.stringify(options));
-    this.loadNotes();
+    this.reloadList();
   }
 
   _onRefresh() {
@@ -254,50 +254,32 @@ export default class Notes extends Abstract {
 
   onSearchTextChange = (text) => {
     this.options.searchTerm = text;
-    this.loadNotes(false);
+    this.reloadList(false);
   }
 
   onSearchCancel = () => {
     this.options.searchTerm = null;
-    this.loadNotes(false);
+    this.reloadList(false);
   }
 
   render() {
+    var notes = ModelManager.getInstance().getNotes(this.options);
     return (
-      <View style={styles.container, GlobalStyles.styles().container}>
-        <View style={styles.decryptNoticeContainer}>
-          <Text style={styles.decryptNotice}>Decrypting notes...</Text>
-        </View>
-        {this.notes &&
+      <View style={GlobalStyles.styles().container}>
+
+        {notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}
             onPressItem={this._onPressItem}
             refreshing={this.state.refreshing}
             onSearchChange={this.onSearchTextChange}
             onSearchCancel={this.onSearchCancel}
-            notes={this.notes}
+            notes={notes}
+            decrypting={this.state.decrypting}
           />
         }
+
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-  },
-
-  decryptNoticeContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: -1,
-  },
-
-  decryptNotice: {
-    position: "absolute",
-    opacity: 0.5
-  }
-});

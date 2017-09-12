@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, FlatList, RefreshControl, ScrollView } from 'react-native';
+import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text } from 'react-native';
 import NoteCell from "./NoteCell"
 import Search from 'react-native-search-box'
 import GlobalStyles from "../Styles"
@@ -38,8 +38,16 @@ export default class NoteList extends Component {
   render() {
     return (
       <View style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
+
+        {this.props.decrypting &&
+          <View style={styles.decryptNoticeContainer}>
+            <Text style={styles.decryptNotice}>Decrypting notes...</Text>
+          </View>
+        }
+
         <FlatList style={{height: "100%"}}
           keyboardDismissMode={'interactive'}
+          keyboardShouldPersistTaps={'always'}
           refreshControl={
             <RefreshControl
               refreshing={this.props.refreshing}
@@ -55,3 +63,26 @@ export default class NoteList extends Component {
     )
   }
 }
+
+const styles = StyleSheet.create({
+
+  container: {
+    flex: 1,
+  },
+
+  decryptNoticeContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: -1,
+    position: "absolute",
+    height: "100%",
+    width: "100%"
+  },
+
+  decryptNotice: {
+    position: "absolute",
+    opacity: 0.5,
+    color: "black"
+  }
+});

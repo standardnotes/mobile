@@ -284,7 +284,7 @@ export default class ModelManager {
     if(item.content_type == "Tag") {
       _.pull(this.tags, item);
     } else if(item.content_type == "Note") {
-      _.pull(this.notes, item);
+      this.notes = _.pull(this.notes, item);
     } else if(item.content_type == "Extension") {
       _.pull(this._extensions, item);
     }

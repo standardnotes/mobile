@@ -31,7 +31,7 @@ export default class GlobalStyles {
 
   systemTheme() {
     if(this._systemTheme) {
-      return this_.systemTheme;
+      return this._systemTheme;
     }
     var constants = this.defaultConstants();
     this._systemTheme = new Theme({
@@ -56,8 +56,12 @@ export default class GlobalStyles {
     }.bind(this));
 
     ModelManager.getInstance().addItemSyncObserver("themes", "SN|Theme", function(items){
-      this.downloadThemes(_.filter(items), {deleted: false});
-      this._themes = _.uniq(this._themes.concat(items));
+      var nonDeleted = _.filter(items, {deleted: false});
+      var deleted = _.difference(items, nonDeleted);
+      this._themes = _.difference(this._themes, deleted);
+      this._themes = _.uniq(this._themes.concat(nonDeleted));
+
+      this.downloadThemes(nonDeleted);
 
       if(!this.activeThemeId) {
         Storage.getItem("active-theme-id").then(function(themeId){
