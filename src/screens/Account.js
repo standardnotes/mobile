@@ -10,6 +10,7 @@ import SectionedTableCell from "../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
 import {Authenticate, AuthenticationState} from "./Authenticate"
+import ItemParams from "../models/local/itemParams"
 
 import AuthSection from "../containers/account/AuthSection"
 import RegistrationConfirmSection from "../containers/account/RegistrationConfirmSection"
@@ -17,9 +18,16 @@ import OptionsSection from "../containers/account/OptionsSection"
 import PasscodeSection from "../containers/account/PasscodeSection"
 import ThemesSection from "../containers/account/ThemesSection"
 
+var base64 = require('base-64');
+
 var _ = require('lodash')
 
 import GlobalStyles from "../Styles"
+
+import { NativeModules} from 'react-native';
+
+var Mailer = require('NativeModules').RNMail;
+console.log("Mailer:", Mailer, Mailer.mail)
 
 import {TextInput, SectionList, ScrollView, View, Alert, Keyboard} from 'react-native';
 
@@ -166,8 +174,44 @@ export default class Account extends Abstract {
     })
   }
 
-  onExportPress() {
+  async onExportPress() {
+    var version = await Auth.getInstance().protocolVersion();
+    var keys = Auth.getInstance().keys();
 
+    var items = [];
+
+    for(var item of ModelManager.getInstance().allItems) {
+      var itemParams = new ItemParams(item, keys, version);
+      var params = await itemParams.paramsForExportFile();
+      items.push(params);
+    }
+
+    var data = {items: items}
+
+    if(keys) {
+      var authParams = await Auth.getInstance().savedAuthParams();
+      // auth params are only needed when encrypted with a standard file key
+      data["auth_params"] = authParams;
+    }
+
+    var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
+    var base64String = base64.encode(jsonString);
+
+    Mailer.mail({
+      subject: 'Standard Notes Backup',
+      recipients: [''],
+      body: '',
+      isHTML: true,
+      attachment: {
+        data: base64String,
+        type: 'json',   // Mime Type: jpg, png, doc, ppt, html, pdf
+        name: 'backup',   // Optional: Custom filename for attachment
+      }
+    }, (error, event) => {
+        if(error) {
+          Alert.alert('Error', 'Could not send mail. Please send a mail to support@example.com');
+        }
+    });
   }
 
   onThemeSelect = (theme) => {

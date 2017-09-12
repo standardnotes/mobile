@@ -138,13 +138,15 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-navigation')
     compile project(':react-native-keychain')
     compile project(':react-native-vector-icons')
     compile project(':react-native-aes-crypto')
-    compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:23.0.1"
-    compile "com.facebook.react:react-native:+"  // From node_modules
+    compile project(':RNMail')
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.facebook.react:react-native:+'
+    // From node_modules
+    compile project(':react-native-navigation')
 }
 
 // Run this once to be able to run the application with BUCK

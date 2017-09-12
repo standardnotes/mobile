@@ -14,7 +14,8 @@ export default class ItemParams {
   async paramsForExportFile() {
     this.additionalFields = ["updated_at"];
     this.forExportFile = true;
-    return _.omit(this.__params(), ["deleted"]);
+    this.omit = ["deleted"];
+    return this.__params();
   }
 
   async paramsForExtension() {
@@ -52,6 +53,10 @@ export default class ItemParams {
 
     if(this.additionalFields) {
       _.merge(params, _.pick(this.item, this.additionalFields));
+    }
+
+    if(this.omit) {
+      params = _.omit(params, this.omit);
     }
 
     return params;

@@ -32,7 +32,8 @@ public class MainApplication extends NavigationApplication {
             new MainReactPackage(),
             new KeychainPackage(),
             new VectorIconsPackage(),
-            new RCTAesPackage()
+            new RCTAesPackage(),
+            new RNMail()
       );
     }
 
