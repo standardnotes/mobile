@@ -4,8 +4,8 @@ var Aes = NativeModules.Aes;
 
 export default class Crypto {
 
-  static generateKeys(password, authParams, callback) {
-    Aes.pbkdf2(password, authParams.pw_salt, authParams.pw_cost, 768).then(key => {
+  static async generateKeys(password, authParams, callback) {
+    return Aes.pbkdf2(password, authParams.pw_salt, authParams.pw_cost, 768).then(key => {
 
       var outputLength = key.length;
       var splitLength = outputLength/3;

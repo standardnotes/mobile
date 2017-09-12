@@ -174,7 +174,9 @@ export default class GlobalStyles {
         mainTextColor: "black",
         selectedBackgroundColor: "#efefef",
         paddingLeft: 14,
-        composeBorderColor: "#F5F5F5"
+        composeBorderColor: "#F5F5F5",
+        mainTextFontSize: 16,
+        mainHeaderFontSize: 16,
       }
   }
 

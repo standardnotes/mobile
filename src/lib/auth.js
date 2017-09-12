@@ -129,7 +129,7 @@ export default class Auth {
 
       Crypto.generateKeys(inputtedPassword, authParams, function(keys){
 
-        root.performLoginRequest(email, keys.pw, server, async function(response, error) {
+        root.performLoginRequest(email, keys.pw, async function(response, error) {
           if(error) {
             callback(null, error);
             return;
@@ -144,9 +144,47 @@ export default class Auth {
     })
   }
 
-  async performLoginRequest(email, pw, server, callback) {
+  register = async (email, inputtedPassword, server, callback) => {
+    this.server = server;
+
+    var root = this;
+
+    var pw_nonce = await Crypto.generateRandomKey(512);
+    var pw_salt = await Crypto.sha256([email, pw_nonce].join(":"));
+
+    var authParams = {
+      pw_cost: 103000,
+      pw_salt: pw_salt
+    }
+
+    Crypto.generateKeys(inputtedPassword, authParams, function(keys){
+
+      root.performRegistrationRequest(email, keys.pw, authParams, async function(response, error) {
+        if(error) {
+          callback(null, error);
+          return;
+        }
+
+        if(response.user) {
+          await root.saveAuthParameters(response.user, response.token, email, server, authParams, keys);
+        }
+        callback(response.user, error);
+      })
+    });
+  }
+
+  async performLoginRequest(email, pw, callback) {
     var url = await this.urlForPath("auth/sign_in");
     Server.getInstance().postAbsolute(url, {email: email, password: pw}, function(response){
+      callback(response, null);
+    }, function(error){
+      callback(null, error.error);
+    })
+  }
+
+  async performRegistrationRequest(email, pw, authParams, callback) {
+    var url = await this.urlForPath("auth/");
+    Server.getInstance().postAbsolute(url, _.merge({email: email, password: pw}, authParams), function(response){
       callback(response, null);
     }, function(error){
       callback(null, error.error);

@@ -54,17 +54,15 @@ export default class NoteCell extends React.PureComponent {
 
       noteTitle: {
         fontWeight: "bold",
-        fontSize: 16,
+        fontSize: GlobalStyles.constants().mainHeaderFontSize,
         color: GlobalStyles.constants().mainTextColor
       },
 
-
       noteText: {
-        fontSize: 15,
+        fontSize: GlobalStyles.constants().mainTextFontSize,
         marginTop: 4,
         color: GlobalStyles.constants().mainTextColor
       },
-
 
       noteDate: {
         marginTop: 5,
