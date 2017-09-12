@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text } from 'react-native';
+import { StyleSheet, View, Platform, Text, AppState } from 'react-native';
 import ModelManager from '../lib/modelManager'
 import Storage from '../lib/storage'
 import Sync from '../lib/sync'
@@ -20,7 +20,10 @@ export default class Notes extends Abstract {
 
   constructor(props) {
     super(props);
-    this.state = {date: Date.now(), refreshing: false, notes: ModelManager.getInstance().notes, decrypting: true};
+    this.state = {
+      refreshing: false,
+      decrypting: true
+    };
     this.options = this.defaultOptions();
     this.registerObservers();
     this.configureNavBar();
@@ -30,9 +33,20 @@ export default class Notes extends Abstract {
   }
 
   componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
     Sync.getInstance().removeSyncObserver(this.syncObserver);
     Auth.getInstance().removeSignoutObserver(this.signoutObserver);
     clearInterval(this.syncTimer);
+  }
+
+  componentDidMount() {
+    AppState.addEventListener('change', this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    if ( nextAppState === 'active') {
+      Sync.getInstance().sync();
+    }
   }
 
   beginSyncTimer() {

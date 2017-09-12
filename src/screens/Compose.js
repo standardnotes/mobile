@@ -75,10 +75,14 @@ export default class Compose extends Abstract {
     super.onNavigatorEvent(event);
 
     if(event.id == 'didAppear') {
-        if(this.state.note.dirty) {
-          this.changesMade();
-          this.configureNavBar();
-        }
+      if(this.state.note.dummy) {
+        this.textview.focus();
+      }
+
+      if(this.state.note.dirty) {
+        this.changesMade();
+        this.configureNavBar();
+      }
     }
     if (event.type == 'NavBarButtonPress') {
       if (event.id == 'tags') {
@@ -217,7 +221,7 @@ export default class Compose extends Abstract {
                 onChangeText={this.onTextChange}
                 multiline = {true}
                 value={this.state.note.text}
-                autoFocus={!this.state.note.uuid}
+                ref={(ref) => this.textview = ref}
                 selectionColor={"red"}
                 underlineColorAndroid={'transparent'}
                 keyboardDismissMode={'interactive'}

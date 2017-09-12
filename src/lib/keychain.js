@@ -12,13 +12,11 @@ export default class Keychain {
   static async getKeys() {
     return RCTKeychain.getGenericPassword()
     .then(function(credentials) {
-      console.log("Creds", credentials);
       if(!credentials || !credentials.password) {
         console.log("===Keychain value missing===");
         return null;
       } else {
         var keys = JSON.parse(credentials.password);
-        console.log("keys", keys);
         return keys;
       }
     }).catch(function(error) {
