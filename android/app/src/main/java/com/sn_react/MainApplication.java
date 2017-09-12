@@ -1,22 +1,20 @@
 package com.sn_react;
 
-import android.app.Application;
+import android.support.annotation.Nullable;
 
-//import com.facebook.react.ReactApplication;
-import com.oblador.keychain.KeychainPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
-import com.tectiv3.aes.RCTAesPackage;
-import com.facebook.react.ReactNativeHost;
+import com.chirag.RNMail.RNMail;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-
-import android.support.annotation.Nullable;
+import com.oblador.keychain.KeychainPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.reactnativenavigation.NavigationApplication;
+import com.tectiv3.aes.RCTAesPackage;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.reactnativenavigation.NavigationApplication;
+//import com.facebook.react.ReactApplication;
 
 public class MainApplication extends NavigationApplication {
 
@@ -29,7 +27,7 @@ public class MainApplication extends NavigationApplication {
 
     protected List<ReactPackage> getPackages() {
       return Arrays.asList(
-            new MainReactPackage(),
+//            new MainReactPackage(),
             new KeychainPackage(),
             new VectorIconsPackage(),
             new RCTAesPackage(),

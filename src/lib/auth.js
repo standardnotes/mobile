@@ -216,7 +216,8 @@ export default class Auth {
       callback(response, null);
     }, function(response){
       console.log("Error getting auth params", response);
-      callback(null, response.error);
+      var error = response.error || {message: response};
+      callback(null, error);
     })
   }
 

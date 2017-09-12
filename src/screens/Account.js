@@ -204,7 +204,7 @@ export default class Account extends Abstract {
       isHTML: true,
       attachment: {
         data: base64String,
-        type: 'json',   // Mime Type: jpg, png, doc, ppt, html, pdf
+        type: '.json',   // Mime Type: jpg, png, doc, ppt, html, pdf
         name: 'backup',   // Optional: Custom filename for attachment
       }
     }, (error, event) => {
