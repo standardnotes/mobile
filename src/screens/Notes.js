@@ -218,9 +218,9 @@ export default class Notes extends Abstract {
       title: 'Options',
       animationType: 'slide-up',
       passProps: {
-        options: this.options,
+        options: _.cloneDeep(this.options),
         onOptionsChange: (options) => {
-          this.setOptions(options);
+          this.setOptions(_.cloneDeep(options));
         }
       }
     });
@@ -236,9 +236,7 @@ export default class Notes extends Abstract {
     console.log("===Reload Notes List===");
 
     this.forceUpdate();
-    this.setState((prevState, props) => {
-      return {refreshing: false};
-    });
+    this.mergeState({refreshing: false})
 
     // this function may be triggled asyncrounsly even when on a different screen
     // we dont want to update the nav bar unless we are the present screen
@@ -267,12 +265,12 @@ export default class Notes extends Abstract {
   }
 
   onSearchTextChange = (text) => {
-    this.options.searchTerm = text;
+    this.options = _.merge(this.options, {searchTerm: text});
     this.reloadList(false);
   }
 
   onSearchCancel = () => {
-    this.options.searchTerm = null;
+    this.options = _.merge(this.options, {searchTerm: null});
     this.reloadList(false);
   }
 
