@@ -194,14 +194,10 @@ export default class Account extends Abstract {
       recipients: [''],
       body: '',
       isHTML: true,
-      attachment: {
-        data: base64String,
-        type: '.json',   // Mime Type: jpg, png, doc, ppt, html, pdf
-        name: 'backup',   // Optional: Custom filename for attachment
-      }
+      attachment: { data: base64String, type: '.json', name: 'backup' }
     }, (error, event) => {
         if(error) {
-          Alert.alert('Error', 'Could not send mail. Please send a mail to support@example.com');
+          Alert.alert('Error', 'Unable to send email.');
         }
     });
   }

@@ -16,10 +16,9 @@ import {
   ScrollView,
   Text,
   Keyboard,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
-
-import {Platform} from 'react-native';
 
 import GlobalStyles from "../Styles"
 
@@ -36,7 +35,7 @@ export default class Compose extends Abstract {
       note = new Note({});
       note.dummy = true;
     }
-    this.state = {note: note, text: note.text, start: 0};
+    this.state = {note: note, text: note.text};
 
     this.configureNavBar();
     this.loadStyles();
@@ -48,17 +47,9 @@ export default class Compose extends Abstract {
     }.bind(this))
   }
 
-  componentDidMount() {
-    // On Android, long notes start at the bottom. This scrolls it up
-    var noteLength = this.state.note.safeText().length;
-    if(Platform.OS === 'android' && noteLength > 0) {
-      setTimeout(function () {
-        this.mergeState({start: Math.min(noteLength, 1), end: Math.min(noteLength, 1)})
-        setTimeout(function () {
-          this.mergeState({start: 0, end: 0})
-        }.bind(this), 0);
-      }.bind(this), 10);
-    }
+  onContentSizeChange = (c) => {
+    // This function must not be deleted. This is called by TextInput on onContentSizeChange
+    // It for some reason makes it so that TextInput starts at the top and not the bottom for a long note
   }
 
   componentWillMount () {
@@ -252,7 +243,14 @@ export default class Compose extends Abstract {
         />
 
         <KeyboardAvoidingView style={{flexGrow: 1}} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
-          <ScrollView style={this.styles.textContainer} contentContainerStyle={this.styles.contentContainer} keyboardDismissMode={'interactive'}>
+          {
+            // We wrap TextInput in a ScrollView so that we can have interactive dismiss gesture on iOS
+          }
+          <ScrollView
+            style={this.styles.textContainer}
+            contentContainerStyle={this.styles.contentContainer}
+            keyboardDismissMode={Platform.OS == 'android' ? 'on-drag' : 'interactive'}
+          >
             <TextInput
                 style={[this.styles.noteText, {paddingBottom: textBottomPadding}]}
                 onChangeText={this.onTextChange}
@@ -263,7 +261,8 @@ export default class Compose extends Abstract {
                 underlineColorAndroid={'transparent'}
                 keyboardDismissMode={'interactive'}
                 textAlignVertical={'top'}
-                selection={this.state.start ? {start: this.state.start, end: this.state.end} : undefined}
+                textAlign={'left'}
+                onContentSizeChange={this.onContentSizeChange}
               >
               </TextInput>
             </ScrollView>
