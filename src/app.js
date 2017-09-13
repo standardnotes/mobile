@@ -56,27 +56,27 @@ export default class App {
     return this.instance;
   }
 
+
   start() {
+    var tabStyles = {
+      tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
+      tabBarButtonColor: 'gray',
+      tabBarSelectedButtonColor: GlobalStyles.constants().mainTintColor,
+      statusBarColor: 'black',
+      tabFontFamily: 'BioRhyme-Bold',
+      navBarButtonColor: GlobalStyles.constants().mainTintColor,
+      navBarTextColor: GlobalStyles.constants().mainTintColor,
+      navigationBarColor: 'black', // android built in bar
+      navBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor, // actual top nav bar
+      statusBarColor: '#002b4c',
+      screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
+    };
+
     Navigation.startTabBasedApp({
-      tabs,
+      tabs: tabs,
       animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
-
-      tabsStyle: {
-        tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
-        tabBarButtonColor: 'gray',
-        tabBarSelectedButtonColor: GlobalStyles.constants().mainTintColor,
-        statusBarColor: 'black',
-        tabFontFamily: 'BioRhyme-Bold',
-      },
-
-      appStyle: {
-        navBarButtonColor: GlobalStyles.constants().mainTintColor,
-        navBarTextColor: GlobalStyles.constants().mainTintColor,
-        navigationBarColor: 'black', // android built in bar
-        navBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor, // actual top nav bar
-        statusBarColor: '#002b4c',
-        screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
-      },
+      tabsStyle: tabStyles, // for iOS
+      appStyle: tabStyles // for Android
     });
   }
 

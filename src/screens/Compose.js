@@ -4,6 +4,7 @@ import Auth from '../lib/auth'
 import ModelManager from '../lib/modelManager'
 import Note from '../models/app/note'
 import Abstract from "./Abstract"
+import {iconsMap, iconsLoaded} from '../Icons';
 
 import {
   AppRegistry,
@@ -35,7 +36,8 @@ export default class Compose extends Abstract {
       note = new Note({});
       note.dummy = true;
     }
-    this.state = {note: note, text: note.text};
+    this.state = {note: note, text: note.text, start: 0};
+
     this.configureNavBar();
     this.loadStyles();
 
@@ -46,7 +48,35 @@ export default class Compose extends Abstract {
     }.bind(this))
   }
 
+  componentDidMount() {
+    // On Android, long notes start at the bottom. This scrolls it up
+    var noteLength = this.state.note.safeText().length;
+    if(Platform.OS === 'android' && noteLength > 0) {
+      setTimeout(function () {
+        this.mergeState({start: Math.min(noteLength, 1), end: Math.min(noteLength, 1)})
+        setTimeout(function () {
+          this.mergeState({start: 0, end: 0})
+        }.bind(this), 0);
+      }.bind(this), 10);
+    }
+  }
+
+  componentWillMount () {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
+  }
+
+  _keyboardDidShow = () => {
+    this.mergeState({keyboard: true})
+  }
+
+  _keyboardDidHide = () => {
+    this.mergeState({keyboard: false})
+  }
+
   componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
     Sync.getInstance().removeSyncObserver(this.syncObserver);
   }
 
@@ -58,15 +88,19 @@ export default class Compose extends Abstract {
       title += ` (${this.state.note.tags.length})`;
     }
 
+    var tagButton = {
+      title: title,
+      id: 'tags',
+      showAsAction: 'ifRoom',
+      buttonColor: GlobalStyles.constants().mainTintColor,
+    }
+
+    if(Platform.OS === "android") {
+      tagButton.icon = iconsMap["md-menu"];
+    }
+
     this.props.navigator.setButtons({
-      rightButtons: [
-        {
-          title: title,
-          id: 'tags',
-          showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants().mainTintColor,
-        },
-      ],
+      rightButtons: [tagButton],
       animated: false
     });
   }
@@ -76,7 +110,7 @@ export default class Compose extends Abstract {
 
     if(event.id == 'didAppear') {
       if(this.state.note.dummy) {
-        this.textview.focus();
+        this.textView.focus();
       }
 
       if(this.state.note.dirty) {
@@ -203,6 +237,10 @@ export default class Compose extends Abstract {
   }
 
   render() {
+    var textBottomPadding = this.state.keyboard ? 10 : 0;
+    var keyboardBehavior = Platform.OS == "android" ? "height" : "padding";
+    var keyboardOffset = this.rawStyles.noteTitle.height + this.rawStyles.noteText.paddingTop + (Platform.OS == "android" ? 15 : 0);
+    console.log("Note", this.state.note.text);
     return (
       <View style={[this.styles.container, GlobalStyles.styles().container]}>
         <TextInput
@@ -214,17 +252,19 @@ export default class Compose extends Abstract {
           underlineColorAndroid={'transparent'}
         />
 
-        <KeyboardAvoidingView style={{flexGrow: 1}} keyboardVerticalOffset={this.rawStyles.noteTitle.height + this.rawStyles.noteText.paddingTop} behavior={'padding'}>
+        <KeyboardAvoidingView style={{flexGrow: 1}} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
           <ScrollView style={this.styles.textContainer} contentContainerStyle={this.styles.contentContainer} keyboardDismissMode={'interactive'}>
             <TextInput
-                style={this.styles.noteText}
+                style={[this.styles.noteText, {paddingBottom: textBottomPadding}]}
                 onChangeText={this.onTextChange}
-                multiline = {true}
+                multiline={true}
                 value={this.state.note.text}
-                ref={(ref) => this.textview = ref}
-                selectionColor={"red"}
+                ref={component => this.textView = component}
+                selectionColor={GlobalStyles.constants().mainTintColor}
                 underlineColorAndroid={'transparent'}
                 keyboardDismissMode={'interactive'}
+                textAlignVertical={'top'}
+                selection={this.state.start ? {start: this.state.start, end: this.state.end} : undefined}
               >
               </TextInput>
             </ScrollView>
@@ -260,7 +300,7 @@ export default class Compose extends Abstract {
       },
 
       contentContainer: {
-        flexGrow: 1
+        flexGrow: 1,
       },
 
       noteText: {
@@ -268,13 +308,10 @@ export default class Compose extends Abstract {
         flexGrow: 1,
         fontSize: 17,
         marginTop: 0,
-        paddingTop: 10,
-        paddingBottom: 10,
         color: GlobalStyles.constants().mainTextColor,
         paddingLeft: GlobalStyles.constants().paddingLeft,
         paddingRight: GlobalStyles.constants().paddingLeft,
         textAlignVertical: 'top',
-        paddingVertical: 0,
         lineHeight: 22,
       }
     }

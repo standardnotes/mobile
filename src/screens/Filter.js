@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, SectionList, ScrollView, View, Text, Share } from 'react-native';
+import { TextInput, SectionList, ScrollView, View, Text, Share, Platform } from 'react-native';
 var _ = require('lodash')
 
 import Sync from '../lib/sync'
@@ -12,6 +12,7 @@ import ManageNote from "../containers/ManageNote";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
 import Tag from "../models/app/tag"
+import {iconsMap, iconsLoaded} from '../Icons';
 
 import GlobalStyles from "../Styles"
 
@@ -42,7 +43,7 @@ export default class Filter extends Abstract {
     super.configureNavBar();
 
     var leftButtons = [];
-    if(!this.note) {
+    if(!this.note || Platform.OS == "android") {
       // tags only means we're presenting horizontally, only want left button on modal
       leftButtons.push({
         title: 'Done',
@@ -53,16 +54,19 @@ export default class Filter extends Abstract {
         buttonFontSize: 17
       })
     }
+    var rightButton = {
+      title: 'New Tag',
+      id: 'new-tag',
+      showAsAction: 'ifRoom',
+      buttonColor: GlobalStyles.constants().mainTintColor,
+    };
+
+    if(Platform.OS === "android") {
+      rightButton.icon = iconsMap["md-pricetag"];
+    }
 
     this.props.navigator.setButtons({
-      rightButtons: [
-        {
-          title: 'New Tag',
-          id: 'new-tag',
-          showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants().mainTintColor,
-        },
-      ],
+      rightButtons: [rightButton],
       leftButtons: leftButtons,
       animated: false
     });
@@ -72,35 +76,37 @@ export default class Filter extends Abstract {
 
     super.onNavigatorEvent(event);
 
-    switch(event.id) {
-      case 'willAppear':
-       this.forceUpdate();
-       break;
-      }
+    if(event.id == "willAppear") {
+      this.forceUpdate();
+    }
 
-      if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
-        if (event.id == 'accept') { // this is the same id field from the static navigatorButtons definition
+    if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
+      if (event.id == 'accept') { // this is the same id field from the static navigatorButtons definition
+        if(this.note) {
+          this.props.navigator.pop();
+        } else {
           this.props.navigator.dismissModal({animationType: "slide-down"})
-        } else if(event.id == 'new-tag') {
-          this.props.navigator.showModal({
-            screen: 'sn.InputModal',
-            title: 'New Tag',
-            animationType: 'slide-up',
-            passProps: {
-              title: 'New Tag',
-              placeholder: "New tag name",
-              onSave: (text) => {
-                this.createTag(text, function(tag){
-                  if(this.note) {
-                    // select this tag
-                    this.onTagSelect(tag)
-                  }
-                }.bind(this));
-              }
-            }
-          });
         }
+      } else if(event.id == 'new-tag') {
+        this.props.navigator.showModal({
+          screen: 'sn.InputModal',
+          title: 'New Tag',
+          animationType: 'slide-up',
+          passProps: {
+            title: 'New Tag',
+            placeholder: "New tag name",
+            onSave: (text) => {
+              this.createTag(text, function(tag){
+                if(this.note) {
+                  // select this tag
+                  this.onTagSelect(tag)
+                }
+              }.bind(this));
+            }
+          }
+        });
       }
+    }
   }
 
   createTag(text, callback) {
