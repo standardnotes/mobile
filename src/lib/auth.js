@@ -15,6 +15,10 @@ export default class Auth {
 
   static instance = null;
 
+  static DidSignOutEvent = "DidSignOutEvent";
+  static WillSignInEvent = "WillSignInEvent";
+  static DidSignInEvent = "DidSignInEvent";
+
   static getInstance() {
     if (this.instance == null) {
       this.instance = new Auth();
@@ -36,17 +40,17 @@ export default class Auth {
   }
 
   constructor() {
-    this.signoutObservers = [];
+    this.eventSubscribers = [];
   }
 
-  addSignoutObserver(callback) {
-    var observer = {key: new Date(), callback: callback};
-    this.signoutObservers.push(observer);
+  addEventObserver(events, callback) {
+    var observer = {key: new Date(), events, callback: callback};
+    this.eventSubscribers.push(observer);
     return observer;
   }
 
-  removeSignoutObserver(observer) {
-    _.pull(this.signoutObservers, observer);
+  removeEventObserver(observer) {
+    _.pull(this.eventSubscribers, observer);
   }
 
   serverUrl() {
@@ -87,7 +91,9 @@ export default class Auth {
   }
 
   login = (email, inputtedPassword, server, callback) => {
-    console.log("Login in with server", server);
+
+    this.postEvent(Auth.WillSignInEvent);
+
     var root = this;
 
     this.getAuthParams(email, server, function(authParams, error){
@@ -106,6 +112,7 @@ export default class Auth {
 
           if(response.user) {
             await root.saveAuthParameters({token: response.token, email: email, server: server, authParams: authParams, keys: keys});
+            root.postEvent(Auth.DidSignInEvent);
           }
           callback(response.user, error);
         })
@@ -122,6 +129,10 @@ export default class Auth {
     var authParams = {
       pw_cost: 103000,
       pw_salt: pw_salt
+    }
+
+    if(__DEV__) {
+      authParams.pw_cost = 3000;
     }
 
     Crypto.generateKeys(inputtedPassword, authParams, function(keys){
@@ -192,14 +203,20 @@ export default class Auth {
     DBManager.clearAllItems(function(){
       Sync.getInstance().handleSignout();
 
-      this.signoutObservers.forEach(function(observer){
-        observer.callback();
-      })
+      this.postEvent(Auth.DidSignOutEvent);
 
       if(callback) {
         callback();
       }
     }.bind(this));
+  }
+
+  postEvent(event) {
+    this.eventSubscribers.forEach(function(observer){
+      if(observer.events.includes(event)) {
+        observer.callback(event);
+      }
+    })
   }
 
 }

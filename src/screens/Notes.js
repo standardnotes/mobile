@@ -39,7 +39,7 @@ export default class Notes extends Abstract {
   componentWillUnmount() {
     AppState.removeEventListener('change', this._handleAppStateChange);
     Sync.getInstance().removeSyncObserver(this.syncObserver);
-    Auth.getInstance().removeSignoutObserver(this.signoutObserver);
+    Auth.getInstance().removeEventObserver(this.signoutObserver);
     clearInterval(this.syncTimer);
   }
 
@@ -66,13 +66,17 @@ export default class Notes extends Abstract {
         console.log("===Changes Made===");
         this.reloadList();
       } else {
-        this.setState({refreshing: false});
+        this.mergeState({refreshing: false, loading: false});
       }
     }.bind(this))
 
-    this.signoutObserver = Auth.getInstance().addSignoutObserver(function(){
-      this.options = this.defaultOptions();
-      this.reloadList();
+    this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
+      if(event == Auth.DidSignOutEvent) {
+        this.options = this.defaultOptions();
+        this.reloadList();
+      } else if(event == Auth.WillSignInEvent) {
+        this.mergeState({loading: true})
+      }
     }.bind(this));
   }
 
@@ -105,9 +109,7 @@ export default class Notes extends Abstract {
 
         Sync.getInstance().loadLocalItems(function(items) {
           this.reloadList();
-          this.setState(function(prevState){
-            return _.merge(prevState, {decrypting: false, loading: false});
-          })
+          this.mergeState({decrypting: false, loading: false});
         }.bind(this));
 
         // perform initial sync
@@ -245,7 +247,7 @@ export default class Notes extends Abstract {
     console.log("===Reload Notes List===");
 
     this.forceUpdate();
-    this.mergeState({refreshing: false})
+    this.mergeState({refreshing: false, loading: false})
 
     // this function may be triggled asyncrounsly even when on a different screen
     // we dont want to update the nav bar unless we are the present screen

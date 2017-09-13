@@ -39,7 +39,7 @@ export default class NoteList extends Component {
     return (
       <View style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
 
-        {this.props.decrypting || this.props.loading &&
+        {(this.props.decrypting || this.props.loading) &&
           <View style={styles.decryptNoticeContainer}>
             <Text style={styles.decryptNotice}> { this.props.decrypting ? "Decrypting notes..." : "Loading notes..."} </Text>
           </View>

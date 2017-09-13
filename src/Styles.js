@@ -28,7 +28,7 @@ export default class GlobalStyles {
 
     KeysManager.get().registerAccountRelatedStorageKeys(["active-theme-id"]);
 
-    Auth.getInstance().addSignoutObserver(function(){
+    Auth.getInstance().addEventObserver([Auth.DidSignOutEvent], function() {
       this._themes = [this.systemTheme()];
     }.bind(this));
 
@@ -99,7 +99,9 @@ export default class GlobalStyles {
   }
 
   themes() {
-    return this._themes;
+    return this._themes.filter(function(theme){
+      return theme.mobileRules != null;
+    });
   }
 
   isThemeActive(theme) {

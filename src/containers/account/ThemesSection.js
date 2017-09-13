@@ -20,7 +20,7 @@ export default class ThemesSection extends Component {
             <SectionedAccessoryTableCell
               onPress={() => this.props.onThemeSelect(theme)}
               onLongPress={() => this.props.onThemeLongPress(theme)}
-              text={theme.mobileRules.name}
+              text={theme.name}
               key={theme.uuid}
               first={i == 0}
               selected={() => {return theme.active}}
