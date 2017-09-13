@@ -5,6 +5,7 @@ import Storage from '../lib/storage'
 import Sync from '../lib/sync'
 import Auth from '../lib/auth'
 import KeysManager from '../lib/keysManager'
+import AlertManager from '../lib/alertManager'
 import GlobalStyles from "../Styles"
 import Keychain from "../lib/keychain"
 import {iconsMap, iconsLoaded} from '../Icons';
@@ -265,11 +266,24 @@ export default class Notes extends Abstract {
   }
 
   _onPressItem = (item: hash) => {
-    this.props.navigator.push({
-      screen: 'sn.Compose',
-      title: 'Compose',
-      passProps: {noteId: item.uuid}
-    });
+    var run = () => {
+      this.props.navigator.push({
+        screen: 'sn.Compose',
+        title: 'Compose',
+        passProps: {noteId: item.uuid}
+      });
+    }
+
+    if(item.errorDecrypting) {
+      AlertManager.showConfirmationAlert(
+        "Unable to Decrypt", "This note could not be decrypted. Perhaps it was encrypted with another key? Please visit standardnotes.org/help for more. Note: Editing this note may damage its original contents.", "Edit Anyway",
+        function(){
+          run();
+        }.bind(this)
+      )
+    } else {
+      run();
+    }
   }
 
   onSearchTextChange = (text) => {

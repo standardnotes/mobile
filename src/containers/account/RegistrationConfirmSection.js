@@ -32,7 +32,7 @@ export default class RegistrationConfirmSection extends Component {
       <TableSection>
         <SectionHeader title={this.props.title} />
 
-        <Text style={{paddingLeft: padding, paddingRight: padding, marginBottom: padding}}>
+        <Text style={[GlobalStyles.styles().uiText, {paddingLeft: padding, paddingRight: padding, marginBottom: padding}]}>
         Due to the nature of our encryption, Standard Notes cannot offer password reset functionality.
         If you forget your password, you will permanently lose access to your data.
         </Text>

@@ -31,7 +31,7 @@ export default class Account extends Abstract {
 
   constructor(props) {
     super(props);
-    this.state = {params: {email: "a@bitar.io", password: "password"}};
+    this.state = {params: {email: "a@bitar.io", password: "password", server: Auth.getInstance().serverUrl()}};
   }
 
   loadPasscodeStatus() {
@@ -120,8 +120,6 @@ export default class Account extends Abstract {
 
     var params = this.state.params;
 
-    console.log("Confirming with params", params);
-
     Auth.getInstance().register(params.email, params.password, params.server, function(user, error) {
       this.setState(function(prevState){
         return _.merge(prevState, {registering: false, confirmRegistration: false});
@@ -161,9 +159,14 @@ export default class Account extends Abstract {
   }
 
   onSignOutPress = () => {
-    Auth.getInstance().signout(() => {
-      this.forceUpdate();
-    })
+    AlertManager.showConfirmationAlert(
+      "Sign Out?", "Signing out will remove all data from this device, including notes and tags. Make sure your data is synced before proceeding.", "Sign Out",
+      function(){
+        Auth.getInstance().signout(() => {
+          this.forceUpdate();
+        })
+      }.bind(this)
+    )
   }
 
   async onExportPress() {

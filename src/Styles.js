@@ -193,6 +193,11 @@ export default class GlobalStyles {
         flexDirection: 'row',
       },
 
+      uiText: {
+        color: constants.mainTextColor,
+        fontSize: constants.mainTextFontSize,
+      },
+
       view: {
         backgroundColor: constants.mainBackgroundColor,
       },
@@ -205,7 +210,7 @@ export default class GlobalStyles {
 
       sectionHeader: {
         color: "gray",
-        fontSize: 12,
+        fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
         paddingBottom: 10,
         paddingTop: 10
@@ -227,7 +232,7 @@ export default class GlobalStyles {
       },
 
       sectionedTableCellTextInput: {
-        fontSize: 16,
+        fontSize: constants.mainTextFontSize,
         padding: 0,
         // height: "100%",
       },
@@ -245,7 +250,7 @@ export default class GlobalStyles {
 
       sectionedAccessoryTableCellLabel: {
         paddingTop: 12,
-        fontSize: 16,
+        fontSize: constants.mainTextFontSize,
         color: constants.mainTextColor
       },
 
@@ -260,7 +265,7 @@ export default class GlobalStyles {
       buttonCellButton: {
         textAlign: "center",
         color: constants.mainTintColor,
-        fontSize: 15,
+        fontSize: constants.mainTextFontSize - 1,
         height: "100%",
         paddingTop: 13
       },

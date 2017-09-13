@@ -53,14 +53,16 @@ export default class Auth {
     return KeysManager.get().user.server || Auth._defaultServer();
   }
 
-  urlForPath(path) {
+  urlForPath(path, serverUrl) {
     function joinPaths(parts){
        var separator = "/";
        var replace = new RegExp(separator+'{1,}', 'g');
        return parts.join(separator).replace(replace, separator);
     }
 
-    var serverUrl = this.serverUrl();
+    if(!serverUrl) {
+      serverUrl = this.serverUrl();
+    }
     return joinPaths([serverUrl, path]);
   }
 
@@ -85,11 +87,10 @@ export default class Auth {
   }
 
   login = (email, inputtedPassword, server, callback) => {
-    this.server = server;
-
+    console.log("Login in with server", server);
     var root = this;
 
-    this.getAuthParams(email, function(authParams, error){
+    this.getAuthParams(email, server, function(authParams, error){
       if(error) {
         callback(null, error);
         return;
@@ -97,7 +98,7 @@ export default class Auth {
 
       Crypto.generateKeys(inputtedPassword, authParams, function(keys){
 
-        root.performLoginRequest(email, keys.pw, async function(response, error) {
+        root.performLoginRequest(email, keys.pw, server, async function(response, error) {
           if(error) {
             callback(null, error);
             return;
@@ -113,8 +114,6 @@ export default class Auth {
   }
 
   register = async (email, inputtedPassword, server, callback) => {
-    this.server = server;
-
     var root = this;
 
     var pw_nonce = await Crypto.generateRandomKey(512);
@@ -127,7 +126,7 @@ export default class Auth {
 
     Crypto.generateKeys(inputtedPassword, authParams, function(keys){
 
-      root.performRegistrationRequest(email, keys.pw, authParams, async function(response, error) {
+      root.performRegistrationRequest(email, keys.pw, authParams, server, async function(response, error) {
         if(error) {
           callback(null, error);
           return;
@@ -141,8 +140,8 @@ export default class Auth {
     });
   }
 
-  async performLoginRequest(email, pw, callback) {
-    var url = this.urlForPath("auth/sign_in");
+  async performLoginRequest(email, pw, server, callback) {
+    var url = this.urlForPath("auth/sign_in", server);
     Server.getInstance().postAbsolute(url, {email: email, password: pw}, function(response){
       callback(response, null);
     }, function(error){
@@ -150,8 +149,8 @@ export default class Auth {
     })
   }
 
-  async performRegistrationRequest(email, pw, authParams, callback) {
-    var url = this.urlForPath("auth/");
+  async performRegistrationRequest(email, pw, authParams, server, callback) {
+    var url = this.urlForPath("auth/", server);
     Server.getInstance().postAbsolute(url, _.merge({email: email, password: pw}, authParams), function(response){
       callback(response, null);
     }, function(error){
@@ -175,8 +174,8 @@ export default class Auth {
     }
   }
 
-  async getAuthParams(email, callback) {
-    var url = this.urlForPath("auth/params");
+  async getAuthParams(email, server, callback) {
+    var url = this.urlForPath("auth/params", server);
     Server.getInstance().getAbsolute(url, {email: email}, function(response){
       callback(response, null);
     }, function(response){

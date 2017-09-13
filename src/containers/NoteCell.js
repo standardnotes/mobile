@@ -119,6 +119,10 @@ export default class NoteCell extends React.PureComponent {
             <Text style={this.styles.deleting}>Deleting...</Text>
           }
 
+          {note.errorDecrypting &&
+            <Text style={this.styles.deleting}>Error Decrypting</Text>
+          }
+
           {note.pinned &&
             <View style={this.styles.pinnedView}>
               <Icon name={"ios-bookmark"} size={14} color={GlobalStyles.constants().mainTintColor} />
