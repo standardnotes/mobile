@@ -311,8 +311,9 @@ export default class ModelManager {
 
     var searchTerm = options.searchTerm;
     if(searchTerm) {
+      searchTerm = searchTerm.toLowerCase();
       notes = notes.filter(function(note){
-        return note.safeTitle().includes(searchTerm) || note.safeText().includes(searchTerm);
+        return note.safeTitle().toLowerCase().includes(searchTerm) || note.safeText().toLowerCase().includes(searchTerm);
       })
     }
 
