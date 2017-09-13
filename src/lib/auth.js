@@ -9,6 +9,8 @@ import Keychain from "./keychain"
 import KeysManager from "./keysManager"
 var _ = require('lodash')
 
+let accountRelatedStorageKeys = [];
+
 export default class Auth {
 
   static instance = null;
@@ -47,25 +49,18 @@ export default class Auth {
     _.pull(this.signoutObservers, observer);
   }
 
-  async serverUrl() {
-    if(this.server) {
-      return this.server;
-    }
-    this.server = await Storage.getItem("server");
-    if(!this.server) {
-      this.server = Auth._defaultServer();
-    }
-    return this.server;
+  serverUrl() {
+    return KeysManager.get().user.server || Auth._defaultServer();
   }
 
-  async urlForPath(path) {
+  urlForPath(path) {
     function joinPaths(parts){
        var separator = "/";
        var replace = new RegExp(separator+'{1,}', 'g');
        return parts.join(separator).replace(replace, separator);
     }
 
-    var serverUrl = await this.serverUrl();
+    var serverUrl = this.serverUrl();
     return joinPaths([serverUrl, path]);
   }
 
@@ -75,16 +70,8 @@ export default class Auth {
     return !keys.jwt;
   }
 
-  async savedAuthParams() {
-    if(!this._authParams) {
-      var result = await Storage.getItem("auth_params")
-      this._authParams = JSON.parse(result);
-    }
-    return this._authParams;
-  }
-
-  async protocolVersion() {
-    var authParams = await this.savedAuthParams();
+  protocolVersion() {
+    var authParams = KeysManager.get().activeAuthParams();
     if(authParams && authParams.version) {
       return authParams.version;
     }
@@ -155,7 +142,7 @@ export default class Auth {
   }
 
   async performLoginRequest(email, pw, callback) {
-    var url = await this.urlForPath("auth/sign_in");
+    var url = this.urlForPath("auth/sign_in");
     Server.getInstance().postAbsolute(url, {email: email, password: pw}, function(response){
       callback(response, null);
     }, function(error){
@@ -164,7 +151,7 @@ export default class Auth {
   }
 
   async performRegistrationRequest(email, pw, authParams, callback) {
-    var url = await this.urlForPath("auth/");
+    var url = this.urlForPath("auth/");
     Server.getInstance().postAbsolute(url, _.merge({email: email, password: pw}, authParams), function(response){
       callback(response, null);
     }, function(error){
@@ -179,8 +166,7 @@ export default class Auth {
       return await Promise.all([
         KeysManager.get().persistAccountKeys(_.merge(keys, {jwt: token})),
         KeysManager.get().setAccountAuthParams(authParams),
-        Storage.setItem("server", server),
-        Storage.setItem("email", email),
+        KeysManager.get().saveUser({server: server, email: email})
       ]);
 
     } catch(e) {
@@ -190,7 +176,7 @@ export default class Auth {
   }
 
   async getAuthParams(email, callback) {
-    var url = await this.urlForPath("auth/params");
+    var url = this.urlForPath("auth/params");
     Server.getInstance().getAbsolute(url, {email: email}, function(response){
       callback(response, null);
     }, function(response){
@@ -201,8 +187,6 @@ export default class Auth {
   }
 
   signout(callback) {
-    this.authParams = null;
-
     ModelManager.getInstance().handleSignout();
     KeysManager.get().clearAccountKeysAndData();
 

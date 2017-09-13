@@ -19,6 +19,7 @@ import {registerScreens, registerScreenVisibilityListener} from './screens';
 
 import Auth from './lib/auth'
 import Sync from './lib/sync'
+import KeysManager from './lib/keysManager'
 
 import GlobalStyles from "./Styles"
 
@@ -56,7 +57,6 @@ export default class App {
     return this.instance;
   }
 
-
   start() {
     var tabStyles = {
       tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
@@ -72,12 +72,15 @@ export default class App {
       screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
     };
 
-    Navigation.startTabBasedApp({
-      tabs: tabs,
-      animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
-      tabsStyle: tabStyles, // for iOS
-      appStyle: tabStyles // for Android
-    });
+    KeysManager.get().loadInitialData().then(function(){
+      Navigation.startTabBasedApp({
+        tabs: tabs,
+        animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
+        tabsStyle: tabStyles, // for iOS
+        appStyle: tabStyles // for Android
+      });
+    })
+
   }
 
   reload() {

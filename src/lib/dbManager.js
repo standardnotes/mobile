@@ -27,6 +27,15 @@ export default class DBManager {
     return "Item-" + item.uuid;
   }
 
+  static getAllItemKeys(callback) {
+    AsyncStorage.getAllKeys(function(error, keys) {
+      var filtered = keys.filter(function(key){
+        return key.includes("Item-");
+      })
+      callback(filtered);
+    })
+  }
+
   static saveItems(items, callback) {
 
     if(items.length == 0) {
@@ -44,13 +53,10 @@ export default class DBManager {
       }
     })
 
-    // multiset is not working properly; returns with error
     /*
-      AsyncStorage.multiSet(data, function(error){
-        callback();
-      })
+      // Note: multiset is not working properly; returns with error
+      AsyncStorage.multiSet(data, function(error){ callback(); })
     */
-
   }
 
   static deleteItem(item, callback) {
@@ -66,8 +72,10 @@ export default class DBManager {
   }
 
   static clearAllItems(callback) {
-    AsyncStorage.clear(function(error){
-      callback();
-    })
+    this.getAllItemKeys(function(itemKeys){
+      AsyncStorage.multiRemove(itemKeys, function(){
+        callback();
+      })
+    });
   }
 }

@@ -117,9 +117,9 @@ export default class Authenticate extends Abstract {
   render() {
     return (
       <View style={GlobalStyles.styles().container}>
-        <TableSection>
+        <TableSection extraStyles={[GlobalStyles.styles().container]}>
           {this.props.mode == "authenticate" &&
-            <View>
+            <View style={GlobalStyles.styles().container}>
               <SectionHeader title={"Enter local passcode"} />
 
               <SectionedTableCell textInputCell={true} first={true}>
@@ -142,7 +142,7 @@ export default class Authenticate extends Abstract {
           }
 
           {this.props.mode == "setup" &&
-            <View>
+            <View style={GlobalStyles.styles().container}>
               <SectionHeader title={"Choose passcode"} />
 
               <SectionedTableCell textInputCell={true} first={true}>

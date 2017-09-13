@@ -18,18 +18,13 @@ import RegistrationConfirmSection from "../containers/account/RegistrationConfir
 import OptionsSection from "../containers/account/OptionsSection"
 import PasscodeSection from "../containers/account/PasscodeSection"
 import ThemesSection from "../containers/account/ThemesSection"
+import EncryptionSection from "../containers/account/EncryptionSection"
 
 var base64 = require('base-64');
-
 var _ = require('lodash')
-
 import GlobalStyles from "../Styles"
-
 import { NativeModules} from 'react-native';
-
 var Mailer = require('NativeModules').RNMail;
-console.log("Mailer:", Mailer, Mailer.mail)
-
 import {TextInput, SectionList, ScrollView, View, Alert, Keyboard} from 'react-native';
 
 export default class Account extends Abstract {
@@ -48,13 +43,6 @@ export default class Account extends Abstract {
 
   componentDidMount() {
     this.loadPasscodeStatus();
-    Auth.getInstance().serverUrl().then(function(server){
-      this.setState(function(prevState) {
-        var params = prevState.params;
-        params.server = server;
-        return _.merge(prevState, {params: params});
-      })
-    }.bind(this))
   }
 
   onNavigatorEvent(event) {
@@ -179,7 +167,7 @@ export default class Account extends Abstract {
   }
 
   async onExportPress() {
-    var version = await Auth.getInstance().protocolVersion();
+    var version = Auth.getInstance().protocolVersion();
     var keys = KeysManager.get().activeKeys();
 
     var items = [];
@@ -306,6 +294,10 @@ export default class Account extends Abstract {
             onEnable={this.onPasscodeEnable}
             onDisable={this.onPasscodeDisable}
             title={"Local Passcode"}
+          />
+
+          <EncryptionSection
+            title={"Encryption Status"}
           />
 
         </ScrollView>

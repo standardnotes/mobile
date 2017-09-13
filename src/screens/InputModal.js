@@ -4,6 +4,7 @@ import GlobalStyles from "../Styles"
 import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import SectionHeader from "../components/SectionHeader";
+import ButtonCell from "../components/ButtonCell";
 
 export default class InputModal extends Component {
 
@@ -16,16 +17,6 @@ export default class InputModal extends Component {
   configureNavBar() {
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     this.props.navigator.setButtons({
-      rightButtons: [
-        {
-          title: 'Save',
-          id: 'save',
-          showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants().mainTintColor,
-          buttonFontWeight: "bold",
-          buttonFontSize: 17
-        },
-      ],
       leftButtons: [
         {
           title: 'Cancel',
@@ -41,12 +32,13 @@ export default class InputModal extends Component {
 
   onNavigatorEvent(event) {
       if (event.type == 'NavBarButtonPress') {
-        if(event.id == 'save') {
-            this.props.onSave(this.state.text);
-        }
-
         this.props.navigator.dismissModal({animationType: "slide-down"});
       }
+  }
+
+  onSave = () => {
+    this.props.onSave(this.state.text);
+    this.props.navigator.dismissModal({animationType: "slide-down"});
   }
 
   onTextChange = (text) => {
@@ -56,7 +48,7 @@ export default class InputModal extends Component {
   render() {
     return (
       <View style={GlobalStyles.styles().container}>
-        <TableSection>
+        <TableSection extraStyles={[GlobalStyles.styles().container]}>
           <SectionHeader title={this.props.title} />
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
@@ -70,6 +62,11 @@ export default class InputModal extends Component {
               autoFocus={true}
             />
           </SectionedTableCell>
+
+          <SectionedTableCell buttonCell={true}>
+              <ButtonCell title={"Save"} bold={true} onPress={() => this.onSave()} />
+          </SectionedTableCell>
+
         </TableSection>
       </View>
     );

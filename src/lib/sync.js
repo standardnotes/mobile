@@ -27,6 +27,7 @@ export default class Sync {
   constructor() {
     this.syncStatus = {};
     this.syncObservers = [];
+    KeysManager.get().registerAccountRelatedStorageKeys(["syncToken", "cursorToken"]);
   }
 
   registerSyncObserver(callback) {
@@ -69,7 +70,7 @@ export default class Sync {
   }
 
   async writeItemsToStorage(items, offlineOnly, callback) {
-    var version = await Auth.getInstance().protocolVersion();
+    var version = Auth.getInstance().protocolVersion();
     var params = [];
 
     for(var item of items) {
@@ -115,7 +116,7 @@ export default class Sync {
 
   async getCursorToken() {
     if(!this._cursorToken) {
-      this._cursorToken = Storage.getItem("cursorToken");
+      this._cursorToken = await Storage.getItem("cursorToken");
     }
     return this._cursorToken;
   }
@@ -221,7 +222,7 @@ export default class Sync {
     params.items = [];
 
     if(subItems.length > 0) {
-      var version = await Auth.getInstance().protocolVersion();
+      var version = Auth.getInstance().protocolVersion();
       var keys = KeysManager.get().activeKeys();
 
       for(var item of subItems) {
@@ -294,7 +295,7 @@ export default class Sync {
     }.bind(this);
 
     try {
-      var url = await Auth.getInstance().urlForPath("items/sync");
+      var url = Auth.getInstance().urlForPath("items/sync");
       Server.getInstance().postAbsolute(url, params, function(response){
 
         try {

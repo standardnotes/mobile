@@ -1,13 +1,14 @@
 var _ = require('lodash')
 
 import { StyleSheet, StatusBar } from 'react-native';
-import App from "./App"
+import App from "./app"
 import ModelManager from "./lib/modelManager"
 import Server from "./lib/server"
 import Sync from "./lib/sync"
 import Storage from "./lib/storage"
 import Auth from "./lib/auth"
 import Theme from "./models/app/theme"
+import KeysManager from './lib/keysManager'
 
 export default class GlobalStyles {
 
@@ -19,6 +20,38 @@ export default class GlobalStyles {
     }
 
     return this.instance;
+  }
+
+  constructor() {
+    this.loadDefaults();
+    this._themes = [this.systemTheme()];
+
+    KeysManager.get().registerAccountRelatedStorageKeys(["active-theme-id"]);
+
+    Auth.getInstance().addSignoutObserver(function(){
+      this._themes = [this.systemTheme()];
+    }.bind(this));
+
+    ModelManager.getInstance().addItemSyncObserver("themes", "SN|Theme", function(items){
+      var nonDeleted = _.filter(items, {deleted: false});
+      var deleted = _.difference(items, nonDeleted);
+      this._themes = _.difference(this._themes, deleted);
+      this._themes = _.uniq(this._themes.concat(nonDeleted));
+
+      this.downloadThemes(nonDeleted);
+
+      if(!this.activeThemeId) {
+        Storage.getItem("active-theme-id").then(function(themeId){
+          this.activeThemeId = themeId;
+          if(themeId) {
+            this.activateTheme(_.find(this._themes, {uuid: themeId}));
+          } else {
+            this.systemTheme().active = true;
+          }
+        }.bind(this));
+      }
+
+    }.bind(this));
   }
 
   static styles() {
@@ -47,38 +80,6 @@ export default class GlobalStyles {
     });
     return this._systemTheme;
   }
-
-  constructor() {
-    this.loadDefaults();
-    this._themes = [this.systemTheme()];
-
-    Auth.getInstance().addSignoutObserver(function(){
-      this._themes = [this.systemTheme()];
-    }.bind(this));
-
-    ModelManager.getInstance().addItemSyncObserver("themes", "SN|Theme", function(items){
-      var nonDeleted = _.filter(items, {deleted: false});
-      var deleted = _.difference(items, nonDeleted);
-      this._themes = _.difference(this._themes, deleted);
-      this._themes = _.uniq(this._themes.concat(nonDeleted));
-
-      this.downloadThemes(nonDeleted);
-
-      if(!this.activeThemeId) {
-        Storage.getItem("active-theme-id").then(function(themeId){
-          this.activeThemeId = themeId;
-          if(themeId) {
-            this.activateTheme(_.find(this._themes, {uuid: themeId}));
-          } else {
-            this.systemTheme().active = true;
-          }
-        }.bind(this));
-      }
-
-    }.bind(this));
-  }
-
-
 
   loadDefaults() {
     var constants = this.defaultConstants();
@@ -199,7 +200,7 @@ export default class GlobalStyles {
       tableSection: {
         marginTop: 10,
         marginBottom: 10,
-        backgroundColor: constants.mainBackgroundColor,
+        backgroundColor: constants.mainBackgroundColor
       },
 
       sectionHeader: {
@@ -215,13 +216,20 @@ export default class GlobalStyles {
         borderBottomWidth: 1,
         paddingLeft: constants.paddingLeft,
         paddingTop: 13,
+        paddingBottom: 12,
         backgroundColor: constants.mainBackgroundColor,
-        height: 45
+        flex: 1
+      },
+
+      textInputCell: {
+        // paddingTop: 0
+        maxHeight: 50
       },
 
       sectionedTableCellTextInput: {
         fontSize: 16,
-        height: "100%"
+        padding: 0,
+        // height: "100%",
       },
 
       sectionedTableCellFirst: {
@@ -241,13 +249,11 @@ export default class GlobalStyles {
         color: constants.mainTextColor
       },
 
-      textInputCell: {
-        paddingTop: 0
-      },
-
       buttonCell: {
         paddingLeft: 0,
         paddingTop: 0,
+        minHeight: 45,
+        flexGrow: 0,
         backgroundColor: constants.mainBackgroundColor,
       },
 

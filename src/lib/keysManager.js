@@ -20,6 +20,10 @@ export default class KeysManager {
     return this.instance;
   }
 
+  constructor() {
+    this.accountRelatedStorageKeys = ["auth_params", "user"];
+  }
+
   async loadInitialData() {
     return Promise.all([
 
@@ -41,8 +45,20 @@ export default class KeysManager {
         if(pcParams) {
           this.offlineAuthParams = JSON.parse(pcParams);
         }
-      }.bind(this))
+      }.bind(this)),
+
+      Storage.getItem("user").then(function(user) {
+        if(user) {
+          this.user = JSON.parse(user);
+        } else {
+          this.user = {};
+        }
+      }.bind(this)),
     ])
+  }
+
+  registerAccountRelatedStorageKeys(storageKeys) {
+    this.accountRelatedStorageKeys = _.uniq(this.accountRelatedStorageKeys.concat(storageKeys));
   }
 
   // what we should write to keychain
@@ -70,6 +86,11 @@ export default class KeysManager {
   async persistOfflineKeys(keys) {
     this.setOfflineKeys(keys);
     return this.persistKeysToKeychain();
+  }
+
+  async saveUser(user) {
+    this.user = user;
+    return Storage.setItem("user", JSON.stringify(user));
   }
 
   setOfflineKeys(keys) {
@@ -113,6 +134,8 @@ export default class KeysManager {
     Keychain.clearKeys();
     this.accountKeys = null;
     this.accountAuthParams = null;
+    this.user = null;
+    Storage.clearKeys(this.accountRelatedStorageKeys);
     return this.persistKeysToKeychain();
   }
 

@@ -38,4 +38,7 @@ export default class Storage {
     return await AsyncStorage.removeItem(key);
   }
 
+  static async clearKeys(keys) {
+    return AsyncStorage.multiRemove(keys);
+  }
 }

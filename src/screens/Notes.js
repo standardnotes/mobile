@@ -32,6 +32,7 @@ export default class Notes extends Abstract {
     this.loadTabbarIcons();
     this.initializeOptionsAndNotes();
     this.beginSyncTimer();
+    KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
   }
 
   componentWillUnmount() {
@@ -92,7 +93,6 @@ export default class Notes extends Abstract {
       Storage.getItem("options").then(function(result){
         this.options = JSON.parse(result) || this.defaultOptions();
       }.bind(this)),
-      KeysManager.get().loadInitialData()
     ]).then(function(){
       // options and keys loaded
       console.log("===Keys and options loaded===");

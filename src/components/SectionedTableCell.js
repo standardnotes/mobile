@@ -10,6 +10,10 @@ export default class SectionedTableCell extends Component {
     if(this.props.buttonCell) { rules.push(GlobalStyles.styles().buttonCell); }
     if(this.props.first) { rules.push(GlobalStyles.styles().sectionedTableCellFirst); }
     if(this.props.textInputCell) {rules.push(GlobalStyles.styles().textInputCell); }
+    if(this.props.height) {rules.push({height: this.props.height})};
+    if(this.props.extraStyles) {
+      rules = rules.concat(this.props.extraStyles);
+    }
     return rules;
   }
 
