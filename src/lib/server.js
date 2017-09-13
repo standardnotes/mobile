@@ -1,5 +1,6 @@
 import { AsyncStorage } from 'react-native'
 import Storage from './storage'
+import KeysManager from './keysManager'
 
 export default class Server {
 
@@ -53,8 +54,10 @@ export default class Server {
 
     xmlhttp.open(verb, url, true);
 
-    var token = await Storage.getItem("jwt");
-    xmlhttp.setRequestHeader('Authorization', 'Bearer ' + token);
+    var token = KeysManager.get().jwt();
+    if(token) {
+      xmlhttp.setRequestHeader('Authorization', 'Bearer ' + token);
+    }
     xmlhttp.setRequestHeader('Content-type', 'application/json');
 
     if(verb == "post" || verb == "patch") {

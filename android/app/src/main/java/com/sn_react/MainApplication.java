@@ -1,6 +1,10 @@
 package com.sn_react;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.WindowManager;
 
 import com.chirag.RNMail.RNMail;
 import com.facebook.react.ReactPackage;
@@ -9,6 +13,7 @@ import com.facebook.soloader.SoLoader;
 import com.oblador.keychain.KeychainPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnativenavigation.NavigationApplication;
+import com.reactnativenavigation.controllers.ActivityCallbacks;
 import com.tectiv3.aes.RCTAesPackage;
 
 import java.util.Arrays;
@@ -44,6 +49,43 @@ public class MainApplication extends NavigationApplication {
   @Override
   public void onCreate() {
     super.onCreate();
+
+    registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+      @Override
+      public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+      }
+
+      @Override
+      public void onActivityStarted(Activity activity) {
+
+      }
+
+      @Override
+      public void onActivityResumed(Activity activity) {
+
+      }
+
+      @Override
+      public void onActivityPaused(Activity activity) {
+
+      }
+
+      @Override
+      public void onActivityStopped(Activity activity) {
+
+      }
+
+      public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+
+      }
+
+      @Override
+      public void onActivityDestroyed(Activity activity) {
+
+      }
+    });
+
     SoLoader.init(this, /* native exopackage */ false);
   }
 }

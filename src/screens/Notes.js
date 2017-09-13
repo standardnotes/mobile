@@ -4,12 +4,13 @@ import ModelManager from '../lib/modelManager'
 import Storage from '../lib/storage'
 import Sync from '../lib/sync'
 import Auth from '../lib/auth'
+import KeysManager from '../lib/keysManager'
 import GlobalStyles from "../Styles"
 import Keychain from "../lib/keychain"
 import {iconsMap, iconsLoaded} from '../Icons';
 import NoteList from "../containers/NoteList"
 import Abstract from "./Abstract"
-import {Authenticate, AuthenticationState} from "./Authenticate"
+import Authenticate from "./Authenticate"
 var _ = require('lodash')
 
 export default class Notes extends Abstract {
@@ -22,7 +23,8 @@ export default class Notes extends Abstract {
     super(props);
     this.state = {
       refreshing: false,
-      decrypting: true
+      decrypting: false,
+      loading: true
     };
     this.options = this.defaultOptions();
     this.registerObservers();
@@ -90,24 +92,28 @@ export default class Notes extends Abstract {
       Storage.getItem("options").then(function(result){
         this.options = JSON.parse(result) || this.defaultOptions();
       }.bind(this)),
-      AuthenticationState.get().load(),
-      Auth.getInstance().loadKeys()
+      KeysManager.get().loadInitialData()
     ]).then(function(){
       // options and keys loaded
       console.log("===Keys and options loaded===");
 
       var run = function() {
+        var encryptionEnabled = KeysManager.get().encryptionEnabled();
+        console.log("Encryption enabled:", encryptionEnabled);
+        this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
+
         Sync.getInstance().loadLocalItems(function(items) {
           this.reloadList();
           this.setState(function(prevState){
-            return _.merge(prevState, {decrypting: false});
+            return _.merge(prevState, {decrypting: false, loading: false});
           })
         }.bind(this));
+
         // perform initial sync
         Sync.getInstance().sync(null);
       }.bind(this)
 
-      if(AuthenticationState.get().hasPasscode()) {
+      if(KeysManager.get().hasOfflinePasscode()) {
         this.presentPasscodeAuther(run);
       } else {
         run();
@@ -120,6 +126,8 @@ export default class Notes extends Abstract {
       screen: 'sn.Authenticate',
       title: 'Passcode Required',
       animationType: 'slide-up',
+      backButtonHidden: true,
+      overrideBackPress: true,
       passProps: {
         mode: "authenticate",
         onAuthenticateSuccess: onAuthenticate
@@ -288,6 +296,7 @@ export default class Notes extends Abstract {
             onSearchCancel={this.onSearchCancel}
             notes={notes}
             decrypting={this.state.decrypting}
+            loading={this.state.loading}
           />
         }
 

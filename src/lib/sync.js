@@ -5,6 +5,7 @@ import ModelManager from './modelManager'
 import DBManager from './dbManager'
 import Storage from './storage'
 import Encryptor from './encryptor'
+import KeysManager from './keysManager'
 
 import Item from "../models/api/item"
 import ItemParams from "../models/local/itemParams"
@@ -26,14 +27,6 @@ export default class Sync {
   constructor() {
     this.syncStatus = {};
     this.syncObservers = [];
-  }
-
-  async masterKey() {
-    return await Storage.getItem("mk");
-  }
-
-  async serverPassword() {
-    return await Storage.getItem("pw");
   }
 
   registerSyncObserver(callback) {
@@ -80,7 +73,7 @@ export default class Sync {
     var params = [];
 
     for(var item of items) {
-      var itemParams = new ItemParams(item, Auth.getInstance().keys(), version);
+      var itemParams = new ItemParams(item, KeysManager.get().activeKeys(), version);
       itemParams = await itemParams.paramsForLocalStorage();
       if(offlineOnly) {
         delete itemParams.dirty;
@@ -229,7 +222,7 @@ export default class Sync {
 
     if(subItems.length > 0) {
       var version = await Auth.getInstance().protocolVersion();
-      var keys = Auth.getInstance().keys();
+      var keys = KeysManager.get().activeKeys();
 
       for(var item of subItems) {
         if(!item.uuid) {
@@ -331,7 +324,7 @@ export default class Sync {
   }
 
   async handleItemsResponse(responseItems, omitFields) {
-    var keys = Auth.getInstance().keys();
+    var keys = KeysManager.get().activeKeys();
     await Encryptor.decryptMultipleItems(responseItems, keys);
     var items = ModelManager.getInstance().mapResponseItemsToLocalModelsOmittingFields(responseItems, omitFields);
     return items;
@@ -349,7 +342,7 @@ export default class Sync {
       if (i < unsaved.length) {
         var mapping = unsaved[i];
         var itemResponse = mapping.item;
-        Encryptor.decryptMultipleItems([itemResponse], Auth.getInstance().keys());
+        Encryptor.decryptMultipleItems([itemResponse], KeysManager.get().activeKeys());
         var item = ModelManager.getInstance().findItem(itemResponse.uuid);
         if(!item) {
           // could be deleted

@@ -6,6 +6,7 @@ import Sync from './sync'
 import ModelManager from './modelManager'
 import {Platform} from 'react-native';
 import Keychain from "./keychain"
+import KeysManager from "./keysManager"
 var _ = require('lodash')
 
 export default class Auth {
@@ -21,28 +22,19 @@ export default class Auth {
   }
 
   static _defaultServer() {
-    if(Platform.OS === "android") {
-      return "http://10.0.2.2:3000/"
+    if (__DEV__) {
+      if(Platform.OS === "android") {
+        return "http://10.0.2.2:3000/"
+      } else {
+        return "http://localhost:3000/"
+      }
     } else {
-      return "http://localhost:3000/"
+      return "https://sync.standardnotes.org";
     }
   }
 
   constructor() {
-    this.loadUser();
     this.signoutObservers = [];
-  }
-
-  loadUser() {
-    try {
-      Storage.getItem("user").then(function(userData){
-        if(userData) {
-          this.user = JSON.parse(userData);
-        }
-      }.bind(this));
-    } catch(e) {
-      console.log("Error loading user:", e);
-    }
   }
 
   addSignoutObserver(callback) {
@@ -78,7 +70,9 @@ export default class Auth {
   }
 
   offline() {
-    return !this.keys();
+    // an offline user could have keys saved if using passcode lock
+    var keys = KeysManager.get().activeKeys() || {};
+    return !keys.jwt;
   }
 
   async savedAuthParams() {
@@ -95,25 +89,12 @@ export default class Auth {
       return authParams.version;
     }
 
-    var keys = this.keys();
+    var keys = KeysManager.get().activeKeys();
     if(keys && keys.ak) {
       return "002";
     } else {
       return "001";
     }
-  }
-
-  async loadKeys() {
-    return Keychain.getKeys().then(function(keys){
-      this._keys = keys;
-    }.bind(this))
-  }
-
-  keys() {
-    if(!this._keys) {
-      // console.log("===Warning: Keys not loaded===")
-    }
-    return this._keys;
   }
 
   login = (email, inputtedPassword, server, callback) => {
@@ -136,7 +117,7 @@ export default class Auth {
           }
 
           if(response.user) {
-            await root.saveAuthParameters(response.user, response.token, email, server, authParams, keys);
+            await root.saveAuthParameters({token: response.token, email: email, server: server, authParams: authParams, keys: keys});
           }
           callback(response.user, error);
         })
@@ -166,7 +147,7 @@ export default class Auth {
         }
 
         if(response.user) {
-          await root.saveAuthParameters(response.user, response.token, email, server, authParams, keys);
+          await root.saveAuthParameters({token: response.token, email: email, server: server, authParams: authParams, keys: keys});
         }
         callback(response.user, error);
       })
@@ -191,17 +172,15 @@ export default class Auth {
     })
   }
 
-  async saveAuthParameters(user, token, email, server, authParams, keys) {
+  async saveAuthParameters({token, email, server, authParams, keys} = {}) {
     try {
       this._keys = keys;
-      this.user = user;
 
       return await Promise.all([
-        Keychain.setKeys(_.merge(keys, {jwt: token})),
-        Storage.setItem("user", JSON.stringify(user)),
-        Storage.setItem("auth_params", JSON.stringify(authParams)),
-        Storage.setItem("jwt", token),
+        KeysManager.get().persistAccountKeys(_.merge(keys, {jwt: token})),
+        KeysManager.get().setAccountAuthParams(authParams),
         Storage.setItem("server", server),
+        Storage.setItem("email", email),
       ]);
 
     } catch(e) {
@@ -222,12 +201,10 @@ export default class Auth {
   }
 
   signout(callback) {
-    this._keys = null;
-    this.user = null;
     this.authParams = null;
 
-    Keychain.clearKeys();
     ModelManager.getInstance().handleSignout();
+    KeysManager.get().clearAccountKeysAndData();
 
     DBManager.clearAllItems(function(){
       Sync.getInstance().handleSignout();

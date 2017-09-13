@@ -7,6 +7,7 @@ import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import Abstract from "./Abstract"
 import Storage from '../lib/storage'
+import KeysManager from '../lib/keysManager'
 import GlobalStyles from "../Styles"
 var _ = require('lodash')
 
@@ -19,49 +20,6 @@ import {
   Keyboard
 } from 'react-native';
 
-let ParamsKey = "pc_params";
-
-export class AuthenticationState {
-  static instance = null;
-
-  static get() {
-    if (this.instance == null) {
-      this.instance = new AuthenticationState();
-    }
-
-    return this.instance;
-  }
-
-  async load() {
-    this._hasPasscode = await Storage.getItem(ParamsKey);
-  }
-
-  hasPasscode() {
-    return this._hasPasscode;
-  }
-
-  isUnlocked() {
-    return this._isUnlocked;
-  }
-
-  setIsUnlocked(isUnlocked) {
-    this._isUnlocked = isUnlocked;
-  }
-
-  setHasPasscode(hasPasscode) {
-    this._hasPasscode = hasPasscode;
-  }
-
-  clearPasscode() {
-    if(this.isUnlocked() === false) {
-      console.error("Can't remove passcode while locked.");
-      return;
-    }
-    Storage.removeItem(ParamsKey);
-    this.setHasPasscode(false);
-  }
-}
-
 export default class Authenticate extends Abstract {
 
   constructor(props) {
@@ -71,8 +29,8 @@ export default class Authenticate extends Abstract {
 
   defaultPasswordParams() {
     return {
-      cost: 100000,
-      length: 512
+      pw_cost: __DEV__ ? 3000 : 100000,
+      version: "002"
     };
   }
 
@@ -112,20 +70,23 @@ export default class Authenticate extends Abstract {
       Alert.alert('Invalid Passcode', "Please enter a valid passcode and try again.", [{text: 'OK'}])
       return;
     }
+
     var salt = await Crypto.generateRandomKey(256);
-    var params = _.merge(this.defaultPasswordParams(), {salt: salt});
-    params.hash = await Crypto.pbkdf2(passcode, params.salt, params.cost, params.length);
+    var params = _.merge(this.defaultPasswordParams(), {pw_salt: salt});
 
-    await Storage.setItem(ParamsKey, JSON.stringify(params));
+    Crypto.generateKeys(passcode, params, function(keys){
+      // make sure it has valid items
+      if(_.keys(keys).length > 0) {
+        KeysManager.get().persistOfflineKeys(keys);
+        KeysManager.get().setOfflineAuthParams(params);
 
-    console.log("Saving params", params);
+        this.props.onSetupSuccess();
 
-    AuthenticationState.get().setHasPasscode(true);
-    AuthenticationState.get().setIsUnlocked(true);
-
-    this.props.onSetupSuccess();
-
-    this.dismiss();
+        this.dismiss();
+      } else {
+        Alert.alert("Passcode Error", "There was an error setting up your passcode. Please try again.");
+      }
+    }.bind(this));
   }
 
   async onUnlockPress() {
@@ -139,23 +100,18 @@ export default class Authenticate extends Abstract {
       return;
     }
 
-    Storage.getItem(ParamsKey).then(async function(object){
-      if(!object) {
-        Alert.alert('Invalid Passcode State', "Unable to read passcode parameters from system. Please delete the app and re-install to sign in to your account.", [{text: 'OK'}])
-        return;
-      }
-      var params = JSON.parse(object);
-      var savedHash = params.hash;
-      var computedHash = await Crypto.pbkdf2(passcode, params.salt, params.cost, params.length);
-      console.log("Saved hash:", savedHash, "computed", computedHash);
-      if(savedHash === computedHash) {
-        AuthenticationState.get().setIsUnlocked(true);
-        this.dismiss();
+    var params = KeysManager.get().offlineAuthParams;
+
+    Crypto.generateKeys(passcode, params, function(keys){
+      if(keys.pw === KeysManager.get().offlinePasscodeHash()) {
+        KeysManager.get().setOfflineKeys(keys);
         this.props.onAuthenticateSuccess();
+        this.dismiss();
       } else {
         invalid();
       }
-    }.bind(this))
+    }.bind(this));
+
   }
 
   render() {

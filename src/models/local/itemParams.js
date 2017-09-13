@@ -34,6 +34,8 @@ export default class ItemParams {
 
   async __params() {
 
+    console.log("Saving with keys", this.keys);
+
     var params = {uuid: this.item.uuid, content_type: this.item.content_type, deleted: this.item.deleted, created_at: this.item.created_at};
     if(this.keys && !this.item.doNotEncrypt()) {
       var encryptedParams = await Encryptor.encryptItem(this.item, this.keys, this.version);

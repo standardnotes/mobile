@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Sync from '../lib/sync'
 import Auth from '../lib/auth'
 import AlertManager from '../lib/alertManager'
+import KeysManager from '../lib/keysManager'
 import ModelManager from '../lib/modelManager'
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
@@ -9,7 +10,7 @@ import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
-import {Authenticate, AuthenticationState} from "./Authenticate"
+import Authenticate from "./Authenticate"
 import ItemParams from "../models/local/itemParams"
 
 import AuthSection from "../containers/account/AuthSection"
@@ -39,7 +40,7 @@ export default class Account extends Abstract {
   }
 
   loadPasscodeStatus() {
-    var hasPasscode = AuthenticationState.get().hasPasscode()
+    var hasPasscode = KeysManager.get().hasOfflinePasscode();
     this.setState(function(prevState){
       return _.merge(prevState, {hasPasscode: hasPasscode});
     })
@@ -157,12 +158,15 @@ export default class Account extends Abstract {
     })
   }
 
-  onAuthSuccess = () => {
+  markAllDataDirtyAndSync() {
     Sync.getInstance().markAllItemsDirtyAndSaveOffline();
     Sync.getInstance().sync(function(response){
       this.forceUpdate();
     }.bind(this));
+  }
 
+  onAuthSuccess = () => {
+    this.markAllDataDirtyAndSync();
     this.props.navigator.switchToTab({
       tabIndex: 0
     });
@@ -176,7 +180,7 @@ export default class Account extends Abstract {
 
   async onExportPress() {
     var version = await Auth.getInstance().protocolVersion();
-    var keys = Auth.getInstance().keys();
+    var keys = KeysManager.get().activeKeys();
 
     var items = [];
 
@@ -189,7 +193,7 @@ export default class Account extends Abstract {
     var data = {items: items}
 
     if(keys) {
-      var authParams = await Auth.getInstance().savedAuthParams();
+      var authParams = KeysManager.get().activeAuthParams();
       // auth params are only needed when encrypted with a standard file key
       data["auth_params"] = authParams;
     }
@@ -234,19 +238,39 @@ export default class Account extends Abstract {
       animationType: 'slide-up',
       passProps: {
         mode: "setup",
-        onSetupSuccess: () => {}
+        onSetupSuccess: () => {
+          var encryptionSource = KeysManager.get().encryptionSource();
+          if(encryptionSource == "offline") {
+            this.markAllDataDirtyAndSync();
+          }
+        }
       }
     });
   }
 
   onPasscodeDisable = () => {
+    var encryptionSource = KeysManager.get().encryptionSource();
+    var message;
+    if(encryptionSource == "account") {
+      message = "Are you sure you want to disable your local passcode? This will not affect your encryption status, as your data is currently being encrypted through your sync account keys.";
+    } else if(encryptionSource == "offline") {
+      message = "Are you sure you want to disable your local passcode? This will disable encryption on your data.";
+    }
+
     AlertManager.showConfirmationAlert(
-      "Disable Passcode", "Are you sure you want to disable your local passcode?", "Disable Passcode",
+      "Disable Passcode", message, "Disable Passcode",
       function(){
-        AuthenticationState.get().clearPasscode();
+        var result = KeysManager.get().clearOfflineKeysAndData();
+
+        if(encryptionSource == "offline") {
+          // remove encryption from all items
+          this.markAllDataDirtyAndSync();
+        }
+
         this.setState(function(prevState){
-          return _.merge(prevState, {hasPasscode: false})
+          return _.merge(prevState, {hasPasscode: !result})
         })
+
         this.forceUpdate();
       }.bind(this)
     )
