@@ -11,11 +11,10 @@ export default class Item {
     this.updateFromJSON(json_obj);
   }
 
-  init(callback) {
+  async initUUID() {
     if(!this.uuid) {
-      Crypto.generateUUID().then(function(uuid){
+      return Crypto.generateUUID().then(function(uuid){
         this.uuid = uuid;
-        callback.bind(this)();
       }.bind(this))
     }
   }

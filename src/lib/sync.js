@@ -260,7 +260,7 @@ export default class Sync {
       var omitFields = ["content", "auth_hash"];
       var saved = await this.handleItemsResponse(response.saved_items, omitFields);
 
-      this.handleUnsavedItemsResponse(response.unsaved)
+      await this.handleUnsavedItemsResponse(response.unsaved)
       this.writeItemsToStorage(saved, false, null);
 
       this.syncStatus.syncOpInProgress = false;
@@ -331,45 +331,45 @@ export default class Sync {
     return items;
   }
 
-  handleUnsavedItemsResponse(unsaved) {
+  async handleUnsavedItemsResponse(unsaved) {
     if(unsaved.length == 0) {
       return;
     }
 
     console.log("Handle unsaved", unsaved);
 
-    var i = 0;
-    var handleNext = function() {
-      if (i < unsaved.length) {
-        var mapping = unsaved[i];
-        var itemResponse = mapping.item;
-        Encryptor.decryptMultipleItems([itemResponse], KeysManager.get().activeKeys());
-        var item = ModelManager.getInstance().findItem(itemResponse.uuid);
-        if(!item) {
-          // could be deleted
-          return;
-        }
-        var error = mapping.error;
-        if(error.tag == "uuid_conflict") {
-          // uuid conflicts can occur if a user attempts to import an old data archive with uuids from the old account into a new account
-          ModelManager.getInstance().alternateUUIDForItem(item, handleNext);
-        } else if(error.tag === "sync_conflict") {
-          // create a new item with the same contents of this item if the contents differ
-          itemResponse.uuid = null; // we want a new uuid for the new item
-          var dup = ModelManager.getInstance().createItem(itemResponse);
-          if(!itemResponse.deleted && JSON.stringify(item.structureParams()) !== JSON.stringify(dup.structureParams())) {
-            ModelManager.getInstance().addItem(dup);
-            dup.conflict_of = item.uuid;
-            dup.setDirty(true);
-          }
-        }
-        ++i;
-      } else {
-        this.sync(null, {additionalFields: ["created_at", "updated_at"]});
-      }
-    }.bind(this);
+    var items = unsaved.map(function(mapping){
+      return mapping.item;
+    })
 
-    handleNext();
+    await Encryptor.decryptMultipleItems(items, KeysManager.get().activeKeys());
+
+    for(var mapping of unsaved) {
+      var itemResponse = mapping.item;
+      var error = mapping.error;
+      var item = ModelManager.getInstance().findItem(itemResponse.uuid);
+      if(!item) {
+        // could be deleted
+        continue;
+      }
+
+      if(error.tag == "uuid_conflict") {
+        // uuid conflicts can occur if a user attempts to import an old data archive with uuids from the old account into a new account
+        await ModelManager.getInstance().alternateUUIDForItem(item);
+      } else if(error.tag === "sync_conflict") {
+        // create a new item with the same contents of this item if the contents differ
+        itemResponse.uuid = null; // we want a new uuid for the new item
+        var dup = ModelManager.getInstance().createItem(itemResponse);
+        if(!itemResponse.deleted && JSON.stringify(item.structureParams()) !== JSON.stringify(dup.structureParams())) {
+          await dup.initUUID();
+          ModelManager.getInstance().addItem(dup);
+          dup.conflictOf = item.uuid;
+          dup.setDirty(true);
+        }
+      }
+    }
+
+    this.sync(null, {additionalFields: ["created_at", "updated_at"]});
   }
 
   async clearSyncToken() {

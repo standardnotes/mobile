@@ -120,7 +120,7 @@ export default class Filter extends Abstract {
 
   createTag(text, callback) {
     var tag = new Tag({title: text});
-    tag.init(function(){
+    tag.initUUID().then(function() {
       tag.setDirty(true);
       ModelManager.getInstance().addItem(tag);
       Sync.getInstance().sync();

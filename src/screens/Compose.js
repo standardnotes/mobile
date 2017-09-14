@@ -153,9 +153,9 @@ export default class Compose extends Abstract {
     this.saveTimeout = setTimeout(function(){
       this.setNavBarSubtitle("Saving...");
       if(!this.state.note.uuid) {
-        this.state.note.init(function(){
+        this.state.note.initUUID().then(function(){
           this.save();
-        }.bind(this))
+        }.bind(this));
       } else {
         this.save();
       }

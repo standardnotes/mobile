@@ -271,6 +271,10 @@ export default class Notes extends Abstract {
 
   _onPressItem = (item: hash) => {
     var run = () => {
+      if(item.conflictOf) {
+        item.conflictOf = null;
+      }
+      
       this.props.navigator.push({
         screen: 'sn.Compose',
         title: 'Compose',

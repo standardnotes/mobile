@@ -50,18 +50,17 @@ export default class ModelManager {
     })
   }
 
-  alternateUUIDForItem(item, callback) {
+  async alternateUUIDForItem(item) {
     // we need to clone this item and give it a new uuid, then delete item with old uuid from db (you can't mofidy uuid's in our indexeddb setup)
     var newItem = this.createItem(item);
-    newItem.uuid = Crypto.generateUUID();
+    newItem.uuid = await Crypto.generateUUID();
     newItem.informReferencesOfUUIDChange(item.uuid, newItem.uuid);
     this.informModelsOfUUIDChangeForItem(newItem, item.uuid, newItem.uuid);
-    this.removeItemLocally(item, function(){
+    return this.removeItemLocally(item).then(function(){
       this.addItem(newItem);
       newItem.setDirty(true);
       newItem.markAllReferencesDirty();
-      callback();
-    }.bind(this));
+    }.bind(this))
   }
 
   informModelsOfUUIDChangeForItem(newItem, oldUUID, newUUID) {
@@ -276,7 +275,7 @@ export default class ModelManager {
     }
   }
 
-  removeItemLocally(item, callback) {
+  async removeItemLocally(item) {
     _.pull(this.items, item);
 
     item.isBeingRemovedLocally();
@@ -289,7 +288,7 @@ export default class ModelManager {
       _.pull(this._extensions, item);
     }
 
-    DBManager.deleteItem(item, callback);
+    return DBManager.deleteItem(item);
   }
 
   getNotes(options = {}) {
