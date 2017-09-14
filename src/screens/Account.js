@@ -19,13 +19,14 @@ import OptionsSection from "../containers/account/OptionsSection"
 import PasscodeSection from "../containers/account/PasscodeSection"
 import ThemesSection from "../containers/account/ThemesSection"
 import EncryptionSection from "../containers/account/EncryptionSection"
+import CompanySection from "../containers/account/CompanySection"
 
 var base64 = require('base-64');
 var _ = require('lodash')
 import GlobalStyles from "../Styles"
 import { NativeModules} from 'react-native';
 var Mailer = require('NativeModules').RNMail;
-import {TextInput, SectionList, ScrollView, View, Alert, Keyboard} from 'react-native';
+import {TextInput, SectionList, ScrollView, View, Alert, Keyboard, Linking, Platform} from 'react-native';
 
 export default class Account extends Abstract {
 
@@ -263,6 +264,19 @@ export default class Account extends Abstract {
     )
   }
 
+  onCompanyAction = (action) => {
+    if(action == "feedback") {
+      var platformString = Platform.OS == "android" ? "Android" : "iOS";
+      Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} app feedback`);
+    } else if(action == "learn_more") {
+      Linking.openURL("https://standardnotes.org");
+    } else if(action == "privacy") {
+      Linking.openURL("https://standardnotes.org/privacy");
+    } else if(action == "twitter") {
+      Linking.openURL("https://twitter.com/StandardNotes");
+    }
+  }
+
   render() {
     let signedIn = !Auth.getInstance().offline();
     return (
@@ -297,6 +311,11 @@ export default class Account extends Abstract {
 
           <EncryptionSection
             title={"Encryption Status"}
+          />
+
+          <CompanySection
+            title={"Standard Notes"}
+            onAction={this.onCompanyAction}
           />
 
         </ScrollView>
