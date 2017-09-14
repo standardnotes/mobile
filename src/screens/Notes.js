@@ -103,41 +103,18 @@ export default class Notes extends Abstract {
     ]).then(function(){
       // options and keys loaded
       console.log("===Keys and options loaded===");
+      var encryptionEnabled = KeysManager.get().encryptionEnabled();
+      console.log("Encryption enabled:", encryptionEnabled);
+      this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
-      var run = function() {
-        var encryptionEnabled = KeysManager.get().encryptionEnabled();
-        console.log("Encryption enabled:", encryptionEnabled);
-        this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
+      Sync.getInstance().loadLocalItems(function(items) {
+        this.reloadList();
+        this.mergeState({decrypting: false, loading: false});
+      }.bind(this));
 
-        Sync.getInstance().loadLocalItems(function(items) {
-          this.reloadList();
-          this.mergeState({decrypting: false, loading: false});
-        }.bind(this));
-
-        // perform initial sync
-        Sync.getInstance().sync(null);
-      }.bind(this)
-
-      if(KeysManager.get().hasOfflinePasscode()) {
-        this.presentPasscodeAuther(run);
-      } else {
-        run();
-      }
+      // perform initial sync
+      Sync.getInstance().sync(null);
     }.bind(this))
-  }
-
-  presentPasscodeAuther(onAuthenticate) {
-    this.props.navigator.showModal({
-      screen: 'sn.Authenticate',
-      title: 'Passcode Required',
-      animationType: 'slide-up',
-      backButtonHidden: true,
-      overrideBackPress: true,
-      passProps: {
-        mode: "authenticate",
-        onAuthenticateSuccess: onAuthenticate
-      }
-    });
   }
 
   configureNavBar() {
@@ -274,7 +251,7 @@ export default class Notes extends Abstract {
       if(item.conflictOf) {
         item.conflictOf = null;
       }
-      
+
       this.props.navigator.push({
         screen: 'sn.Compose',
         title: 'Compose',

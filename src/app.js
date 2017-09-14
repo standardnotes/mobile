@@ -75,15 +75,40 @@ export default class App {
       screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
     };
 
-    KeysManager.get().loadInitialData().then(function(){
+    function showPasscodeLock(onAuthenticate) {
+      Navigation.startSingleScreenApp({
+        screen: {
+          screen: 'sn.Authenticate',
+          title: 'Passcode Required',
+          backButtonHidden: true,
+          overrideBackPress: true,
+        },
+        passProps: {
+          mode: "authenticate",
+          onAuthenticateSuccess: onAuthenticate
+        },
+        animationType: 'slide-down',
+        tabsStyle: tabStyles, // for iOS
+        appStyle: tabStyles // for Android
+      })
+    }
+
+    function startActualApp() {
       Navigation.startTabBasedApp({
         tabs: tabs,
         animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
         tabsStyle: tabStyles, // for iOS
         appStyle: tabStyles // for Android
       });
-    })
+    }
 
+    KeysManager.get().loadInitialData().then(function(){
+      if(KeysManager.get().hasOfflinePasscode()) {
+        showPasscodeLock(startActualApp);
+      } else {
+        startActualApp();
+      }
+    })
   }
 
   reload() {

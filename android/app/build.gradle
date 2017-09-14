@@ -96,7 +96,7 @@ android {
     defaultConfig {
         applicationId "com.sn_react"
         minSdkVersion 19
-        targetSdkVersion 22
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -146,6 +146,7 @@ dependencies {
     compile project(':react-native-keychain')
     compile project(':react-native-vector-icons')
     compile project(':react-native-aes-crypto')
+    compile project(':react-native-fingerprint-scanner')
 }
 
 // Run this once to be able to run the application with BUCK

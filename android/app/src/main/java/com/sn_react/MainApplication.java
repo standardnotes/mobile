@@ -15,6 +15,7 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.controllers.ActivityCallbacks;
 import com.tectiv3.aes.RCTAesPackage;
+import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +37,8 @@ public class MainApplication extends NavigationApplication {
             new KeychainPackage(),
             new VectorIconsPackage(),
             new RCTAesPackage(),
-            new RNMail()
+            new RNMail(),
+            new ReactNativeFingerprintScannerPackage()
       );
     }
 
