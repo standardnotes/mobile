@@ -20,8 +20,9 @@ import {registerScreens, registerScreenVisibilityListener} from './screens';
 import Auth from './lib/auth'
 import Sync from './lib/sync'
 import KeysManager from './lib/keysManager'
-
 import GlobalStyles from "./Styles"
+
+var _ = require('lodash');
 
 const tabs = [{
   label: 'Notes',
@@ -88,8 +89,26 @@ export default class App {
           onAuthenticateSuccess: onAuthenticate
         },
         animationType: 'slide-down',
-        tabsStyle: tabStyles, // for iOS
-        appStyle: tabStyles // for Android
+        tabsStyle: _.clone(tabStyles), // for iOS
+        appStyle: _.clone(tabStyles) // for Android
+      })
+    }
+
+    function showFingerprintScanner(onAuthenticate) {
+      Navigation.startSingleScreenApp({
+        screen: {
+          screen: 'sn.Fingerprint',
+          title: 'Fingerprint Required',
+          backButtonHidden: true,
+          overrideBackPress: true,
+        },
+        passProps: {
+          mode: "authenticate",
+          onAuthenticateSuccess: onAuthenticate
+        },
+        animationType: 'slide-down',
+        tabsStyle: _.clone(tabStyles), // for iOS
+        appStyle: _.clone(tabStyles) // for Android
       })
     }
 
@@ -97,14 +116,26 @@ export default class App {
       Navigation.startTabBasedApp({
         tabs: tabs,
         animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
-        tabsStyle: tabStyles, // for iOS
-        appStyle: tabStyles // for Android
+        tabsStyle: _.clone(tabStyles), // for iOS
+        appStyle: _.clone(tabStyles) // for Android
       });
     }
 
     KeysManager.get().loadInitialData().then(function(){
-      if(KeysManager.get().hasOfflinePasscode()) {
-        showPasscodeLock(startActualApp);
+
+      var hasPasscode = KeysManager.get().hasOfflinePasscode();
+      var hasFingerprint = KeysManager.get().hasFingerprint();
+
+      if(hasPasscode) {
+        showPasscodeLock(function(){
+          if(hasFingerprint) {
+            showFingerprintScanner(startActualApp);
+          } else {
+            startActualApp();
+          }
+        });
+      } else if(hasFingerprint) {
+        showFingerprintScanner(startActualApp);
       } else {
         startActualApp();
       }

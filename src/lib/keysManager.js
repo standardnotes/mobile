@@ -29,7 +29,8 @@ export default class KeysManager {
 
       Keychain.getKeys().then(function(keys){
         this.offlineKeys = keys.offline;
-        this.accountKeys = _.omit(keys, "offline");
+        this.fingerprintEnabled = keys.fingerprint;
+        this.accountKeys = _.omit(keys, ["offline", "fingerprint"]);
         if(_.keys(this.accountKeys).length == 0) {
           this.accountKeys = null;
         }
@@ -63,15 +64,16 @@ export default class KeysManager {
 
   // what we should write to keychain
   generateKeychainStoreValue() {
-    var result = {};
+    var value = {fingerprint: this.fingerprintEnabled};
+
     if(this.accountKeys) {
-      _.merge(result, this.accountKeys);
+      _.merge(value, this.accountKeys);
     }
     if(this.offlineKeys) {
-      _.merge(result, {offline: {pw: this.offlineKeys.pw}});
+      _.merge(value, {offline: {pw: this.offlineKeys.pw}});
     }
 
-    return result;
+    return value;
   }
 
   async persistKeysToKeychain() {
@@ -83,27 +85,9 @@ export default class KeysManager {
     return this.persistKeysToKeychain();
   }
 
-  async persistOfflineKeys(keys) {
-    this.setOfflineKeys(keys);
-    return this.persistKeysToKeychain();
-  }
-
   async saveUser(user) {
     this.user = user;
     return Storage.setItem("user", JSON.stringify(user));
-  }
-
-  setOfflineKeys(keys) {
-    // offline keys are ephemeral and should not be stored anywhere
-    this.offlineKeys = keys;
-  }
-
-  offlinePasscodeHash() {
-    return this.offlineKeys ? this.offlineKeys.pw : null;
-  }
-
-  hasOfflinePasscode() {
-    return this.offlineKeys && this.offlineKeys.pw !== null;
   }
 
   /* The keys to use for encryption. If user is signed in, use those keys, otherwise use offline keys */
@@ -139,22 +123,11 @@ export default class KeysManager {
     return this.persistKeysToKeychain();
   }
 
-  clearOfflineKeysAndData() {
-    // make sure user is authenticated before performing this step
-    if(!this.offlineKeys.mk) {
-      alert("Unable to remove passcode. Make sure you are properly authenticated and try again.");
-      return false;
-    }
-    this.offlineKeys = null;
-    this.offlineAuthParams = null;
-    Storage.removeItem(OfflineParamsKey);
-    return this.persistKeysToKeychain();
-  }
-
   jwt() {
     var keys = this.activeKeys();
     return keys && keys.jwt;
   }
+
 
   // Auth Params
 
@@ -174,6 +147,54 @@ export default class KeysManager {
     } else {
       return this.offlineAuthParams;
     }
+  }
+
+
+
+  // Local Security
+
+  clearOfflineKeysAndData() {
+    // make sure user is authenticated before performing this step
+    if(!this.offlineKeys.mk) {
+      alert("Unable to remove passcode. Make sure you are properly authenticated and try again.");
+      return false;
+    }
+    this.offlineKeys = null;
+    this.offlineAuthParams = null;
+    Storage.removeItem(OfflineParamsKey);
+    return this.persistKeysToKeychain();
+  }
+
+  async persistOfflineKeys(keys) {
+    this.setOfflineKeys(keys);
+    return this.persistKeysToKeychain();
+  }
+
+  setOfflineKeys(keys) {
+    // offline keys are ephemeral and should not be stored anywhere
+    this.offlineKeys = keys;
+  }
+
+  offlinePasscodeHash() {
+    return this.offlineKeys ? this.offlineKeys.pw : null;
+  }
+
+  hasOfflinePasscode() {
+    return this.offlineKeys && this.offlineKeys.pw !== null;
+  }
+
+  hasFingerprint() {
+    return this.fingerprintEnabled;
+  }
+
+  async enableFingerprint() {
+    this.fingerprintEnabled = true;
+    return this.persistKeysToKeychain();
+  }
+
+  async disableFingerprint() {
+    this.fingerprintEnabled = false;
+    return this.persistKeysToKeychain();
   }
 
 }

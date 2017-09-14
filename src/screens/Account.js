@@ -35,15 +35,14 @@ export default class Account extends Abstract {
     this.state = {params: {email: "a@bitar.io", password: "password", server: Auth.getInstance().serverUrl()}};
   }
 
-  loadPasscodeStatus() {
+  loadSecurityStatus() {
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
-    this.setState(function(prevState){
-      return _.merge(prevState, {hasPasscode: hasPasscode});
-    })
+    var hasFingerprint = KeysManager.get().hasFingerprint();
+    this.mergeState({hasPasscode: hasPasscode, hasFingerprint: hasFingerprint})
   }
 
   componentDidMount() {
-    this.loadPasscodeStatus();
+    this.loadSecurityStatus();
   }
 
   onNavigatorEvent(event) {
@@ -51,7 +50,7 @@ export default class Account extends Abstract {
 
     switch(event.id) {
       case 'willAppear':
-       this.loadPasscodeStatus();
+       this.loadSecurityStatus();
        this.forceUpdate();
        break;
       }
@@ -264,6 +263,18 @@ export default class Account extends Abstract {
     )
   }
 
+  onFingerprintEnable = () => {
+    console.log("On fingerprint enable");
+    KeysManager.get().enableFingerprint();
+    this.loadSecurityStatus();
+  }
+
+  onFingerprintDisable = () => {
+    console.log("On fingerprint disable");
+    KeysManager.get().disableFingerprint();
+    this.loadSecurityStatus();
+  }
+
   onCompanyAction = (action) => {
     if(action == "feedback") {
       var platformString = Platform.OS == "android" ? "Android" : "iOS";
@@ -304,9 +315,12 @@ export default class Account extends Abstract {
 
           <PasscodeSection
             hasPasscode={this.state.hasPasscode}
+            hasFingerprint={this.state.hasFingerprint}
             onEnable={this.onPasscodeEnable}
             onDisable={this.onPasscodeDisable}
-            title={"Local Passcode"}
+            onFingerprintEnable={this.onFingerprintEnable}
+            onFingerprintDisable={this.onFingerprintDisable}
+            title={"Security"}
           />
 
           <EncryptionSection

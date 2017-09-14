@@ -6,6 +6,7 @@ import Account from './Account'
 import Authenticate from './Authenticate'
 import Filter from './Filter'
 import InputModal from './InputModal'
+import Fingerprint from './Fingerprint'
 import Sync from '../lib/sync'
 
 export function registerScreens() {
@@ -15,6 +16,7 @@ export function registerScreens() {
   Navigation.registerComponent('sn.Filter', () => Filter);
   Navigation.registerComponent('sn.InputModal', () => InputModal);
   Navigation.registerComponent('sn.Authenticate', () => Authenticate);
+  Navigation.registerComponent('sn.Fingerprint', () => Fingerprint);
 }
 
 export function registerScreenVisibilityListener() {

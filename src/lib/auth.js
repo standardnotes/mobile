@@ -7,7 +7,7 @@ import ModelManager from './modelManager'
 import {Platform} from 'react-native';
 import Keychain from "./keychain"
 import KeysManager from "./keysManager"
-var _ = require('lodash')
+var _ = require('lodash');
 
 let accountRelatedStorageKeys = [];
 
