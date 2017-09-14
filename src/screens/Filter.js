@@ -29,14 +29,23 @@ export default class Filter extends Abstract {
     } else {
       selectedTags = [];
     }
+    this.state = {tags: [], selectedTags: selectedTags};
 
     if(this.props.noteId) {
       this.note = ModelManager.getInstance().findItem(this.props.noteId);
     }
 
-    this.state = {tags: ModelManager.getInstance().tags, selectedTags: selectedTags};
-
     this.configureNavBar();
+  }
+
+  componentDidMount() {
+    // React Native Navigation has an issue where navigation pushes are pushed first, then rendered.
+    // This causes an undesired flash while content loads. To reduce the flash, we load the easy stuff first
+    // then wait a little to render the rest, such as a dynamic list of tags
+    // See https://github.com/wix/react-native-navigation/issues/358
+    setTimeout(function () {
+      this.mergeState({tags: ModelManager.getInstance().tags});
+    }.bind(this), 10);
   }
 
   configureNavBar() {
@@ -176,7 +185,6 @@ export default class Filter extends Abstract {
           Sync.getInstance().sync();
           this.props.navigator.popToRoot({
             animated: true,
-             animationType: 'fade'
           });
         }.bind(this)
       )

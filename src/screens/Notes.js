@@ -84,11 +84,13 @@ export default class Notes extends Abstract {
     iconsLoaded.then(() => {
       this.props.navigator.setTabButton({
         tabIndex: 0,
-        icon: iconsMap['ios-menu-outline']
+        icon: iconsMap['ios-menu-outline'],
+        selectedIcon: iconsMap['ios-menu-outline']
       });
       this.props.navigator.setTabButton({
         tabIndex: 1,
-        icon: iconsMap['ios-contact-outline']
+        icon: iconsMap['ios-contact-outline'],
+        selectedIcon: iconsMap['ios-contact-outline']
       });
     })
   }

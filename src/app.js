@@ -60,15 +60,18 @@ export default class App {
   start() {
     var tabStyles = {
       tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
+      tabBarTranslucent: true,
       tabBarButtonColor: 'gray',
       tabBarSelectedButtonColor: GlobalStyles.constants().mainTintColor,
-      statusBarColor: 'black',
-      tabFontFamily: 'BioRhyme-Bold',
+
+      // navBarBlur: true,
       navBarButtonColor: GlobalStyles.constants().mainTintColor,
       navBarTextColor: GlobalStyles.constants().mainTintColor,
       navigationBarColor: 'black', // android built in bar
       navBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor, // actual top nav bar
-      statusBarColor: '#002b4c',
+
+      statusBarColor: GlobalStyles.constants().mainTextColor, // Android only
+
       screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
     };
 
