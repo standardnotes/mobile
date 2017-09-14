@@ -290,7 +290,7 @@ export default class Account extends Abstract {
   render() {
     let signedIn = !Auth.getInstance().offline();
     var themes = GlobalStyles.get().themes();
-    console.log("Theme count:", themes.length);
+
     return (
       <View style={GlobalStyles.styles().container}>
         <ScrollView style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>

@@ -231,7 +231,6 @@ export default class Compose extends Abstract {
     var textBottomPadding = this.state.keyboard ? 10 : 0;
     var keyboardBehavior = Platform.OS == "android" ? "height" : "padding";
     var keyboardOffset = this.rawStyles.noteTitle.height + this.rawStyles.noteText.paddingTop + (Platform.OS == "android" ? 15 : 0);
-    console.log("Keyboard offset", keyboardOffset, this.rawStyles.noteTitle.height, this.rawStyles.noteText.paddingTop);
     return (
       <View style={[this.styles.container, GlobalStyles.styles().container]}>
         <TextInput

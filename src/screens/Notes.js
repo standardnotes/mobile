@@ -152,8 +152,6 @@ export default class Notes extends Abstract {
       })
     }
 
-    console.log("Icon", Icons.getIcon('md-add'));
-
     this.props.navigator.setButtons({
       rightButtons: rightButtons,
       leftButtons: [

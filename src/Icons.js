@@ -45,10 +45,8 @@ export default class Icons {
           ))
       ).then(sources => {
         Object.keys(icons).forEach((iconName, idx) => {
-          console.log("Putting shit:", sources[idx]);
           iconsMap[iconName] = sources[idx]
         })
-        console.log("Finished loading icons");
         resolve(true);
       })
     });
