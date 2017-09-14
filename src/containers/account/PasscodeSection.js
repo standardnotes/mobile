@@ -30,7 +30,9 @@ export default class PasscodeSection extends Component {
   }
 
   componentWillUnmount() {
-    FingerprintScanner.release();
+    if(!__DEV__) {
+      FingerprintScanner.release();
+    }
   }
 
   render() {

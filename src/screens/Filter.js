@@ -12,7 +12,7 @@ import ManageNote from "../containers/ManageNote";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
 import Tag from "../models/app/tag"
-import {iconsMap, iconsLoaded} from '../Icons';
+import Icons from '../Icons';
 
 import GlobalStyles from "../Styles"
 
@@ -71,7 +71,7 @@ export default class Filter extends Abstract {
     };
 
     if(Platform.OS === "android") {
-      rightButton.icon = iconsMap["md-pricetag"];
+      rightButton.icon = Icons.getIcon("md-pricetag");
     }
 
     this.props.navigator.setButtons({

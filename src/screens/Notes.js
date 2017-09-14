@@ -8,7 +8,7 @@ import KeysManager from '../lib/keysManager'
 import AlertManager from '../lib/alertManager'
 import GlobalStyles from "../Styles"
 import Keychain from "../lib/keychain"
-import {iconsMap, iconsLoaded} from '../Icons';
+import Icons from '../Icons';
 import NoteList from "../containers/NoteList"
 import Abstract from "./Abstract"
 import Authenticate from "./Authenticate"
@@ -81,18 +81,16 @@ export default class Notes extends Abstract {
   }
 
   loadTabbarIcons() {
-    iconsLoaded.then(() => {
-      this.props.navigator.setTabButton({
-        tabIndex: 0,
-        icon: iconsMap['ios-menu-outline'],
-        selectedIcon: iconsMap['ios-menu-outline']
-      });
-      this.props.navigator.setTabButton({
-        tabIndex: 1,
-        icon: iconsMap['ios-contact-outline'],
-        selectedIcon: iconsMap['ios-contact-outline']
-      });
-    })
+    this.props.navigator.setTabButton({
+      tabIndex: 0,
+      icon: Icons.getIcon('ios-menu-outline'),
+      selectedIcon: Icons.getIcon('ios-menu-outline')
+    });
+    this.props.navigator.setTabButton({
+      tabIndex: 1,
+      icon: Icons.getIcon('ios-contact-outline'),
+      selectedIcon: Icons.getIcon('ios-contact-outline')
+    });
   }
 
   initializeOptionsAndNotes() {
@@ -154,6 +152,8 @@ export default class Notes extends Abstract {
       })
     }
 
+    console.log("Icon", Icons.getIcon('md-add'));
+
     this.props.navigator.setButtons({
       rightButtons: rightButtons,
       leftButtons: [
@@ -166,7 +166,7 @@ export default class Notes extends Abstract {
       ],
       fab: {
         collapsedId: 'new',
-        collapsedIcon: iconsMap['md-add'],
+        collapsedIcon: Icons.getIcon('md-add'),
         backgroundColor: GlobalStyles.constants().mainTintColor
       },
       animated: false

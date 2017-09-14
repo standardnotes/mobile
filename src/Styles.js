@@ -1,6 +1,6 @@
 var _ = require('lodash')
 
-import { StyleSheet, StatusBar, Alert } from 'react-native';
+import { StyleSheet, StatusBar, Alert, Platform } from 'react-native';
 import App from "./app"
 import ModelManager from "./lib/modelManager"
 import Server from "./lib/server"
@@ -40,6 +40,10 @@ export default class GlobalStyles {
       }
 
     }.bind(this));
+
+    // setTimeout(function () {
+    //   StatusBar.setBarStyle("dark-content", true);
+    // }, 1000);
   }
 
   static styles() {
@@ -162,7 +166,10 @@ export default class GlobalStyles {
       constants: constants
     }
 
-    StatusBar.setBarStyle(statusBar, true);
+    // On Android, a time out is required, especially during app startup
+    setTimeout(function () {
+      StatusBar.setBarStyle(statusBar, true);
+    }, Platform.OS == "android" ? 100 : 0);
   }
 
   defaultConstants() {

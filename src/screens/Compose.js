@@ -4,7 +4,7 @@ import Auth from '../lib/auth'
 import ModelManager from '../lib/modelManager'
 import Note from '../models/app/note'
 import Abstract from "./Abstract"
-import {iconsMap, iconsLoaded} from '../Icons';
+import Icons from '../Icons';
 
 import {
   AppRegistry,
@@ -87,7 +87,7 @@ export default class Compose extends Abstract {
     }
 
     if(Platform.OS === "android") {
-      tagButton.icon = iconsMap["md-menu"];
+      tagButton.icon = Icon.getIcon("md-menu");
     }
 
     this.props.navigator.setButtons({

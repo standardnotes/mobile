@@ -15,12 +15,13 @@ import {
 import {Platform} from 'react-native';
 
 import {Navigation} from 'react-native-navigation';
-import {registerScreens, registerScreenVisibilityListener} from './screens';
+import {registerScreens} from './screens';
 
 import Auth from './lib/auth'
 import Sync from './lib/sync'
 import KeysManager from './lib/keysManager'
 import GlobalStyles from "./Styles"
+import Icons from "./Icons"
 
 var _ = require('lodash');
 
@@ -44,7 +45,6 @@ if(Platform.OS === "android") {
 }
 
 registerScreens();
-registerScreenVisibilityListener();
 
 export default class App {
 
@@ -71,13 +71,14 @@ export default class App {
       navigationBarColor: 'black', // android built in bar
       navBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor, // actual top nav bar
 
-      statusBarColor: GlobalStyles.constants().mainTextColor, // Android only
+      statusBarColor: GlobalStyles.constants().mainBackgroundColor, // Android only
 
       screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
     }
   }
 
   start() {
+    Icons.get().loadIcons();
     KeysManager.get().loadInitialData().then(function() {
       var hasPasscode = KeysManager.get().hasOfflinePasscode();
       var hasFingerprint = KeysManager.get().hasFingerprint();
@@ -144,6 +145,7 @@ export default class App {
   }
 
   reload() {
+    Icons.get().loadIcons();
     this.startActualApp();
   }
 }
