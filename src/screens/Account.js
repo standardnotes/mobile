@@ -32,7 +32,13 @@ export default class Account extends Abstract {
 
   constructor(props) {
     super(props);
-    this.state = {params: {email: "a@bitar.io", password: "password", server: Auth.getInstance().serverUrl()}};
+    this.state = {
+      params: {email: "a@bitar.io", password: "password", server: Auth.getInstance().serverUrl()}
+    };
+
+    this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
+      this.forceUpdate();
+    }.bind(this))
   }
 
   loadSecurityStatus() {
@@ -43,6 +49,10 @@ export default class Account extends Abstract {
 
   componentDidMount() {
     this.loadSecurityStatus();
+  }
+
+  componentWillUnmount() {
+    Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
   }
 
   onNavigatorEvent(event) {
@@ -107,23 +117,16 @@ export default class Account extends Abstract {
       return;
     }
 
-    this.setState(function(prevState){
-      return _.merge(prevState, {params: params, confirmRegistration: true});
-    })
-
+    this.mergeState({params: params, confirmRegistration: true});
   }
 
   onRegisterConfirmSuccess = () => {
-    this.setState(function(prevState){
-      return _.merge(prevState, {registering: true});
-    })
+    this.mergeState({registering: true});
 
     var params = this.state.params;
 
     Auth.getInstance().register(params.email, params.password, params.server, function(user, error) {
-      this.setState(function(prevState){
-        return _.merge(prevState, {registering: false, confirmRegistration: false});
-      })
+      this.mergeState({registering: false, confirmRegistration: false});
 
       if(error) {
         Alert.alert(
@@ -139,9 +142,7 @@ export default class Account extends Abstract {
   }
 
   onRegisterConfirmCancel = () => {
-    this.setState(function(prevState){
-      return _.merge(prevState, {confirmRegistration: false});
-    })
+    this.mergeState({confirmRegistration: false});
   }
 
   markAllDataDirtyAndSync() {
@@ -254,9 +255,7 @@ export default class Account extends Abstract {
           this.markAllDataDirtyAndSync();
         }
 
-        this.setState(function(prevState){
-          return _.merge(prevState, {hasPasscode: !result})
-        })
+        this.mergeState({hasPasscode: !result});
 
         this.forceUpdate();
       }.bind(this)
@@ -290,6 +289,8 @@ export default class Account extends Abstract {
 
   render() {
     let signedIn = !Auth.getInstance().offline();
+    var themes = GlobalStyles.get().themes();
+    console.log("Theme count:", themes.length);
     return (
       <View style={GlobalStyles.styles().container}>
         <ScrollView style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
@@ -311,7 +312,7 @@ export default class Account extends Abstract {
 
           <OptionsSection signedIn={signedIn} title={"Options"} onSignOutPress={this.onSignOutPress} onExportPress={this.onExportPress} />
 
-          <ThemesSection themes={GlobalStyles.get().themes()} title={"Themes"} onThemeSelect={this.onThemeSelect} onThemeLongPress={this.onThemeLongPress} />
+          <ThemesSection themes={themes} title={"Themes"} onThemeSelect={this.onThemeSelect} onThemeLongPress={this.onThemeLongPress} />
 
           <PasscodeSection
             hasPasscode={this.state.hasPasscode}

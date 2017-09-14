@@ -58,8 +58,8 @@ export default class App {
     return this.instance;
   }
 
-  start() {
-    var tabStyles = {
+  get tabStyles() {
+    return {
       tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
       tabBarTranslucent: true,
       tabBarButtonColor: 'gray',
@@ -74,75 +74,76 @@ export default class App {
       statusBarColor: GlobalStyles.constants().mainTextColor, // Android only
 
       screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
-    };
-
-    function showPasscodeLock(onAuthenticate) {
-      Navigation.startSingleScreenApp({
-        screen: {
-          screen: 'sn.Authenticate',
-          title: 'Passcode Required',
-          backButtonHidden: true,
-          overrideBackPress: true,
-        },
-        passProps: {
-          mode: "authenticate",
-          onAuthenticateSuccess: onAuthenticate
-        },
-        animationType: 'slide-down',
-        tabsStyle: _.clone(tabStyles), // for iOS
-        appStyle: _.clone(tabStyles) // for Android
-      })
     }
+  }
 
-    function showFingerprintScanner(onAuthenticate) {
-      Navigation.startSingleScreenApp({
-        screen: {
-          screen: 'sn.Fingerprint',
-          title: 'Fingerprint Required',
-          backButtonHidden: true,
-          overrideBackPress: true,
-        },
-        passProps: {
-          mode: "authenticate",
-          onAuthenticateSuccess: onAuthenticate
-        },
-        animationType: 'slide-down',
-        tabsStyle: _.clone(tabStyles), // for iOS
-        appStyle: _.clone(tabStyles) // for Android
-      })
-    }
-
-    function startActualApp() {
-      Navigation.startTabBasedApp({
-        tabs: tabs,
-        animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
-        tabsStyle: _.clone(tabStyles), // for iOS
-        appStyle: _.clone(tabStyles) // for Android
-      });
-    }
-
-    KeysManager.get().loadInitialData().then(function(){
-
+  start() {
+    KeysManager.get().loadInitialData().then(function() {
       var hasPasscode = KeysManager.get().hasOfflinePasscode();
       var hasFingerprint = KeysManager.get().hasFingerprint();
 
       if(hasPasscode) {
-        showPasscodeLock(function(){
+        this.showPasscodeLock(function(){
           if(hasFingerprint) {
-            showFingerprintScanner(startActualApp);
+            this.showFingerprintScanner(startActualApp);
           } else {
-            startActualApp();
+            this.startActualApp();
           }
-        });
+        }.bind(this));
       } else if(hasFingerprint) {
-        showFingerprintScanner(startActualApp);
+        this.showFingerprintScanner(startActualApp);
       } else {
-        startActualApp();
+        this.startActualApp();
       }
+    }.bind(this))
+  }
+
+  showPasscodeLock(onAuthenticate) {
+    Navigation.startSingleScreenApp({
+      screen: {
+        screen: 'sn.Authenticate',
+        title: 'Passcode Required',
+        backButtonHidden: true,
+        overrideBackPress: true,
+      },
+      passProps: {
+        mode: "authenticate",
+        onAuthenticateSuccess: onAuthenticate
+      },
+      animationType: 'slide-down',
+      tabsStyle: _.clone(this.tabStyles), // for iOS
+      appStyle: _.clone(this.tabStyles) // for Android
     })
   }
 
+  showFingerprintScanner(onAuthenticate) {
+    Navigation.startSingleScreenApp({
+      screen: {
+        screen: 'sn.Fingerprint',
+        title: 'Fingerprint Required',
+        backButtonHidden: true,
+        overrideBackPress: true,
+      },
+      passProps: {
+        mode: "authenticate",
+        onAuthenticateSuccess: onAuthenticate
+      },
+      animationType: 'slide-down',
+      tabsStyle: _.clone(this.tabStyles), // for iOS
+      appStyle: _.clone(this.tabStyles) // for Android
+    })
+  }
+
+  startActualApp() {
+    Navigation.startTabBasedApp({
+      tabs: tabs,
+      animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
+      tabsStyle: _.clone(this.tabStyles), // for iOS
+      appStyle: _.clone(this.tabStyles) // for Android
+    });
+  }
+
   reload() {
-    this.start();
+    this.startActualApp();
   }
 }

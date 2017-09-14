@@ -26,6 +26,7 @@ export default class ThemesSection extends Component {
               selected={() => {return theme.active}}
               buttonCell={true}
               tinted={true}
+              dimmed={theme.notAvailableOnMobile}
             />
           )
         }.bind(this))}

@@ -27,6 +27,7 @@ export default class Sync {
   constructor() {
     this.syncStatus = {};
     this.syncObservers = [];
+    this.dataLoadObservers = [];
     KeysManager.get().registerAccountRelatedStorageKeys(["syncToken", "cursorToken"]);
   }
 
@@ -40,12 +41,29 @@ export default class Sync {
     _.pull(this.syncObservers, observer);
   }
 
+  registerInitialDataLoadObserver(callback) {
+    var observer = {key: new Date(), callback: callback};
+    this.dataLoadObservers.push(observer);
+    return observer;
+  }
+
+  removeDataLoadObserver(observer) {
+    _.pull(this.dataLoadObservers, observer);
+  }
+
   async loadLocalItems(callback) {
     return DBManager.getAllItems(function(items){
+
       this.handleItemsResponse(items, null, null).then(function(mappedItems){
         Item.sortItemsByDate(mappedItems);
+
+        this.dataLoadObservers.forEach(function(observer){
+          observer.callback();
+        })
+
         callback(mappedItems);
       }.bind(this))
+
     }.bind(this))
   }
 

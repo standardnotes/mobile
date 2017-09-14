@@ -12,13 +12,15 @@ export default class Theme extends Item {
     this.url = contentObject.url;
     this.name = contentObject.name;
     this.mobileRules = contentObject.mobileRules;
+    this.notAvailableOnMobile = contentObject.notAvailableOnMobile;
   }
 
   structureParams() {
     var params = {
       url: this.url,
       name: this.name,
-      mobileRules: this.mobileRules
+      mobileRules: this.mobileRules,
+      notAvailableOnMobile: this.notAvailableOnMobile
     };
 
     _.merge(params, super.structureParams());

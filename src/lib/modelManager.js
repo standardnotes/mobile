@@ -20,9 +20,10 @@ export default class ModelManager {
   }
 
   constructor() {
+    this.items = [];
     this.notes = [];
     this.tags = [];
-    this.items = [];
+    this.themes = [];
 
     this.itemSyncObservers = [];
 
@@ -34,6 +35,7 @@ export default class ModelManager {
     // empty the following arrays by settings its length to 0
     this.notes.length = 0;
     this.tags.length = 0;
+    this.themes.length = 0;
     this.items.length = 0;
     this._extensions.length = 0;
   }
@@ -193,7 +195,11 @@ export default class ModelManager {
         if(!_.find(this._extensions, {uuid: item.uuid})) {
           this._extensions.unshift(item);
         }
-      }
+      } else if(item.content_type == "SN|Theme") {
+       if(!_.find(this.themes, {uuid: item.uuid})) {
+         this.themes.unshift(item);
+       }
+     }
     }.bind(this));
   }
 
@@ -286,6 +292,8 @@ export default class ModelManager {
       this.notes = _.pull(this.notes, item);
     } else if(item.content_type == "Extension") {
       _.pull(this._extensions, item);
+    } else if(item.content_type == "SN|Theme") {
+      _.pull(this.themes, item);
     }
 
     return DBManager.deleteItem(item);

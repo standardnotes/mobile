@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     padding: 10,
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingLeft: 25,
+    paddingRight: 25,
     textAlign: "center"
   },
 

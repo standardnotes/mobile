@@ -239,7 +239,7 @@ export default class Compose extends Abstract {
           onChangeText={this.onTitleChange}
           value={this.state.note.title}
           placeholder={"Add Title"}
-          selectionColor={"red"}
+          selectionColor={GlobalStyles.constants().mainTintColor}
           underlineColorAndroid={'transparent'}
         />
 

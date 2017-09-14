@@ -1,6 +1,6 @@
 var _ = require('lodash')
 
-import { StyleSheet, StatusBar } from 'react-native';
+import { StyleSheet, StatusBar, Alert } from 'react-native';
 import App from "./app"
 import ModelManager from "./lib/modelManager"
 import Server from "./lib/server"
@@ -24,27 +24,15 @@ export default class GlobalStyles {
 
   constructor() {
     this.loadDefaults();
-    this._themes = [this.systemTheme()];
 
     KeysManager.get().registerAccountRelatedStorageKeys(["active-theme-id"]);
 
-    Auth.getInstance().addEventObserver([Auth.DidSignOutEvent], function() {
-      this._themes = [this.systemTheme()];
-    }.bind(this));
-
     ModelManager.getInstance().addItemSyncObserver("themes", "SN|Theme", function(items){
-      var nonDeleted = _.filter(items, {deleted: false});
-      var deleted = _.difference(items, nonDeleted);
-      this._themes = _.difference(this._themes, deleted);
-      this._themes = _.uniq(this._themes.concat(nonDeleted));
-
-      this.downloadThemes(nonDeleted);
-
       if(!this.activeThemeId) {
         Storage.getItem("active-theme-id").then(function(themeId){
           this.activeThemeId = themeId;
           if(themeId) {
-            this.activateTheme(_.find(this._themes, {uuid: themeId}));
+            this.activateTheme(_.find(this.themes(), {uuid: themeId}));
           } else {
             this.systemTheme().active = true;
           }
@@ -86,22 +74,8 @@ export default class GlobalStyles {
     this.setStyles(this.defaultRules(constants), constants, "dark-content");
   }
 
-  downloadThemes(themes) {
-    var needingDownload = themes.filter(function(theme){
-      return theme.mobileRules == null;
-    })
-
-    Promise.all(needingDownload.map(function(theme){
-      return this.downloadTheme(theme);
-    }.bind(this))).then(function(){
-      Sync.getInstance().sync();
-    })
-  }
-
   themes() {
-    return this._themes.filter(function(theme){
-      return theme.mobileRules != null;
-    });
+    return [this.systemTheme()].concat(ModelManager.getInstance().themes);
   }
 
   isThemeActive(theme) {
@@ -113,39 +87,63 @@ export default class GlobalStyles {
       this.activeTheme.active = false;
     }
 
-    var constants = _.merge(this.defaultConstants(), theme.mobileRules.constants);
-    var rules = _.merge(this.defaultRules(constants), theme.mobileRules.rules);
-    this.setStyles(rules, constants, theme.mobileRules.statusBar);
+    var run = () => {
+      var constants = _.merge(this.defaultConstants(), theme.mobileRules.constants);
+      var rules = _.merge(this.defaultRules(constants), theme.mobileRules.rules);
+      this.setStyles(rules, constants, theme.mobileRules.statusBar);
 
-    this.activeTheme = theme;
-    theme.active = true;
-    if(theme.default) {
-      Storage.removeItem("active-theme-id");
-    } else {
-      Storage.setItem("active-theme-id", theme.uuid);
+      this.activeTheme = theme;
+      theme.active = true;
+      if(theme.default) {
+        Storage.removeItem("active-theme-id");
+      } else {
+        Storage.setItem("active-theme-id", theme.uuid);
+      }
+
+      App.get().reload();
     }
 
-    App.get().reload();
+    if(!theme.mobileRules) {
+      this.downloadTheme(theme, function(){
+        if(theme.notAvailableOnMobile) {
+          Alert.alert("Not Available", "This theme is not available on mobile.");
+        } else {
+          run();
+        }
+      });
+    } else {
+      run();
+    }
   }
 
   async downloadTheme(theme, callback) {
     var url = theme.url.replace("?", ".json?");
     return Server.getInstance().getAbsolute(url, {}, function(response){
       // success
-      theme.mobileRules = response;
-      theme.setDirty(true);
+      if(response !== theme.mobileRules) {
+        theme.mobileRules = response;
+        theme.setDirty(true);
+      }
+
+      if(theme.notAvailableOnMobile) {
+        theme.notAvailableOnMobile = false;
+        theme.setDirty(true);
+      }
+
       if(callback) {
         callback();
       }
-    }, function(response){
-      if(response.error) {
-        theme.mobileRules = response;
+    }, function(response) {
+      // error
+      if(!theme.notAvailableOnMobile) {
+        theme.notAvailableOnMobile = true;
         theme.setDirty(true);
       }
       if(callback) {
         callback();
       }
-      console.log("Theme download error");
+
+      console.log("Theme download error", response);
     })
   }
 
@@ -169,11 +167,11 @@ export default class GlobalStyles {
 
   defaultConstants() {
     return {
-        themeColor: "#086DD6",
         mainBackgroundColor: "white",
         mainTintColor: "#fb0206",
         plainCellBorderColor: "#efefef",
         sectionedCellHorizontalPadding: 14,
+        mainDimColor: "gray",
         mainTextColor: "black",
         selectedBackgroundColor: "#efefef",
         paddingLeft: 14,
@@ -236,6 +234,7 @@ export default class GlobalStyles {
       sectionedTableCellTextInput: {
         fontSize: constants.mainTextFontSize,
         padding: 0,
+        color: constants.mainTextColor
         // height: "100%",
       },
 

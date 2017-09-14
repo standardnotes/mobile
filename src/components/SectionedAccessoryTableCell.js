@@ -50,6 +50,9 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     if(this.props.tinted) {
       textStyles.push({color: GlobalStyles.constants().mainTintColor})
     }
+    if(this.props.dimmed) {
+      textStyles.push({color: GlobalStyles.constants().mainDimColor})
+    }
 
     var textWrapper = (<Text key={1} style={textStyles}>{this.props.text}</Text>);
 

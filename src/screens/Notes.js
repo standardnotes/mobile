@@ -108,8 +108,10 @@ export default class Notes extends Abstract {
       this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
       Sync.getInstance().loadLocalItems(function(items) {
-        this.reloadList();
-        this.mergeState({decrypting: false, loading: false});
+        setTimeout(function () {
+          this.reloadList();
+          this.mergeState({decrypting: false, loading: false});
+        }.bind(this), 0);
       }.bind(this));
 
       // perform initial sync
