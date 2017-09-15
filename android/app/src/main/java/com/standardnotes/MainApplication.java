@@ -1,4 +1,4 @@
-package com.sn_react;
+package com.standardnotes;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,8 +20,6 @@ import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 import java.util.Arrays;
 import java.util.List;
 
-//import com.facebook.react.ReactApplication;
-
 public class MainApplication extends NavigationApplication {
 
   @Override
@@ -31,16 +29,16 @@ public class MainApplication extends NavigationApplication {
   }
 
 
-    protected List<ReactPackage> getPackages() {
-      return Arrays.asList(
+  protected List<ReactPackage> getPackages() {
+    return Arrays.asList(
 //            new MainReactPackage(),
             new KeychainPackage(),
             new VectorIconsPackage(),
             new RCTAesPackage(),
             new RNMail(),
             new ReactNativeFingerprintScannerPackage()
-      );
-    }
+    );
+  }
 
   @Override
   @Nullable

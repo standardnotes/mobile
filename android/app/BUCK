@@ -45,12 +45,12 @@ android_library(
 
 android_build_config(
     name = "build_config",
-    package = "com.sn_react",
+    package = "com.standardnotes",
 )
 
 android_resource(
     name = "res",
-    package = "com.sn_react",
+    package = "com.standardnotes",
     res = "src/main/res",
 )
 

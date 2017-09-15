@@ -94,12 +94,12 @@ android {
     buildToolsVersion "26.0.1"
 
     defaultConfig {
-        applicationId "com.sn_react"
+        applicationId "com.standardnotes"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
+        multiDexEnabled  true
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -113,10 +113,6 @@ android {
         }
     }
     buildTypes {
-        debug {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-        }
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"

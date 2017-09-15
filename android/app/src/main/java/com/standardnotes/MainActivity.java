@@ -1,6 +1,5 @@
-package com.sn_react;
+package com.standardnotes;
 
-//import com.facebook.react.ReactActivity;
 import com.reactnativenavigation.controllers.SplashActivity;
 
 public class MainActivity extends SplashActivity {
@@ -10,6 +9,6 @@ public class MainActivity extends SplashActivity {
      * This is used to schedule rendering of the component.
      */
     protected String getMainComponentName() {
-        return "sn_react";
+        return "StandardNotes";
     }
 }
