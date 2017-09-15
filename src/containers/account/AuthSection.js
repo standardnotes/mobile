@@ -49,6 +49,7 @@ export default class AuthSection extends Component {
             autoCapitalize={'none'}
             keyboardType={'email-address'}
             underlineColorAndroid={'transparent'}
+            placeholderTextColor={GlobalStyles.constants().mainDimColor}
           />
         </SectionedTableCell>
 
@@ -60,6 +61,7 @@ export default class AuthSection extends Component {
             value={this.state.password}
             secureTextEntry={true}
             underlineColorAndroid={'transparent'}
+            placeholderTextColor={GlobalStyles.constants().mainDimColor}
           />
         </SectionedTableCell>
 
@@ -74,6 +76,7 @@ export default class AuthSection extends Component {
               autoCapitalize={'none'}
               keyboardType={'url'}
               underlineColorAndroid={'transparent'}
+              placeholderTextColor={GlobalStyles.constants().mainDimColor}
             />
           </SectionedTableCell>
         }

@@ -60,6 +60,7 @@ export default class InputModal extends Component {
               autoCorrect={false}
               autoCapitalize={'none'}
               autoFocus={true}
+              placeholderTextColor={GlobalStyles.constants().mainDimColor}
             />
           </SectionedTableCell>
 

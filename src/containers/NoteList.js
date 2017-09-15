@@ -6,6 +6,31 @@ import GlobalStyles from "../Styles"
 
 export default class NoteList extends Component {
 
+  constructor(props) {
+    super(props);
+    this.styles = StyleSheet.create({
+      container: {
+        flex: 1,
+      },
+
+      decryptNoticeContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: -1,
+        position: "absolute",
+        height: "100%",
+        width: "100%"
+      },
+
+      decryptNotice: {
+        position: "absolute",
+        opacity: 0.5,
+        color: GlobalStyles.constants().mainTextColor
+      }
+    });
+  }
+
   renderHeader = () => {
     return (
       <View style={{paddingLeft: 5, paddingRight: 5, paddingTop: 5, backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
@@ -41,8 +66,8 @@ export default class NoteList extends Component {
       <View style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
 
         {(this.props.decrypting || this.props.loading) &&
-          <View style={styles.decryptNoticeContainer}>
-            <Text style={styles.decryptNotice}> { this.props.decrypting ? "Decrypting notes..." : "Loading notes..."} </Text>
+          <View style={this.styles.decryptNoticeContainer}>
+            <Text style={this.styles.decryptNotice}> { this.props.decrypting ? "Decrypting notes..." : "Loading notes..."} </Text>
           </View>
         }
 
@@ -64,26 +89,3 @@ export default class NoteList extends Component {
     )
   }
 }
-
-const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-  },
-
-  decryptNoticeContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: -1,
-    position: "absolute",
-    height: "100%",
-    width: "100%"
-  },
-
-  decryptNotice: {
-    position: "absolute",
-    opacity: 0.5,
-    color: "black"
-  }
-});

@@ -240,6 +240,7 @@ export default class Compose extends Abstract {
           placeholder={"Add Title"}
           selectionColor={GlobalStyles.constants().mainTintColor}
           underlineColorAndroid={'transparent'}
+          placeholderTextColor={GlobalStyles.constants().mainDimColor}
         />
 
         <KeyboardAvoidingView style={{flexGrow: 1}} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
