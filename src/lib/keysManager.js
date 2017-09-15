@@ -28,11 +28,13 @@ export default class KeysManager {
     return Promise.all([
 
       Keychain.getKeys().then(function(keys){
-        this.offlineKeys = keys.offline;
-        this.fingerprintEnabled = keys.fingerprint;
-        this.accountKeys = _.omit(keys, ["offline", "fingerprint"]);
-        if(_.keys(this.accountKeys).length == 0) {
-          this.accountKeys = null;
+        if(keys) {
+          this.offlineKeys = keys.offline;
+          this.fingerprintEnabled = keys.fingerprint;
+          this.accountKeys = _.omit(keys, ["offline", "fingerprint"]);
+          if(_.keys(this.accountKeys).length == 0) {
+            this.accountKeys = null;
+          }
         }
       }.bind(this)),
 

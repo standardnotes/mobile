@@ -27,10 +27,6 @@ export default class Theme extends Item {
     return params;
   }
 
-  toJSON() {
-    return {uuid: this.uuid}
-  }
-
   get content_type() {
     return "SN|Theme";
   }

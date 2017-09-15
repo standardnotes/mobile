@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 var _ = require('lodash')
+import GlobalStyles from "../Styles"
 
 export default class Abstract extends Component {
 

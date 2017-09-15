@@ -72,31 +72,38 @@ export default class App {
       navBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor, // actual top nav bar
 
       statusBarColor: GlobalStyles.constants().mainBackgroundColor, // Android only
+      statusBarTextColorScheme: 'dark',
+      statusBarTextColorSchemeSingleScreen: 'dark',
 
       screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
     }
   }
 
   start() {
-    Icons.get().loadIcons();
-    KeysManager.get().loadInitialData().then(function() {
-      var hasPasscode = KeysManager.get().hasOfflinePasscode();
-      var hasFingerprint = KeysManager.get().hasFingerprint();
+    GlobalStyles.get().resolveInitialTheme().then(function(){
+      Promise.all([
+        Icons.get().loadIcons(),
+        KeysManager.get().loadInitialData()
+      ]).then(function(){
+        var hasPasscode = KeysManager.get().hasOfflinePasscode();
+        var hasFingerprint = KeysManager.get().hasFingerprint();
 
-      if(hasPasscode) {
-        this.showPasscodeLock(function(){
-          if(hasFingerprint) {
-            this.showFingerprintScanner(startActualApp);
-          } else {
-            this.startActualApp();
-          }
-        }.bind(this));
-      } else if(hasFingerprint) {
-        this.showFingerprintScanner(startActualApp);
-      } else {
-        this.startActualApp();
-      }
+        if(hasPasscode) {
+          this.showPasscodeLock(function(){
+            if(hasFingerprint) {
+              this.showFingerprintScanner(this.startActualApp.bind(this));
+            } else {
+              this.startActualApp();
+            }
+          }.bind(this));
+        } else if(hasFingerprint) {
+          this.showFingerprintScanner(this.startActualApp.bind(this));
+        } else {
+          this.startActualApp();
+        }
+      }.bind(this))
     }.bind(this))
+
   }
 
   showPasscodeLock(onAuthenticate) {

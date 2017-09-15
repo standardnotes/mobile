@@ -22,28 +22,37 @@ export default class GlobalStyles {
     return this.instance;
   }
 
-  constructor() {
-    this.loadDefaults();
+  async resolveInitialTheme() {
+    // Get the active theme from storage rather than waiting for local database to load
+    return Storage.getItem("activeTheme").then(function(theme) {
+      if(theme) {
+        theme = JSON.parse(theme);
+        theme.isSwapIn = true;
+        var constants = _.merge(this.defaultConstants(), theme.mobileRules.constants);
+        var rules = _.merge(this.defaultRules(constants), theme.mobileRules.rules);
+        this.setStyles(rules, constants, theme.mobileRules.statusBar);
 
-    KeysManager.get().registerAccountRelatedStorageKeys(["active-theme-id"]);
+        this.activeTheme = theme;
+      } else {
+        var theme = this.systemTheme();
+        theme.active = true;
+        this.activeTheme = theme;
+        var constants = this.defaultConstants();
+        this.setStyles(this.defaultRules(constants), constants, "dark-content");
+      }
+    }.bind(this));
+  }
+
+  constructor() {
+    KeysManager.get().registerAccountRelatedStorageKeys(["activeTheme"]);
 
     ModelManager.getInstance().addItemSyncObserver("themes", "SN|Theme", function(items){
-      if(!this.activeThemeId) {
-        Storage.getItem("active-theme-id").then(function(themeId){
-          this.activeThemeId = themeId;
-          if(themeId) {
-            this.activateTheme(_.find(this.themes(), {uuid: themeId}));
-          } else {
-            this.systemTheme().active = true;
-          }
-        }.bind(this));
+      if(this.activeTheme && this.activeTheme.isSwapIn) {
+        this.activeTheme.isSwapIn = false;
+        this.activeTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
+        this.activeTheme.active = true;
       }
-
     }.bind(this));
-
-    // setTimeout(function () {
-    //   StatusBar.setBarStyle("dark-content", true);
-    // }, 1000);
   }
 
   static styles() {
@@ -73,11 +82,6 @@ export default class GlobalStyles {
     return this._systemTheme;
   }
 
-  loadDefaults() {
-    var constants = this.defaultConstants();
-    this.setStyles(this.defaultRules(constants), constants, "dark-content");
-  }
-
   themes() {
     return [this.systemTheme()].concat(ModelManager.getInstance().themes);
   }
@@ -86,7 +90,7 @@ export default class GlobalStyles {
     return this.activateThemeId === theme.uuid;
   }
 
-  activateTheme(theme) {
+  activateTheme(theme, writeToStorage = true) {
     if(this.activeTheme) {
       this.activeTheme.active = false;
     }
@@ -98,10 +102,11 @@ export default class GlobalStyles {
 
       this.activeTheme = theme;
       theme.active = true;
+
       if(theme.default) {
-        Storage.removeItem("active-theme-id");
-      } else {
-        Storage.setItem("active-theme-id", theme.uuid);
+        Storage.removeItem("activeTheme");
+      } else if(writeToStorage) {
+        Storage.setItem("activeTheme", JSON.stringify(theme));
       }
 
       App.get().reload();
@@ -160,6 +165,7 @@ export default class GlobalStyles {
   }
 
   setStyles(rules, constants, statusBar) {
+    this.statusBar = statusBar;
     this.constants = constants;
     this.styles = {
       rules: StyleSheet.create(rules),

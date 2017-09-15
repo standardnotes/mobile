@@ -87,7 +87,7 @@ export default class Compose extends Abstract {
     }
 
     if(Platform.OS === "android") {
-      tagButton.icon = Icon.getIcon("md-menu");
+      tagButton.icon = Icons.getIcon("md-menu");
     }
 
     this.props.navigator.setButtons({

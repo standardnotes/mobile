@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, SectionList, ScrollView, View, Text, Share, Platform } from 'react-native';
+import { TextInput, SectionList, ScrollView, View, Text, Share, Platform, StatusBar } from 'react-native';
 var _ = require('lodash')
 
 import Sync from '../lib/sync'
