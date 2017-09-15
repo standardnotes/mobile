@@ -6,6 +6,7 @@ export default class Abstract extends Component {
 
   constructor(props) {
     super(props);
+    this.initialLoad = true;
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
   }
 
@@ -15,7 +16,7 @@ export default class Abstract extends Component {
     })
   }
 
-  configureNavBar() {
+  configureNavBar(initial) {
 
   }
 
@@ -23,12 +24,13 @@ export default class Abstract extends Component {
 
     switch(event.id) {
       case 'willAppear':
-        // console.log("===Will Appear===");
         this.willBeVisible = true;
-        this.configureNavBar();
+        this.configureNavBar(this.initialLoad);
+        if(this.initialLoad) {
+          this.initialLoad = false;
+        }
        break;
       case 'didAppear':
-        // console.log("===Did Appear===");
         this.visible = true;
         break;
       case 'willDisappear':

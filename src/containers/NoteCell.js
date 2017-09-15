@@ -156,7 +156,11 @@ export default class NoteCell extends React.PureComponent {
             <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>{note.text}</Text>
           }
 
-          <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>{note.createdAt()}</Text>
+          <Text
+            numberOfLines={1}
+            style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>
+            {this.props.sortType == "updated_at" ? "Last modified " + note.updatedAt() : note.createdAt()}
+          </Text>
 
         </View>
       </TouchableWithoutFeedback>

@@ -140,6 +140,13 @@ export default class Item {
     return string;
   }
 
+  updatedAt() {
+    var date = this.updated_at;
+    var string = date.toLocaleDateString() + ", " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    return string;
+  }
+
   doNotEncrypt() {
     return false;
   }

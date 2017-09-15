@@ -29,7 +29,6 @@ export default class Notes extends Abstract {
     };
     this.options = this.defaultOptions();
     this.registerObservers();
-    this.configureNavBar();
     this.loadTabbarIcons();
     this.initializeOptionsAndNotes();
     this.beginSyncTimer();
@@ -117,7 +116,7 @@ export default class Notes extends Abstract {
     }.bind(this))
   }
 
-  configureNavBar() {
+  configureNavBar(initial = false) {
     super.configureNavBar();
 
     var notesTitle = "Notes";
@@ -141,6 +140,10 @@ export default class Notes extends Abstract {
     this.filterTitle = filterTitle;
 
     this.props.navigator.setTitle({title: notesTitle, animated: false});
+
+    if(!initial) {
+      return;
+    }
 
     var rightButtons = [];
     if(Platform.OS == "ios") {
@@ -216,8 +219,8 @@ export default class Notes extends Abstract {
     });
   }
 
-  reloadList(reloadNavBar = true) {
-    if(!this.visible && !this.willBeVisible) {
+  reloadList(force) {
+    if(!this.visible && !this.willBeVisible && !force) {
       console.log("===Scheduling Notes Render Update===");
       this.loadNotesOnVisible = true;
       return;
@@ -227,18 +230,12 @@ export default class Notes extends Abstract {
 
     this.forceUpdate();
     this.mergeState({refreshing: false, loading: false})
-
-    // this function may be triggled asyncrounsly even when on a different screen
-    // we dont want to update the nav bar unless we are the present screen
-    if(reloadNavBar && this.visible) {
-      this.configureNavBar();
-    }
   }
 
   setOptions(options) {
     this.options = options;
     Storage.setItem("options", JSON.stringify(options));
-    this.reloadList();
+    this.reloadList(true);
   }
 
   _onRefresh() {
@@ -273,12 +270,12 @@ export default class Notes extends Abstract {
 
   onSearchTextChange = (text) => {
     this.options = _.merge(this.options, {searchTerm: text});
-    this.reloadList(false);
+    this.reloadList();
   }
 
   onSearchCancel = () => {
     this.options = _.merge(this.options, {searchTerm: null});
-    this.reloadList(false);
+    this.reloadList();
   }
 
   render() {
@@ -294,6 +291,7 @@ export default class Notes extends Abstract {
             onSearchChange={this.onSearchTextChange}
             onSearchCancel={this.onSearchCancel}
             notes={notes}
+            sortType={this.options.sortBy}
             decrypting={this.state.decrypting}
             loading={this.state.loading}
           />

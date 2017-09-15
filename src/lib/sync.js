@@ -306,7 +306,7 @@ export default class Sync {
         this.callQueuedCallbacksAndCurrent(callback, response);
 
         this.syncObservers.forEach(function(mapping){
-          var changesMade = retrieved.length > 0 || saved.length > 0 || response.unsaved.length > 0;
+          var changesMade = retrieved.length > 0 || response.unsaved.length > 0;
           mapping.callback(changesMade);
         })
       }

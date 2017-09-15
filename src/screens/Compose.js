@@ -5,6 +5,7 @@ import ModelManager from '../lib/modelManager'
 import Note from '../models/app/note'
 import Abstract from "./Abstract"
 import Icons from '../Icons';
+var dismissKeyboard = require('dismissKeyboard');
 
 import {
   AppRegistry,
@@ -17,7 +18,8 @@ import {
   Text,
   Keyboard,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  PanResponder
 } from 'react-native';
 
 import GlobalStyles from "../Styles"
@@ -29,6 +31,7 @@ export default class Compose extends Abstract {
   };
 
   constructor(props) {
+    console.log("===COMPOSE CONSTRUCTOR===")
     super(props);
     var note = ModelManager.getInstance().findItem(this.props.noteId);
     if(!note) {
@@ -45,6 +48,36 @@ export default class Compose extends Abstract {
         this.forceUpdate();
       }
     }.bind(this))
+
+    this._panResponder = PanResponder.create({
+      // Ask to be the responder:
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => {
+        return true;
+      },
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
+        // returning false here allows us to jerk our textview around smoothly for some reason
+        return false
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        // The most recent move distance is gestureState.move{X,Y}
+        if(gestureState.dy > 100 && this.isFocused) {
+          this.refs.input.blur();
+        }
+        // The accumulated gesture distance since becoming responder is
+        // gestureState.d{x,y}
+      },
+      onPanResponderTerminationRequest: (evt, gestureState) => {
+        return true;
+      },
+
+      onShouldBlockNativeResponder: (evt, gestureState) => {
+        // Returns whether this component should block native components from becoming the JS
+        // responder. Returns true by default. Is currently only supported on android.
+        return true;
+      },
+    });
   }
 
   onContentSizeChange = (c) => {
@@ -101,7 +134,8 @@ export default class Compose extends Abstract {
 
     if(event.id == 'didAppear') {
       if(this.state.note.dummy) {
-        this.textView.focus();
+        // this.textView.focus();
+         this.refs.input.focus();
       }
 
       if(this.state.note.dirty) {
@@ -227,10 +261,22 @@ export default class Compose extends Abstract {
     });
   }
 
+  onTextFocus = () => {
+    // in order to call blur() later, we need to focus here manually, even though it does nothing
+    this.refs.input.focus();
+    this.isFocused = true;
+  }
+
+  onTextBlur = () =>  {
+    this.isFocused = false;
+  }
+
   render() {
     var textBottomPadding = this.state.keyboard ? 10 : 0;
+    textBottomPadding = 10;
     var keyboardBehavior = Platform.OS == "android" ? "height" : "padding";
     var keyboardOffset = this.rawStyles.noteTitle.height + this.rawStyles.noteText.paddingTop + (Platform.OS == "android" ? 15 : 0);
+    keyboardOffset = 0;
     return (
       <View style={[this.styles.container, GlobalStyles.styles().container]}>
         <TextInput
@@ -243,32 +289,26 @@ export default class Compose extends Abstract {
           placeholderTextColor={GlobalStyles.constants().mainDimColor}
         />
 
-        <KeyboardAvoidingView style={{flexGrow: 1}} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
-          {
-            // We wrap TextInput in a ScrollView so that we can have interactive dismiss gesture on iOS
-          }
-          <ScrollView
-            style={this.styles.textContainer}
-            contentContainerStyle={this.styles.contentContainer}
-            keyboardDismissMode={Platform.OS == 'android' ? 'on-drag' : 'interactive'}
-          >
+        <KeyboardAvoidingView {...this._panResponder.panHandlers} style={[this.styles.textContainer]} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
             <TextInput
                 style={[this.styles.noteText, {paddingBottom: textBottomPadding}]}
                 onChangeText={this.onTextChange}
                 multiline={true}
+                autoFocus={false}
                 value={this.state.note.text}
-                ref={component => this.textView = component}
+                ref={'input'}
+                onFocus={this.onTextFocus}
+                onBlur={this.onTextBlur}
                 selectionColor={GlobalStyles.constants().mainTintColor}
                 underlineColorAndroid={'transparent'}
                 keyboardDismissMode={'interactive'}
                 textAlignVertical={'top'}
                 textAlign={'left'}
+                onScroll={() => {}}
                 onContentSizeChange={this.onContentSizeChange}
-              >
-              </TextInput>
-            </ScrollView>
-          </KeyboardAvoidingView>
+              />
 
+            </KeyboardAvoidingView>
       </View>
     );
   }

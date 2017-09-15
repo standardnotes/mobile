@@ -58,6 +58,7 @@ export default class NoteList extends Component {
       pinned={item.pinned}
       deleted={item.deleted}
       archived={item.archived}
+      sortType={this.props.sortType}
     />
   )
 

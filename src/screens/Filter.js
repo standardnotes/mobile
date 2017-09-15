@@ -38,6 +38,10 @@ export default class Filter extends Abstract {
     this.configureNavBar();
   }
 
+  notifyParentOfOptionsChange() {
+    this.props.onOptionsChange(this.options);
+  }
+
   componentDidMount() {
     // React Native Navigation has an issue where navigation pushes are pushed first, then rendered.
     // This causes an undesired flash while content loads. To reduce the flash, we load the easy stuff first
@@ -89,11 +93,21 @@ export default class Filter extends Abstract {
       this.forceUpdate();
     }
 
+    if(event.id == "willDisappear") {
+      // we prefer to notify the parent via NavBarButtonPress.accept, but when this view is presented via nav push,
+      // the user can swipe back and miss that. So we do it here as a backup
+      if(!this.didNotifyParent) {
+        this.notifyParentOfOptionsChange();
+      }
+    }
+
     if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
       if (event.id == 'accept') { // this is the same id field from the static navigatorButtons definition
         if(this.note) {
           this.props.navigator.pop();
         } else {
+          this.didNotifyParent = true;
+          this.notifyParentOfOptionsChange();
           this.props.navigator.dismissModal({animationType: "slide-down"})
         }
       } else if(event.id == 'new-tag') {
@@ -130,7 +144,6 @@ export default class Filter extends Abstract {
 
   onSortChange = (key) => {
     this.options.sortBy = key;
-    this.props.onOptionsChange(this.options);
   }
 
   onTagSelect = (tag) => {
@@ -147,7 +160,6 @@ export default class Filter extends Abstract {
     this.selectedTags = selectedTags.slice();
     this.options.selectedTags = selectedTags;
     this.state.selectedTags = selectedTags;
-    this.props.onOptionsChange(this.options);
   }
 
   onTagLongPress = (tag) => {
@@ -204,7 +216,6 @@ export default class Filter extends Abstract {
 
   onOptionsChange = (options) => {
     _.merge(this.options, options);
-    this.props.onOptionsChange(this.options);
   }
 
   render() {
