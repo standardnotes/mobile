@@ -53,7 +53,7 @@ export default class InputModal extends Abstract {
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
               underlineColorAndroid='transparent'
-              style={GlobalStyles.styles().sectionedTableCellTextInput}
+              style={[GlobalStyles.styles().sectionedTableCellTextInput]}
               placeholder={this.props.placeholder}
               onChangeText={this.onTextChange}
               value={this.state.text}

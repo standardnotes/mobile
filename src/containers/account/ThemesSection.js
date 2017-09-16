@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import GlobalStyles from "../../Styles"
-import {TextInput, View} from 'react-native';
+import {TextInput, View, Linking} from 'react-native';
 
 import SectionHeader from "../../components/SectionHeader";
 import ButtonCell from "../../components/ButtonCell";
@@ -30,6 +30,15 @@ export default class ThemesSection extends Component {
             />
           )
         }.bind(this))}
+
+        {this.props.themes.length == 1 &&
+          <SectionedAccessoryTableCell
+            onPress={() => Linking.openURL("https://standardnotes.org/extensions")}
+            text={"More Themes"}
+            buttonCell={true}
+            tinted={true}
+          />
+        }
 
       </TableSection>
     );

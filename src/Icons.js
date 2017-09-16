@@ -32,7 +32,7 @@ export default class Icons {
       "ios-contact-outline": [Ionicons, 25, color],
       "md-add" : [Ionicons, 25, color],
       "md-pricetag" : [Ionicons, 25, color],
-      "md-menu":[Ionicons, 25, color],
+      "md-menu" : [Ionicons, 25, color],
     };
 
     return new Promise((resolve, reject) => {

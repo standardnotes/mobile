@@ -63,12 +63,20 @@ export default class NoteList extends Component {
   )
 
   render() {
+    var placeholderText = "";
+    if(this.props.decrypting) {
+      placeholderText = "Decrypting notes...";
+    } else if(this.props.loading) {
+      placeholderText = "Loading notes...";
+    } else if(this.props.notes.length == 0) {
+      placeholderText = "No notes.";
+    }
     return (
       <View style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
 
-        {(this.props.decrypting || this.props.loading) &&
+        {placeholderText.length > 0 &&
           <View style={this.styles.decryptNoticeContainer}>
-            <Text style={this.styles.decryptNotice}> { this.props.decrypting ? "Decrypting notes..." : "Loading notes..."} </Text>
+            <Text style={this.styles.decryptNotice}> { placeholderText } </Text>
           </View>
         }
 

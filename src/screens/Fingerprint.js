@@ -25,6 +25,43 @@ export default class Fingerprint extends Abstract {
   constructor(props) {
     super(props);
     this.state = {};
+
+    this.styles = StyleSheet.create({
+      container: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+
+      text: {
+        fontWeight: "bold",
+        color: GlobalStyles.constants().mainTextColor
+      },
+
+      error: {
+        color: "red",
+        padding: 10,
+        paddingLeft: 25,
+        paddingRight: 25,
+        textAlign: "center"
+      },
+
+      dev: {
+        marginTop: 50,
+        backgroundColor: GlobalStyles.constants().mainDimColor,
+        padding: 15,
+        paddingTop: 20,
+        borderRadius: 5,
+        opacity: 0.5
+      },
+
+      centered: {
+        textAlign: "center",
+        color: GlobalStyles.constants().mainTextColor
+      },
+    });
+
   }
 
   componentDidMount() {
@@ -76,20 +113,20 @@ export default class Fingerprint extends Abstract {
 
   render() {
     return (
-      <View style={[GlobalStyles.styles().container, styles.container]}>
-        <Text style={styles.text}>Please scan your fingerprint</Text>
+      <View style={[GlobalStyles.styles().container, this.styles.container]}>
+        <Text style={this.styles.text}>Please scan your fingerprint</Text>
 
         {this.state.error &&
-          <Text style={styles.error}>{this.state.error}</Text>
+          <Text style={this.styles.error}>{this.state.error}</Text>
         }
 
         {__DEV__ &&
-          <View style={[styles.dev]}>
-            <Text style={styles.centered}>Dev Build Detected</Text>
+          <View style={[this.styles.dev]}>
+            <Text style={this.styles.centered}>Dev Build Detected</Text>
             <Button
               onPress={this.handleSuccessfulAuth}
-              title="Simulate Successful Fingerprint"
-              color="black"
+              title={"Simulate Successful Fingerprint"}
+              color={GlobalStyles.constants().mainTextColor}
             />
           </View>
         }
@@ -97,38 +134,3 @@ export default class Fingerprint extends Abstract {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  text: {
-    fontWeight: "bold",
-  },
-
-  error: {
-    color: "red",
-    padding: 10,
-    paddingLeft: 25,
-    paddingRight: 25,
-    textAlign: "center"
-  },
-
-  dev: {
-    marginTop: 50,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    padding: 15,
-    paddingTop: 20,
-    borderRadius: 5,
-    opacity: 0.5
-  },
-
-  centered: {
-    textAlign: "center"
-  },
-
-});

@@ -283,7 +283,7 @@ export default class GlobalStyles {
       buttonCellButton: {
         textAlign: "center",
         color: constants.mainTintColor,
-        fontSize: constants.mainTextFontSize - 1,
+        fontSize: constants.mainTextFontSize,
         height: "100%",
         paddingTop: 13
       },

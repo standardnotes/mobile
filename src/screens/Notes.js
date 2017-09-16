@@ -296,7 +296,6 @@ export default class Notes extends Abstract {
             loading={this.state.loading}
           />
         }
-
       </View>
     );
   }
