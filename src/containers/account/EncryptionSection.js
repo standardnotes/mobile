@@ -26,12 +26,18 @@ export default class PasscodeSection extends Component {
     var items = ModelManager.getInstance().allItemsMatchingTypes(["Note", "Tag"]);
     var itemsStatus = items.length + "/" + items.length + " notes and tags encrypted";
 
+    var textStyles = {
+      color: GlobalStyles.constants().mainTextColor,
+      fontSize: GlobalStyles.constants().mainTextFontSize,
+      lineHeight: 22
+    }
+
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
 
         <SectionedTableCell first={true}>
-          <Text style={{color: GlobalStyles.constants().mainTextColor}}>
+          <Text style={textStyles}>
             <Text style={{fontWeight: "bold"}}>Encryption: </Text>
             <Text>{encryptionStatus}</Text>
             {enabled &&
@@ -45,7 +51,7 @@ export default class PasscodeSection extends Component {
 
         {enabled &&
           <SectionedTableCell>
-            <Text style={{color: GlobalStyles.constants().mainTextColor}}>
+            <Text style={textStyles}>
               <Text style={{fontWeight: "bold"}}>Encryption Source: </Text>
               <Text>{sourceString}</Text>
             </Text>
@@ -54,7 +60,7 @@ export default class PasscodeSection extends Component {
 
         {enabled &&
           <SectionedTableCell>
-            <Text style={{color: GlobalStyles.constants().mainTextColor}}>
+            <Text style={textStyles}>
               <Text style={{fontWeight: "bold"}}>Items Encrypted: </Text>
               <Text>{itemsStatus}</Text>
             </Text>
