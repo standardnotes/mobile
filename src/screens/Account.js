@@ -308,7 +308,10 @@ export default class Account extends Abstract {
             />
           }
 
-          <OptionsSection signedIn={signedIn} title={"Options"} onSignOutPress={this.onSignOutPress} onExportPress={this.onExportPress} />
+          <OptionsSection signedIn={signedIn} title={"Options"}
+          onSignOutPress={this.onSignOutPress} onExportPress={this.onExportPress}
+          email={KeysManager.get().getUserEmail()}
+          />
 
           <ThemesSection themes={themes} title={"Themes"} onThemeSelect={this.onThemeSelect} onThemeLongPress={this.onThemeLongPress} />
 

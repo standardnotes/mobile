@@ -17,7 +17,7 @@ export default class OptionsSection extends Component {
 
         {this.props.signedIn &&
           <SectionedTableCell buttonCell={true} first={true}>
-            <ButtonCell leftAligned={true} title="Sign Out" onPress={this.props.onSignOutPress} />
+            <ButtonCell leftAligned={true} title={`Sign out (${this.props.email})`} onPress={this.props.onSignOutPress} />
           </SectionedTableCell>
         }
 

@@ -58,6 +58,7 @@ export default class KeysManager {
       }.bind(this)),
 
       Storage.getItem("user").then(function(user) {
+        console.log("Got user", user);
         if(user) {
           this.user = JSON.parse(user);
         } else {
@@ -156,6 +157,14 @@ export default class KeysManager {
     } else {
       return this.offlineAuthParams;
     }
+  }
+
+
+
+  // User
+
+  getUserEmail() {
+    return this.user && this.user.email;
   }
 
 
