@@ -60,7 +60,7 @@ export default class Compose extends Abstract {
       },
       onPanResponderMove: (evt, gestureState) => {
         // The most recent move distance is gestureState.move{X,Y}
-        if(gestureState.dy > 100 && this.isFocused) {
+        if(gestureState.dy > 200 && this.isFocused) {
           this.refs.input.blur();
         }
         // The accumulated gesture distance since becoming responder is
@@ -276,11 +276,10 @@ export default class Compose extends Abstract {
   }
 
   render() {
-    var textBottomPadding = this.state.keyboard ? 10 : 0;
-    textBottomPadding = 10;
+    var textBottomPadding = 10;
     var keyboardBehavior = Platform.OS == "android" ? "height" : "padding";
     var keyboardOffset = this.rawStyles.noteTitle.height + this.rawStyles.noteText.paddingTop + (Platform.OS == "android" ? 15 : 0);
-    keyboardOffset = 0;
+
     return (
       <View style={[this.styles.container, GlobalStyles.styles().container]}>
         <TextInput
