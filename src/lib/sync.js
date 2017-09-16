@@ -263,7 +263,7 @@ export default class Sync {
     }.bind(this);
 
     var onSyncSuccess = async function(response) {
-      console.log("Sync response:", response);
+      console.log("Sync completed.");
       ModelManager.getInstance().clearDirtyItems(subItems);
       this.syncStatus.error = null;
 

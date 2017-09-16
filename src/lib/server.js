@@ -36,7 +36,11 @@ export default class Server {
         if(response) {
           try {
             response = JSON.parse(response);
-          } catch(e) {}
+          } catch(e) {
+            console.log("Error parsing JSON");
+            onerror(response);
+            return;
+          }
         }
 
        if(xmlhttp.status >= 200 && xmlhttp.status <= 299){

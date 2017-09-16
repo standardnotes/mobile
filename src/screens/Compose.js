@@ -31,7 +31,6 @@ export default class Compose extends Abstract {
   };
 
   constructor(props) {
-    console.log("===COMPOSE CONSTRUCTOR===")
     super(props);
     var note = ModelManager.getInstance().findItem(this.props.noteId);
     if(!note) {
@@ -40,7 +39,6 @@ export default class Compose extends Abstract {
     }
     this.state = {note: note, text: note.text};
 
-    this.configureNavBar();
     this.loadStyles();
 
     this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade){
@@ -86,6 +84,7 @@ export default class Compose extends Abstract {
   }
 
   componentWillMount () {
+    super.componentWillMount();
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
   }
@@ -99,21 +98,22 @@ export default class Compose extends Abstract {
   }
 
   componentWillUnmount() {
+    super.componentWillUnmount();
     this.keyboardDidShowListener.remove();
     this.keyboardDidHideListener.remove();
     Sync.getInstance().removeSyncObserver(this.syncObserver);
   }
 
-  configureNavBar() {
+  configureNavBar(initial) {
     super.configureNavBar();
 
-    var title = "Options";
-    if(this.state.note.tags.length > 0) {
-      title += ` (${this.state.note.tags.length})`;
+    // Only edit the nav bar once, it wont be changed
+    if(!initial) {
+      return;
     }
 
     var tagButton = {
-      title: title,
+      title: "Manage",
       id: 'tags',
       showAsAction: 'ifRoom',
       buttonColor: GlobalStyles.constants().mainTintColor,
@@ -134,34 +134,38 @@ export default class Compose extends Abstract {
 
     if(event.id == 'didAppear') {
       if(this.state.note.dummy) {
-        // this.textView.focus();
          this.refs.input.focus();
       }
-
+    } else if(event.id == "willAppear") {
       if(this.state.note.dirty) {
-        this.changesMade();
-        this.configureNavBar();
+        // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
+        setTimeout(() => {
+          this.changesMade();
+        }, 300);
       }
     }
     if (event.type == 'NavBarButtonPress') {
       if (event.id == 'tags') {
-        this.showTags();
+        this.showOptions();
       }
     }
   }
 
-  showTags() {
+  showOptions() {
+    this.previousOptions = {selectedTags: this.state.note.tags.map(function(tag){return tag.uuid})};
     this.props.navigator.push({
       screen: 'sn.Filter',
       title: 'Options',
       animationType: 'slide-up',
       passProps: {
         noteId: this.state.note.uuid,
-        options: {selectedTags: this.state.note.tags.map(function(tag){return tag.uuid})},
+        options: this.previousOptions,
         onOptionsChange: (options) => {
-          var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
-          this.state.note.replaceTags(tags);
-          this.state.note.setDirty(true);
+          if(options.selectedTags !== this.previousOptions.selectedTags) {
+            var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
+            this.state.note.replaceTags(tags);
+            this.state.note.setDirty(true);
+          }
         }
       }
     });

@@ -165,6 +165,9 @@ export default class GlobalStyles {
   }
 
   setStyles(rules, constants, statusBar) {
+    if(!statusBar) {
+      statusBar = "light-content";
+    }
     this.statusBar = statusBar;
     this.constants = constants;
     this.styles = {
@@ -233,6 +236,7 @@ export default class GlobalStyles {
         borderBottomColor: constants.plainCellBorderColor,
         borderBottomWidth: 1,
         paddingLeft: constants.paddingLeft,
+        paddingRight: constants.paddingLeft,
         paddingTop: 13,
         paddingBottom: 12,
         backgroundColor: constants.mainBackgroundColor,

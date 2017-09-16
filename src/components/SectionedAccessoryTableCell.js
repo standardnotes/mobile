@@ -28,7 +28,16 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
     var iconStyles = {position: "absolute", right: GlobalStyles.constants().sectionedCellHorizontalPadding, top: 6};
     if(this.props.leftAlignIcon) {
-      iconStyles = {marginRight: 10, width: 30, paddingTop: 8, paddingLeft: 5};
+      iconStyles = {
+        width: 30,
+        maxWidth: 30,
+        paddingTop: 8,
+        flex: 1,
+        alignItems: "center",
+        position: "absolute",
+        left: 8,
+        top: 1
+      };
     }
 
     var left = this.props.leftAlignIcon;
@@ -44,6 +53,15 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     }
 
     var textStyles = [GlobalStyles.styles().sectionedAccessoryTableCellLabel];
+    if(this.props.leftAlignIcon) {
+      textStyles.push({
+        marginTop: iconStyles.marginTop + 4,
+        paddingTop: 0,
+        position: "absolute",
+        left: iconStyles.left + iconStyles.width + 12,
+        top: iconStyles.top + 12
+      });
+    }
     if(this.props.bold) {
       textStyles.push(GlobalStyles.styles().bold)
     }

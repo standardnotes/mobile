@@ -34,8 +34,6 @@ export default class Filter extends Abstract {
     if(this.props.noteId) {
       this.note = ModelManager.getInstance().findItem(this.props.noteId);
     }
-
-    this.configureNavBar();
   }
 
   notifyParentOfOptionsChange() {
@@ -134,11 +132,13 @@ export default class Filter extends Abstract {
 
   createTag(text, callback) {
     var tag = new Tag({title: text});
-    tag.initUUID().then(function() {
+    tag.initUUID().then(() => {
       tag.setDirty(true);
       ModelManager.getInstance().addItem(tag);
       Sync.getInstance().sync();
       callback(tag);
+
+      this.mergeState({tags: ModelManager.getInstance().tags});
     })
   }
 

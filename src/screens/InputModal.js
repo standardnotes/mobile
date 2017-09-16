@@ -5,13 +5,13 @@ import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
+import Abstract from "./Abstract"
 
-export default class InputModal extends Component {
+export default class InputModal extends Abstract {
 
   constructor(props) {
     super(props);
     this.state = {text: ""};
-    this.configureNavBar();
   }
 
   configureNavBar() {

@@ -16,6 +16,15 @@ export default class Abstract extends Component {
     })
   }
 
+  componentWillUnmount() {
+    this.willUnmount = true;
+  }
+
+  componentWillMount() {
+    this.willUnmount = false;
+    this.configureNavBar(true);
+  }
+
   configureNavBar(initial) {
 
   }
@@ -25,10 +34,7 @@ export default class Abstract extends Component {
     switch(event.id) {
       case 'willAppear':
         this.willBeVisible = true;
-        this.configureNavBar(this.initialLoad);
-        if(this.initialLoad) {
-          this.initialLoad = false;
-        }
+        this.configureNavBar(false);
        break;
       case 'didAppear':
         this.visible = true;

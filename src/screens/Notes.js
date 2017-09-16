@@ -99,9 +99,7 @@ export default class Notes extends Abstract {
       }.bind(this)),
     ]).then(function(){
       // options and keys loaded
-      console.log("===Keys and options loaded===");
       var encryptionEnabled = KeysManager.get().encryptionEnabled();
-      console.log("Encryption enabled:", encryptionEnabled);
       this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
       Sync.getInstance().loadLocalItems(function(items) {
@@ -127,7 +125,7 @@ export default class Notes extends Abstract {
       if(numFilters > 0) {
         filterTitle += ` (${numFilters})`
       }
-      notesTitle = "Filtered Notes";
+      notesTitle = this.options.archivedOnly ? "Archived Notes" : "Filtered Notes";
     }
 
     if(notesTitle === this.notesTitle && filterTitle === this.filterTitle) {
@@ -144,6 +142,8 @@ export default class Notes extends Abstract {
     if(!initial) {
       return;
     }
+
+    console.log("Configuring Notes Nav Bar", this.willBeVisible, this.willUnmount, this.props.navigator.buttons);
 
     var rightButtons = [];
     if(Platform.OS == "ios") {
