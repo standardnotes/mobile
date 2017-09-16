@@ -30,7 +30,14 @@ export default class KeysManager {
       Keychain.getKeys().then(function(keys){
         if(keys) {
           this.offlineKeys = keys.offline;
-          this.fingerprintEnabled = keys.fingerprint;
+          if(this.offlineKeys) {
+            this.passcodeTiming = this.offlineKeys.timing;
+          }
+
+          if(keys.fingerprint) {
+            this.fingerprintEnabled = keys.fingerprint.enabled;
+            this.fingerprintTiming = keys.fingerprint.timing;
+          }
           this.accountKeys = _.omit(keys, ["offline", "fingerprint"]);
           if(_.keys(this.accountKeys).length == 0) {
             this.accountKeys = null;
@@ -66,13 +73,13 @@ export default class KeysManager {
 
   // what we should write to keychain
   generateKeychainStoreValue() {
-    var value = {fingerprint: this.fingerprintEnabled};
+    var value = {fingerprint: {enabled: this.fingerprintEnabled, timing: this.fingerprintTiming}};
 
     if(this.accountKeys) {
       _.merge(value, this.accountKeys);
     }
     if(this.offlineKeys) {
-      _.merge(value, {offline: {pw: this.offlineKeys.pw}});
+      _.merge(value, {offline: {pw: this.offlineKeys.pw, timing: this.passcodeTiming}});
     }
 
     return value;
@@ -169,6 +176,9 @@ export default class KeysManager {
 
   async persistOfflineKeys(keys) {
     this.setOfflineKeys(keys);
+    if(!this.passcodeTiming) {
+      this.passcodeTiming = "on-quit";
+    }
     return this.persistKeysToKeychain();
   }
 
@@ -189,14 +199,41 @@ export default class KeysManager {
     return this.fingerprintEnabled;
   }
 
+  async setPasscodeTiming(timing) {
+    this.passcodeTiming = timing;
+    return this.persistKeysToKeychain();
+  }
+
+  async setFingerprintTiming(timing) {
+    this.fingerprintTiming = timing;
+    return this.persistKeysToKeychain();
+  }
+
   async enableFingerprint() {
     this.fingerprintEnabled = true;
+    if(!this.fingerprintTiming) {
+      this.fingerprintTiming = "on-quit";
+    }
     return this.persistKeysToKeychain();
   }
 
   async disableFingerprint() {
     this.fingerprintEnabled = false;
     return this.persistKeysToKeychain();
+  }
+
+  getPasscodeTimingOptions() {
+    return [
+      {title: "Immediately", key: "immediately", selected: this.passcodeTiming == "immediately"},
+      {title: "On Quit", key: "on-quit", selected: this.passcodeTiming == "on-quit"},
+    ]
+  }
+
+  getFingerprintTimingOptions() {
+    return [
+      {title: "Immediately", key: "immediately", selected: this.fingerprintTiming == "immediately"},
+      {title: "On Quit", key: "on-quit", selected: this.fingerprintTiming == "on-quit"},
+    ]
   }
 
 }

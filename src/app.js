@@ -1,24 +1,15 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * Standard Notes React Native App
  */
 
-import React, { Component } from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  FlatList
+  AppState,
+  Platform
 } from 'react-native';
-import {Platform} from 'react-native';
 
 import {Navigation} from 'react-native-navigation';
 import {registerScreens} from './screens';
 
-import Auth from './lib/auth'
-import Sync from './lib/sync'
 import KeysManager from './lib/keysManager'
 import GlobalStyles from "./Styles"
 import Icons from "./Icons"
@@ -58,6 +49,21 @@ export default class App {
     return this.instance;
   }
 
+  constructor() {
+    AppState.addEventListener('change', this.handleAppStateChange);
+  }
+
+  handleAppStateChange = (nextAppState) => {
+    console.log("App.js AppState: ", nextAppState);
+    if (nextAppState === 'background') {
+      var showPasscode = KeysManager.get().hasOfflinePasscode() && KeysManager.get().passcodeTiming == "immediately";
+      var showFingerprint = KeysManager.get().hasFingerprint()  && KeysManager.get().fingerprintTiming == "immediately";
+      if(showPasscode || showFingerprint) {
+        this.beginAuthentication(showPasscode, showFingerprint);
+      }
+    }
+  }
+
   get tabStyles() {
     return {
       tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
@@ -87,23 +93,25 @@ export default class App {
       ]).then(function(){
         var hasPasscode = KeysManager.get().hasOfflinePasscode();
         var hasFingerprint = KeysManager.get().hasFingerprint();
+        this.beginAuthentication(hasPasscode, hasFingerprint);
+      }.bind(this))
+    }.bind(this))
+  }
 
-        if(hasPasscode) {
-          this.showPasscodeLock(function(){
-            if(hasFingerprint) {
-              this.showFingerprintScanner(this.startActualApp.bind(this));
-            } else {
-              this.startActualApp();
-            }
-          }.bind(this));
-        } else if(hasFingerprint) {
+  beginAuthentication(hasPasscode, hasFingerprint) {
+    if(hasPasscode) {
+      this.showPasscodeLock(function(){
+        if(hasFingerprint) {
           this.showFingerprintScanner(this.startActualApp.bind(this));
         } else {
           this.startActualApp();
         }
-      }.bind(this))
-    }.bind(this))
-
+      }.bind(this));
+    } else if(hasFingerprint) {
+      this.showFingerprintScanner(this.startActualApp.bind(this));
+    } else {
+      this.startActualApp();
+    }
   }
 
   showPasscodeLock(onAuthenticate) {

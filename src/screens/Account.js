@@ -263,13 +263,11 @@ export default class Account extends Abstract {
   }
 
   onFingerprintEnable = () => {
-    console.log("On fingerprint enable");
     KeysManager.get().enableFingerprint();
     this.loadSecurityStatus();
   }
 
   onFingerprintDisable = () => {
-    console.log("On fingerprint disable");
     KeysManager.get().disableFingerprint();
     this.loadSecurityStatus();
   }
