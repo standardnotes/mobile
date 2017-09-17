@@ -68,12 +68,12 @@ export default class Account extends Abstract {
 
   validate(email, password) {
     if(!email) {
-      Alert.alert('Missing Email', "Please enter a valid email address.", [{text: 'OK', onPress: () => console.log('OK Pressed')}])
+      Alert.alert('Missing Email', "Please enter a valid email address.", [{text: 'OK'}])
       return false;
     }
 
     if(!password) {
-      Alert.alert('Missing Password', "Please enter your password.", [{text: 'OK', onPress: () => console.log('OK Pressed')}])
+      Alert.alert('Missing Password', "Please enter your password.", [{text: 'OK'}])
       return false;
     }
 
@@ -93,13 +93,11 @@ export default class Account extends Abstract {
     Auth.getInstance().login(email, password, params.server, function(user, error) {
       if(error) {
         Alert.alert(
-          'Oops', error.message, [{text: 'OK', onPress: () => console.log('OK Pressed')},]
+          'Oops', error.message, [{text: 'OK'}]
         )
         callback();
         return;
       }
-
-      console.log("Logged in user: ", user);
 
       this.onAuthSuccess();
       callback();
@@ -107,8 +105,6 @@ export default class Account extends Abstract {
   }
 
   onRegisterPress = (params) => {
-    console.log("Registering with params", params);
-
     Keyboard.dismiss();
     var email = params.email;
     var password = params.password;
@@ -130,12 +126,10 @@ export default class Account extends Abstract {
 
       if(error) {
         Alert.alert(
-          'Oops', error.message, [{text: 'OK', onPress: () => console.log('OK Pressed')},]
+          'Oops', error.message, [{text: 'OK'}]
         )
         return;
       }
-
-      console.log("Logged in user: ", user);
 
       this.onAuthSuccess();
     }.bind(this));

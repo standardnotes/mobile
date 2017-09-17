@@ -143,8 +143,6 @@ export default class Notes extends Abstract {
       return;
     }
 
-    console.log("Configuring Notes Nav Bar", this.willBeVisible, this.willUnmount, this.props.navigator.buttons);
-
     var rightButtons = [];
     if(Platform.OS == "ios") {
       rightButtons.push({

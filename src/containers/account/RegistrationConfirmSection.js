@@ -16,7 +16,7 @@ export default class RegistrationConfirmSection extends Component {
 
   onConfirmPress = () => {
     if(this.state.password !== this.state.passwordConfirmation) {
-      Alert.alert("Passwords Don't Match", "The passwords you entered do not match. Please try again.", [{text: 'OK', onPress: () => console.log('OK Pressed')}])
+      Alert.alert("Passwords Don't Match", "The passwords you entered do not match. Please try again.", [{text: 'OK'}])
     } else {
       this.props.onSuccess();
     }

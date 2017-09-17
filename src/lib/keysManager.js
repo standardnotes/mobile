@@ -7,6 +7,7 @@ import Keychain from "./keychain"
 var _ = require('lodash')
 
 let OfflineParamsKey = "pc_params";
+let FirstRunKey = "first_run";
 
 export default class KeysManager {
 
@@ -24,48 +25,88 @@ export default class KeysManager {
     this.accountRelatedStorageKeys = ["auth_params", "user"];
   }
 
+  loadLocalStateFromKeys(keys) {
+    if(keys) {
+      this.offlineKeys = keys.offline;
+      if(this.offlineKeys) {
+        this.passcodeTiming = this.offlineKeys.timing;
+      }
+
+      if(keys.fingerprint) {
+        this.fingerprintEnabled = keys.fingerprint.enabled;
+        this.fingerprintTiming = keys.fingerprint.timing;
+      }
+      this.accountKeys = _.omit(keys, ["offline", "fingerprint"]);
+      if(_.keys(this.accountKeys).length == 0) {
+        this.accountKeys = null;
+      }
+    } else {
+      this.offlineKeys = null;
+      this.passcodeTiming = null;
+      this.fingerprintEnabled = null;
+      this.fingerprintTiming = null;
+      this.accountKeys = null;
+    }
+  }
+
   async loadInitialData() {
+    var storageKeys = ["auth_params", OfflineParamsKey, "user", FirstRunKey];
+
     return Promise.all([
 
       Keychain.getKeys().then(function(keys){
         if(keys) {
-          this.offlineKeys = keys.offline;
-          if(this.offlineKeys) {
-            this.passcodeTiming = this.offlineKeys.timing;
-          }
-
-          if(keys.fingerprint) {
-            this.fingerprintEnabled = keys.fingerprint.enabled;
-            this.fingerprintTiming = keys.fingerprint.timing;
-          }
-          this.accountKeys = _.omit(keys, ["offline", "fingerprint"]);
-          if(_.keys(this.accountKeys).length == 0) {
-            this.accountKeys = null;
-          }
+          this.loadLocalStateFromKeys(keys);
         }
       }.bind(this)),
 
-      Storage.getItem("auth_params").then(function(authParams) {
+      Storage.getMultiItems(storageKeys).then(function(items){
+        // first run
+        this.firstRun = items[FirstRunKey] === null || items[FirstRunKey] === undefined;
+
+        // auth params
+        var authParams = items.auth_params;
         if(authParams) {
           this.accountAuthParams = JSON.parse(authParams);
         }
-      }.bind(this)),
 
-      Storage.getItem(OfflineParamsKey).then(function(pcParams) {
+        // offline params
+        var pcParams = items[OfflineParamsKey];
         if(pcParams) {
           this.offlineAuthParams = JSON.parse(pcParams);
         }
-      }.bind(this)),
 
-      Storage.getItem("user").then(function(user) {
-        console.log("Got user", user);
+        // user
+        var user = items.user;
         if(user) {
           this.user = JSON.parse(user);
         } else {
           this.user = {};
         }
-      }.bind(this)),
+      }.bind(this))
     ])
+  }
+
+  isFirstRun() {
+    return this.firstRun;
+  }
+
+  async handleFirstRun() {
+    // on first run, clear keys and data.
+    // why? on iOS keychain data is persisted between installs/uninstalls.
+    // this prevents the user from deleting the app and reinstalling if they forgot their local passocde
+    // or if fingerprint scanning isn't working. By deleting all data on first run, we allow the user to reset app
+    // state after uninstall.
+
+    console.log("===Handling First Run===");
+
+    return Promise.all([
+      Storage.clear(),
+      Keychain.clearKeys()
+    ]).then(function(){
+      this.loadLocalStateFromKeys(null);
+      Storage.setItem(FirstRunKey, "false")
+    }.bind(this));
   }
 
   registerAccountRelatedStorageKeys(storageKeys) {

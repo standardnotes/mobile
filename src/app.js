@@ -54,7 +54,6 @@ export default class App {
   }
 
   handleAppStateChange = (nextAppState) => {
-    console.log("App.js AppState: ", nextAppState);
     if (nextAppState === 'background') {
       var showPasscode = KeysManager.get().hasOfflinePasscode() && KeysManager.get().passcodeTiming == "immediately";
       var showFingerprint = KeysManager.get().hasFingerprint()  && KeysManager.get().fingerprintTiming == "immediately";
@@ -91,9 +90,16 @@ export default class App {
         Icons.get().loadIcons(),
         KeysManager.get().loadInitialData()
       ]).then(function(){
-        var hasPasscode = KeysManager.get().hasOfflinePasscode();
-        var hasFingerprint = KeysManager.get().hasFingerprint();
-        this.beginAuthentication(hasPasscode, hasFingerprint);
+        var run = () => {
+          var hasPasscode = KeysManager.get().hasOfflinePasscode();
+          var hasFingerprint = KeysManager.get().hasFingerprint();
+          this.beginAuthentication(hasPasscode, hasFingerprint);
+        }
+        if(KeysManager.get().isFirstRun()) {
+          KeysManager.get().handleFirstRun().then(run);
+        } else {
+          run();
+        }
       }.bind(this))
     }.bind(this))
   }
