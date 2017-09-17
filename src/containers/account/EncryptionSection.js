@@ -45,7 +45,7 @@ export default class PasscodeSection extends Component {
             }
           </Text>
           {!enabled &&
-            <Text style={{marginTop: 4}}>Sign in, register, or add a local passcode to enable encryption.</Text>
+            <Text style={[textStyles, {marginTop: 4, color: GlobalStyles.constants().mainDimColor}]}>Sign in, register, or add a local passcode to enable encryption.</Text>
           }
         </SectionedTableCell>
 

@@ -33,7 +33,7 @@ export default class Account extends Abstract {
   constructor(props) {
     super(props);
     this.state = {
-      params: {email: "a@bitar.io", password: "password", server: Auth.getInstance().serverUrl()}
+      params: {server: Auth.getInstance().serverUrl()}
     };
 
     this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
@@ -184,6 +184,8 @@ export default class Account extends Abstract {
       data["auth_params"] = authParams;
     }
 
+    var encrypted = keys !== null;
+
     var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
     var base64String = base64.encode(jsonString);
 
@@ -192,7 +194,7 @@ export default class Account extends Abstract {
       recipients: [''],
       body: '',
       isHTML: true,
-      attachment: { data: base64String, type: '.json', name: 'backup' }
+      attachment: { data: base64String, type: 'json', name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
     }, (error, event) => {
         if(error) {
           Alert.alert('Error', 'Unable to send email.');
@@ -302,9 +304,12 @@ export default class Account extends Abstract {
             />
           }
 
-          <OptionsSection signedIn={signedIn} title={"Options"}
-          onSignOutPress={this.onSignOutPress} onExportPress={this.onExportPress}
-          email={KeysManager.get().getUserEmail()}
+          <OptionsSection
+            signedIn={signedIn}
+            title={"Options"}
+            onSignOutPress={this.onSignOutPress}
+            onExportPress={this.onExportPress}
+            email={KeysManager.get().getUserEmail()}
           />
 
           <ThemesSection themes={themes} title={"Themes"} onThemeSelect={this.onThemeSelect} onThemeLongPress={this.onThemeLongPress} />

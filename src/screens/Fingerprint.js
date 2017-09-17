@@ -1,24 +1,9 @@
+var _ = require('lodash')
 import React, { Component } from 'react';
-import Auth from '../lib/auth'
-import Crypto from '../lib/crypto'
-import SectionHeader from "../components/SectionHeader";
-import ButtonCell from "../components/ButtonCell";
-import TableSection from "../components/TableSection";
-import SectionedTableCell from "../components/SectionedTableCell";
 import Abstract from "./Abstract"
-import Storage from '../lib/storage'
-import KeysManager from '../lib/keysManager'
 import GlobalStyles from "../Styles"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-var _ = require('lodash')
-
-import {
-  Text,
-  View,
-  Button,
-  StyleSheet,
-  Platform
-} from 'react-native';
+import {Text, View, Button, StyleSheet, Platform} from 'react-native';
 
 export default class Fingerprint extends Abstract {
 
@@ -102,8 +87,6 @@ export default class Fingerprint extends Abstract {
 
   handleInvalidAttempt = (error) => {
     this.setState({ error: error.message });
-    // try again
-    this.authenticate();
   }
 
   handleSuccessfulAuth = () => {

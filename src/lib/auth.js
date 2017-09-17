@@ -30,9 +30,9 @@ export default class Auth {
   static _defaultServer() {
     if (__DEV__) {
       if(Platform.OS === "android") {
-        return "http://10.0.2.2:3000/"
+        return "http://10.0.2.2:3000"
       } else {
-        return "http://localhost:3000/"
+        return "http://localhost:3000"
       }
     } else {
       return "https://sync.standardnotes.org";
@@ -54,7 +54,8 @@ export default class Auth {
   }
 
   serverUrl() {
-    return KeysManager.get().user.server || Auth._defaultServer();
+    var user = KeysManager.get().user;
+    return (user && user.server) || Auth._defaultServer();
   }
 
   urlForPath(path, serverUrl) {

@@ -105,6 +105,8 @@ export default class KeysManager {
       Keychain.clearKeys()
     ]).then(function(){
       this.loadLocalStateFromKeys(null);
+      this.accountAuthParams = null;
+      this.user = null;
       Storage.setItem(FirstRunKey, "false")
     }.bind(this));
   }
