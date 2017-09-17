@@ -54,9 +54,10 @@ export default class App {
   }
 
   handleAppStateChange = (nextAppState) => {
-    if (nextAppState === 'background') {
+    console.log("handleAppStateChange|App.js", nextAppState, "starting app?", this.isStartingApp);
+    if (nextAppState === "background" && !this.isStartingApp) {
       var showPasscode = KeysManager.get().hasOfflinePasscode() && KeysManager.get().passcodeTiming == "immediately";
-      var showFingerprint = KeysManager.get().hasFingerprint()  && KeysManager.get().fingerprintTiming == "immediately";
+      var showFingerprint = KeysManager.get().hasFingerprint() && KeysManager.get().fingerprintTiming == "immediately";
       if(showPasscode || showFingerprint) {
         this.beginAuthentication(showPasscode, showFingerprint);
       }
@@ -157,12 +158,24 @@ export default class App {
   }
 
   startActualApp() {
+    // Calling Navigation.startSingleScreenApp first (for authentication), then calling
+    // Navigation.startTabBasedApp will trigger an AppState change from active to background to active again.
+    // Since if fingerprint/passcode lock is enabled we present the auth screens when the app switches to background,
+    // if we don't catch this edge case, it will result in infinite recursion. So as `startActualApp` is called
+    // immediately before this transition, setting isStartingApp to true then false afterwards will prevent the infinite
+    // recursion
+
+    this.isStartingApp = true;
     Navigation.startTabBasedApp({
       tabs: tabs,
       animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
       tabsStyle: _.clone(this.tabStyles), // for iOS
       appStyle: _.clone(this.tabStyles) // for Android
     });
+
+    setTimeout(function () {
+      this.isStartingApp = false;
+    }.bind(this), 10);
   }
 
   reload() {

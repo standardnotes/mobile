@@ -18,6 +18,10 @@ import GlobalStyles from "../Styles"
 
 export default class Filter extends Abstract {
 
+  static navigatorStyle = {
+    tabBarHidden: true
+  };
+
   constructor(props) {
     super(props);
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
