@@ -166,7 +166,7 @@ export default class GlobalStyles {
 
   setStyles(rules, constants, statusBar) {
     if(!statusBar) {
-      statusBar = "light-content";
+      statusBar = "dark-content";
     }
     this.statusBar = statusBar;
     this.constants = constants;
@@ -251,7 +251,7 @@ export default class GlobalStyles {
       sectionedTableCellTextInput: {
         fontSize: constants.mainTextFontSize,
         padding: 0,
-        color: constants.mainTextColor
+        color: constants.mainTextColor,
         // height: "100%",
       },
 
@@ -267,7 +267,7 @@ export default class GlobalStyles {
       },
 
       sectionedAccessoryTableCellLabel: {
-        paddingTop: 12,
+        paddingTop: 10,
         fontSize: constants.mainTextFontSize,
         color: constants.mainTextColor
       },
@@ -275,6 +275,7 @@ export default class GlobalStyles {
       buttonCell: {
         paddingLeft: 0,
         paddingTop: 0,
+        paddingBottom: 0,
         minHeight: 45,
         flexGrow: 0,
         backgroundColor: constants.mainBackgroundColor,
@@ -285,7 +286,7 @@ export default class GlobalStyles {
         color: constants.mainTintColor,
         fontSize: constants.mainTextFontSize,
         height: "100%",
-        paddingTop: 13
+        paddingTop: 10,
       },
 
       buttonCellButtonLeft: {

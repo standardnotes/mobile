@@ -4,7 +4,8 @@
 
 import {
   AppState,
-  Platform
+  Platform,
+  StatusBar
 } from 'react-native';
 
 import {Navigation} from 'react-native-navigation';
@@ -65,6 +66,12 @@ export default class App {
   }
 
   get tabStyles() {
+    var statusBarColor = GlobalStyles.constants().mainBackgroundColor;
+    if(Platform.OS === "android" && Platform.Version <= 22) {
+      // Android <= v22 does not support changing status bar text color. It will always be white
+      // So we have to make sure background color has proper contrast
+      statusBarColor = "black";
+    }
     return {
       tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
       tabBarTranslucent: true,
@@ -77,7 +84,7 @@ export default class App {
       navigationBarColor: 'black', // android built in bar
       navBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor, // actual top nav bar
 
-      statusBarColor: GlobalStyles.constants().mainBackgroundColor, // Android only
+      statusBarColor: statusBarColor, // Android only
       statusBarTextColorScheme: 'dark',
       statusBarTextColorSchemeSingleScreen: 'dark',
 

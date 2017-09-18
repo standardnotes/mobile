@@ -132,6 +132,7 @@ export default class Authenticate extends Abstract {
                   autoCapitalize={'none'}
                   autoFocus={true}
                   secureTextEntry={true}
+                  underlineColorAndroid={'transparent'}
                 />
               </SectionedTableCell>
 
@@ -155,6 +156,7 @@ export default class Authenticate extends Abstract {
                   autoCapitalize={'none'}
                   autoFocus={true}
                   secureTextEntry={true}
+                  underlineColorAndroid={'transparent'}
                 />
               </SectionedTableCell>
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, AppState } from 'react-native';
+import { StyleSheet, View, Platform, Text, AppState, StatusBar } from 'react-native';
 import ModelManager from '../lib/modelManager'
 import Storage from '../lib/storage'
 import Sync from '../lib/sync'
@@ -64,9 +64,8 @@ export default class Notes extends Abstract {
       if(changesMade) {
         console.log("===Changes Made===");
         this.reloadList();
-      } else {
-        this.mergeState({refreshing: false, loading: false});
       }
+      this.mergeState({refreshing: false, loading: false});
     }.bind(this))
 
     this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
@@ -227,7 +226,7 @@ export default class Notes extends Abstract {
     console.log("===Reload Notes List===");
 
     this.forceUpdate();
-    this.mergeState({refreshing: false, loading: false})
+    this.mergeState({refreshing: false})
   }
 
   setOptions(options) {
@@ -280,7 +279,6 @@ export default class Notes extends Abstract {
     var notes = ModelManager.getInstance().getNotes(this.options);
     return (
       <View style={GlobalStyles.styles().container}>
-
         {notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}

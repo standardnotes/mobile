@@ -52,7 +52,6 @@ export default class InputModal extends Abstract {
           <SectionHeader title={this.props.title} />
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
-              underlineColorAndroid='transparent'
               style={[GlobalStyles.styles().sectionedTableCellTextInput]}
               placeholder={this.props.placeholder}
               onChangeText={this.onTextChange}
@@ -61,6 +60,7 @@ export default class InputModal extends Abstract {
               autoCapitalize={'none'}
               autoFocus={true}
               placeholderTextColor={GlobalStyles.constants().mainDimColor}
+              underlineColorAndroid={'transparent'}
             />
           </SectionedTableCell>
 

@@ -309,6 +309,7 @@ export default class Compose extends Abstract {
                 textAlign={'left'}
                 onScroll={() => {}}
                 onContentSizeChange={this.onContentSizeChange}
+                autoCapitalize={'sentences'}
               />
 
             </KeyboardAvoidingView>
