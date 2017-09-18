@@ -51,6 +51,8 @@ export default class Compose extends Abstract {
       // Ask to be the responder:
       onStartShouldSetPanResponder: (evt, gestureState) => true,
       onStartShouldSetPanResponderCapture: (evt, gestureState) => {
+        // If you set this true, then for some reason, on Android Tablets (Nexus 9 in testing),
+        // they keyboard wont come up when you tap to focus.
         return true;
       },
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
@@ -61,7 +63,7 @@ export default class Compose extends Abstract {
       onPanResponderMove: (evt, gestureState) => {
         // The most recent move distance is gestureState.move{X,Y}
         if(gestureState.dy > 200 && this.isFocused) {
-          this.refs.input.blur();
+          // this.refs.input.blur();
         }
         // The accumulated gesture distance since becoming responder is
         // gestureState.d{x,y}

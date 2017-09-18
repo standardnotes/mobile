@@ -165,7 +165,7 @@ export default class App {
   }
 
   startActualApp() {
-    // Calling Navigation.startSingleScreenApp first (for authentication), then calling
+    // On Android, calling Navigation.startSingleScreenApp first (for authentication), then calling
     // Navigation.startTabBasedApp will trigger an AppState change from active to background to active again.
     // Since if fingerprint/passcode lock is enabled we present the auth screens when the app switches to background,
     // if we don't catch this edge case, it will result in infinite recursion. So as `startActualApp` is called
@@ -182,7 +182,7 @@ export default class App {
 
     setTimeout(function () {
       this.isStartingApp = false;
-    }.bind(this), 10);
+    }.bind(this), 1500);
   }
 
   reload() {
