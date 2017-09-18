@@ -16,6 +16,9 @@ import Icons from "./Icons"
 
 var _ = require('lodash');
 
+import { Client } from 'bugsnag-react-native';
+const bugsnag = new Client()
+
 const tabs = [{
   label: 'Notes',
   screen: 'sn.Notes',

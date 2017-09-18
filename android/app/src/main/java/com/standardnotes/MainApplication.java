@@ -19,6 +19,7 @@ import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 
 import java.util.Arrays;
 import java.util.List;
+import com.bugsnag.BugsnagReactNative;
 
 public class MainApplication extends NavigationApplication {
 
@@ -32,6 +33,7 @@ public class MainApplication extends NavigationApplication {
   protected List<ReactPackage> getPackages() {
     return Arrays.asList(
 //            new MainReactPackage(),
+            BugsnagReactNative.getPackage(),
             new KeychainPackage(),
             new VectorIconsPackage(),
             new RCTAesPackage(),
@@ -86,6 +88,7 @@ public class MainApplication extends NavigationApplication {
       }
     });
 
+    BugsnagReactNative.start(this);
     SoLoader.init(this, /* native exopackage */ false);
   }
 }
