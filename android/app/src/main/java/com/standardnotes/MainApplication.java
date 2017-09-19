@@ -9,6 +9,7 @@ import android.view.WindowManager;
 import com.chirag.RNMail.RNMail;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
+import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.soloader.SoLoader;
 import com.oblador.keychain.KeychainPackage;
 import com.oblador.vectoricons.VectorIconsPackage;

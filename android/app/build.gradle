@@ -134,10 +134,10 @@ android {
 }
 
 dependencies {
-    compile project(':RNMail')
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:23.0.1'
-    compile 'com.facebook.react:react-native:+'
+    compile project(':ReactAndroid')
+    compile project(':RNMail')
     compile project(':react-native-navigation')
     compile project(':react-native-keychain')
     compile project(':react-native-vector-icons')
@@ -150,4 +150,8 @@ dependencies {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
+}
+
+configurations.all {
+    exclude group: 'com.facebook.react', module: 'react-native'
 }
