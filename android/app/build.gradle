@@ -97,8 +97,8 @@ android {
         applicationId "com.standardnotes"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 2
-        versionName "0.0.2"
+        versionCode 3
+        versionName "0.0.3"
         multiDexEnabled  true
         ndk {
             abiFilters "armeabi-v7a", "x86"
@@ -149,6 +149,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:23.0.1'
+    compile project(':bugsnag-react-native')
     compile project(':ReactAndroid')
     compile project(':RNMail')
     compile project(':react-native-navigation')

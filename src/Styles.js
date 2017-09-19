@@ -127,10 +127,10 @@ export default class GlobalStyles {
 
   async downloadTheme(theme, callback) {
     var url;
-    if(url.contains("?")) {
+    if(theme.url.contains("?")) {
       url = theme.url.replace("?", ".json?");
     } else {
-      url = url + ".json";
+      url = theme.url + ".json";
     }
     return Server.getInstance().getAbsolute(url, {}, function(response){
       // success
