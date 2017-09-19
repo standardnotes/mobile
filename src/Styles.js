@@ -126,7 +126,12 @@ export default class GlobalStyles {
   }
 
   async downloadTheme(theme, callback) {
-    var url = theme.url.replace("?", ".json?");
+    var url;
+    if(url.contains("?")) {
+      url = theme.url.replace("?", ".json?");
+    } else {
+      url = url + ".json";
+    }
     return Server.getInstance().getAbsolute(url, {}, function(response){
       // success
       if(response !== theme.mobileRules) {

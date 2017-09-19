@@ -51,9 +51,9 @@ export default class Compose extends Abstract {
       // Ask to be the responder:
       onStartShouldSetPanResponder: (evt, gestureState) => true,
       onStartShouldSetPanResponderCapture: (evt, gestureState) => {
-        // If you set this true, then for some reason, on Android Tablets (Nexus 9 in testing),
+        // If you set this true, then for some reason, on Android,
         // they keyboard wont come up when you tap to focus.
-        return true;
+        return false;
       },
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => {

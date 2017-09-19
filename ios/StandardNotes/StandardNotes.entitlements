@@ -4,5 +4,9 @@
 <dict>
 	<key>com.apple.developer.default-data-protection</key>
 	<string>NSFileProtectionComplete</string>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.standardnotes.standardnotes</string>
+	</array>
 </dict>
 </plist>
