@@ -22,6 +22,15 @@ export default class Abstract extends Component {
 
   componentWillMount() {
     this.willUnmount = false;
+    this.mounted = false;
+  }
+
+  loadInitialState() {
+    this.configureNavBar(true);
+  }
+
+  componentDidMount() {
+    this.mounted = true;
     this.configureNavBar(true);
   }
 

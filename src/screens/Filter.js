@@ -13,8 +13,9 @@ import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCe
 import Abstract from "./Abstract"
 import Tag from "../models/app/tag"
 import Icons from '../Icons';
-
+import OptionsState from "../OptionsState"
 import GlobalStyles from "../Styles"
+import App from "../app"
 
 export default class Filter extends Abstract {
 
@@ -24,34 +25,57 @@ export default class Filter extends Abstract {
 
   constructor(props) {
     super(props);
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
-    this.options = Object.assign({}, props.options);
 
-    var selectedTags ;
+    this.state = {ready: false};
+
+    this.readyObserver = App.get().addApplicationReadyObserver(() => {
+      if(this.mounted) {
+        this.loadInitialState();
+      }
+    })
+  }
+
+  loadInitialState() {
+    this.options = new OptionsState(JSON.parse(this.props.options));
+
+    var selectedTags;
     if(this.options.selectedTags) {
-      selectedTags = props.options.selectedTags.slice(); // copy the array
+      selectedTags = this.options.selectedTags.slice(); // copy the array
     } else {
       selectedTags = [];
     }
-    this.state = {tags: [], selectedTags: selectedTags};
+
+    this.mergeState({ready: true, tags: [], selectedTags: selectedTags, archivedOnly: this.options.archivedOnly});
 
     if(this.props.noteId) {
       this.note = ModelManager.getInstance().findItem(this.props.noteId);
     }
   }
 
-  notifyParentOfOptionsChange() {
-    this.props.onOptionsChange(this.options);
-  }
-
   componentDidMount() {
+    if(!this.state.ready) {
+      this.loadInitialState();
+    }
+
     // React Native Navigation has an issue where navigation pushes are pushed first, then rendered.
     // This causes an undesired flash while content loads. To reduce the flash, we load the easy stuff first
     // then wait a little to render the rest, such as a dynamic list of tags
     // See https://github.com/wix/react-native-navigation/issues/358
-    setTimeout(function () {
-      this.mergeState({tags: ModelManager.getInstance().tags});
-    }.bind(this), 10);
+
+    this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
+      setTimeout(function () {
+        this.mergeState({tags: ModelManager.getInstance().tags});
+      }.bind(this), 10);
+    }.bind(this))
+  }
+
+  componentWillUnmount() {
+    App.get().removeApplicationReadyObserver(this.readyObserver);
+    Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
+  }
+
+  notifyParentOfOptionsChange() {
+    this.props.onOptionsChange(this.options);
   }
 
   configureNavBar() {
@@ -147,7 +171,10 @@ export default class Filter extends Abstract {
   }
 
   onSortChange = (key) => {
-    this.options.sortBy = key;
+    this.options.setSortBy(key);
+    if(this.props.liveReload) {
+      this.notifyParentOfOptionsChange();
+    }
   }
 
   onTagSelect = (tag) => {
@@ -162,8 +189,12 @@ export default class Filter extends Abstract {
       selectedTags.push(tag.uuid);
     }
     this.selectedTags = selectedTags.slice();
-    this.options.selectedTags = selectedTags;
+    this.options.setSelectedTags(selectedTags);
     this.state.selectedTags = selectedTags;
+
+    if(this.props.liveReload) {
+      this.notifyParentOfOptionsChange();
+    }
   }
 
   onTagLongPress = (tag) => {
@@ -218,11 +249,19 @@ export default class Filter extends Abstract {
     }
   }
 
-  onOptionsChange = (options) => {
-    _.merge(this.options, options);
+  onArchiveSelect = () => {
+    this.options.setArchivedOnly(!this.options.archivedOnly);
+    this.mergeState({archivedOnly: this.options.archivedOnly});
+
+    if(this.props.liveReload) {
+      this.notifyParentOfOptionsChange();
+    }
   }
 
   render() {
+    if(!this.state.ready) {
+      return (<View></View>);
+    }
     return (
       <View style={GlobalStyles.styles().container}>
         <ScrollView style={GlobalStyles.styles().view}>
@@ -232,7 +271,7 @@ export default class Filter extends Abstract {
           }
 
           {!this.note &&
-            <OptionsSection options={this.options} onOptionsChange={this.onOptionsChange} title={"Options"} />
+            <OptionsSection archivedOnly={this.state.archivedOnly} onArchiveSelect={this.onArchiveSelect} title={"Options"} />
           }
 
           { this.note &&
@@ -296,29 +335,23 @@ class TagsSection extends Component {
 class OptionsSection extends Component {
   constructor(props) {
     super(props);
-    this.state = {options: props.options}
+    this.state = {archivedOnly: props.archivedOnly}
   }
 
   onPressArchive = () => {
-    this.setState(function(prevState){
-      var state = prevState;
-      state.options.archivedOnly = !state.options.archivedOnly;
-      this.props.onOptionsChange(state.options);
-      return state;
-    }.bind(this))
+    this.props.onArchiveSelect();
   }
 
   render() {
-    let root = this;
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
 
         <SectionedAccessoryTableCell
-          onPress={root.onPressArchive}
+          onPress={this.onPressArchive}
           text={"Show only archived notes"}
           first={true}
-          selected={() => {return root.state.options.archivedOnly}}
+          selected={() => {return this.props.archivedOnly}}
           buttonCell={true}
         />
 

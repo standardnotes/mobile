@@ -12,39 +12,55 @@ import Icons from '../Icons';
 import NoteList from "../containers/NoteList"
 import Abstract from "./Abstract"
 import Authenticate from "./Authenticate"
+import OptionsState from "../OptionsState"
+import App from "../app"
 var _ = require('lodash')
 
 export default class Notes extends Abstract {
 
-  defaultOptions() {
-    return {selectedTags: [], sortBy: "created_at"};
-  }
-
   constructor(props) {
     super(props);
-    this.state = {
+
+    this.state = {ready: false};
+
+    this.readyObserver = App.get().addApplicationReadyObserver(() => {
+      if(this.mounted) {
+        this.loadInitialState();
+      }
+    })
+  }
+
+  loadInitialState() {
+    this.mergeState({
+      ready: true,
       refreshing: false,
       decrypting: false,
       loading: true
-    };
-    this.options = this.defaultOptions();
+    });
+    this.options = App.get().globalOptions();
     this.registerObservers();
     this.loadTabbarIcons();
-    this.initializeOptionsAndNotes();
+    this.initializeNotes();
     this.beginSyncTimer();
-    KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
+
+    super.loadInitialState();
+  }
+
+  componentDidMount() {
+    if(!this.state.ready) {
+      this.loadInitialState();
+    }
   }
 
   componentWillUnmount() {
     AppState.removeEventListener('change', this._handleAppStateChange);
+    App.get().removeApplicationReadyObserver(this.readyObserver);
     Sync.getInstance().removeSyncObserver(this.syncObserver);
     Auth.getInstance().removeEventObserver(this.signoutObserver);
+    this.options.removeChangeObserver(this.optionsObserver);
     clearInterval(this.syncTimer);
   }
 
-  componentDidMount() {
-    AppState.addEventListener('change', this._handleAppStateChange);
-  }
 
   _handleAppStateChange = (nextAppState) => {
     if ( nextAppState === 'active') {
@@ -60,6 +76,17 @@ export default class Notes extends Abstract {
   }
 
   registerObservers() {
+    AppState.addEventListener('change', this._handleAppStateChange);
+
+    this.optionsObserver = this.options.addChangeObserver((options) => {
+      this.reloadList(true);
+
+      // On iOS, configureNavBar would be handle by viewWillAppear. However, we're using a drawer in Android.
+      if(Platform.OS == "android") {
+        this.configureNavBar();
+      }
+    })
+
     this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade){
       if(changesMade) {
         console.log("===Changes Made===");
@@ -69,10 +96,7 @@ export default class Notes extends Abstract {
     }.bind(this))
 
     this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
-      if(event == Auth.DidSignOutEvent) {
-        this.options = this.defaultOptions();
-        this.reloadList();
-      } else if(event == Auth.WillSignInEvent) {
+      if(event == Auth.WillSignInEvent) {
         this.mergeState({loading: true})
       }
     }.bind(this));
@@ -91,40 +115,35 @@ export default class Notes extends Abstract {
     });
   }
 
-  initializeOptionsAndNotes() {
-    Promise.all([
-      Storage.getItem("options").then(function(result){
-        this.options = JSON.parse(result) || this.defaultOptions();
-      }.bind(this)),
-    ]).then(function(){
-      // options and keys loaded
-      var encryptionEnabled = KeysManager.get().encryptionEnabled();
-      this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
+  initializeNotes() {
+    var encryptionEnabled = KeysManager.get().encryptionEnabled();
+    this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
-      Sync.getInstance().loadLocalItems(function(items) {
-        setTimeout(function () {
-          this.reloadList();
-          this.mergeState({decrypting: false, loading: false});
-        }.bind(this), 0);
-      }.bind(this));
+    Sync.getInstance().loadLocalItems(function(items) {
+      setTimeout(function () {
+        this.reloadList();
+        this.mergeState({decrypting: false, loading: false});
+      }.bind(this), 0);
+    }.bind(this));
 
-      // perform initial sync
-      Sync.getInstance().sync(null);
-    }.bind(this))
+    // perform initial sync
+    Sync.getInstance().sync(null);
   }
 
   configureNavBar(initial = false) {
     super.configureNavBar();
 
+    var options = this.options;
+
     var notesTitle = "Notes";
     var filterTitle = "Filter";
-    var numFilters = this.options.selectedTags.length;
+    var numFilters = options.selectedTags.length;
 
-    if(numFilters > 0 || this.options.archivedOnly) {
+    if(numFilters > 0 || options.archivedOnly) {
       if(numFilters > 0) {
         filterTitle += ` (${numFilters})`
       }
-      notesTitle = this.options.archivedOnly ? "Archived Notes" : "Filtered Notes";
+      notesTitle = options.archivedOnly ? "Archived Notes" : "Filtered Notes";
     }
 
     if(notesTitle === this.notesTitle && filterTitle === this.filterTitle) {
@@ -190,7 +209,10 @@ export default class Notes extends Abstract {
         this.presentNewComposer();
       }
       else if (event.id == 'sideMenu') {
-        this.presentFilterScreen();
+        // Android is handled by the drawer attribute of rn-navigation
+        if(Platform.OS == "ios") {
+          this.presentFilterScreen();
+        }
       }
     }
   }
@@ -208,9 +230,9 @@ export default class Notes extends Abstract {
       title: 'Options',
       animationType: 'slide-up',
       passProps: {
-        options: _.cloneDeep(this.options),
+        options: JSON.stringify(this.options),
         onOptionsChange: (options) => {
-          this.setOptions(_.cloneDeep(options));
+          this.options.mergeWith(options);
         }
       }
     });
@@ -227,12 +249,6 @@ export default class Notes extends Abstract {
 
     this.forceUpdate();
     this.mergeState({refreshing: false})
-  }
-
-  setOptions(options) {
-    this.options = options;
-    Storage.setItem("options", JSON.stringify(options));
-    this.reloadList(true);
   }
 
   _onRefresh() {
@@ -266,16 +282,17 @@ export default class Notes extends Abstract {
   }
 
   onSearchTextChange = (text) => {
-    this.options = _.merge(this.options, {searchTerm: text});
-    this.reloadList();
+    this.options.setSearchTerm(text);
   }
 
   onSearchCancel = () => {
-    this.options = _.merge(this.options, {searchTerm: null});
-    this.reloadList();
+    this.options.setSearchTerm(null);
   }
 
   render() {
+    if(!this.state.ready) {
+      return (<View></View>);
+    }
     var notes = ModelManager.getInstance().getNotes(this.options);
     return (
       <View style={GlobalStyles.styles().container}>

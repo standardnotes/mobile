@@ -44,6 +44,9 @@ export default class Sync {
   registerInitialDataLoadObserver(callback) {
     var observer = {key: new Date(), callback: callback};
     this.dataLoadObservers.push(observer);
+    if(this.dataLoaded) {
+      callback();
+    }
     return observer;
   }
 
@@ -56,6 +59,8 @@ export default class Sync {
 
       this.handleItemsResponse(items, null, null).then(function(mappedItems){
         Item.sortItemsByDate(mappedItems);
+
+        this.dataLoaded = true;
 
         this.dataLoadObservers.forEach(function(observer){
           observer.callback();

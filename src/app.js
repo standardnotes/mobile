@@ -12,31 +12,16 @@ import {Navigation} from 'react-native-navigation';
 import {registerScreens} from './screens';
 
 import KeysManager from './lib/keysManager'
+import Auth from './lib/auth'
 import GlobalStyles from "./Styles"
 import Icons from "./Icons"
-
-var _ = require('lodash');
+import OptionsState from "./OptionsState"
 
 import { Client } from 'bugsnag-react-native';
-const bugsnag = new Client()
+var _ = require('lodash');
 
-const tabs = [{
-  label: 'Notes',
-  screen: 'sn.Notes',
-  title: 'Notes',
-},
-{
-  label: 'Account',
-  screen: 'sn.Account',
-  title: 'Account',
-  }
-];
-
-// android will fail to load if icon is not specified here
-if(Platform.OS === "android") {
-  tabs.forEach(function(tab){
-    tab.icon = require("./img/placeholder.png")
-  })
+if(!__DEV__) {
+  const bugsnag = new Client()
 }
 
 registerScreens();
@@ -55,6 +40,40 @@ export default class App {
 
   constructor() {
     AppState.addEventListener('change', this.handleAppStateChange);
+    KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
+
+    this.readyObservers = [];
+    this.optionsState = new OptionsState();
+
+    this.optionsState.addChangeObserver((options) => {
+      options.persist();
+    })
+
+    this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
+      if(event == Auth.DidSignOutEvent) {
+        this.optionsState.reset();
+      }
+    }.bind(this));
+  }
+
+  addApplicationReadyObserver(callback) {
+    var observer = {key: Math.random, callback: callback};
+    this.readyObservers.push(observer);
+
+    // Sometimes an observer could be added after the application is already ready, in which case we call it immediately
+    if(this.ready) {
+      callback();
+    }
+
+    return observer;
+  }
+
+  removeApplicationReadyObserver(observer) {
+    _.pull(this.readyObservers, observer);
+  }
+
+  globalOptions() {
+    return this.optionsState;
   }
 
   handleAppStateChange = (nextAppState) => {
@@ -99,9 +118,11 @@ export default class App {
     GlobalStyles.get().resolveInitialTheme().then(function(){
       Promise.all([
         Icons.get().loadIcons(),
-        KeysManager.get().loadInitialData()
+        KeysManager.get().loadInitialData(),
+        this.optionsState.loadSaved()
       ]).then(function(){
         var run = () => {
+          this.startApp();
           var hasPasscode = KeysManager.get().hasOfflinePasscode();
           var hasFingerprint = KeysManager.get().hasFingerprint();
           this.beginAuthentication(hasPasscode, hasFingerprint);
@@ -115,30 +136,35 @@ export default class App {
     }.bind(this))
   }
 
+  applicationIsReady() {
+    this.ready = true;
+    this.readyObservers.forEach(function(observer){
+      observer.callback();
+    })
+  }
+
   beginAuthentication(hasPasscode, hasFingerprint) {
     if(hasPasscode) {
       this.showPasscodeLock(function(){
         if(hasFingerprint) {
-          this.showFingerprintScanner(this.startActualApp.bind(this));
+          this.showFingerprintScanner(this.applicationIsReady.bind(this));
         } else {
-          this.startActualApp();
+          this.applicationIsReady();
         }
       }.bind(this));
     } else if(hasFingerprint) {
-      this.showFingerprintScanner(this.startActualApp.bind(this));
+      this.showFingerprintScanner(this.applicationIsReady.bind(this));
     } else {
-      this.startActualApp();
+      this.applicationIsReady();
     }
   }
 
   showPasscodeLock(onAuthenticate) {
-    Navigation.startSingleScreenApp({
-      screen: {
-        screen: 'sn.Authenticate',
-        title: 'Passcode Required',
-        backButtonHidden: true,
-        overrideBackPress: true,
-      },
+    Navigation.showModal({
+      screen: 'sn.Authenticate',
+      title: 'Passcode Required',
+      backButtonHidden: true,
+      overrideBackPress: true,
       passProps: {
         mode: "authenticate",
         onAuthenticateSuccess: onAuthenticate
@@ -150,13 +176,11 @@ export default class App {
   }
 
   showFingerprintScanner(onAuthenticate) {
-    Navigation.startSingleScreenApp({
-      screen: {
-        screen: 'sn.Fingerprint',
-        title: 'Fingerprint Required',
-        backButtonHidden: true,
-        overrideBackPress: true,
-      },
+    Navigation.showModal({
+      screen: 'sn.Fingerprint',
+      title: 'Fingerprint Required',
+      backButtonHidden: true,
+      overrideBackPress: true,
       passProps: {
         mode: "authenticate",
         onAuthenticateSuccess: onAuthenticate
@@ -167,21 +191,68 @@ export default class App {
     })
   }
 
-  startActualApp() {
+  startApp() {
     // On Android, calling Navigation.startSingleScreenApp first (for authentication), then calling
     // Navigation.startTabBasedApp will trigger an AppState change from active to background to active again.
     // Since if fingerprint/passcode lock is enabled we present the auth screens when the app switches to background,
-    // if we don't catch this edge case, it will result in infinite recursion. So as `startActualApp` is called
+    // if we don't catch this edge case, it will result in infinite recursion. So as `startApp` is called
     // immediately before this transition, setting isStartingApp to true then false afterwards will prevent the infinite
     // recursion
-
     this.isStartingApp = true;
-    Navigation.startTabBasedApp({
-      tabs: tabs,
-      animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
-      tabsStyle: _.clone(this.tabStyles), // for iOS
-      appStyle: _.clone(this.tabStyles) // for Android
-    });
+
+    let tabs = [{
+      label: 'Notes',
+      screen: 'sn.Notes',
+      title: 'Notes',
+      passProps: {
+        options: this.optionsState
+      }
+    },
+    {
+      label: 'Account',
+      screen: 'sn.Account',
+      title: 'Account',
+      }
+    ];
+
+    // android will fail to load if icon is not specified here
+    if(Platform.OS === "android") {
+      tabs.forEach(function(tab){
+        tab.icon = require("./img/placeholder.png")
+      })
+    }
+
+    Navigation.startTabBasedApp(
+      {
+        tabs: tabs,
+        animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
+        tabsStyle: _.clone(this.tabStyles), // for iOS
+        appStyle: _.clone(this.tabStyles), // for Android
+        drawer: { // optional, add this if you want a side menu drawer in your app
+          left: { // optional, define if you want a drawer from the left
+            screen: 'sn.Filter', // unique ID registered with Navigation.registerScreen
+            passProps: {
+              liveReload: true,
+              options: JSON.stringify(this.optionsState),
+              onOptionsChange: (options) => {
+                this.optionsState.mergeWith(options);
+              }
+            } // simple serializable object that will pass as props to all top screens (optional)
+          },
+          style: { // ( iOS only )
+            drawerShadow: true, // optional, add this if you want a side menu drawer shadow
+            contentOverlayColor: 'rgba(0,0,0,0.25)', // optional, add this if you want a overlay color when drawer is open
+            leftDrawerWidth: 50, // optional, add this if you want a define left drawer width (50=percent)
+            rightDrawerWidth: 50, // optional, add this if you want a define right drawer width (50=percent)
+            shouldStretchDrawer: true // optional, iOS only with 'MMDrawer' type, whether or not the panning gesture will “hard-stop” at the maximum width for a given drawer side, default : true
+          },
+          type: 'MMDrawer', // optional, iOS only, types: 'TheSideBar', 'MMDrawer' default: 'MMDrawer'
+          animationType: 'door', //optional, iOS only, for MMDrawer: 'door', 'parallax', 'slide', 'slide-and-scale'
+          // for TheSideBar: 'airbnb', 'facebook', 'luvocracy','wunder-list'
+          disableOpenGesture: false // optional, can the drawer be opened with a swipe instead of button
+        }
+      }
+    );
 
     setTimeout(function () {
       this.isStartingApp = false;
@@ -190,6 +261,6 @@ export default class App {
 
   reload() {
     Icons.get().loadIcons();
-    this.startActualApp();
+    this.startApp();
   }
 }

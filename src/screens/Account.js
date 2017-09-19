@@ -28,17 +28,32 @@ import { NativeModules} from 'react-native';
 var Mailer = require('NativeModules').RNMail;
 import {TextInput, SectionList, ScrollView, View, Alert, Keyboard, Linking, Platform} from 'react-native';
 
+import App from "../app"
+
 export default class Account extends Abstract {
 
   constructor(props) {
     super(props);
-    this.state = {
-      params: {server: Auth.getInstance().serverUrl()}
-    };
+
+    this.state = {ready: false};
+
+    this.readyObserver = App.get().addApplicationReadyObserver(() => {
+      this.ready = true;
+
+      if(this.mounted) {
+        this.loadInitialState();
+      }
+    })
+  }
+
+  loadInitialState() {
+    this.mergeState({ready: true, params: {server: Auth.getInstance().serverUrl()}})
 
     this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
       this.forceUpdate();
     }.bind(this))
+
+    this.loadSecurityStatus();
   }
 
   loadSecurityStatus() {
@@ -48,11 +63,14 @@ export default class Account extends Abstract {
   }
 
   componentDidMount() {
-    this.loadSecurityStatus();
+    if(!this.state.ready) {
+      this.loadInitialState();
+    }
   }
 
   componentWillUnmount() {
     Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
+    App.get().removeApplicationReadyObserver(this.readyObserver);
   }
 
   onNavigatorEvent(event) {

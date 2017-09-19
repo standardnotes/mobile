@@ -6,6 +6,7 @@ import Note from '../models/app/note'
 import Abstract from "./Abstract"
 import Icons from '../Icons';
 var dismissKeyboard = require('dismissKeyboard');
+var _ = require('lodash');
 
 import {
   AppRegistry,
@@ -161,12 +162,14 @@ export default class Compose extends Abstract {
       animationType: 'slide-up',
       passProps: {
         noteId: this.state.note.uuid,
-        options: this.previousOptions,
+        options: JSON.stringify(this.previousOptions),
         onOptionsChange: (options) => {
-          if(options.selectedTags !== this.previousOptions.selectedTags) {
+          console.log("Comparing", options.selectedTags, this.previousOptions.selectedTags);
+          if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
             var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
             this.state.note.replaceTags(tags);
             this.state.note.setDirty(true);
+            this.changesMade();
           }
         }
       }
