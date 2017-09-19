@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.WindowManager;
+import com.facebook.react.modules.storage.ReactDatabaseSupplier;
 
 import com.chirag.RNMail.RNMail;
 import com.facebook.react.ReactPackage;
@@ -88,5 +89,9 @@ public class MainApplication extends NavigationApplication {
     });
 
     SoLoader.init(this, /* native exopackage */ false);
+
+    // Set AsyncStorage size, default is 6mb
+    long size = 50L * 1024L * 1024L; // 50 MB
+    com.facebook.react.modules.storage.ReactDatabaseSupplier.getInstance(getApplicationContext()).setMaximumSize(size);
   }
 }
