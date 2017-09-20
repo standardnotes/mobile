@@ -19,8 +19,7 @@ import {
   Text,
   Keyboard,
   KeyboardAvoidingView,
-  Platform,
-  PanResponder
+  Platform
 } from 'react-native';
 
 import GlobalStyles from "../Styles"
@@ -47,38 +46,6 @@ export default class Compose extends Abstract {
         this.forceUpdate();
       }
     }.bind(this))
-
-    this._panResponder = PanResponder.create({
-      // Ask to be the responder:
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => {
-        // If you set this true, then for some reason, on Android,
-        // they keyboard wont come up when you tap to focus.
-        return false;
-      },
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-        // returning false here allows us to jerk our textview around smoothly for some reason
-        return false
-      },
-      onPanResponderMove: (evt, gestureState) => {
-        // The most recent move distance is gestureState.move{X,Y}
-        if(gestureState.dy > 200 && this.isFocused) {
-          // this.refs.input.blur();
-        }
-        // The accumulated gesture distance since becoming responder is
-        // gestureState.d{x,y}
-      },
-      onPanResponderTerminationRequest: (evt, gestureState) => {
-        return true;
-      },
-
-      onShouldBlockNativeResponder: (evt, gestureState) => {
-        // Returns whether this component should block native components from becoming the JS
-        // responder. Returns true by default. Is currently only supported on android.
-        return true;
-      },
-    });
   }
 
   onContentSizeChange = (c) => {
@@ -297,7 +264,7 @@ export default class Compose extends Abstract {
           placeholderTextColor={GlobalStyles.constants().mainDimColor}
         />
 
-        <KeyboardAvoidingView {...this._panResponder.panHandlers} style={[this.styles.textContainer]} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
+        <KeyboardAvoidingView style={[this.styles.textContainer]} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
             <TextInput
                 style={[this.styles.noteText, {paddingBottom: textBottomPadding}]}
                 onChangeText={this.onTextChange}

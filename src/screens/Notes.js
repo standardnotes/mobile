@@ -265,7 +265,8 @@ export default class Notes extends Abstract {
       this.props.navigator.push({
         screen: 'sn.Compose',
         title: 'Compose',
-        passProps: {noteId: item.uuid}
+        passProps: {noteId: item.uuid},
+        animationType: "slide-horizontal"
       });
     }
 
