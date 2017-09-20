@@ -49,7 +49,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     var iconSize = left ? 25: 30;
     if(Platform.OS == "android") {
       iconSize -= 5;
-      iconStyles.paddingTop = 13;
+      iconStyles.paddingTop = left ? 13 : 4;
     }
     var icon = (
       <View key={0} style={iconStyles}>
