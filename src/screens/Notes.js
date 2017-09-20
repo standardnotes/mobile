@@ -167,7 +167,7 @@ export default class Notes extends Abstract {
         title: 'New',
         id: 'new',
         showAsAction: 'ifRoom',
-        buttonColor: GlobalStyles.constants().mainTintColor,
+        // buttonColor: GlobalStyles.constants().mainTintColor,
       })
     }
 
@@ -178,7 +178,7 @@ export default class Notes extends Abstract {
           title: filterTitle,
           id: 'sideMenu',
           showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants().mainTintColor,
+          // buttonColor: GlobalStyles.constants().mainTintColor,
         },
       ],
       fab: {

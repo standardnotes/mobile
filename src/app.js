@@ -88,12 +88,18 @@ export default class App {
   }
 
   get tabStyles() {
+    var android = Platform.OS == "android";
     var statusBarColor = GlobalStyles.constants().mainBackgroundColor;
-    if(Platform.OS === "android" && Platform.Version <= 22) {
+    if(android) {
+      statusBarColor = GlobalStyles.constants().mainTintColor;
       // Android <= v22 does not support changing status bar text color. It will always be white
       // So we have to make sure background color has proper contrast
-      statusBarColor = "black";
+      if(Platform.Version <= 22) {
+        statusBarColor = "black";
+      }
     }
+    var navBarColor = android ? GlobalStyles.constants().mainTintColor : GlobalStyles.constants().mainBackgroundColor;
+    var navBarText = android ? GlobalStyles.constants().mainBackgroundColor : GlobalStyles.constants().mainTintColor;
     return {
       tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
       tabBarTranslucent: true,
@@ -101,14 +107,15 @@ export default class App {
       tabBarSelectedButtonColor: GlobalStyles.constants().mainTintColor,
 
       // navBarBlur: true,
-      navBarButtonColor: GlobalStyles.constants().mainTintColor,
-      navBarTextColor: GlobalStyles.constants().mainTintColor,
+      navBarButtonColor: navBarText,
+      navBarTextColor: navBarText,
       navigationBarColor: 'black', // android built in bar
-      navBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor, // actual top nav bar
+      navBarBackgroundColor: navBarColor, // actual top nav bar
 
       statusBarColor: statusBarColor, // Android only
       statusBarTextColorScheme: 'dark',
       statusBarTextColorSchemeSingleScreen: 'dark',
+      topBarElevationShadowEnabled: true,
 
       screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
     }

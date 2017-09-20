@@ -38,7 +38,7 @@ export default class GlobalStyles {
         theme.active = true;
         this.activeTheme = theme;
         var constants = this.defaultConstants();
-        this.setStyles(this.defaultRules(constants), constants, "dark-content");
+        this.setStyles(this.defaultRules(constants), constants, constants.statusBar);
       }
     }.bind(this));
   }
@@ -76,7 +76,7 @@ export default class GlobalStyles {
         name: "Default",
         rules: this.defaultRules(constants),
         constants: constants,
-        statusBar: "dark-content"
+        statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
       }
     });
     return this._systemTheme;
@@ -171,7 +171,7 @@ export default class GlobalStyles {
 
   setStyles(rules, constants, statusBar) {
     if(!statusBar) {
-      statusBar = "dark-content";
+      statusBar = "light-content";
     }
     this.statusBar = statusBar;
     this.constants = constants;
@@ -230,11 +230,12 @@ export default class GlobalStyles {
       },
 
       sectionHeader: {
-        color: "gray",
+        color: Platform.OS == "android" ? constants.mainTintColor : "gray",
         fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
         paddingBottom: 10,
-        paddingTop: 10
+        paddingTop: 10,
+        fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
 
       sectionedTableCell: {
@@ -248,8 +249,12 @@ export default class GlobalStyles {
         flex: 1
       },
 
+      noBorder: {
+        borderBottomColor: null,
+        borderBottomWidth: 0
+      },
+
       textInputCell: {
-        // paddingTop: 0
         maxHeight: 50
       },
 
@@ -257,7 +262,6 @@ export default class GlobalStyles {
         fontSize: constants.mainTextFontSize,
         padding: 0,
         color: constants.mainTextColor,
-        // height: "100%",
       },
 
       sectionedTableCellFirst: {
@@ -268,13 +272,14 @@ export default class GlobalStyles {
       sectionedAccessoryTableCell: {
         paddingLeft: constants.paddingLeft,
         paddingRight: constants.paddingLeft,
-        backgroundColor: constants.mainBackgroundColor
+        // backgroundColor: constants.mainBackgroundColor
       },
 
       sectionedAccessoryTableCellLabel: {
         paddingTop: 10,
         fontSize: constants.mainTextFontSize,
-        color: constants.mainTextColor
+        color: constants.mainTextColor,
+        fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
 
       buttonCell: {
@@ -288,10 +293,11 @@ export default class GlobalStyles {
 
       buttonCellButton: {
         textAlign: "center",
-        color: constants.mainTintColor,
+        color: Platform.OS == "android" ? constants.mainTextColor : constants.mainTintColor,
         fontSize: constants.mainTextFontSize,
         height: "100%",
         paddingTop: 10,
+        fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
 
       buttonCellButtonLeft: {

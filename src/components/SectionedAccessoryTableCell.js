@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {View, Image, Text, TouchableHighlight} from 'react-native';
+import {View, Image, Text, TouchableHighlight, Platform} from 'react-native';
 
 import GlobalStyles from "../Styles"
 import SectionedTableCell from "./SectionedTableCell"
@@ -9,7 +9,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
   rules() {
-    return super.rules().concat([GlobalStyles.styles().view, GlobalStyles.styles().flexContainer, GlobalStyles.styles().sectionedAccessoryTableCell]);
+    var rules = super.rules().concat([GlobalStyles.styles().view, GlobalStyles.styles().flexContainer, GlobalStyles.styles().sectionedAccessoryTableCell]);
+    if(Platform.OS == "android") {
+      rules.push(GlobalStyles.styles().noBorder)
+    }
+    return rules;
   }
 
   onPress = () => {
@@ -24,7 +28,8 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
   }
 
   render() {
-    var iconName = this.props.iconName ? this.props.iconName : ((this.props.selected && this.props.selected()) ? "ios-checkmark-circle" : null);
+    var checkmarkName = Platform.OS == "android" ? "md-checkmark-circle" : "ios-checkmark-circle";
+    var iconName = this.props.iconName ? this.props.iconName : ((this.props.selected && this.props.selected()) ? checkmarkName : null);
 
     var iconStyles = {position: "absolute", right: GlobalStyles.constants().sectionedCellHorizontalPadding, top: 6};
     if(this.props.leftAlignIcon) {
@@ -41,10 +46,14 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     }
 
     var left = this.props.leftAlignIcon;
-
+    var iconSize = left ? 25: 30;
+    if(Platform.OS == "android") {
+      iconSize -= 5;
+      iconStyles.paddingTop = 13;
+    }
     var icon = (
       <View key={0} style={iconStyles}>
-        <Icon name={iconName} size={left ? 25: 30} color={left ? GlobalStyles.constants().mainTextColor : GlobalStyles.constants().mainTintColor} />
+        <Icon name={iconName} size={iconSize} color={left ? GlobalStyles.constants().mainTextColor : GlobalStyles.constants().mainTintColor} />
       </View>
     )
 

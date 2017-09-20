@@ -119,11 +119,11 @@ export default class Compose extends Abstract {
       title: "Manage",
       id: 'tags',
       showAsAction: 'ifRoom',
-      buttonColor: GlobalStyles.constants().mainTintColor,
+      // buttonColor: GlobalStyles.constants().mainTintColor,
     }
 
     if(Platform.OS === "android") {
-      tagButton.icon = Icons.getIcon("md-menu");
+      tagButton.icon = Icons.getIcon("md-more");
     }
 
     this.props.navigator.setButtons({
@@ -265,7 +265,7 @@ export default class Compose extends Abstract {
     });
 
     this.props.navigator.setStyle({
-      navBarSubtitleColor: 'gray',
+      navBarSubtitleColor: GlobalStyles.constants().plainCellBorderColor,
       navBarSubtitleFontSize: 12
     });
   }
