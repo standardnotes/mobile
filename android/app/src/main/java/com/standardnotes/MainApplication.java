@@ -5,17 +5,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.WindowManager;
+
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.modules.storage.ReactDatabaseSupplier;
 
 import com.chirag.RNMail.RNMail;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.react.modules.core.PermissionAwareActivity;
+import com.facebook.react.uimanager.ViewManager;
 import com.facebook.soloader.SoLoader;
 import com.oblador.keychain.KeychainPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.controllers.ActivityCallbacks;
+import com.standardnotes.sntextview.SNTextViewPackage;
 import com.tectiv3.aes.RCTAesPackage;
 import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 
@@ -31,6 +35,10 @@ public class MainApplication extends NavigationApplication {
     return BuildConfig.DEBUG;
   }
 
+  protected  List<ViewManager> createViewManagers(ReactApplicationContext reactContext){
+    return Arrays.<ViewManager>asList();
+  }
+
 
   protected List<ReactPackage> getPackages() {
     return Arrays.asList(
@@ -40,7 +48,8 @@ public class MainApplication extends NavigationApplication {
             new VectorIconsPackage(),
             new RCTAesPackage(),
             new RNMail(),
-            new ReactNativeFingerprintScannerPackage()
+            new ReactNativeFingerprintScannerPackage(),
+            new SNTextViewPackage()
     );
   }
 

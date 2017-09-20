@@ -8,6 +8,8 @@ import Icons from '../Icons';
 var dismissKeyboard = require('dismissKeyboard');
 var _ = require('lodash');
 
+import TextView from "sn-textview";
+
 import {
   AppRegistry,
   StyleSheet,
@@ -264,27 +266,33 @@ export default class Compose extends Abstract {
           placeholderTextColor={GlobalStyles.constants().mainDimColor}
         />
 
-        <KeyboardAvoidingView style={[this.styles.textContainer]} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
-            <TextInput
-                style={[this.styles.noteText, {paddingBottom: textBottomPadding}]}
-                onChangeText={this.onTextChange}
-                multiline={true}
-                autoFocus={false}
-                value={this.state.note.text}
-                ref={'input'}
-                onFocus={this.onTextFocus}
-                onBlur={this.onTextBlur}
-                selectionColor={GlobalStyles.constants().mainTintColor}
-                underlineColorAndroid={'transparent'}
-                keyboardDismissMode={'interactive'}
-                textAlignVertical={'top'}
-                textAlign={'left'}
-                onScroll={() => {}}
-                onContentSizeChange={this.onContentSizeChange}
-                autoCapitalize={'sentences'}
-              />
+        {Platform.OS == "android" &&
+          <TextView style={this.styles.noteText} text={this.state.note.text} onChangeText={this.onTextChange}/>
+        }
 
-            </KeyboardAvoidingView>
+        {Platform.OS == "ios" &&
+          <KeyboardAvoidingView style={[this.styles.textContainer]} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
+              <TextInput
+                  style={[this.styles.noteText, {paddingBottom: textBottomPadding}]}
+                  onChangeText={this.onTextChange}
+                  multiline={true}
+                  autoFocus={false}
+                  value={this.state.note.text}
+                  ref={'input'}
+                  onFocus={this.onTextFocus}
+                  onBlur={this.onTextBlur}
+                  selectionColor={GlobalStyles.constants().mainTintColor}
+                  underlineColorAndroid={'transparent'}
+                  keyboardDismissMode={'interactive'}
+                  textAlignVertical={'top'}
+                  textAlign={'left'}
+                  onScroll={() => {}}
+                  onContentSizeChange={this.onContentSizeChange}
+                  autoCapitalize={'sentences'}
+                />
+
+              </KeyboardAvoidingView>
+        }
       </View>
     );
   }
@@ -321,14 +329,14 @@ export default class Compose extends Abstract {
       noteText: {
         height: "100%",
         flexGrow: 1,
-        fontSize: 17,
+        // fontSize: 17,
         marginTop: 0,
         paddingTop: 10,
-        color: GlobalStyles.constants().mainTextColor,
+        // color: GlobalStyles.constants().mainTextColor,
         paddingLeft: GlobalStyles.constants().paddingLeft,
         paddingRight: GlobalStyles.constants().paddingLeft,
-        textAlignVertical: 'top',
-        lineHeight: 22,
+        // textAlignVertical: 'top',
+        // lineHeight: 22,
       }
     }
 

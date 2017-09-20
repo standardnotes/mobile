@@ -152,6 +152,7 @@ dependencies {
     compile project(':bugsnag-react-native')
     compile project(':ReactAndroid')
     compile project(':RNMail')
+    compile project(':SNTextView')
     compile project(':react-native-navigation')
     compile project(':react-native-keychain')
     compile project(':react-native-vector-icons')
