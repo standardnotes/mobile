@@ -45,7 +45,7 @@ export default class App {
     this.readyObservers = [];
     this.optionsState = new OptionsState();
 
-    this._isAndroid = Platform.OS != "android";
+    this._isAndroid = Platform.OS === "android";
 
     this.optionsState.addChangeObserver((options) => {
       if(!this.loading) {
@@ -221,28 +221,18 @@ export default class App {
     // recursion
     this.isStartingApp = true;
 
-    let drawer = { // optional, add this if you want a side menu drawer in your app
-      left: { // optional, define if you want a drawer from the left
-        screen: 'sn.Filter', // unique ID registered with Navigation.registerScreen
+    let drawer = {
+      left: {
+        screen: 'sn.Filter',
         passProps: {
           liveReload: true,
           options: JSON.stringify(this.optionsState),
           onOptionsChange: (options) => {
             this.optionsState.mergeWith(options);
           }
-        } // simple serializable object that will pass as props to all top screens (optional)
+        }
       },
-      style: { // ( iOS only )
-        drawerShadow: true, // optional, add this if you want a side menu drawer shadow
-        contentOverlayColor: 'rgba(0,0,0,0.25)', // optional, add this if you want a overlay color when drawer is open
-        leftDrawerWidth: 50, // optional, add this if you want a define left drawer width (50=percent)
-        rightDrawerWidth: 50, // optional, add this if you want a define right drawer width (50=percent)
-        shouldStretchDrawer: true // optional, iOS only with 'MMDrawer' type, whether or not the panning gesture will “hard-stop” at the maximum width for a given drawer side, default : true
-      },
-      type: 'MMDrawer', // optional, iOS only, types: 'TheSideBar', 'MMDrawer' default: 'MMDrawer'
-      animationType: 'door', //optional, iOS only, for MMDrawer: 'door', 'parallax', 'slide', 'slide-and-scale'
-      // for TheSideBar: 'airbnb', 'facebook', 'luvocracy','wunder-list'
-      disableOpenGesture: false // optional, can the drawer be opened with a swipe instead of button
+      disableOpenGesture: false
     };
 
     if(this.isIOS) {
@@ -270,7 +260,8 @@ export default class App {
           animationType: this.isIOS ? 'slide-down' : 'fade',
           tabsStyle: _.clone(this.tabStyles), // for iOS
           appStyle: _.clone(this.tabStyles), // for Android
-          drawer: drawer
+          drawer: drawer,
+          animationType: 'none'
         }
       );
     } else {
@@ -283,7 +274,8 @@ export default class App {
           },
           tabsStyle: _.clone(this.tabStyles), // for iOS
           appStyle: _.clone(this.tabStyles), // for Android
-          drawer: drawer
+          drawer: drawer,
+          animationType: 'none'
         }
       );
     }
