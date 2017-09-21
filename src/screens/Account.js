@@ -73,6 +73,23 @@ export default class Account extends Abstract {
     App.get().removeApplicationReadyObserver(this.readyObserver);
   }
 
+  configureNavBar() {
+    super.configureNavBar();
+
+    if(App.get().isAndroid) {
+      this.props.navigator.setButtons({
+        leftButtons: [
+          {
+            title: "Close",
+            id: 'cancel',
+            showAsAction: 'ifRoom',
+          },
+        ],
+        animated: false
+      });
+    }
+  }
+
   onNavigatorEvent(event) {
     super.onNavigatorEvent(event);
 
@@ -81,7 +98,15 @@ export default class Account extends Abstract {
        this.loadSecurityStatus();
        this.forceUpdate();
        break;
+    }
+
+    if (event.type == 'NavBarButtonPress') {
+      if (event.id == 'cancel') {
+        this.props.navigator.dismissModal({
+          animationType: 'slide-down'
+        });
       }
+    }
   }
 
   validate(email, password) {

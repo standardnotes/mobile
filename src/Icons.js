@@ -34,6 +34,7 @@ export default class Icons {
       "md-pricetag" : [Ionicons, 25, color],
       "md-menu" : [Ionicons, 25, color],
       "md-more" : [Ionicons, 25, color],
+      "md-settings" : [Ionicons, 25, color],
     };
 
     return new Promise((resolve, reject) => {

@@ -45,6 +45,8 @@ export default class App {
     this.readyObservers = [];
     this.optionsState = new OptionsState();
 
+    this._isAndroid = Platform.OS != "android";
+
     this.optionsState.addChangeObserver((options) => {
       if(!this.loading) {
         options.persist();
@@ -56,6 +58,14 @@ export default class App {
         this.optionsState.reset();
       }
     }.bind(this));
+  }
+
+  get isAndroid() {
+    return this._isAndroid;
+  }
+
+  get isIOS() {
+    return !this._isAndroid;
   }
 
   addApplicationReadyObserver(callback) {
@@ -90,9 +100,8 @@ export default class App {
   }
 
   get tabStyles() {
-    var android = Platform.OS == "android";
     var statusBarColor = GlobalStyles.constants().mainBackgroundColor;
-    if(android) {
+    if(this.isAndroid) {
       statusBarColor = GlobalStyles.constants().mainTintColor;
       // Android <= v22 does not support changing status bar text color. It will always be white
       // So we have to make sure background color has proper contrast
@@ -100,8 +109,8 @@ export default class App {
         statusBarColor = "black";
       }
     }
-    var navBarColor = android ? GlobalStyles.constants().mainTintColor : GlobalStyles.constants().mainBackgroundColor;
-    var navBarText = android ? GlobalStyles.constants().mainBackgroundColor : GlobalStyles.constants().mainTintColor;
+    var navBarColor = this.isAndroid ? GlobalStyles.constants().mainTintColor : GlobalStyles.constants().mainBackgroundColor;
+    var navBarText = this.isAndroid ? GlobalStyles.constants().mainBackgroundColor : GlobalStyles.constants().mainTintColor;
     return {
       tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
       tabBarTranslucent: true,
@@ -203,6 +212,7 @@ export default class App {
   }
 
   startApp() {
+    console.log("===Starting App===");
     // On Android, calling Navigation.startSingleScreenApp first (for authentication), then calling
     // Navigation.startTabBasedApp will trigger an AppState change from active to background to active again.
     // Since if fingerprint/passcode lock is enabled we present the auth screens when the app switches to background,
@@ -211,59 +221,72 @@ export default class App {
     // recursion
     this.isStartingApp = true;
 
-    let tabs = [{
-      label: 'Notes',
-      screen: 'sn.Notes',
-      title: 'Notes',
-      passProps: {
-        options: this.optionsState
-      }
-    },
-    {
-      label: 'Account',
-      screen: 'sn.Account',
-      title: 'Account',
-      }
-    ];
+    let drawer = { // optional, add this if you want a side menu drawer in your app
+      left: { // optional, define if you want a drawer from the left
+        screen: 'sn.Filter', // unique ID registered with Navigation.registerScreen
+        passProps: {
+          liveReload: true,
+          options: JSON.stringify(this.optionsState),
+          onOptionsChange: (options) => {
+            this.optionsState.mergeWith(options);
+          }
+        } // simple serializable object that will pass as props to all top screens (optional)
+      },
+      style: { // ( iOS only )
+        drawerShadow: true, // optional, add this if you want a side menu drawer shadow
+        contentOverlayColor: 'rgba(0,0,0,0.25)', // optional, add this if you want a overlay color when drawer is open
+        leftDrawerWidth: 50, // optional, add this if you want a define left drawer width (50=percent)
+        rightDrawerWidth: 50, // optional, add this if you want a define right drawer width (50=percent)
+        shouldStretchDrawer: true // optional, iOS only with 'MMDrawer' type, whether or not the panning gesture will “hard-stop” at the maximum width for a given drawer side, default : true
+      },
+      type: 'MMDrawer', // optional, iOS only, types: 'TheSideBar', 'MMDrawer' default: 'MMDrawer'
+      animationType: 'door', //optional, iOS only, for MMDrawer: 'door', 'parallax', 'slide', 'slide-and-scale'
+      // for TheSideBar: 'airbnb', 'facebook', 'luvocracy','wunder-list'
+      disableOpenGesture: false // optional, can the drawer be opened with a swipe instead of button
+    };
 
-    // android will fail to load if icon is not specified here
-    if(Platform.OS === "android") {
-      tabs.forEach(function(tab){
-        tab.icon = require("./img/placeholder.png")
-      })
-    }
-
-    Navigation.startTabBasedApp(
+    if(this.isIOS) {
+      let tabs = [{
+        label: 'Notes',
+        screen: 'sn.Notes',
+        title: 'Notes',
+      },
       {
-        tabs: tabs,
-        animationType: Platform.OS === 'ios' ? 'slide-down' : 'fade',
-        tabsStyle: _.clone(this.tabStyles), // for iOS
-        appStyle: _.clone(this.tabStyles), // for Android
-        drawer: { // optional, add this if you want a side menu drawer in your app
-          left: { // optional, define if you want a drawer from the left
-            screen: 'sn.Filter', // unique ID registered with Navigation.registerScreen
-            passProps: {
-              liveReload: true,
-              options: JSON.stringify(this.optionsState),
-              onOptionsChange: (options) => {
-                this.optionsState.mergeWith(options);
-              }
-            } // simple serializable object that will pass as props to all top screens (optional)
-          },
-          style: { // ( iOS only )
-            drawerShadow: true, // optional, add this if you want a side menu drawer shadow
-            contentOverlayColor: 'rgba(0,0,0,0.25)', // optional, add this if you want a overlay color when drawer is open
-            leftDrawerWidth: 50, // optional, add this if you want a define left drawer width (50=percent)
-            rightDrawerWidth: 50, // optional, add this if you want a define right drawer width (50=percent)
-            shouldStretchDrawer: true // optional, iOS only with 'MMDrawer' type, whether or not the panning gesture will “hard-stop” at the maximum width for a given drawer side, default : true
-          },
-          type: 'MMDrawer', // optional, iOS only, types: 'TheSideBar', 'MMDrawer' default: 'MMDrawer'
-          animationType: 'door', //optional, iOS only, for MMDrawer: 'door', 'parallax', 'slide', 'slide-and-scale'
-          // for TheSideBar: 'airbnb', 'facebook', 'luvocracy','wunder-list'
-          disableOpenGesture: false // optional, can the drawer be opened with a swipe instead of button
+        label: 'Account',
+        screen: 'sn.Account',
+        title: 'Account',
         }
+      ];
+
+      if(Platform.OS === "android") {
+        tabs.forEach(function(tab){
+          tab.icon = require("./img/placeholder.png")
+        })
       }
-    );
+
+      Navigation.startTabBasedApp(
+        {
+          tabs: tabs,
+          animationType: this.isIOS ? 'slide-down' : 'fade',
+          tabsStyle: _.clone(this.tabStyles), // for iOS
+          appStyle: _.clone(this.tabStyles), // for Android
+          drawer: drawer
+        }
+      );
+    } else {
+      Navigation.startSingleScreenApp(
+        {
+          screen: {
+            label: 'Notes',
+            screen: 'sn.Notes',
+            title: 'Notes',
+          },
+          tabsStyle: _.clone(this.tabStyles), // for iOS
+          appStyle: _.clone(this.tabStyles), // for Android
+          drawer: drawer
+        }
+      );
+    }
 
     setTimeout(function () {
       this.isStartingApp = false;

@@ -102,6 +102,9 @@ export default class Notes extends Abstract {
   }
 
   loadTabbarIcons() {
+    if(!App.get().isIOS) {
+      return;
+    }
     this.props.navigator.setTabButton({
       tabIndex: 0,
       icon: Icons.getIcon('ios-menu-outline'),
@@ -161,12 +164,18 @@ export default class Notes extends Abstract {
     }
 
     var rightButtons = [];
-    if(Platform.OS == "ios") {
+    if(App.get().isIOS) {
       rightButtons.push({
         title: 'New',
         id: 'new',
         showAsAction: 'ifRoom',
-        // buttonColor: GlobalStyles.constants().mainTintColor,
+      })
+    } else {
+      rightButtons.push({
+        title: 'Settings',
+        id: 'settings',
+        showAsAction: 'ifRoom',
+        icon: Icons.getIcon('md-settings'),
       })
     }
 
@@ -177,7 +186,6 @@ export default class Notes extends Abstract {
           title: filterTitle,
           id: 'sideMenu',
           showAsAction: 'ifRoom',
-          // buttonColor: GlobalStyles.constants().mainTintColor,
         },
       ],
       fab: {
@@ -206,12 +214,13 @@ export default class Notes extends Abstract {
     if (event.type == 'NavBarButtonPress') {
       if (event.id == 'new') {
         this.presentNewComposer();
-      }
-      else if (event.id == 'sideMenu') {
+      } else if (event.id == 'sideMenu') {
         // Android is handled by the drawer attribute of rn-navigation
         if(Platform.OS == "ios") {
           this.presentFilterScreen();
         }
+      } else if(event.id == "settings") {
+        this.presentSettingsScreen();
       }
     }
   }
@@ -234,6 +243,14 @@ export default class Notes extends Abstract {
           this.options.mergeWith(options);
         }
       }
+    });
+  }
+
+  presentSettingsScreen() {
+    this.props.navigator.showModal({
+      screen: 'sn.Account',
+      title: 'Account',
+      animationType: 'slide-up'
     });
   }
 
