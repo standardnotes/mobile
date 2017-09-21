@@ -63,6 +63,17 @@ export default class GlobalStyles {
     return this.get().styles.constants;
   }
 
+  static stylesForKey(key) {
+    var rules = this.get().styles.rules;
+    var styles = [rules[key]];
+    var platform = Platform.OS == "android" ? "Android" : "IOS";
+    var platformRules = rules[key+platform];
+    if(platformRules) {
+      styles.push(platformRules);
+    }
+    return styles;
+  }
+
   systemTheme() {
     if(this._systemTheme) {
       return this._systemTheme;
@@ -230,12 +241,16 @@ export default class GlobalStyles {
       },
 
       sectionHeader: {
-        color: Platform.OS == "android" ? constants.mainTintColor : "gray",
+        color: "gray",
         fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
         paddingBottom: 10,
         paddingTop: 10,
         fontWeight: Platform.OS == "android" ? "bold" : "normal"
+      },
+
+      sectionHeaderAndroid: {
+        color: constants.mainDimColor
       },
 
       sectionedTableCell: {
@@ -247,11 +262,6 @@ export default class GlobalStyles {
         paddingBottom: 12,
         backgroundColor: constants.mainBackgroundColor,
         flex: 1
-      },
-
-      noBorder: {
-        borderBottomColor: null,
-        borderBottomWidth: 0
       },
 
       textInputCell: {
@@ -272,14 +282,16 @@ export default class GlobalStyles {
       sectionedAccessoryTableCell: {
         paddingLeft: constants.paddingLeft,
         paddingRight: constants.paddingLeft,
-        // backgroundColor: constants.mainBackgroundColor
+      },
+
+      sectionedAccessoryTableCellAndroid: {
+
       },
 
       sectionedAccessoryTableCellLabel: {
         paddingTop: 10,
         fontSize: constants.mainTextFontSize,
         color: constants.mainTextColor,
-        fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
 
       buttonCell: {
@@ -297,7 +309,6 @@ export default class GlobalStyles {
         fontSize: constants.mainTextFontSize,
         height: "100%",
         paddingTop: 10,
-        fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
 
       buttonCellButtonLeft: {
@@ -309,6 +320,21 @@ export default class GlobalStyles {
         fontWeight: "bold"
       },
     }
+  }
+
+  static shadeBlend(p,c0,c1) {
+    var n=p<0?p*-1:p,u=Math.round,w=parseInt;
+    if(c0.length>7){
+      var f=c0.split(","),t=(c1?c1:p<0?"rgb(0,0,0)":"rgb(255,255,255)").split(","),R=w(f[0].slice(4)),G=w(f[1]),B=w(f[2]);
+      return "rgb("+(u((w(t[0].slice(4))-R)*n)+R)+","+(u((w(t[1])-G)*n)+G)+","+(u((w(t[2])-B)*n)+B)+")"
+    } else{
+      var f=w(c0.slice(1),16),t=w((c1?c1:p<0?"#000000":"#FFFFFF").slice(1),16),R1=f>>16,G1=f>>8&0x00FF,B1=f&0x0000FF;
+      return "#"+(0x1000000+(u(((t>>16)-R1)*n)+R1)*0x10000+(u(((t>>8&0x00FF)-G1)*n)+G1)*0x100+(u(((t&0x0000FF)-B1)*n)+B1)).toString(16).slice(1)
+    }
+  }
+
+  static darken(color) {
+    return this.shadeBlend(-0.15, color);
   }
 
 }

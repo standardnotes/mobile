@@ -303,7 +303,8 @@ export default class ModelManager {
 
   getNotes(options = {}) {
     var notes;
-    if(options.selectedTags && options.selectedTags.length > 0) {
+
+    if(options.selectedTags && options.selectedTags.length > 0 && options.selectedTags[0].key !== "all") {
       var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
       if(tags.length > 0) {
         var taggedNotes = new Set();

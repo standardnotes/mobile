@@ -60,6 +60,10 @@ export default class App {
     }.bind(this));
   }
 
+  static get isAndroid() {
+    return this.get().isAndroid;
+  }
+
   get isAndroid() {
     return this._isAndroid;
   }
@@ -102,7 +106,7 @@ export default class App {
   get tabStyles() {
     var statusBarColor = GlobalStyles.constants().mainBackgroundColor;
     if(this.isAndroid) {
-      statusBarColor = GlobalStyles.constants().mainTintColor;
+      statusBarColor = GlobalStyles.darken(GlobalStyles.constants().mainTintColor);
       // Android <= v22 does not support changing status bar text color. It will always be white
       // So we have to make sure background color has proper contrast
       if(Platform.Version <= 22) {

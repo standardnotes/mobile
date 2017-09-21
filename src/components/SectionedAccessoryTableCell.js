@@ -9,10 +9,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
   rules() {
-    var rules = super.rules().concat([GlobalStyles.styles().view, GlobalStyles.styles().flexContainer, GlobalStyles.styles().sectionedAccessoryTableCell]);
-    if(Platform.OS == "android") {
-      rules.push(GlobalStyles.styles().noBorder)
-    }
+    var rules = super.rules().concat([GlobalStyles.styles().view, GlobalStyles.styles().flexContainer, ...GlobalStyles.stylesForKey("sectionedAccessoryTableCell")]);
     return rules;
   }
 
@@ -28,7 +25,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
   }
 
   render() {
-    var checkmarkName = Platform.OS == "android" ? "md-checkmark-circle" : "ios-checkmark-circle";
+    var checkmarkName = Platform.OS == "android" ? "md-checkmark-circle-outline" : "ios-checkmark-circle";
     var iconName = this.props.iconName ? this.props.iconName : ((this.props.selected && this.props.selected()) ? checkmarkName : null);
 
     var iconStyles = {position: "absolute", right: GlobalStyles.constants().sectionedCellHorizontalPadding, top: 6};
@@ -47,13 +44,17 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
     var left = this.props.leftAlignIcon;
     var iconSize = left ? 25: 30;
+    var color = left ? GlobalStyles.constants().mainTextColor : GlobalStyles.constants().mainTintColor;
+
     if(Platform.OS == "android") {
       iconSize -= 5;
       iconStyles.paddingTop = left ? 13 : 4;
+      color = GlobalStyles.constants().mainDimColor;
     }
+
     var icon = (
       <View key={0} style={iconStyles}>
-        <Icon name={iconName} size={iconSize} color={left ? GlobalStyles.constants().mainTextColor : GlobalStyles.constants().mainTintColor} />
+        <Icon name={iconName} size={iconSize} color={color} />
       </View>
     )
 

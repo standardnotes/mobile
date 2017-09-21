@@ -52,6 +52,14 @@ export default class Filter extends Abstract {
     }
   }
 
+  getTags() {
+    var tags = ModelManager.getInstance().tags;
+    if(App.isAndroid) {
+      tags.unshift({title: "All notes", key: "all", uuid: 100})
+    }
+    return tags;
+  }
+
   componentDidMount() {
     if(!this.state.ready) {
       this.loadInitialState();
@@ -64,7 +72,7 @@ export default class Filter extends Abstract {
 
     this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
       setTimeout(function () {
-        this.mergeState({tags: ModelManager.getInstance().tags});
+        this.mergeState({tags: this.getTags()});
       }.bind(this), 10);
     }.bind(this))
   }
@@ -76,6 +84,14 @@ export default class Filter extends Abstract {
 
   notifyParentOfOptionsChange() {
     this.props.onOptionsChange(this.options);
+
+    if(App.isAndroid) {
+      this.props.navigator.toggleDrawer({
+        side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
+        animated: true, // does the toggle have transition animation or does it happen immediately (optional)
+        to: 'closed' // optional, 'open' = open the drawer, 'closed' = close it, missing = the opposite of current state
+      });
+    }
   }
 
   configureNavBar() {
@@ -119,7 +135,7 @@ export default class Filter extends Abstract {
       this.forceUpdate();
     }
 
-    if(event.id == "willDisappear") {
+    if(event.id == "willDisappear" && App.isIOS) {
       // we prefer to notify the parent via NavBarButtonPress.accept, but when this view is presented via nav push,
       // the user can swipe back and miss that. So we do it here as a backup
       if(!this.didNotifyParent) {
@@ -166,7 +182,7 @@ export default class Filter extends Abstract {
       Sync.getInstance().sync();
       callback(tag);
 
-      this.mergeState({tags: ModelManager.getInstance().tags});
+      this.mergeState({tags: this.state.tags.concat([tag])});
     })
   }
 
@@ -178,19 +194,25 @@ export default class Filter extends Abstract {
   }
 
   onTagSelect = (tag) => {
-    var selectedTags = this.state.selectedTags;
-    var selected = selectedTags.includes(tag.uuid);
+    var selectedTags;
 
-    if(selected) {
-      // deselect
-      selectedTags.splice(selectedTags.indexOf(tag.uuid), 1);
+    if(App.isAndroid) {
+      selectedTags = [tag.uuid];
     } else {
-      // select
-      selectedTags.push(tag.uuid);
+      selectedTags = this.state.selectedTags;
+      var selected = selectedTags.includes(tag.uuid);
+      if(selected) {
+        // deselect
+        selectedTags.splice(selectedTags.indexOf(tag.uuid), 1);
+      } else {
+        // select
+        selectedTags.push(tag.uuid);
+      }
     }
+
     this.selectedTags = selectedTags.slice();
     this.options.setSelectedTags(selectedTags);
-    this.state.selectedTags = selectedTags;
+    this.mergeState({selectedTags: selectedTags});
 
     if(this.props.liveReload) {
       this.notifyParentOfOptionsChange();

@@ -10,7 +10,7 @@ export default class SectionHeader extends Component {
       title = title.toUpperCase();
     }
     return (
-      <Text style={GlobalStyles.styles().sectionHeader}>{title}</Text>
+      <Text style={GlobalStyles.stylesForKey("sectionHeader")}>{title}</Text>
     )
   }
 }

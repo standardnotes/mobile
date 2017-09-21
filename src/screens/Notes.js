@@ -31,6 +31,7 @@ export default class Notes extends Abstract {
   }
 
   loadInitialState() {
+    console.log("LOADING INTITIAL STATE");
     this.mergeState({
       ready: true,
       refreshing: false,
@@ -42,7 +43,6 @@ export default class Notes extends Abstract {
     this.loadTabbarIcons();
     this.initializeNotes();
     this.beginSyncTimer();
-
     super.loadInitialState();
   }
 
@@ -79,7 +79,6 @@ export default class Notes extends Abstract {
 
     this.optionsObserver = this.options.addChangeObserver((options) => {
       this.reloadList(true);
-
       // On iOS, configureNavBar would be handle by viewWillAppear. However, we're using a drawer in Android.
       if(Platform.OS == "android") {
         this.configureNavBar();
@@ -123,7 +122,9 @@ export default class Notes extends Abstract {
 
     Sync.getInstance().loadLocalItems(function(items) {
       setTimeout(function () {
+        this.dataLoaded = true;
         this.reloadList();
+        this.configureNavBar(true);
         this.mergeState({decrypting: false, loading: false});
       }.bind(this), 0);
     }.bind(this));
@@ -133,19 +134,41 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
+    if(!this.dataLoaded) {
+      return;
+    }
     super.configureNavBar();
 
     var options = this.options;
 
     var notesTitle = "Notes";
     var filterTitle = "Filter";
-    var numFilters = options.selectedTags.length;
+    var numTags = options.selectedTags.length;
 
-    if(numFilters > 0 || options.archivedOnly) {
-      if(numFilters > 0) {
-        filterTitle += ` (${numFilters})`
+    if(numTags > 0 || options.archivedOnly) {
+      if(numTags > 0) {
+        filterTitle += ` (${numTags})`
       }
       notesTitle = options.archivedOnly ? "Archived Notes" : "Filtered Notes";
+    }
+
+    console.log("Configuring with options", options);
+
+    // Android only allows 1 tag selection
+    if(App.isAndroid) {
+      if(numTags > 0) {
+        var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
+        if(tags.length > 0) {
+          var tag = tags[0];
+          notesTitle = tag.title + " notes";
+        } else {
+          notesTitle = "Notes";
+        }
+      }
+
+      if(options.archivedOnly) {
+        notesTitle = "Archived " + notesTitle;
+      }
     }
 
     if(notesTitle === this.notesTitle && filterTitle === this.filterTitle) {
@@ -218,6 +241,13 @@ export default class Notes extends Abstract {
         // Android is handled by the drawer attribute of rn-navigation
         if(Platform.OS == "ios") {
           this.presentFilterScreen();
+        } else {
+          // Although RNN is supposed to open this automatically, it doesn't sometimes. So this is to force it.
+          this.props.navigator.toggleDrawer({
+            side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
+            animated: true, // does the toggle have transition animation or does it happen immediately (optional)
+            to: 'open' // optional, 'open' = open the drawer, 'closed' = close it, missing = the opposite of current state
+          });
         }
       } else if(event.id == "settings") {
         this.presentSettingsScreen();
