@@ -46,7 +46,9 @@ export default class App {
     this.optionsState = new OptionsState();
 
     this.optionsState.addChangeObserver((options) => {
-      options.persist();
+      if(!this.loading) {
+        options.persist();
+      }
     })
 
     this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
@@ -122,12 +124,14 @@ export default class App {
   }
 
   start() {
+    this.loading = true;
     GlobalStyles.get().resolveInitialTheme().then(function(){
       Promise.all([
         Icons.get().loadIcons(),
         KeysManager.get().loadInitialData(),
         this.optionsState.loadSaved()
       ]).then(function(){
+        this.loading = false;
         var run = () => {
           this.startApp();
           var hasPasscode = KeysManager.get().hasOfflinePasscode();

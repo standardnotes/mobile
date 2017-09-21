@@ -56,8 +56,7 @@ export default class Sync {
 
   async loadLocalItems(callback) {
     return DBManager.getAllItems(function(items){
-
-      this.handleItemsResponse(items, null, null).then(function(mappedItems){
+      this.handleItemsResponse(items, null).then(function(mappedItems){
         Item.sortItemsByDate(mappedItems);
 
         this.dataLoaded = true;

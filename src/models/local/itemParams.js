@@ -44,7 +44,7 @@ export default class ItemParams {
       }
     }
     else {
-      params.content = this.forExportFile ? this.item.createContentJSONFromProperties() : "000" + Crypto.base64(JSON.stringify(this.item.createContentJSONFromProperties()));
+      params.content = this.forExportFile ? this.item.createContentJSONFromProperties() : "000" + await Crypto.base64(JSON.stringify(this.item.createContentJSONFromProperties()));
       if(!this.forExportFile) {
         params.enc_item_key = null;
         params.auth_hash = null;

@@ -133,7 +133,6 @@ export default class Compose extends Abstract {
         noteId: this.state.note.uuid,
         options: JSON.stringify(this.previousOptions),
         onOptionsChange: (options) => {
-          console.log("Comparing", options.selectedTags, this.previousOptions.selectedTags);
           if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
             var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
             this.state.note.replaceTags(tags);

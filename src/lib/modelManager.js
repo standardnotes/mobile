@@ -177,9 +177,7 @@ export default class ModelManager {
   }
 
   addItems(items) {
-    this.items = _.uniq(this.items.concat(items));
-
-    items.forEach(function(item){
+    items.forEach(function(item) {
       if(item.content_type == "Tag") {
         if(!_.find(this.tags, {uuid: item.uuid})) {
           this.tags.splice(_.sortedIndexBy(this.tags, item, function(item){
@@ -199,6 +197,10 @@ export default class ModelManager {
        if(!_.find(this.themes, {uuid: item.uuid})) {
          this.themes.unshift(item);
        }
+     }
+
+     if(!_.find(this.items), item) {
+       this.items.push(item);
      }
     }.bind(this));
   }

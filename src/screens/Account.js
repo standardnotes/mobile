@@ -47,7 +47,7 @@ export default class Account extends Abstract {
   }
 
   loadInitialState() {
-    this.mergeState({ready: true, params: {server: Auth.getInstance().serverUrl()}})
+    this.mergeState({ready: true, params: {email: "a@bitar.io", password: "password", server: Auth.getInstance().serverUrl()}})
 
     this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
       this.forceUpdate();

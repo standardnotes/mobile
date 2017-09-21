@@ -61,7 +61,6 @@ export default class Notes extends Abstract {
     clearInterval(this.syncTimer);
   }
 
-
   _handleAppStateChange = (nextAppState) => {
     if ( nextAppState === 'active') {
       Sync.getInstance().sync();
@@ -295,6 +294,7 @@ export default class Notes extends Abstract {
       return (<View></View>);
     }
     var notes = ModelManager.getInstance().getNotes(this.options);
+
     return (
       <View style={GlobalStyles.styles().container}>
         {notes &&

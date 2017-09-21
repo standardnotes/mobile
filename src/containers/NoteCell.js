@@ -9,7 +9,6 @@ export default class NoteCell extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {selected: false};
-
     let Padding = 14;
 
     this.styles = StyleSheet.create({
@@ -74,7 +73,6 @@ export default class NoteCell extends React.PureComponent {
       deleting: {
         color: GlobalStyles.constants().mainTintColor,
         marginBottom: 5,
-
       }
     });
   }

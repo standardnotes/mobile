@@ -81,6 +81,9 @@ export default class NoteList extends Component {
         }
 
         <FlatList style={{height: "100%"}}
+          initialNumToRender={5}
+          windowSize={4}
+          maxToRenderPerBatch={5}
           keyboardDismissMode={'interactive'}
           keyboardShouldPersistTaps={'always'}
           refreshControl={
@@ -89,10 +92,10 @@ export default class NoteList extends Component {
               onRefresh={this.props.onRefresh}
             />
           }
-          removeClippedSubviews={false}
           data={this.props.notes}
           renderItem={this._renderItem}
           ListHeaderComponent={this.renderHeader}
+          initialNumToRender={5}
         />
       </View>
     )

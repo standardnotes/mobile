@@ -27,6 +27,7 @@ export default class OptionsState {
   }
 
   persist() {
+    console.log("Persisting Options", this);
     Storage.setItem("options", JSON.stringify(this));
   }
 
@@ -46,7 +47,6 @@ export default class OptionsState {
 
   notifyObservers() {
     this.changeObservers.forEach(function(observer){
-      console.log("Observer:", observer);
       observer.callback(this);
     }.bind(this))
   }
@@ -54,7 +54,7 @@ export default class OptionsState {
   // Interface
 
   mergeWith(options) {
-    _.merge(this, _.omit(options, ["changeObservers"]));
+    _.extend(this, _.omit(options, ["changeObservers"]));
     this.notifyObservers();
   }
 
