@@ -34,6 +34,7 @@ export default class Compose extends Abstract {
 
   constructor(props) {
     super(props);
+    this.state = {};
     var note = ModelManager.getInstance().findItem(this.props.noteId);
     if(!note) {
       note = new Note({});
@@ -251,6 +252,10 @@ export default class Compose extends Abstract {
   }
 
   render() {
+    if(this.state.lockContent) {
+      return (<View></View>);
+    }
+
     var textBottomPadding = 10;
     var keyboardBehavior = Platform.OS == "android" ? "height" : "padding";
     var keyboardOffset = this.rawStyles.noteTitle.height + this.rawStyles.noteText.paddingTop + (Platform.OS == "android" ? 15 : 0);

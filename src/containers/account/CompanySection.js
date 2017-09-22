@@ -27,10 +27,6 @@ export default class CompanySection extends Component {
           <ButtonCell leftAligned={true} title="Our Privacy Manifesto" onPress={() => this.props.onAction("privacy")} />
         </SectionedTableCell>
 
-        <SectionedTableCell buttonCell={true}>
-          <ButtonCell leftAligned={true} title="Our Twitter" onPress={() => this.props.onAction("twitter")} />
-        </SectionedTableCell>
-
       </TableSection>
     );
   }

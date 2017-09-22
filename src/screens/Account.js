@@ -38,9 +38,9 @@ export default class Account extends Abstract {
     this.state = {ready: false};
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
-      this.ready = true;
+      this.applicationIsReady = true;
 
-      if(this.mounted) {
+      if(this.isMounted()) {
         this.loadInitialState();
       }
     })
@@ -63,12 +63,14 @@ export default class Account extends Abstract {
   }
 
   componentDidMount() {
-    if(!this.state.ready) {
+    super.componentDidMount();
+    if(this.applicationIsReady && !this.state.ready) {
       this.loadInitialState();
     }
   }
 
   componentWillUnmount() {
+    super.componentWillUnmount();
     Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
     App.get().removeApplicationReadyObserver(this.readyObserver);
   }
@@ -102,9 +104,7 @@ export default class Account extends Abstract {
 
     if (event.type == 'NavBarButtonPress') {
       if (event.id == 'cancel') {
-        this.props.navigator.dismissModal({
-          animationType: 'slide-down'
-        });
+        this.dismissModal();
       }
     }
   }
@@ -191,9 +191,7 @@ export default class Account extends Abstract {
 
   onAuthSuccess = () => {
     this.markAllDataDirtyAndSync();
-    this.props.navigator.switchToTab({
-      tabIndex: 0
-    });
+    this.dismissModal();
   }
 
   onSignOutPress = () => {
@@ -326,6 +324,10 @@ export default class Account extends Abstract {
   }
 
   render() {
+    if(this.state.lockContent) {
+      return (<View></View>);
+    }
+
     let signedIn = !Auth.getInstance().offline();
     var themes = GlobalStyles.get().themes();
 

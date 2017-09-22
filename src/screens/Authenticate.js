@@ -38,13 +38,9 @@ export default class Authenticate extends Abstract {
     super.onNavigatorEvent(event);
     if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
       if (event.id == 'cancel') { // this is the same id field from the static navigatorButtons definition
-        this.dismiss();
+        this.dismissModal();
       }
     }
-  }
-
-  dismiss() {
-    this.props.navigator.dismissModal({animationType: "slide-down"})
   }
 
   configureNavBar() {
@@ -55,8 +51,8 @@ export default class Authenticate extends Abstract {
             title: 'Cancel',
             id: 'cancel',
             showAsAction: 'ifRoom',
-            buttonColor: GlobalStyles.constants().mainTintColor,
-            buttonFontSize: 17
+            // buttonColor: GlobalStyles.constants().mainTintColor,
+            // buttonFontSize: 17
           }
         ],
         animated: false
@@ -82,7 +78,7 @@ export default class Authenticate extends Abstract {
 
         this.props.onSetupSuccess();
 
-        this.dismiss();
+        this.dismissModal();
       } else {
         Alert.alert("Passcode Error", "There was an error setting up your passcode. Please try again.");
       }
@@ -106,7 +102,7 @@ export default class Authenticate extends Abstract {
       if(keys.pw === KeysManager.get().offlinePasscodeHash()) {
         KeysManager.get().setOfflineKeys(keys);
         this.props.onAuthenticateSuccess();
-        this.dismiss();
+        this.dismissModal();
       } else {
         invalid();
       }

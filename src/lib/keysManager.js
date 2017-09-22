@@ -5,7 +5,8 @@ import ModelManager from './modelManager'
 import {Platform} from 'react-native';
 import Keychain from "./keychain"
 var _ = require('lodash')
-
+import FlagSecure from 'react-native-flag-secure-android';
+import App from "../app"
 let OfflineParamsKey = "pc_params";
 let FirstRunKey = "first_run";
 
@@ -50,6 +51,10 @@ export default class KeysManager {
   }
 
   async loadInitialData() {
+    this.readyObserver = App.get().addApplicationReadyObserver(() => {
+      this.updateScreenshotPrivacy();
+    })
+
     var storageKeys = ["auth_params", OfflineParamsKey, "user", FirstRunKey];
 
     return Promise.all([
@@ -130,7 +135,25 @@ export default class KeysManager {
   }
 
   async persistKeysToKeychain() {
+    // This funciton is called when changes are made to authentication state
+    this.updateScreenshotPrivacy();
     return Keychain.setKeys(this.generateKeychainStoreValue());
+  }
+
+  updateScreenshotPrivacy(enabled) {
+    if(App.isIOS) {
+      return;
+    }
+
+    var hasImmediatePasscode = this.hasOfflinePasscode() && this.passcodeTiming == "immediately";
+    var hasImmedateFingerprint = this.hasFingerprint() && this.fingerprintTiming == "immediately";
+    var enabled = hasImmediatePasscode || hasImmedateFingerprint;
+
+    if(enabled) {
+      FlagSecure.activate();
+    } else {
+      FlagSecure.deactivate();
+    }
   }
 
   async persistAccountKeys(keys) {

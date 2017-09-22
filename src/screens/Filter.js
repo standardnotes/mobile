@@ -28,10 +28,18 @@ export default class Filter extends Abstract {
     this.state = {ready: false};
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
-      if(this.mounted) {
+      this.applicationIsReady = true;
+      if(this.isMounted()) {
         this.loadInitialState();
       }
     })
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    if(this.applicationIsReady && !this.state.ready) {
+      this.loadInitialState();
+    }
   }
 
   loadInitialState() {
@@ -49,20 +57,6 @@ export default class Filter extends Abstract {
     if(this.props.noteId) {
       this.note = ModelManager.getInstance().findItem(this.props.noteId);
     }
-  }
-
-  getTags() {
-    var tags = ModelManager.getInstance().tags.slice();
-    if(this.props.singleSelectMode) {
-      tags.unshift({title: "All notes", key: "all", uuid: 100})
-    }
-    return tags;
-  }
-
-  componentDidMount() {
-    if(!this.state.ready) {
-      this.loadInitialState();
-    }
 
     // React Native Navigation has an issue where navigation pushes are pushed first, then rendered.
     // This causes an undesired flash while content loads. To reduce the flash, we load the easy stuff first
@@ -76,7 +70,16 @@ export default class Filter extends Abstract {
     }.bind(this))
   }
 
+  getTags() {
+    var tags = ModelManager.getInstance().tags.slice();
+    if(this.props.singleSelectMode) {
+      tags.unshift({title: "All notes", key: "all", uuid: 100})
+    }
+    return tags;
+  }
+
   componentWillUnmount() {
+    super.componentWillUnmount();
     App.get().removeApplicationReadyObserver(this.readyObserver);
     Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
   }
@@ -280,7 +283,7 @@ export default class Filter extends Abstract {
   }
 
   render() {
-    if(!this.state.ready) {
+    if(!this.state.ready || this.state.lockContent) {
       return (<View></View>);
     }
     return (

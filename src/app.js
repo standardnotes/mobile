@@ -5,10 +5,12 @@
 import {
   AppState,
   Platform,
-  StatusBar
+  StatusBar,
+  BackHandler,
+  DeviceEventEmitter
 } from 'react-native';
 
-import {Navigation} from 'react-native-navigation';
+import {Navigation, ScreenVisibilityListener} from 'react-native-navigation';
 import {registerScreens} from './screens';
 
 import KeysManager from './lib/keysManager'
@@ -25,6 +27,9 @@ if(!__DEV__) {
 }
 
 registerScreens();
+
+const COLD_LAUNCH_STATE = "COLD_LAUNCH_STATE";
+const WARM_LAUNCH_STATE = "WARM_LAUNCH_STATE";
 
 export default class App {
 
@@ -43,6 +48,7 @@ export default class App {
     KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
 
     this.readyObservers = [];
+    this.lockStatusObservers = [];
     this.optionsState = new OptionsState();
 
     this._isAndroid = Platform.OS === "android";
@@ -53,11 +59,48 @@ export default class App {
       }
     })
 
+    this.listener = new ScreenVisibilityListener({
+      willAppear: ({screen, startTime, endTime, commandType}) => {
+        // This handles authentication for the initial app launch. We wait for the Notes component to be ready
+        // (meaning the app UI is ready), then present the authentication modal
+        if(screen == "sn.Notes" && this.authenticationQueued) {
+          this.authenticationQueued = false;
+          this.handleAuthentication(this.queuedAuthenticationLaunchState);
+          this.queuedAuthenticationLaunchState = null;
+        }
+      }
+    });
+    this.listener.register();
+
     this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
       if(event == Auth.DidSignOutEvent) {
         this.optionsState.reset();
       }
     }.bind(this));
+  }
+
+  handleAppStateChange = (nextAppState) => {
+    console.log("handleAppStateChange|App.js", nextAppState, "starting app?", this.isStartingApp);
+
+    // Hide screen content as we go to the background
+    if(nextAppState == "background" && !this.isStartingApp) {
+      if(this.shouldLockContent()) {
+        this.notifyLockStatusObserverOfLockState(true, null);
+      }
+    }
+
+    // Handle authentication as we come back from the background
+    if (nextAppState === "active" && this.previousAppState == "background" && !this.isStartingApp) {
+      this.handleAuthentication(WARM_LAUNCH_STATE);
+    }
+
+    this.previousAppState = nextAppState;
+  }
+
+  notifyLockStatusObserverOfLockState(lock, unlock) {
+    this.lockStatusObservers.forEach(function(observer){
+      observer.callback(lock, unlock);
+    })
   }
 
   static get isAndroid() {
@@ -70,6 +113,22 @@ export default class App {
 
   get isIOS() {
     return !this._isAndroid;
+  }
+
+  shouldLockContent() {
+    var showPasscode = KeysManager.get().hasOfflinePasscode() && KeysManager.get().passcodeTiming == "immediately";
+    var showFingerprint = KeysManager.get().hasFingerprint() && KeysManager.get().fingerprintTiming == "immediately";
+    return showPasscode || showFingerprint;
+  }
+
+  addLockStatusObserver(callback) {
+    var observer = {key: Math.random, callback: callback};
+    this.lockStatusObservers.push(observer);
+    return observer;
+  }
+
+  removeLockStatusObserver(observer) {
+    _.pull(this.lockStatusObservers, observer);
   }
 
   addApplicationReadyObserver(callback) {
@@ -90,17 +149,6 @@ export default class App {
 
   globalOptions() {
     return this.optionsState;
-  }
-
-  handleAppStateChange = (nextAppState) => {
-    console.log("handleAppStateChange|App.js", nextAppState, "starting app?", this.isStartingApp);
-    if (nextAppState === "background" && !this.isStartingApp) {
-      var showPasscode = KeysManager.get().hasOfflinePasscode() && KeysManager.get().passcodeTiming == "immediately";
-      var showFingerprint = KeysManager.get().hasFingerprint() && KeysManager.get().fingerprintTiming == "immediately";
-      if(showPasscode || showFingerprint) {
-        this.beginAuthentication(showPasscode, showFingerprint);
-      }
-    }
   }
 
   get tabStyles() {
@@ -147,9 +195,7 @@ export default class App {
         this.loading = false;
         var run = () => {
           this.startApp();
-          var hasPasscode = KeysManager.get().hasOfflinePasscode();
-          var hasFingerprint = KeysManager.get().hasFingerprint();
-          this.beginAuthentication(hasPasscode, hasFingerprint);
+          this.handleAuthentication(COLD_LAUNCH_STATE, true);
         }
         if(KeysManager.get().isFirstRun()) {
           KeysManager.get().handleFirstRun().then(run);
@@ -165,18 +211,46 @@ export default class App {
     this.readyObservers.forEach(function(observer){
       observer.callback();
     })
+
+    this.notifyLockStatusObserverOfLockState(null, true);
   }
 
-  beginAuthentication(hasPasscode, hasFingerprint) {
-    if(hasPasscode) {
+  handleAuthentication(fromState, queue = false) {
+    var hasPasscode = KeysManager.get().hasOfflinePasscode();
+    var hasFingerprint = KeysManager.get().hasFingerprint();
+
+    var showPasscode, showFingerprint;
+
+    if(fromState == COLD_LAUNCH_STATE) {
+      showPasscode = hasPasscode;
+      showFingerprint = hasFingerprint;
+    } else if(fromState == WARM_LAUNCH_STATE) {
+      showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
+      showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
+    }
+
+    if(!showPasscode && !showFingerprint) {
+      return;
+    }
+
+    if(queue) {
+      this.authenticationQueued = true;
+      this.queuedAuthenticationLaunchState = fromState;
+      return;
+    }
+
+    if(showPasscode) {
       this.showPasscodeLock(function(){
-        if(hasFingerprint) {
-          this.showFingerprintScanner(this.applicationIsReady.bind(this));
+        if(showFingerprint) {
+          // wait for passcode modal dismissal
+          setTimeout(() => {
+            this.showFingerprintScanner(this.applicationIsReady.bind(this));
+          }, 0);
         } else {
           this.applicationIsReady();
         }
       }.bind(this));
-    } else if(hasFingerprint) {
+    } else if(showFingerprint) {
       this.showFingerprintScanner(this.applicationIsReady.bind(this));
     } else {
       this.applicationIsReady();
@@ -193,7 +267,7 @@ export default class App {
         mode: "authenticate",
         onAuthenticateSuccess: onAuthenticate
       },
-      animationType: 'slide-down',
+      animationType: 'slide-up',
       tabsStyle: _.clone(this.tabStyles), // for iOS
       appStyle: _.clone(this.tabStyles) // for Android
     })
@@ -209,7 +283,7 @@ export default class App {
         mode: "authenticate",
         onAuthenticateSuccess: onAuthenticate
       },
-      animationType: 'slide-down',
+      animationType: 'slide-up',
       tabsStyle: _.clone(this.tabStyles), // for iOS
       appStyle: _.clone(this.tabStyles) // for Android
     })

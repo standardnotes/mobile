@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.modules.storage.ReactDatabaseSupplier;
 
 import com.chirag.RNMail.RNMail;
@@ -22,6 +24,7 @@ import com.reactnativenavigation.controllers.ActivityCallbacks;
 import com.standardnotes.sntextview.SNTextViewPackage;
 import com.tectiv3.aes.RCTAesPackage;
 import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
+import com.kristiansorens.flagsecure.FlagSecurePackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +52,8 @@ public class MainApplication extends NavigationApplication {
             new RCTAesPackage(),
             new RNMail(),
             new ReactNativeFingerprintScannerPackage(),
-            new SNTextViewPackage()
+            new SNTextViewPackage(),
+            new FlagSecurePackage()
     );
   }
 
@@ -71,17 +75,17 @@ public class MainApplication extends NavigationApplication {
 
       @Override
       public void onActivityStarted(Activity activity) {
-
+//        activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
       }
 
       @Override
       public void onActivityResumed(Activity activity) {
-
+//        sendEvent("onActivityResumed");
       }
 
       @Override
       public void onActivityPaused(Activity activity) {
-
+//        sendEvent("onActivityPaused");
       }
 
       @Override
@@ -90,13 +94,21 @@ public class MainApplication extends NavigationApplication {
       }
 
       public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-
+//        sendEvent("onActivitySaveInstanceState");
       }
 
       @Override
       public void onActivityDestroyed(Activity activity) {
 
       }
+
+      public void sendEvent(String eventName) {
+        ReactContext context = getReactGateway().getReactContext();
+        if(context != null) {
+          context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, null);
+        }
+      }
+
     });
 
     BugsnagReactNative.start(this);

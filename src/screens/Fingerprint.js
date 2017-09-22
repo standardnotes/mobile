@@ -50,14 +50,13 @@ export default class Fingerprint extends Abstract {
   }
 
   componentDidMount() {
+    super.componentDidMount();
     this.authenticate();
   }
 
   authenticate() {
     if(Platform.OS == "android") {
-      FingerprintScanner
-      .authenticate({ onAttempt: this.handleInvalidAttempt })
-      .then(() => {
+      FingerprintScanner.authenticate({ onAttempt: this.handleInvalidAttempt }).then(() => {
         this.handleSuccessfulAuth();
       })
       .catch((error) => {
@@ -65,23 +64,27 @@ export default class Fingerprint extends Abstract {
         if(error.name == "UserCancel") {
           this.authenticate();
         } else {
-          this.setState({ error: error.message });
+          if(this.isMounted()) {
+            this.setState({ error: error.message });
+          }
         }
       });
     } else {
-      FingerprintScanner
-        .authenticate({fallbackEnabled: false, description: 'Fingerprint is required to access your notes.' })
+      FingerprintScanner.authenticate({fallbackEnabled: false, description: 'Fingerprint is required to access your notes.' })
         .then(() => {
           this.handleSuccessfulAuth();
         })
         .catch((error) => {
           console.log("Error:", error);
-          this.setState({ error: error.message });
+          if(this.isMounted()) {
+            this.setState({ error: error.message });
+          }
         });
     }
   }
 
   componentWillUnmount() {
+    super.componentWillUnmount();
     FingerprintScanner.release();
   }
 
@@ -91,7 +94,7 @@ export default class Fingerprint extends Abstract {
 
   handleSuccessfulAuth = () => {
     this.props.onAuthenticateSuccess();
-    this.props.navigator.dismissModal({animationType: "slide-down"})
+    this.dismissModal();
   }
 
   render() {

@@ -24,35 +24,38 @@ export default class Notes extends Abstract {
     this.state = {ready: false};
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
-      if(this.mounted) {
+      this.applicationIsReady = true;
+      if(this.isMounted() && !this.state.ready) {
         this.loadInitialState();
       }
     })
   }
 
   loadInitialState() {
-    console.log("LOADING INTITIAL STATE");
+    this.options = App.get().globalOptions();
     this.mergeState({
       ready: true,
       refreshing: false,
       decrypting: false,
       loading: true
     });
-    this.options = App.get().globalOptions();
     this.registerObservers();
     this.loadTabbarIcons();
     this.initializeNotes();
     this.beginSyncTimer();
+
     super.loadInitialState();
   }
 
   componentDidMount() {
-    if(!this.state.ready) {
+    super.componentDidMount();
+    if(this.applicationIsReady && !this.state.ready) {
       this.loadInitialState();
     }
   }
 
   componentWillUnmount() {
+    super.componentWillUnmount();
     AppState.removeEventListener('change', this._handleAppStateChange);
     App.get().removeApplicationReadyObserver(this.readyObserver);
     Sync.getInstance().removeSyncObserver(this.syncObserver);
@@ -338,7 +341,7 @@ export default class Notes extends Abstract {
   }
 
   render() {
-    if(!this.state.ready) {
+    if(!this.state.ready || this.state.lockContent) {
       return (<View></View>);
     }
     var notes = ModelManager.getInstance().getNotes(this.options);
