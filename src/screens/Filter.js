@@ -25,7 +25,6 @@ export default class Filter extends Abstract {
 
   constructor(props) {
     super(props);
-
     this.state = {ready: false};
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
@@ -53,8 +52,8 @@ export default class Filter extends Abstract {
   }
 
   getTags() {
-    var tags = ModelManager.getInstance().tags;
-    if(App.isAndroid) {
+    var tags = ModelManager.getInstance().tags.slice();
+    if(this.props.singleSelectMode) {
       tags.unshift({title: "All notes", key: "all", uuid: 100})
     }
     return tags;
@@ -85,7 +84,7 @@ export default class Filter extends Abstract {
   notifyParentOfOptionsChange() {
     this.props.onOptionsChange(this.options);
 
-    if(App.isAndroid) {
+    if(App.isAndroid && this.props.singleSelectMode) {
       this.props.navigator.toggleDrawer({
         side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
         animated: true, // does the toggle have transition animation or does it happen immediately (optional)
@@ -135,7 +134,7 @@ export default class Filter extends Abstract {
       this.forceUpdate();
     }
 
-    if(event.id == "willDisappear" && App.isIOS) {
+    if(event.id == "willDisappear" && !this.props.singleSelectMode) {
       // we prefer to notify the parent via NavBarButtonPress.accept, but when this view is presented via nav push,
       // the user can swipe back and miss that. So we do it here as a backup
       if(!this.didNotifyParent) {
@@ -188,7 +187,7 @@ export default class Filter extends Abstract {
 
   onSortChange = (key) => {
     this.options.setSortBy(key);
-    if(this.props.liveReload) {
+    if(this.props.singleSelectMode) {
       this.notifyParentOfOptionsChange();
     }
   }
@@ -196,7 +195,7 @@ export default class Filter extends Abstract {
   onTagSelect = (tag) => {
     var selectedTags;
 
-    if(App.isAndroid) {
+    if(this.props.singleSelectMode) {
       selectedTags = [tag.uuid];
     } else {
       selectedTags = this.state.selectedTags;
@@ -214,7 +213,7 @@ export default class Filter extends Abstract {
     this.options.setSelectedTags(selectedTags);
     this.mergeState({selectedTags: selectedTags});
 
-    if(this.props.liveReload) {
+    if(this.props.singleSelectMode) {
       this.notifyParentOfOptionsChange();
     }
   }
@@ -275,7 +274,7 @@ export default class Filter extends Abstract {
     this.options.setArchivedOnly(!this.options.archivedOnly);
     this.mergeState({archivedOnly: this.options.archivedOnly});
 
-    if(this.props.liveReload) {
+    if(this.props.singleSelectMode) {
       this.notifyParentOfOptionsChange();
     }
   }

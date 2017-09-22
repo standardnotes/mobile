@@ -5,11 +5,13 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -19,6 +21,7 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.uimanager.Spacing;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 import static java.security.AccessController.getContext;
@@ -31,6 +34,7 @@ public class SNTextView extends LinearLayout {
 
     private EditText editText;
     private ScrollView scrollView;
+    private Boolean ignoreNextTextEvent;
 
     @SuppressLint("ResourceAsColor")
     public SNTextView(Context context) {
@@ -43,8 +47,8 @@ public class SNTextView extends LinearLayout {
         scrollView.setLayoutParams(lp);
 
         editText = new EditText(this.getContext());
-        editText.setLayoutParams(lp);
-
+        LayoutParams textLayout = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
+        editText.setLayoutParams(textLayout);
         editText.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -59,12 +63,16 @@ public class SNTextView extends LinearLayout {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(ignoreNextTextEvent) {
+                    ignoreNextTextEvent = false;
+                    return;
+                }
                 textDidChange(s.toString());
             }
         });
 
         scrollView.addView(editText);
-        this.addView(scrollView, lp);
+        this.addView(scrollView);
     }
 
     @Override
@@ -74,8 +82,35 @@ public class SNTextView extends LinearLayout {
 
 
     public void setText(String text) {
+        ignoreNextTextEvent = true;
         editText.setText(text);
     }
+
+    public void setAutoFocus(boolean autoFocus) {
+        if(autoFocus) {
+            editText.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
+    }
+
+    public void setContentPadding(int position, Integer padding) {
+        float scale = getResources().getDisplayMetrics().density;
+        int pixels = (int) (padding * scale + 0.5f);
+
+        if(position == Spacing.ALL) {
+            editText.setPadding(pixels, pixels, pixels, pixels);
+        } else if(position == Spacing.LEFT) {
+            editText.setPadding(pixels, editText.getTotalPaddingTop(), editText.getPaddingRight(), editText.getPaddingBottom());
+        } else if(position == Spacing.TOP) {
+            editText.setPadding(editText.getPaddingLeft(), pixels, editText.getPaddingRight(), editText.getPaddingBottom());
+        } else if(position == Spacing.RIGHT) {
+            editText.setPadding(editText.getPaddingLeft(), editText.getTotalPaddingTop(), pixels, editText.getPaddingBottom());
+        } else if(position == Spacing.BOTTOM) {
+            editText.setPadding(editText.getPaddingLeft(), editText.getTotalPaddingTop(), editText.getPaddingRight(), pixels);
+        }
+    }
+
 
     public void textDidChange(String text) {
         WritableMap event = Arguments.createMap();
@@ -86,4 +121,6 @@ public class SNTextView extends LinearLayout {
             ((ReactContext) context).getJSModule(RCTEventEmitter.class).receiveEvent(getId(),"onChangeTextValue", event);
         }
     }
+
+
 }

@@ -19,6 +19,7 @@ export default class TextView extends Component {
 TextView.propTypes = {
   onChangeText: PropTypes.func,
   text: PropTypes.string,
+  autoFocus: PropTypes.bool,
   ...View.propTypes
 }
 

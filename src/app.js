@@ -229,7 +229,7 @@ export default class App {
       left: {
         screen: 'sn.Filter',
         passProps: {
-          liveReload: true,
+          singleSelectMode: true,
           options: JSON.stringify(this.optionsState),
           onOptionsChange: (options) => {
             this.optionsState.mergeWith(options);

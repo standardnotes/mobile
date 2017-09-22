@@ -10,8 +10,10 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
+import com.facebook.react.uimanager.Spacing;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.facebook.react.uimanager.annotations.ReactPropGroup;
 
 import java.util.Map;
 
@@ -22,6 +24,10 @@ import static java.security.AccessController.getContext;
  */
 
 public class SNTextViewManager extends SimpleViewManager<SNTextView> {
+
+    private static final int[] PADDING_TYPES = {
+            Spacing.ALL, Spacing.LEFT, Spacing.RIGHT, Spacing.TOP, Spacing.BOTTOM,
+    };
 
     public static final String REACT_CLASS = "SNTextView";
 
@@ -40,6 +46,11 @@ public class SNTextViewManager extends SimpleViewManager<SNTextView> {
         view.setText(text);
     }
 
+    @ReactProp(name = "autoFocus")
+    public void setAutoFocus(SNTextView view, boolean autoFocus) {
+        view.setAutoFocus(autoFocus);
+    }
+
 
     @Override
     public @Nullable Map getExportedCustomDirectEventTypeConstants() {
@@ -47,5 +58,12 @@ public class SNTextViewManager extends SimpleViewManager<SNTextView> {
                 "onChangeTextValue",
                 MapBuilder.of("registrationName", "onChangeTextValue")
         );
+    }
+
+    @ReactPropGroup(names = {
+            "padding", "paddingLeft", "paddingRight", "paddingTop", "paddingBottom"
+    }, customType = "String")
+    public void setBorderColor(SNTextView view, int index, Integer padding) {
+        view.setContentPadding(PADDING_TYPES[index], padding);
     }
 }

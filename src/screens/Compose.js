@@ -39,7 +39,8 @@ export default class Compose extends Abstract {
       note = new Note({});
       note.dummy = true;
     }
-    this.state = {note: note, text: note.text};
+
+    this.note = note;
 
     this.loadStyles();
 
@@ -105,11 +106,13 @@ export default class Compose extends Abstract {
     super.onNavigatorEvent(event);
 
     if(event.id == 'didAppear') {
-      if(this.state.note.dummy) {
-         this.refs.input.focus();
+      if(this.note.dummy) {
+        if(this.refs.input) {
+          this.refs.input.focus();
+        }
       }
     } else if(event.id == "willAppear") {
-      if(this.state.note.dirty) {
+      if(this.note.dirty) {
         // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
         setTimeout(() => {
           this.changesMade();
@@ -124,19 +127,20 @@ export default class Compose extends Abstract {
   }
 
   showOptions() {
-    this.previousOptions = {selectedTags: this.state.note.tags.map(function(tag){return tag.uuid})};
+    this.previousOptions = {selectedTags: this.note.tags.map(function(tag){return tag.uuid})};
     this.props.navigator.push({
       screen: 'sn.Filter',
       title: 'Options',
       animationType: 'slide-up',
       passProps: {
-        noteId: this.state.note.uuid,
+        noteId: this.note.uuid,
+        singleSelectMode: false,
         options: JSON.stringify(this.previousOptions),
         onOptionsChange: (options) => {
           if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
             var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
-            this.state.note.replaceTags(tags);
-            this.state.note.setDirty(true);
+            this.note.replaceTags(tags);
+            this.note.setDirty(true);
             this.changesMade();
           }
         }
@@ -145,26 +149,24 @@ export default class Compose extends Abstract {
   }
 
   onTitleChange = (text) => {
-    this.setState({title: text});
-    this.state.note.title = text;
+    this.note.title = text;
     this.changesMade();
   }
 
   onTextChange = (text) => {
-    this.setState({text: text});
-    this.state.note.text = text;
+    this.note.text = text;
     this.changesMade();
   }
 
   changesMade() {
-    this.state.note.hasChanges = true;
+    this.note.hasChanges = true;
 
     if(this.saveTimeout) clearTimeout(this.saveTimeout);
     if(this.statusTimeout) clearTimeout(this.statusTimeout);
     this.saveTimeout = setTimeout(function(){
       this.setNavBarSubtitle("Saving...");
-      if(!this.state.note.uuid) {
-        this.state.note.initUUID().then(function(){
+      if(!this.note.uuid) {
+        this.note.initUUID().then(function(){
           this.save();
         }.bind(this));
       } else {
@@ -195,7 +197,7 @@ export default class Compose extends Abstract {
   }
 
   save() {
-    var note = this.state.note;
+    var note = this.note;
     if(note.dummy) {
       note.dummy = false;
       ModelManager.getInstance().addItem(note);
@@ -240,7 +242,7 @@ export default class Compose extends Abstract {
 
   onTextFocus = () => {
     // in order to call blur() later, we need to focus here manually, even though it does nothing
-    this.refs.input.focus();
+    // this.refs.input.focus();
     this.isFocused = true;
   }
 
@@ -258,7 +260,7 @@ export default class Compose extends Abstract {
         <TextInput
           style={this.styles.noteTitle}
           onChangeText={this.onTitleChange}
-          value={this.state.note.title}
+          value={this.note.title}
           placeholder={"Add Title"}
           selectionColor={GlobalStyles.constants().mainTintColor}
           underlineColorAndroid={'transparent'}
@@ -266,7 +268,9 @@ export default class Compose extends Abstract {
         />
 
         {Platform.OS == "android" &&
-          <TextView style={this.styles.noteText} text={this.state.note.text} onChangeText={this.onTextChange}/>
+          <View style={this.styles.noteTextContainer}>
+            <TextView style={this.styles.noteText} autoFocus={this.note.dummy} text={this.note.text} onChangeText={this.onTextChange}/>
+          </View>
         }
 
         {Platform.OS == "ios" &&
@@ -275,8 +279,8 @@ export default class Compose extends Abstract {
                   style={[this.styles.noteText, {paddingBottom: textBottomPadding}]}
                   onChangeText={this.onTextChange}
                   multiline={true}
-                  autoFocus={false}
-                  value={this.state.note.text}
+                  autoFocus={this.note.dummy}
+                  value={this.note.text}
                   ref={'input'}
                   onFocus={this.onTextFocus}
                   onBlur={this.onTextBlur}
@@ -325,8 +329,11 @@ export default class Compose extends Abstract {
         flexGrow: 1,
       },
 
+      noteTextContainer: {
+        flexGrow: 1,
+      },
+
       noteText: {
-        height: "100%",
         flexGrow: 1,
         // fontSize: 17,
         marginTop: 0,
