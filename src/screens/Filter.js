@@ -25,6 +25,7 @@ export default class Filter extends Abstract {
 
   constructor(props) {
     super(props);
+    this.tags = [];
     this.state = {ready: false};
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
@@ -63,8 +64,6 @@ export default class Filter extends Abstract {
     // then wait a little to render the rest, such as a dynamic list of tags
     // See https://github.com/wix/react-native-navigation/issues/358
 
-    this.tags = [];
-
     this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
       if(!this.props.singleSelectMode) {
         // Load tags after delay
@@ -75,6 +74,7 @@ export default class Filter extends Abstract {
       } else {
         // Load tags immediately on every render
         this.loadTags = true;
+        this.forceUpdate();
       }
     }.bind(this))
 
@@ -182,7 +182,6 @@ export default class Filter extends Abstract {
     var tag = new Tag({title: text});
     tag.initUUID().then(() => {
       tag.setDirty(true);
-      console.log("Adding tag to mdoelmanager", tag);
       ModelManager.getInstance().addItem(tag);
       Sync.getInstance().sync();
       callback(tag);
@@ -213,8 +212,6 @@ export default class Filter extends Abstract {
         selectedTags.push(tag.uuid);
       }
     }
-
-    console.log("Setting selected tags", selectedTags);
 
     this.selectedTags = selectedTags.slice();
     this.options.setSelectedTags(selectedTags);

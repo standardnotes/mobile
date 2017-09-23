@@ -1,6 +1,7 @@
 package com.standardnotes.sntextview;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -39,7 +40,7 @@ public class SNTextView extends LinearLayout {
 
     private EditText editText;
     private ScrollView scrollView;
-    private Boolean ignoreNextTextEvent;
+    private Boolean ignoreNextTextEvent = false;
 
     @SuppressLint("ResourceAsColor")
     public SNTextView(Context context) {
@@ -97,6 +98,14 @@ public class SNTextView extends LinearLayout {
             InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
+    }
+
+    public void blur() {
+        editText.clearFocus();
+
+        // this does the actual keyboard dismissal
+        InputMethodManager imm = (InputMethodManager) this.getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
     }
 
     public void setContentPadding(int position, Integer padding) {

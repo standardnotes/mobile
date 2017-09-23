@@ -45,11 +45,11 @@ export default class Compose extends Abstract {
 
     this.loadStyles();
 
-    this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade){
-      if(changesMade) {
+    this.syncObserver = Sync.getInstance().registerSyncObserver((changesMade, retreivedIds, savedIds) => {
+      if(retreivedIds && this.note.uuid && retreivedIds.includes(this.note.uuid)) {
         this.forceUpdate();
       }
-    }.bind(this))
+    });
   }
 
   onContentSizeChange = (c) => {
@@ -128,6 +128,7 @@ export default class Compose extends Abstract {
   }
 
   showOptions() {
+    this.input.blur();
     this.previousOptions = {selectedTags: this.note.tags.map(function(tag){return tag.uuid})};
     this.props.navigator.push({
       screen: 'sn.Filter',
@@ -140,8 +141,6 @@ export default class Compose extends Abstract {
         onOptionsChange: (options) => {
           if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
             var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
-
-            console.log("Replacing note tags with", options.selectedTags, tags.map(function(tag){return tag.title}));
             this.note.replaceTags(tags);
             this.note.setDirty(true);
             this.changesMade();
@@ -238,7 +237,7 @@ export default class Compose extends Abstract {
     });
 
     this.props.navigator.setStyle({
-      navBarSubtitleColor: GlobalStyles.constants().plainCellBorderColor,
+      navBarSubtitleColor: GlobalStyles.hexToRGBA(GlobalStyles.constantForKey("navBarTextColor"), 0.5),
       navBarSubtitleFontSize: 12
     });
   }
@@ -277,10 +276,11 @@ export default class Compose extends Abstract {
         {Platform.OS == "android" &&
           <View style={this.styles.noteTextContainer}>
             <TextView style={this.styles.noteText}
-            autoFocus={this.note.dummy}
-            text={this.note.text}
-            selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
-            onChangeText={this.onTextChange}
+              ref={(ref) => this.input = ref}
+              autoFocus={this.note.dummy}
+              text={this.note.text}
+              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
+              onChangeText={this.onTextChange}
             />
           </View>
         }

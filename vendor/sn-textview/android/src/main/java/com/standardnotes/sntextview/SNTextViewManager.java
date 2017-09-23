@@ -2,12 +2,16 @@ package com.standardnotes.sntextview;
 
 import android.graphics.Color;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -73,6 +77,40 @@ public class SNTextViewManager extends SimpleViewManager<SNTextView> {
     @ReactProp(name = "autoFocus")
     public void setAutoFocus(SNTextView view, boolean autoFocus) {
         view.setAutoFocus(autoFocus);
+    }
+
+    @ReactMethod
+    public void blur(SNTextView view) {
+        view.blur();
+    }
+
+    public static final int COMMAND_BLUR = 1;
+
+    @Override
+    public Map<String,Integer> getCommandsMap() {
+        Log.d("React"," View manager getCommandsMap:");
+        return MapBuilder.of(
+                "blur",
+                COMMAND_BLUR
+               );
+    }
+
+    @Override
+    public void receiveCommand(SNTextView view, int commandType, @Nullable ReadableArray args) {
+        Assertions.assertNotNull(view);
+        Assertions.assertNotNull(args);
+        switch (commandType) {
+            case COMMAND_BLUR: {
+                view.blur();
+                return;
+            }
+
+            default:
+                throw new IllegalArgumentException(String.format(
+                        "Unsupported command %d received by %s.",
+                        commandType,
+                        getClass().getSimpleName()));
+        }
     }
 
 

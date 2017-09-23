@@ -221,18 +221,18 @@ export default class GlobalStyles {
   defaultConstants() {
     return {
         composeBorderColor: "#F5F5F5",
-        mainBackgroundColor: "white",
+        mainBackgroundColor: "#ffffff",
         mainTintColor: "#fb0206",
         mainDimColor: "gray",
         mainTextColor: "black",
         mainTextFontSize: 16,
         mainHeaderFontSize: 16,
 
-        navBarColor: "white",
+        navBarColor: "#ffffff",
         navBarTextColor: "#fb0206",
 
         navBarColorAndroid: "#fb0206",
-        navBarTextColorAndroid: "white",
+        navBarTextColorAndroid: "#ffffff",
 
         paddingLeft: 14,
         plainCellBorderColor: "#efefef",
@@ -361,12 +361,26 @@ export default class GlobalStyles {
     }
   }
 
-  static darken(color) {
-    return this.shadeBlend(-0.15, color);
+  static darken(color, value = -0.15) {
+    return this.shadeBlend(value, color);
   }
 
-  static lighten(color) {
-    return this.shadeBlend(0.25, color);
+  static lighten(color, value = 0.25) {
+    return this.shadeBlend(value, color);
+  }
+
+  static hexToRGBA(hex, alpha) {
+    var c;
+    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+      c= hex.substring(1).split('');
+      if(c.length== 3){
+          c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+      }
+      c= '0x'+c.join('');
+      return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+',' + alpha + ')';
+    } else {
+      throw new Error('Bad Hex');
+    }
   }
 
 }
