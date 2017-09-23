@@ -129,6 +129,7 @@ export default class Authenticate extends Abstract {
                   autoFocus={true}
                   secureTextEntry={true}
                   underlineColorAndroid={'transparent'}
+                  placeholderTextColor={GlobalStyles.constants().mainDimColor}
                 />
               </SectionedTableCell>
 
@@ -153,6 +154,7 @@ export default class Authenticate extends Abstract {
                   autoFocus={true}
                   secureTextEntry={true}
                   underlineColorAndroid={'transparent'}
+                  placeholderTextColor={GlobalStyles.constants().mainDimColor}
                 />
               </SectionedTableCell>
 

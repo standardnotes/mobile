@@ -223,7 +223,7 @@ export default class GlobalStyles {
         composeBorderColor: "#F5F5F5",
         mainBackgroundColor: "#ffffff",
         mainTintColor: "#fb0206",
-        mainDimColor: "gray",
+        mainDimColor: "#9d9d9d",
         mainTextColor: "black",
         mainTextFontSize: 16,
         mainHeaderFontSize: 16,
@@ -269,7 +269,7 @@ export default class GlobalStyles {
       },
 
       sectionHeader: {
-        color: "gray",
+        color: constants.mainDimColor,
         fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
         paddingBottom: 10,
@@ -278,7 +278,8 @@ export default class GlobalStyles {
       },
 
       sectionHeaderAndroid: {
-        color: constants.mainDimColor
+        color: constants.mainDimColor,
+        fontSize: constants.mainTextFontSize - 2,
       },
 
       sectionedTableCell: {

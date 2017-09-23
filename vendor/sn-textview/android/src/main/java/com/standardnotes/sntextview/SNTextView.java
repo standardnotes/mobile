@@ -74,7 +74,7 @@ public class SNTextView extends LinearLayout {
             }
         });
 
-        scrollView.addView(editText, new LayoutParams(MATCH_PARENT, 1000));
+        scrollView.addView(editText);
         this.addView(scrollView);
     }
 
