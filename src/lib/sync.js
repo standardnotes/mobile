@@ -289,7 +289,7 @@ export default class Sync {
       var omitFields = ["content", "auth_hash"];
       var saved = await this.handleItemsResponse(response.saved_items, omitFields);
 
-      await this.handleUnsavedItemsResponse(response.unsaved)
+      var unsaved = await this.handleUnsavedItemsResponse(response.unsaved)
       this.writeItemsToStorage(saved, false, null);
 
       this.syncStatus.syncOpInProgress = false;
@@ -318,9 +318,7 @@ export default class Sync {
 
         this.syncObservers.forEach(function(mapping){
           var changesMade = retrieved.length > 0 || response.unsaved.length > 0;
-          var retreivedIds = retreived.map((item) => {return item.uuid});
-          var savedIds = saved.map((item) => {return item.uuid});
-          mapping.callback(changesMade, retreivedIds, savedIds);
+          mapping.callback(changesMade, retrieved, saved, unsaved);
         })
       }
     }.bind(this);

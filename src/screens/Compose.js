@@ -45,8 +45,8 @@ export default class Compose extends Abstract {
 
     this.loadStyles();
 
-    this.syncObserver = Sync.getInstance().registerSyncObserver((changesMade, retreivedIds, savedIds) => {
-      if(retreivedIds && this.note.uuid && retreivedIds.includes(this.note.uuid)) {
+    this.syncObserver = Sync.getInstance().registerSyncObserver((changesMade, retreived, saved) => {
+      if(retreived && this.note.uuid && retreived.map((i) => i.uuid).includes(this.note.uuid)) {
         this.forceUpdate();
       }
     });

@@ -30,6 +30,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 import java.lang.reflect.Field;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static java.security.AccessController.getContext;
 
 /**
@@ -46,26 +47,22 @@ public class SNTextView extends LinearLayout {
     public SNTextView(Context context) {
         super(context);
 
-        LayoutParams lp = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
-
+        LayoutParams scrollParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         scrollView = new ScrollView(context);
-        scrollView.setBackgroundColor(android.R.color.transparent);
-        scrollView.setLayoutParams(lp);
+        scrollView.setLayoutParams(scrollParams);
+        scrollView.setFillViewport(true);
 
         editText = new EditText(this.getContext());
-        LayoutParams textLayout = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
+        LayoutParams textLayout = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         editText.setLayoutParams(textLayout);
+        editText.setGravity(Gravity.TOP);
+
         editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {}
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -77,7 +74,7 @@ public class SNTextView extends LinearLayout {
             }
         });
 
-        scrollView.addView(editText);
+        scrollView.addView(editText, new LayoutParams(MATCH_PARENT, 1000));
         this.addView(scrollView);
     }
 

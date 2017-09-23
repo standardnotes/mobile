@@ -74,7 +74,7 @@ export default class Notes extends Abstract {
     // Refresh every 30s
     this.syncTimer = setInterval(function () {
       Sync.getInstance().sync(null);
-    }, 30000);
+    }, 3000);
   }
 
   registerObservers() {
@@ -88,9 +88,9 @@ export default class Notes extends Abstract {
       }
     })
 
-    this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade){
-      if(changesMade) {
-        console.log("===Changes Made===");
+    this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade, retrieved, saved, unsaved){
+      if(_.find(retrieved, {content_type: "Note"}) || _.find(unsaved, {content_type: "Note"})) {
+        console.log("===Note Changes Pulled===");
         this.reloadList();
       }
       this.mergeState({refreshing: false, loading: false});
