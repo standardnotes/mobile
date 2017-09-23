@@ -20,7 +20,7 @@ TextView.propTypes = {
   onChangeText: PropTypes.func,
   text: PropTypes.string,
   autoFocus: PropTypes.bool,
-  ...View.propTypes
+  ...TextInput.propTypes
 }
 
 var SNTextView = requireNativeComponent("SNTextView", TextView, {

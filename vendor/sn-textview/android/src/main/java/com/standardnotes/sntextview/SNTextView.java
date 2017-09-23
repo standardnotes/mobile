@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextWatcher;
@@ -15,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
@@ -23,6 +26,8 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.Spacing;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+
+import java.lang.reflect.Field;
 
 import static java.security.AccessController.getContext;
 
@@ -111,6 +116,36 @@ public class SNTextView extends LinearLayout {
         }
     }
 
+    public void setTextColor(Integer color) {
+        editText.setTextColor(color);
+    }
+
+    public void setHighlightColor(Integer color) {
+        editText.setHighlightColor(color);
+
+        try {
+            // Get the cursor resource id
+            Field field = TextView.class.getDeclaredField("mCursorDrawableRes");
+            field.setAccessible(true);
+            int drawableResId = field.getInt(editText);
+
+            // Get the editor
+            field = TextView.class.getDeclaredField("mEditor");
+            field.setAccessible(true);
+            Object editor = field.get(editText);
+
+            // Get the drawable and set a color filter
+            Drawable drawable = ContextCompat.getDrawable(editText.getContext(), drawableResId);
+            drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            Drawable[] drawables = {drawable, drawable};
+
+            // Set the drawables
+            field = editor.getClass().getDeclaredField("mCursorDrawable");
+            field.setAccessible(true);
+            field.set(editor, drawables);
+        } catch (Exception ignored) {
+        }
+    }
 
     public void textDidChange(String text) {
         WritableMap event = Arguments.createMap();
@@ -121,6 +156,4 @@ public class SNTextView extends LinearLayout {
             ((ReactContext) context).getJSModule(RCTEventEmitter.class).receiveEvent(getId(),"onChangeTextValue", event);
         }
     }
-
-
 }

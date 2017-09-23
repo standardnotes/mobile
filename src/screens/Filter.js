@@ -63,19 +63,21 @@ export default class Filter extends Abstract {
     // then wait a little to render the rest, such as a dynamic list of tags
     // See https://github.com/wix/react-native-navigation/issues/358
 
-    this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
-      setTimeout(function () {
-        this.mergeState({tags: this.getTags()});
-      }.bind(this), 10);
-    }.bind(this))
-  }
+    this.tags = [];
 
-  getTags() {
-    var tags = ModelManager.getInstance().tags.slice();
-    if(this.props.singleSelectMode) {
-      tags.unshift({title: "All notes", key: "all", uuid: 100})
-    }
-    return tags;
+    this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
+      if(!this.props.singleSelectMode) {
+        // Load tags after delay
+        setTimeout(function () {
+          this.loadTags = true;
+          this.forceUpdate();
+        }.bind(this), 10);
+      } else {
+        // Load tags immediately on every render
+        this.loadTags = true;
+      }
+    }.bind(this))
+
   }
 
   componentWillUnmount() {
@@ -183,8 +185,8 @@ export default class Filter extends Abstract {
       ModelManager.getInstance().addItem(tag);
       Sync.getInstance().sync();
       callback(tag);
-
-      this.mergeState({tags: this.state.tags.concat([tag])});
+      this.tags.push(tag);
+      this.forceUpdate();
     })
   }
 
@@ -286,6 +288,15 @@ export default class Filter extends Abstract {
     if(!this.state.ready || this.state.lockContent) {
       return (<View></View>);
     }
+
+    if(this.loadTags) {
+      var tags = ModelManager.getInstance().tags.slice();
+      if(this.props.singleSelectMode) {
+        tags.unshift({title: "All notes", key: "all", uuid: 100})
+      }
+      this.tags = tags;
+    }
+
     return (
       <View style={GlobalStyles.styles().container}>
         <ScrollView style={GlobalStyles.styles().view}>
@@ -303,7 +314,7 @@ export default class Filter extends Abstract {
           }
 
           <TagsSection
-            tags={this.state.tags}
+            tags={this.tags}
             selected={this.state.selectedTags}
             onTagSelect={this.onTagSelect}
             onTagLongPress={this.onTagLongPress}

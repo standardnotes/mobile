@@ -152,17 +152,19 @@ export default class App {
   }
 
   get tabStyles() {
+    var navBarColor = GlobalStyles.constantForKey("navBarColor");
+    var navBarTextColor = GlobalStyles.constantForKey("navBarTextColor");
     var statusBarColor = GlobalStyles.constants().mainBackgroundColor;
+
     if(this.isAndroid) {
-      statusBarColor = GlobalStyles.darken(GlobalStyles.constants().mainTintColor);
+      statusBarColor = GlobalStyles.darken(navBarColor);
       // Android <= v22 does not support changing status bar text color. It will always be white
       // So we have to make sure background color has proper contrast
       if(Platform.Version <= 22) {
         statusBarColor = "black";
       }
     }
-    var navBarColor = this.isAndroid ? GlobalStyles.constants().mainTintColor : GlobalStyles.constants().mainBackgroundColor;
-    var navBarText = this.isAndroid ? GlobalStyles.constants().mainBackgroundColor : GlobalStyles.constants().mainTintColor;
+
     return {
       tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
       tabBarTranslucent: true,
@@ -170,8 +172,8 @@ export default class App {
       tabBarSelectedButtonColor: GlobalStyles.constants().mainTintColor,
 
       // navBarBlur: true,
-      navBarButtonColor: navBarText,
-      navBarTextColor: navBarText,
+      navBarButtonColor: navBarTextColor,
+      navBarTextColor: navBarTextColor,
       navigationBarColor: 'black', // android built in bar
       navBarBackgroundColor: navBarColor, // actual top nav bar
 
@@ -195,7 +197,10 @@ export default class App {
         this.loading = false;
         var run = () => {
           this.startApp();
-          this.handleAuthentication(COLD_LAUNCH_STATE, true);
+          var handled = this.handleAuthentication(COLD_LAUNCH_STATE, true);
+          if(!handled) {
+            this.applicationIsReady();
+          }
         }
         if(KeysManager.get().isFirstRun()) {
           KeysManager.get().handleFirstRun().then(run);
@@ -207,6 +212,7 @@ export default class App {
   }
 
   applicationIsReady() {
+    console.log("===Emitting Application Ready===");
     this.ready = true;
     this.readyObservers.forEach(function(observer){
       observer.callback();
@@ -230,13 +236,13 @@ export default class App {
     }
 
     if(!showPasscode && !showFingerprint) {
-      return;
+      return false;
     }
 
     if(queue) {
       this.authenticationQueued = true;
       this.queuedAuthenticationLaunchState = fromState;
-      return;
+      return true;
     }
 
     if(showPasscode) {
@@ -255,6 +261,8 @@ export default class App {
     } else {
       this.applicationIsReady();
     }
+
+    return true;
   }
 
   showPasscodeLock(onAuthenticate) {
@@ -325,12 +333,6 @@ export default class App {
         title: 'Account',
         }
       ];
-
-      if(Platform.OS === "android") {
-        tabs.forEach(function(tab){
-          tab.icon = require("./img/placeholder.png")
-        })
-      }
 
       Navigation.startTabBasedApp(
         {

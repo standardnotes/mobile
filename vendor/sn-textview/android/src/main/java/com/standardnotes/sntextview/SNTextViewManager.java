@@ -1,5 +1,6 @@
 package com.standardnotes.sntextview;
 
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -12,8 +13,10 @@ import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.Spacing;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.ViewProps;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.annotations.ReactPropGroup;
+import com.facebook.react.views.text.DefaultStyleValuesUtil;
 
 import java.util.Map;
 
@@ -46,6 +49,27 @@ public class SNTextViewManager extends SimpleViewManager<SNTextView> {
         view.setText(text);
     }
 
+    @ReactProp(name = ViewProps.COLOR, customType = "Color")
+    public void setColor(SNTextView view, @Nullable Integer color) {
+        if (color != null) {
+            view.setTextColor(color);
+        }
+    }
+
+    @ReactProp(name = "selectionColor", customType = "Color")
+    public void setSelectionColor(SNTextView view, @Nullable Integer color) {
+        if (color != null) {
+            view.setHighlightColor(color);
+        }
+    }
+
+    @ReactPropGroup(names = {
+            "padding", "paddingLeft", "paddingRight", "paddingTop", "paddingBottom"
+    }, customType = "String")
+    public void setBorderColor(SNTextView view, int index, Integer padding) {
+        view.setContentPadding(PADDING_TYPES[index], padding);
+    }
+
     @ReactProp(name = "autoFocus")
     public void setAutoFocus(SNTextView view, boolean autoFocus) {
         view.setAutoFocus(autoFocus);
@@ -60,10 +84,4 @@ public class SNTextViewManager extends SimpleViewManager<SNTextView> {
         );
     }
 
-    @ReactPropGroup(names = {
-            "padding", "paddingLeft", "paddingRight", "paddingTop", "paddingBottom"
-    }, customType = "String")
-    public void setBorderColor(SNTextView view, int index, Integer padding) {
-        view.setContentPadding(PADDING_TYPES[index], padding);
-    }
 }

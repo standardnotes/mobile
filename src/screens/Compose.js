@@ -274,7 +274,12 @@ export default class Compose extends Abstract {
 
         {Platform.OS == "android" &&
           <View style={this.styles.noteTextContainer}>
-            <TextView style={this.styles.noteText} autoFocus={this.note.dummy} text={this.note.text} onChangeText={this.onTextChange}/>
+            <TextView style={this.styles.noteText}
+            autoFocus={this.note.dummy}
+            text={this.note.text}
+            selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
+            onChangeText={this.onTextChange}
+            />
           </View>
         }
 
@@ -343,7 +348,7 @@ export default class Compose extends Abstract {
         // fontSize: 17,
         marginTop: 0,
         paddingTop: 10,
-        // color: GlobalStyles.constants().mainTextColor,
+        color: GlobalStyles.constants().mainTextColor,
         paddingLeft: GlobalStyles.constants().paddingLeft,
         paddingRight: GlobalStyles.constants().paddingLeft,
         // textAlignVertical: 'top',

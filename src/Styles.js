@@ -74,6 +74,22 @@ export default class GlobalStyles {
     return styles;
   }
 
+  static constantForKey(key) {
+    var value = this.get().constants[key];
+
+    // For the platform value, if the active theme does not have a specific value, but the defaults do, we don't
+    // want to use the defaults, but instead just look at the activeTheme. Because default platform values only apply
+    // to the default theme
+    var platform = Platform.OS == "android" ? "Android" : "IOS";
+    var platformValue = this.get().activeTheme.mobileRules.constants[key+platform];
+
+    if(platformValue) {
+      return platformValue;
+    } else {
+      return value;
+    }
+  }
+
   systemTheme() {
     if(this._systemTheme) {
       return this._systemTheme;
@@ -143,6 +159,11 @@ export default class GlobalStyles {
     } else {
       url = theme.url + ".json";
     }
+
+    if(App.isAndroid && url.contains("localhost")) {
+      url = url.replace("localhost", "10.0.2.2");
+    }
+
     return Server.getInstance().getAbsolute(url, {}, function(response){
       // success
       if(response !== theme.mobileRules) {
@@ -199,17 +220,24 @@ export default class GlobalStyles {
 
   defaultConstants() {
     return {
+        composeBorderColor: "#F5F5F5",
         mainBackgroundColor: "white",
         mainTintColor: "#fb0206",
-        plainCellBorderColor: "#efefef",
-        sectionedCellHorizontalPadding: 14,
         mainDimColor: "gray",
         mainTextColor: "black",
-        selectedBackgroundColor: "#efefef",
-        paddingLeft: 14,
-        composeBorderColor: "#F5F5F5",
         mainTextFontSize: 16,
         mainHeaderFontSize: 16,
+
+        navBarColor: "white",
+        navBarTextColor: "#fb0206",
+
+        navBarColorAndroid: "#fb0206",
+        navBarTextColorAndroid: "white",
+
+        paddingLeft: 14,
+        plainCellBorderColor: "#efefef",
+        sectionedCellHorizontalPadding: 14,
+        selectedBackgroundColor: "#efefef",
       }
   }
 
@@ -335,6 +363,10 @@ export default class GlobalStyles {
 
   static darken(color) {
     return this.shadeBlend(-0.15, color);
+  }
+
+  static lighten(color) {
+    return this.shadeBlend(0.25, color);
   }
 
 }
