@@ -140,6 +140,8 @@ export default class Compose extends Abstract {
         onOptionsChange: (options) => {
           if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
             var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
+
+            console.log("Replacing note tags with", options.selectedTags, tags.map(function(tag){return tag.title}));
             this.note.replaceTags(tags);
             this.note.setDirty(true);
             this.changesMade();

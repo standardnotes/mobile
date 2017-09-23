@@ -64,13 +64,14 @@ export default class Note extends Item {
     super.removeReferencesNotPresentIn(references);
 
     var uuids = references.map(function(ref){return ref.uuid});
-    this.tags.forEach(function(tag){
+    this.tags.slice().forEach(function(tag){
       if(!uuids.includes(tag.uuid)) {
         _.pull(tag.notes, this);
         _.pull(this.tags, tag);
-        this.tags = Array.from(this.tags);
       }
     }.bind(this))
+
+    this.tags = Array.from(this.tags);
   }
 
   isBeingRemovedLocally() {
@@ -93,7 +94,8 @@ export default class Note extends Item {
   }
 
   replaceTags(newTags) {
-    for(var oldTag of this.tags) {
+    var oldTags = this.tags.slice(); // original array will be modified in the for loop so we make a copy
+    for(var oldTag of oldTags) {
       if(!newTags.includes(oldTag)) {
         oldTag.setDirty(true);
         this.removeItemAsRelationship(oldTag);

@@ -199,7 +199,7 @@ export default class ModelManager {
        }
      }
 
-     if(!_.find(this.items), item) {
+     if(!_.find(this.items, {uuid: item.uuid})) {
        this.items.push(item);
      }
     }.bind(this));

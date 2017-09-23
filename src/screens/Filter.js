@@ -182,10 +182,10 @@ export default class Filter extends Abstract {
     var tag = new Tag({title: text});
     tag.initUUID().then(() => {
       tag.setDirty(true);
+      console.log("Adding tag to mdoelmanager", tag);
       ModelManager.getInstance().addItem(tag);
       Sync.getInstance().sync();
       callback(tag);
-      this.tags.push(tag);
       this.forceUpdate();
     })
   }
@@ -213,6 +213,8 @@ export default class Filter extends Abstract {
         selectedTags.push(tag.uuid);
       }
     }
+
+    console.log("Setting selected tags", selectedTags);
 
     this.selectedTags = selectedTags.slice();
     this.options.setSelectedTags(selectedTags);
