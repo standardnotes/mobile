@@ -65,7 +65,8 @@ export default class Notes extends Abstract {
   }
 
   _handleAppStateChange = (nextAppState) => {
-    if ( nextAppState === 'active') {
+    // we only want to perform sync here if the app is resuming, not if it's a fresh start
+    if(this.dataLoaded && nextAppState === 'active') {
       Sync.getInstance().sync();
     }
   }
@@ -83,14 +84,13 @@ export default class Notes extends Abstract {
     this.optionsObserver = this.options.addChangeObserver((options) => {
       this.reloadList(true);
       // On iOS, configureNavBar would be handle by viewWillAppear. However, we're using a drawer in Android.
-      if(Platform.OS == "android") {
+      if(Platform.OS == "android" && !this.skipUpdatingNavBar) {
         this.configureNavBar();
       }
     })
 
     this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade, retrieved, saved, unsaved){
       if(_.find(retrieved, {content_type: "Note"}) || _.find(unsaved, {content_type: "Note"})) {
-        console.log("===Note Changes Pulled===");
         this.reloadList();
       }
       this.mergeState({refreshing: false, loading: false});
@@ -129,11 +129,10 @@ export default class Notes extends Abstract {
         this.reloadList();
         this.configureNavBar(true);
         this.mergeState({decrypting: false, loading: false});
+        // perform initial sync
+        Sync.getInstance().sync(null);
       }.bind(this), 0);
     }.bind(this));
-
-    // perform initial sync
-    Sync.getInstance().sync(null);
   }
 
   configureNavBar(initial = false) {
@@ -302,6 +301,7 @@ export default class Notes extends Abstract {
   }
 
   _onRefresh() {
+    console.log("On refresh sync");
     this.setState({refreshing: true});
     Sync.getInstance().sync();
   }
@@ -333,11 +333,15 @@ export default class Notes extends Abstract {
   }
 
   onSearchTextChange = (text) => {
+    this.skipUpdatingNavBar = true;
     this.options.setSearchTerm(text);
+    this.skipUpdatingNavBar = false;
   }
 
   onSearchCancel = () => {
+    this.skipUpdatingNavBar = true;
     this.options.setSearchTerm(null);
+    this.skipUpdatingNavBar = false;
   }
 
   render() {

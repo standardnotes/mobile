@@ -7,31 +7,44 @@ import ButtonCell from "../../components/ButtonCell";
 import TableSection from "../../components/TableSection";
 import SectionedTableCell from "../../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../../components/SectionedAccessoryTableCell";
+import AbstractComponent from "../../components/AbstractComponent"
 
 var _ = require('lodash')
 
-export default class AuthSection extends Component {
+const DEFAULT_SIGN_IN_TEXT = "Sign In";
+const DEFAULT_REGISTER_TEXT = "Register";
+
+export default class AuthSection extends AbstractComponent {
   constructor(props) {
     super(props);
-    this.state = _.merge(props.params, {signingIn: false});
+    this.state = _.merge(props.params, {
+      signingIn: false,
+      registering: false,
+      signInButtonText: DEFAULT_SIGN_IN_TEXT,
+      registerButtonText: DEFAULT_REGISTER_TEXT
+    });
   }
 
   showAdvanced = () => {
-    this.setState(function(prevState){
-      return _.merge(prevState, {showAdvanced: true});
+    this.mergeState({showAdvanced: true});
+  }
+
+  onSignInPress = () => {
+    this.mergeState({signingIn: true, signInButtonText: "Generating Keys..."});
+    this.props.onSignInPress(this.state, (success) => {
+      if(!success) {
+        this.mergeState({signingIn: false, signInButtonText: DEFAULT_SIGN_IN_TEXT});
+      }
     })
   }
 
-  onSignInPress() {
-    this.setState(function(prevState){
-      return _.merge(prevState, {signingIn: true});
+  onRegisterPress = () => {
+    this.mergeState({registering: true, registerButtonText: "Generating Keys..."});
+    this.props.onRegisterPress(this.state, (success) => {
+      if(!success) {
+        this.mergeState({registering: false, registerButtonText: DEFAULT_REGISTER_TEXT});
+      }
     })
-
-    this.props.onSignInPress(this.state, function(){
-      this.setState(function(prevState){
-        return _.merge(prevState, {signingIn: false});
-      })
-    }.bind(this))
   }
 
   render() {
@@ -65,7 +78,7 @@ export default class AuthSection extends Component {
           />
         </SectionedTableCell>
 
-        {this.state.showAdvanced &&
+        {(this.state.showAdvanced || !this.state.server) &&
           <SectionedTableCell textInputCell={true}>
             <TextInput
               style={GlobalStyles.styles().sectionedTableCellTextInput}
@@ -82,11 +95,11 @@ export default class AuthSection extends Component {
         }
 
         <SectionedTableCell buttonCell={true}>
-          <ButtonCell disabled={this.state.signingIn} title={this.state.signingIn ? "Signing in..." : "Sign In"} bold={true} onPress={() => this.onSignInPress()} />
+          <ButtonCell title={this.state.signInButtonText} disabled={this.state.signingIn} bold={true} onPress={() => this.onSignInPress()} />
         </SectionedTableCell>
 
         <SectionedTableCell buttonCell={true}>
-          <ButtonCell title="Register" bold={true}  onPress={() => this.props.onRegisterPress(this.state)} />
+          <ButtonCell title={this.state.registerButtonText} disabled={this.state.registering} bold={true} onPress={() => this.onRegisterPress()} />
         </SectionedTableCell>
 
         {!this.state.showAdvanced &&

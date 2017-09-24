@@ -22,8 +22,11 @@ import OptionsState from "./OptionsState"
 import { Client } from 'bugsnag-react-native';
 var _ = require('lodash');
 
-if(!__DEV__) {
+if(__DEV__ === false) {
   const bugsnag = new Client()
+
+  // Disable console.log for non-dev builds
+  console.log = () => {};
 }
 
 registerScreens();

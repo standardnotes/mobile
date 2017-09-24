@@ -4,6 +4,8 @@ import Abstract from "./Abstract"
 import GlobalStyles from "../Styles"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import {Text, View, Button, StyleSheet, Platform} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import App from "../app"
 
 export default class Fingerprint extends Abstract {
 
@@ -100,6 +102,8 @@ export default class Fingerprint extends Abstract {
   render() {
     return (
       <View style={[GlobalStyles.styles().container, this.styles.container]}>
+
+        <Icon style={{marginBottom: 20}} name={App.isAndroid ? "md-finger-print" : 'ios-finger-print'} size={50} color={GlobalStyles.constants().mainTextColor} />
         <Text style={this.styles.text}>Please scan your fingerprint</Text>
 
         {this.state.error &&

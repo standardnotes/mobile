@@ -48,7 +48,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
     if(Platform.OS == "android") {
       iconSize -= 5;
-      iconStyles.paddingTop = left ? 13 : 4;
+      iconStyles.paddingTop = left ? 11 : 4;
       color = GlobalStyles.constants().mainDimColor;
     }
 
@@ -65,11 +65,9 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     var textStyles = [GlobalStyles.styles().sectionedAccessoryTableCellLabel];
     if(this.props.leftAlignIcon) {
       textStyles.push({
-        marginTop: iconStyles.marginTop + 4,
-        paddingTop: 0,
         position: "absolute",
         left: iconStyles.left + iconStyles.width + 12,
-        top: iconStyles.top + 12
+        top: iconStyles.top
       });
     }
     if(this.props.bold) {

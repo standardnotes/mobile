@@ -20,11 +20,20 @@ import {
   Keyboard
 } from 'react-native';
 
+const SAVE_BUTTON_DEFAULT_TEXT = "Save";
+const UNLOCK_BUTTON_DEFAULT_TEXT = "Unlock";
+
 export default class Authenticate extends Abstract {
 
   constructor(props) {
     super(props);
-    this.state = {passcode: null};
+    this.state = {
+      passcode: null,
+      setupButtonText: SAVE_BUTTON_DEFAULT_TEXT,
+      unlockButtonText: UNLOCK_BUTTON_DEFAULT_TEXT,
+      setupButtonEnabled: true,
+      unlockButtonEnabled: true,
+    };
   }
 
   defaultPasswordParams() {
@@ -67,6 +76,8 @@ export default class Authenticate extends Abstract {
       return;
     }
 
+    this.mergeState({setupButtonText: "Generating Keys...", setupButtonEnabled: false})
+
     var salt = await Crypto.generateRandomKey(256);
     var params = _.merge(this.defaultPasswordParams(), {pw_salt: salt});
 
@@ -80,13 +91,15 @@ export default class Authenticate extends Abstract {
 
         this.dismissModal();
       } else {
+        this.mergeState({setupButtonText: SAVE_BUTTON_DEFAULT_TEXT, setupButtonEnabled: true});
         Alert.alert("Passcode Error", "There was an error setting up your passcode. Please try again.");
       }
     }.bind(this));
   }
 
   async onUnlockPress() {
-    var invalid = function() {
+    var invalid = () => {
+      this.mergeState({unlockButtonText: UNLOCK_BUTTON_DEFAULT_TEXT, unlockButtonEnabled: true});
       Alert.alert('Invalid Passcode', "Please enter a valid passcode and try again.", [{text: 'OK'}])
     }
 
@@ -95,6 +108,8 @@ export default class Authenticate extends Abstract {
       invalid();
       return;
     }
+
+    this.mergeState({unlockButtonText: "Generating Keys...", unlockButtonEnabled: false})
 
     var params = KeysManager.get().offlineAuthParams;
 
@@ -107,7 +122,6 @@ export default class Authenticate extends Abstract {
         invalid();
       }
     }.bind(this));
-
   }
 
   render() {
@@ -134,7 +148,7 @@ export default class Authenticate extends Abstract {
               </SectionedTableCell>
 
               <SectionedTableCell buttonCell={true}>
-                  <ButtonCell title={"Unlock"} bold={true} onPress={() => this.onUnlockPress()} />
+                  <ButtonCell title={this.state.unlockButtonText} disabled={!this.state.unlockButtonEnabled} bold={true} onPress={() => this.onUnlockPress()} />
               </SectionedTableCell>
             </View>
           }
@@ -159,7 +173,7 @@ export default class Authenticate extends Abstract {
               </SectionedTableCell>
 
               <SectionedTableCell buttonCell={true}>
-                  <ButtonCell title={"Save"} bold={true} onPress={() => this.onSavePress()} />
+                  <ButtonCell title={this.state.setupButtonText} disabled={!this.state.setupButtonEnabled} bold={true} onPress={() => this.onSavePress()} />
               </SectionedTableCell>
             </View>
           }

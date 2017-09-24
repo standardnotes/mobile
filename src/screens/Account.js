@@ -35,7 +35,7 @@ export default class Account extends Abstract {
   constructor(props) {
     super(props);
 
-    this.state = {ready: false};
+    this.state = {ready: false, params: {}};
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
       this.applicationIsReady = true;
@@ -130,6 +130,7 @@ export default class Account extends Abstract {
     var password = params.password;
 
     if(!this.validate(email, password)) {
+      if(callback) {callback(false);}
       return;
     }
 
@@ -138,21 +139,24 @@ export default class Account extends Abstract {
         Alert.alert(
           'Oops', error.message, [{text: 'OK'}]
         )
-        callback();
+        if(callback) {callback(false);}
         return;
       }
 
       this.onAuthSuccess();
-      callback();
+      if(callback) {
+        callback(true);
+      }
     }.bind(this));
   }
 
-  onRegisterPress = (params) => {
+  onRegisterPress = (params, callback) => {
     Keyboard.dismiss();
     var email = params.email;
     var password = params.password;
 
     if(!this.validate(email, password)) {
+      if(callback) {callback(false);}
       return;
     }
 
@@ -182,10 +186,12 @@ export default class Account extends Abstract {
     this.mergeState({confirmRegistration: false});
   }
 
-  markAllDataDirtyAndSync() {
+  markAllDataDirtyAndSync(updateAfter = false) {
     Sync.getInstance().markAllItemsDirtyAndSaveOffline();
     Sync.getInstance().sync(function(response){
-      this.forceUpdate();
+      if(updateAfter) {
+        this.forceUpdate();
+      }
     }.bind(this));
   }
 
@@ -267,7 +273,7 @@ export default class Account extends Abstract {
         onSetupSuccess: () => {
           var encryptionSource = KeysManager.get().encryptionSource();
           if(encryptionSource == "offline") {
-            this.markAllDataDirtyAndSync();
+            this.markAllDataDirtyAndSync(true);
           }
         }
       }
@@ -290,7 +296,7 @@ export default class Account extends Abstract {
 
         if(encryptionSource == "offline") {
           // remove encryption from all items
-          this.markAllDataDirtyAndSync();
+          this.markAllDataDirtyAndSync(true);
         }
 
         this.mergeState({hasPasscode: !result});
@@ -336,8 +342,13 @@ export default class Account extends Abstract {
         <ScrollView style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
 
           {!signedIn && !this.state.confirmRegistration &&
-            <AuthSection params={this.state.params} confirmRegistration={this.state.confirmRegistration}
-            title={"Account"} onSignInPress={this.onSignInPress} onRegisterPress={this.onRegisterPress} />
+            <AuthSection
+              params={this.state.params}
+              confirmRegistration={this.state.confirmRegistration}
+              title={"Account"}
+              onSignInPress={this.onSignInPress}
+              onRegisterPress={this.onRegisterPress}
+            />
           }
 
           {this.state.confirmRegistration &&
