@@ -98,7 +98,6 @@ public class SNTextViewManager extends SimpleViewManager<SNTextView> {
     @Override
     public void receiveCommand(SNTextView view, int commandType, @Nullable ReadableArray args) {
         Assertions.assertNotNull(view);
-        Assertions.assertNotNull(args);
         switch (commandType) {
             case COMMAND_BLUR: {
                 view.blur();

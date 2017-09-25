@@ -116,8 +116,10 @@ export default class Compose extends Abstract {
   }
 
   showOptions() {
+    if(App.isAndroid) {
+      this.input.blur();
+    }
 
-    this.input.blur();
     this.previousOptions = {selectedTags: this.note.tags.map(function(tag){return tag.uuid})};
     this.props.navigator.push({
       screen: 'sn.Filter',

@@ -82,7 +82,7 @@ export default class NoteList extends Component {
 
         <FlatList style={{height: "100%"}}
           initialNumToRender={6}
-          windowSize={4}
+          windowSize={6}
           maxToRenderPerBatch={6}
           keyboardDismissMode={'interactive'}
           keyboardShouldPersistTaps={'always'}

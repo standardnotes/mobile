@@ -21,7 +21,7 @@
         self.contentInset = UIEdgeInsetsZero;
     
         [[NSNotificationCenter defaultCenter] addObserverForName:UIKeyboardDidShowNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull note) {
-            CGSize keyboardSize = [[[note userInfo] objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+            CGSize keyboardSize = [[[note userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
             UIEdgeInsets insets = UIEdgeInsetsMake(0, 0, keyboardSize.height, 0);
             weakself.contentInset = insets;
             weakself.scrollIndicatorInsets = insets;

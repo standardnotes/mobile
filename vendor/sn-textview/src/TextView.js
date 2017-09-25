@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {requireNativeComponent, View, TextInput, findNodeHandle, UIManager, Platform} from 'react-native';
 
-export default class TextView extends TextInput {
+export default class TextView extends Component {
   constructor(props) {
     super(props);
   }
@@ -13,6 +13,10 @@ export default class TextView extends TextInput {
 
   blur() {
     UIManager.dispatchViewManagerCommand(findNodeHandle(this.ref), UIManager.SNTextView.Commands.blur, []);
+  }
+
+  focus() {
+    this.ref.focus();
   }
 
   render() {

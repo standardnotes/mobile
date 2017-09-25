@@ -67,10 +67,10 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
       textStyles.push({
         position: "absolute",
         left: iconStyles.left + iconStyles.width + 12,
-        top: iconStyles.top
+        top: 0
       });
     }
-    if(this.props.bold) {
+    if(this.props.bold || (this.props.selected && this.props.selected())) {
       textStyles.push(GlobalStyles.styles().bold)
     }
     if(this.props.tinted) {
