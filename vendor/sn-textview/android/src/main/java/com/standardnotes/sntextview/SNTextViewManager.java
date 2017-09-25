@@ -117,8 +117,8 @@ public class SNTextViewManager extends SimpleViewManager<SNTextView> {
     @Override
     public @Nullable Map getExportedCustomDirectEventTypeConstants() {
         return MapBuilder.of(
-                "onChangeTextValue",
-                MapBuilder.of("registrationName", "onChangeTextValue")
+                "onChangeText",
+                MapBuilder.of("registrationName", "onChangeText")
         );
     }
 

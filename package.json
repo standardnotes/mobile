@@ -12,7 +12,7 @@
     "immutable": "^3.8.1",
     "lodash": "^4.17.4",
     "react": "16.0.0-beta.5",
-    "react-native": "^0.48.3",
+    "react-native": "^0.48.4",
     "react-native-keychain": "^1.2.1",
     "react-native-search-box": "0.0.11",
     "react-native-vector-icons": "^4.3.0"

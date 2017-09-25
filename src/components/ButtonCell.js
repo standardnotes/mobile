@@ -6,7 +6,7 @@ import GlobalStyles from "../Styles"
 export default class ButtonCell extends Component {
 
   rules() {
-    var rules = [GlobalStyles.styles().buttonCellButton];
+    var rules = [GlobalStyles.stylesForKey("buttonCellButton")];
     if(this.props.leftAligned) { rules.push(GlobalStyles.styles().buttonCellButtonLeft) }
     if(this.props.bold) { rules.push(GlobalStyles.styles().bold) }
     if(this.props.disabled) { rules.push({color: "gray", opacity: 0.6}) }

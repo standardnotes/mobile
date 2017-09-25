@@ -3,17 +3,12 @@ package com.standardnotes.sntextview;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -26,12 +21,13 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.Spacing;
+import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.facebook.react.views.textinput.ReactEditText;
 
 import java.lang.reflect.Field;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static java.security.AccessController.getContext;
 
 /**
  * Created by mo on 9/20/17.
@@ -41,7 +37,8 @@ public class SNTextView extends LinearLayout {
 
     private EditText editText;
     private ScrollView scrollView;
-    private Boolean ignoreNextTextEvent = false;
+    private Boolean ignoreNextLocalTextChange = false;
+    private Boolean ignoreNextIncomingTextChange = false;
 
     @SuppressLint("ResourceAsColor")
     public SNTextView(Context context) {
@@ -58,19 +55,46 @@ public class SNTextView extends LinearLayout {
         editText.setGravity(Gravity.TOP);
 
         editText.addTextChangedListener(new TextWatcher() {
+            private EventDispatcher mEventDispatcher;
+            private ReactEditText mEditText;
+            private String mPreviousText;
+
             @Override
             public void afterTextChanged(Editable s) {}
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mPreviousText = s.toString();
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(ignoreNextTextEvent) {
-                    ignoreNextTextEvent = false;
+                // Rearranging the text (i.e. changing between singleline and multiline attributes) can
+                // also trigger onTextChanged, call the event in JS only when the text actually changed
+                if (count == 0 && before == 0) {
                     return;
                 }
-                textDidChange(s.toString());
+
+
+                String newText = s.toString().substring(start, start + count);
+                String oldText = mPreviousText.substring(start, start + before);
+                // Don't send same text changes
+                if (count == before && newText.equals(oldText)) {
+                    return;
+                }
+
+                if(ignoreNextLocalTextChange) {
+                    ignoreNextLocalTextChange = false;
+                    return;
+                }
+
+                WritableMap event = Arguments.createMap();
+                event.putString("text", s.toString());
+
+                final Context context = getContext();
+                if (context instanceof ReactContext) {
+                    ((ReactContext) context).getJSModule(RCTEventEmitter.class).receiveEvent(getId(),"onChangeText", event);
+                }
             }
         });
 
@@ -83,9 +107,8 @@ public class SNTextView extends LinearLayout {
         super.onLayout(changed, left, top, right, bottom);
     }
 
-
     public void setText(String text) {
-        ignoreNextTextEvent = true;
+        ignoreNextLocalTextChange = true;
         editText.setText(text);
     }
 
@@ -153,13 +176,4 @@ public class SNTextView extends LinearLayout {
         }
     }
 
-    public void textDidChange(String text) {
-        WritableMap event = Arguments.createMap();
-        event.putString("message", editText.getText().toString());
-
-        final Context context = getContext();
-        if (context instanceof ReactContext) {
-            ((ReactContext) context).getJSModule(RCTEventEmitter.class).receiveEvent(getId(),"onChangeTextValue", event);
-        }
-    }
 }

@@ -38,7 +38,7 @@ export default class GlobalStyles {
         theme.active = true;
         this.activeTheme = theme;
         var constants = this.defaultConstants();
-        this.setStyles(this.defaultRules(constants), constants, constants.statusBar);
+        this.setStyles(this.defaultRules(constants), constants, theme.mobileRules.statusBar);
       }
     }.bind(this));
   }
@@ -224,7 +224,7 @@ export default class GlobalStyles {
         mainBackgroundColor: "#ffffff",
         mainTintColor: "#fb0206",
         mainDimColor: "#9d9d9d",
-        mainTextColor: "black",
+        mainTextColor: "#000000",
         mainTextFontSize: 16,
         mainHeaderFontSize: 16,
 
@@ -318,9 +318,9 @@ export default class GlobalStyles {
       },
 
       sectionedAccessoryTableCellLabel: {
-        paddingTop: 10,
         fontSize: constants.mainTextFontSize,
         color: constants.mainTextColor,
+        paddingTop: 12,
       },
 
       buttonCell: {
@@ -337,12 +337,34 @@ export default class GlobalStyles {
         color: Platform.OS == "android" ? constants.mainTextColor : constants.mainTintColor,
         fontSize: constants.mainTextFontSize,
         height: "100%",
-        paddingTop: 10,
+        paddingTop: 13,
+      },
+
+      buttonCellButtonAndroid: {
+        paddingTop: 11
       },
 
       buttonCellButtonLeft: {
         textAlign: "left",
         paddingLeft: constants.paddingLeft
+      },
+
+      noteText: {
+        flexGrow: 1,
+        fontSize: 17,
+        marginTop: 0,
+        paddingTop: 10,
+        color: constants.mainTextColor,
+        paddingLeft: constants.paddingLeft,
+        paddingRight: constants.paddingLeft,
+        paddingBottom: 10,
+        // textAlignVertical: 'top',
+        // lineHeight: 22,
+      },
+
+      noteTextIOS: {
+        paddingLeft: constants.paddingLeft - 5,
+        paddingRight: constants.paddingLeft - 5,
       },
 
       bold: {

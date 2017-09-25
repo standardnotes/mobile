@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {requireNativeComponent, View, TextInput, findNodeHandle, UIManager} from 'react-native';
+import {requireNativeComponent, View, TextInput, findNodeHandle, UIManager, Platform} from 'react-native';
 
-export default class TextView extends Component {
+export default class TextView extends TextInput {
   constructor(props) {
     super(props);
   }
 
   onChangeText = (event) => {
-    this.props.onChangeText(event.nativeEvent.message);
+    this.props.onChangeText(event.nativeEvent.text);
   }
 
   blur() {
@@ -16,7 +16,26 @@ export default class TextView extends Component {
   }
 
   render() {
-    return <SNTextView ref={(ref) => this.ref = ref} {...this.props} onChangeTextValue={this.onChangeText} />
+    if(Platform.OS == "android") {
+      const container =
+        <SNTextView
+          {...this.props}
+          ref={(ref) => this.ref = ref}
+          text={this.props.value}
+          onChangeText={this.onChangeText}
+        />
+      return container;
+    } else {
+      return (
+        <SNTextView
+          {...this.props}
+          ref={(ref) => this.ref = ref}
+          text={this.props.value}
+          onChangeText={this.onChangeText}
+        />
+      )
+
+    }
   }
 }
 
@@ -24,6 +43,11 @@ TextView.propTypes = {
   onChangeText: PropTypes.func,
   text: PropTypes.string,
   autoFocus: PropTypes.bool,
+  keyboardDismissMode: PropTypes.oneOf([
+      'none', // default
+      'on-drag', // Cross-platform
+      'interactive', // iOS-only
+    ]),
   ...TextInput.propTypes
 }
 

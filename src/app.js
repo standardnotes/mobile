@@ -110,6 +110,10 @@ export default class App {
     return this.get().isAndroid;
   }
 
+  static get isIOS() {
+    return this.get().isIOS;
+  }
+
   get isAndroid() {
     return this._isAndroid;
   }
@@ -310,20 +314,6 @@ export default class App {
     // recursion
     this.isStartingApp = true;
 
-    let drawer = {
-      left: {
-        screen: 'sn.Filter',
-        passProps: {
-          singleSelectMode: true,
-          options: JSON.stringify(this.optionsState),
-          onOptionsChange: (options) => {
-            this.optionsState.mergeWith(options);
-          }
-        }
-      },
-      disableOpenGesture: false
-    };
-
     if(this.isIOS) {
       let tabs = [{
         label: 'Notes',
@@ -343,11 +333,24 @@ export default class App {
           animationType: this.isIOS ? 'slide-down' : 'fade',
           tabsStyle: _.clone(this.tabStyles), // for iOS
           appStyle: _.clone(this.tabStyles), // for Android
-          drawer: drawer,
           animationType: 'none'
         }
       );
     } else {
+      let drawer = {
+        left: {
+          screen: 'sn.Filter',
+          passProps: {
+            singleSelectMode: true,
+            options: JSON.stringify(this.optionsState),
+            onOptionsChange: (options) => {
+              this.optionsState.mergeWith(options);
+            }
+          }
+        },
+        disableOpenGesture: false
+      };
+
       Navigation.startSingleScreenApp(
         {
           screen: {

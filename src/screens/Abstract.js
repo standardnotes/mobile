@@ -61,6 +61,10 @@ export default class Abstract extends Component {
     this.props.navigator.dismissModal({animationType: "slide-down"})
   }
 
+  viewDidAppear() {
+    this.visible = true;
+  }
+
   onNavigatorEvent(event) {
 
     switch(event.id) {
@@ -69,7 +73,7 @@ export default class Abstract extends Component {
         this.configureNavBar(false);
        break;
       case 'didAppear':
-        this.visible = true;
+        this.viewDidAppear();
         break;
       case 'willDisappear':
         this.willBeVisible = false;

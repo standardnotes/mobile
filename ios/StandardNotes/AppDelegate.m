@@ -13,6 +13,7 @@
 #import "RCCManager.h"
 #import <React/RCTRootView.h>
 #import <BugsnagReactNative/BugsnagReactNative.h>
+#import "RCTTextView.h"
 
 @implementation AppDelegate
 

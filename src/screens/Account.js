@@ -104,7 +104,7 @@ export default class Account extends Abstract {
 
     if (event.type == 'NavBarButtonPress') {
       if (event.id == 'cancel') {
-        this.dismissModal();
+        this.returnToNotesScreen();
       }
     }
   }
@@ -152,6 +152,7 @@ export default class Account extends Abstract {
 
   onRegisterPress = (params, callback) => {
     Keyboard.dismiss();
+    
     var email = params.email;
     var password = params.password;
 
@@ -197,7 +198,18 @@ export default class Account extends Abstract {
 
   onAuthSuccess = () => {
     this.markAllDataDirtyAndSync();
-    this.dismissModal();
+    this.returnToNotesScreen();
+  }
+
+  returnToNotesScreen = () => {
+    if(App.isIOS) {
+      this.props.navigator.switchToTab({
+        tabIndex: 0
+      });
+      this.forceUpdate();
+    } else {
+      this.dismissModal();
+    }
   }
 
   onSignOutPress = () => {

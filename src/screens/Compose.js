@@ -5,23 +5,18 @@ import ModelManager from '../lib/modelManager'
 import Note from '../models/app/note'
 import Abstract from "./Abstract"
 import Icons from '../Icons';
-var dismissKeyboard = require('dismissKeyboard');
+import App from '../app'
 var _ = require('lodash');
 
 import TextView from "sn-textview";
 
 import {
-  AppRegistry,
   StyleSheet,
   TextInput,
   View,
-  FlatList,
-  TouchableHighlight,
-  ScrollView,
-  Text,
-  Keyboard,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Keyboard
 } from 'react-native';
 
 import GlobalStyles from "../Styles"
@@ -34,48 +29,42 @@ export default class Compose extends Abstract {
 
   constructor(props) {
     super(props);
-    this.state = {};
-    var note = ModelManager.getInstance().findItem(this.props.noteId);
+    var note = ModelManager.getInstance().findItem(props.noteId);
     if(!note) {
       note = new Note({});
       note.dummy = true;
     }
 
     this.note = note;
+    this.state = {title: note.title, text: note.text};
 
     this.loadStyles();
 
     this.syncObserver = Sync.getInstance().registerSyncObserver((changesMade, retreived, saved) => {
       if(retreived && this.note.uuid && retreived.map((i) => i.uuid).includes(this.note.uuid)) {
-        this.forceUpdate();
+        this.mergeState({title: this.note.title, text: this.note.text});
       }
     });
   }
 
-  onContentSizeChange = (c) => {
-    // This function must not be deleted. This is called by TextInput on onContentSizeChange
-    // It for some reason makes it so that TextInput starts at the top and not the bottom for a long note
-  }
-
   componentWillMount () {
     super.componentWillMount();
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
-    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
-  }
-
-  _keyboardDidShow = () => {
-    this.mergeState({keyboard: true})
-  }
-
-  _keyboardDidHide = () => {
-    this.mergeState({keyboard: false})
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    this.keyboardDidShowListener.remove();
-    this.keyboardDidHideListener.remove();
     Sync.getInstance().removeSyncObserver(this.syncObserver);
+  }
+
+  viewDidAppear() {
+    super.viewDidAppear();
+
+    // Autofocus doesn't work properly on iOS due to navigation push, so we'll focus manually
+    if(App.isIOS) {
+      if(this.note.dummy) {
+        this.input.focus();
+      }
+    }
   }
 
   configureNavBar(initial) {
@@ -90,7 +79,6 @@ export default class Compose extends Abstract {
       title: "Manage",
       id: 'tags',
       showAsAction: 'ifRoom',
-      // buttonColor: GlobalStyles.constants().mainTintColor,
     }
 
     if(Platform.OS === "android") {
@@ -128,6 +116,7 @@ export default class Compose extends Abstract {
   }
 
   showOptions() {
+
     this.input.blur();
     this.previousOptions = {selectedTags: this.note.tags.map(function(tag){return tag.uuid})};
     this.props.navigator.push({
@@ -236,20 +225,11 @@ export default class Compose extends Abstract {
       subtitle: title
     });
 
+    var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
     this.props.navigator.setStyle({
-      navBarSubtitleColor: GlobalStyles.hexToRGBA(GlobalStyles.constantForKey("navBarTextColor"), 0.5),
+      navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
       navBarSubtitleFontSize: 12
     });
-  }
-
-  onTextFocus = () => {
-    // in order to call blur() later, we need to focus here manually, even though it does nothing
-    // this.refs.input.focus();
-    this.isFocused = true;
-  }
-
-  onTextBlur = () =>  {
-    this.isFocused = false;
   }
 
   render() {
@@ -257,16 +237,12 @@ export default class Compose extends Abstract {
       return (<View></View>);
     }
 
-    var textBottomPadding = 10;
-    var keyboardBehavior = Platform.OS == "android" ? "height" : "padding";
-    var keyboardOffset = this.rawStyles.noteTitle.height + this.rawStyles.noteText.paddingTop + (Platform.OS == "android" ? 15 : 0);
-
     return (
       <View style={[this.styles.container, GlobalStyles.styles().container]}>
         <TextInput
           style={this.styles.noteTitle}
           onChangeText={this.onTitleChange}
-          value={this.note.title}
+          value={this.state.title}
           placeholder={"Add Title"}
           selectionColor={GlobalStyles.constants().mainTintColor}
           underlineColorAndroid={'transparent'}
@@ -275,10 +251,10 @@ export default class Compose extends Abstract {
 
         {Platform.OS == "android" &&
           <View style={this.styles.noteTextContainer}>
-            <TextView style={this.styles.noteText}
+            <TextView style={[GlobalStyles.stylesForKey("noteText")]}
               ref={(ref) => this.input = ref}
               autoFocus={this.note.dummy}
-              text={this.note.text}
+              value={this.note.text}
               selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
               onChangeText={this.onTextChange}
             />
@@ -286,27 +262,16 @@ export default class Compose extends Abstract {
         }
 
         {Platform.OS == "ios" &&
-          <KeyboardAvoidingView style={[this.styles.textContainer]} keyboardVerticalOffset={keyboardOffset} behavior={keyboardBehavior}>
-              <TextInput
-                  style={[this.styles.noteText, {paddingBottom: textBottomPadding}]}
-                  onChangeText={this.onTextChange}
-                  multiline={true}
-                  autoFocus={this.note.dummy}
-                  value={this.note.text}
-                  ref={'input'}
-                  onFocus={this.onTextFocus}
-                  onBlur={this.onTextBlur}
-                  selectionColor={GlobalStyles.constants().mainTintColor}
-                  underlineColorAndroid={'transparent'}
-                  keyboardDismissMode={'interactive'}
-                  textAlignVertical={'top'}
-                  textAlign={'left'}
-                  onScroll={() => {}}
-                  onContentSizeChange={this.onContentSizeChange}
-                  autoCapitalize={'sentences'}
-                />
 
-              </KeyboardAvoidingView>
+          <TextView style={[...GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10}]}
+            ref={(ref) => this.input = ref}
+            autoFocus={false}
+            value={this.note.text}
+            keyboardDismissMode={'interactive'}
+            selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
+            onChangeText={this.onTextChange}
+          />
+
         }
       </View>
     );
@@ -343,19 +308,8 @@ export default class Compose extends Abstract {
 
       noteTextContainer: {
         flexGrow: 1,
+        flex: 1,
       },
-
-      noteText: {
-        flexGrow: 1,
-        // fontSize: 17,
-        marginTop: 0,
-        paddingTop: 10,
-        color: GlobalStyles.constants().mainTextColor,
-        paddingLeft: GlobalStyles.constants().paddingLeft,
-        paddingRight: GlobalStyles.constants().paddingLeft,
-        // textAlignVertical: 'top',
-        // lineHeight: 22,
-      }
     }
 
     this.styles = StyleSheet.create(this.rawStyles);
