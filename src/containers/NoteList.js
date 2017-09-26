@@ -41,7 +41,7 @@ export default class NoteList extends Component {
           backgroundColor={GlobalStyles.constants().mainBackgroundColor}
           titleCancelColor={GlobalStyles.constants().mainTintColor}
           keyboardDismissMode={'interactive'}
-          inputStyle={{backgroundColor: GlobalStyles.constants().plainCellBorderColor}}
+          inputStyle={{backgroundColor: GlobalStyles.constants().plainCellBorderColor, color: GlobalStyles.constants().mainTextColor}}
         />
       </View>
     );
