@@ -55,6 +55,7 @@ export default class App {
     this.lockStatusObservers = [];
     this._isAndroid = Platform.OS === "android";
 
+    console.log("Locale", this.getLocale());
     // Configure Moment locale
     moment.locale(this.getLocale());
 
@@ -92,7 +93,7 @@ export default class App {
     if (Platform.OS === 'android') {
       return NativeModules.I18nManager.localeIdentifier;
     } else {
-      return NativeModules.SettingsManager.settings.AppleLocale.replace(/_/, '-');
+      return NativeModules.SettingsManager.settings.AppleLocale;
     }
   }
 

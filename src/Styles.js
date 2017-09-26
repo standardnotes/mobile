@@ -307,27 +307,20 @@ export default class GlobalStyles {
       },
 
       sectionedAccessoryTableCell: {
-        paddingLeft: constants.paddingLeft,
-        paddingRight: constants.paddingLeft,
-      },
-
-      sectionedAccessoryTableCellAndroid: {
-
+        paddingTop: 0
       },
 
       sectionedAccessoryTableCellLabel: {
+        marginTop: 13,
         fontSize: constants.mainTextFontSize,
         color: constants.mainTextColor,
-        // paddingTop: 12,
       },
 
       buttonCell: {
         paddingTop: 0,
         paddingBottom: 0,
-        backgroundColor: constants.mainBackgroundColor,
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        justifyContent: 'center'
       },
 
       buttonCellButton: {
@@ -337,13 +330,8 @@ export default class GlobalStyles {
         fontSize: constants.mainTextFontSize,
       },
 
-      buttonCellButtonAndroid: {
-        // paddingTop: 11
-      },
-
       buttonCellButtonLeft: {
         textAlign: "left",
-        paddingLeft: constants.paddingLeft
       },
 
       noteText: {
