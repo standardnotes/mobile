@@ -250,7 +250,7 @@ export default class GlobalStyles {
 
       flexContainer: {
         flex: 1,
-        flexDirection: 'row',
+        flexDirection: 'column',
       },
 
       uiText: {
@@ -269,7 +269,6 @@ export default class GlobalStyles {
       },
 
       sectionHeader: {
-        color: constants.mainDimColor,
         fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
         paddingBottom: 10,
@@ -278,7 +277,6 @@ export default class GlobalStyles {
       },
 
       sectionHeaderAndroid: {
-        color: constants.mainDimColor,
         fontSize: constants.mainTextFontSize - 2,
       },
 
@@ -320,27 +318,27 @@ export default class GlobalStyles {
       sectionedAccessoryTableCellLabel: {
         fontSize: constants.mainTextFontSize,
         color: constants.mainTextColor,
-        paddingTop: 12,
+        // paddingTop: 12,
       },
 
       buttonCell: {
-        paddingLeft: 0,
         paddingTop: 0,
-        minHeight: 45,
-        flexGrow: 0,
+        paddingBottom: 0,
         backgroundColor: constants.mainBackgroundColor,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
       },
 
       buttonCellButton: {
         textAlign: "center",
+        textAlignVertical: "center",
         color: Platform.OS == "android" ? constants.mainTextColor : constants.mainTintColor,
         fontSize: constants.mainTextFontSize,
-        height: "100%",
-        paddingTop: 13,
       },
 
       buttonCellButtonAndroid: {
-        paddingTop: 11
+        // paddingTop: 11
       },
 
       buttonCellButtonLeft: {

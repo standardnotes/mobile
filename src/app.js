@@ -7,7 +7,8 @@ import {
   Platform,
   StatusBar,
   BackHandler,
-  DeviceEventEmitter
+  DeviceEventEmitter,
+  NativeModules
 } from 'react-native';
 
 import {Navigation, ScreenVisibilityListener} from 'react-native-navigation';
@@ -18,7 +19,7 @@ import Auth from './lib/auth'
 import GlobalStyles from "./Styles"
 import Icons from "./Icons"
 import OptionsState from "./OptionsState"
-
+var moment = require('moment/min/moment-with-locales.min.js');
 import { Client } from 'bugsnag-react-native';
 var _ = require('lodash');
 
@@ -52,16 +53,20 @@ export default class App {
 
     this.readyObservers = [];
     this.lockStatusObservers = [];
-    this.optionsState = new OptionsState();
-
     this._isAndroid = Platform.OS === "android";
 
+    // Configure Moment locale
+    moment.locale(this.getLocale());
+
+    // Initialize Options (sort by, filter, selected tags, etc)
+    this.optionsState = new OptionsState();
     this.optionsState.addChangeObserver((options) => {
       if(!this.loading) {
         options.persist();
       }
     })
 
+    // Screen visibility listener
     this.listener = new ScreenVisibilityListener({
       willAppear: ({screen, startTime, endTime, commandType}) => {
         // This handles authentication for the initial app launch. We wait for the Notes component to be ready
@@ -75,11 +80,20 @@ export default class App {
     });
     this.listener.register();
 
+    // Listen to sign out event
     this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
       if(event == Auth.DidSignOutEvent) {
         this.optionsState.reset();
       }
     }.bind(this));
+  }
+
+  getLocale() {
+    if (Platform.OS === 'android') {
+      return NativeModules.I18nManager.localeIdentifier;
+    } else {
+      return NativeModules.SettingsManager.settings.AppleLocale.replace(/_/, '-');
+    }
   }
 
   handleAppStateChange = (nextAppState) => {
@@ -376,3 +390,5 @@ export default class App {
     this.startApp();
   }
 }
+
+export {moment}

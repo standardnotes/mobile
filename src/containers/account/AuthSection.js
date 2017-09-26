@@ -94,18 +94,12 @@ export default class AuthSection extends AbstractComponent {
           </SectionedTableCell>
         }
 
-        <SectionedTableCell buttonCell={true}>
-          <ButtonCell title={this.state.signInButtonText} disabled={this.state.signingIn} bold={true} onPress={() => this.onSignInPress()} />
-        </SectionedTableCell>
+        <ButtonCell title={this.state.signInButtonText} disabled={this.state.signingIn} bold={true} onPress={() => this.onSignInPress()} />
 
-        <SectionedTableCell buttonCell={true}>
-          <ButtonCell title={this.state.registerButtonText} disabled={this.state.registering} bold={true} onPress={() => this.onRegisterPress()} />
-        </SectionedTableCell>
+        <ButtonCell title={this.state.registerButtonText} disabled={this.state.registering} bold={true} onPress={() => this.onRegisterPress()} />
 
         {!this.state.showAdvanced &&
-          <SectionedTableCell buttonCell={true}>
-            <ButtonCell title="Advanced Options" onPress={() => this.showAdvanced()} />
-          </SectionedTableCell>
+          <ButtonCell title="Advanced Options" onPress={() => this.showAdvanced()} />
         }
 
 

@@ -24,7 +24,6 @@ export default class ThemesSection extends Component {
               key={theme.uuid}
               first={i == 0}
               selected={() => {return theme.active}}
-              buttonCell={true}
               dimmed={theme.notAvailableOnMobile}
             />
           )
@@ -34,7 +33,6 @@ export default class ThemesSection extends Component {
           <SectionedAccessoryTableCell
             onPress={() => Linking.openURL("https://standardnotes.org/extensions")}
             text={"More Themes"}
-            buttonCell={true}
           />
         }
 

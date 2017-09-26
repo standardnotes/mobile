@@ -147,9 +147,7 @@ export default class Authenticate extends Abstract {
                 />
               </SectionedTableCell>
 
-              <SectionedTableCell buttonCell={true}>
-                  <ButtonCell title={this.state.unlockButtonText} disabled={!this.state.unlockButtonEnabled} bold={true} onPress={() => this.onUnlockPress()} />
-              </SectionedTableCell>
+                <ButtonCell title={this.state.unlockButtonText} disabled={!this.state.unlockButtonEnabled} bold={true} onPress={() => this.onUnlockPress()} />
             </View>
           }
 
@@ -172,9 +170,7 @@ export default class Authenticate extends Abstract {
                 />
               </SectionedTableCell>
 
-              <SectionedTableCell buttonCell={true}>
-                  <ButtonCell title={this.state.setupButtonText} disabled={!this.state.setupButtonEnabled} bold={true} onPress={() => this.onSavePress()} />
-              </SectionedTableCell>
+                <ButtonCell title={this.state.setupButtonText} disabled={!this.state.setupButtonEnabled} bold={true} onPress={() => this.onSavePress()} />
             </View>
           }
 

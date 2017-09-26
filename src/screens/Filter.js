@@ -363,7 +363,6 @@ class TagsSection extends Component {
               key={tag.uuid}
               first={i == 0}
               selected={() => {return root.state.selected.includes(tag.uuid)}}
-              buttonCell={true}
             />
           )
         })}
@@ -394,7 +393,6 @@ class OptionsSection extends Component {
           text={"Show only archived notes"}
           first={true}
           selected={() => {return this.props.archivedOnly}}
-          buttonCell={true}
         />
 
       </TableSection>
@@ -431,7 +429,6 @@ class SortSection extends Component {
               key={option.key}
               first={i == 0}
               selected={() => {return option.key == root.state.sortBy}}
-              buttonCell={true}
             />
           )
         })}

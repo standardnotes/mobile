@@ -15,17 +15,11 @@ export default class CompanySection extends Component {
 
         <SectionHeader title={this.props.title} />
 
-        <SectionedTableCell buttonCell={true} first={true}>
-          <ButtonCell leftAligned={true} title="Send Feedback" onPress={() => this.props.onAction("feedback")} />
-        </SectionedTableCell>
+        <ButtonCell first={true} leftAligned={true} title="Send Feedback" onPress={() => this.props.onAction("feedback")} />
 
-        <SectionedTableCell buttonCell={true}>
-          <ButtonCell leftAligned={true} title="Learn more about Standard Notes" onPress={() => this.props.onAction("learn_more")} />
-        </SectionedTableCell>
+        <ButtonCell leftAligned={true} title="Learn more about Standard Notes" onPress={() => this.props.onAction("learn_more")} />
 
-        <SectionedTableCell buttonCell={true}>
-          <ButtonCell leftAligned={true} title="Our Privacy Manifesto" onPress={() => this.props.onAction("privacy")} />
-        </SectionedTableCell>
+        <ButtonCell leftAligned={true} title="Our Privacy Manifesto" onPress={() => this.props.onAction("privacy")} />
 
       </TableSection>
     );

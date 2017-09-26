@@ -21,8 +21,7 @@ export default class InputModal extends Abstract {
         {
           title: 'Cancel',
           id: 'cancel',
-          showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants().mainTintColor,
+          showAsAction: 'ifRoom'
         },
       ],
       animated: false
@@ -37,6 +36,12 @@ export default class InputModal extends Abstract {
   }
 
   onSave = () => {
+    if(this.props.validate) {
+      if(!this.props.validate(this.state.text)) {
+        this.props.onError(this.state.text);
+        return;
+      }
+    }
     this.props.onSave(this.state.text);
     this.props.navigator.dismissModal({animationType: "slide-down"});
   }
@@ -64,9 +69,7 @@ export default class InputModal extends Abstract {
             />
           </SectionedTableCell>
 
-          <SectionedTableCell buttonCell={true}>
-              <ButtonCell title={"Save"} bold={true} onPress={() => this.onSave()} />
-          </SectionedTableCell>
+          <ButtonCell maxHeight={50} disabled={this.state.text.length == 0} title={"Save"} bold={true} onPress={() => this.onSave()} />
 
         </TableSection>
       </View>

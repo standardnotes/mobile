@@ -31,28 +31,28 @@ export default class SortSection extends Component {
           <SectionedAccessoryTableCell
             iconName={nameForIcon("flag")}
             onPress={() => {this.onPress(pinAction.toLowerCase())}}
-            first={true} text={pinAction} buttonCell={true}
+            first={true} text={pinAction}
             leftAlignIcon={true}
           />
 
           <SectionedAccessoryTableCell
             iconName={nameForIcon("archive")}
             onPress={() => {this.onPress(archiveOption.toLowerCase())}}
-            text={archiveOption} buttonCell={true}
+            text={archiveOption}
             leftAlignIcon={true}
           />
 
           <SectionedAccessoryTableCell
           iconName={nameForIcon("share")}
           onPress={() => {this.onPress("share")}}
-          text={"Share"} buttonCell={true}
+          text={"Share"}
           leftAlignIcon={true}
           />
 
           <SectionedAccessoryTableCell
           iconName={nameForIcon("trash")}
           onPress={() => {this.onPress("delete")}}
-          text={"Delete"} buttonCell={true}
+          text={"Delete"}
           leftAlignIcon={true}
           />
       </TableSection>

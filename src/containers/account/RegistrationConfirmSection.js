@@ -49,15 +49,14 @@ export default class RegistrationConfirmSection extends Component {
           />
         </SectionedTableCell>
 
-        <SectionedTableCell buttonCell={true}>
-          <ButtonCell disabled={this.props.registering}
-          title={this.props.registering ? "Generating Keys..." : "Register"} bold={true}
-          onPress={() => this.onConfirmPress()} />
-        </SectionedTableCell>
+        <ButtonCell
+          disabled={this.props.registering}
+          title={this.props.registering ? "Generating Keys..." : "Register"}
+          bold={true}
+          onPress={() => this.onConfirmPress()}
+        />
 
-        <SectionedTableCell buttonCell={true}>
-          <ButtonCell title="Cancel" onPress={() => this.onCancel()} />
-        </SectionedTableCell>
+        <ButtonCell title="Cancel" onPress={() => this.onCancel()} />
 
 
       </TableSection>

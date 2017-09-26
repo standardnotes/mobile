@@ -16,14 +16,10 @@ export default class OptionsSection extends Component {
         <SectionHeader title={this.props.title} />
 
         {this.props.signedIn &&
-          <SectionedTableCell buttonCell={true} first={true}>
-            <ButtonCell leftAligned={true} title={`Sign out (${this.props.email})`} onPress={this.props.onSignOutPress} />
-          </SectionedTableCell>
+          <ButtonCell first={true} leftAligned={true} title={`Sign out (${this.props.email})`} onPress={this.props.onSignOutPress} />
         }
 
-        <SectionedTableCell buttonCell={true} first={!this.props.signedIn}>
-          <ButtonCell leftAligned={true} title="Export Data" onPress={this.props.onExportPress} />
-        </SectionedTableCell>
+        <ButtonCell first={!this.props.signedIn} leftAligned={true} title="Export Data" onPress={this.props.onExportPress} />
 
       </TableSection>
     );

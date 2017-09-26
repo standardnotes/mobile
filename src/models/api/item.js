@@ -1,4 +1,5 @@
 import Crypto from "../../lib/crypto"
+import {moment} from "../../app"
 
 var _ = require('lodash')
 
@@ -51,8 +52,8 @@ export default class Item {
     _.merge(this, json);
 
     if(this.created_at) {
-      this.created_at = new Date(this.created_at);
-      this.updated_at = new Date(this.updated_at);
+      this.created_at = moment(this.created_at);
+      this.updated_at = moment(this.updated_at);
     } else {
       this.created_at = new Date();
       this.updated_at = new Date();
@@ -133,18 +134,21 @@ export default class Item {
     return [];
   }
 
-  createdAt() {
-    var date = this.created_at;
-    var string = date.toLocaleDateString() + ", " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-    return string;
+  createdAt(withTime) {
+    return this.dateToString(this.created_at, withTime);
   }
 
   updatedAt() {
-    var date = this.updated_at;
-    var string = date.toLocaleDateString() + ", " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    return this.dateToString(this.updated_at, true);
+  }
 
-    return string;
+  dateToString(date, withTime) {
+    if(withTime) {
+      return moment(date).format('lll')
+    } else {
+      return moment(date).format('l')
+    }
+    // return this.created_at.fromNow()
   }
 
   doNotEncrypt() {

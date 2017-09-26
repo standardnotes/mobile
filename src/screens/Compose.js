@@ -75,6 +75,10 @@ export default class Compose extends Abstract {
       return;
     }
 
+    if(!this.note.uuid) {
+      return;
+    }
+
     var tagButton = {
       title: "Manage",
       id: 'tags',
@@ -162,6 +166,7 @@ export default class Compose extends Abstract {
       if(!this.note.uuid) {
         this.note.initUUID().then(function(){
           this.save();
+          this.configureNavBar(true);
         }.bind(this));
       } else {
         this.save();

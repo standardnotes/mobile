@@ -11,6 +11,7 @@
     "bugsnag-react-native": "^2.3.2",
     "immutable": "^3.8.1",
     "lodash": "^4.17.4",
+    "moment": "^2.18.1",
     "react": "16.0.0-beta.5",
     "react-native": "^0.48.4",
     "react-native-keychain": "^1.2.1",
