@@ -337,15 +337,12 @@ export default class GlobalStyles {
 
       noteText: {
         flexGrow: 1,
-        fontSize: 17,
         marginTop: 0,
         paddingTop: 10,
         color: constants.mainTextColor,
         paddingLeft: constants.paddingLeft,
         paddingRight: constants.paddingLeft,
         paddingBottom: 10,
-        // textAlignVertical: 'top',
-        // lineHeight: 22,
       },
 
       noteTextIOS: {

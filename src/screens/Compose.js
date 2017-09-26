@@ -300,7 +300,6 @@ export default class Compose extends Abstract {
 
       noteTitle: {
         fontWeight: "600",
-        fontSize: 16,
         color: GlobalStyles.constants().mainTextColor,
         height: 50,
         borderBottomColor: GlobalStyles.constants().composeBorderColor,

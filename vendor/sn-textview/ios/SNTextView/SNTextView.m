@@ -19,6 +19,8 @@
         __weak typeof(self) weakself = self;
         
         self.contentInset = UIEdgeInsetsZero;
+        
+        self.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     
         [[NSNotificationCenter defaultCenter] addObserverForName:UIKeyboardDidShowNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull note) {
             CGSize keyboardSize = [[[note userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
