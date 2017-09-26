@@ -21,17 +21,18 @@ export default class OptionsState {
 
   async loadSaved() {
     Storage.getItem("options").then(function(result){
+      console.log("Loaded options json results", result);
       _.merge(this, _.omit(JSON.parse(result), ["changeObservers"]));
       this.notifyObservers();
     }.bind(this))
   }
 
   persist() {
-    console.log("Persisting Options", this);
+    console.log("Persisting Options", JSON.stringify(this));
     Storage.setItem("options", JSON.stringify(this));
   }
 
-  toJson() {
+  toJSON() {
     return {sortBy: this.sortBy, archivedOnly: this.archivedOnly, selectedTags: this.selectedTags};
   }
 

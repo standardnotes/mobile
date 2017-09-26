@@ -90,4 +90,14 @@ export default class Tag extends Item {
   allReferencedObjects() {
     return this.notes;
   }
+
+  static arrayToDisplayString(tags, includeComma) {
+    return tags.map(function(tag, i){
+      var text = "#" + tag.title;
+      if(i != tags.length - 1) {
+        text += includeComma ? ", " : " ";
+      }
+      return text;
+    })
+  }
 }

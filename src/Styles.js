@@ -273,6 +273,7 @@ export default class GlobalStyles {
         paddingLeft: constants.paddingLeft,
         paddingBottom: 10,
         paddingTop: 10,
+        color: constants.mainDimColor,
         fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
 
@@ -309,7 +310,7 @@ export default class GlobalStyles {
       sectionedAccessoryTableCell: {
         paddingTop: 0,
         paddingBottom: 0,
-        minHeight: 50,
+        minHeight: 47,
       },
 
       sectionedAccessoryTableCellLabel: {

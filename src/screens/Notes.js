@@ -173,21 +173,22 @@ export default class Notes extends Abstract {
       }
     }
 
-    if(notesTitle !== this.notesTitle || filterTitle !== this.filterTitle) {
+    if(notesTitle !== this.notesTitle) {
       // no changes, return. We do this so when swiping back from compose to here,
       // we don't change the title while a transition is taking place
       this.notesTitle = notesTitle;
-      this.filterTitle = filterTitle;
 
       this.props.navigator.setTitle({title: notesTitle, animated: false});
     }
 
-    if(!initial && App.isIOS) {
+    if(!initial && App.isIOS && filterTitle === this.filterTitle) {
       // On Android, we want to always run the bottom code in the case of the FAB that doesn't
       // reappaer if on the next screen a keyboard is present and you hit back.
       // on iOS, navigation button stack is saved so it only needs to be configured once
       return;
     }
+
+    this.filterTitle = filterTitle;
 
     var rightButtons = [];
     if(App.get().isIOS) {
@@ -301,7 +302,6 @@ export default class Notes extends Abstract {
   }
 
   _onRefresh() {
-    console.log("On refresh sync");
     this.setState({refreshing: true});
     Sync.getInstance().sync();
   }
@@ -346,6 +346,7 @@ export default class Notes extends Abstract {
 
   render() {
     if(!this.state.ready || this.state.lockContent) {
+      console.log("Rendering Locked Notes Content");
       return (<View></View>);
     }
     var notes = ModelManager.getInstance().getNotes(this.options);

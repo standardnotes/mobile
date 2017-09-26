@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import GlobalStyles from "../Styles"
+import Tag from "../models/app/tag"
 
 export default class NoteCell extends React.PureComponent {
 
@@ -135,13 +136,7 @@ export default class NoteCell extends React.PureComponent {
           {note.tags.length > 0 &&
             <View style={this.styles.noteTags}>
               <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag)}>
-              {note.tags.map(function(tag, i){
-                var text = "#" + tag.title;
-                if(i != note.tags.length - 1) {
-                  text += " ";
-                }
-                return text;
-              })}
+              {Tag.arrayToDisplayString(note.tags)}
               </Text>
             </View>
           }

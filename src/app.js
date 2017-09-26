@@ -100,15 +100,18 @@ export default class App {
   handleAppStateChange = (nextAppState) => {
     console.log("handleAppStateChange|App.js", nextAppState, "starting app?", this.isStartingApp);
 
+    // iOS uses 'inactive' for the state we want, while Android uses 'background'
+    var backgroundState = App.isAndroid ? "background" : "inactive";
+
     // Hide screen content as we go to the background
-    if(nextAppState == "background" && !this.isStartingApp) {
+    if(nextAppState == backgroundState && !this.isStartingApp) {
       if(this.shouldLockContent()) {
         this.notifyLockStatusObserverOfLockState(true, null);
       }
     }
 
     // Handle authentication as we come back from the background
-    if (nextAppState === "active" && this.previousAppState == "background" && !this.isStartingApp) {
+    if (nextAppState === "active" && this.previousAppState == backgroundState && !this.isStartingApp) {
       this.handleAuthentication(WARM_LAUNCH_STATE);
     }
 

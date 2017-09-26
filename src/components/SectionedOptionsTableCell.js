@@ -15,6 +15,8 @@ export default class SectionedOptionsTableCell extends Component {
     rules.push({
       flex: 1,
       flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
       padding: 0,
       paddingTop: 0,
       paddingBottom: 0,
@@ -27,7 +29,6 @@ export default class SectionedOptionsTableCell extends Component {
     super(props);
 
     this.titleStyles = {
-      paddingBottom: 10,
       width: "42%",
     }
 
