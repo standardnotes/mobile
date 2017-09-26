@@ -142,6 +142,7 @@ export default class Compose extends Abstract {
   }
 
   onTitleChange = (text) => {
+    this.mergeState({title: text})
     this.note.title = text;
     this.changesMade();
   }
@@ -239,6 +240,13 @@ export default class Compose extends Abstract {
       return (<View></View>);
     }
 
+    /*
+      For the note text, we are using a custom component that is currently incapable of immediate re-renders on text
+      change without flickering. So we do not use this.state.text for the value, but instead this.note.text.
+      For the title however, we are not using a custom component and thus can (and must) look at the state value of
+      this.state.title for the value. We also update the state onTitleChange.
+    */
+
     return (
       <View style={[this.styles.container, GlobalStyles.styles().container]}>
         <TextInput
@@ -264,7 +272,6 @@ export default class Compose extends Abstract {
         }
 
         {Platform.OS == "ios" &&
-
           <TextView style={[...GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10}]}
             ref={(ref) => this.input = ref}
             autoFocus={false}
@@ -273,7 +280,6 @@ export default class Compose extends Abstract {
             selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
             onChangeText={this.onTextChange}
           />
-
         }
       </View>
     );

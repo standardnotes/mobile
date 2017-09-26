@@ -344,6 +344,13 @@
 			remoteGlobalIDString = 5DBEB1501B18CEA900B34395;
 			remoteInfo = RNVectorIcons;
 		};
+		CDFC05B41F79A868007EFC71 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = CD2830C01F795AB7002B9529;
+			remoteInfo = SNTextView;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -796,6 +803,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				CDFC05B51F79A868007EFC71 /* PBXTargetDependency */,
 			);
 			name = StandardNotes;
 			productName = "Hello World";
@@ -1374,6 +1382,11 @@
 			target = 2D02E47A1E0B4A5D006451C7 /* StandardNotes-tvOS */;
 			targetProxy = 2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */;
 		};
+		CDFC05B51F79A868007EFC71 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SNTextView;
+			targetProxy = CDFC05B41F79A868007EFC71 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -1469,7 +1482,7 @@
 					"$(SRCROOT)/../node_modules/react-native/Libraries/Text",
 				);
 				INFOPLIST_FILE = StandardNotes/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = (
@@ -1500,7 +1513,7 @@
 					"$(SRCROOT)/../node_modules/react-native/Libraries/Text",
 				);
 				INFOPLIST_FILE = StandardNotes/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = (

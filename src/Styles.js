@@ -290,7 +290,7 @@ export default class GlobalStyles {
         paddingTop: 13,
         paddingBottom: 12,
         backgroundColor: constants.mainBackgroundColor,
-        flex: 1
+        flex: 1,
       },
 
       textInputCell: {
@@ -326,7 +326,6 @@ export default class GlobalStyles {
       buttonCell: {
         paddingLeft: 0,
         paddingTop: 0,
-        paddingBottom: 0,
         minHeight: 45,
         flexGrow: 0,
         backgroundColor: constants.mainBackgroundColor,

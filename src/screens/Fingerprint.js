@@ -34,6 +34,10 @@ export default class Fingerprint extends Abstract {
         textAlign: "center"
       },
 
+      success: {
+        color: "green"
+      },
+
       dev: {
         marginTop: 50,
         backgroundColor: GlobalStyles.constants().mainDimColor,
@@ -95,16 +99,35 @@ export default class Fingerprint extends Abstract {
   }
 
   handleSuccessfulAuth = () => {
-    this.props.onAuthenticateSuccess();
-    this.dismissModal();
+    this.mergeState({success: true});
+    setTimeout(() => {
+      this.props.onAuthenticateSuccess();
+      this.dismissModal();
+    }, 500);
   }
 
   render() {
+    let iconColor = this.state.success ? "green" : GlobalStyles.constants().mainTextColor;
+    let textStyles = [this.styles.text];
+    var iconName = App.isAndroid ? "md-finger-print" : 'ios-finger-print';
+    var text = "Please scan your fingerprint";
+
+    if(this.state.success) {
+      iconName = App.isAndroid ? "md-checkmark-circle-outline" : "ios-checkmark-circle-outline";
+      text = "Successfully Authenticated.";
+      textStyles.push(this.styles.success);
+    }
+
     return (
       <View style={[GlobalStyles.styles().container, this.styles.container]}>
 
-        <Icon style={{marginBottom: 20}} name={App.isAndroid ? "md-finger-print" : 'ios-finger-print'} size={50} color={GlobalStyles.constants().mainTextColor} />
-        <Text style={this.styles.text}>Please scan your fingerprint</Text>
+        <Icon
+          style={{marginBottom: 20}}
+          name={iconName}
+          size={50}
+          color={iconColor}
+        />
+        <Text style={textStyles}>{text}</Text>
 
         {this.state.error &&
           <Text style={this.styles.error}>{this.state.error}</Text>
