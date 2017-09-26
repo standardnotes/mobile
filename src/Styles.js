@@ -307,11 +307,12 @@ export default class GlobalStyles {
       },
 
       sectionedAccessoryTableCell: {
-        paddingTop: 0
+        paddingTop: 0,
+        paddingBottom: 0,
+        minHeight: 50,
       },
 
       sectionedAccessoryTableCellLabel: {
-        marginTop: 13,
         fontSize: constants.mainTextFontSize,
         color: constants.mainTextColor,
       },

@@ -32,24 +32,9 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     var checkmarkName = Platform.OS == "android" ? "md-checkmark-circle-outline" : "ios-checkmark-circle";
     var iconName = this.props.iconName ? this.props.iconName : ((this.props.selected && this.props.selected()) ? checkmarkName : null);
 
-    var iconStyles;
-    if(this.props.leftAlignIcon) {
-      iconStyles = {
-        width: 30,
-        maxWidth: 30,
-        // paddingTop: 8,
-        flex: 1,
-        alignItems: "center",
-        position: "absolute",
-        left: -6,
-        top: Platform.OS == "android" ? 17 : 10
-      };
-    } else {
-      iconStyles = {
-        position: "absolute",
-        right: GlobalStyles.constants().sectionedCellHorizontalPadding,
-        top: Platform.OS == "android" ? 14 : 8
-      };
+    var iconStyles = {
+      width: 30,
+      maxWidth: 30,
     }
 
     var left = this.props.leftAlignIcon;
@@ -58,7 +43,6 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
     if(Platform.OS == "android") {
       iconSize -= 5;
-      // iconStyles.paddingTop = left ? 12 : 4;
       color = GlobalStyles.constants().mainDimColor;
     }
 
@@ -73,12 +57,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     }
 
     var textStyles = [GlobalStyles.styles().sectionedAccessoryTableCellLabel];
-    if(this.props.leftAlignIcon) {
-      textStyles.push({
-        left: iconStyles.left + iconStyles.width + 7 + (Platform.OS == "android" ? 4 : 0),
-        top: 0
-      });
-    }
+
     if(this.props.bold || (this.props.selected && this.props.selected())) {
       textStyles.push(GlobalStyles.styles().bold)
     }
@@ -91,9 +70,16 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
     var textWrapper = (<Text key={1} style={textStyles}>{this.props.text}</Text>);
 
+    var containerStyles = {
+      flex: 1,
+      justifyContent: left ? 'flex-start' : 'space-between',
+      flexDirection: 'row',
+      alignItems: 'center'
+    }
+
     return (
       <TouchableHighlight underlayColor={GlobalStyles.constants().plainCellBorderColor} style={this.rules()} onPress={this.onPress} onLongPress={this.onLongPress}>
-        <View>
+        <View style={containerStyles}>
         {
           this.props.leftAlignIcon
           ? [icon, textWrapper]
