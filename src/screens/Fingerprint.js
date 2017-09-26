@@ -57,7 +57,7 @@ export default class Fingerprint extends Abstract {
 
   componentDidMount() {
     super.componentDidMount();
-    this.authenticate();
+    // this.authenticate();
   }
 
   authenticate() {

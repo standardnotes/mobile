@@ -51,11 +51,13 @@ export default class App {
     AppState.addEventListener('change', this.handleAppStateChange);
     KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
 
+    // required to initialize current app state to active since the observer is not called in time on initial app launch
+    this.previousAppState = "active";
+
     this.readyObservers = [];
     this.lockStatusObservers = [];
     this._isAndroid = Platform.OS === "android";
 
-    console.log("Locale", this.getLocale());
     // Configure Moment locale
     moment.locale(this.getLocale());
 
@@ -72,12 +74,28 @@ export default class App {
       willAppear: ({screen, startTime, endTime, commandType}) => {
         // This handles authentication for the initial app launch. We wait for the Notes component to be ready
         // (meaning the app UI is ready), then present the authentication modal
+        console.log("Screen will appear", screen);
         if(screen == "sn.Notes" && this.authenticationQueued) {
           this.authenticationQueued = false;
           this.handleAuthentication(this.queuedAuthenticationLaunchState);
           this.queuedAuthenticationLaunchState = null;
         }
-      }
+      },
+
+      didAppear: ({screen, startTime, endTime, commandType}) => {
+
+      },
+
+      didDisappear: ({screen, startTime, endTime, commandType}) => {
+        if(screen == 'sn.Authenticate' && this.queueFingerprint) {
+          this.queueFingerprint = false;
+          this.showFingerprintScanner(this.applicationIsReady.bind(this));
+        }
+      },
+
+      willDisappear: ({screen, startTime, endTime, commandType}) => {
+
+      },
     });
     this.listener.register();
 
@@ -98,20 +116,36 @@ export default class App {
   }
 
   handleAppStateChange = (nextAppState) => {
-    console.log("handleAppStateChange|App.js", nextAppState, "starting app?", this.isStartingApp);
 
-    // iOS uses 'inactive' for the state we want, while Android uses 'background'
-    var backgroundState = App.isAndroid ? "background" : "inactive";
+    var isEnteringForeground = nextAppState === "active"
+      && (this.previousAppState == 'background' || this.previousAppState == 'inactive')
+      && !this.isStartingApp;
+
+    var isEnteringBackground;
+
+    if(App.isIOS) {
+      isEnteringBackground = ((nextAppState == 'inactive' && this.previousAppState == 'active')
+        || (nextAppState == 'background' && this.previousAppState != 'inactive')) && !this.isStartingApp;
+    } else if(App.isAndroid) {
+      isEnteringBackground = nextAppState == 'background' && !this.isStartingApp;
+    }
+
+    console.log("APP STATE CHANGE FROM", this.previousAppState,
+    "TO STATE", nextAppState,
+    "IS STARTING APP:", this.isStartingApp,
+    "IS ENTERING BACKGROUND", isEnteringBackground,
+    "IS ENTERING FOREGROUND", isEnteringForeground
+    );
 
     // Hide screen content as we go to the background
-    if(nextAppState == backgroundState && !this.isStartingApp) {
+    if(isEnteringBackground) {
       if(this.shouldLockContent()) {
         this.notifyLockStatusObserverOfLockState(true, null);
       }
     }
 
     // Handle authentication as we come back from the background
-    if (nextAppState === "active" && this.previousAppState == backgroundState && !this.isStartingApp) {
+    if (isEnteringForeground && !this.authenticationInProgress) {
       this.handleAuthentication(WARM_LAUNCH_STATE);
     }
 
@@ -238,6 +272,7 @@ export default class App {
 
   applicationIsReady() {
     console.log("===Emitting Application Ready===");
+    this.authenticationInProgress = false;
     this.ready = true;
     this.readyObservers.forEach(function(observer){
       observer.callback();
@@ -270,13 +305,13 @@ export default class App {
       return true;
     }
 
+    this.authenticationInProgress = true;
+
     if(showPasscode) {
       this.showPasscodeLock(function(){
         if(showFingerprint) {
-          // wait for passcode modal dismissal
-          setTimeout(() => {
-            this.showFingerprintScanner(this.applicationIsReady.bind(this));
-          }, 0);
+          // wait for passcode modal dismissal.
+          this.queueFingerprint = true;
         } else {
           this.applicationIsReady();
         }
@@ -307,6 +342,7 @@ export default class App {
   }
 
   showFingerprintScanner(onAuthenticate) {
+    console.log("Showing Fingerprint");
     Navigation.showModal({
       screen: 'sn.Fingerprint',
       title: 'Fingerprint Required',

@@ -346,7 +346,6 @@ export default class Notes extends Abstract {
 
   render() {
     if(!this.state.ready || this.state.lockContent) {
-      console.log("Rendering Locked Notes Content");
       return (<View></View>);
     }
     var notes = ModelManager.getInstance().getNotes(this.options);

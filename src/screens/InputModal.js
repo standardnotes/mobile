@@ -69,7 +69,7 @@ export default class InputModal extends Abstract {
             />
           </SectionedTableCell>
 
-          <ButtonCell maxHeight={50} disabled={this.state.text.length == 0} title={"Save"} bold={true} onPress={() => this.onSave()} />
+          <ButtonCell maxHeight={45} disabled={this.state.text.length == 0} title={"Save"} bold={true} onPress={() => this.onSave()} />
 
         </TableSection>
       </View>
