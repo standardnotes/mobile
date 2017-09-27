@@ -30,6 +30,7 @@ export default class SectionedOptionsTableCell extends Component {
 
     this.titleStyles = {
       width: "42%",
+      minWidth: 0
     }
 
     this.optionsContainerStyle = {

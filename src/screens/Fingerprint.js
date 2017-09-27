@@ -23,7 +23,9 @@ export default class Fingerprint extends Abstract {
 
       text: {
         fontWeight: "bold",
-        color: GlobalStyles.constants().mainTextColor
+        color: GlobalStyles.constants().mainTextColor,
+        textAlign: 'center',
+        width: "100%"
       },
 
       error: {

@@ -316,6 +316,7 @@ export default class GlobalStyles {
       sectionedAccessoryTableCellLabel: {
         fontSize: constants.mainTextFontSize,
         color: constants.mainTextColor,
+        minWidth: "80%"
       },
 
       buttonCell: {
