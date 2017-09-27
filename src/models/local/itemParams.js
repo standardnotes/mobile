@@ -40,14 +40,14 @@ export default class ItemParams {
       _.merge(params, encryptedParams);
 
       if(this.version !== "001") {
-        params.auth_hash = null;
+        delete params.auth_hash;
       }
     }
     else {
       params.content = this.forExportFile ? this.item.createContentJSONFromProperties() : "000" + await Crypto.base64(JSON.stringify(this.item.createContentJSONFromProperties()));
       if(!this.forExportFile) {
-        params.enc_item_key = null;
-        params.auth_hash = null;
+        delete params.auth_hash;
+        delete params.enc_item_key;
       }
     }
 

@@ -55,8 +55,8 @@ export default class Item {
       this.created_at = moment(this.created_at);
       this.updated_at = moment(this.updated_at);
     } else {
-      this.created_at = new Date();
-      this.updated_at = new Date();
+      this.created_at = moment(new Date());
+      this.updated_at = moment(new Date());
     }
 
     if(json.content) {

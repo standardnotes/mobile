@@ -235,6 +235,11 @@ export default class Account extends Abstract {
       items.push(params);
     }
 
+    if(items.length == 0) {
+      Alert.alert('No Data', "You don't have any notes yet.");
+      return;
+    }
+
     var data = {items: items}
 
     if(keys) {
@@ -243,18 +248,18 @@ export default class Account extends Abstract {
       data["auth_params"] = authParams;
     }
 
-    var encrypted = keys !== null;
+    var encrypted = keys && keys !== null;
 
     var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
     var base64String = base64.encode(jsonString);
-    var fileType = Platform.OS === "android" ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
+    var fileType = App.isAndroid ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
 
     Mailer.mail({
       subject: 'Standard Notes Backup',
       recipients: [''],
       body: '',
       isHTML: true,
-      attachment: { data: base64String, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
+      attachment: { data: App.isIOS ? jsonString : base64String, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
     }, (error, event) => {
         if(error) {
           Alert.alert('Error', 'Unable to send email.');
