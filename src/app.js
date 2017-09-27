@@ -16,6 +16,7 @@ import {registerScreens} from './screens';
 
 import KeysManager from './lib/keysManager'
 import Auth from './lib/auth'
+import ReviewManager from './lib/reviewManager';
 import GlobalStyles from "./Styles"
 import Icons from "./Icons"
 import OptionsState from "./OptionsState"
@@ -57,6 +58,9 @@ export default class App {
     this.readyObservers = [];
     this.lockStatusObservers = [];
     this._isAndroid = Platform.OS === "android";
+
+    // Initialize iOS review manager. Will automatically handle requesting review logic.
+    ReviewManager.initialize();
 
     // Configure Moment locale
     moment.locale(this.getLocale());
