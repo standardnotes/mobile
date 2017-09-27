@@ -223,7 +223,7 @@ export default class Account extends Abstract {
     )
   }
 
-  async onExportPress() {
+  async onExportPress(callback) {
     var version = Auth.getInstance().protocolVersion();
     var keys = KeysManager.get().activeKeys();
 
@@ -237,6 +237,7 @@ export default class Account extends Abstract {
 
     if(items.length == 0) {
       Alert.alert('No Data', "You don't have any notes yet.");
+      callback();
       return;
     }
 
@@ -261,6 +262,7 @@ export default class Account extends Abstract {
       isHTML: true,
       attachment: { data: App.isIOS ? jsonString : base64String, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
     }, (error, event) => {
+        callback();
         if(error) {
           Alert.alert('Error', 'Unable to send email.');
         }
