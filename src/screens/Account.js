@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import {ScrollView, View, Alert, Keyboard, Linking, Platform, Share, NativeModules} from 'react-native';
+
 import Sync from '../lib/sync'
 import Auth from '../lib/auth'
 import AlertManager from '../lib/alertManager'
@@ -21,14 +23,12 @@ import ThemesSection from "../containers/account/ThemesSection"
 import EncryptionSection from "../containers/account/EncryptionSection"
 import CompanySection from "../containers/account/CompanySection"
 
+import GlobalStyles from "../Styles"
+import App from "../app"
+
 var base64 = require('base-64');
 var _ = require('lodash')
-import GlobalStyles from "../Styles"
-import { NativeModules} from 'react-native';
 var Mailer = require('NativeModules').RNMail;
-import {TextInput, SectionList, ScrollView, View, Alert, Keyboard, Linking, Platform} from 'react-native';
-
-import App from "../app"
 
 export default class Account extends Abstract {
 
@@ -152,7 +152,7 @@ export default class Account extends Abstract {
 
   onRegisterPress = (params, callback) => {
     Keyboard.dismiss();
-    
+
     var email = params.email;
     var password = params.password;
 
@@ -331,13 +331,29 @@ export default class Account extends Abstract {
   onCompanyAction = (action) => {
     if(action == "feedback") {
       var platformString = Platform.OS == "android" ? "Android" : "iOS";
-      Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} app feedback`);
+      Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} app feedback (v${App.version})`);
     } else if(action == "learn_more") {
       Linking.openURL("https://standardnotes.org");
     } else if(action == "privacy") {
       Linking.openURL("https://standardnotes.org/privacy");
-    } else if(action == "twitter") {
-      Linking.openURL("https://twitter.com/StandardNotes");
+    } else if(action == "help") {
+      Linking.openURL("https://standardnotes.org/help");
+    } else if(action == "rate") {
+      if(App.isIOS) {
+        Linking.openURL("https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8");
+      } else {
+        Linking.openURL("market://details?id=com.standardnotes");
+      }
+    } else if(action == "friend") {
+      let title = "Standard Notes";
+      var message = "Check out Standard Notes. It's a simple and private notes app. Thought you'd find it useful.";
+      let url = "https://standardnotes.org";
+      // Android ignores url. iOS ignores title.
+      if(App.isAndroid) {
+        message += "\n\n https://standardnotes.org";
+      }
+
+      Share.share({title: title, message: message, url: url})
     }
   }
 

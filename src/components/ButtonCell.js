@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {TouchableHighlight, Text} from 'react-native';
+import {TouchableHighlight, Text, View} from 'react-native';
 import SectionedTableCell from './SectionedTableCell'
 import GlobalStyles from "../Styles"
 
@@ -22,7 +22,12 @@ export default class ButtonCell extends SectionedTableCell {
   render() {
     return (
         <TouchableHighlight underlayColor={GlobalStyles.constants().plainCellBorderColor} style={[GlobalStyles.styles().flexContainer, GlobalStyles.styles().buttonCell, ...this.rules()]} disabled={this.props.disabled} onPress={this.props.onPress}>
-          <Text style={this.buttonRules()}>{this.props.title}</Text>
+          <View>
+            <Text style={this.buttonRules()}>{this.props.title}</Text>
+            {this.props.children &&
+              this.props.children
+            }
+          </View>
         </TouchableHighlight>
     )
   }

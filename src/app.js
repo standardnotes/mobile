@@ -2,14 +2,7 @@
  * Standard Notes React Native App
  */
 
-import {
-  AppState,
-  Platform,
-  StatusBar,
-  BackHandler,
-  DeviceEventEmitter,
-  NativeModules
-} from 'react-native';
+import {AppState, Platform, StatusBar, BackHandler, DeviceEventEmitter, NativeModules} from 'react-native';
 
 import {Navigation, ScreenVisibilityListener} from 'react-native-navigation';
 import {registerScreens} from './screens';
@@ -20,9 +13,11 @@ import ReviewManager from './lib/reviewManager';
 import GlobalStyles from "./Styles"
 import Icons from "./Icons"
 import OptionsState from "./OptionsState"
-var moment = require('moment/min/moment-with-locales.min.js');
 import { Client } from 'bugsnag-react-native';
+
+var moment = require('moment/min/moment-with-locales.min.js');
 var _ = require('lodash');
+var pjson = require('../package.json');
 
 if(__DEV__ === false) {
   const bugsnag = new Client()
@@ -168,6 +163,10 @@ export default class App {
 
   static get isIOS() {
     return this.get().isIOS;
+  }
+
+  static get version() {
+    return pjson.version;
   }
 
   get isAndroid() {
