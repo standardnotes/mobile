@@ -166,7 +166,7 @@ export default class App {
   }
 
   static get version() {
-    return pjson.version;
+    return this.isAndroid ? pjson.versionAndroid : pjson.versionIOS;
   }
 
   get isAndroid() {
