@@ -343,6 +343,10 @@ export default class Sync {
 
         onSyncCompletion(response);
 
+        this.syncObservers.forEach(function(mapping){
+          mapping.callback();
+        })
+
         // this.$rootScope.$broadcast("sync:error", error);
 
         this.callQueuedCallbacksAndCurrent(callback, {error: "Sync error"});
