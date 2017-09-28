@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, SectionList, ScrollView, View, Text, Share, Platform, StatusBar } from 'react-native';
+import { TextInput, SectionList, ScrollView, View, Text, Share, Platform, StatusBar, FlatList } from 'react-native';
 var _ = require('lodash')
 
 import Sync from '../lib/sync'
@@ -349,24 +349,30 @@ class TagsSection extends Component {
     this.props.onTagLongPress(tag);
   }
 
+  // must pass title, text, and tags as props so that it re-renders when either of those change
+  _renderItem = ({item}) => (
+    <SectionedAccessoryTableCell
+      onPress={() => {this.onPress(item)}}
+      onLongPress={() => this.onLongPress(item)}
+      text={item.title}
+      key={item.uuid}
+      first={this.props.tags.indexOf(item) == 0}
+      selected={() => {return this.state.selected.includes(item.uuid)}}
+    />
+  )
+
   render() {
-    let root = this;
     return (
       <TableSection style={GlobalStyles.styles().view}>
         <SectionHeader title={this.props.title} />
-        {this.props.tags.map(function(tag, i){
-          return (
-            <SectionedAccessoryTableCell
-              onPress={() => {root.onPress(tag)}}
-              onLongPress={() => root.onLongPress(tag)}
-              text={tag.title}
-              key={tag.uuid}
-              first={i == 0}
-              selected={() => {return root.state.selected.includes(tag.uuid)}}
-            />
-          )
-        })}
 
+        <FlatList style={{height: "100%"}}
+          initialNumToRender={6}
+          windowSize={6}
+          maxToRenderPerBatch={6}
+          data={this.props.tags}
+          renderItem={this._renderItem}
+        />
 
       </TableSection>
     );

@@ -95,7 +95,6 @@ export default class NoteList extends Component {
           data={this.props.notes}
           renderItem={this._renderItem}
           ListHeaderComponent={this.renderHeader}
-          initialNumToRender={5}
         />
       </View>
     )

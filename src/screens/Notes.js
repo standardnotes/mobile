@@ -247,11 +247,11 @@ export default class Notes extends Abstract {
           this.presentFilterScreen();
         } else {
           // Although RNN is supposed to open this automatically, it doesn't sometimes. So this is to force it.
-          this.props.navigator.toggleDrawer({
-            side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
-            animated: true, // does the toggle have transition animation or does it happen immediately (optional)
-            to: 'open' // optional, 'open' = open the drawer, 'closed' = close it, missing = the opposite of current state
-          });
+          // this.props.navigator.toggleDrawer({
+          //   side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
+          //   animated: true, // does the toggle have transition animation or does it happen immediately (optional)
+          //   // to: 'open' // optional, 'open' = open the drawer, 'closed' = close it, missing = the opposite of current state
+          // });
         }
       } else if(event.id == "settings") {
         this.presentSettingsScreen();
@@ -346,6 +346,7 @@ export default class Notes extends Abstract {
 
   render() {
     if(!this.state.ready || this.state.lockContent) {
+      // console.log("Rendering locked note content");
       return (<View></View>);
     }
     var notes = ModelManager.getInstance().getNotes(this.options);
