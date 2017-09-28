@@ -105,7 +105,7 @@ export default class Fingerprint extends Abstract {
     setTimeout(() => {
       this.props.onAuthenticateSuccess();
       this.dismissModal();
-    }, 500);
+    }, 350);
   }
 
   render() {

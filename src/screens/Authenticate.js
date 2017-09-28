@@ -17,7 +17,8 @@ import {
   ScrollView,
   View,
   Alert,
-  Keyboard
+  Keyboard,
+  InteractionManager
 } from 'react-native';
 
 const SAVE_BUTTON_DEFAULT_TEXT = "Save";
@@ -78,23 +79,27 @@ export default class Authenticate extends Abstract {
 
     this.mergeState({setupButtonText: "Generating Keys...", setupButtonEnabled: false})
 
-    var salt = await Crypto.generateRandomKey(256);
-    var params = _.merge(this.defaultPasswordParams(), {pw_salt: salt});
+    // Allow UI to update before executing block task. InteractionManager.runAfterInteractions doesn't seem to work.
+    setTimeout(async () => {
+      var salt = await Crypto.generateRandomKey(256);
+      var params = _.merge(this.defaultPasswordParams(), {pw_salt: salt});
 
-    Crypto.generateKeys(passcode, params, function(keys){
-      // make sure it has valid items
-      if(_.keys(keys).length > 0) {
-        KeysManager.get().persistOfflineKeys(keys);
-        KeysManager.get().setOfflineAuthParams(params);
+      Crypto.generateKeys(passcode, params, function(keys){
+        // make sure it has valid items
+        if(_.keys(keys).length > 0) {
+          KeysManager.get().persistOfflineKeys(keys);
+          KeysManager.get().setOfflineAuthParams(params);
 
-        this.props.onSetupSuccess();
+          this.props.onSetupSuccess();
 
-        this.dismissModal();
-      } else {
-        this.mergeState({setupButtonText: SAVE_BUTTON_DEFAULT_TEXT, setupButtonEnabled: true});
-        Alert.alert("Passcode Error", "There was an error setting up your passcode. Please try again.");
-      }
-    }.bind(this));
+          this.dismissModal();
+        } else {
+          this.mergeState({setupButtonText: SAVE_BUTTON_DEFAULT_TEXT, setupButtonEnabled: true});
+          Alert.alert("Passcode Error", "There was an error setting up your passcode. Please try again.");
+        }
+      }.bind(this));
+    }, 125);
+
   }
 
   async onUnlockPress() {
@@ -111,17 +116,20 @@ export default class Authenticate extends Abstract {
 
     this.mergeState({unlockButtonText: "Generating Keys...", unlockButtonEnabled: false})
 
-    var params = KeysManager.get().offlineAuthParams;
+    // Allow UI to update before executing block task. InteractionManager.runAfterInteractions doesn't seem to work.
+    setTimeout(() => {
+       var params = KeysManager.get().offlineAuthParams;
+       Crypto.generateKeys(passcode, params, function(keys){
+         if(keys.pw === KeysManager.get().offlinePasscodeHash()) {
+           KeysManager.get().setOfflineKeys(keys);
+           this.props.onAuthenticateSuccess();
+           this.dismissModal();
+         } else {
+           invalid();
+         }
+       }.bind(this));
+    }, 125);
 
-    Crypto.generateKeys(passcode, params, function(keys){
-      if(keys.pw === KeysManager.get().offlinePasscodeHash()) {
-        KeysManager.get().setOfflineKeys(keys);
-        this.props.onAuthenticateSuccess();
-        this.dismissModal();
-      } else {
-        invalid();
-      }
-    }.bind(this));
   }
 
   render() {
