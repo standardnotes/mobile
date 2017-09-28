@@ -106,6 +106,16 @@ export default class Filter extends Abstract {
     }
   }
 
+  // on iOS, declaring nav bar buttons as static prevents the flickering issue that occurs on nav push
+
+  static navigatorButtons = Platform.OS == 'android' ? {} : {
+    rightButtons: [{
+      title: 'New Tag',
+      id: 'new-tag',
+      showAsAction: 'ifRoom',
+    }]
+  };
+
   configureNavBar() {
     super.configureNavBar();
 
@@ -116,7 +126,6 @@ export default class Filter extends Abstract {
         title: 'Done',
         id: 'accept',
         showAsAction: 'ifRoom',
-        // buttonColor: GlobalStyles.constants().mainTintColor,
         buttonFontWeight: "bold",
         buttonFontSize: 17
       })
@@ -125,7 +134,6 @@ export default class Filter extends Abstract {
       title: 'New Tag',
       id: 'new-tag',
       showAsAction: 'ifRoom',
-      // buttonColor: GlobalStyles.constants().mainTintColor,
     };
 
     if(Platform.OS === "android") {

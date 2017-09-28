@@ -228,7 +228,7 @@ export default class GlobalStyles {
         mainTextFontSize: 16,
         mainHeaderFontSize: 16,
 
-        navBarColor: "#ffffff",
+        navBarColor: "#f7f7f7",
         navBarTextColor: "#fb0206",
 
         navBarColorAndroid: "#fb0206",

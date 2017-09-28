@@ -45,6 +45,8 @@ export default class Compose extends Abstract {
         this.mergeState({title: this.note.title, text: this.note.text});
       }
     });
+
+    this.configureNavBar(true);
   }
 
   componentWillMount () {
@@ -67,15 +69,21 @@ export default class Compose extends Abstract {
     }
   }
 
+  // on iOS, declaring nav bar buttons as static prevents the flickering issue that occurs on nav push
+
+  static navigatorButtons = Platform.OS == 'android' ? {} : {
+    rightButtons: [{
+      title: "Manage",
+      id: 'tags',
+      showAsAction: 'ifRoom',
+    }]
+  };
+
   configureNavBar(initial) {
     super.configureNavBar();
 
     // Only edit the nav bar once, it wont be changed
     if(!initial) {
-      return;
-    }
-
-    if(!this.note.uuid) {
       return;
     }
 
@@ -87,6 +95,14 @@ export default class Compose extends Abstract {
 
     if(Platform.OS === "android") {
       tagButton.icon = Icons.getIcon("md-more");
+    }
+
+    if(!this.note.uuid) {
+      if(App.isIOS) {
+        tagButton.disabled = true;
+      } else {
+        tagButton = {};
+      }
     }
 
     this.props.navigator.setButtons({
