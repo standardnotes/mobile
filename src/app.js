@@ -477,6 +477,10 @@ export default class App {
 
   reload() {
     Icons.get().loadIcons();
+
+    // reset search box
+    this.optionsState.setSearchTerm(null);
+
     this.startApp();
   }
 }

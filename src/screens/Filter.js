@@ -301,11 +301,8 @@ export default class Filter extends Abstract {
 
   render() {
     if(!this.state.ready || this.state.lockContent) {
-      // console.log("Render Locked Filter content");
       return (<View></View>);
     }
-
-    console.log("Render regular Filter content");
 
     if(this.loadTags) {
       var tags = ModelManager.getInstance().tags.slice();
