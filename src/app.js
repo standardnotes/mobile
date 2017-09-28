@@ -429,8 +429,14 @@ export default class App {
   }
 
   reload() {
+    this.count = 0;
     Icons.get().loadIcons();
-    this.startApp();
+    setInterval(() => {
+      this.count++;
+      if(this.count < 10) {
+        this.startApp();
+      }
+    }, 200);
   }
 }
 

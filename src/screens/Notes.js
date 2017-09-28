@@ -247,16 +247,21 @@ export default class Notes extends Abstract {
           this.presentFilterScreen();
         } else {
           // Although RNN is supposed to open this automatically, it doesn't sometimes. So this is to force it.
-          // this.props.navigator.toggleDrawer({
-          //   side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
-          //   animated: true, // does the toggle have transition animation or does it happen immediately (optional)
-          //   // to: 'open' // optional, 'open' = open the drawer, 'closed' = close it, missing = the opposite of current state
-          // });
+          this.openDrawer();
         }
       } else if(event.id == "settings") {
         this.presentSettingsScreen();
       }
     }
+  }
+
+  openDrawer() {
+    console.log("Opening drawer");
+    this.props.navigator.toggleDrawer({
+      side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
+      animated: false, // does the toggle have transition animation or does it happen immediately (optional)
+      to: 'open' // optional, 'open' = open the drawer, 'closed' = close it, missing = the opposite of current state
+    });
   }
 
   presentNewComposer() {
