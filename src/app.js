@@ -73,7 +73,6 @@ export default class App {
       willAppear: ({screen, startTime, endTime, commandType}) => {
         // This handles authentication for the initial app launch. We wait for the Notes component to be ready
         // (meaning the app UI is ready), then present the authentication modal
-        console.log("Screen will appear", screen);
         if(screen == "sn.Notes" && this.authenticationQueued) {
           this.authenticationQueued = false;
           this.handleAuthentication(this.queuedAuthenticationLaunchState);
@@ -82,13 +81,24 @@ export default class App {
       },
 
       didAppear: ({screen, startTime, endTime, commandType}) => {
-
+        if(screen == "sn.Authenticate" || screen == "sn.Fingerprint") {
+          this.modalVisible = true;
+        }
       },
 
       didDisappear: ({screen, startTime, endTime, commandType}) => {
-        if(screen == 'sn.Authenticate' && this.queueFingerprint) {
-          this.queueFingerprint = false;
-          this.showFingerprintScanner(this.applicationIsReady.bind(this));
+        let isPasscode = screen == "sn.Authenticate";
+        let isFingerprint = screen == "sn.Fingerprint";
+        if(isPasscode || isFingerprint) {
+          this.modalVisible = false;
+          this.handleQueuedAuth();
+
+          if(isPasscode) {
+            this.passcodeVisible = false;
+          }
+          if(isFingerprint) {
+            this.fingerprintVisible = false;
+          }
         }
       },
 
@@ -144,7 +154,8 @@ export default class App {
     }
 
     // Handle authentication as we come back from the background
-    if (isEnteringForeground && !this.authenticationInProgress) {
+    if (isEnteringForeground && !this.authenticationInProgress
+       && !this.passcodeVisible && !this.fingerprintVisible) {
       this.handleAuthentication(WARM_LAUNCH_STATE);
     }
 
@@ -169,6 +180,10 @@ export default class App {
     return this.isAndroid ? pjson.versionAndroid : pjson.versionIOS;
   }
 
+  static get isAuthenticated() {
+    return this.get().isAuthenticated;
+  }
+
   get isAndroid() {
     return this._isAndroid;
   }
@@ -176,6 +191,7 @@ export default class App {
   get isIOS() {
     return !this._isAndroid;
   }
+
 
   shouldLockContent() {
     var showPasscode = KeysManager.get().hasOfflinePasscode() && KeysManager.get().passcodeTiming == "immediately";
@@ -186,6 +202,12 @@ export default class App {
   addLockStatusObserver(callback) {
     var observer = {key: Math.random, callback: callback};
     this.lockStatusObservers.push(observer);
+
+    // Sometimes an observer could be added after the application is already authenticated, in which case we call it immediately
+    if(this.isAuthenticated) {
+      callback(false, true);
+    }
+
     return observer;
   }
 
@@ -261,7 +283,7 @@ export default class App {
           this.startApp();
           var handled = this.handleAuthentication(COLD_LAUNCH_STATE, true);
           if(!handled) {
-            this.applicationIsReady();
+            this.onAuthenticationSuccess();
           }
         }
         if(KeysManager.get().isFirstRun()) {
@@ -284,6 +306,22 @@ export default class App {
     this.notifyLockStatusObserverOfLockState(null, true);
   }
 
+  onAuthenticationSuccess() {
+    this.isAuthenticated = true;
+    this.applicationIsReady();
+  }
+
+  handleQueuedAuth() {
+    if(this.queuePasscode) {
+      this.queuePasscode = false;
+      this.showPasscodeLock(this.onAuthenticationSuccess.bind(this));
+    }
+    else if(this.queueFingerprint) {
+      this.queueFingerprint = false;
+      this.showFingerprintScanner(this.onAuthenticationSuccess.bind(this))
+    }
+  }
+
   handleAuthentication(fromState, queue = false) {
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
     var hasFingerprint = KeysManager.get().hasFingerprint();
@@ -302,10 +340,18 @@ export default class App {
       return false;
     }
 
+    this.isAuthenticated = false;
+
     if(queue) {
       this.authenticationQueued = true;
       this.queuedAuthenticationLaunchState = fromState;
       return true;
+    }
+
+    if(this.modalVisible) {
+      this.queuePasscode = showPasscode && !this.passcodeVisible;
+      this.queueFingerprint = showFingerprint && !this.fingerprintVisible;
+      return;
     }
 
     this.authenticationInProgress = true;
@@ -316,19 +362,20 @@ export default class App {
           // wait for passcode modal dismissal.
           this.queueFingerprint = true;
         } else {
-          this.applicationIsReady();
+          this.onAuthenticationSuccess();
         }
       }.bind(this));
     } else if(showFingerprint) {
-      this.showFingerprintScanner(this.applicationIsReady.bind(this));
+      this.showFingerprintScanner(this.onAuthenticationSuccess.bind(this));
     } else {
-      this.applicationIsReady();
+      this.onAuthenticationSuccess();
     }
 
     return true;
   }
 
   showPasscodeLock(onAuthenticate) {
+    this.passcodeVisible = true;
     Navigation.showModal({
       screen: 'sn.Authenticate',
       title: 'Passcode Required',
@@ -345,7 +392,7 @@ export default class App {
   }
 
   showFingerprintScanner(onAuthenticate) {
-    console.log("Showing Fingerprint");
+    this.fingerprintVisible = true;
     Navigation.showModal({
       screen: 'sn.Fingerprint',
       title: 'Fingerprint Required',

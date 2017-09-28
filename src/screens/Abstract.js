@@ -12,16 +12,26 @@ export default class Abstract extends Component {
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
 
     this.lockObserver = App.get().addLockStatusObserver((lock, unlock) => {
+      console.log("LOCK STATUS OBSERVER", lock, unlock);
       if(!this.isMounted()) {
+        this.authenticated = unlock;
         return;
       }
 
       if(lock == true) {
         this.mergeState({lockContent: true});
       } else if(unlock == true) {
-        this.mergeState({lockContent: false});
+        this.unlockContent();
       }
     })
+  }
+
+  constructState(state) {
+    this.state = _.merge({lockContent: !App.isAuthenticated}, state);
+  }
+
+  unlockContent() {
+    this.mergeState({lockContent: false});
   }
 
   mergeState(state) {
@@ -38,6 +48,11 @@ export default class Abstract extends Component {
   componentWillMount() {
     this.willUnmount = false;
     this.mounted = false;
+
+    if(this.authenticated && this.state.lockContent) {
+      // observer was called before component was mounted
+      this.unlockContent();
+    }
   }
 
   loadInitialState() {

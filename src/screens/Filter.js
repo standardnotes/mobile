@@ -26,7 +26,7 @@ export default class Filter extends Abstract {
   constructor(props) {
     super(props);
     this.tags = [];
-    this.state = {ready: false};
+    this.constructState({ready: false});
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
       this.applicationIsReady = true;
@@ -301,8 +301,11 @@ export default class Filter extends Abstract {
 
   render() {
     if(!this.state.ready || this.state.lockContent) {
+      // console.log("Render Locked Filter content");
       return (<View></View>);
     }
+
+    console.log("Render regular Filter content");
 
     if(this.loadTags) {
       var tags = ModelManager.getInstance().tags.slice();
