@@ -303,9 +303,9 @@ export default class ModelManager {
 
   getNotes(options = {}) {
     var notes;
-
+    var tags;
     if(options.selectedTags && options.selectedTags.length > 0 && options.selectedTags[0].key !== "all") {
-      var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
+      tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
       if(tags.length > 0) {
         var taggedNotes = new Set();
         for(var tag of tags) {
@@ -367,6 +367,6 @@ export default class ModelManager {
       return 0;
     })
 
-    return notes;
+    return {notes: notes, tags: tags};
   }
 }

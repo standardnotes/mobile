@@ -133,7 +133,7 @@ export default class NoteCell extends React.PureComponent {
             </View>
           }
 
-          {note.tags.length > 0 &&
+          {this.props.renderTags && note.tags.length > 0 &&
             <View style={this.styles.noteTags}>
               <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag)}>
               {Tag.arrayToDisplayString(note.tags)}

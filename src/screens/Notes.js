@@ -339,11 +339,12 @@ export default class Notes extends Abstract {
 
   render() {
     if(!this.state.ready || this.state.lockContent) {
-      console.log("Rendering locked note content");
       return (<View></View>);
     }
-    console.log("Rendering UNlocked content");
-    var notes = ModelManager.getInstance().getNotes(this.options);
+
+    var result = ModelManager.getInstance().getNotes(this.options);
+    var notes = result.notes;
+    var tags = result.tags;
 
     return (
       <View style={GlobalStyles.styles().container}>
@@ -358,6 +359,7 @@ export default class Notes extends Abstract {
             sortType={this.options.sortBy}
             decrypting={this.state.decrypting}
             loading={this.state.loading}
+            selectedTags={tags}
           />
         }
       </View>

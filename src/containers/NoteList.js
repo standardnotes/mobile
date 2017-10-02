@@ -3,6 +3,7 @@ import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text } from 're
 import NoteCell from "./NoteCell"
 import Search from 'react-native-search-box'
 import GlobalStyles from "../Styles"
+import App from "../app"
 
 export default class NoteList extends Component {
 
@@ -48,19 +49,28 @@ export default class NoteList extends Component {
   };
 
   // must pass title, text, and tags as props so that it re-renders when either of those change
-  _renderItem = ({item}) => (
-    <NoteCell
-      item={item}
-      onPressItem={this.props.onPressItem}
-      title={item.title}
-      text={item.text}
-      tags={item.tags}
-      pinned={item.pinned}
-      deleted={item.deleted}
-      archived={item.archived}
-      sortType={this.props.sortType}
-    />
-  )
+  _renderItem = ({item}) => {
+    // On Android, only one tag is selected at a time. If it is selected, we don't need to display the tags string
+    // above the note cell
+    console.log("Selected tags", this.props.selectedTags);
+    let selectedTags = this.props.selectedTags || [];
+    let renderTags = App.isIOS || selectedTags.length == 0 || (!item.tags.includes(selectedTags[0]));
+
+    return (
+      <NoteCell
+        item={item}
+        onPressItem={this.props.onPressItem}
+        title={item.title}
+        text={item.text}
+        tags={item.tags}
+        pinned={item.pinned}
+        deleted={item.deleted}
+        archived={item.archived}
+        sortType={this.props.sortType}
+        renderTags={renderTags}
+      />
+    )
+  }
 
   render() {
     var placeholderText = "";

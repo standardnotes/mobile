@@ -219,19 +219,20 @@ export default class GlobalStyles {
   }
 
   defaultConstants() {
+    var tintColor = "#fb0206";
     return {
         composeBorderColor: "#F5F5F5",
         mainBackgroundColor: "#ffffff",
-        mainTintColor: "#fb0206",
+        mainTintColor: tintColor,
         mainDimColor: "#9d9d9d",
         mainTextColor: "#000000",
         mainTextFontSize: 16,
         mainHeaderFontSize: 16,
 
-        navBarColor: "#f7f7f7",
-        navBarTextColor: "#fb0206",
+        navBarColor: "white",
+        navBarTextColor: tintColor,
 
-        navBarColorAndroid: "#fb0206",
+        navBarColorAndroid: tintColor,
         navBarTextColorAndroid: "#ffffff",
 
         paddingLeft: 14,
