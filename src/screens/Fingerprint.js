@@ -101,11 +101,17 @@ export default class Fingerprint extends Abstract {
   }
 
   handleSuccessfulAuth = () => {
-    this.mergeState({success: true});
-    setTimeout(() => {
+    var success = () => {
       this.props.onAuthenticateSuccess();
       this.dismissModal();
-    }, 350);
+    }
+    // No success animation needed for iOS. Just dismiss right away.
+    if(App.isAndroid) {
+      this.mergeState({success: true});
+      setTimeout(success, 350);
+    } else {
+      success();
+    }
   }
 
   render() {

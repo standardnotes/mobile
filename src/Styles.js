@@ -153,7 +153,6 @@ export default class GlobalStyles {
   }
 
   async downloadTheme(theme, callback) {
-    console.log("Downloading theme", theme.url);
     var url;
     if(theme.url.includes("?")) {
       url = theme.url.replace("?", ".json?");
