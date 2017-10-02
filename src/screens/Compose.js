@@ -94,7 +94,7 @@ export default class Compose extends Abstract {
     }
 
     if(Platform.OS === "android") {
-      tagButton.icon = Icons.getIcon("md-more");
+      tagButton.icon = Icons.getIcon("md-pricetag");
     }
 
     if(!this.note.uuid) {

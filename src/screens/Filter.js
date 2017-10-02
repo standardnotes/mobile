@@ -137,13 +137,19 @@ export default class Filter extends Abstract {
     };
 
     if(Platform.OS === "android") {
-      rightButton.icon = Icons.getIcon("md-pricetag");
+      // Android will use FAB for new tag instead
+      rightButton = {};
     }
 
     this.props.navigator.setButtons({
       rightButtons: [rightButton],
       leftButtons: leftButtons,
-      animated: false
+      animated: false,
+      fab: {
+        collapsedId: 'new-tag',
+        collapsedIcon: Icons.getIcon('md-add'),
+        backgroundColor: GlobalStyles.constants().mainTintColor
+      },
     });
   }
 
