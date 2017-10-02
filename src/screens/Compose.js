@@ -181,6 +181,11 @@ export default class Compose extends Abstract {
       this.setNavBarSubtitle("Saving...");
       if(!this.note.uuid) {
         this.note.initUUID().then(function(){
+          if(this.props.selectedTagId) {
+            var tag = ModelManager.getInstance().findItem(this.props.selectedTagId);
+            this.note.addItemAsRelationship(tag);
+            tag.addItemAsRelationship(this.note);
+          }
           this.save();
           this.configureNavBar(true);
         }.bind(this));

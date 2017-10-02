@@ -256,6 +256,7 @@ export default class Notes extends Abstract {
     this.props.navigator.push({
       screen: 'sn.Compose',
       title: 'Compose',
+      passProps: {selectedTagId: this.selectedTags.length && this.selectedTags[0].uuid}, // For Android
     });
   }
 
@@ -344,7 +345,7 @@ export default class Notes extends Abstract {
 
     var result = ModelManager.getInstance().getNotes(this.options);
     var notes = result.notes;
-    var tags = result.tags;
+    var tags = this.selectedTags = result.tags;
 
     return (
       <View style={GlobalStyles.styles().container}>

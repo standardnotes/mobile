@@ -52,7 +52,6 @@ export default class NoteList extends Component {
   _renderItem = ({item}) => {
     // On Android, only one tag is selected at a time. If it is selected, we don't need to display the tags string
     // above the note cell
-    console.log("Selected tags", this.props.selectedTags);
     let selectedTags = this.props.selectedTags || [];
     let renderTags = App.isIOS || selectedTags.length == 0 || (!item.tags.includes(selectedTags[0]));
 
