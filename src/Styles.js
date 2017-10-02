@@ -153,14 +153,15 @@ export default class GlobalStyles {
   }
 
   async downloadTheme(theme, callback) {
+    console.log("Downloading theme", theme.url);
     var url;
-    if(theme.url.contains("?")) {
+    if(theme.url.includes("?")) {
       url = theme.url.replace("?", ".json?");
     } else {
       url = theme.url + ".json";
     }
 
-    if(App.isAndroid && url.contains("localhost")) {
+    if(App.isAndroid && url.includes("localhost")) {
       url = url.replace("localhost", "10.0.2.2");
     }
 

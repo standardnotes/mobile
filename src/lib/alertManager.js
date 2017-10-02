@@ -5,10 +5,7 @@ export default class AlertManager {
 
   static showConfirmationAlert(title, message, confirmationTitle, onConfirm, onCancel) {
     // On iOS, confirm should go first. On Android, cancel should go first.
-    let buttons = App.isIOS ? [
-      {text: confirmationTitle, onPress: onConfirm},
-      {text: 'Cancel', onPress: onCancel},
-    ] : [
+    let buttons = [
       {text: 'Cancel', onPress: onCancel},
       {text: confirmationTitle, onPress: onConfirm},
     ];
