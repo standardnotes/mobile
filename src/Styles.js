@@ -239,6 +239,8 @@ export default class GlobalStyles {
         plainCellBorderColor: "#efefef",
         sectionedCellHorizontalPadding: 14,
         selectedBackgroundColor: "#efefef",
+
+        maxSettingsCellHeight: 45
       }
   }
 

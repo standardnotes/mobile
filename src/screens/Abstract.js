@@ -40,6 +40,14 @@ export default class Abstract extends Component {
     })
   }
 
+  renderOnMount() {
+    if(this.isMounted()) {
+      this.forceUpdate();
+    } else {
+      this._renderOnMount = true;
+    }
+  }
+
   componentWillUnmount() {
     this.willUnmount = true;
     App.get().removeLockStatusObserver(this.lockObserver);
@@ -55,14 +63,20 @@ export default class Abstract extends Component {
     }
   }
 
+  componentDidMount() {
+    this.mounted = true;
+    this.configureNavBar(true);
+
+    if(this._renderOnMount) {
+      this._renderOnMount = false;
+      this.forceUpdate();
+    }
+  }
+
   loadInitialState() {
     this.configureNavBar(true);
   }
 
-  componentDidMount() {
-    this.mounted = true;
-    this.configureNavBar(true);
-  }
 
   isMounted() {
     return this.mounted;

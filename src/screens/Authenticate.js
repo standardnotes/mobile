@@ -5,17 +5,20 @@ import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
+import SectionedOptionsTableCell from "../components/SectionedOptionsTableCell";
 import Abstract from "./Abstract"
 import Storage from '../lib/storage'
 import KeysManager from '../lib/keysManager'
 import GlobalStyles from "../Styles"
 var _ = require('lodash')
+import App from "../app"
 
 import {
   TextInput,
   SectionList,
   ScrollView,
   View,
+  Text,
   Alert,
   Keyboard,
   InteractionManager
@@ -35,6 +38,12 @@ export default class Authenticate extends Abstract {
       setupButtonEnabled: true,
       unlockButtonEnabled: true,
     };
+
+    Storage.getItem("passcodeKeyboardType").then((result) => {
+      console.log("Got keyboard type", result);
+      this.keyboardType = result || 'default';
+      this.renderOnMount();
+    })
   }
 
   defaultPasswordParams() {
@@ -61,8 +70,6 @@ export default class Authenticate extends Abstract {
             title: 'Cancel',
             id: 'cancel',
             showAsAction: 'ifRoom',
-            // buttonColor: GlobalStyles.constants().mainTintColor,
-            // buttonFontSize: 17
           }
         ],
         animated: false
@@ -129,10 +136,34 @@ export default class Authenticate extends Abstract {
          }
        }.bind(this));
     }, 125);
+  }
 
+  onKeyboardOptionsSelect = (option) => {
+    if(option.key !== this.keyboardType) {
+      this.keyboardType = option.key;
+      Storage.setItem("passcodeKeyboardType", option.key);
+      this.forceUpdate();
+
+      if(App.isIOS) {
+        // on Android, keyboard will update right away
+        Keyboard.dismiss();
+        setTimeout(() => {
+          this.refs.input.focus();
+        }, 100);
+      }
+    }
   }
 
   render() {
+    let keyboardOptions = [
+      {title: "General", key: "default", selected: this.keyboardType == "default"},
+      {title: "Numeric", key: "numeric", selected: this.keyboardType == "numeric"}
+    ]
+
+    let optionsComponents = (
+      <SectionedOptionsTableCell title={"Keyboard Type"} options={keyboardOptions} onPress={this.onKeyboardOptionsSelect}/>
+    )
+
     return (
       <View style={GlobalStyles.styles().container}>
         <TableSection extraStyles={[GlobalStyles.styles().container]}>
@@ -142,6 +173,7 @@ export default class Authenticate extends Abstract {
 
               <SectionedTableCell textInputCell={true} first={true}>
                 <TextInput
+                  ref={'input'}
                   style={GlobalStyles.styles().sectionedTableCellTextInput}
                   placeholder={"Local passcode"}
                   onChangeText={(text) => this.setState({passcode: text})}
@@ -150,12 +182,13 @@ export default class Authenticate extends Abstract {
                   autoCapitalize={'none'}
                   autoFocus={true}
                   secureTextEntry={true}
+                  keyboardType={this.keyboardType}
                   underlineColorAndroid={'transparent'}
                   placeholderTextColor={GlobalStyles.constants().mainDimColor}
                 />
               </SectionedTableCell>
 
-                <ButtonCell maxHeight={45} title={this.state.unlockButtonText} disabled={!this.state.unlockButtonEnabled} bold={true} onPress={() => this.onUnlockPress()} />
+              <ButtonCell maxHeight={45} title={this.state.unlockButtonText} disabled={!this.state.unlockButtonEnabled} bold={true} onPress={() => this.onUnlockPress()} />
             </View>
           }
 
@@ -165,6 +198,7 @@ export default class Authenticate extends Abstract {
 
               <SectionedTableCell textInputCell={true} first={true}>
                 <TextInput
+                  ref={'input'}
                   style={GlobalStyles.styles().sectionedTableCellTextInput}
                   placeholder={"Local passcode"}
                   onChangeText={(text) => this.setState({passcode: text})}
@@ -173,16 +207,19 @@ export default class Authenticate extends Abstract {
                   autoCapitalize={'none'}
                   autoFocus={true}
                   secureTextEntry={true}
+                  keyboardType={this.keyboardType}
                   underlineColorAndroid={'transparent'}
                   placeholderTextColor={GlobalStyles.constants().mainDimColor}
                 />
               </SectionedTableCell>
 
-                <ButtonCell maxHeight={45} title={this.state.setupButtonText} disabled={!this.state.setupButtonEnabled} bold={true} onPress={() => this.onSavePress()} />
+              {optionsComponents}
+
+              <ButtonCell maxHeight={45} title={this.state.setupButtonText} disabled={!this.state.setupButtonEnabled} bold={true} onPress={() => this.onSavePress()} />
             </View>
           }
 
-      </TableSection>
+        </TableSection>
       </View>
     );
   }

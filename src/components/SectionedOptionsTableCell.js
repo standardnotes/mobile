@@ -20,7 +20,8 @@ export default class SectionedOptionsTableCell extends Component {
       padding: 0,
       paddingTop: 0,
       paddingBottom: 0,
-      paddingRight: 5
+      paddingRight: 5,
+      maxHeight: GlobalStyles.constants().maxSettingsCellHeight
     })
     return rules;
   }
