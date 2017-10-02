@@ -54,7 +54,7 @@ public class SNTextView extends LinearLayout {
         LayoutParams textLayout = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         editText.setLayoutParams(textLayout);
         editText.setGravity(Gravity.TOP);
-        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+        editText.setInputType(editText.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
 
         editText.addTextChangedListener(new TextWatcher() {
             private EventDispatcher mEventDispatcher;
