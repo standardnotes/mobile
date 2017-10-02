@@ -80,7 +80,6 @@ export default class Filter extends Abstract {
 
     this.syncObserver = Sync.getInstance().registerSyncObserver((changesMade, retreived, saved) => {
       if(retreived && _.find(retreived, {content_type: "Tag"})) {
-        console.log("Reloading tags list");
         this.forceUpdate();
       }
     });

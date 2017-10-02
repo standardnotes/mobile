@@ -12,7 +12,6 @@ export default class Abstract extends Component {
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
 
     this.lockObserver = App.get().addLockStatusObserver((lock, unlock) => {
-      console.log("LOCK STATUS OBSERVER", lock, unlock);
       if(!this.isMounted()) {
         this.authenticated = unlock;
         return;

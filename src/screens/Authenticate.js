@@ -40,7 +40,6 @@ export default class Authenticate extends Abstract {
     };
 
     Storage.getItem("passcodeKeyboardType").then((result) => {
-      console.log("Got keyboard type", result);
       this.keyboardType = result || 'default';
       this.renderOnMount();
     })
