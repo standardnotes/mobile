@@ -13,6 +13,7 @@ import NoteList from "../containers/NoteList"
 import Abstract from "./Abstract"
 import OptionsState from "../OptionsState"
 import App from "../app"
+import AuthModal from "../containers/AuthModal"
 var _ = require('lodash')
 
 export default class Notes extends Abstract {
@@ -38,7 +39,7 @@ export default class Notes extends Abstract {
       ready: true,
       refreshing: false,
       decrypting: false,
-      loading: true
+      loading: true,
     });
     this.registerObservers();
     this.loadTabbarIcons();
@@ -340,8 +341,8 @@ export default class Notes extends Abstract {
   }
 
   render() {
-    if(!this.state.ready || this.state.lockContent) {
-      return super.render();
+    if(this.state.lockContent || !this.state.ready) {
+      return <AuthModal />;
     }
 
     var result = ModelManager.getInstance().getNotes(this.options);

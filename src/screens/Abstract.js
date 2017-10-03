@@ -129,23 +129,4 @@ export default class Abstract extends Component {
       }
   }
 
-  render() {
-    if(!this.rendersLockscreen) {
-      return (<View></View>);
-    }
-
-    return (
-      <Modal
-        animationType={"slide"}
-        transparent={false}
-        key={Math.random}
-        visible={this.state.lockContent}
-        onRequestClose={() => {alert("Modal has been closed.")}}>
-
-        {App.get().getAuthenticationComponent()}
-
-      </Modal>
-    )
-  }
-
 }

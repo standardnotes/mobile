@@ -19,6 +19,7 @@ import Authenticate from "./screens/Authenticate";
 var moment = require('moment/min/moment-with-locales.min.js');
 var _ = require('lodash');
 var pjson = require('../package.json');
+import ApplicationState from "./ApplicationState";
 
 if(__DEV__ === false) {
   const bugsnag = new Client()
@@ -45,7 +46,6 @@ export default class App {
   }
 
   constructor() {
-    AppState.addEventListener('change', this.handleAppStateChange);
     KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
 
     // required to initialize current app state to active since the observer is not called in time on initial app launch
@@ -69,12 +69,39 @@ export default class App {
       }
     })
 
+    // Screen visibility listener
+    this.listener = new ScreenVisibilityListener({
+      willAppear: ({screen, startTime, endTime, commandType}) => {
+        this._currentScreen = screen;
+      },
+    });
+
+    this.listener.register();
+
     // Listen to sign out event
     this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
       if(event == Auth.DidSignOutEvent) {
         this.optionsState.reset();
       }
     }.bind(this));
+
+    ApplicationState.get().addStateObserver((state) => {
+      // Hide screen content as we go to the background
+      if(state == 'background') {
+        if(this.shouldLockContent()) {
+          this.notifyLockStatusObserverOfLockState(true, null);
+        }
+      }
+
+      if(state == 'foreground') {
+
+      }
+
+    })
+  }
+
+  currentScreen() {
+    return this._currentScreen;
   }
 
   getLocale() {
@@ -83,39 +110,6 @@ export default class App {
     } else {
       return NativeModules.SettingsManager.settings.AppleLocale;
     }
-  }
-
-  handleAppStateChange = (nextAppState) => {
-
-    var isEnteringForeground = nextAppState === "active"
-      && (this.previousAppState == 'background' || this.previousAppState == 'inactive')
-      && !this.isStartingApp;
-
-    var isEnteringBackground;
-
-    if(App.isIOS) {
-      isEnteringBackground = ((nextAppState == 'inactive' && this.previousAppState == 'active')
-        || (nextAppState == 'background' && this.previousAppState != 'inactive')) && !this.isStartingApp;
-    } else if(App.isAndroid) {
-      isEnteringBackground = nextAppState == 'background' && !this.isStartingApp;
-    }
-
-    console.log("APP STATE CHANGE FROM", this.previousAppState,
-    "TO STATE", nextAppState,
-    "IS STARTING APP:", this.isStartingApp,
-    "IS ENTERING BACKGROUND", isEnteringBackground,
-    "IS ENTERING FOREGROUND", isEnteringForeground,
-    "WILL AUTHENTICATE", isEnteringForeground && !this.authenticationInProgress
-    );
-
-    // Hide screen content as we go to the background
-    if(isEnteringBackground) {
-      if(this.shouldLockContent()) {
-        this.notifyLockStatusObserverOfLockState(true, null);
-      }
-    }
-
-    this.previousAppState = nextAppState;
   }
 
   notifyLockStatusObserverOfLockState(lock, unlock) {
@@ -249,7 +243,6 @@ export default class App {
 
   applicationIsReady() {
     console.log("===Emitting Application Ready===");
-    this.authenticationInProgress = false;
     this.ready = true;
     this.readyObservers.forEach(function(observer){
       observer.callback();
@@ -263,45 +256,27 @@ export default class App {
     this.applicationIsReady();
   }
 
-  setAuthenticationComponentProps(title, passcode, fingerprint, onAuthenticate) {
-    this.authProps = {
-      title: title,
-      passcode: passcode,
-      fingerprint: fingerprint,
-      onAuthenticate: onAuthenticate
-    }
-  }
-
   getAuthenticationProps() {
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
     var hasFingerprint = KeysManager.get().hasFingerprint();
 
-    this.isAuthenticated = false;
-    this.authenticationInProgress = true;
+    var showPasscode = hasPasscode, showFingerprint = hasFingerprint;
 
-    var title = hasPasscode && hasFingerprint ? "Authentication Required" : (hasPasscode ? "Passcode Required" : "Fingerprint Required");
+    if(ApplicationState.get().isWarmLaunch()) {
+       showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
+       showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
+     }
+
+    this.isAuthenticated = false;
+
+    var title = showPasscode && showFingerprint ? "Authentication Required" : (showPasscode ? "Passcode Required" : "Fingerprint Required");
 
     return {
       title: title,
-      passcode: hasPasscode,
-      fingerprint: hasFingerprint,
+      passcode: showPasscode,
+      fingerprint: showFingerprint,
       onAuthenticate: this.onAuthenticationSuccess.bind(this)
     }
-  }
-
-  getAuthenticationComponent() {
-    var props = this.getAuthenticationProps();
-    return (
-      <Authenticate
-        title={props.title}
-        onAuthenticateSuccess={props.onAuthenticate}
-        mode={"authenticate"}
-        requirePasscode={props.passcode}
-        requireFingerprint={props.fingerprint}
-        pseudoModal={true}
-        key={Math.random}
-      />
-    )
   }
 
   startApp() {
@@ -312,7 +287,7 @@ export default class App {
     // if we don't catch this edge case, it will result in infinite recursion. So as `startApp` is called
     // immediately before this transition, setting isStartingApp to true then false afterwards will prevent the infinite
     // recursion
-    this.isStartingApp = true;
+    ApplicationState.get().setIsStartingApp(true);
 
     if(this.isIOS) {
       let tabs = [{
@@ -367,7 +342,7 @@ export default class App {
     }
 
     setTimeout(function () {
-      this.isStartingApp = false;
+      ApplicationState.get().setIsStartingApp(false);
     }.bind(this), 1500);
   }
 

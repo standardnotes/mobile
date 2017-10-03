@@ -14,7 +14,7 @@ import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCe
 import Abstract from "./Abstract"
 import Authenticate from "./Authenticate"
 import ItemParams from "../models/local/itemParams"
-
+import AuthModal from "../containers/AuthModal"
 import AuthSection from "../containers/account/AuthSection"
 import RegistrationConfirmSection from "../containers/account/RegistrationConfirmSection"
 import OptionsSection from "../containers/account/OptionsSection"
@@ -37,7 +37,7 @@ export default class Account extends Abstract {
 
     this.state = {ready: false, params: {}};
 
-    this.rendersLockscreen = true;
+    // this.rendersLockscreen = true;
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
       this.applicationIsReady = true;
@@ -367,10 +367,10 @@ export default class Account extends Abstract {
   }
 
   render() {
-    if(!this.state.ready || this.state.lockContent) {
-      return super.render();
+    if(this.state.lockContent || !this.state.ready) {
+      return <View />
     }
-    
+
     let signedIn = !Auth.getInstance().offline();
     var themes = GlobalStyles.get().themes();
 

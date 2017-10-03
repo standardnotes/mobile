@@ -15,6 +15,7 @@ var _ = require('lodash')
 import App from "../app"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Icon from 'react-native-vector-icons/Ionicons';
+import ApplicationState from "../ApplicationState";
 
 import {
   TextInput,
@@ -27,14 +28,50 @@ import {
   InteractionManager,
   StyleSheet,
   Button,
-  Dimensions
 } from 'react-native';
 
 export default class Authenticate extends Abstract {
 
   constructor(props) {
     super(props);
-    console.log("Constructing Authentication Component");
+    this.authProps = App.get().getAuthenticationProps();
+
+    this.observer = ApplicationState.get().addStateObserver((state) => {
+      if(state == 'foreground') {
+        if(this.isMounted()) {
+          this.beginAuthentication();
+        } else {
+          this.authenticateOnMount = true;
+        }
+      }
+    })
+  }
+
+  componentWillUnmount() {
+    ApplicationState.get().removeStateObserver(this.observer);
+    super.componentWillUnmount();
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+
+    if(!["background", "inactive"].includes(ApplicationState.get().nextAppState) || this.authenticateOnMount) {
+      this.beginAuthentication();
+      this.authenticateOnMount = false;
+    }
+  }
+
+  beginAuthentication = () => {
+    if(this.authenticationInProgress) {
+      return;
+    }
+    this.authenticationInProgress = true;
+    this.mergeState({began: true});
+    if(this.authProps.fingerprint) {
+      this.refs.fingerprintSection.beginAuthentication();
+    } else if(this.authProps.passcode) {
+      this.refs.passcodeSection.beginAuthentication();
+    }
   }
 
   dismiss() {
@@ -65,15 +102,6 @@ export default class Authenticate extends Abstract {
     }
   }
 
-  componentDidMount() {
-    super.componentDidMount();
-    if(this.props.requireFingerprint) {
-      this.refs.fingerprintSection.beginAuthentication();
-    } else if(this.props.requirePasscode) {
-      this.refs.passcodeSection.beginAuthentication();
-    }
-  }
-
   onPasscodeSetupSuccess = () => {
     this.props.onSetupSuccess();
     this.dismiss();
@@ -81,16 +109,18 @@ export default class Authenticate extends Abstract {
 
   onPasscodeAuthenticateSuccess = () => {
     this.props.onAuthenticateSuccess();
+    this.authenticationInProgress = false;
     this.dismiss();
   }
 
   onFingerprintSuccess = () => {
-    if(this.props.requirePasscode) {
+    if(this.authProps.passcode) {
       setTimeout(() => {
         this.refs.passcodeSection.beginAuthentication();
       }, 100);
     } else {
       this.props.onAuthenticateSuccess();
+      this.authenticationInProgress = false;
       this.dismiss();
     }
   }
@@ -99,11 +129,11 @@ export default class Authenticate extends Abstract {
     var sectionTitle;
     if(this.props.mode == "setup") {
       sectionTitle = "Choose passcode";
-    } else if(this.props.requirePasscode && this.props.requireFingerprint) {
+    } else if(this.authProps.passcode && this.authProps.fingerprint) {
       sectionTitle = "Authentication Required";
-    } else if(this.props.requirePasscode) {
+    } else if(this.authProps.passcode) {
       sectionTitle = "Enter Passcode";
-    } else if(this.props.requireFingerprint) {
+    } else if(this.authProps.fingerprint) {
       sectionTitle = "Fingerprint Required";
     }
 
@@ -114,12 +144,12 @@ export default class Authenticate extends Abstract {
 
             <SectionHeader title={sectionTitle} />
 
-            {this.props.requireFingerprint &&
-              <FingerprintSection first={true} ref={'fingerprintSection'} onAuthenticateSuccess={this.onFingerprintSuccess} />
+            {this.authProps.fingerprint &&
+              <FingerprintSection began={this.state.began} first={true} ref={'fingerprintSection'} onPress={this.beginAuthentication} onAuthenticateSuccess={this.onFingerprintSuccess} />
             }
 
-            {(this.props.requirePasscode || this.props.mode === "setup") &&
-              <PasscodeSection ref={'passcodeSection'} first={!this.props.requireFingerprint} mode={this.props.mode} onSetupSuccess={this.onPasscodeSetupSuccess} onAuthenticateSuccess={this.onPasscodeAuthenticateSuccess} />
+            {(this.authProps.passcode || this.props.mode === "setup") &&
+              <PasscodeSection ref={'passcodeSection'} first={!this.authProps.fingerprint} mode={this.props.mode} onSetupSuccess={this.onPasscodeSetupSuccess} onAuthenticateSuccess={this.onPasscodeAuthenticateSuccess} />
             }
 
 
@@ -340,10 +370,6 @@ class FingerprintSection extends Abstract {
 
   }
 
-  componentDidMount() {
-    super.componentDidMount();
-  }
-
   beginAuthentication() {
     if(App.isAndroid) {
       FingerprintScanner.authenticate({ onAttempt: this.handleInvalidAttempt }).then(() => {
@@ -391,6 +417,14 @@ class FingerprintSection extends Abstract {
     setTimeout(success, 50);
   }
 
+  onPress = () => {
+    if(!this.props.began) {
+      this.props.onPress();
+    } else {
+      __DEV__ && this.__dev_simulateSuccess();
+    }
+  }
+
   __dev_simulateSuccess = () => {
     this.handleSuccessfulAuth();
   }
@@ -400,6 +434,10 @@ class FingerprintSection extends Abstract {
     let textStyles = [this.styles.text];
     var iconName = App.isAndroid ? "md-finger-print" : 'ios-finger-print';
     var text = this.state.error ? this.state.error : "Please scan your fingerprint";
+
+    if(!this.props.began) {
+      text = "Tap here to begin authentication.";
+    }
 
     if(this.state.success) {
       iconName = App.isAndroid ? "md-checkmark-circle-outline" : "ios-checkmark-circle-outline";
@@ -412,7 +450,7 @@ class FingerprintSection extends Abstract {
         <SectionedAccessoryTableCell
           first={this.props.first}
           iconName={iconName}
-          onPress={() => {__DEV__ && this.__dev_simulateSuccess()}}
+          onPress={this.onPress}
           text={text}
           color={ this.state.success ? GlobalStyles.constants().mainTintColor : null}
           leftAlignIcon={true}
