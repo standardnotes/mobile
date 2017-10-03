@@ -15,7 +15,7 @@ import GlobalStyles from "./Styles"
 import Icons from "./Icons"
 import OptionsState from "./OptionsState"
 import { Client } from 'bugsnag-react-native';
-
+import Authenticate from "./screens/Authenticate";
 var moment = require('moment/min/moment-with-locales.min.js');
 var _ = require('lodash');
 var pjson = require('../package.json');
@@ -287,6 +287,21 @@ export default class App {
       fingerprint: hasFingerprint,
       onAuthenticate: this.onAuthenticationSuccess.bind(this)
     }
+  }
+
+  getAuthenticationComponent() {
+    var props = this.getAuthenticationProps();
+    return (
+      <Authenticate
+        title={props.title}
+        onAuthenticateSuccess={props.onAuthenticate}
+        mode={"authenticate"}
+        requirePasscode={props.passcode}
+        requireFingerprint={props.fingerprint}
+        pseudoModal={true}
+        key={Math.random}
+      />
+    )
   }
 
   startApp() {

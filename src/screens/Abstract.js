@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import {DeviceEventEmitter, Modal} from 'react-native';
+import {DeviceEventEmitter, Modal, View} from 'react-native';
 var _ = require('lodash')
 import GlobalStyles from "../Styles"
 import App from "../app"
-import Authenticate from "./Authenticate"
 
 export default class Abstract extends Component {
 
@@ -130,33 +129,23 @@ export default class Abstract extends Component {
       }
   }
 
-  // render() {
-    // if(!this.rendersLockscreen) {
-      // return (<View></View>);
-    // }
-    //
-    // var props = App.get().getAuthenticationProps();
-    //
-    // return (
-    //   <Modal
-    //     animationType="slide"
-    //     transparent={false}
-    //     key={Math.random}
-    //     visible={this.state.lockContent}
-    //     onRequestClose={() => {alert("Modal has been closed.")}}>
-    //
-    //     <Authenticate
-    //       title={props.title}
-    //       onAuthenticateSuccess={props.onAuthenticate}
-    //       mode={"authenticate"}
-    //       requirePasscode={props.passcode}
-    //       requireFingerprint={props.fingerprint}
-    //       pseudoModal={true}
-    //       key={Math.random}
-    //     />
-    //
-    //   </Modal>
-    // )
-  // }
+  render() {
+    if(!this.rendersLockscreen) {
+      return (<View></View>);
+    }
+
+    return (
+      <Modal
+        animationType={"slide"}
+        transparent={false}
+        key={Math.random}
+        visible={this.state.lockContent}
+        onRequestClose={() => {alert("Modal has been closed.")}}>
+
+        {App.get().getAuthenticationComponent()}
+
+      </Modal>
+    )
+  }
 
 }
