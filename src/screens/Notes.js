@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, AppState, StatusBar } from 'react-native';
+import { StyleSheet, View, Platform, Text, AppState, StatusBar, Modal } from 'react-native';
 import ModelManager from '../lib/modelManager'
 import Storage from '../lib/storage'
 import Sync from '../lib/sync'
@@ -11,7 +11,6 @@ import Keychain from "../lib/keychain"
 import Icons from '../Icons';
 import NoteList from "../containers/NoteList"
 import Abstract from "./Abstract"
-import Authenticate from "./Authenticate"
 import OptionsState from "../OptionsState"
 import App from "../app"
 var _ = require('lodash')
@@ -20,6 +19,8 @@ export default class Notes extends Abstract {
 
   constructor(props) {
     super(props);
+
+    this.rendersLockscreen = true;
 
     this.state = {ready: false};
 
@@ -340,9 +341,7 @@ export default class Notes extends Abstract {
 
   render() {
     if(!this.state.ready || this.state.lockContent) {
-      return (
-        <View></View>
-      );
+      return super.render();
     }
 
     var result = ModelManager.getInstance().getNotes(this.options);

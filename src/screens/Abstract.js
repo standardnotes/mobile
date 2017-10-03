@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import {DeviceEventEmitter} from 'react-native';
+import {DeviceEventEmitter, Modal} from 'react-native';
 var _ = require('lodash')
 import GlobalStyles from "../Styles"
 import App from "../app"
+import Authenticate from "./Authenticate"
 
 export default class Abstract extends Component {
 
@@ -128,5 +129,34 @@ export default class Abstract extends Component {
         break;
       }
   }
+
+  // render() {
+    // if(!this.rendersLockscreen) {
+      // return (<View></View>);
+    // }
+    //
+    // var props = App.get().getAuthenticationProps();
+    //
+    // return (
+    //   <Modal
+    //     animationType="slide"
+    //     transparent={false}
+    //     key={Math.random}
+    //     visible={this.state.lockContent}
+    //     onRequestClose={() => {alert("Modal has been closed.")}}>
+    //
+    //     <Authenticate
+    //       title={props.title}
+    //       onAuthenticateSuccess={props.onAuthenticate}
+    //       mode={"authenticate"}
+    //       requirePasscode={props.passcode}
+    //       requireFingerprint={props.fingerprint}
+    //       pseudoModal={true}
+    //       key={Math.random}
+    //     />
+    //
+    //   </Modal>
+    // )
+  // }
 
 }

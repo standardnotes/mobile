@@ -37,6 +37,8 @@ export default class Account extends Abstract {
 
     this.state = {ready: false, params: {}};
 
+    this.rendersLockscreen = true;
+
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
       this.applicationIsReady = true;
 
@@ -365,10 +367,10 @@ export default class Account extends Abstract {
   }
 
   render() {
-    if(this.state.lockContent) {
-      return (<View></View>);
+    if(!this.state.ready || this.state.lockContent) {
+      return super.render();
     }
-
+    
     let signedIn = !Auth.getInstance().offline();
     var themes = GlobalStyles.get().themes();
 

@@ -2,6 +2,7 @@
  * Standard Notes React Native App
  */
 
+import React, { Component } from 'react';
 import {AppState, Platform, StatusBar, BackHandler, DeviceEventEmitter, NativeModules} from 'react-native';
 
 import {Navigation, ScreenVisibilityListener} from 'react-native-navigation';
@@ -68,33 +69,6 @@ export default class App {
       }
     })
 
-    // Screen visibility listener
-    this.listener = new ScreenVisibilityListener({
-      willAppear: ({screen, startTime, endTime, commandType}) => {
-        // This handles authentication for the initial app launch. We wait for the Notes component to be ready
-        // (meaning the app UI is ready), then present the authentication modal
-        if(screen == "sn.Notes" && this.authenticationQueued) {
-          this.authenticationQueued = false;
-          this.handleAuthentication(this.queuedAuthenticationLaunchState);
-          this.queuedAuthenticationLaunchState = null;
-        }
-      },
-
-      didAppear: ({screen, startTime, endTime, commandType}) => {
-        if(screen == "sn.Authenticate") {
-          this.modalVisible = true;
-        }
-      },
-
-      didDisappear: ({screen, startTime, endTime, commandType}) => {
-        if(screen == "sn.Authenticate") {
-          this.modalVisible = false;
-        }
-      },
-    });
-
-    this.listener.register();
-
     // Listen to sign out event
     this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
       if(event == Auth.DidSignOutEvent) {
@@ -131,7 +105,7 @@ export default class App {
     "IS STARTING APP:", this.isStartingApp,
     "IS ENTERING BACKGROUND", isEnteringBackground,
     "IS ENTERING FOREGROUND", isEnteringForeground,
-    "WILL AUTHENTICATE", isEnteringForeground && !this.authenticationInProgress && !this.modalVisible
+    "WILL AUTHENTICATE", isEnteringForeground && !this.authenticationInProgress
     );
 
     // Hide screen content as we go to the background
@@ -139,13 +113,6 @@ export default class App {
       if(this.shouldLockContent()) {
         this.notifyLockStatusObserverOfLockState(true, null);
       }
-    }
-
-    // Handle authentication as we come back from the background
-    if (isEnteringForeground && !this.authenticationInProgress && !this.modalVisible) {
-      setTimeout(() => {
-        this.handleAuthentication(WARM_LAUNCH_STATE);
-      }, 500);
     }
 
     this.previousAppState = nextAppState;
@@ -270,10 +237,6 @@ export default class App {
         this.loading = false;
         var run = () => {
           this.startApp();
-          var handled = this.handleAuthentication(COLD_LAUNCH_STATE, true);
-          if(!handled) {
-            this.onAuthenticationSuccess();
-          }
         }
         if(KeysManager.get().isFirstRun()) {
           KeysManager.get().handleFirstRun().then(run);
@@ -300,61 +263,30 @@ export default class App {
     this.applicationIsReady();
   }
 
-  handleAuthentication(fromState, queue = false) {
+  setAuthenticationComponentProps(title, passcode, fingerprint, onAuthenticate) {
+    this.authProps = {
+      title: title,
+      passcode: passcode,
+      fingerprint: fingerprint,
+      onAuthenticate: onAuthenticate
+    }
+  }
+
+  getAuthenticationProps() {
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
     var hasFingerprint = KeysManager.get().hasFingerprint();
 
-    var showPasscode, showFingerprint;
-
-    if(fromState == COLD_LAUNCH_STATE) {
-      showPasscode = hasPasscode;
-      showFingerprint = hasFingerprint;
-    } else if(fromState == WARM_LAUNCH_STATE) {
-      showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
-      showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
-    }
-
-    if(!showPasscode && !showFingerprint) {
-      return false;
-    }
-
     this.isAuthenticated = false;
-
-    if(queue) {
-      this.authenticationQueued = true;
-      this.queuedAuthenticationLaunchState = fromState;
-      return true;
-    }
-
-    if(this.modalVisible) {
-      console.log("MODAL IS VISIBLE. NOT SUPPOSED TO BE.");
-    }
-
     this.authenticationInProgress = true;
 
-    this.showAuthenticate(showPasscode, showFingerprint, this.onAuthenticationSuccess.bind(this));
+    var title = hasPasscode && hasFingerprint ? "Authentication Required" : (hasPasscode ? "Passcode Required" : "Fingerprint Required");
 
-    return true;
-  }
-
-  showAuthenticate(passcode, fingerprint, onAuthenticate) {
-    var title = passcode && fingerprint ? "Authentication Required" : (passcode ? "Passcode Required" : "Fingerprint Required");
-
-    Navigation.showModal({
-      screen: 'sn.Authenticate',
+    return {
       title: title,
-      backButtonHidden: true,
-      overrideBackPress: true,
-      passProps: {
-        mode: "authenticate",
-        onAuthenticateSuccess: onAuthenticate,
-        requirePasscode: passcode,
-        requireFingerprint: fingerprint
-      },
-      animationType: 'slide-up',
-      tabsStyle: _.clone(this.tabStyles), // for iOS
-      appStyle: _.clone(this.tabStyles) // for Android
-    })
+      passcode: hasPasscode,
+      fingerprint: hasFingerprint,
+      onAuthenticate: this.onAuthenticationSuccess.bind(this)
+    }
   }
 
   startApp() {

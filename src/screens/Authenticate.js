@@ -34,10 +34,13 @@ export default class Authenticate extends Abstract {
 
   constructor(props) {
     super(props);
+    console.log("Constructing Authentication Component");
   }
 
   dismiss() {
-    this.dismissModal();
+    if(!this.props.pseudoModal) {
+      this.dismissModal();
+    }
   }
 
   onNavigatorEvent(event) {
