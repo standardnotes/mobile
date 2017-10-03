@@ -81,31 +81,18 @@ export default class App {
       },
 
       didAppear: ({screen, startTime, endTime, commandType}) => {
-        if(screen == "sn.Authenticate" || screen == "sn.Fingerprint") {
+        if(screen == "sn.Authenticate") {
           this.modalVisible = true;
         }
       },
 
       didDisappear: ({screen, startTime, endTime, commandType}) => {
-        let isPasscode = screen == "sn.Authenticate";
-        let isFingerprint = screen == "sn.Fingerprint";
-        if(isPasscode || isFingerprint) {
+        if(screen == "sn.Authenticate") {
           this.modalVisible = false;
-          this.handleQueuedAuth();
-
-          if(isPasscode) {
-            this.passcodeVisible = false;
-          }
-          if(isFingerprint) {
-            this.fingerprintVisible = false;
-          }
         }
       },
-
-      willDisappear: ({screen, startTime, endTime, commandType}) => {
-
-      },
     });
+
     this.listener.register();
 
     // Listen to sign out event
@@ -143,7 +130,8 @@ export default class App {
     "TO STATE", nextAppState,
     "IS STARTING APP:", this.isStartingApp,
     "IS ENTERING BACKGROUND", isEnteringBackground,
-    "IS ENTERING FOREGROUND", isEnteringForeground
+    "IS ENTERING FOREGROUND", isEnteringForeground,
+    "WILL AUTHENTICATE", isEnteringForeground && !this.authenticationInProgress && !this.modalVisible
     );
 
     // Hide screen content as we go to the background
@@ -154,9 +142,10 @@ export default class App {
     }
 
     // Handle authentication as we come back from the background
-    if (isEnteringForeground && !this.authenticationInProgress
-       && !this.passcodeVisible && !this.fingerprintVisible) {
-      this.handleAuthentication(WARM_LAUNCH_STATE);
+    if (isEnteringForeground && !this.authenticationInProgress && !this.modalVisible) {
+      setTimeout(() => {
+        this.handleAuthentication(WARM_LAUNCH_STATE);
+      }, 500);
     }
 
     this.previousAppState = nextAppState;
@@ -311,17 +300,6 @@ export default class App {
     this.applicationIsReady();
   }
 
-  handleQueuedAuth() {
-    if(this.queuePasscode) {
-      this.queuePasscode = false;
-      this.showPasscodeLock(this.onAuthenticationSuccess.bind(this));
-    }
-    else if(this.queueFingerprint) {
-      this.queueFingerprint = false;
-      this.showFingerprintScanner(this.onAuthenticationSuccess.bind(this))
-    }
-  }
-
   handleAuthentication(fromState, queue = false) {
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
     var hasFingerprint = KeysManager.get().hasFingerprint();
@@ -349,58 +327,29 @@ export default class App {
     }
 
     if(this.modalVisible) {
-      this.queuePasscode = showPasscode && !this.passcodeVisible;
-      this.queueFingerprint = showFingerprint && !this.fingerprintVisible;
-      return;
+      console.log("MODAL IS VISIBLE. NOT SUPPOSED TO BE.");
     }
 
     this.authenticationInProgress = true;
 
-    if(showPasscode) {
-      this.showPasscodeLock(function(){
-        if(showFingerprint) {
-          // wait for passcode modal dismissal.
-          this.queueFingerprint = true;
-        } else {
-          this.onAuthenticationSuccess();
-        }
-      }.bind(this));
-    } else if(showFingerprint) {
-      this.showFingerprintScanner(this.onAuthenticationSuccess.bind(this));
-    } else {
-      this.onAuthenticationSuccess();
-    }
+    this.showAuthenticate(showPasscode, showFingerprint, this.onAuthenticationSuccess.bind(this));
 
     return true;
   }
 
-  showPasscodeLock(onAuthenticate) {
-    this.passcodeVisible = true;
+  showAuthenticate(passcode, fingerprint, onAuthenticate) {
+    var title = passcode && fingerprint ? "Authentication Required" : (passcode ? "Passcode Required" : "Fingerprint Required");
+
     Navigation.showModal({
       screen: 'sn.Authenticate',
-      title: 'Passcode Required',
+      title: title,
       backButtonHidden: true,
       overrideBackPress: true,
       passProps: {
         mode: "authenticate",
-        onAuthenticateSuccess: onAuthenticate
-      },
-      animationType: 'slide-up',
-      tabsStyle: _.clone(this.tabStyles), // for iOS
-      appStyle: _.clone(this.tabStyles) // for Android
-    })
-  }
-
-  showFingerprintScanner(onAuthenticate) {
-    this.fingerprintVisible = true;
-    Navigation.showModal({
-      screen: 'sn.Fingerprint',
-      title: 'Fingerprint Required',
-      backButtonHidden: true,
-      overrideBackPress: true,
-      passProps: {
-        mode: "authenticate",
-        onAuthenticateSuccess: onAuthenticate
+        onAuthenticateSuccess: onAuthenticate,
+        requirePasscode: passcode,
+        requireFingerprint: fingerprint
       },
       animationType: 'slide-up',
       tabsStyle: _.clone(this.tabStyles), // for iOS

@@ -256,6 +256,10 @@ export default class GlobalStyles {
         flexDirection: 'column',
       },
 
+      flexedItem: {
+        flexGrow: 1
+      },
+
       uiText: {
         color: constants.mainTextColor,
         fontSize: constants.mainTextFontSize,

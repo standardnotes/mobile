@@ -340,7 +340,9 @@ export default class Notes extends Abstract {
 
   render() {
     if(!this.state.ready || this.state.lockContent) {
-      return (<View></View>);
+      return (
+        <View></View>
+      );
     }
 
     var result = ModelManager.getInstance().getNotes(this.options);

@@ -8,8 +8,12 @@ export default class Abstract extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {};
     this.initialLoad = true;
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+
+    if(this.props.navigator) {
+      this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    }
 
     this.lockObserver = App.get().addLockStatusObserver((lock, unlock) => {
       if(!this.isMounted()) {
@@ -18,7 +22,7 @@ export default class Abstract extends Component {
       }
 
       if(lock == true) {
-        this.mergeState({lockContent: true});
+        this.lockContent();
       } else if(unlock == true) {
         this.unlockContent();
       }
@@ -27,6 +31,10 @@ export default class Abstract extends Component {
 
   constructState(state) {
     this.state = _.merge({lockContent: !App.isAuthenticated}, state);
+  }
+
+  lockContent() {
+    this.mergeState({lockContent: true});
   }
 
   unlockContent() {
@@ -39,11 +47,13 @@ export default class Abstract extends Component {
     })
   }
 
-  renderOnMount() {
+  renderOnMount(callback) {
     if(this.isMounted()) {
       this.forceUpdate();
+      callback && callback();
     } else {
       this._renderOnMount = true;
+      this._renderOnMountCallback = callback;
     }
   }
 
@@ -69,6 +79,9 @@ export default class Abstract extends Component {
     if(this._renderOnMount) {
       this._renderOnMount = false;
       this.forceUpdate();
+
+      this._renderOnMountCallback && this._renderOnMountCallback();
+      this._renderOnMountCallback = null;
     }
   }
 
@@ -87,6 +100,10 @@ export default class Abstract extends Component {
 
   dismissModal() {
     this.props.navigator.dismissModal({animationType: "slide-down"})
+  }
+
+  dismissLightBox() {
+    this.props.navigator.dismissLightBox({animationType: "slide-down"})
   }
 
   viewDidAppear() {
