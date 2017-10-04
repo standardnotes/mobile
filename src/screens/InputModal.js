@@ -12,7 +12,7 @@ export default class InputModal extends Abstract {
 
   constructor(props) {
     super(props);
-    this.state = {text: ""};
+    this.constructState({text: ""});
   }
 
   configureNavBar() {
@@ -52,7 +52,7 @@ export default class InputModal extends Abstract {
   }
 
   render() {
-    if(!this.state.ready || this.state.lockContent) {
+    if(this.state.lockContent) {
       return (<LockedView />);
     }
 

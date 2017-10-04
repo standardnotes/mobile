@@ -17,6 +17,7 @@ import Icons from '../Icons';
 import OptionsState from "../OptionsState"
 import GlobalStyles from "../Styles"
 import App from "../app"
+import ApplicationState from "../ApplicationState";
 
 export default class Filter extends Abstract {
 
@@ -27,25 +28,12 @@ export default class Filter extends Abstract {
   constructor(props) {
     super(props);
     this.tags = [];
-    this.constructState({ready: false});
-
-    this.readyObserver = App.get().addApplicationReadyObserver(() => {
-      this.applicationIsReady = true;
-      if(this.isMounted() && !this.state.ready) {
-        this.loadInitialState();
-      }
-    })
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    if(this.applicationIsReady && !this.state.ready) {
-      this.loadInitialState();
-    }
   }
 
   loadInitialState() {
     console.log("Loading Filter Initial State");
+
+    super.loadInitialState();
     this.options = new OptionsState(JSON.parse(this.props.options));
 
     var selectedTags;
@@ -55,7 +43,7 @@ export default class Filter extends Abstract {
       selectedTags = [];
     }
 
-    this.mergeState({ready: true, tags: [], selectedTags: selectedTags, archivedOnly: this.options.archivedOnly});
+    this.mergeState({tags: [], selectedTags: selectedTags, archivedOnly: this.options.archivedOnly});
 
     if(this.props.noteId) {
       this.note = ModelManager.getInstance().findItem(this.props.noteId);
@@ -90,7 +78,7 @@ export default class Filter extends Abstract {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    App.get().removeApplicationReadyObserver(this.readyObserver);
+    ApplicationState.get().removeStateObserver(this.stateObserver);
     Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
     Sync.getInstance().removeSyncObserver(this.syncObserver);
   }
@@ -319,7 +307,7 @@ export default class Filter extends Abstract {
       viewStyles.push({width: drawerWidth});
     }
 
-    if(!this.state.ready || this.state.lockContent) {
+    if(this.state.lockContent) {
       return (<LockedView style={viewStyles} />);
     }
 

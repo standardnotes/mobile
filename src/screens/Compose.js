@@ -37,7 +37,7 @@ export default class Compose extends Abstract {
     }
 
     this.note = note;
-    this.state = {title: note.title, text: note.text};
+    this.constructState({title: note.title, text: note.text});
 
     this.loadStyles();
 
@@ -48,10 +48,6 @@ export default class Compose extends Abstract {
     });
 
     this.configureNavBar(true);
-  }
-
-  componentWillMount () {
-    super.componentWillMount();
   }
 
   componentWillUnmount() {

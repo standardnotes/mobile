@@ -23,7 +23,7 @@ import ThemesSection from "../containers/account/ThemesSection"
 import EncryptionSection from "../containers/account/EncryptionSection"
 import CompanySection from "../containers/account/CompanySection"
 import LockedView from "../containers/LockedView";
-
+import ApplicationState from "../ApplicationState";
 import GlobalStyles from "../Styles"
 import App from "../app"
 
@@ -36,19 +36,13 @@ export default class Account extends Abstract {
   constructor(props) {
     super(props);
 
-    this.state = {ready: false, params: {}};
-
-    this.readyObserver = App.get().addApplicationReadyObserver(() => {
-      this.applicationIsReady = true;
-
-      if(this.isMounted()) {
-        this.loadInitialState();
-      }
-    })
+    this.constructState({params: {}});
   }
 
   loadInitialState() {
-    this.mergeState({ready: true, params: {server: Auth.getInstance().serverUrl()}})
+    super.loadInitialState();
+
+    this.mergeState({params: {server: Auth.getInstance().serverUrl()}})
 
     this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
       this.forceUpdate();
@@ -63,17 +57,9 @@ export default class Account extends Abstract {
     this.mergeState({hasPasscode: hasPasscode, hasFingerprint: hasFingerprint})
   }
 
-  componentDidMount() {
-    super.componentDidMount();
-    if(this.applicationIsReady && !this.state.ready) {
-      this.loadInitialState();
-    }
-  }
-
   componentWillUnmount() {
     super.componentWillUnmount();
     Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
-    App.get().removeApplicationReadyObserver(this.readyObserver);
   }
 
   configureNavBar() {
@@ -366,7 +352,7 @@ export default class Account extends Abstract {
   }
 
   render() {
-    if(this.state.lockContent || !this.state.ready) {
+    if(this.state.lockContent) {
       return (<LockedView />);
     }
 

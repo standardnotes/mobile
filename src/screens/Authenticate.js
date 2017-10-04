@@ -34,37 +34,18 @@ export default class Authenticate extends Abstract {
 
   constructor(props) {
     super(props);
-
-    this.authProps = App.get().getAuthenticationProps();
-
-    this.observer = ApplicationState.get().addStateObserver((state) => {
-      if(state == 'foreground') {
-        if(this.isMounted()) {
-          console.log("Beginning Auth From State Observer for State", state);
-          this.beginAuthentication();
-        } else {
-          this.authenticateOnMount = true;
-        }
-      }
-    })
+    this.authProps = props.authProps;
   }
 
   componentWillUnmount() {
-    ApplicationState.get().removeStateObserver(this.observer);
     super.componentWillUnmount();
   }
 
   componentDidMount() {
     super.componentDidMount();
 
-    let nextAppState = ApplicationState.get().nextAppState;
-    let isLaunching = ApplicationState.get().isLaunching();
-    let goingToBackground = ["background", "inactive"].includes(nextAppState);
-
-    if((!goingToBackground && isLaunching) || this.authenticateOnMount) {
-      console.log("Beginning Auth From Component Did Mount", nextAppState, "auth on mount", this.authenticateOnMount);
+    if(this.props.mode === "authenticate") {
       this.beginAuthentication();
-      this.authenticateOnMount = false;
     }
   }
 
@@ -167,8 +148,11 @@ export default class Authenticate extends Abstract {
     } else if(this.authProps.fingerprint) {
       sectionTitle = "Fingerprint Required";
     } else {
-      // sectionTitle = "Missing";
+      sectionTitle = "Missing";
     }
+
+    var isAuthenticating = this.props.mode === "authenticate";
+    var isSetup = !isAuthenticating;
 
     return (
       <View style={GlobalStyles.styles().flexContainer}>
@@ -177,12 +161,13 @@ export default class Authenticate extends Abstract {
 
             <SectionHeader title={sectionTitle} />
 
-            {this.authProps.fingerprint && this.props.mode === "authenticate" &&
+            {isAuthenticating && this.authProps.fingerprint &&
               <FingerprintSection began={this.state.began} first={true} ref={'fingerprintSection'} onPress={this.beginAuthentication} onAuthenticateSuccess={this.onFingerprintSuccess} />
             }
 
-            {(this.authProps.passcode || this.props.mode === "setup") &&
-              <PasscodeSection waitingForFingerprint={this.authProps.fingerprint && !this.state.fingerprintSuccess} ref={'passcodeSection'} first={!this.authProps.fingerprint} mode={this.props.mode} onSetupSuccess={this.onPasscodeSetupSuccess} onAuthenticateSuccess={this.onPasscodeAuthenticateSuccess} />
+            {((isAuthenticating && this.authProps.passcode) || isSetup) &&
+              <PasscodeSection waitingForFingerprint={isAuthenticating && this.authProps.fingerprint && !this.state.fingerprintSuccess} ref={'passcodeSection'}
+              first={(isAuthenticating && !this.authProps.fingerprint) || isSetup} mode={this.props.mode} onSetupSuccess={this.onPasscodeSetupSuccess} onAuthenticateSuccess={this.onPasscodeAuthenticateSuccess} />
             }
 
 
@@ -412,7 +397,7 @@ class FingerprintSection extends Abstract {
       return;
     }
 
-    this.mergeState({began: true});
+    this.mergeState({began: true, error: null});
 
     if(App.isAndroid) {
       FingerprintScanner.authenticate({ onAttempt: this.handleInvalidAttempt }).then(() => {

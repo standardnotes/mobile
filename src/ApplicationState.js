@@ -1,11 +1,27 @@
 import {AppState} from 'react-native';
 import App from "./app"
+import KeysManager from "./lib/keysManager"
 var _ = require('lodash');
+
 
 export default class ApplicationState {
 
-  static instance = null;
+  // When the app first launches
+  static Launching = "Launching";
 
+  // When the app enters the background completely
+  static Backgrounding = "Backgrounding";
+
+  // When the app resumes from the background
+  static Resuming = "Resuming";
+
+  // When the user enters their local passcode and/or fingerprint
+  static Locking = "Locking";
+
+  // When the user enters their local passcode and/or fingerprint
+  static Unlocking = "Unlocking";
+
+  static instance = null;
   static get() {
     if (this.instance == null) {
       this.instance = new ApplicationState();
@@ -16,77 +32,73 @@ export default class ApplicationState {
 
   constructor() {
     this.observers = [];
+    this.locked = true;
     AppState.addEventListener('change', this.handleAppStateChange);
-
-    this.lastLaunch = new Date();
-
-    // required to initialize current app state to active since the observer is not called in time on initial app launch
-    this.previousAppState = "active";
+    this.didLaunch();
   }
+
+  // Sent from App.js
+  receiveApplicationStartEvent() {
+    var authProps = this.getAuthenticationPropsForAppState(ApplicationState.Launching);
+    if(!authProps.passcode && !authProps.fingerprint) {
+      this.unlockApplication();
+    }
+  }
+
 
   handleAppStateChange = (nextAppState) => {
 
     this.nextAppState = nextAppState;
 
-    var isEnteringForeground = nextAppState === "active"
-      && (this.previousAppState == 'background' || this.previousAppState == 'inactive')
-      && !this.isStartingApp;
+    var isResuming = nextAppState === "active";
+    var isEnteringBackground = nextAppState == 'background';
 
-    var isEnteringBackground;
-
-    if(App.isIOS) {
-      isEnteringBackground = ((nextAppState == 'inactive' && this.previousAppState == 'active')
-        || (nextAppState == 'background' && this.previousAppState != 'inactive')) && !this.isStartingApp;
-    } else if(App.isAndroid) {
-      isEnteringBackground = nextAppState == 'background' && !this.isStartingApp;
-    }
-
-    console.log("APP STATE CHANGE FROM", this.previousAppState,
+    console.log("APP STATE CHANGE FROM", this.mostRecentState,
     "TO STATE", nextAppState,
-    "IS STARTING APP:", this.isStartingApp,
     "IS ENTERING BACKGROUND", isEnteringBackground,
-    "IS ENTERING FOREGROUND", isEnteringForeground,
+    "IS RESUMING", isResuming,
     );
 
-    if(isEnteringForeground) {
-      this.lastLaunch = new Date();
-    }
-
-    // Hide screen content as we go to the background
     if(isEnteringBackground) {
-      this.notifyOfState("background");
+      this.didEnterBackground();
     }
 
-    if(isEnteringForeground) {
-      this.launchTemp = "warm";
-      this.notifyOfState("foreground");
+    if(isResuming) {
+      this.didResume();
     }
 
-    this.previousAppState = nextAppState;
+    this.mostRecentState = nextAppState;
   }
 
-  isLaunching() {
-    let launchWindow = 2.0; // seconds
-    return (new Date() - this.lastLaunch)/1000.0 < launchWindow;
+  /* States */
+
+  didLaunch() {
+    this.notifyOfState(ApplicationState.Launching);
   }
 
-  setIsStartingApp(starting) {
-    this.isStartingApp = starting;
+  didEnterBackground() {
+    this.notifyOfState(ApplicationState.Backgrounding);
+
+    if(this.shouldLockApplication) {
+      this.lockApplication();
+    }
   }
 
-  setAuthenticationInProgress(inProgress) {
-    this.authenticationInProgress = inProgress;
+  didResume() {
+    this.notifyOfState(ApplicationState.Resuming);
   }
 
-  isAuthenticationInProgress() {
-    return this.authenticationInProgress;
-  }
 
-  isWarmLaunch() {
-    return this.launchTemp;
+
+
+
+
+  getMostRecentState() {
+    return this.mostRecentState;
   }
 
   notifyOfState(state) {
+    console.log("ApplicationState notifying of state:", state);
     for(var observer of this.observers) {
       observer.callback(state);
     }
@@ -101,5 +113,71 @@ export default class ApplicationState {
   removeStateObserver(observer) {
     _.pull(this.observers, observer);
   }
+
+
+
+
+  /* Locking / Unlocking */
+
+  isLocked() {
+    return this.locked;
+  }
+
+  isUnlocked() {
+    return !this.locked;
+  }
+
+  shouldLockApplication() {
+    var showPasscode = KeysManager.get().hasOfflinePasscode() && KeysManager.get().passcodeTiming == "immediately";
+    var showFingerprint = KeysManager.get().hasFingerprint() && KeysManager.get().fingerprintTiming == "immediately";
+    return showPasscode || showFingerprint;
+  }
+
+  lockApplication() {
+    this.notifyOfState(ApplicationState.Locking);
+    this.locked = true;
+  }
+
+  unlockApplication() {
+    this.notifyOfState(ApplicationState.Unlocking);
+    this.locked = false;
+  }
+
+  setAuthenticationInProgress(inProgress) {
+    this.authenticationInProgress = inProgress;
+  }
+
+  isAuthenticationInProgress() {
+    return this.authenticationInProgress;
+  }
+
+  getAuthenticationPropsForAppState(state) {
+    if(state == ApplicationState.Unlocking) {
+      return {};
+    }
+    
+    var hasPasscode = KeysManager.get().hasOfflinePasscode();
+    var hasFingerprint = KeysManager.get().hasFingerprint();
+
+    var showPasscode = hasPasscode, showFingerprint = hasFingerprint;
+
+    if(state == ApplicationState.Resuming) {
+     showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
+     showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
+    }
+
+    var title = showPasscode && showFingerprint ? "Authentication Required" : (showPasscode ? "Passcode Required" : "Fingerprint Required");
+
+    return {
+      title: title,
+      passcode: showPasscode || false,
+      fingerprint: showFingerprint || false,
+      onAuthenticate: this.unlockApplication.bind(this)
+    }
+  }
+
+
+
+
 
 }

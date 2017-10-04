@@ -3,42 +3,85 @@ import {DeviceEventEmitter, Modal, View} from 'react-native';
 var _ = require('lodash')
 import GlobalStyles from "../Styles"
 import App from "../app"
+import ApplicationState from "../ApplicationState"
 
 export default class Abstract extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
-    this.initialLoad = true;
+    this.state = {lockContent: true};
 
     if(this.props.navigator) {
       this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     }
 
-    this.lockObserver = App.get().addLockStatusObserver((lock, unlock) => {
+    this._stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(!this.isMounted()) {
-        this.authenticated = unlock;
         return;
       }
 
-      if(lock == true) {
-        this.lockContent();
-      } else if(unlock == true) {
+      if(state == ApplicationState.Unlocking) {
         this.unlockContent();
+      }
+
+      if(state == ApplicationState.Locking) {
+        this.lockContent();
       }
     })
   }
 
-  constructState(state) {
-    this.state = _.merge({lockContent: !App.isAuthenticated}, state);
-  }
-
   lockContent() {
+    console.log("Locking Content");
     this.mergeState({lockContent: true});
   }
 
   unlockContent() {
+    if(!this.loadedInitialState) {
+      this.loadInitialState();
+    }
+    console.log("Unlocking Content");
     this.mergeState({lockContent: false});
+  }
+
+  componentWillUnmount() {
+    this.willUnmount = true;
+    this.mounted = false;
+    ApplicationState.get().removeStateObserver(this._stateObserver);
+  }
+
+  componentWillMount() {
+    this.willUnmount = false;
+    this.mounted = false;
+
+    if(ApplicationState.get().isUnlocked() && this.state.lockContent) {
+      this.unlockContent();
+    }
+  }
+
+  componentDidMount() {
+    this.mounted = true;
+    this.configureNavBar(true);
+
+    if(!this.loadedInitialState) {
+      this.loadInitialState();
+    }
+
+    if(this._renderOnMount) {
+      this._renderOnMount = false;
+      this.forceUpdate();
+
+      this._renderOnMountCallback && this._renderOnMountCallback();
+      this._renderOnMountCallback = null;
+    }
+  }
+
+  loadInitialState() {
+    this.loadedInitialState = true;
+    this.configureNavBar(true);
+  }
+
+  constructState(state) {
+    this.state = _.merge({lockContent: ApplicationState.get().isLocked()}, state);
   }
 
   mergeState(state) {
@@ -56,40 +99,6 @@ export default class Abstract extends Component {
       this._renderOnMountCallback = callback;
     }
   }
-
-  componentWillUnmount() {
-    this.willUnmount = true;
-    this.mounted = false;
-    App.get().removeLockStatusObserver(this.lockObserver);
-  }
-
-  componentWillMount() {
-    this.willUnmount = false;
-    this.mounted = false;
-
-    if(this.authenticated && this.state.lockContent) {
-      // observer was called before component was mounted
-      this.unlockContent();
-    }
-  }
-
-  componentDidMount() {
-    this.mounted = true;
-    this.configureNavBar(true);
-
-    if(this._renderOnMount) {
-      this._renderOnMount = false;
-      this.forceUpdate();
-
-      this._renderOnMountCallback && this._renderOnMountCallback();
-      this._renderOnMountCallback = null;
-    }
-  }
-
-  loadInitialState() {
-    this.configureNavBar(true);
-  }
-
 
   isMounted() {
     return this.mounted;

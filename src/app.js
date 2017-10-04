@@ -48,8 +48,6 @@ export default class App {
   constructor() {
     KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
 
-    this.readyObservers = [];
-    this.lockStatusObservers = [];
     this._isAndroid = Platform.OS === "android";
 
     // Initialize iOS review manager. Will automatically handle requesting review logic.
@@ -82,19 +80,6 @@ export default class App {
       }
     }.bind(this));
 
-    ApplicationState.get().addStateObserver((state) => {
-      // Hide screen content as we go to the background
-      if(state == 'background') {
-        if(this.shouldLockContent()) {
-          this.notifyLockStatusObserverOfLockState(true, null);
-        }
-      }
-
-      if(state == 'foreground') {
-
-      }
-
-    })
   }
 
   currentScreen() {
@@ -109,12 +94,6 @@ export default class App {
     }
   }
 
-  notifyLockStatusObserverOfLockState(lock, unlock) {
-    this.lockStatusObservers.forEach(function(observer){
-      observer.callback(lock, unlock);
-    })
-  }
-
   static get isAndroid() {
     return this.get().isAndroid;
   }
@@ -127,55 +106,12 @@ export default class App {
     return this.isAndroid ? pjson.versionAndroid : pjson.versionIOS;
   }
 
-  static get isAuthenticated() {
-    return this.get().isAuthenticated;
-  }
-
   get isAndroid() {
     return this._isAndroid;
   }
 
   get isIOS() {
     return !this._isAndroid;
-  }
-
-
-  shouldLockContent() {
-    var showPasscode = KeysManager.get().hasOfflinePasscode() && KeysManager.get().passcodeTiming == "immediately";
-    var showFingerprint = KeysManager.get().hasFingerprint() && KeysManager.get().fingerprintTiming == "immediately";
-    return showPasscode || showFingerprint;
-  }
-
-  addLockStatusObserver(callback) {
-    var observer = {key: Math.random, callback: callback};
-    this.lockStatusObservers.push(observer);
-
-    // Sometimes an observer could be added after the application is already authenticated, in which case we call it immediately
-    if(this.isAuthenticated) {
-      callback(false, true);
-    }
-
-    return observer;
-  }
-
-  removeLockStatusObserver(observer) {
-    _.pull(this.lockStatusObservers, observer);
-  }
-
-  addApplicationReadyObserver(callback) {
-    var observer = {key: Math.random, callback: callback};
-    this.readyObservers.push(observer);
-
-    // Sometimes an observer could be added after the application is already ready, in which case we call it immediately
-    if(this.ready) {
-      callback();
-    }
-
-    return observer;
-  }
-
-  removeApplicationReadyObserver(observer) {
-    _.pull(this.readyObservers, observer);
   }
 
   globalOptions() {
@@ -228,10 +164,7 @@ export default class App {
         this.loading = false;
         var run = () => {
           this.startApp();
-          var authProps = this.getAuthenticationProps();
-          if(!authProps.passcode && !authProps.fingerprint) {
-            this.applicationIsReady();
-          }
+          ApplicationState.get().receiveApplicationStartEvent();
         }
         if(KeysManager.get().isFirstRun()) {
           KeysManager.get().handleFirstRun().then(run);
@@ -242,51 +175,8 @@ export default class App {
     }.bind(this))
   }
 
-  applicationIsReady() {
-    console.log("===Emitting Application Ready===");
-    this.ready = true;
-    this.isAuthenticated = true;
-    this.readyObservers.forEach(function(observer){
-      observer.callback();
-    })
-
-    this.notifyLockStatusObserverOfLockState(null, true);
-  }
-
-  getAuthenticationProps() {
-    var hasPasscode = KeysManager.get().hasOfflinePasscode();
-    var hasFingerprint = KeysManager.get().hasFingerprint();
-
-    var showPasscode = hasPasscode, showFingerprint = hasFingerprint;
-
-    if(ApplicationState.get().isWarmLaunch()) {
-       showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
-       showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
-     }
-
-    this.isAuthenticated = !showPasscode && !showFingerprint;
-
-    var title = showPasscode && showFingerprint ? "Authentication Required" : (showPasscode ? "Passcode Required" : "Fingerprint Required");
-
-    return {
-      title: title,
-      passcode: showPasscode || false,
-      fingerprint: showFingerprint || false,
-      onAuthenticate: this.applicationIsReady.bind(this)
-    }
-  }
-
   startApp(options = {}) {
     console.log("===Starting App===");
-    // On Android, calling Navigation.startSingleScreenApp first (for authentication), then calling
-    // Navigation.startTabBasedApp will trigger an AppState change from active to background to active again.
-    // Since if fingerprint/passcode lock is enabled we present the auth screens when the app switches to background,
-    // if we don't catch this edge case, it will result in infinite recursion. So as `startApp` is called
-    // immediately before this transition, setting isStartingApp to true then false afterwards will prevent the infinite
-    // recursion
-    if(!options.reloading) {
-      ApplicationState.get().setIsStartingApp(true);
-    }
 
     if(this.isIOS) {
       let tabs = [{
@@ -339,12 +229,6 @@ export default class App {
         }
       );
     }
-
-    if(!options.reloading) {
-      setTimeout(function () {
-        ApplicationState.get().setIsStartingApp(false);
-      }.bind(this), 1500);
-    }
   }
 
   reload() {
@@ -353,7 +237,7 @@ export default class App {
     // reset search box
     this.optionsState.setSearchTerm(null);
 
-    this.startApp({reloading: true});
+    this.startApp();
   }
 }
 

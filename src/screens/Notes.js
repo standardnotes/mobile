@@ -24,23 +24,14 @@ export default class Notes extends Abstract {
 
     this.rendersLockscreen = true;
 
-    this.state = {ready: false};
-
-    this.readyObserver = App.get().addApplicationReadyObserver(() => {
-      this.applicationIsReady = true;
-      if(this.isMounted() && !this.state.ready) {
-        this.loadInitialState();
-      }
-    })
-
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      if(state == 'foreground') {
+      if(state == ApplicationState.Resuming) {
         // we only want to perform sync here if the app is resuming, not if it's a fresh start
         if(this.dataLoaded) {
           Sync.getInstance().sync();
         }
 
-        var authProps = App.get().getAuthenticationProps();
+        var authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
         if((authProps.passcode || authProps.fingerprint) && !ApplicationState.get().isAuthenticationInProgress()) {
           // The auth modal is only presented if the Notes screen is visible.
           this.props.navigator.popToRoot();
@@ -57,9 +48,10 @@ export default class Notes extends Abstract {
   }
 
   loadInitialState() {
+    console.log("Notes loading initial state");
     this.options = App.get().globalOptions();
+
     this.mergeState({
-      ready: true,
       refreshing: false,
       decrypting: false,
       loading: true,
@@ -72,17 +64,9 @@ export default class Notes extends Abstract {
     super.loadInitialState();
   }
 
-  componentDidMount() {
-    super.componentDidMount();
-    if(this.applicationIsReady && !this.state.ready) {
-      this.loadInitialState();
-    }
-  }
-
   componentWillUnmount() {
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
-    App.get().removeApplicationReadyObserver(this.readyObserver);
     Sync.getInstance().removeSyncObserver(this.syncObserver);
     Auth.getInstance().removeEventObserver(this.signoutObserver);
     this.options.removeChangeObserver(this.optionsObserver);
@@ -353,7 +337,7 @@ export default class Notes extends Abstract {
   }
 
   render() {
-    if(this.state.lockContent || !this.state.ready) {
+    if(this.state.lockContent) {
       return <AuthModal />;
     }
 

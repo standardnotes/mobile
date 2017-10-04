@@ -5,16 +5,30 @@ import Search from 'react-native-search-box'
 import GlobalStyles from "../Styles"
 import App from "../app"
 import Authenticate from "../screens/Authenticate"
+import ApplicationState from "../ApplicationState";
 
 export default class AuthModal extends Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {authProps: ApplicationState.get().getAuthenticationPropsForAppState(ApplicationState.get().getMostRecentState())};
+
+    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
+      let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
+      console.log("GOt auth props", authProps);
+      this.setState({authProps: authProps});
+    });
+  }
+
+  componentWillUnmount() {
+    ApplicationState.get().removeStateObserver(this.stateObserver);
   }
 
   render() {
-    let props = App.get().getAuthenticationProps();
-    let visible = props.passcode || props.fingerprint;
+    let authProps = this.state.authProps;
+    let visible = (authProps.passcode || authProps.fingerprint) || false;
+    console.log("Visible", visible);
     return (
       <Modal
         animationType={"slide"}
@@ -24,12 +38,13 @@ export default class AuthModal extends Component {
 
         <Authenticate
           ref={'authenticate'}
-          title={props.title}
-          onAuthenticateSuccess={props.onAuthenticate}
+          title={authProps.title}
+          onAuthenticateSuccess={authProps.onAuthenticate}
           mode={"authenticate"}
-          requirePasscode={props.passcode}
-          requireFingerprint={props.fingerprint}
+          requirePasscode={authProps.passcode}
+          requireFingerprint={authProps.fingerprint}
           pseudoModal={true}
+          authProps={authProps}
         />
 
       </Modal>

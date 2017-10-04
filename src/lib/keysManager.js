@@ -7,6 +7,8 @@ import Keychain from "./keychain"
 var _ = require('lodash')
 import FlagSecure from 'react-native-flag-secure-android';
 import App from "../app"
+import ApplicationState from "../ApplicationState"
+
 let OfflineParamsKey = "pc_params";
 let FirstRunKey = "first_run";
 
@@ -51,8 +53,10 @@ export default class KeysManager {
   }
 
   async loadInitialData() {
-    this.readyObserver = App.get().addApplicationReadyObserver(() => {
-      this.updateScreenshotPrivacy();
+    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
+      if(state == ApplicationState.Unlocking) {
+        this.updateScreenshotPrivacy();
+      }
     })
 
     var storageKeys = ["auth_params", OfflineParamsKey, "user", FirstRunKey];
