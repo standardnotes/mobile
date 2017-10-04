@@ -320,10 +320,14 @@ export default class Filter extends Abstract {
     }
 
     var viewStyles = [GlobalStyles.styles().container];
+
     if(App.isAndroid && this.props.singleSelectMode) {
       // See https://github.com/wix/react-native-navigation/issues/1942
       var {height, width} = Dimensions.get('window');
       var drawerWidth = Math.min(width * 0.8, 450);
+      if(drawerWidth == 0) {
+        drawerWidth = 320;
+      }
       viewStyles.push({width: drawerWidth});
     }
 
