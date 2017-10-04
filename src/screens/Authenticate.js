@@ -407,6 +407,13 @@ class FingerprintSection extends Abstract {
   }
 
   beginAuthentication() {
+
+    if(this.state.began) {
+      return;
+    }
+
+    this.mergeState({began: true});
+
     if(App.isAndroid) {
       FingerprintScanner.authenticate({ onAttempt: this.handleInvalidAttempt }).then(() => {
         this.handleSuccessfulAuth();
@@ -417,7 +424,7 @@ class FingerprintSection extends Abstract {
           this.beginAuthentication();
         } else {
           if(this.isMounted()) {
-            this.setState({ error: error.message });
+            this.setState({ error: error.message, began: false});
           }
         }
       });
@@ -429,7 +436,7 @@ class FingerprintSection extends Abstract {
         .catch((error) => {
           console.log("Error:", error);
           if(this.isMounted()) {
-            this.setState({ error: error.message });
+            this.setState({ error: error.message, began: false });
           }
         });
     }
@@ -469,10 +476,17 @@ class FingerprintSection extends Abstract {
     let iconColor = this.state.success ? "green" : GlobalStyles.constants().mainTextColor;
     let textStyles = [this.styles.text];
     var iconName = App.isAndroid ? "md-finger-print" : 'ios-finger-print';
-    var text = this.state.error ? this.state.error : "Please scan your fingerprint";
 
-    if(!this.props.began) {
+    var text;
+    if(this.state.began) {
+      text = "Please scan your fingerprint";
+    }
+    else if(!this.props.began) {
       text = "Tap here to begin authentication.";
+    }
+
+    if(this.state.error) {
+      text = this.state.error;
     }
 
     if(this.state.success) {

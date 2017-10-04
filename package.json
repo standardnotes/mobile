@@ -1,7 +1,7 @@
 {
   "name": "StandardNotes",
   "version": "0.0.1",
-  "versionIOS" : "1.0.6",
+  "versionIOS" : "1.0.7",
   "versionAndroid" : "0.0.12",
   "private": true,
   "scripts": {

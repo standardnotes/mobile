@@ -331,7 +331,6 @@ export default class Filter extends Abstract {
       this.tags = tags;
     }
 
-
     return (
       <View style={viewStyles}>
         <ScrollView style={GlobalStyles.styles().view}>
