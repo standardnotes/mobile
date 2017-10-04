@@ -6,6 +6,7 @@ import SectionedTableCell from "../components/SectionedTableCell";
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import Abstract from "./Abstract"
+import LockedView from "../containers/LockedView";
 
 export default class InputModal extends Abstract {
 
@@ -51,6 +52,10 @@ export default class InputModal extends Abstract {
   }
 
   render() {
+    if(this.state.lockContent) {
+      return (<LockedView />);
+    }
+
     return (
       <View style={GlobalStyles.styles().container}>
         <TableSection extraStyles={[GlobalStyles.styles().container]}>

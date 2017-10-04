@@ -6,6 +6,7 @@ import Note from '../models/app/note'
 import Abstract from "./Abstract"
 import Icons from '../Icons';
 import App from '../app'
+import LockedView from "../containers/LockedView";
 var _ = require('lodash');
 
 import TextView from "sn-textview";
@@ -263,7 +264,7 @@ export default class Compose extends Abstract {
 
   render() {
     if(this.state.lockContent) {
-      return (<View></View>);
+      return (<LockedView />);
     }
 
     /*

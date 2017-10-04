@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, AppState, StatusBar, Modal } from 'react-native';
+import { StyleSheet, View, Platform, Text, StatusBar, Modal } from 'react-native';
 import ModelManager from '../lib/modelManager'
 import Storage from '../lib/storage'
 import Sync from '../lib/sync'
@@ -15,6 +15,7 @@ import OptionsState from "../OptionsState"
 import App from "../app"
 import AuthModal from "../containers/AuthModal"
 var _ = require('lodash')
+import ApplicationState from "../ApplicationState";
 
 export default class Notes extends Abstract {
 
@@ -29,6 +30,25 @@ export default class Notes extends Abstract {
       this.applicationIsReady = true;
       if(this.isMounted() && !this.state.ready) {
         this.loadInitialState();
+      }
+    })
+
+    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
+      if(state == 'foreground') {
+        // we only want to perform sync here if the app is resuming, not if it's a fresh start
+        if(this.dataLoaded) {
+          Sync.getInstance().sync();
+        }
+
+        var authProps = App.get().getAuthenticationProps();
+        if((authProps.passcode || authProps.fingerprint) && !ApplicationState.get().isAuthenticationInProgress()) {
+          // The auth modal is only presented if the Notes screen is visible.
+          this.props.navigator.popToRoot();
+          this.props.navigator.dismissModal();
+          this.props.navigator.switchToTab({
+            tabIndex: 0
+          });
+        }
       }
     })
   }
@@ -58,19 +78,12 @@ export default class Notes extends Abstract {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    AppState.removeEventListener('change', this._handleAppStateChange);
+    ApplicationState.get().removeStateObserver(this.stateObserver);
     App.get().removeApplicationReadyObserver(this.readyObserver);
     Sync.getInstance().removeSyncObserver(this.syncObserver);
     Auth.getInstance().removeEventObserver(this.signoutObserver);
     this.options.removeChangeObserver(this.optionsObserver);
     clearInterval(this.syncTimer);
-  }
-
-  _handleAppStateChange = (nextAppState) => {
-    // we only want to perform sync here if the app is resuming, not if it's a fresh start
-    if(this.dataLoaded && nextAppState === 'active') {
-      Sync.getInstance().sync();
-    }
   }
 
   beginSyncTimer() {
@@ -81,8 +94,6 @@ export default class Notes extends Abstract {
   }
 
   registerObservers() {
-    AppState.addEventListener('change', this._handleAppStateChange);
-
     this.optionsObserver = this.options.addChangeObserver((options) => {
       this.reloadList(true);
       // On iOS, configureNavBar would be handle by viewWillAppear. However, we're using a drawer in Android.

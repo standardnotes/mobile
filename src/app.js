@@ -231,6 +231,10 @@ export default class App {
         this.loading = false;
         var run = () => {
           this.startApp();
+          var authProps = this.getAuthenticationProps();
+          if(!authProps.passcode && !authProps.fingerprint) {
+            this.applicationIsReady();
+          }
         }
         if(KeysManager.get().isFirstRun()) {
           KeysManager.get().handleFirstRun().then(run);
@@ -244,16 +248,12 @@ export default class App {
   applicationIsReady() {
     console.log("===Emitting Application Ready===");
     this.ready = true;
+    this.isAuthenticated = true;
     this.readyObservers.forEach(function(observer){
       observer.callback();
     })
 
     this.notifyLockStatusObserverOfLockState(null, true);
-  }
-
-  onAuthenticationSuccess() {
-    this.isAuthenticated = true;
-    this.applicationIsReady();
   }
 
   getAuthenticationProps() {
@@ -267,15 +267,15 @@ export default class App {
        showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
      }
 
-    this.isAuthenticated = false;
+    this.isAuthenticated = !showPasscode && !showFingerprint;
 
     var title = showPasscode && showFingerprint ? "Authentication Required" : (showPasscode ? "Passcode Required" : "Fingerprint Required");
 
     return {
       title: title,
-      passcode: showPasscode,
-      fingerprint: showFingerprint,
-      onAuthenticate: this.onAuthenticationSuccess.bind(this)
+      passcode: showPasscode || false,
+      fingerprint: showFingerprint || false,
+      onAuthenticate: this.applicationIsReady.bind(this)
     }
   }
 

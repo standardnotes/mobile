@@ -34,6 +34,7 @@ export default class Authenticate extends Abstract {
 
   constructor(props) {
     super(props);
+
     this.authProps = App.get().getAuthenticationProps();
 
     this.observer = ApplicationState.get().addStateObserver((state) => {
@@ -62,16 +63,26 @@ export default class Authenticate extends Abstract {
   }
 
   beginAuthentication = () => {
-    if(this.authenticationInProgress) {
+    if(ApplicationState.get().isAuthenticationInProgress()) {
       return;
     }
-    this.authenticationInProgress = true;
+
+    ApplicationState.get().setAuthenticationInProgress(true);
+
     this.mergeState({began: true});
     if(this.authProps.fingerprint) {
-      this.refs.fingerprintSection.beginAuthentication();
+      this.beginFingerprintAuth();
     } else if(this.authProps.passcode) {
-      this.refs.passcodeSection.beginAuthentication();
+      this.beginPasscodeAuth();
     }
+  }
+
+  beginFingerprintAuth() {
+    this.refs.fingerprintSection.beginAuthentication();
+  }
+
+  beginPasscodeAuth() {
+    this.refs.passcodeSection.beginAuthentication();
   }
 
   dismiss() {
@@ -108,19 +119,28 @@ export default class Authenticate extends Abstract {
   }
 
   onPasscodeAuthenticateSuccess = () => {
-    this.props.onAuthenticateSuccess();
-    this.authenticationInProgress = false;
-    this.dismiss();
+    this.mergeState({passcodeSuccess: true});
+
+    if(this.authProps.fingerprint && !this.state.fingerprintSuccess) {
+      this.beginFingerprintAuth();
+    } else {
+      this.props.onAuthenticateSuccess();
+      ApplicationState.get().setAuthenticationInProgress(false);
+      this.dismiss();
+    }
+
   }
 
   onFingerprintSuccess = () => {
-    if(this.authProps.passcode) {
+    this.mergeState({fingerprintSuccess: true});
+
+    if(this.authProps.passcode && !this.state.passcodeSuccess) {
       setTimeout(() => {
-        this.refs.passcodeSection.beginAuthentication();
+        this.beginPasscodeAuth();
       }, 100);
     } else {
       this.props.onAuthenticateSuccess();
-      this.authenticationInProgress = false;
+      ApplicationState.get().setAuthenticationInProgress(false);
       this.dismiss();
     }
   }
@@ -135,7 +155,11 @@ export default class Authenticate extends Abstract {
       sectionTitle = "Enter Passcode";
     } else if(this.authProps.fingerprint) {
       sectionTitle = "Fingerprint Required";
+    } else {
+      sectionTitle = "Missing";
     }
+
+    console.log("Auth Props", this.authProps);
 
     return (
       <View style={GlobalStyles.styles().flexContainer}>
@@ -149,7 +173,7 @@ export default class Authenticate extends Abstract {
             }
 
             {(this.authProps.passcode || this.props.mode === "setup") &&
-              <PasscodeSection ref={'passcodeSection'} first={!this.authProps.fingerprint} mode={this.props.mode} onSetupSuccess={this.onPasscodeSetupSuccess} onAuthenticateSuccess={this.onPasscodeAuthenticateSuccess} />
+              <PasscodeSection waitingForFingerprint={this.authProps.fingerprint && !this.state.fingerprintSuccess} ref={'passcodeSection'} first={!this.authProps.fingerprint} mode={this.props.mode} onSetupSuccess={this.onPasscodeSetupSuccess} onAuthenticateSuccess={this.onPasscodeAuthenticateSuccess} />
             }
 
 
@@ -206,7 +230,7 @@ class PasscodeSection extends Abstract {
         return;
       }
 
-      this.mergeState({setupButtonText: "Generating Keys...", setupButtonEnabled: false})
+      this.mergeState({setupButtonText: "Saving Keys...", setupButtonEnabled: false})
 
       // Allow UI to update before executing block task. InteractionManager.runAfterInteractions doesn't seem to work.
       setTimeout(async () => {
@@ -241,7 +265,7 @@ class PasscodeSection extends Abstract {
         return;
       }
 
-      this.mergeState({unlockButtonText: "Generating Keys...", unlockButtonEnabled: false})
+      this.mergeState({unlockButtonText: "Verifying Keys...", unlockButtonEnabled: false})
 
       // Allow UI to update before executing block task. InteractionManager.runAfterInteractions doesn't seem to work.
       setTimeout(() => {
@@ -250,6 +274,9 @@ class PasscodeSection extends Abstract {
            if(keys.pw === KeysManager.get().offlinePasscodeHash()) {
              KeysManager.get().setOfflineKeys(keys);
              this.props.onAuthenticateSuccess();
+             if(this.props.waitingForFingerprint) {
+               this.mergeState({unlockButtonText: "Waiting for Fingerprint", unlockButtonEnabled: false})
+             }
            } else {
              invalid();
            }

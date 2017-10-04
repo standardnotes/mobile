@@ -21,7 +21,6 @@ export default class OptionsState {
 
   async loadSaved() {
     Storage.getItem("options").then(function(result){
-      console.log("Loaded options json results", result);
       _.merge(this, _.omit(JSON.parse(result), ["changeObservers"]));
       this.notifyObservers();
     }.bind(this))

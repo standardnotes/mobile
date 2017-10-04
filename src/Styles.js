@@ -256,6 +256,13 @@ export default class GlobalStyles {
         flexDirection: 'column',
       },
 
+      centeredContainer: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
+      },
+
       flexedItem: {
         flexGrow: 1
       },

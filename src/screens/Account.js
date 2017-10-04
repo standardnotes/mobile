@@ -22,6 +22,7 @@ import PasscodeSection from "../containers/account/PasscodeSection"
 import ThemesSection from "../containers/account/ThemesSection"
 import EncryptionSection from "../containers/account/EncryptionSection"
 import CompanySection from "../containers/account/CompanySection"
+import LockedView from "../containers/LockedView";
 
 import GlobalStyles from "../Styles"
 import App from "../app"
@@ -36,8 +37,6 @@ export default class Account extends Abstract {
     super(props);
 
     this.state = {ready: false, params: {}};
-
-    // this.rendersLockscreen = true;
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
       this.applicationIsReady = true;
@@ -368,7 +367,7 @@ export default class Account extends Abstract {
 
   render() {
     if(this.state.lockContent || !this.state.ready) {
-      return <View />
+      return (<LockedView />);
     }
 
     let signedIn = !Auth.getInstance().offline();

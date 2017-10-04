@@ -9,6 +9,7 @@ import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import ManageNote from "../containers/ManageNote";
+import LockedView from "../containers/LockedView";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
 import Tag from "../models/app/tag"
@@ -30,7 +31,7 @@ export default class Filter extends Abstract {
 
     this.readyObserver = App.get().addApplicationReadyObserver(() => {
       this.applicationIsReady = true;
-      if(this.isMounted()) {
+      if(this.isMounted() && !this.state.ready) {
         this.loadInitialState();
       }
     })
@@ -44,6 +45,7 @@ export default class Filter extends Abstract {
   }
 
   loadInitialState() {
+    console.log("Loading Filter Initial State");
     this.options = new OptionsState(JSON.parse(this.props.options));
 
     var selectedTags;
@@ -306,7 +308,7 @@ export default class Filter extends Abstract {
 
   render() {
     if(!this.state.ready || this.state.lockContent) {
-      return (<View></View>);
+      return (<LockedView />);
     }
 
     if(this.loadTags) {

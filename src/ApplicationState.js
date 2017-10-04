@@ -60,6 +60,14 @@ export default class ApplicationState {
     this.isStartingApp = starting;
   }
 
+  setAuthenticationInProgress(inProgress) {
+    this.authenticationInProgress = inProgress;
+  }
+
+  isAuthenticationInProgress() {
+    return this.authenticationInProgress;
+  }
+
   isWarmLaunch() {
     return this.launchTemp;
   }
