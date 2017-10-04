@@ -28,14 +28,9 @@ export default class AuthModal extends Component {
   render() {
     let authProps = this.state.authProps;
     let visible = (authProps.passcode || authProps.fingerprint) || false;
-    console.log("Visible", visible);
     return (
-      <Modal
-        animationType={"slide"}
-        transparent={false}
-        visible={visible}
-        onRequestClose={() => {}}>
-
+      <View style={GlobalStyles.styles().flexContainer}>
+      {visible &&
         <Authenticate
           ref={'authenticate'}
           title={authProps.title}
@@ -46,8 +41,8 @@ export default class AuthModal extends Component {
           pseudoModal={true}
           authProps={authProps}
         />
-
-      </Modal>
+      }
+    </View>
   )
   }
 

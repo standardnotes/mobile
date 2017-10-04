@@ -31,8 +31,6 @@ export default class Filter extends Abstract {
   }
 
   loadInitialState() {
-    console.log("Loading Filter Initial State");
-
     super.loadInitialState();
     this.options = new OptionsState(JSON.parse(this.props.options));
 

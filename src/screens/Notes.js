@@ -14,6 +14,7 @@ import Abstract from "./Abstract"
 import OptionsState from "../OptionsState"
 import App from "../app"
 import AuthModal from "../containers/AuthModal"
+import LockedView from "../containers/LockedView"
 var _ = require('lodash')
 import ApplicationState from "../ApplicationState";
 
@@ -32,12 +33,12 @@ export default class Notes extends Abstract {
         }
 
         var authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
-        if((authProps.passcode || authProps.fingerprint) && !ApplicationState.get().isAuthenticationInProgress()) {
+        if((authProps.passcode || authProps.fingerprint)) {
           // The auth modal is only presented if the Notes screen is visible.
           this.props.navigator.popToRoot();
 
           // Don't use the below as it will also for some reason dismiss the non RNN auth modal as well
-          // this.props.navigator.dismissAllModals({animationType: 'none'});
+          this.props.navigator.dismissAllModals({animationType: 'none'});
 
           this.props.navigator.switchToTab({
             tabIndex: 0
@@ -47,8 +48,13 @@ export default class Notes extends Abstract {
     })
   }
 
+  // Implemented by super class. We just want to latch on so we can configure the nav bar.
+  unlockContent() {
+    super.unlockContent();
+    this.configureNavBar(true);
+  }
+
   loadInitialState() {
-    console.log("Notes loading initial state");
     this.options = App.get().globalOptions();
 
     this.mergeState({
@@ -56,6 +62,7 @@ export default class Notes extends Abstract {
       decrypting: false,
       loading: true,
     });
+
     this.registerObservers();
     this.loadTabbarIcons();
     this.initializeNotes();
@@ -136,9 +143,24 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
-    if(!this.dataLoaded) {
+    if(this.state.lockContent) {
+      this.notesTitle = "Authentication Required";
+      this.props.navigator.setTitle({title: this.notesTitle, animated: false});
+      this.props.navigator.setButtons({
+        rightButtons: [],
+        leftButtons: [],
+        fab: {},
+        animated: false
+      });
       return;
     }
+
+    if(!this.dataLoaded) {
+      this.notesTitle = "Notes";
+      this.props.navigator.setTitle({title: this.notesTitle, animated: false});
+      return;
+    }
+
     super.configureNavBar();
 
     var options = this.options;

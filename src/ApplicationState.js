@@ -70,7 +70,11 @@ export default class ApplicationState {
     this.mostRecentState = nextAppState;
   }
 
-  /* States */
+
+
+
+
+  /* State Changes */
 
   didLaunch() {
     this.notifyOfState(ApplicationState.Launching);
@@ -88,6 +92,7 @@ export default class ApplicationState {
     this.notifyOfState(ApplicationState.Resuming);
   }
 
+  /* End State */
 
 
 
@@ -155,7 +160,7 @@ export default class ApplicationState {
     if(state == ApplicationState.Unlocking) {
       return {};
     }
-    
+
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
     var hasFingerprint = KeysManager.get().hasFingerprint();
 
@@ -175,9 +180,4 @@ export default class ApplicationState {
       onAuthenticate: this.unlockApplication.bind(this)
     }
   }
-
-
-
-
-
 }

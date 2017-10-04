@@ -62,7 +62,7 @@ export default class Abstract extends Component {
     this.mounted = true;
     this.configureNavBar(true);
 
-    if(!this.loadedInitialState) {
+    if(ApplicationState.get().isUnlocked() && !this.loadedInitialState) {
       this.loadInitialState();
     }
 
