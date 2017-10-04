@@ -17,10 +17,10 @@ export default class AuthModal extends Component {
     let visible = props.passcode || props.fingerprint;
     return (
       <Modal
-      animationType={"slide"}
-      transparent={false}
-      visible={visible}
-      onRequestClose={() => {}}>
+        animationType={"slide"}
+        transparent={false}
+        visible={visible}
+        onRequestClose={() => {}}>
 
         <Authenticate
           ref={'authenticate'}

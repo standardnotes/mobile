@@ -12,8 +12,12 @@ export default class LockedView extends Component {
 
   render() {
     let color = GlobalStyles.constants().mainTintColor;
+    var styles = [GlobalStyles.styles().centeredContainer];
+    if(this.props.style) {
+      styles.push(this.props.style);
+    }
     return (
-      <View style={GlobalStyles.styles().centeredContainer}>
+      <View style={styles}>
         <Text style={{color: color, marginTop: 5, fontWeight: "bold"}}>Application Locked.</Text>
         <Text style={{color: color, marginTop: 5}}>Return to Notes to unlock.</Text>
       </View>

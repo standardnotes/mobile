@@ -307,18 +307,6 @@ export default class Filter extends Abstract {
   }
 
   render() {
-    if(!this.state.ready || this.state.lockContent) {
-      return (<LockedView />);
-    }
-
-    if(this.loadTags) {
-      var tags = ModelManager.getInstance().tags.slice();
-      if(this.props.singleSelectMode) {
-        tags.unshift({title: "All notes", key: "all", uuid: 100})
-      }
-      this.tags = tags;
-    }
-
     var viewStyles = [GlobalStyles.styles().container];
 
     if(App.isAndroid && this.props.singleSelectMode) {
@@ -330,6 +318,19 @@ export default class Filter extends Abstract {
       }
       viewStyles.push({width: drawerWidth});
     }
+
+    if(!this.state.ready || this.state.lockContent) {
+      return (<LockedView style={viewStyles} />);
+    }
+
+    if(this.loadTags) {
+      var tags = ModelManager.getInstance().tags.slice();
+      if(this.props.singleSelectMode) {
+        tags.unshift({title: "All notes", key: "all", uuid: 100})
+      }
+      this.tags = tags;
+    }
+
 
     return (
       <View style={viewStyles}>
