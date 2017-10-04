@@ -340,9 +340,14 @@ export default class ModelManager {
       }
     })
 
-    notes = notes.sort(function(a, b){
-      if(a.pinned) { return -1; }
-      if(b.pinned) { return 1; }
+    let sortValueFn = (a, b, pinCheck = false) => {
+      if(!pinCheck) {
+        if(a.pinned && b.pinned) {
+          return sortValueFn(a, b, true);
+        }
+        if(a.pinned) { return -1; }
+        if(b.pinned) { return 1; }
+      }
 
       var aValue = a[sortBy] || "";
       var bValue = b[sortBy] || "";
@@ -362,9 +367,14 @@ export default class ModelManager {
           vector = -1;
         }
       }
+
       if(aValue > bValue) { return -1 * vector;}
       else if(aValue < bValue) { return 1 * vector;}
       return 0;
+    }
+
+    notes = notes.sort(function(a, b){
+      return sortValueFn(a, b);
     })
 
     return {notes: notes, tags: tags};

@@ -128,7 +128,7 @@ export default class NoteCell extends React.PureComponent {
 
           {note.pinned &&
             <View style={this.styles.pinnedView}>
-              <Icon name={"ios-bookmark"} size={14} color={GlobalStyles.constants().mainTintColor} />
+              <Icon name={"ios-flag"} size={14} color={GlobalStyles.constants().mainTintColor} />
               <Text style={this.styles.pinnedText}>Pinned</Text>
             </View>
           }

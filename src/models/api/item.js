@@ -134,8 +134,8 @@ export default class Item {
     return [];
   }
 
-  createdAt(withTime) {
-    return this.dateToString(this.created_at, withTime);
+  createdAt() {
+    return this.dateToString(this.created_at, true);
   }
 
   updatedAt() {
@@ -144,11 +144,10 @@ export default class Item {
 
   dateToString(date, withTime) {
     if(withTime) {
-      return moment(date).format('lll')
+      return moment(date).format('llll')
     } else {
       return moment(date).format('l')
     }
-    // return this.created_at.fromNow()
   }
 
   doNotEncrypt() {

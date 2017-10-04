@@ -177,7 +177,7 @@ export default class Authenticate extends Abstract {
 
             <SectionHeader title={sectionTitle} />
 
-            {this.authProps.fingerprint &&
+            {this.authProps.fingerprint && this.props.mode === "authenticate" &&
               <FingerprintSection began={this.state.began} first={true} ref={'fingerprintSection'} onPress={this.beginAuthentication} onAuthenticateSuccess={this.onFingerprintSuccess} />
             }
 
