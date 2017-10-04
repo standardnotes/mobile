@@ -40,6 +40,7 @@ export default class Authenticate extends Abstract {
     this.observer = ApplicationState.get().addStateObserver((state) => {
       if(state == 'foreground') {
         if(this.isMounted()) {
+          console.log("Beginning Auth From State Observer for State", state);
           this.beginAuthentication();
         } else {
           this.authenticateOnMount = true;
@@ -56,7 +57,12 @@ export default class Authenticate extends Abstract {
   componentDidMount() {
     super.componentDidMount();
 
-    if(!["background", "inactive"].includes(ApplicationState.get().nextAppState) || this.authenticateOnMount) {
+    let nextAppState = ApplicationState.get().nextAppState;
+    let isLaunching = ApplicationState.get().isLaunching();
+    let goingToBackground = ["background", "inactive"].includes(nextAppState);
+
+    if((!goingToBackground && isLaunching) || this.authenticateOnMount) {
+      console.log("Beginning Auth From Component Did Mount", nextAppState, "auth on mount", this.authenticateOnMount);
       this.beginAuthentication();
       this.authenticateOnMount = false;
     }
@@ -70,11 +76,15 @@ export default class Authenticate extends Abstract {
     ApplicationState.get().setAuthenticationInProgress(true);
 
     this.mergeState({began: true});
-    if(this.authProps.fingerprint) {
-      this.beginFingerprintAuth();
-    } else if(this.authProps.passcode) {
-      this.beginPasscodeAuth();
-    }
+
+    // Allow render to call so that this.refs is defined
+    setTimeout(() => {
+      if(this.authProps.fingerprint) {
+        this.beginFingerprintAuth();
+      } else if(this.authProps.passcode) {
+        this.beginPasscodeAuth();
+      }
+    }, 0);
   }
 
   beginFingerprintAuth() {
@@ -146,6 +156,7 @@ export default class Authenticate extends Abstract {
   }
 
   render() {
+
     var sectionTitle;
     if(this.props.mode == "setup") {
       sectionTitle = "Choose passcode";
@@ -156,14 +167,12 @@ export default class Authenticate extends Abstract {
     } else if(this.authProps.fingerprint) {
       sectionTitle = "Fingerprint Required";
     } else {
-      sectionTitle = "Missing";
+      // sectionTitle = "Missing";
     }
-
-    console.log("Auth Props", this.authProps);
 
     return (
       <View style={GlobalStyles.styles().flexContainer}>
-        <ScrollView keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
+        <ScrollView style={{paddingTop: this.props.mode == 'authenticate' ? 15 : 0}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
           <TableSection>
 
             <SectionHeader title={sectionTitle} />

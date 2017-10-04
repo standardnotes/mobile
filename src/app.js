@@ -48,9 +48,6 @@ export default class App {
   constructor() {
     KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
 
-    // required to initialize current app state to active since the observer is not called in time on initial app launch
-    this.previousAppState = "active";
-
     this.readyObservers = [];
     this.lockStatusObservers = [];
     this._isAndroid = Platform.OS === "android";
@@ -279,7 +276,7 @@ export default class App {
     }
   }
 
-  startApp() {
+  startApp(options = {}) {
     console.log("===Starting App===");
     // On Android, calling Navigation.startSingleScreenApp first (for authentication), then calling
     // Navigation.startTabBasedApp will trigger an AppState change from active to background to active again.
@@ -287,7 +284,9 @@ export default class App {
     // if we don't catch this edge case, it will result in infinite recursion. So as `startApp` is called
     // immediately before this transition, setting isStartingApp to true then false afterwards will prevent the infinite
     // recursion
-    ApplicationState.get().setIsStartingApp(true);
+    if(!options.reloading) {
+      ApplicationState.get().setIsStartingApp(true);
+    }
 
     if(this.isIOS) {
       let tabs = [{
@@ -341,9 +340,11 @@ export default class App {
       );
     }
 
-    setTimeout(function () {
-      ApplicationState.get().setIsStartingApp(false);
-    }.bind(this), 1500);
+    if(!options.reloading) {
+      setTimeout(function () {
+        ApplicationState.get().setIsStartingApp(false);
+      }.bind(this), 1500);
+    }
   }
 
   reload() {
@@ -352,7 +353,7 @@ export default class App {
     // reset search box
     this.optionsState.setSearchTerm(null);
 
-    this.startApp();
+    this.startApp({reloading: true});
   }
 }
 

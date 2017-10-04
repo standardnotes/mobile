@@ -52,7 +52,7 @@ export default class InputModal extends Abstract {
   }
 
   render() {
-    if(this.state.lockContent) {
+    if(!this.state.ready || this.state.lockContent) {
       return (<LockedView />);
     }
 

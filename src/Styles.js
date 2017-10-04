@@ -254,6 +254,7 @@ export default class GlobalStyles {
       flexContainer: {
         flex: 1,
         flexDirection: 'column',
+        backgroundColor: constants.mainBackgroundColor,
       },
 
       centeredContainer: {

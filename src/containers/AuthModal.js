@@ -33,7 +33,7 @@ export default class AuthModal extends Component {
         />
 
       </Modal>
-    )
+  )
   }
 
 }

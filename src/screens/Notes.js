@@ -44,7 +44,10 @@ export default class Notes extends Abstract {
         if((authProps.passcode || authProps.fingerprint) && !ApplicationState.get().isAuthenticationInProgress()) {
           // The auth modal is only presented if the Notes screen is visible.
           this.props.navigator.popToRoot();
-          this.props.navigator.dismissModal();
+
+          // Don't use the below as it will also for some reason dismiss the non RNN auth modal as well
+          // this.props.navigator.dismissAllModals({animationType: 'none'});
+
           this.props.navigator.switchToTab({
             tabIndex: 0
           });
@@ -166,8 +169,6 @@ export default class Notes extends Abstract {
       }
       notesTitle = options.archivedOnly ? "Archived Notes" : "Filtered Notes";
     }
-
-    console.log("Configuring with options", options);
 
     // Android only allows 1 tag selection
     if(App.isAndroid) {

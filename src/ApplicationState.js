@@ -17,6 +17,11 @@ export default class ApplicationState {
   constructor() {
     this.observers = [];
     AppState.addEventListener('change', this.handleAppStateChange);
+
+    this.lastLaunch = new Date();
+
+    // required to initialize current app state to active since the observer is not called in time on initial app launch
+    this.previousAppState = "active";
   }
 
   handleAppStateChange = (nextAppState) => {
@@ -43,6 +48,10 @@ export default class ApplicationState {
     "IS ENTERING FOREGROUND", isEnteringForeground,
     );
 
+    if(isEnteringForeground) {
+      this.lastLaunch = new Date();
+    }
+
     // Hide screen content as we go to the background
     if(isEnteringBackground) {
       this.notifyOfState("background");
@@ -54,6 +63,11 @@ export default class ApplicationState {
     }
 
     this.previousAppState = nextAppState;
+  }
+
+  isLaunching() {
+    let launchWindow = 2.0; // seconds
+    return (new Date() - this.lastLaunch)/1000.0 < launchWindow;
   }
 
   setIsStartingApp(starting) {

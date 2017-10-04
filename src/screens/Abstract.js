@@ -59,6 +59,7 @@ export default class Abstract extends Component {
 
   componentWillUnmount() {
     this.willUnmount = true;
+    this.mounted = false;
     App.get().removeLockStatusObserver(this.lockObserver);
   }
 
