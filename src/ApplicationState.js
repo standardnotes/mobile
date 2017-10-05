@@ -9,6 +9,9 @@ export default class ApplicationState {
   // When the app first launches
   static Launching = "Launching";
 
+  // When the app enters into multitasking view, or control/notification center for iOS
+  static LosingFocus = "LosingFocus";
+
   // When the app enters the background completely
   static Backgrounding = "Backgrounding";
 
@@ -48,16 +51,11 @@ export default class ApplicationState {
 
   handleAppStateChange = (nextAppState) => {
 
-    this.nextAppState = nextAppState;
-
     var isResuming = nextAppState === "active";
     var isEnteringBackground = nextAppState == 'background';
+    var isLosingFocus = nextAppState == 'inactive';
 
-    console.log("APP STATE CHANGE FROM", this.mostRecentState,
-    "TO STATE", nextAppState,
-    "IS ENTERING BACKGROUND", isEnteringBackground,
-    "IS RESUMING", isResuming,
-    );
+    console.log("APP STATE CHANGE FROM", this.mostRecentState, "TO STATE", this.applicationStateForNativeState(nextAppState));
 
     if(isEnteringBackground) {
       this.didEnterBackground();
@@ -67,10 +65,36 @@ export default class ApplicationState {
       this.didResume();
     }
 
-    this.mostRecentState = nextAppState;
+    if(isLosingFocus) {
+      this.didLoseFocus();
+    }
   }
 
+  applicationStateForNativeState(nativeState) {
+    if(nativeState == 'active') {
+      return ApplicationState.Resuming;
+    }
 
+    if(nativeState == 'background') {
+      return ApplicationState.Backgrounding;
+    }
+
+    if(nativeState == 'inactive') {
+      return ApplicationState.LosingFocus;
+    }
+  }
+
+  // An app cycle change  are natural events like active, inactive, background,
+  // while non-app cycle events are custom events like locking and unlocking
+
+  isStateAppCycleChange(state) {
+    return [
+      ApplicationState.Launching,
+      ApplicationState.LosingFocus,
+      ApplicationState.Backgrounding,
+      ApplicationState.Resuming
+    ].includes(state);
+  }
 
 
 
@@ -78,18 +102,30 @@ export default class ApplicationState {
 
   didLaunch() {
     this.notifyOfState(ApplicationState.Launching);
+    this.mostRecentState = ApplicationState.Launching;
+  }
+
+  didLoseFocus() {
+    this.notifyOfState(ApplicationState.LosingFocus);
+    this.mostRecentState = ApplicationState.LosingFocus;
+
+    if(this.shouldLockApplication()) {
+      this.lockApplication();
+    }
   }
 
   didEnterBackground() {
     this.notifyOfState(ApplicationState.Backgrounding);
+    this.mostRecentState = ApplicationState.Backgrounding;
 
-    if(this.shouldLockApplication) {
+    if(this.shouldLockApplication()) {
       this.lockApplication();
     }
   }
 
   didResume() {
     this.notifyOfState(ApplicationState.Resuming);
+    this.mostRecentState = ApplicationState.Resuming;
   }
 
   /* End State */
@@ -145,6 +181,7 @@ export default class ApplicationState {
 
   unlockApplication() {
     this.notifyOfState(ApplicationState.Unlocking);
+    this.setAuthenticationInProgress(false);
     this.locked = false;
   }
 
@@ -157,7 +194,7 @@ export default class ApplicationState {
   }
 
   getAuthenticationPropsForAppState(state) {
-    if(state == ApplicationState.Unlocking) {
+    if(state == ApplicationState.Unlocking || state == ApplicationState.Locking) {
       return {};
     }
 
@@ -166,9 +203,9 @@ export default class ApplicationState {
 
     var showPasscode = hasPasscode, showFingerprint = hasFingerprint;
 
-    if(state == ApplicationState.Resuming) {
-     showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
-     showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
+    if(state == ApplicationState.Backgrounding || state == ApplicationState.Resuming || state == ApplicationState.LosingFocus) {
+      showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
+      showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
     }
 
     var title = showPasscode && showFingerprint ? "Authentication Required" : (showPasscode ? "Passcode Required" : "Fingerprint Required");

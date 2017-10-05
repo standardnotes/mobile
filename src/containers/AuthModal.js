@@ -15,8 +15,10 @@ export default class AuthModal extends Component {
     this.state = {authProps: ApplicationState.get().getAuthenticationPropsForAppState(ApplicationState.get().getMostRecentState())};
 
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
-      this.setState({authProps: authProps});
+      if(ApplicationState.get().isStateAppCycleChange(state) && !ApplicationState.get().isAuthenticationInProgress()) {
+        let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
+        this.setState({authProps: authProps});
+      }
     });
   }
 
@@ -27,6 +29,14 @@ export default class AuthModal extends Component {
   render() {
     let authProps = this.state.authProps;
     let visible = (authProps.passcode || authProps.fingerprint) || false;
+    if(visible) {
+      // Once visible is true even once, we need to lock it in place,
+      // and only make it in-visible after authentication completes.
+      // This value is checked above in the application state observer to make sure we
+      // don't accidentally change the value and dismiss this while its in view
+      ApplicationState.get().setAuthenticationInProgress(true);
+    }
+
     return (
       <Modal
        animationType={"slide"}

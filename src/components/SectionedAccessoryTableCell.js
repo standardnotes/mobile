@@ -41,13 +41,14 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     var iconSize = left ? 25: 30;
     var color = left ? GlobalStyles.constants().mainTextColor : GlobalStyles.constants().mainTintColor;
 
-    if(this.props.color) {
-      color = this.props.color;
-    }
 
     if(Platform.OS == "android") {
       iconSize -= 5;
       color = GlobalStyles.constants().mainDimColor;
+    }
+
+    if(this.props.color) {
+      color = this.props.color;
     }
 
     var icon = (

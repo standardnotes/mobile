@@ -34,18 +34,26 @@ export default class Notes extends Abstract {
 
         var authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
         if((authProps.passcode || authProps.fingerprint)) {
-          // The auth modal is only presented if the Notes screen is visible.
-          this.props.navigator.popToRoot();
+          // Android can handle presenting modals no matter which screen you're on
+          if(App.isIOS) {
+            // The auth modal is only presented if the Notes screen is visible.
+            this.props.navigator.popToRoot();
 
-          // Don't use the below as it will also for some reason dismiss the non RNN auth modal as well
-          // this.props.navigator.dismissAllModals({animationType: 'none'});
+            // Don't use the below as it will also for some reason dismiss the non RNN auth modal as well
+            // this.props.navigator.dismissAllModals({animationType: 'none'});
 
-          this.props.navigator.switchToTab({
-            tabIndex: 0
-          });
+            this.props.navigator.switchToTab({
+              tabIndex: 0
+            });
+          }
         }
       }
     })
+  }
+
+  unlockContent() {
+    super.unlockContent();
+    this.configureNavBar(true);
   }
 
   loadInitialState() {
@@ -137,7 +145,15 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
+    if(this.state.lockContent) {
+      this.notesTitle = "Authentication Required";
+      this.props.navigator.setTitle({title: this.notesTitle, animated: false});
+      return;
+    }
+
     if(!this.dataLoaded) {
+      this.notesTitle = "Notes";
+      this.props.navigator.setTitle({title: this.notesTitle, animated: false});
       return;
     }
 

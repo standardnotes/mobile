@@ -15,7 +15,6 @@ var _ = require('lodash')
 import App from "../app"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Icon from 'react-native-vector-icons/Ionicons';
-import ApplicationState from "../ApplicationState";
 
 import {
   TextInput,
@@ -50,12 +49,6 @@ export default class Authenticate extends Abstract {
   }
 
   beginAuthentication = () => {
-    if(ApplicationState.get().isAuthenticationInProgress()) {
-      return;
-    }
-
-    ApplicationState.get().setAuthenticationInProgress(true);
-
     this.mergeState({began: true});
 
     // Allow render to call so that this.refs is defined
@@ -116,7 +109,6 @@ export default class Authenticate extends Abstract {
       this.beginFingerprintAuth();
     } else {
       this.props.onAuthenticateSuccess();
-      ApplicationState.get().setAuthenticationInProgress(false);
       this.dismiss();
     }
 
@@ -131,7 +123,6 @@ export default class Authenticate extends Abstract {
       }, 100);
     } else {
       this.props.onAuthenticateSuccess();
-      ApplicationState.get().setAuthenticationInProgress(false);
       this.dismiss();
     }
   }
