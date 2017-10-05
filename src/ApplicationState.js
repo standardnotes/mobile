@@ -24,6 +24,9 @@ export default class ApplicationState {
   // When the user enters their local passcode and/or fingerprint
   static Unlocking = "Unlocking";
 
+  static ThemeChangeBegin = "ThemeChangeBegin";
+  static ThemeChangeEnd = "ThemeChangeEnd";
+
   static instance = null;
   static get() {
     if (this.instance == null) {
@@ -48,8 +51,22 @@ export default class ApplicationState {
     }
   }
 
+  setThemeChangeBegan() {
+    this.themeChangeInProgress = true;
+    this.notifyOfState(ApplicationState.ThemeChangeBegin);
+  }
+
+  setThemeChangeEnded() {
+    this.themeChangeInProgress = false;
+    this.notifyOfState(ApplicationState.ThemeChangeEnd);
+  }
+
 
   handleAppStateChange = (nextAppState) => {
+
+    if(this.themeChangeInProgress) {
+      return;
+    }
 
     var isResuming = nextAppState === "active";
     var isEnteringBackground = nextAppState == 'background';

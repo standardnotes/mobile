@@ -232,12 +232,18 @@ export default class App {
   }
 
   reload() {
+    ApplicationState.get().setThemeChangeBegan();
+
     Icons.get().loadIcons();
 
     // reset search box
     this.optionsState.setSearchTerm(null);
 
     this.startApp();
+
+    setTimeout(function () {
+      ApplicationState.get().setThemeChangeEnded();
+    }, 100);
   }
 }
 

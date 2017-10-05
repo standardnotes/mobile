@@ -18,6 +18,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.uimanager.ViewManager;
 import com.facebook.soloader.SoLoader;
+import com.kristiansorens.flagsecure.FlagSecure;
 import com.oblador.keychain.KeychainPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnativenavigation.NavigationApplication;
@@ -30,6 +31,7 @@ import com.kristiansorens.flagsecure.FlagSecurePackage;
 import java.util.Arrays;
 import java.util.List;
 import com.bugsnag.BugsnagReactNative;
+
 
 public class MainApplication extends NavigationApplication {
 
@@ -74,33 +76,33 @@ public class MainApplication extends NavigationApplication {
         activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
       }
 
+
+
       @Override
       public void onActivityStarted(Activity activity) {
-//        activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        if(FlagSecure.instance != null && FlagSecure.instance.enabled) {
+          activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        }
       }
 
       @Override
       public void onActivityResumed(Activity activity) {
-//        sendEvent("onActivityResumed");
       }
 
       @Override
       public void onActivityPaused(Activity activity) {
-//        sendEvent("onActivityPaused");
       }
 
       @Override
       public void onActivityStopped(Activity activity) {
-
       }
 
       public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-//        sendEvent("onActivitySaveInstanceState");
+
       }
 
       @Override
       public void onActivityDestroyed(Activity activity) {
-
       }
 
       public void sendEvent(String eventName) {

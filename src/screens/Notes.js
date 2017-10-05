@@ -146,8 +146,6 @@ export default class Notes extends Abstract {
 
   configureNavBar(initial = false) {
     if(this.state.lockContent) {
-      this.notesTitle = "Authentication Required";
-      this.props.navigator.setTitle({title: this.notesTitle, animated: false});
       return;
     }
 
@@ -356,8 +354,11 @@ export default class Notes extends Abstract {
 
   render() {
     if(this.state.lockContent) {
+      console.log("Notes rendering AuthModal");
       return <AuthModal />;
     }
+
+    console.log("Notes rendering actual content");
 
     var result = ModelManager.getInstance().getNotes(this.options);
     var notes = result.notes;
