@@ -38,7 +38,7 @@ export default class Notes extends Abstract {
           this.props.navigator.popToRoot();
 
           // Don't use the below as it will also for some reason dismiss the non RNN auth modal as well
-          this.props.navigator.dismissAllModals({animationType: 'none'});
+          // this.props.navigator.dismissAllModals({animationType: 'none'});
 
           this.props.navigator.switchToTab({
             tabIndex: 0
@@ -46,12 +46,6 @@ export default class Notes extends Abstract {
         }
       }
     })
-  }
-
-  // Implemented by super class. We just want to latch on so we can configure the nav bar.
-  unlockContent() {
-    super.unlockContent();
-    this.configureNavBar(true);
   }
 
   loadInitialState() {
@@ -143,21 +137,7 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
-    if(this.state.lockContent) {
-      this.notesTitle = "Authentication Required";
-      this.props.navigator.setTitle({title: this.notesTitle, animated: false});
-      this.props.navigator.setButtons({
-        rightButtons: [],
-        leftButtons: [],
-        fab: {},
-        animated: false
-      });
-      return;
-    }
-
     if(!this.dataLoaded) {
-      this.notesTitle = "Notes";
-      this.props.navigator.setTitle({title: this.notesTitle, animated: false});
       return;
     }
 

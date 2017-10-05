@@ -16,7 +16,6 @@ export default class AuthModal extends Component {
 
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
-      console.log("GOt auth props", authProps);
       this.setState({authProps: authProps});
     });
   }
@@ -29,8 +28,12 @@ export default class AuthModal extends Component {
     let authProps = this.state.authProps;
     let visible = (authProps.passcode || authProps.fingerprint) || false;
     return (
-      <View style={GlobalStyles.styles().flexContainer}>
-      {visible &&
+      <Modal
+       animationType={"slide"}
+       transparent={false}
+       visible={visible}
+       onRequestClose={() => {}}>
+
         <Authenticate
           ref={'authenticate'}
           title={authProps.title}
@@ -41,9 +44,8 @@ export default class AuthModal extends Component {
           pseudoModal={true}
           authProps={authProps}
         />
-      }
-    </View>
-  )
+      </Modal>
+    )
   }
 
 }
