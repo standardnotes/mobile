@@ -354,11 +354,8 @@ export default class Notes extends Abstract {
 
   render() {
     if(this.state.lockContent) {
-      console.log("Notes rendering AuthModal");
       return <AuthModal />;
     }
-
-    console.log("Notes rendering actual content");
 
     var result = ModelManager.getInstance().getNotes(this.options);
     var notes = result.notes;
