@@ -67,6 +67,13 @@ public class SNTextViewManager extends SimpleViewManager<SNTextView> {
         }
     }
 
+    @ReactProp(name = "handlesColor", customType = "Color")
+    public void setHandlesColor(SNTextView view, @Nullable Integer color) {
+        if (color != null) {
+            view.setHandlesColor(color);
+        }
+    }
+
     @ReactPropGroup(names = {
             "padding", "paddingLeft", "paddingRight", "paddingTop", "paddingBottom"
     }, customType = "String")

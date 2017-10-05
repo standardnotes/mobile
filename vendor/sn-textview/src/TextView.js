@@ -47,6 +47,7 @@ TextView.propTypes = {
   onChangeText: PropTypes.func,
   text: PropTypes.string,
   autoFocus: PropTypes.bool,
+  handlesColor: PropTypes.string,
   keyboardDismissMode: PropTypes.oneOf([
       'none', // default
       'on-drag', // Cross-platform

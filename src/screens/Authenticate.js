@@ -42,10 +42,6 @@ export default class Authenticate extends Abstract {
 
   componentDidMount() {
     super.componentDidMount();
-
-    if(this.props.mode === "authenticate") {
-      this.beginAuthentication();
-    }
   }
 
   beginAuthentication = () => {
@@ -391,11 +387,12 @@ class FingerprintSection extends Abstract {
     this.mergeState({began: true, error: null});
 
     if(App.isAndroid) {
+      console.log("Creating FingerprintScanner Instance");
       FingerprintScanner.authenticate({ onAttempt: this.handleInvalidAttempt }).then(() => {
         this.handleSuccessfulAuth();
       })
       .catch((error) => {
-        console.log("Error:", error);
+        console.log("Fingerprint Error:", error);
         if(error.name == "UserCancel") {
           this.beginAuthentication();
         } else {
@@ -420,6 +417,7 @@ class FingerprintSection extends Abstract {
 
   componentWillUnmount() {
     super.componentWillUnmount();
+    console.log("Releasing FingerprintScanner Instance");
     FingerprintScanner.release();
   }
 

@@ -17,7 +17,7 @@ export default class AuthModal extends Component {
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(ApplicationState.get().isStateAppCycleChange(state) && !ApplicationState.get().isAuthenticationInProgress()) {
         let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
-        this.setState({authProps: authProps});
+        this.setState({authProps: authProps, applicationState: state});
       }
     });
   }
@@ -34,7 +34,14 @@ export default class AuthModal extends Component {
       // and only make it in-visible after authentication completes.
       // This value is checked above in the application state observer to make sure we
       // don't accidentally change the value and dismiss this while its in view
-      ApplicationState.get().setAuthenticationInProgress(true);
+      if(!ApplicationState.get().isAuthenticationInProgress()) {
+        if(this.state.applicationState == ApplicationState.Launching || this.state.applicationState == ApplicationState.Resuming) {
+          setTimeout(() => {
+            this.refs.authenticate.beginAuthentication();
+            ApplicationState.get().setAuthenticationInProgress(true);
+          }, 0);
+        }
+      }
     }
 
     return (

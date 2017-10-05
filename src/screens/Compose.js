@@ -290,7 +290,8 @@ export default class Compose extends Abstract {
               ref={(ref) => this.input = ref}
               autoFocus={this.note.dummy}
               value={this.note.text}
-              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
+              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
+              handlesColor={GlobalStyles.constants().mainTintColor}
               onChangeText={this.onTextChange}
             />
           </View>

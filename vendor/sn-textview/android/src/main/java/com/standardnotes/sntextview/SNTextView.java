@@ -3,6 +3,7 @@ package com.standardnotes.sntextview;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
@@ -174,7 +175,48 @@ public class SNTextView extends LinearLayout {
             field = editor.getClass().getDeclaredField("mCursorDrawable");
             field.setAccessible(true);
             field.set(editor, drawables);
-        } catch (Exception ignored) {
+        } catch (Exception ignored) {}
+    }
+
+    public void setHandlesColor(int color) {
+        try {
+
+            Field editorField = TextView.class.getDeclaredField("mEditor");
+            if (!editorField.isAccessible()) {
+                editorField.setAccessible(true);
+            }
+
+            Object editor = editorField.get(editText);
+            Class<?> editorClass = editor.getClass();
+
+            String[] handleNames = {"mSelectHandleLeft", "mSelectHandleRight", "mSelectHandleCenter"};
+            String[] resNames = {"mTextSelectHandleLeftRes", "mTextSelectHandleRightRes", "mTextSelectHandleRes"};
+
+            for (int i = 0; i < handleNames.length; i++) {
+                Field handleField = editorClass.getDeclaredField(handleNames[i]);
+                if (!handleField.isAccessible()) {
+                    handleField.setAccessible(true);
+                }
+
+                Drawable handleDrawable = (Drawable) handleField.get(editor);
+
+                if (handleDrawable == null) {
+                    Field resField = TextView.class.getDeclaredField(resNames[i]);
+                    if (!resField.isAccessible()) {
+                        resField.setAccessible(true);
+                    }
+                    int resId = resField.getInt(editText);
+                    handleDrawable = editText.getResources().getDrawable(resId);
+                }
+
+                if (handleDrawable != null) {
+                    Drawable drawable = handleDrawable.mutate();
+                    drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+                    handleField.set(editor, drawable);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
