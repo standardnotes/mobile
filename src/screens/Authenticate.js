@@ -386,8 +386,8 @@ class FingerprintSection extends Abstract {
 
     this.mergeState({began: true, error: null});
 
+    console.log("Creating FingerprintScanner Instance");
     if(App.isAndroid) {
-      console.log("Creating FingerprintScanner Instance");
       FingerprintScanner.authenticate({ onAttempt: this.handleInvalidAttempt }).then(() => {
         this.handleSuccessfulAuth();
       })
