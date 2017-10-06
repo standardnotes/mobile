@@ -87,6 +87,7 @@ public class MainApplication extends NavigationApplication {
 
       @Override
       public void onActivityResumed(Activity activity) {
+
       }
 
       @Override

@@ -17,37 +17,61 @@ export default class AuthModal extends Component {
       authProps: ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState),
       applicationState: mostRecentState
     };
-
-    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      if(ApplicationState.get().isStateAppCycleChange(state) && !ApplicationState.get().isAuthenticationInProgress()) {
-        let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
-        this.setState({authProps: authProps, applicationState: state});
-      }
-    });
+    this.stateChanged();
   }
 
   componentWillUnmount() {
     ApplicationState.get().removeStateObserver(this.stateObserver);
   }
 
-  render() {
-    let authProps = this.state.authProps;
-    let visible = (authProps.passcode || authProps.fingerprint) || false;
-    if(visible) {
-      // Once visible is true even once, we need to lock it in place,
-      // and only make it in-visible after authentication completes.
-      // This value is checked above in the application state observer to make sure we
-      // don't accidentally change the value and dismiss this while its in view
-      if(!ApplicationState.get().isAuthenticationInProgress()) {
-        if(this.state.applicationState == ApplicationState.Launching || this.state.applicationState == ApplicationState.Resuming) {
-          setTimeout(() => {
-            this.refs.authenticate.beginAuthentication();
-            ApplicationState.get().setAuthenticationInProgress(true);
-          }, 0);
+  componentDidMount() {
+    this.mounted = true;
+
+    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
+      if(ApplicationState.get().isStateAppCycleChange(state) && !ApplicationState.get().isAuthenticationInProgress()) {
+        let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
+        this.setState({authProps: authProps, applicationState: state});
+        this.stateChanged();
+      }
+    });
+
+    if(this.beginAuthOnMount) {
+      this.beginAuthOnMount = false;
+      this.beginAuth();
+    }
+  }
+
+  stateChanged() {
+    // Once visible is true even once, we need to lock it in place,
+    // and only make it in-visible after authentication completes.
+    // This value is checked above in the application state observer to make sure we
+    // don't accidentally change the value and dismiss this while its in view
+
+    if(!ApplicationState.get().isAuthenticationInProgress()) {
+      if(this.state.applicationState == ApplicationState.Launching || this.state.applicationState == ApplicationState.Resuming) {
+        if(this.mounted) {
+          this.beginAuth();
+        } else {
+          this.beginAuthOnMount = true;
         }
       }
     }
+  }
 
+  beginAuth() {
+    this.refs.authenticate.beginAuthentication();
+    ApplicationState.get().setAuthenticationInProgress(true);
+  }
+
+  get visible() {
+    let authProps = this.state.authProps;
+    let _visible = (authProps.passcode || authProps.fingerprint) || false;
+    return _visible;
+  }
+
+  render() {
+    let authProps = this.state.authProps;
+    let visible = this.visible;
     return (
       <Modal
        animationType={"slide"}
