@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+const ColorPropType = require('ColorPropType');
 import {requireNativeComponent, View, TextInput, findNodeHandle, UIManager, Platform} from 'react-native';
 
 export default class TextView extends Component {
@@ -47,7 +48,7 @@ TextView.propTypes = {
   onChangeText: PropTypes.func,
   text: PropTypes.string,
   autoFocus: PropTypes.bool,
-  handlesColor: PropTypes.string,
+  handlesColor: ColorPropType,
   keyboardDismissMode: PropTypes.oneOf([
       'none', // default
       'on-drag', // Cross-platform

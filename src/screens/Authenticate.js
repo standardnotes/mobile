@@ -149,12 +149,23 @@ export default class Authenticate extends Abstract {
             <SectionHeader title={sectionTitle} />
 
             {isAuthenticating && this.authProps.fingerprint &&
-              <FingerprintSection began={this.state.began} first={true} ref={'fingerprintSection'} onPress={this.beginAuthentication} onAuthenticateSuccess={this.onFingerprintSuccess} />
+              <FingerprintSection
+                first={true}
+                last={!this.authProps.passcode}
+                ref={'fingerprintSection'}
+                onPress={this.beginAuthentication}
+                onAuthenticateSuccess={this.onFingerprintSuccess}
+              />
             }
 
             {((isAuthenticating && this.authProps.passcode) || isSetup) &&
-              <PasscodeSection waitingForFingerprint={isAuthenticating && this.authProps.fingerprint && !this.state.fingerprintSuccess} ref={'passcodeSection'}
-              first={(isAuthenticating && !this.authProps.fingerprint) || isSetup} mode={this.props.mode} onSetupSuccess={this.onPasscodeSetupSuccess} onAuthenticateSuccess={this.onPasscodeAuthenticateSuccess} />
+              <PasscodeSection
+                waitingForFingerprint={isAuthenticating && this.authProps.fingerprint && !this.state.fingerprintSuccess}
+                ref={'passcodeSection'}
+                first={(isAuthenticating && !this.authProps.fingerprint) || isSetup}
+                mode={this.props.mode} onSetupSuccess={this.onPasscodeSetupSuccess}
+                onAuthenticateSuccess={this.onPasscodeAuthenticateSuccess}
+              />
             }
 
 
@@ -397,19 +408,22 @@ class FingerprintSection extends Abstract {
           this.beginAuthentication();
         } else {
           if(this.isMounted()) {
-            this.setState({ error: error.message, began: false});
+            this.setState({ error: "Authentication failed. Tap to try again.", began: false});
           }
         }
       });
     } else {
-      FingerprintScanner.authenticate({fallbackEnabled: false, description: 'Fingerprint is required to access your notes.' })
+      // iOS
+      FingerprintScanner.authenticate({fallbackEnabled: true, description: 'Fingerprint is required to access your notes.' })
         .then(() => {
           this.handleSuccessfulAuth();
         })
         .catch((error) => {
           console.log("Error:", error);
-          if(this.isMounted()) {
-            this.setState({ error: error.message, began: false });
+          if(error.name == "UserCancel") {
+            this.mergeState({ began: false });
+          } else if(this.isMounted()) {
+            this.mergeState({ error: "Authentication failed. Tap to try again.", began: false });
           }
         });
     }
@@ -435,10 +449,13 @@ class FingerprintSection extends Abstract {
   }
 
   onPress = () => {
-    if(!this.props.began) {
+    if(__DEV__) {
+      this.__dev_simulateSuccess();
+      return;
+    }
+
+    if(!this.state.began) {
       this.props.onPress();
-    } else {
-      __DEV__ && this.__dev_simulateSuccess();
     }
   }
 
@@ -454,8 +471,7 @@ class FingerprintSection extends Abstract {
     var text;
     if(this.state.began) {
       text = "Please scan your fingerprint";
-    }
-    else if(!this.props.began) {
+    } else  {
       text = "Tap here to begin authentication.";
     }
 
@@ -473,6 +489,7 @@ class FingerprintSection extends Abstract {
       <View>
         <SectionedAccessoryTableCell
           first={this.props.first}
+          last={this.props.last}
           iconName={iconName}
           onPress={this.onPress}
           text={text}
