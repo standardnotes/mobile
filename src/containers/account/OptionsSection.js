@@ -32,7 +32,7 @@ export default class OptionsSection extends Component {
           <ButtonCell first={true} leftAligned={true} title={`Sign out (${this.props.email})`} onPress={this.props.onSignOutPress} />
         }
 
-        <ButtonCell first={!this.props.signedIn} disabled={this.state.loadingExport} leftAligned={true} title={this.state.loadingExport ? "Preparing Data..." : "Export Data"} onPress={this.onExportPress} />
+        <ButtonCell last={true} first={!this.props.signedIn} disabled={this.state.loadingExport} leftAligned={true} title={this.state.loadingExport ? "Preparing Data..." : "Export Data"} onPress={this.onExportPress} />
 
       </TableSection>
     );

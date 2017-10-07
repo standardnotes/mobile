@@ -25,6 +25,7 @@ export default class ThemesSection extends Component {
               first={i == 0}
               selected={() => {return theme.active}}
               dimmed={theme.notAvailableOnMobile}
+              last={i == this.props.themes.length - 1 && this.props.themes.length > 1}
             />
           )
         }.bind(this))}
@@ -32,6 +33,7 @@ export default class ThemesSection extends Component {
         {this.props.themes.length == 1 &&
           <SectionedAccessoryTableCell
             onPress={() => Linking.openURL("https://standardnotes.org/extensions")}
+            last={true}
             text={"More Themes"}
           />
         }

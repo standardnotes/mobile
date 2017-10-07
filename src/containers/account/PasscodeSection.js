@@ -73,14 +73,14 @@ export default class PasscodeSection extends Component {
 
         <ButtonCell first={true} leftAligned={true} title={passcodeTitle} onPress={passcodeOnPress} />
 
-        <ButtonCell disabled={!this.state.fingerprintAvailable} leftAligned={true} title={fingerprintTitle} onPress={fingerprintOnPress} />
+        <ButtonCell last={!this.props.hasFingerprint && !this.props.hasPasscode} disabled={!this.state.fingerprintAvailable} leftAligned={true} title={fingerprintTitle} onPress={fingerprintOnPress} />
 
         {this.props.hasPasscode &&
-          <SectionedOptionsTableCell title={"Require Passcode"} options={passcodeOptions} onPress={this.onPasscodeOptionPress}/>
+          <SectionedOptionsTableCell last={!this.props.hasFingerprint} title={"Require Passcode"} options={passcodeOptions} onPress={this.onPasscodeOptionPress}/>
         }
 
         {this.props.hasFingerprint &&
-          <SectionedOptionsTableCell title={"Require Fingerprint"} options={fingerprintOptions} onPress={this.onFingerprintOptionPress}/>
+          <SectionedOptionsTableCell last={true} title={"Require Fingerprint"} options={fingerprintOptions} onPress={this.onFingerprintOptionPress}/>
         }
 
       </TableSection>

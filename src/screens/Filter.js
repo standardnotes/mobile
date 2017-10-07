@@ -370,6 +370,7 @@ class TagsSection extends Component {
       text={item.title}
       key={item.uuid}
       first={this.props.tags.indexOf(item) == 0}
+      last={this.props.tags.indexOf(item) == this.props.tags.length - 1}
       selected={() => {return this.state.selected.includes(item.uuid)}}
     />
   )
@@ -380,9 +381,9 @@ class TagsSection extends Component {
         <SectionHeader title={this.props.title} />
 
         <FlatList style={{height: "100%"}}
-          initialNumToRender={6}
-          windowSize={6}
-          maxToRenderPerBatch={6}
+          initialNumToRender={10}
+          windowSize={10}
+          maxToRenderPerBatch={10}
           data={this.props.tags}
           renderItem={this._renderItem}
         />
@@ -411,6 +412,7 @@ class OptionsSection extends Component {
           onPress={this.onPressArchive}
           text={"Show only archived notes"}
           first={true}
+          last={true}
           selected={() => {return this.props.archivedOnly}}
         />
 
@@ -447,6 +449,7 @@ class SortSection extends Component {
               text={option.label}
               key={option.key}
               first={i == 0}
+              last={i == root.options.length - 1}
               selected={() => {return option.key == root.state.sortBy}}
             />
           )

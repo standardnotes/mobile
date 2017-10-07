@@ -294,6 +294,7 @@ export default class GlobalStyles {
 
       sectionHeaderAndroid: {
         fontSize: constants.mainTextFontSize - 2,
+        color: constants.mainTintColor
       },
 
       sectionedTableCell: {
@@ -320,6 +321,19 @@ export default class GlobalStyles {
       sectionedTableCellFirst: {
         borderTopColor: constants.plainCellBorderColor,
         borderTopWidth: 1,
+      },
+
+      sectionedTableCellLast: {
+
+      },
+
+      sectionedTableCellFirstAndroid: {
+        borderTopWidth: 0,
+      },
+
+      sectionedTableCellLastAndroid: {
+        borderBottomWidth: 0,
+        borderTopWidth: 0,
       },
 
       sectionedAccessoryTableCell: {

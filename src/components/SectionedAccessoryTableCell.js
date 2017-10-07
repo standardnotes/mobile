@@ -29,7 +29,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
   }
 
   render() {
-    var checkmarkName = Platform.OS == "android" ? "md-checkmark-circle-outline" : "ios-checkmark-circle";
+    var checkmarkName = Platform.OS == "android" ? "md-checkbox" : "ios-checkmark-circle";
     var iconName = this.props.iconName ? this.props.iconName : ((this.props.selected && this.props.selected()) ? checkmarkName : null);
 
     var iconStyles = {
@@ -42,10 +42,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     var color = left ? GlobalStyles.constants().mainTextColor : GlobalStyles.constants().mainTintColor;
 
 
-    if(Platform.OS == "android") {
-      iconSize -= 5;
-      color = GlobalStyles.constants().mainDimColor;
-    }
+    if(Platform.OS == "android") { iconSize -= 5; }
 
     if(this.props.color) {
       color = this.props.color;

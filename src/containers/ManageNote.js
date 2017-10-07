@@ -53,6 +53,7 @@ export default class SortSection extends Component {
           iconName={nameForIcon("trash")}
           onPress={() => {this.onPress("delete")}}
           text={"Delete"}
+          last={true}
           leftAlignIcon={true}
           />
       </TableSection>

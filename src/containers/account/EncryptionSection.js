@@ -36,7 +36,7 @@ export default class PasscodeSection extends Component {
       <TableSection>
         <SectionHeader title={this.props.title} />
 
-        <SectionedTableCell first={true}>
+        <SectionedTableCell last={!enabled} first={true}>
           <Text style={textStyles}>
             <Text style={{fontWeight: "bold"}}>Encryption: </Text>
             <Text>{encryptionStatus}</Text>
@@ -59,7 +59,7 @@ export default class PasscodeSection extends Component {
         }
 
         {enabled &&
-          <SectionedTableCell>
+          <SectionedTableCell last={true}>
             <Text style={textStyles}>
               <Text style={{fontWeight: "bold"}}>Items Encrypted: </Text>
               <Text>{itemsStatus}</Text>
