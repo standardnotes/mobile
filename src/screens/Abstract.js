@@ -31,7 +31,6 @@ export default class Abstract extends Component {
   }
 
   lockContent() {
-    console.log("Locking Content");
     this.mergeState({lockContent: true});
     this.configureNavBar();
   }
@@ -40,7 +39,6 @@ export default class Abstract extends Component {
     if(!this.loadedInitialState) {
       this.loadInitialState();
     }
-    console.log("Unlocking Content");
     this.mergeState({lockContent: false});
   }
 

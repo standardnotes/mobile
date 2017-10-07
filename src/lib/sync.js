@@ -66,8 +66,6 @@ export default class Sync {
 
         this.dataLoaded = true;
 
-        console.log("Sync: Local Data Loaded");
-
         this.dataLoadObservers.forEach(function(observer){
           observer.callback();
         })

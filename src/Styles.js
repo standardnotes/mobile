@@ -153,7 +153,24 @@ export default class GlobalStyles {
   }
 
   async downloadTheme(theme, callback) {
+    let errorBlock = (error) => {
+      if(!theme.notAvailableOnMobile) {
+        theme.notAvailableOnMobile = true;
+        theme.setDirty(true);
+      }
+
+      callback && callback();
+
+      console.error("Theme download error", error);
+    }
+
+    if(!theme.url) {
+      errorBlock(null);
+      return;
+    }
+
     var url;
+
     if(theme.url.includes("?")) {
       url = theme.url.replace("?", ".json?");
     } else {
@@ -180,16 +197,7 @@ export default class GlobalStyles {
         callback();
       }
     }, function(response) {
-      // error
-      if(!theme.notAvailableOnMobile) {
-        theme.notAvailableOnMobile = true;
-        theme.setDirty(true);
-      }
-      if(callback) {
-        callback();
-      }
-
-      console.log("Theme download error", response);
+      errorBlock(response);
     })
   }
 
