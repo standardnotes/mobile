@@ -14,7 +14,6 @@ export default class AuthModal extends Component {
 
     let mostRecentState = ApplicationState.get().getMostRecentState();
     let authProps = ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState);
-    console.log("Auth props", authProps);
     this.state = {
       authProps: authProps,
       applicationState: mostRecentState,
@@ -33,7 +32,6 @@ export default class AuthModal extends Component {
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(ApplicationState.get().isStateAppCycleChange(state) && !ApplicationState.get().isAuthenticationInProgress()) {
         let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
-        console.log("Auth props", authProps);
         this.setState({
           authProps: authProps,
           applicationState: state,

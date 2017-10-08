@@ -188,9 +188,9 @@ export default class KeysManager {
     }
   }
 
-  encryptionEnabled() {
+  isOfflineEncryptionEnabled() {
     var keys = this.activeKeys();
-    return keys && keys.mk !== null;
+    return keys && keys.mk !== null && this.isStorageEncryptionEnabled();
   }
 
   encryptionSource() {

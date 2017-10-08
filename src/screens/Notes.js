@@ -129,7 +129,7 @@ export default class Notes extends Abstract {
   }
 
   initializeNotes() {
-    var encryptionEnabled = KeysManager.get().encryptionEnabled();
+    var encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
     Sync.getInstance().loadLocalItems(function(items) {

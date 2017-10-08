@@ -86,7 +86,7 @@ export default class PasscodeSection extends Component {
         <SectionHeader title={this.props.title} />
 
         <ButtonCell first={true} leftAligned={true} title={storageEncryptionTitle} onPress={storageOnPress}>
-          <Text>{storageSubText}</Text>
+          <Text style={{color: GlobalStyles.constants().mainDimColor, marginTop: 2}}>{storageSubText}</Text>
         </ButtonCell>
 
         <ButtonCell leftAligned={true} title={passcodeTitle} onPress={passcodeOnPress} />
