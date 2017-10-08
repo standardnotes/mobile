@@ -276,9 +276,11 @@ export default class Filter extends Abstract {
       this.note.setAppDataItem("archived", event == "archive");
       this.note.setDirty(true);
     } else if(event == "share") {
-      Share.share({
-        title: this.note.title,
-        message: this.note.text,
+      ApplicationState.get().performActionWithoutStateChangeImpact(() => {
+        Share.share({
+          title: this.note.title,
+          message: this.note.text,
+        })
       })
     }
   }

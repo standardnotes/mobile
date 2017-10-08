@@ -64,7 +64,7 @@ export default class ApplicationState {
 
   handleAppStateChange = (nextAppState) => {
 
-    if(this.themeChangeInProgress) {
+    if(this.themeChangeInProgress || this.ignoreStateChanges) {
       return;
     }
 
@@ -145,21 +145,33 @@ export default class ApplicationState {
     this.mostRecentState = ApplicationState.Resuming;
   }
 
+  notifyOfState(state) {
+    if(this.ignoreStateChanges) {return;}
+    console.log("ApplicationState notifying of state:", state);
+    for(var observer of this.observers) {
+      observer.callback(state);
+    }
+  }
+
   /* End State */
 
 
+  /*
+  Allows other parts of the code to perform external actions without triggering state change notifications.
+  This is useful on Android when you present a share sheet and dont want immediate authentication to appear.
+  */
+  performActionWithoutStateChangeImpact(block) {
+    this.ignoreStateChanges = true;
+    block();
+    setTimeout(() => {
+      this.ignoreStateChanges = false;
+    }, 350);
+  }
 
 
 
   getMostRecentState() {
     return this.mostRecentState;
-  }
-
-  notifyOfState(state) {
-    console.log("ApplicationState notifying of state:", state);
-    for(var observer of this.observers) {
-      observer.callback(state);
-    }
   }
 
   addStateObserver(callback) {

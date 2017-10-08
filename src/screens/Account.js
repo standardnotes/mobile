@@ -383,7 +383,9 @@ export default class Account extends Abstract {
         message += "\n\n https://standardnotes.org";
       }
 
-      Share.share({title: title, message: message, url: url})
+      ApplicationState.get().performActionWithoutStateChangeImpact(() => {        
+        Share.share({title: title, message: message, url: url})
+      })
     }
   }
 
