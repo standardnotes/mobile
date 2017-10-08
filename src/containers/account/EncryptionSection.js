@@ -19,6 +19,10 @@ export default class PasscodeSection extends Component {
   render() {
     var source = KeysManager.get().encryptionSource();
     var enabled = source !== null;
+    if(source == "offline") {
+      enabled = KeysManager.get().isStorageEncryptionEnabled();
+    }
+    var storageEncryptionAvailable = source != null;
     var encryptionStatus = enabled ? "Enabled" : "Not Enabled";
     var sourceString = source == "account" ? "Account Keys" : "Passcode";
     var encryptionType = "AES-256";
@@ -45,7 +49,12 @@ export default class PasscodeSection extends Component {
             }
           </Text>
           {!enabled &&
-            <Text style={[textStyles, {marginTop: 4, color: GlobalStyles.constants().mainDimColor}]}>Sign in, register, or add a local passcode to enable encryption.</Text>
+            <Text style={[textStyles, {marginTop: 4, color: GlobalStyles.constants().mainDimColor}]}>
+            {storageEncryptionAvailable
+              ? "To enable encryption, sign in, register, or enable storage encryption."
+              : "Sign in, register, or add a local passcode to enable encryption."
+            }
+            </Text>
           }
         </SectionedTableCell>
 

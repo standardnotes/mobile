@@ -168,7 +168,6 @@ export default class Authenticate extends Abstract {
               />
             }
 
-
           </TableSection>
         </ScrollView>
       </View>

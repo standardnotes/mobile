@@ -11,6 +11,7 @@ import ApplicationState from "../ApplicationState"
 
 let OfflineParamsKey = "pc_params";
 let FirstRunKey = "first_run";
+let StorageEncryptionKey = "storage_encryption";
 
 export default class KeysManager {
 
@@ -59,7 +60,7 @@ export default class KeysManager {
       }
     })
 
-    var storageKeys = ["auth_params", OfflineParamsKey, "user", FirstRunKey];
+    var storageKeys = ["auth_params", OfflineParamsKey, "user", FirstRunKey, StorageEncryptionKey];
 
     return Promise.all([
 
@@ -83,6 +84,14 @@ export default class KeysManager {
         var pcParams = items[OfflineParamsKey];
         if(pcParams) {
           this.offlineAuthParams = JSON.parse(pcParams);
+        }
+
+        // storage encryption
+        if(items[StorageEncryptionKey] == null) {
+          // default is true
+          this.storageEncryptionEnabled = true;
+        } else {
+          this.storageEncryptionEnabled = JSON.parse(items[StorageEncryptionKey]) == true;
         }
 
         // user
@@ -207,6 +216,26 @@ export default class KeysManager {
     var keys = this.activeKeys();
     return keys && keys.jwt;
   }
+
+
+
+
+  // Storage Encryption
+
+  async enableStorageEncryption() {
+    this.storageEncryptionEnabled = true;
+    return Storage.setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
+  }
+
+  async disableStorageEncryption() {
+    this.storageEncryptionEnabled = false;
+    return Storage.setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
+  }
+
+  isStorageEncryptionEnabled() {
+    return this.storageEncryptionEnabled;
+  }
+
 
 
   // Auth Params

@@ -13,9 +13,12 @@ export default class AuthModal extends Component {
     super(props);
 
     let mostRecentState = ApplicationState.get().getMostRecentState();
+    let authProps = ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState);
+    console.log("Auth props", authProps);
     this.state = {
-      authProps: ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState),
-      applicationState: mostRecentState
+      authProps: authProps,
+      applicationState: mostRecentState,
+      visible: (authProps.passcode || authProps.fingerprint) || false
     };
     this.stateChanged();
   }
@@ -30,7 +33,12 @@ export default class AuthModal extends Component {
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(ApplicationState.get().isStateAppCycleChange(state) && !ApplicationState.get().isAuthenticationInProgress()) {
         let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
-        this.setState({authProps: authProps, applicationState: state});
+        console.log("Auth props", authProps);
+        this.setState({
+          authProps: authProps,
+          applicationState: state,
+          visible: (authProps.passcode || authProps.fingerprint) || false
+        });
         this.stateChanged();
       }
     });
@@ -49,7 +57,7 @@ export default class AuthModal extends Component {
 
     if(!ApplicationState.get().isAuthenticationInProgress()) {
       if(this.state.applicationState == ApplicationState.Launching || this.state.applicationState == ApplicationState.Resuming) {
-        if(this.mounted) {
+        if(this.mounted && this.state.visible) {
           this.beginAuth();
         } else {
           this.beginAuthOnMount = true;
@@ -59,24 +67,21 @@ export default class AuthModal extends Component {
   }
 
   beginAuth() {
+    if(!this.state.visible) {
+      console.error("Not supposed to call beginAuth before visible.");
+    }
     this.refs.authenticate.beginAuthentication();
     ApplicationState.get().setAuthenticationInProgress(true);
   }
 
-  get visible() {
-    let authProps = this.state.authProps;
-    let _visible = (authProps.passcode || authProps.fingerprint) || false;
-    return _visible;
-  }
-
   render() {
     let authProps = this.state.authProps;
-    let visible = this.visible;
+    console.log("Showing modal:", this.state.visible);
     return (
       <Modal
        animationType={"slide"}
        transparent={false}
-       visible={visible}
+       visible={this.state.visible}
        onRequestClose={() => {}}>
 
         <Authenticate

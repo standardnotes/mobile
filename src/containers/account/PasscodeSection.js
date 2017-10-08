@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import GlobalStyles from "../../Styles"
-import {TextInput, View, Alert} from 'react-native';
+import {TextInput, View, Alert, Text} from 'react-native';
 
 import SectionHeader from "../../components/SectionHeader";
 import ButtonCell from "../../components/ButtonCell";
@@ -51,6 +51,20 @@ export default class PasscodeSection extends Component {
   }
 
   render() {
+    var source = KeysManager.get().encryptionSource();
+    var encryptionAvailable = source !== null;
+
+    var storageEncryptionTitle = encryptionAvailable ? (this.props.storageEncryption ? "Disable Storage Encryption" : "Enable Storage Encryption") : "Storage Encryption";
+    var storageOnPress = this.props.storageEncryption ? this.props.onStorageEncryptionDisable : this.props.onStorageEncryptionEnable;
+    var storageSubText = "Encrypts your data before saving to your device's local storage.";
+
+    if(encryptionAvailable) {
+      storageSubText += this.props.storageEncryption ?" Disable to improve app start-up speed." : " May decrease app start-up speed.";
+    } else {
+      storageSubText += " Sign in, register, or add a local passcode to enable this option.";
+      storageOnPress = null;
+    }
+
     var passcodeTitle = this.props.hasPasscode ? "Disable Passcode Lock" : "Enable Passcode Lock";
     var passcodeOnPress = this.props.hasPasscode ? this.props.onDisable : this.props.onEnable;
 
@@ -71,7 +85,11 @@ export default class PasscodeSection extends Component {
 
         <SectionHeader title={this.props.title} />
 
-        <ButtonCell first={true} leftAligned={true} title={passcodeTitle} onPress={passcodeOnPress} />
+        <ButtonCell first={true} leftAligned={true} title={storageEncryptionTitle} onPress={storageOnPress}>
+          <Text>{storageSubText}</Text>
+        </ButtonCell>
+
+        <ButtonCell leftAligned={true} title={passcodeTitle} onPress={passcodeOnPress} />
 
         <ButtonCell last={!this.props.hasFingerprint && !this.props.hasPasscode} disabled={!this.state.fingerprintAvailable} leftAligned={true} title={fingerprintTitle} onPress={fingerprintOnPress} />
 

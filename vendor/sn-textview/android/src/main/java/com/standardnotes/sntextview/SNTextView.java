@@ -206,7 +206,7 @@ public class SNTextView extends LinearLayout {
                         resField.setAccessible(true);
                     }
                     int resId = resField.getInt(editText);
-                    handleDrawable = editText.getResources().getDrawable(resId);
+                    handleDrawable = ContextCompat.getDrawable(editText.getContext(), resId);
                 }
 
                 if (handleDrawable != null) {

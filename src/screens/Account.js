@@ -54,7 +54,8 @@ export default class Account extends Abstract {
   loadSecurityStatus() {
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
     var hasFingerprint = KeysManager.get().hasFingerprint();
-    this.mergeState({hasPasscode: hasPasscode, hasFingerprint: hasFingerprint})
+    var encryptedStorage = KeysManager.get().isStorageEncryptionEnabled();
+    this.mergeState({hasPasscode: hasPasscode, hasFingerprint: hasFingerprint, storageEncryption: encryptedStorage})
   }
 
   componentWillUnmount() {
@@ -174,6 +175,14 @@ export default class Account extends Abstract {
     this.mergeState({confirmRegistration: false});
   }
 
+  resaveOfflineData(updateAfter = false) {
+    Sync.getInstance().resaveOfflineData(() => {
+      if(updateAfter) {
+        this.forceUpdate();
+      }
+    });
+  }
+
   markAllDataDirtyAndSync(updateAfter = false) {
     Sync.getInstance().markAllItemsDirtyAndSaveOffline();
     Sync.getInstance().sync(function(response){
@@ -269,6 +278,28 @@ export default class Account extends Abstract {
     )
   }
 
+  onStorageEncryptionEnable = () => {
+    AlertManager.showConfirmationAlert(
+      "Enable Storage Encryption?", "Storage encryption improves your security by encrypting your data on your device. It may increase app start-up speed.", "Enable",
+      () => {
+        KeysManager.get().enableStorageEncryption();
+        this.resaveOfflineData();
+        this.mergeState({storageEncryption: true});
+      }
+    )
+  }
+
+  onStorageEncryptionDisable = () => {
+    AlertManager.showConfirmationAlert(
+      "Disable Storage Encryption?", "Storage encryption improves your security by encrypting your data on your device. Disabling it can improve app start-up speed.", "Disable",
+      () => {
+        KeysManager.get().disableStorageEncryption();
+        this.resaveOfflineData();
+        this.mergeState({storageEncryption: false});
+      }
+    )
+  }
+
   onPasscodeEnable = () => {
     this.props.navigator.showModal({
       screen: 'sn.Authenticate',
@@ -279,7 +310,7 @@ export default class Account extends Abstract {
         onSetupSuccess: () => {
           var encryptionSource = KeysManager.get().encryptionSource();
           if(encryptionSource == "offline") {
-            this.markAllDataDirtyAndSync(true);
+            this.resaveOfflineData(true);
           }
         }
       }
@@ -302,7 +333,7 @@ export default class Account extends Abstract {
 
         if(encryptionSource == "offline") {
           // remove encryption from all items
-          this.markAllDataDirtyAndSync(true);
+          this.resaveOfflineData(true);
         }
 
         this.mergeState({hasPasscode: !result});
@@ -394,8 +425,11 @@ export default class Account extends Abstract {
           <ThemesSection themes={themes} title={"Themes"} onThemeSelect={this.onThemeSelect} onThemeLongPress={this.onThemeLongPress} />
 
           <PasscodeSection
+            storageEncryption={this.state.storageEncryption}
             hasPasscode={this.state.hasPasscode}
             hasFingerprint={this.state.hasFingerprint}
+            onStorageEncryptionEnable={this.onStorageEncryptionEnable}
+            onStorageEncryptionDisable={this.onStorageEncryptionDisable}
             onEnable={this.onPasscodeEnable}
             onDisable={this.onPasscodeDisable}
             onFingerprintEnable={this.onFingerprintEnable}

@@ -97,11 +97,18 @@ export default class Sync {
   }
 
   async writeItemsToStorage(items, offlineOnly, callback) {
+    if(items.length == 0) {
+      callback && callback();
+      return;
+    }
+
     var version = Auth.getInstance().protocolVersion();
     var params = [];
 
+    var keys = KeysManager.get().isStorageEncryptionEnabled() && KeysManager.get().activeKeys();
+
     for(var item of items) {
-      var itemParams = new ItemParams(item, KeysManager.get().activeKeys(), version);
+      var itemParams = new ItemParams(item, keys, version);
       itemParams = await itemParams.paramsForLocalStorage();
       if(offlineOnly) {
         delete itemParams.dirty;
@@ -110,6 +117,11 @@ export default class Sync {
     }
 
     DBManager.saveItems(params, callback);
+  }
+
+  resaveOfflineData(callback) {
+    var items = ModelManager.getInstance().allItems;
+    this.writeItemsToStorage(items, false, callback);
   }
 
   markAllItemsDirtyAndSaveOffline(callback) {
