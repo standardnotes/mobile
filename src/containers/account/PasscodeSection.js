@@ -65,6 +65,10 @@ export default class PasscodeSection extends Component {
       storageOnPress = null;
     }
 
+    if(this.props.storageEncryptionLoading) {
+      storageSubText = "Applying changes...";
+    }
+
     var passcodeTitle = this.props.hasPasscode ? "Disable Passcode Lock" : "Enable Passcode Lock";
     var passcodeOnPress = this.props.hasPasscode ? this.props.onDisable : this.props.onEnable;
 
