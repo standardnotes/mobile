@@ -1,27 +1,16 @@
 package com.standardnotes.sntextview;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.method.ArrowKeyMovementMethod;
-import android.text.method.LinkMovementMethod;
-import android.text.method.MovementMethod;
-import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
