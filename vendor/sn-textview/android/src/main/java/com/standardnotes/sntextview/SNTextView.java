@@ -9,11 +9,19 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.ArrowKeyMovementMethod;
+import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -37,25 +45,25 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class SNTextView extends LinearLayout {
 
-    private EditText editText;
+    private SNEditText editText;
     private ScrollView scrollView;
     private Boolean ignoreNextLocalTextChange = false;
-    private Boolean ignoreNextIncomingTextChange = false;
 
-    @SuppressLint("ResourceAsColor")
     public SNTextView(Context context) {
         super(context);
 
-        LayoutParams scrollParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         scrollView = new ScrollView(context);
-        scrollView.setLayoutParams(scrollParams);
+        scrollView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        scrollView.setClipToPadding(false);
         scrollView.setFillViewport(true);
 
-        editText = new EditText(this.getContext());
-        LayoutParams textLayout = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
-        editText.setLayoutParams(textLayout);
-        editText.setGravity(Gravity.TOP);
-        editText.setInputType(editText.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+        editText = new SNEditText(context);
+        editText.setLayoutParams(new ScrollView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        editText.setGravity(Gravity.BOTTOM);
+        editText.setInputType(editText.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+
+        scrollView.addView(editText);
+        this.addView(scrollView);
 
         editText.addTextChangedListener(new TextWatcher() {
             private EventDispatcher mEventDispatcher;
@@ -63,7 +71,9 @@ public class SNTextView extends LinearLayout {
             private String mPreviousText;
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+
+            }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -72,6 +82,9 @@ public class SNTextView extends LinearLayout {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                editText.requestLayout();
+                scrollView.requestLayout();
+                requestLayout();
                 // Rearranging the text (i.e. changing between singleline and multiline attributes) can
                 // also trigger onTextChanged, call the event in JS only when the text actually changed
                 if (count == 0 && before == 0) {
@@ -100,9 +113,11 @@ public class SNTextView extends LinearLayout {
                 }
             }
         });
+    }
 
-        scrollView.addView(editText);
-        this.addView(scrollView);
+    @Override
+    public boolean isLayoutRequested() {
+        return true;
     }
 
     @Override
