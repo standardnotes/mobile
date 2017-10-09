@@ -48,7 +48,7 @@ public class SNTextView extends LinearLayout {
 
         editText = new SNEditText(context);
         editText.setLayoutParams(new ScrollView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-        editText.setGravity(Gravity.BOTTOM);
+        editText.setGravity(Gravity.TOP);
         editText.setInputType(editText.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 
         scrollView.addView(editText);
