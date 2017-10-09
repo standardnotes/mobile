@@ -27,7 +27,6 @@ export default class ModelManager {
 
     this.itemSyncObservers = [];
 
-    this._extensions = [];
     this.acceptableContentTypes = ["Note", "Tag", "SN|Theme"];
   }
 
@@ -37,18 +36,11 @@ export default class ModelManager {
     this.tags.length = 0;
     this.themes.length = 0;
     this.items.length = 0;
-    this._extensions.length = 0;
   }
 
   get allItems() {
     return this.items.filter(function(item){
       return !item.dummy;
-    })
-  }
-
-  get extensions() {
-    return this._extensions.filter(function(ext){
-      return !ext.deleted;
     })
   }
 
@@ -189,10 +181,6 @@ export default class ModelManager {
         if(!_.find(this.notes, {uuid: item.uuid})) {
           this.notes.unshift(item);
         }
-      } else if(item.content_type == "Extension") {
-        if(!_.find(this._extensions, {uuid: item.uuid})) {
-          this._extensions.unshift(item);
-        }
       } else if(item.content_type == "SN|Theme") {
        if(!_.find(this.themes, {uuid: item.uuid})) {
          this.themes.unshift(item);
@@ -292,8 +280,6 @@ export default class ModelManager {
       _.pull(this.tags, item);
     } else if(item.content_type == "Note") {
       this.notes = _.pull(this.notes, item);
-    } else if(item.content_type == "Extension") {
-      _.pull(this._extensions, item);
     } else if(item.content_type == "SN|Theme") {
       _.pull(this.themes, item);
     }
