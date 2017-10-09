@@ -71,6 +71,7 @@ export default class InputModal extends Abstract {
               autoFocus={true}
               placeholderTextColor={GlobalStyles.constants().mainDimColor}
               underlineColorAndroid={'transparent'}
+              onSubmitEditing={this.onSave.bind(this)}
             />
           </SectionedTableCell>
 

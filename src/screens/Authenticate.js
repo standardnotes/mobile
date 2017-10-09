@@ -320,6 +320,7 @@ class PasscodeSection extends Abstract {
               keyboardType={this.keyboardType}
               underlineColorAndroid={'transparent'}
               placeholderTextColor={GlobalStyles.constants().mainDimColor}
+              onSubmitEditing={this.props.mode == 'authenticate' ? this.onUnlockPress.bind(this) : this.onSavePress.bind(this)}
             />
           </SectionedTableCell>
 
