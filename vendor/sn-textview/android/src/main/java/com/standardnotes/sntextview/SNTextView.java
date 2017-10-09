@@ -42,7 +42,7 @@ public class SNTextView extends LinearLayout {
         super(context);
 
         scrollView = new ScrollView(context);
-        scrollView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        scrollView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
         scrollView.setClipToPadding(false);
         scrollView.setFillViewport(true);
 
@@ -55,8 +55,6 @@ public class SNTextView extends LinearLayout {
         this.addView(scrollView);
 
         editText.addTextChangedListener(new TextWatcher() {
-            private EventDispatcher mEventDispatcher;
-            private ReactEditText mEditText;
             private String mPreviousText;
 
             @Override
@@ -71,9 +69,6 @@ public class SNTextView extends LinearLayout {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                editText.requestLayout();
-                scrollView.requestLayout();
-                requestLayout();
                 // Rearranging the text (i.e. changing between singleline and multiline attributes) can
                 // also trigger onTextChanged, call the event in JS only when the text actually changed
                 if (count == 0 && before == 0) {
@@ -102,11 +97,6 @@ public class SNTextView extends LinearLayout {
                 }
             }
         });
-    }
-
-    @Override
-    public boolean isLayoutRequested() {
-        return true;
     }
 
     @Override
