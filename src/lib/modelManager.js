@@ -28,7 +28,7 @@ export default class ModelManager {
     this.itemSyncObservers = [];
 
     this._extensions = [];
-    this.acceptableContentTypes = ["Note", "Tag", "Extension", "SN|Editor", "SN|Theme", "SN|Component"];
+    this.acceptableContentTypes = ["Note", "Tag", "SN|Theme"];
   }
 
   handleSignout() {
