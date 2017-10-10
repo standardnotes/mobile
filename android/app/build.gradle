@@ -95,7 +95,7 @@ android {
 
     defaultConfig {
         applicationId "com.standardnotes"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 25
         versionCode 21
         versionName "0.0.21"
