@@ -77,6 +77,7 @@ export default class Notes extends Abstract {
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
     Sync.getInstance().removeSyncObserver(this.syncObserver);
+    Sync.getInstance().removeSyncStatusObserver(this.syncStatusObserver);
     Auth.getInstance().removeEventObserver(this.signoutObserver);
     this.options.removeChangeObserver(this.optionsObserver);
     clearInterval(this.syncTimer);
@@ -104,6 +105,19 @@ export default class Notes extends Abstract {
       }
       this.mergeState({refreshing: false, loading: false});
     }.bind(this))
+
+    this.syncStatusObserver = Sync.getInstance().registerSyncStatusObserver((status) => {
+      if(status.retrievedCount > 5) {
+        if(!this.state.showSyncBar) {
+          this.mergeState({showSyncBar: true});
+        }
+      } else if(this.state.showSyncBar) {
+        this.mergeState({syncBarComplete: true});
+        setTimeout(() => {
+          this.mergeState({showSyncBar: false, syncBarComplete: false});
+        }, 1000);
+      }
+    })
 
     this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
       if(event == Auth.WillSignInEvent) {
@@ -361,6 +375,8 @@ export default class Notes extends Abstract {
     var notes = result.notes;
     var tags = this.selectedTags = result.tags;
 
+    var syncStatus = Sync.getInstance().syncStatus;
+
     return (
       <View style={GlobalStyles.styles().container}>
         {notes &&
@@ -376,6 +392,12 @@ export default class Notes extends Abstract {
             loading={this.state.loading}
             selectedTags={tags}
           />
+        }
+
+        {this.state.showSyncBar &&
+          <View style={GlobalStyles.styles().syncBar}>
+            <Text style={GlobalStyles.styles().syncBarText}>{this.state.syncBarComplete ? "Download Success" : `Downloading ${syncStatus.retrievedCount} items. Keep app opened.`}</Text>
+          </View>
         }
       </View>
     );

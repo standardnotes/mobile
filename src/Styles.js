@@ -389,6 +389,19 @@ export default class GlobalStyles {
         paddingRight: constants.paddingLeft - 5,
       },
 
+      syncBar: {
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        backgroundColor: constants.mainTextColor,
+        padding: 5
+      },
+
+      syncBarText: {
+        textAlign: "center",
+        color: constants.mainBackgroundColor
+      },
+
       bold: {
         fontWeight: "bold"
       },

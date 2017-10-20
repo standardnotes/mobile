@@ -28,6 +28,7 @@ export default class Sync {
     this.syncStatus = {};
     this.syncObservers = [];
     this.dataLoadObservers = [];
+    this.syncStatusObservers = [];
     KeysManager.get().registerAccountRelatedStorageKeys(["syncToken", "cursorToken"]);
   }
 
@@ -39,6 +40,22 @@ export default class Sync {
 
   removeSyncObserver(observer) {
     _.pull(this.syncObservers, observer);
+  }
+
+  registerSyncStatusObserver(callback) {
+    var observer = {key: new Date(), callback: callback};
+    this.syncStatusObservers.push(observer);
+    return observer;
+  }
+
+  removeSyncStatusObserver(observer) {
+    _.pull(this.syncStatusObservers, observer);
+  }
+
+  syncStatusDidChange() {
+    this.syncStatusObservers.forEach((observer) => {
+      observer.callback(this.syncStatus);
+    })
   }
 
   registerInitialDataLoadObserver(callback) {
@@ -248,6 +265,8 @@ export default class Sync {
       this.syncStatus.current = 0;
     }
 
+    this.syncStatusDidChange();
+
     // when doing a sync request that returns items greater than the limit, and thus subsequent syncs are required,
     // we want to keep track of all retreived items, then save to local storage only once all items have been retrieved,
     // so that relationships remain intact
@@ -292,6 +311,7 @@ export default class Sync {
 
       var retrieved = await this.handleItemsResponse(response.retrieved_items, null);
       this.allRetreivedItems = this.allRetreivedItems.concat(retrieved);
+      this.syncStatus.retrievedCount = this.allRetreivedItems.length;
 
       // merge only metadata for saved items
       // we write saved items to disk now because it clears their dirty status then saves
@@ -304,6 +324,8 @@ export default class Sync {
 
       this.syncStatus.syncOpInProgress = false;
       this.syncStatus.current += subItems.length;
+
+      this.syncStatusDidChange();
 
       // set the sync token at the end, so that if any errors happen above, you can resync
       this.setSyncToken(response.sync_token);
@@ -321,7 +343,10 @@ export default class Sync {
           this.sync(callback, options);
         }.bind(this), 10); // wait 10ms to allow UI to update
       } else {
-        this.writeItemsToStorage(this.allRetreivedItems, false, null);
+        this.writeItemsToStorage(this.allRetreivedItems, false, () => {
+          this.syncStatus.retrievedCount = 0;
+          this.syncStatusDidChange();
+        });
         this.allRetreivedItems = [];
 
         this.callQueuedCallbacksAndCurrent(callback, response);
@@ -349,6 +374,7 @@ export default class Sync {
 
         this.syncStatus.syncOpInProgress = false;
         this.syncStatus.error = error;
+        this.syncStatusDidChange();
         this.writeItemsToStorage(allDirtyItems, false, null);
 
         onSyncCompletion(response);
