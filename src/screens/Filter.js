@@ -19,6 +19,7 @@ import OptionsState from "../OptionsState"
 import GlobalStyles from "../Styles"
 import App from "../app"
 import ApplicationState from "../ApplicationState";
+import ActionSheet from 'react-native-actionsheet'
 
 export default class Filter extends Abstract {
 
@@ -232,30 +233,21 @@ export default class Filter extends Abstract {
     }
   }
 
-  onTagLongPress = (tag) => {
-    if(this.willBeVisible == false) {
-      return;
-    }
-    AlertManager.showConfirmationAlert(
-      "Delete Tag", "Long pressing on a tag presents this option. Are you sure you want to delete this tag?", "Delete",
-      function(){
-        // confirm
-        this.deleteTag(tag);
-      }.bind(this)
-    )
-  }
-
   isTagSelected(tag) {
     return this.tags.indexOf(tag.uuid) !== -1;
   }
 
-  deleteTag = (tag) => {
-    ModelManager.getInstance().setItemToBeDeleted(tag);
-    Sync.getInstance().sync(function(){
-      this.setState(function(prevState){
-        return _.merge(prevState, {tags : prevState.tags});
-      })
-    }.bind(this));
+  onManageTagEvent = (event, tag, renderBlock) => {
+    ItemActionManager.handleEvent(event, tag, () => {
+        if(event == ItemActionManager.DeleteEvent) {
+          this.loadTags = true;
+          this.forceUpdate();
+        }
+    }, () => {
+      // afterConfirmCallback
+      // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
+      renderBlock();
+    })
   }
 
   onManageNoteEvent(event) {
@@ -322,7 +314,7 @@ export default class Filter extends Abstract {
             tags={this.tags}
             selected={this.state.selectedTags}
             onTagSelect={this.onTagSelect}
-            onTagLongPress={this.onTagLongPress}
+            onManageTagEvent={this.onManageTagEvent}
             title={"Tags"}
            />
 
@@ -347,17 +339,54 @@ class TagsSection extends Component {
     this.props.onTagLongPress(tag);
   }
 
+  static ActionSheetCancelIndex = 0;
+  static ActionSheetDestructiveIndex = 1;
+
+  actionSheetActions() {
+    return [
+      ['Cancel', ""],
+      ['Delete', ItemActionManager.DeleteEvent]
+    ];
+  }
+
+  showActionSheet = (item) => {
+    this.actionSheetItem = item;
+    this.actionSheet.show();
+  }
+
+  handleActionSheetPress = (index) => {
+    if(index == 0) {
+      return;
+    }
+
+    this.props.onManageTagEvent(this.actionSheetActions()[index][1], this.actionSheetItem, () => {
+      this.forceUpdate();
+    });
+    this.actionSheetItem = null;
+  }
+
   // must pass title, text, and tags as props so that it re-renders when either of those change
   _renderItem = ({item}) => (
-    <SectionedAccessoryTableCell
-      onPress={() => {this.onPress(item)}}
-      onLongPress={() => this.onLongPress(item)}
-      text={item.title}
-      key={item.uuid}
-      first={this.props.tags.indexOf(item) == 0}
-      last={this.props.tags.indexOf(item) == this.props.tags.length - 1}
-      selected={() => {return this.state.selected.includes(item.uuid)}}
-    />
+    <View>
+      <SectionedAccessoryTableCell
+        onPress={() => {this.onPress(item)}}
+        onLongPress={() => this.showActionSheet(item)}
+        text={item.deleted ? "Deleting..." : item.title}
+        color={item.deleted ? GlobalStyles.constants().mainTintColor : undefined}
+        key={item.uuid}
+        first={this.props.tags.indexOf(item) == 0}
+        last={this.props.tags.indexOf(item) == this.props.tags.length - 1}
+        selected={() => {return this.state.selected.includes(item.uuid)}}
+      />
+
+      <ActionSheet
+        ref={o => this.actionSheet = o}
+        options={this.actionSheetActions().map((action) => {return action[0]})}
+        cancelButtonIndex={TagsSection.ActionSheetCancelIndex}
+        destructiveButtonIndex={TagsSection.ActionSheetDestructiveIndex}
+        onPress={this.handleActionSheetPress}
+      />
+    </View>
   )
 
   render() {

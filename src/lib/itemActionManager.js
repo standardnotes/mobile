@@ -17,7 +17,9 @@ export default class ItemActionManager {
 
   static ShareEvent = "ShareEvent";
 
-  static handleEvent(event, item, callback) {
+  /* The afterConfirmCallback is called after user confirms deletion pop up */
+
+  static handleEvent(event, item, callback, afterConfirmCallback) {
 
     if(event == this.DeleteEvent) {
       var title = `Delete ${item.displayName}`;
@@ -26,8 +28,12 @@ export default class ItemActionManager {
       AlertManager.showConfirmationAlert(title, message, "Delete",
         () => {
           ModelManager.getInstance().setItemToBeDeleted(item);
-          Sync.getInstance().sync();
-          callback && callback();
+
+          afterConfirmCallback && afterConfirmCallback();
+
+          Sync.getInstance().sync(() => {
+            callback && callback();
+          });
         }
       )
     }

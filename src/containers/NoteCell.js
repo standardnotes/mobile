@@ -140,7 +140,12 @@ export default class NoteCell extends React.PureComponent {
 
     ItemActionManager.handleEvent(this.actionSheetActions()[index][1], this.props.item, () => {
       this.forceUpdate();
+    }, () => {
+      // afterConfirmCallback
+      // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
+      this.forceUpdate();
     });
+
   }
 
   render() {
