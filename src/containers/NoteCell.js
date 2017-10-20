@@ -3,6 +3,8 @@ import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import GlobalStyles from "../Styles"
 import Tag from "../models/app/tag"
+import ActionSheet from 'react-native-actionsheet'
+import ItemActionManager from '../lib/itemActionManager'
 
 export default class NoteCell extends React.PureComponent {
 
@@ -108,53 +110,94 @@ export default class NoteCell extends React.PureComponent {
     }
   }
 
+  static ActionSheetCancelIndex = 0;
+  static ActionSheetDestructiveIndex = 4;
+
+  actionSheetActions() {
+    var pinAction = this.props.item.pinned ? "Unpin" : "Pin";
+    let pinEvent = pinAction == "Pin" ? ItemActionManager.PinEvent : ItemActionManager.UnpinEvent;
+
+    var archiveOption = this.props.item.archived ? "Unarchive" : "Archive";
+    let archiveEvent = archiveOption == "Archive" ? ItemActionManager.ArchiveEvent : ItemActionManager.UnarchiveEvent;
+
+    return [
+      ['Cancel', ""],
+      [pinAction, pinEvent],
+      [archiveOption, archiveEvent],
+      ['Share', ItemActionManager.ShareEvent],
+      ['Delete', ItemActionManager.DeleteEvent]
+    ];
+  }
+
+  showActionSheet = () => {
+    this.actionSheet.show();
+  }
+
+  handleActionSheetPress = (index) => {
+    if(index == 0) {
+      return;
+    }
+
+    ItemActionManager.handleEvent(this.actionSheetActions()[index][1], this.props.item, () => {
+      this.forceUpdate();
+    });
+  }
+
   render() {
     var note = this.props.item;
     return (
-       <TouchableWithoutFeedback onPress={this._onPress} onPressIn={this._onPressIn} onPressOut={this._onPressOut}>
-        <View style={this.aggregateStyles(this.styles.noteCell, this.styles.noteCellSelected, this.state.selected)} onPress={this._onPress}>
+       <TouchableWithoutFeedback onPress={this._onPress} onPressIn={this._onPressIn} onPressOut={this._onPressOut} onLongPress={this.showActionSheet}>
+          <View style={this.aggregateStyles(this.styles.noteCell, this.styles.noteCellSelected, this.state.selected)} onPress={this._onPress}>
 
-          {note.deleted &&
-            <Text style={this.styles.deleting}>Deleting...</Text>
-          }
+            {note.deleted &&
+              <Text style={this.styles.deleting}>Deleting...</Text>
+            }
 
-          {note.errorDecrypting &&
-            <Text style={this.styles.deleting}>Error Decrypting</Text>
-          }
+            {note.errorDecrypting &&
+              <Text style={this.styles.deleting}>Error Decrypting</Text>
+            }
 
-          {note.conflictOf &&
-            <Text style={this.styles.deleting}>Conflicted Copy</Text>
-          }
+            {note.conflictOf &&
+              <Text style={this.styles.deleting}>Conflicted Copy</Text>
+            }
 
-          {note.pinned &&
-            <View style={this.styles.pinnedView}>
-              <Icon name={"ios-flag"} size={14} color={GlobalStyles.constants().mainTintColor} />
-              <Text style={this.styles.pinnedText}>Pinned</Text>
-            </View>
-          }
+            {note.pinned &&
+              <View style={this.styles.pinnedView}>
+                <Icon name={"ios-flag"} size={14} color={GlobalStyles.constants().mainTintColor} />
+                <Text style={this.styles.pinnedText}>Pinned</Text>
+              </View>
+            }
 
-          {this.props.renderTags && note.tags.length > 0 &&
-            <View style={this.styles.noteTags}>
-              <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag)}>
-              {Tag.arrayToDisplayString(note.tags)}
-              </Text>
-            </View>
-          }
+            {this.props.renderTags && note.tags.length > 0 &&
+              <View style={this.styles.noteTags}>
+                <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag)}>
+                {Tag.arrayToDisplayString(note.tags)}
+                </Text>
+              </View>
+            }
 
-          {note.safeTitle().length > 0 &&
-            <Text style={this.aggregateStyles(this.styles.noteTitle, this.styles.noteTitleSelected, this.state.selected)}>{note.title}</Text>
-          }
+            {note.safeTitle().length > 0 &&
+              <Text style={this.aggregateStyles(this.styles.noteTitle, this.styles.noteTitleSelected, this.state.selected)}>{note.title}</Text>
+            }
 
-          {note.safeText().length > 0 &&
-            <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>{note.text}</Text>
-          }
+            {note.safeText().length > 0 &&
+              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>{note.text}</Text>
+            }
 
-          <Text
-            numberOfLines={1}
-            style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>
-            {this.props.sortType == "updated_at" ? "Modified " + note.updatedAt() : note.createdAt()}
-          </Text>
+            <Text
+              numberOfLines={1}
+              style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>
+              {this.props.sortType == "updated_at" ? "Modified " + note.updatedAt() : note.createdAt()}
+            </Text>
 
+            <ActionSheet
+              ref={o => this.actionSheet = o}
+              title={note.safeTitle()}
+              options={this.actionSheetActions().map((action) => {return action[0]})}
+              cancelButtonIndex={NoteCell.ActionSheetCancelIndex}
+              destructiveButtonIndex={NoteCell.ActionSheetDestructiveIndex}
+              onPress={this.handleActionSheetPress}
+            />
         </View>
       </TouchableWithoutFeedback>
     )

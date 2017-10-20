@@ -131,6 +131,10 @@ export default class Note extends Item {
     return "Note";
   }
 
+  get displayName() {
+    return "Note";
+  }
+
   get pinned() {
     return this.getAppDataItem("pinned");
   }

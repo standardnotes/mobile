@@ -5,6 +5,7 @@ var _ = require('lodash')
 import Sync from '../lib/sync'
 import ModelManager from '../lib/modelManager'
 import AlertManager from '../lib/alertManager'
+import ItemActionManager from '../lib/itemActionManager'
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
@@ -258,31 +259,13 @@ export default class Filter extends Abstract {
   }
 
   onManageNoteEvent(event) {
-    if(event == "delete") {
-      AlertManager.showConfirmationAlert(
-        "Delete Note", "Are you sure you want to delete this note?", "Delete",
-        function(){
-          ModelManager.getInstance().setItemToBeDeleted(this.note);
-          Sync.getInstance().sync();
+    ItemActionManager.handleEvent(event, this.note, () => {
+        if(event == ItemActionManager.DeleteEvent) {
           this.props.navigator.popToRoot({
             animated: true,
           });
-        }.bind(this)
-      )
-    } else if(event == "pin" || event == "unpin") {
-      this.note.setAppDataItem("pinned", event == "pin");
-      this.note.setDirty(true);
-    } else if(event == "archive" || event == "unarchive") {
-      this.note.setAppDataItem("archived", event == "archive");
-      this.note.setDirty(true);
-    } else if(event == "share") {
-      ApplicationState.get().performActionWithoutStateChangeImpact(() => {
-        Share.share({
-          title: this.note.title,
-          message: this.note.text,
-        })
-      })
-    }
+        }
+    })
   }
 
   onArchiveSelect = () => {

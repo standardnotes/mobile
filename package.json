@@ -1,8 +1,8 @@
 {
   "name": "StandardNotes",
   "version": "2.0.0",
-  "versionIOS" : "2.0.0.1",
-  "versionAndroid" : "2.0.0",
+  "versionIOS": "2.0.0.1",
+  "versionAndroid": "2.0.0",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -16,6 +16,7 @@
     "moment": "^2.18.1",
     "react": "16.0.0-beta.5",
     "react-native": "^0.48.4",
+    "react-native-actionsheet": "^2.3.0",
     "react-native-keychain": "^1.2.1",
     "react-native-search-box": "0.0.11",
     "react-native-store-review": "^0.1.3",

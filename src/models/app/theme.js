@@ -30,4 +30,8 @@ export default class Theme extends Item {
   get content_type() {
     return "SN|Theme";
   }
+
+  get displayName() {
+    return "Theme";
+  }
 }

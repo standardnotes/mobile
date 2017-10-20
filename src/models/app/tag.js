@@ -87,6 +87,10 @@ export default class Tag extends Item {
     return "Tag";
   }
 
+  get displayName() {
+    return "Tag";
+  }
+
   allReferencedObjects() {
     return this.notes;
   }

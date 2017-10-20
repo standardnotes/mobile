@@ -105,6 +105,7 @@ export default class NoteList extends Component {
           renderItem={this._renderItem}
           ListHeaderComponent={this.renderHeader}
         />
+
       </View>
     )
   }
