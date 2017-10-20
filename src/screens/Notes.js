@@ -177,7 +177,7 @@ export default class Notes extends Abstract {
     var filterTitle = "Filter";
     var numTags = options.selectedTags.length;
 
-    if(numTags > 0 || options.archivedOnly) {
+    if(App.isIOS && (numTags > 0 || options.archivedOnly)) {
       if(numTags > 0) {
         filterTitle += ` (${numTags})`
       }

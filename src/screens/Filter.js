@@ -350,8 +350,11 @@ class TagsSection extends Component {
   }
 
   showActionSheet = (item) => {
-    this.actionSheetItem = item;
-    this.actionSheet.show();
+    // Dont show actionsheet for "All notes" tag
+    if(item.key !== "all") {
+      this.actionSheetItem = item;
+      this.actionSheet.show();
+    }
   }
 
   handleActionSheetPress = (index) => {
