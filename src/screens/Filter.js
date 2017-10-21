@@ -353,6 +353,9 @@ class TagsSection extends Component {
     // Dont show actionsheet for "All notes" tag
     if(item.key !== "all") {
       this.actionSheetItem = item;
+      this.setState((prevState) => {
+        return _.merge(prevState, {actionSheetTitle: item.title})
+      })
       this.actionSheet.show();
     }
   }
@@ -369,28 +372,32 @@ class TagsSection extends Component {
   }
 
   // must pass title, text, and tags as props so that it re-renders when either of those change
-  _renderItem = ({item}) => (
-    <View>
-      <SectionedAccessoryTableCell
-        onPress={() => {this.onPress(item)}}
-        onLongPress={() => this.showActionSheet(item)}
-        text={item.deleted ? "Deleting..." : item.title}
-        color={item.deleted ? GlobalStyles.constants().mainTintColor : undefined}
-        key={item.uuid}
-        first={this.props.tags.indexOf(item) == 0}
-        last={this.props.tags.indexOf(item) == this.props.tags.length - 1}
-        selected={() => {return this.state.selected.includes(item.uuid)}}
-      />
+  _renderItem = ({item}) => {
+    return (
+      <View>
+        <SectionedAccessoryTableCell
+          onPress={() => {this.onPress(item)}}
+          onLongPress={() => this.showActionSheet(item)}
+          text={item.deleted ? "Deleting..." : item.title}
+          color={item.deleted ? GlobalStyles.constants().mainTintColor : undefined}
+          key={item.uuid}
+          first={this.props.tags.indexOf(item) == 0}
+          last={this.props.tags.indexOf(item) == this.props.tags.length - 1}
+          selected={() => {return this.state.selected.includes(item.uuid)}}
+        />
 
-      <ActionSheet
-        ref={o => this.actionSheet = o}
-        options={this.actionSheetActions().map((action) => {return action[0]})}
-        cancelButtonIndex={TagsSection.ActionSheetCancelIndex}
-        destructiveButtonIndex={TagsSection.ActionSheetDestructiveIndex}
-        onPress={this.handleActionSheetPress}
-      />
-    </View>
-  )
+        <ActionSheet
+          title={this.state.actionSheetTitle}
+          ref={o => this.actionSheet = o}
+          options={this.actionSheetActions().map((action) => {return action[0]})}
+          cancelButtonIndex={TagsSection.ActionSheetCancelIndex}
+          destructiveButtonIndex={TagsSection.ActionSheetDestructiveIndex}
+          onPress={this.handleActionSheetPress}
+          {...GlobalStyles.actionSheetStyles()}
+        />
+      </View>
+    )
+  }
 
   render() {
     return (

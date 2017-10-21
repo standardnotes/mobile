@@ -1,0 +1,3 @@
+[submodule "vendor/react-native-actionsheet"]
+	path = vendor/react-native-actionsheet
+	url = git@github.com:mobitar/react-native-actionsheet.git

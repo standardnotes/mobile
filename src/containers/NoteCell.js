@@ -202,6 +202,7 @@ export default class NoteCell extends React.PureComponent {
               cancelButtonIndex={NoteCell.ActionSheetCancelIndex}
               destructiveButtonIndex={NoteCell.ActionSheetDestructiveIndex}
               onPress={this.handleActionSheetPress}
+              {...GlobalStyles.actionSheetStyles()}
             />
         </View>
       </TouchableWithoutFeedback>

@@ -402,9 +402,72 @@ export default class GlobalStyles {
         color: constants.mainBackgroundColor
       },
 
+      actionSheetWrapper: {
+
+      },
+
+      actionSheetOverlay: {
+        // This is the dimmed background
+        // backgroundColor: constants.mainDimColor
+      },
+
+      actionSheetBody: {
+        // This will also set button border bottoms, since margin is used instead of borders
+        backgroundColor: constants.plainCellBorderColor
+      },
+
+      actionSheetTitleWrapper: {
+        backgroundColor: constants.mainBackgroundColor,
+        marginBottom: 1
+      },
+
+      actionSheetTitleText: {
+        color: constants.mainTextColor,
+        opacity: 0.5
+      },
+
+      actionSheetButtonWrapper: {
+        backgroundColor: constants.mainBackgroundColor,
+        marginTop: 0
+      },
+
+      actionSheetButtonTitle: {
+        color: constants.mainTextColor,
+      },
+
+      actionSheetCancelButtonWrapper: {
+        marginTop: 0
+      },
+
+      actionSheetCancelButtonTitle: {
+        color: constants.mainTintColor,
+        fontWeight: "normal"
+      },
+
       bold: {
         fontWeight: "bold"
       },
+    }
+  }
+
+  static actionSheetStyles() {
+    return {
+      wrapperStyle: GlobalStyles.styles().actionSheetWrapper,
+      overlayStyle: GlobalStyles.styles().actionSheetOverlay,
+      bodyStyle : GlobalStyles.styles().actionSheetBody,
+
+      buttonWrapperStyle: GlobalStyles.styles().actionSheetButtonWrapper,
+      buttonTitleStyle: GlobalStyles.styles().actionSheetButtonTitle,
+
+      titleWrapperStyle: GlobalStyles.styles().actionSheetTitleWrapper,
+      titleTextStyle: GlobalStyles.styles().actionSheetTitleText,
+      tintColor: GlobalStyles.constants().mainTintColor,
+
+      buttonUnderlayColor: GlobalStyles.constants().plainCellBorderColor,
+
+      cancelButtonWrapperStyle: GlobalStyles.styles().actionSheetCancelButtonWrapper,
+      cancelButtonTitleStyle: GlobalStyles.styles().actionSheetCancelButtonTitle,
+      cancelMargin: 1
     }
   }
 
