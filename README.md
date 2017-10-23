@@ -43,5 +43,5 @@ We love community contributions! Before contributing, please read our [Longevity
 
 You can find the "classic" versions of our applications, which are built in Swift and Java/Kotlin, respectively, via these links:
 
-1. [Swift-based iOS app]() (deprecated)
-2. [Java/Kotlin based Android app]() (deprecated)
+1. [Swift-based iOS app](https://github.com/standardnotes/ios) (deprecated)
+2. [Java/Kotlin based Android app](https://github.com/standardnotes/android) (deprecated)
