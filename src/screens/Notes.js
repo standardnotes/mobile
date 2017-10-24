@@ -107,7 +107,7 @@ export default class Notes extends Abstract {
     }.bind(this))
 
     this.syncStatusObserver = Sync.getInstance().registerSyncStatusObserver((status) => {
-      if(status.retrievedCount > 5) {
+      if(status.retrievedCount > 20) {
         if(!this.state.showSyncBar) {
           this.mergeState({showSyncBar: true});
         }

@@ -461,13 +461,13 @@ export default class GlobalStyles {
 
       titleWrapperStyle: GlobalStyles.styles().actionSheetTitleWrapper,
       titleTextStyle: GlobalStyles.styles().actionSheetTitleText,
-      tintColor: GlobalStyles.constants().mainTintColor,
+      tintColor: App.isIOS ? undefined : GlobalStyles.constants().mainTintColor,
 
       buttonUnderlayColor: GlobalStyles.constants().plainCellBorderColor,
 
       cancelButtonWrapperStyle: GlobalStyles.styles().actionSheetCancelButtonWrapper,
       cancelButtonTitleStyle: GlobalStyles.styles().actionSheetCancelButtonTitle,
-      cancelMargin: 1
+      cancelMargin: StyleSheet.hairlineWidth
     }
   }
 

@@ -30,8 +30,8 @@ export default class CompanySection extends Component {
 
         <ButtonCell last={true} leftAligned={true} title="Rate Standard Notes" onPress={() => this.props.onAction("rate")} >
           <View style={{display: "flex", flexDirection: "column"}}>
-            <Text style={{color: GlobalStyles.constants().mainDimColor, marginTop: 2}}>Version {App.version}</Text>
-            <Text style={{color: GlobalStyles.constants().mainDimColor, marginTop: 1}}>Support us with a review on the {storeName}.</Text>
+            <Text style={{color: GlobalStyles.constants().mainDimColor, marginTop: 3}}>Version {App.version}</Text>
+            <Text style={{color: GlobalStyles.constants().mainDimColor, marginTop: 3}}>Help support us with a review on the {storeName}.</Text>
           </View>
         </ButtonCell>
 
