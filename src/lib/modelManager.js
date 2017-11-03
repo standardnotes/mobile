@@ -260,17 +260,6 @@ export default class ModelManager {
     item.removeAllRelationships();
   }
 
-  /* Used when changing encryption key */
-  setAllItemsDirty() {
-    var relevantItems = this.allItems.filter(function(item){
-      return _.includes(this.acceptableContentTypes, item.content_type);
-    }.bind(this));
-
-    for(var item of relevantItems) {
-      item.setDirty(true);
-    }
-  }
-
   async removeItemLocally(item) {
     _.pull(this.items, item);
 

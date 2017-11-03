@@ -81,6 +81,10 @@ export default class GlobalStyles {
     // want to use the defaults, but instead just look at the activeTheme. Because default platform values only apply
     // to the default theme
     var platform = Platform.OS == "android" ? "Android" : "IOS";
+    if(!this.get().activeTheme.mobileRules) {
+      return null;
+    }
+
     var platformValue = this.get().activeTheme.mobileRules.constants[key+platform];
 
     if(platformValue) {
@@ -491,6 +495,9 @@ export default class GlobalStyles {
   }
 
   static hexToRGBA(hex, alpha) {
+    if(!hex) {
+      return null;
+    }
     var c;
     if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
       c= hex.substring(1).split('');
