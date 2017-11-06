@@ -7,3 +7,6 @@
 [submodule "vendor/react-native-mail"]
 	path = vendor/react-native-mail
 	url = git@github.com:mobitar/react-native-mail.git
+[submodule "vendor/react-native-fingerprint-scanner"]
+	path = vendor/react-native-fingerprint-scanner
+	url = git@github.com:mobitar/react-native-fingerprint-scanner.git
