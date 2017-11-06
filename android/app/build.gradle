@@ -91,14 +91,14 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "com.standardnotes"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 2000200
-        versionName "2.0.2"
+        versionCode 2000300
+        versionName "2.0.3"
         multiDexEnabled  true
         ndk {
             abiFilters "armeabi-v7a", "x86"
