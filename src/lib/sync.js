@@ -347,14 +347,15 @@ export default class Sync {
           this.syncStatus.retrievedCount = 0;
           this.syncStatusDidChange();
         });
-        this.allRetreivedItems = [];
 
         this.callQueuedCallbacksAndCurrent(callback, response);
 
-        this.syncObservers.forEach(function(mapping){
-          var changesMade = retrieved.length > 0 || response.unsaved.length > 0;
-          mapping.callback(changesMade, retrieved, saved, unsaved);
+        this.syncObservers.forEach((mapping) => {
+          var changesMade = this.allRetreivedItems.length > 0 || response.unsaved.length > 0;
+          mapping.callback(changesMade, this.allRetreivedItems, saved, unsaved);
         })
+
+        this.allRetreivedItems = [];
       }
     }.bind(this);
 
