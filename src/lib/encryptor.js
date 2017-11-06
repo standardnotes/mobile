@@ -122,6 +122,8 @@ export default class Encryptor {
     var content = await Crypto.decryptText(itemParams, true);
     if(!content) {
       item.errorDecrypting = true;
+    } else {
+      item.errorDecrypting = false;
     }
     item.content = content;
   }

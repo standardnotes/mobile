@@ -108,7 +108,7 @@ export default class Item {
 
   }
 
-  removeAllRelationships() {
+  removeAndDirtyAllRelationships() {
     // must override
     this.setDirty(true);
   }

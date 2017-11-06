@@ -24,7 +24,7 @@ export default class ModelManager {
     this.notes = [];
     this.tags = [];
     this.themes = [];
-
+    this.itemsPendingRemoval = [];
     this.itemSyncObservers = [];
 
     this.acceptableContentTypes = ["Note", "Tag", "SN|Theme"];
@@ -97,22 +97,32 @@ export default class ModelManager {
   }
 
   mapResponseItemsToLocalModelsOmittingFields(items, omitFields) {
-    var models = [], processedObjects = [], allModels = [];
+    var models = [], processedObjects = [], modelsToNotifyObserversOf = [];
 
     // first loop should add and process items
     for (var json_obj of items) {
-      json_obj = _.omit(json_obj, omitFields || [])
-      var item = this.findItem(json_obj["uuid"]);
+      if((!json_obj.content_type || !json_obj.content) && !json_obj.deleted) {
+        // An item that is not deleted should never have empty content
+        console.log("Server response item is corrupt:", json_obj);
+        continue;
+      }
 
-      _.omit(json_obj, omitFields);
+      json_obj = _.omit(json_obj, omitFields || [])
+      var item = this.findItem(json_obj.uuid);
 
       if(item) {
         item.updateFromJSON(json_obj);
       }
 
-      if(json_obj["deleted"] == true || !_.includes(this.acceptableContentTypes, json_obj["content_type"])) {
-        if(item) {
-          allModels.push(item);
+      if(this.itemsPendingRemoval.includes(json_obj.uuid)) {
+        _.pull(this.itemsPendingRemoval, json_obj.uuid);
+        continue;
+      }
+
+      var unknownContentType = !_.includes(this.acceptableContentTypes, json_obj["content_type"]);
+      if(json_obj.deleted == true || unknownContentType) {
+        if(item && !unknownContentType) {
+          modelsToNotifyObserversOf.push(item);
           this.removeItemLocally(item)
         }
         continue;
@@ -124,7 +134,7 @@ export default class ModelManager {
 
       this.addItem(item);
 
-      allModels.push(item);
+      modelsToNotifyObserversOf.push(item);
       models.push(item);
       processedObjects.push(json_obj);
     }
@@ -137,7 +147,7 @@ export default class ModelManager {
       }
     }
 
-    this.notifySyncObserversOfModels(allModels);
+    this.notifySyncObserversOfModels(modelsToNotifyObserversOf);
 
     return models;
   }
@@ -197,6 +207,12 @@ export default class ModelManager {
     this.addItems([item]);
   }
 
+  createDuplicateItem(itemResponse) {
+    var dup = this.createItem(itemResponse);
+    this.resolveReferencesForItem(dup);
+    return dup;
+  }
+
   itemsForContentType(contentType) {
     return this.items.filter(function(item){
       return item.content_type == contentType;
@@ -239,7 +255,8 @@ export default class ModelManager {
   }
 
   getDirtyItems() {
-    return this.items.filter(function(item){return item.dirty == true && !item.dummy})
+    // Items that have errorDecrypting should never be synced back up to the server
+    return this.items.filter(function(item){return item.dirty == true && !item.dummy && !item.errorDecrypting})
   }
 
   clearDirtyItems(items) {
@@ -257,11 +274,13 @@ export default class ModelManager {
     if(!item.dummy) {
       item.setDirty(true);
     }
-    item.removeAllRelationships();
+    item.removeAndDirtyAllRelationships();
   }
 
   async removeItemLocally(item) {
     _.pull(this.items, item);
+
+    this.itemsPendingRemoval.push(item.uuid);
 
     item.isBeingRemovedLocally();
 
