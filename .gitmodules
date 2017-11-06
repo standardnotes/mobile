@@ -10,3 +10,9 @@
 [submodule "vendor/react-native-fingerprint-scanner"]
 	path = vendor/react-native-fingerprint-scanner
 	url = git@github.com:mobitar/react-native-fingerprint-scanner.git
+[submodule "vendor/react-native-flag-secure-android"]
+	path = vendor/react-native-flag-secure-android
+	url = git@github.com:mobitar/react-native-flag-secure-android.git
+[submodule "vendor/react-native-navigation"]
+	path = vendor/react-native-navigation
+	url = git@github.com:mobitar/react-native-navigation.git
