@@ -1,3 +1,9 @@
 [submodule "vendor/react-native-actionsheet"]
 	path = vendor/react-native-actionsheet
 	url = git@github.com:mobitar/react-native-actionsheet.git
+[submodule "vendor/react-native-aes"]
+	path = vendor/react-native-aes
+	url = git@github.com:mobitar/react-native-aes.git
+[submodule "vendor/react-native-mail"]
+	path = vendor/react-native-mail
+	url = git@github.com:mobitar/react-native-mail.git
