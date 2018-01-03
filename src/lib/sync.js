@@ -142,7 +142,7 @@ export default class Sync {
   }
 
   markAllItemsDirtyAndSaveOffline(callback) {
-    var items = ModelManager.getInstance().allItems;
+    var items = ModelManager.getInstance().allItems.filter((item) => {return !item.errorDecrypting});
     for(var item of items) {
       item.setDirty(true);
     }
@@ -398,7 +398,29 @@ export default class Sync {
     var keys = KeysManager.get().activeKeys();
     await Encryptor.decryptMultipleItems(responseItems, keys);
     var items = ModelManager.getInstance().mapResponseItemsToLocalModelsOmittingFields(responseItems, omitFields);
+
+    // During the decryption process, items may be marked as "errorDecrypting". If so, we want to be sure
+    // to persist this new state by writing these items back to local storage. When an item's "errorDecrypting"
+    // flag is changed, its "errorDecryptingValueChanged" flag will be set, so we can find these items by filtering (then unsetting) below:
+    var itemsWithErrorStatusChange = items.filter((item) => {
+      var valueChanged = item.errorDecryptingValueChanged;
+      // unset after consuming value
+      item.errorDecryptingValueChanged = false;
+      return valueChanged;
+    });
+    if(itemsWithErrorStatusChange.length > 0) {
+      this.writeItemsToStorage(itemsWithErrorStatusChange, false, null);
+    }
+
     return items;
+  }
+
+  async refreshErroredItems() {
+    var erroredItems = ModelManager.getInstance().allItems.filter((item) => {return item.errorDecrypting == true});
+    if(erroredItems.length > 0) {
+      return this.handleItemsResponse(erroredItems, null);
+    }
+    return null;
   }
 
   async handleUnsavedItemsResponse(unsaved) {

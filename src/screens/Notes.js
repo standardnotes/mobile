@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, StatusBar, Modal } from 'react-native';
+import { StyleSheet, View, Platform, Text, StatusBar, Modal, Alert } from 'react-native';
 import ModelManager from '../lib/modelManager'
 import Storage from '../lib/storage'
 import Sync from '../lib/sync'
@@ -119,11 +119,16 @@ export default class Notes extends Abstract {
       }
     })
 
-    this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
+    this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent, Auth.DidSignInEvent], (event) => {
       if(event == Auth.WillSignInEvent) {
         this.mergeState({loading: true})
+      } else if(event == Auth.DidSignInEvent) {
+        // Check if there are items that are errorDecrypting and try decrypting with new keys
+        Sync.getInstance().refreshErroredItems().then(() => {
+          this.reloadList();
+        })
       }
-    }.bind(this));
+    });
   }
 
   loadTabbarIcons() {
@@ -148,6 +153,7 @@ export default class Notes extends Abstract {
 
     Sync.getInstance().loadLocalItems(function(items) {
       setTimeout(function () {
+        this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
         this.dataLoaded = true;
         this.reloadList();
         this.configureNavBar(true);
@@ -156,6 +162,27 @@ export default class Notes extends Abstract {
         Sync.getInstance().sync(null);
       }.bind(this), 0);
     }.bind(this));
+  }
+
+  /* If there is at least one item that has an error decrypting, and there are no account keys saved,
+    display an alert instructing the user to log in. This happens when restoring from iCloud and data is restored but keys are not.
+   */
+  displayNeedSignInAlertForLocalItemsIfApplicable(items) {
+    if(KeysManager.get().hasAccountKeys()) {
+      return;
+    }
+
+    var needsDecrypt = false;
+    for(var item of items) {
+      if(item.errorDecrypting) {
+        needsDecrypt = true;
+        break;
+      }
+    }
+
+    if(needsDecrypt) {
+      Alert.alert("Missing Keys", "Some of your items cannot be decrypted because the keys are missing. This can happen if you restored your device from backup. Please sign in to restore your data.");
+    }
   }
 
   configureNavBar(initial = false) {
@@ -396,7 +423,7 @@ export default class Notes extends Abstract {
 
         {this.state.showSyncBar &&
           <View style={GlobalStyles.styles().syncBar}>
-            <Text style={GlobalStyles.styles().syncBarText}>{this.state.syncBarComplete ? "Download Success" : `Downloading ${syncStatus.retrievedCount} items. Keep app opened.`}</Text>
+            <Text style={GlobalStyles.styles().syncBarText}>{this.state.syncBarComplete ? "Download Complete." : `Downloading ${syncStatus.retrievedCount} items. Keep app opened.`}</Text>
           </View>
         }
       </View>

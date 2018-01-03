@@ -35,20 +35,27 @@ export default class ItemParams {
   async __params() {
 
     var params = {uuid: this.item.uuid, content_type: this.item.content_type, deleted: this.item.deleted, created_at: this.item.created_at};
-    if(this.keys && !this.item.doNotEncrypt()) {
-      var encryptedParams = await Encryptor.encryptItem(this.item, this.keys, this.version);
-      _.merge(params, encryptedParams);
+    if(!this.item.errorDecrypting) {
+      if(this.keys && !this.item.doNotEncrypt()) {
+        var encryptedParams = await Encryptor.encryptItem(this.item, this.keys, this.version);
+        _.merge(params, encryptedParams);
 
-      if(this.version !== "001") {
-        delete params.auth_hash;
+        if(this.version !== "001") {
+          delete params.auth_hash;
+        }
       }
-    }
-    else {
-      params.content = this.forExportFile ? this.item.createContentJSONFromProperties() : "000" + await Crypto.base64(JSON.stringify(this.item.createContentJSONFromProperties()));
-      if(!this.forExportFile) {
-        delete params.auth_hash;
-        delete params.enc_item_key;
+      else {
+        params.content = this.forExportFile ? this.item.createContentJSONFromProperties() : "000" + await Crypto.base64(JSON.stringify(this.item.createContentJSONFromProperties()));
+        if(!this.forExportFile) {
+          delete params.auth_hash;
+          delete params.enc_item_key;
+        }
       }
+    } else {
+      // Error decrypting, keep "content" and related fields as is (and do not try to encrypt, otherwise that would be undefined behavior)
+      params.content = this.item.content;
+      params.enc_item_key = this.item.enc_item_key;
+      params.auth_hash = this.item.auth_hash;
     }
 
     if(this.additionalFields) {

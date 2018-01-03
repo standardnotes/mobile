@@ -38,7 +38,6 @@ export default class Encryptor {
       var authHash = await Crypto.hmac256(ciphertext, ak);
       params.auth_hash = authHash;
     }
-
     params.content = ciphertext;
     return params;
   }
@@ -92,6 +91,7 @@ export default class Encryptor {
 
     // return if uuid in auth hash does not match item uuid. Signs of tampering.
     if(keyParams.uuid && keyParams.uuid !== item.uuid) {
+      if(!item.errorDecrypting) { item.errorDecryptingValueChanged = true;}
       item.errorDecrypting = true;
       return;
     }
@@ -99,6 +99,7 @@ export default class Encryptor {
     var item_key = await Crypto.decryptText(keyParams, requiresAuth);
 
     if(!item_key) {
+      if(!item.errorDecrypting) { item.errorDecryptingValueChanged = true;}
       item.errorDecrypting = true;
       return;
     }
@@ -110,6 +111,7 @@ export default class Encryptor {
 
     // return if uuid in auth hash does not match item uuid. Signs of tampering.
     if(itemParams.uuid && itemParams.uuid !== item.uuid) {
+      if(!item.errorDecrypting) { item.errorDecryptingValueChanged = true;}
       item.errorDecrypting = true;
       return;
     }
@@ -121,11 +123,14 @@ export default class Encryptor {
 
     var content = await Crypto.decryptText(itemParams, true);
     if(!content) {
+      if(!item.errorDecrypting) { item.errorDecryptingValueChanged = true;}
       item.errorDecrypting = true;
     } else {
+      if(item.errorDecrypting == true) { item.errorDecryptingValueChanged = true;}
       item.errorDecrypting = false;
+      // Content should only be set if it was successfully decrypted, and should otherwise remain unchanged.
+      item.content = content;
     }
-    item.content = content;
   }
 
   static async decryptMultipleItems(items, keys, throws) {
@@ -133,12 +138,12 @@ export default class Encryptor {
      if(item.deleted == true) {
        continue;
      }
-
      var isString = typeof item.content === 'string' || item.content instanceof String;
      if(isString) {
        try {
          await this.decryptItem(item, keys);
        } catch (e) {
+         if(!item.errorDecrypting) { item.errorDecryptingValueChanged = true;}
          item.errorDecrypting = true;
          if(throws) {
            throw e;
@@ -146,6 +151,8 @@ export default class Encryptor {
          console.log("Error decrypting item", item, e);
          continue;
        }
+     } else {
+
      }
    }
   }

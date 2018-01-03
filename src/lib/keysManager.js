@@ -181,11 +181,15 @@ export default class KeysManager {
 
   /* The keys to use for encryption. If user is signed in, use those keys, otherwise use offline keys */
   activeKeys() {
-    if(_.keys(this.accountKeys).length > 0) {
+    if(this.hasAccountKeys()) {
       return this.accountKeys;
     } else {
       return this.offlineKeys;
     }
+  }
+
+  hasAccountKeys() {
+    return _.keys(this.accountKeys).length > 0;
   }
 
   isOfflineEncryptionEnabled() {
