@@ -10,6 +10,7 @@ export default class Theme extends Item {
   mapContentToLocalProperties(contentObject) {
     super.mapContentToLocalProperties(contentObject)
     this.url = contentObject.url;
+    this.hosted_url = contentObject.hosted_url;
     this.name = contentObject.name;
     this.mobileRules = contentObject.mobileRules;
     this.notAvailableOnMobile = contentObject.notAvailableOnMobile;
@@ -19,6 +20,7 @@ export default class Theme extends Item {
     var params = {
       url: this.url,
       name: this.name,
+      hosted_url: this.hosted_url,
       mobileRules: this.mobileRules,
       notAvailableOnMobile: this.notAvailableOnMobile
     };

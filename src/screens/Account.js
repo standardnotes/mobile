@@ -122,13 +122,24 @@ export default class Account extends Abstract {
       return;
     }
 
-    Auth.getInstance().login(email, password, params.server, function(user, error) {
+    var extraParams = {};
+    if(this.state.mfa) {
+      extraParams[this.state.mfa.payload.mfa_key] = params.mfa_token;
+    }
+
+    Auth.getInstance().login(email, password, params.server, extraParams, function(user, error) {
       if(error) {
-        Alert.alert(
-          'Oops', error.message, [{text: 'OK'}]
-        )
+        if(error.tag == "mfa-required" || error.tag == "mfa-invalid") {
+          this.mergeState({mfa: error});
+        } else {
+          Alert.alert('Oops', error.message, [{text: 'OK'}])
+        }
         if(callback) {callback(false);}
         return;
+      }
+
+      if(this.state.mfa) {
+        this.mergeState({mfa: null});
       }
 
       this.onAuthSuccess();
@@ -383,7 +394,7 @@ export default class Account extends Abstract {
         message += "\n\n https://standardnotes.org";
       }
 
-      ApplicationState.get().performActionWithoutStateChangeImpact(() => {        
+      ApplicationState.get().performActionWithoutStateChangeImpact(() => {
         Share.share({title: title, message: message, url: url})
       })
     }
@@ -406,6 +417,7 @@ export default class Account extends Abstract {
               params={this.state.params}
               confirmRegistration={this.state.confirmRegistration}
               title={"Account"}
+              mfa={this.state.mfa}
               onSignInPress={this.onSignInPress}
               onRegisterPress={this.onRegisterPress}
             />

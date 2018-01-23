@@ -74,7 +74,6 @@ export default class AuthModal extends Component {
 
   render() {
     let authProps = this.state.authProps;
-    console.log("Showing modal:", this.state.visible);
     return (
       <Modal
        animationType={"slide"}

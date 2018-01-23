@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {TextInput, View} from 'react-native';
+import {TextInput, View, Text} from 'react-native';
 import GlobalStyles from "../../Styles"
 
 import SectionHeader from "../../components/SectionHeader";
@@ -48,37 +48,62 @@ export default class AuthSection extends AbstractComponent {
   }
 
   render() {
+    let textPadding = GlobalStyles.constants().paddingLeft;
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
 
-        <SectionedTableCell textInputCell={true} first={true}>
-          <TextInput
-            style={GlobalStyles.styles().sectionedTableCellTextInput}
-            placeholder={"Email"}
-            onChangeText={(text) => this.setState({email: text})}
-            value={this.state.email}
-            autoCorrect={false}
-            autoCapitalize={'none'}
-            keyboardType={'email-address'}
-            underlineColorAndroid={'transparent'}
-            placeholderTextColor={GlobalStyles.constants().mainDimColor}
-          />
-        </SectionedTableCell>
+        {!this.props.mfa &&
+          <View>
+            <SectionedTableCell textInputCell={true} first={true}>
+              <TextInput
+                style={GlobalStyles.styles().sectionedTableCellTextInput}
+                placeholder={"Email"}
+                onChangeText={(text) => this.setState({email: text})}
+                value={this.state.email}
+                autoCorrect={false}
+                autoCapitalize={'none'}
+                keyboardType={'email-address'}
+                underlineColorAndroid={'transparent'}
+                placeholderTextColor={GlobalStyles.constants().mainDimColor}
+              />
+            </SectionedTableCell>
 
-        <SectionedTableCell textInputCell={true}>
-          <TextInput
-            style={GlobalStyles.styles().sectionedTableCellTextInput}
-            placeholder={"Password"}
-            onChangeText={(text) => this.setState({password: text})}
-            value={this.state.password}
-            secureTextEntry={true}
-            underlineColorAndroid={'transparent'}
-            placeholderTextColor={GlobalStyles.constants().mainDimColor}
-          />
-        </SectionedTableCell>
+            <SectionedTableCell textInputCell={true}>
+              <TextInput
+                style={GlobalStyles.styles().sectionedTableCellTextInput}
+                placeholder={"Password"}
+                onChangeText={(text) => this.setState({password: text})}
+                value={this.state.password}
+                secureTextEntry={true}
+                underlineColorAndroid={'transparent'}
+                placeholderTextColor={GlobalStyles.constants().mainDimColor}
+              />
+            </SectionedTableCell>
+          </View>
+        }
 
-        {(this.state.showAdvanced || !this.state.server) &&
+        {this.props.mfa &&
+          <View>
+            <Text style={[GlobalStyles.styles().uiText, {paddingLeft: textPadding, paddingRight: textPadding, marginBottom: textPadding}]}>
+              {this.props.mfa.message}
+            </Text>
+            <SectionedTableCell textInputCell={true} first={true}>
+              <TextInput
+                style={GlobalStyles.styles().sectionedTableCellTextInput}
+                placeholder=""
+                onChangeText={(text) => this.setState({mfa_token: text})}
+                value={this.state.mfa_token}
+                keyboardType={'numeric'}
+                autoFocus={true}
+                underlineColorAndroid={'transparent'}
+                placeholderTextColor={GlobalStyles.constants().mainDimColor}
+              />
+            </SectionedTableCell>
+          </View>
+        }
+
+        {(this.state.showAdvanced || !this.state.server) && !this.props.mfa &&
           <SectionedTableCell textInputCell={true}>
             <TextInput
               style={GlobalStyles.styles().sectionedTableCellTextInput}
@@ -96,9 +121,11 @@ export default class AuthSection extends AbstractComponent {
 
         <ButtonCell title={this.state.signInButtonText} disabled={this.state.signingIn} bold={true} onPress={() => this.onSignInPress()} />
 
-        <ButtonCell last={this.state.showAdvanced} title={this.state.registerButtonText} disabled={this.state.registering} bold={true} onPress={() => this.onRegisterPress()} />
+        {!this.props.mfa &&
+          <ButtonCell last={this.state.showAdvanced} title={this.state.registerButtonText} disabled={this.state.registering} bold={true} onPress={() => this.onRegisterPress()} />
+        }
 
-        {!this.state.showAdvanced &&
+        {!this.state.showAdvanced && !this.props.mfa &&
           <ButtonCell last={true} title="Advanced Options" onPress={() => this.showAdvanced()} />
         }
 
