@@ -98,6 +98,7 @@ export default class AuthSection extends AbstractComponent {
                 autoFocus={true}
                 underlineColorAndroid={'transparent'}
                 placeholderTextColor={GlobalStyles.constants().mainDimColor}
+                onSubmitEditing={this.onSignInPress}
               />
             </SectionedTableCell>
           </View>

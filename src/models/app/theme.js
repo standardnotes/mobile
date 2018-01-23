@@ -1,32 +1,10 @@
-import Item from "../api/item"
+import Component from "./component"
 var _ = require('lodash')
 
-export default class Theme extends Item {
+export default class Theme extends Component {
 
   constructor(json_obj) {
     super(json_obj);
-  }
-
-  mapContentToLocalProperties(contentObject) {
-    super.mapContentToLocalProperties(contentObject)
-    this.url = contentObject.url;
-    this.hosted_url = contentObject.hosted_url;
-    this.name = contentObject.name;
-    this.mobileRules = contentObject.mobileRules;
-    this.notAvailableOnMobile = contentObject.notAvailableOnMobile;
-  }
-
-  structureParams() {
-    var params = {
-      url: this.url,
-      name: this.name,
-      hosted_url: this.hosted_url,
-      mobileRules: this.mobileRules,
-      notAvailableOnMobile: this.notAvailableOnMobile
-    };
-
-    _.merge(params, super.structureParams());
-    return params;
   }
 
   get content_type() {
@@ -35,5 +13,34 @@ export default class Theme extends Item {
 
   get displayName() {
     return "Theme";
+  }
+
+  setMobileRules(rules) {
+    this.setAppDataItem("mobileRules", rules);
+  }
+
+  getMobileRules() {
+    return this.getAppDataItem("mobileRules") || {constants: {}, rules: {}};
+  }
+
+  // Same as getMobileRules but without default value
+  hasMobileRules() {
+    return this.getAppDataItem("mobileRules");
+  }
+
+  setNotAvailOnMobile(na) {
+    this.setAppDataItem("notAvailableOnMobile", na);
+  }
+
+  getNotAvailOnMobile() {
+    return this.getAppDataItem("notAvailableOnMobile");
+  }
+
+  setMobileActive(active) {
+    this.setAppDataItem("mobileActive", active);
+  }
+
+  isMobileActive() {
+    return this.getAppDataItem("mobileActive");
   }
 }

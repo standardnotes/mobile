@@ -26,19 +26,23 @@ export default class GlobalStyles {
     // Get the active theme from storage rather than waiting for local database to load
     return Storage.getItem("activeTheme").then(function(theme) {
       if(theme) {
+        // JSON stringified content is generic and includes all items property at time of stringification
+        // So we parse it, then set content to itself, so that the mapping can be handled correctly.
         theme = JSON.parse(theme);
+        theme.content = theme;
+        theme = new Theme(theme);
         theme.isSwapIn = true;
-        var constants = _.merge(this.defaultConstants(), theme.mobileRules.constants);
-        var rules = _.merge(this.defaultRules(constants), theme.mobileRules.rules);
-        this.setStyles(rules, constants, theme.mobileRules.statusBar);
+        var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
+        var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
+        this.setStyles(rules, constants, theme.getMobileRules().statusBar);
 
         this.activeTheme = theme;
       } else {
         var theme = this.systemTheme();
-        theme.active = true;
+        theme.setMobileActive(true);
         this.activeTheme = theme;
         var constants = this.defaultConstants();
-        this.setStyles(this.defaultRules(constants), constants, theme.mobileRules.statusBar);
+        this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
       }
     }.bind(this));
   }
@@ -50,7 +54,7 @@ export default class GlobalStyles {
       if(this.activeTheme && this.activeTheme.isSwapIn) {
         this.activeTheme.isSwapIn = false;
         this.activeTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
-        this.activeTheme.active = true;
+        this.activeTheme.setMobileActive(true);
       }
     }.bind(this));
   }
@@ -81,11 +85,11 @@ export default class GlobalStyles {
     // want to use the defaults, but instead just look at the activeTheme. Because default platform values only apply
     // to the default theme
     var platform = Platform.OS == "android" ? "Android" : "IOS";
-    if(!this.get().activeTheme.mobileRules) {
+    if(!this.get().activeTheme.hasMobileRules()) {
       return null;
     }
 
-    var platformValue = this.get().activeTheme.mobileRules.constants[key+platform];
+    var platformValue = this.get().activeTheme.getMobileRules().constants[key+platform];
 
     if(platformValue) {
       return platformValue;
@@ -102,14 +106,14 @@ export default class GlobalStyles {
     this._systemTheme = new Theme({
       name: "Default",
       default: true,
-      uuid: 0,
-      mobileRules: {
-        name: "Default",
-        rules: this.defaultRules(constants),
-        constants: constants,
-        statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
-      }
+      uuid: 0
     });
+    this._systemTheme.setMobileRules({
+      name: "Default",
+      rules: this.defaultRules(constants),
+      constants: constants,
+      statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
+    })
     return this._systemTheme;
   }
 
@@ -123,16 +127,18 @@ export default class GlobalStyles {
 
   activateTheme(theme, writeToStorage = true) {
     if(this.activeTheme) {
-      this.activeTheme.active = false;
+      this.activeTheme.setMobileActive(false);
+      this.activeTheme.setDirty(true);
     }
 
     var run = () => {
-      var constants = _.merge(this.defaultConstants(), theme.mobileRules.constants);
-      var rules = _.merge(this.defaultRules(constants), theme.mobileRules.rules);
-      this.setStyles(rules, constants, theme.mobileRules.statusBar);
+      var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
+      var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
+      this.setStyles(rules, constants, theme.getMobileRules().statusBar);
 
       this.activeTheme = theme;
-      theme.active = true;
+      theme.setMobileActive(true);
+      theme.setDirty(true);
 
       if(theme.default) {
         Storage.removeItem("activeTheme");
@@ -143,11 +149,12 @@ export default class GlobalStyles {
       App.get().reload();
     }
 
-    if(!theme.mobileRules) {
+    if(!theme.hasMobileRules()) {
       this.downloadTheme(theme, function(){
-        if(theme.notAvailableOnMobile) {
+        if(theme.getNotAvailOnMobile()) {
           Alert.alert("Not Available", "This theme is not available on mobile.");
         } else {
+          Sync.getInstance().sync();
           run();
         }
       });
@@ -158,8 +165,8 @@ export default class GlobalStyles {
 
   async downloadTheme(theme, callback) {
     let errorBlock = (error) => {
-      if(!theme.notAvailableOnMobile) {
-        theme.notAvailableOnMobile = true;
+      if(!theme.getNotAvailOnMobile()) {
+        theme.setNotAvailOnMobile(true);
         theme.setDirty(true);
       }
 
@@ -168,17 +175,17 @@ export default class GlobalStyles {
       console.error("Theme download error", error);
     }
 
-    if(!theme.url) {
+    var url = theme.url;
+
+    if(!url) {
       errorBlock(null);
       return;
     }
 
-    var url;
-
-    if(theme.url.includes("?")) {
-      url = theme.url.replace("?", ".json?");
+    if(url.includes("?")) {
+      url = url.replace("?", ".json?");
     } else {
-      url = theme.url + ".json";
+      url = url + ".json";
     }
 
     if(App.isAndroid && url.includes("localhost")) {
@@ -187,13 +194,13 @@ export default class GlobalStyles {
 
     return Server.getInstance().getAbsolute(url, {}, function(response){
       // success
-      if(response !== theme.mobileRules) {
-        theme.mobileRules = response;
+      if(response !== theme.getMobileRules()) {
+        theme.setMobileRules(response);
         theme.setDirty(true);
       }
 
-      if(theme.notAvailableOnMobile) {
-        theme.notAvailableOnMobile = false;
+      if(theme.getNotAvailOnMobile()) {
+        theme.setNotAvailOnMobile(false);
         theme.setDirty(true);
       }
 
