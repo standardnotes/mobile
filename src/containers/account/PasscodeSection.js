@@ -22,11 +22,11 @@ export default class PasscodeSection extends Component {
       fingerprintAvailable: false || __DEV__,
     };
 
-    if(!__DEV__) {
+    // if(!__DEV__) {
       KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
         this.setState({fingerprintAvailable: available, biometricsType: type, biometricsNoun: noun})
       })
-    }
+    // }
   }
 
   componentWillUnmount() {
