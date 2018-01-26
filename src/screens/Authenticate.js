@@ -34,10 +34,13 @@ export default class Authenticate extends Abstract {
   constructor(props) {
     super(props);
     this.authProps = props.authProps;
+    this.state = {biometricsType: "touch", biometricsNoun: "Fingerprint"};
 
-    KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
-      this.setState({biometricsType: type, biometricsNoun: noun})
-    })
+    if(!__DEV__) {
+      KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
+        this.setState({biometricsType: type, biometricsNoun: noun})
+      })
+    }
   }
 
   componentWillUnmount() {
@@ -144,10 +147,11 @@ export default class Authenticate extends Abstract {
 
     var isAuthenticating = this.props.mode === "authenticate";
     var isSetup = !isAuthenticating;
+    var paddingTop = GlobalStyles.isIPhoneX() ? 30 : 15;
 
     return (
       <View style={GlobalStyles.styles().flexContainer}>
-        <ScrollView style={{paddingTop: this.props.mode == 'authenticate' ? 30 : 0}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
+        <ScrollView style={{paddingTop: this.props.mode == 'authenticate' ? paddingTop : 0}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
           <TableSection>
 
             <SectionHeader title={sectionTitle} />

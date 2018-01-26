@@ -1,6 +1,6 @@
 var _ = require('lodash')
 
-import { StyleSheet, StatusBar, Alert, Platform } from 'react-native';
+import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
 import App from "./app"
 import ModelManager from "./lib/modelManager"
 import Server from "./lib/server"
@@ -9,6 +9,7 @@ import Storage from "./lib/storage"
 import Auth from "./lib/auth"
 import Theme from "./models/app/theme"
 import KeysManager from './lib/keysManager'
+
 
 export default class GlobalStyles {
 
@@ -184,6 +185,8 @@ export default class GlobalStyles {
 
     if(url.includes("?")) {
       url = url.replace("?", ".json?");
+    } else if(url.includes(".css?")) {
+      url = url.replace(".css?", ".json?");
     } else {
       url = url + ".json";
     }
@@ -235,6 +238,16 @@ export default class GlobalStyles {
     setTimeout(function () {
       StatusBar.setBarStyle(statusBar, true);
     }, Platform.OS == "android" ? 100 : 0);
+  }
+
+  static isIPhoneX() {
+    // See https://mydevice.io/devices/ for device dimensions
+    const X_WIDTH = 375;
+    const X_HEIGHT = 812;
+    const { height: D_HEIGHT, width: D_WIDTH } = Dimensions.get('window');
+    return Platform.OS === 'ios' &&
+      ((D_HEIGHT === X_HEIGHT && D_WIDTH === X_WIDTH) ||
+        (D_HEIGHT === X_WIDTH && D_WIDTH === X_HEIGHT));
   }
 
   defaultConstants() {

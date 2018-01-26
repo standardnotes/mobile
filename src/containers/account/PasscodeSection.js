@@ -18,15 +18,18 @@ export default class PasscodeSection extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      fingerprintAvailable: false || __DEV__,
-    };
+    var state = { fingerprintAvailable: false || __DEV__};
+    if(__DEV__) {
+      state.biometricsType = "touch";
+      state.biometricsNoun = "Fingerprint";
+    }
+    this.state = state;
 
-    // if(!__DEV__) {
+    if(!__DEV__) {
       KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
         this.setState({fingerprintAvailable: available, biometricsType: type, biometricsNoun: noun})
       })
-    // }
+    }
   }
 
   componentWillUnmount() {
