@@ -23,14 +23,9 @@ export default class PasscodeSection extends Component {
     };
 
     if(!__DEV__) {
-      FingerprintScanner.isSensorAvailable()
-      .then(function(){
-        this.setState({fingerprintAvailable: true})
-      }.bind(this))
-      .catch(function(error){
-        this.setState({fingerprintAvailable: false})
-        console.log("Fingerprint error", error);
-      }.bind(this))
+      KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
+        this.setState({fingerprintAvailable: available, biometricsType: type, biometricsNoun: noun})
+      })
     }
   }
 
@@ -72,7 +67,9 @@ export default class PasscodeSection extends Component {
     var passcodeTitle = this.props.hasPasscode ? "Disable Passcode Lock" : "Enable Passcode Lock";
     var passcodeOnPress = this.props.hasPasscode ? this.props.onDisable : this.props.onEnable;
 
-    var fingerprintTitle = this.props.hasFingerprint ? "Disable Fingerprint Lock" : "Enable Fingerprint Lock";
+    var biometricsNoun = this.state.biometricsNoun;
+
+    var fingerprintTitle = this.props.hasFingerprint ? `Disable ${biometricsNoun} Lock` : `Enable ${biometricsNoun} Lock`;
     var fingerprintOnPress = this.props.hasFingerprint ? this.props.onFingerprintDisable : this.props.onFingerprintEnable;
 
     var passcodeOptions = KeysManager.get().getPasscodeTimingOptions();
@@ -102,7 +99,7 @@ export default class PasscodeSection extends Component {
         }
 
         {this.props.hasFingerprint &&
-          <SectionedOptionsTableCell last={true} title={"Require Fingerprint"} options={fingerprintOptions} onPress={this.onFingerprintOptionPress}/>
+          <SectionedOptionsTableCell last={true} title={`Require ${biometricsNoun}`} options={fingerprintOptions} onPress={this.onFingerprintOptionPress}/>
         }
 
       </TableSection>
