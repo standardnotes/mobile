@@ -452,7 +452,7 @@ export default class Sync {
         // create a new item with the same contents of this item if the contents differ
         itemResponse.uuid = null; // we want a new uuid for the new item
         var dup = ModelManager.getInstance().createDuplicateItem(itemResponse);
-        if(!itemResponse.deleted && JSON.stringify(item.structureParams()) !== JSON.stringify(dup.structureParams())) {
+        if(!itemResponse.deleted && !item.isItemContentEqualWith(dup)) {
           await dup.initUUID();
           ModelManager.getInstance().addItem(dup);
           dup.conflictOf = item.uuid;
