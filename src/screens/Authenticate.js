@@ -36,11 +36,9 @@ export default class Authenticate extends Abstract {
     this.authProps = props.authProps;
     this.state = {biometricsType: "touch", biometricsNoun: "Fingerprint"};
 
-    if(!__DEV__) {
-      KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
-        this.setState({biometricsType: type, biometricsNoun: noun})
-      })
-    }
+    KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
+      this.setState({biometricsType: type, biometricsNoun: noun})
+    })
   }
 
   componentWillUnmount() {

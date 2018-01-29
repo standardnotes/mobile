@@ -23,13 +23,12 @@ export default class PasscodeSection extends Component {
       state.biometricsType = "touch";
       state.biometricsNoun = "Fingerprint";
     }
+
     this.state = state;
 
-    if(!__DEV__) {
-      KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
-        this.setState({fingerprintAvailable: available, biometricsType: type, biometricsNoun: noun})
-      })
-    }
+    KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
+      this.setState({fingerprintAvailable: available, biometricsType: type, biometricsNoun: noun})
+    })
   }
 
   componentWillUnmount() {
