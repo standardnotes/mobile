@@ -25,7 +25,7 @@ export default class GlobalStyles {
 
   async resolveInitialTheme() {
     // Get the active theme from storage rather than waiting for local database to load
-    return Storage.getItem("activeTheme").then(function(theme) {
+    return Storage.getItem("activeTheme").then(function(themeResult) {
       let runDefaultTheme = () => {
         var theme = this.systemTheme();
         theme.setMobileActive(true);
@@ -34,12 +34,13 @@ export default class GlobalStyles {
         this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
       }
 
-      if(theme) {
+      if(themeResult) {
         // JSON stringified content is generic and includes all items property at time of stringification
         // So we parse it, then set content to itself, so that the mapping can be handled correctly.
         try {
-          theme = JSON.parse(theme);
-          theme.content = theme;
+          var theme = JSON.parse(themeResult);
+          let content = Object.assign({}, theme);
+          theme.content = content;
           theme = new Theme(theme);
           theme.isSwapIn = true;
           var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
@@ -99,7 +100,7 @@ export default class GlobalStyles {
     // to the default theme
     var platform = Platform.OS == "android" ? "Android" : "IOS";
     if(!this.get().activeTheme.hasMobileRules()) {
-      return null;
+      return value;
     }
 
     var platformValue = this.get().activeTheme.getMobileRules().constants[key+platform];
@@ -134,16 +135,10 @@ export default class GlobalStyles {
     return [this.systemTheme()].concat(ModelManager.getInstance().themes);
   }
 
-  isThemeActive(theme) {
-    return this.activateThemeId === theme.uuid;
-  }
-
   activateTheme(theme, writeToStorage = true) {
     if(this.activeTheme) {
       this.activeTheme.setMobileActive(false);
     }
-
-    console.log("Activating theme", JSON.stringify(theme));
 
     var run = () => {
       var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);

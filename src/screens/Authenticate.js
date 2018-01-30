@@ -144,7 +144,7 @@ export default class Authenticate extends Abstract {
 
     var isAuthenticating = this.props.mode === "authenticate";
     var isSetup = !isAuthenticating;
-    var paddingTop = GlobalStyles.isIPhoneX() ? 30 : 15;
+    var paddingTop = (App.isIOS && GlobalStyles.isIPhoneX()) ? 30 : 15;
 
     return (
       <View style={GlobalStyles.styles().flexContainer}>

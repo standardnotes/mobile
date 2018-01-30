@@ -30,7 +30,10 @@ export default class Icons {
     let icons = {
       "ios-menu-outline": [Ionicons, 25, color],
       "ios-contact-outline": [Ionicons, 25, color],
+      "ios-flag": [Ionicons, 25, color],
+
       "md-add" : [Ionicons, 25, color],
+      "md-bookmark" : [Ionicons, 25, color],
       "md-pricetag" : [Ionicons, 25, color],
       "md-menu" : [Ionicons, 25, color],
       "md-more" : [Ionicons, 25, color],
