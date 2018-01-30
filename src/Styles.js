@@ -131,7 +131,7 @@ export default class GlobalStyles {
       constants: constants,
       statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
     })
-    
+
     return this._systemTheme;
   }
 
@@ -187,7 +187,7 @@ export default class GlobalStyles {
       console.error("Theme download error", error);
     }
 
-    var url = theme.url;
+    var url = theme.hosted_url || theme.url;
 
     if(!url) {
       errorBlock(null);
