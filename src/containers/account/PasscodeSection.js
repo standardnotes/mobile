@@ -25,16 +25,12 @@ export default class PasscodeSection extends Component {
     }
 
     this.state = state;
+  }
 
+  componentDidMount() {
     KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
       this.setState({fingerprintAvailable: available, biometricsType: type, biometricsNoun: noun})
     })
-  }
-
-  componentWillUnmount() {
-    if(!__DEV__) {
-      FingerprintScanner.release();
-    }
   }
 
   onPasscodeOptionPress = (option) => {

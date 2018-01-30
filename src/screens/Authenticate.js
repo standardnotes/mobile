@@ -35,10 +35,6 @@ export default class Authenticate extends Abstract {
     super(props);
     this.authProps = props.authProps;
     this.state = {biometricsType: "touch", biometricsNoun: "Fingerprint"};
-
-    KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
-      this.setState({biometricsType: type, biometricsNoun: noun})
-    })
   }
 
   componentWillUnmount() {
@@ -47,6 +43,10 @@ export default class Authenticate extends Abstract {
 
   componentDidMount() {
     super.componentDidMount();
+
+    KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
+      this.setState({biometricsType: type, biometricsNoun: noun})
+    })
   }
 
   beginAuthentication = () => {
@@ -112,7 +112,6 @@ export default class Authenticate extends Abstract {
       this.props.onAuthenticateSuccess();
       this.dismiss();
     }
-
   }
 
   onFingerprintSuccess = () => {
@@ -412,12 +411,9 @@ class FingerprintSection extends Abstract {
       })
       .catch((error) => {
         console.log("Fingerprint Error:", error);
-        if(error.name == "UserCancel") {
-          this.beginAuthentication();
-        } else {
-          if(this.isMounted()) {
-            this.setState({ error: "Authentication failed. Tap to try again.", began: false});
-          }
+        // if(error.name == "UserCancel") does not apply to Android
+        if(this.isMounted()) {
+          this.setState({ error: "Authentication failed. Tap to try again.", began: false});
         }
       });
     } else {
@@ -439,7 +435,6 @@ class FingerprintSection extends Abstract {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    console.log("Releasing FingerprintScanner Instance");
     FingerprintScanner.release();
   }
 
