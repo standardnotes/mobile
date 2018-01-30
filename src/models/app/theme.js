@@ -35,4 +35,13 @@ export default class Theme extends Component {
   getNotAvailOnMobile() {
     return this.getAppDataItem("notAvailableOnMobile");
   }
+
+  /* We must not use .active because if you set that to true, it will also activate that theme on desktop/web */
+  setMobileActive(active) {
+    this.setAppDataItem("mobileActive", active);
+  }
+
+  isMobileActive() {
+    return this.getAppDataItem("mobileActive");
+  }
 }

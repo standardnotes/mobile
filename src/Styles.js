@@ -28,7 +28,7 @@ export default class GlobalStyles {
     return Storage.getItem("activeTheme").then(function(theme) {
       let runDefaultTheme = () => {
         var theme = this.systemTheme();
-        theme.active = true;
+        theme.setMobileActive(true);
         this.activeTheme = theme;
         var constants = this.defaultConstants();
         this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
@@ -62,9 +62,12 @@ export default class GlobalStyles {
 
     ModelManager.getInstance().addItemSyncObserver("themes", "SN|Theme", function(items){
       if(this.activeTheme && this.activeTheme.isSwapIn) {
-        this.activeTheme.isSwapIn = false;
-        this.activeTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
-        this.activeTheme.active = true;
+        var matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
+        if(matchingTheme) {
+          this.activeTheme = matchingTheme;
+          this.activeTheme.isSwapIn = false;
+          this.activeTheme.setMobileActive(true);
+        }
       }
     }.bind(this));
   }
@@ -137,8 +140,10 @@ export default class GlobalStyles {
 
   activateTheme(theme, writeToStorage = true) {
     if(this.activeTheme) {
-      this.activeTheme.active = false;
+      this.activeTheme.setMobileActive(false);
     }
+
+    console.log("Activating theme", JSON.stringify(theme));
 
     var run = () => {
       var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
@@ -146,7 +151,7 @@ export default class GlobalStyles {
       this.setStyles(rules, constants, theme.getMobileRules().statusBar);
 
       this.activeTheme = theme;
-      theme.active = true;
+      theme.setMobileActive(true);
 
       if(theme.default) {
         Storage.removeItem("activeTheme");

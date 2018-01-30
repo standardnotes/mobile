@@ -79,7 +79,9 @@ export default class Notes extends Abstract {
     Sync.getInstance().removeSyncObserver(this.syncObserver);
     Sync.getInstance().removeSyncStatusObserver(this.syncStatusObserver);
     Auth.getInstance().removeEventObserver(this.signoutObserver);
-    this.options.removeChangeObserver(this.optionsObserver);
+    if(this.options) {
+      this.options.removeChangeObserver(this.optionsObserver);
+    }
     clearInterval(this.syncTimer);
   }
 
