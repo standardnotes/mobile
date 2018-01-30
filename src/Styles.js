@@ -38,10 +38,22 @@ export default class GlobalStyles {
         // JSON stringified content is generic and includes all items property at time of stringification
         // So we parse it, then set content to itself, so that the mapping can be handled correctly.
         try {
-          var theme = JSON.parse(themeResult);
-          let content = Object.assign({}, theme);
-          theme.content = content;
-          theme = new Theme(theme);
+          var parsedTheme = JSON.parse(themeResult);
+          var needsMigration = false;
+          if(!parsedTheme.appData) {
+            // Newer versions of the app persist a Theme object where mobileRules are nested in AppData.
+            // We want to check if the currently saved data is of the old format, which uses theme.mobileRules
+            // instead of theme.getMobileRules(). If so, we want to prepare it for the new format.
+            needsMigration = true;
+          }
+          let content = Object.assign({}, parsedTheme);
+          parsedTheme.content = content;
+
+          var theme = new Theme(parsedTheme);
+          if(needsMigration) {
+            theme.setMobileRules(parsedTheme.mobileRules);
+          }
+
           theme.isSwapIn = true;
           var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
           var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
@@ -93,22 +105,22 @@ export default class GlobalStyles {
   }
 
   static constantForKey(key) {
-    var value = this.get().constants[key];
+    var defaultValue = this.get().constants[key];
 
-    // For the platform value, if the active theme does not have a specific value, but the defaults do, we don't
-    // want to use the defaults, but instead just look at the activeTheme. Because default platform values only apply
-    // to the default theme
-    var platform = Platform.OS == "android" ? "Android" : "IOS";
-    if(!this.get().activeTheme.hasMobileRules()) {
-      return value;
-    }
+    try {
+      // For the platform value, if the active theme does not have a specific value, but the defaults do, we don't
+      // want to use the defaults, but instead just look at the activeTheme. Because default platform values only apply
+      // to the default theme
+      var platform = Platform.OS == "android" ? "Android" : "IOS";
+      var platformValue = this.get().activeTheme.getMobileRules().constants[key+platform];
 
-    var platformValue = this.get().activeTheme.getMobileRules().constants[key+platform];
-
-    if(platformValue) {
-      return platformValue;
-    } else {
-      return value;
+      if(platformValue) {
+        return platformValue;
+      } else {
+        return defaultValue;
+      }
+    } catch (e) {
+      return defaultValue;
     }
   }
 
