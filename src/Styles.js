@@ -26,24 +26,33 @@ export default class GlobalStyles {
   async resolveInitialTheme() {
     // Get the active theme from storage rather than waiting for local database to load
     return Storage.getItem("activeTheme").then(function(theme) {
-      if(theme) {
-        // JSON stringified content is generic and includes all items property at time of stringification
-        // So we parse it, then set content to itself, so that the mapping can be handled correctly.
-        theme = JSON.parse(theme);
-        theme.content = theme;
-        theme = new Theme(theme);
-        theme.isSwapIn = true;
-        var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
-        var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
-        this.setStyles(rules, constants, theme.getMobileRules().statusBar);
-
-        this.activeTheme = theme;
-      } else {
+      let runDefaultTheme = () => {
         var theme = this.systemTheme();
-        theme.setMobileActive(true);
+        theme.active = true;
         this.activeTheme = theme;
         var constants = this.defaultConstants();
         this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
+      }
+
+      if(theme) {
+        // JSON stringified content is generic and includes all items property at time of stringification
+        // So we parse it, then set content to itself, so that the mapping can be handled correctly.
+        try {
+          theme = JSON.parse(theme);
+          theme.content = theme;
+          theme = new Theme(theme);
+          theme.isSwapIn = true;
+          var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
+          var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
+          this.setStyles(rules, constants, theme.getMobileRules().statusBar);
+
+          this.activeTheme = theme;
+        } catch (e) {
+          console.error("Error parsing initial theme", e);
+          runDefaultTheme();
+        }
+      } else {
+        runDefaultTheme();
       }
     }.bind(this));
   }
@@ -55,7 +64,7 @@ export default class GlobalStyles {
       if(this.activeTheme && this.activeTheme.isSwapIn) {
         this.activeTheme.isSwapIn = false;
         this.activeTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
-        this.activeTheme.setMobileActive(true);
+        this.activeTheme.active = true;
       }
     }.bind(this));
   }
@@ -128,8 +137,7 @@ export default class GlobalStyles {
 
   activateTheme(theme, writeToStorage = true) {
     if(this.activeTheme) {
-      this.activeTheme.setMobileActive(false);
-      this.activeTheme.setDirty(true);
+      this.activeTheme.active = false;
     }
 
     var run = () => {
@@ -138,8 +146,7 @@ export default class GlobalStyles {
       this.setStyles(rules, constants, theme.getMobileRules().statusBar);
 
       this.activeTheme = theme;
-      theme.setMobileActive(true);
-      theme.setDirty(true);
+      theme.active = true;
 
       if(theme.default) {
         Storage.removeItem("activeTheme");

@@ -68,8 +68,13 @@ export default class AuthModal extends Component {
     if(!this.state.visible) {
       console.error("Not supposed to call beginAuth before visible.");
     }
-    this.refs.authenticate.beginAuthentication();
-    ApplicationState.get().setAuthenticationInProgress(true);
+
+    try {
+      this.refs.authenticate.beginAuthentication();
+      ApplicationState.get().setAuthenticationInProgress(true);
+    } catch (e) {
+      console.error("Unable to begin auth", e);
+    }
   }
 
   render() {

@@ -35,12 +35,4 @@ export default class Theme extends Component {
   getNotAvailOnMobile() {
     return this.getAppDataItem("notAvailableOnMobile");
   }
-
-  setMobileActive(active) {
-    this.setAppDataItem("mobileActive", active);
-  }
-
-  isMobileActive() {
-    return this.getAppDataItem("mobileActive");
-  }
 }
