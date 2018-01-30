@@ -116,18 +116,22 @@ export default class GlobalStyles {
     if(this._systemTheme) {
       return this._systemTheme;
     }
+
     var constants = this.defaultConstants();
+
     this._systemTheme = new Theme({
       name: "Default",
       default: true,
       uuid: 0
     });
+
     this._systemTheme.setMobileRules({
       name: "Default",
       rules: this.defaultRules(constants),
       constants: constants,
       statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
     })
+    
     return this._systemTheme;
   }
 
