@@ -344,13 +344,13 @@ export default class GlobalStyles {
         justifyContent: "space-between",
         flexDirection: 'row',
         paddingRight: constants.paddingLeft,
+        paddingBottom: 10,
+        paddingTop: 10,
       },
 
       sectionHeader: {
         fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
-        paddingBottom: 10,
-        paddingTop: 10,
         color: constants.mainDimColor,
         fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
