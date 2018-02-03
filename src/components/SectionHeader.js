@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Text, Platform} from 'react-native';
+import {Text, Platform, View, TouchableOpacity} from 'react-native';
 
 import GlobalStyles from "../Styles"
 
@@ -10,7 +10,14 @@ export default class SectionHeader extends Component {
       title = title.toUpperCase();
     }
     return (
-      <Text style={GlobalStyles.stylesForKey("sectionHeader")}>{title}</Text>
+      <View style={GlobalStyles.stylesForKey("sectionHeaderContainer")}>
+        <Text style={GlobalStyles.stylesForKey("sectionHeader")}>{title}</Text>
+        {this.props.buttonText &&
+          <TouchableOpacity onPress={this.props.buttonAction}>
+            <Text style={GlobalStyles.stylesForKey("sectionHeaderButton")}>{this.props.buttonText}</Text>
+          </TouchableOpacity>
+        }
+      </View>
     )
   }
 }

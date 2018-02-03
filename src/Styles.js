@@ -338,6 +338,14 @@ export default class GlobalStyles {
         backgroundColor: constants.mainBackgroundColor
       },
 
+      sectionHeaderContainer: {
+        flex: 1,
+        flexGrow: 0,
+        justifyContent: "space-between",
+        flexDirection: 'row',
+        paddingRight: constants.paddingLeft,
+      },
+
       sectionHeader: {
         fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
@@ -345,6 +353,10 @@ export default class GlobalStyles {
         paddingTop: 10,
         color: constants.mainDimColor,
         fontWeight: Platform.OS == "android" ? "bold" : "normal"
+      },
+
+      sectionHeaderButton: {
+        color: constants.mainTintColor
       },
 
       sectionHeaderAndroid: {
