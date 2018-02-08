@@ -327,7 +327,8 @@ export default class Filter extends Abstract {
             tags={this.tags}
             selected={this.state.selectedTags}
             onTagSelect={this.onTagSelect}
-            clearSelection={!this.props.singleSelectMode && this.clearTags}
+            hasClearButton={!this.props.singleSelectMode && this.state.selectedTags.length > 0}
+            clearSelection={this.clearTags}
             onManageTagEvent={this.onManageTagEvent}
             title={"Tags"}
            />
@@ -416,7 +417,7 @@ class TagsSection extends Component {
   render() {
     return (
       <TableSection style={GlobalStyles.styles().view}>
-        <SectionHeader title={this.props.title} buttonText={this.props.clearSelection && "Clear"} buttonAction={() => {this.props.clearSelection(true)}}/>
+        <SectionHeader title={this.props.title} buttonText={this.props.hasClearButton && "Clear"} buttonAction={() => {this.props.clearSelection(true)}}/>
 
         <FlatList style={{height: "100%"}}
           initialNumToRender={10}
