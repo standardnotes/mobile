@@ -383,13 +383,16 @@ export default class GlobalStyles {
       },
 
       textInputCell: {
-        maxHeight: 50
+        maxHeight: 50,
+        paddingTop: 0,
+        paddingBottom: 0
       },
 
       sectionedTableCellTextInput: {
         fontSize: constants.mainTextFontSize,
         padding: 0,
         color: constants.mainTextColor,
+        height: "100%"
       },
 
       sectionedTableCellFirst: {
