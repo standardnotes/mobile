@@ -27,11 +27,17 @@ export default class GlobalStyles {
     // Get the active theme from storage rather than waiting for local database to load
     return Storage.getItem("activeTheme").then(function(themeResult) {
       let runDefaultTheme = () => {
-        var theme = this.systemTheme();
-        theme.setMobileActive(true);
-        this.activeTheme = theme;
-        var constants = this.defaultConstants();
-        this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
+        try {
+          var theme = this.systemTheme();
+          theme.setMobileActive(true);
+          this.activeTheme = theme;
+          var constants = this.defaultConstants();
+          this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
+        } catch (e) {
+          var constants = this.defaultConstants();
+          this.setStyles(this.defaultRules(constants), constants, Platform.OS == "android" ? "light-content" : "dark-content");
+          console.log("Default theme error", e);
+        }
       }
 
       if(themeResult) {
@@ -40,7 +46,7 @@ export default class GlobalStyles {
         try {
           var parsedTheme = JSON.parse(themeResult);
           var needsMigration = false;
-          if(!parsedTheme.appData) {
+          if(parsedTheme.mobileRules) {
             // Newer versions of the app persist a Theme object where mobileRules are nested in AppData.
             // We want to check if the currently saved data is of the old format, which uses theme.mobileRules
             // instead of theme.getMobileRules(). If so, we want to prepare it for the new format.
@@ -52,6 +58,7 @@ export default class GlobalStyles {
           var theme = new Theme(parsedTheme);
           if(needsMigration) {
             theme.setMobileRules(parsedTheme.mobileRules);
+            theme.mobileRules = null;
           }
 
           theme.isSwapIn = true;
