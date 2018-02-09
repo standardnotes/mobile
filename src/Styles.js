@@ -158,6 +158,13 @@ export default class GlobalStyles {
     return [this.systemTheme()].concat(ModelManager.getInstance().themes);
   }
 
+  isThemeActive(theme) {
+    if(this.activeTheme) {
+      return theme.uuid == this.activeTheme.uuid;
+    }
+    return theme.isMobileActive();
+  }
+
   activateTheme(theme, writeToStorage = true) {
     if(this.activeTheme) {
       this.activeTheme.setMobileActive(false);

@@ -23,7 +23,7 @@ export default class ThemesSection extends Component {
               text={theme.name}
               key={theme.uuid}
               first={i == 0}
-              selected={() => {return theme.isMobileActive()}}
+              selected={() => {return GlobalStyles.get().isThemeActive(theme)}}
               dimmed={theme.getNotAvailOnMobile()}
               last={i == this.props.themes.length - 1 && this.props.themes.length > 1}
             />

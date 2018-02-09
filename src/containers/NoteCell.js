@@ -158,10 +158,6 @@ export default class NoteCell extends React.PureComponent {
               <Text style={this.styles.deleting}>Deleting...</Text>
             }
 
-            {note.errorDecrypting &&
-              <Text style={this.styles.deleting}>Error Decrypting</Text>
-            }
-
             {note.conflictOf &&
               <Text style={this.styles.deleting}>Conflicted Copy</Text>
             }
@@ -177,6 +173,17 @@ export default class NoteCell extends React.PureComponent {
               <View style={this.styles.noteTags}>
                 <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag)}>
                 {Tag.arrayToDisplayString(note.tags)}
+                </Text>
+              </View>
+            }
+
+            {note.errorDecrypting &&
+              <View>
+                <Text style={[this.styles.noteTitle, this.styles.deleting]}>
+                  {"Password Required."}
+                </Text>
+                <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>
+                  {"Please sign in to restore your decryption keys and notes."}
                 </Text>
               </View>
             }
