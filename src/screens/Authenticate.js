@@ -34,6 +34,7 @@ export default class Authenticate extends Abstract {
   constructor(props) {
     super(props);
     this.authProps = props.authProps;
+    this.state = {biometricsType: "touch", biometricsNoun: "Fingerprint"};
   }
 
   componentWillUnmount() {
@@ -42,6 +43,10 @@ export default class Authenticate extends Abstract {
 
   componentDidMount() {
     super.componentDidMount();
+
+    KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
+      this.setState({biometricsType: type, biometricsNoun: noun})
+    })
   }
 
   beginAuthentication = () => {
@@ -107,7 +112,6 @@ export default class Authenticate extends Abstract {
       this.props.onAuthenticateSuccess();
       this.dismiss();
     }
-
   }
 
   onFingerprintSuccess = () => {
@@ -133,17 +137,18 @@ export default class Authenticate extends Abstract {
     } else if(this.authProps.passcode) {
       sectionTitle = "Enter Passcode";
     } else if(this.authProps.fingerprint) {
-      sectionTitle = "Fingerprint Required";
+      sectionTitle = `${this.state.biometricsNoun} Required`;
     } else {
       sectionTitle = "Missing";
     }
 
     var isAuthenticating = this.props.mode === "authenticate";
     var isSetup = !isAuthenticating;
+    var paddingTop = (App.isIOS && GlobalStyles.isIPhoneX()) ? 30 : 15;
 
     return (
       <View style={GlobalStyles.styles().flexContainer}>
-        <ScrollView style={{paddingTop: this.props.mode == 'authenticate' ? 15 : 0}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
+        <ScrollView style={{paddingTop: this.props.mode == 'authenticate' ? paddingTop : 0}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
           <TableSection>
 
             <SectionHeader title={sectionTitle} />
@@ -153,6 +158,8 @@ export default class Authenticate extends Abstract {
                 first={true}
                 last={!this.authProps.passcode}
                 ref={'fingerprintSection'}
+                biometricsType={this.state.biometricsType}
+                biometricsNoun={this.state.biometricsNoun}
                 onPress={this.beginAuthentication}
                 onAuthenticateSuccess={this.onFingerprintSuccess}
               />
@@ -404,12 +411,9 @@ class FingerprintSection extends Abstract {
       })
       .catch((error) => {
         console.log("Fingerprint Error:", error);
-        if(error.name == "UserCancel") {
-          this.beginAuthentication();
-        } else {
-          if(this.isMounted()) {
-            this.setState({ error: "Authentication failed. Tap to try again.", began: false});
-          }
+        // if(error.name == "UserCancel") does not apply to Android
+        if(this.isMounted()) {
+          this.setState({ error: "Authentication failed. Tap to try again.", began: false});
         }
       });
     } else {
@@ -431,7 +435,6 @@ class FingerprintSection extends Abstract {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    console.log("Releasing FingerprintScanner Instance");
     FingerprintScanner.release();
   }
 
@@ -470,7 +473,11 @@ class FingerprintSection extends Abstract {
 
     var text;
     if(this.state.began) {
-      text = "Please scan your fingerprint";
+      if(this.props.biometricsType == "face") {
+        text = "Please scan your face";
+      } else {
+        text = "Please scan your fingerprint";
+      }
     } else  {
       text = "Tap here to begin authentication.";
     }
@@ -481,7 +488,7 @@ class FingerprintSection extends Abstract {
 
     if(this.state.success) {
       iconName = App.isAndroid ? "md-checkmark-circle-outline" : "ios-checkmark-circle-outline";
-      text = "Fingerprint Successful";
+      text = `${this.props.biometricsNoun} Successful`;
       textStyles.push(this.styles.success);
     }
 

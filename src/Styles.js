@@ -1,6 +1,6 @@
 var _ = require('lodash')
 
-import { StyleSheet, StatusBar, Alert, Platform } from 'react-native';
+import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
 import App from "./app"
 import ModelManager from "./lib/modelManager"
 import Server from "./lib/server"
@@ -9,6 +9,7 @@ import Storage from "./lib/storage"
 import Auth from "./lib/auth"
 import Theme from "./models/app/theme"
 import KeysManager from './lib/keysManager'
+
 
 export default class GlobalStyles {
 
@@ -24,21 +25,54 @@ export default class GlobalStyles {
 
   async resolveInitialTheme() {
     // Get the active theme from storage rather than waiting for local database to load
-    return Storage.getItem("activeTheme").then(function(theme) {
-      if(theme) {
-        theme = JSON.parse(theme);
-        theme.isSwapIn = true;
-        var constants = _.merge(this.defaultConstants(), theme.mobileRules.constants);
-        var rules = _.merge(this.defaultRules(constants), theme.mobileRules.rules);
-        this.setStyles(rules, constants, theme.mobileRules.statusBar);
+    return Storage.getItem("activeTheme").then(function(themeResult) {
+      let runDefaultTheme = () => {
+        try {
+          var theme = this.systemTheme();
+          theme.setMobileActive(true);
+          this.activeTheme = theme;
+          var constants = this.defaultConstants();
+          this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
+        } catch (e) {
+          var constants = this.defaultConstants();
+          this.setStyles(this.defaultRules(constants), constants, Platform.OS == "android" ? "light-content" : "dark-content");
+          console.log("Default theme error", e);
+        }
+      }
 
-        this.activeTheme = theme;
+      if(themeResult) {
+        // JSON stringified content is generic and includes all items property at time of stringification
+        // So we parse it, then set content to itself, so that the mapping can be handled correctly.
+        try {
+          var parsedTheme = JSON.parse(themeResult);
+          var needsMigration = false;
+          if(parsedTheme.mobileRules) {
+            // Newer versions of the app persist a Theme object where mobileRules are nested in AppData.
+            // We want to check if the currently saved data is of the old format, which uses theme.mobileRules
+            // instead of theme.getMobileRules(). If so, we want to prepare it for the new format.
+            needsMigration = true;
+          }
+          let content = Object.assign({}, parsedTheme);
+          parsedTheme.content = content;
+
+          var theme = new Theme(parsedTheme);
+          if(needsMigration) {
+            theme.setMobileRules(parsedTheme.mobileRules);
+            theme.mobileRules = null;
+          }
+
+          theme.isSwapIn = true;
+          var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
+          var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
+          this.setStyles(rules, constants, theme.getMobileRules().statusBar);
+
+          this.activeTheme = theme;
+        } catch (e) {
+          console.error("Error parsing initial theme", e);
+          runDefaultTheme();
+        }
       } else {
-        var theme = this.systemTheme();
-        theme.active = true;
-        this.activeTheme = theme;
-        var constants = this.defaultConstants();
-        this.setStyles(this.defaultRules(constants), constants, theme.mobileRules.statusBar);
+        runDefaultTheme();
       }
     }.bind(this));
   }
@@ -48,9 +82,12 @@ export default class GlobalStyles {
 
     ModelManager.getInstance().addItemSyncObserver("themes", "SN|Theme", function(items){
       if(this.activeTheme && this.activeTheme.isSwapIn) {
-        this.activeTheme.isSwapIn = false;
-        this.activeTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
-        this.activeTheme.active = true;
+        var matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
+        if(matchingTheme) {
+          this.activeTheme = matchingTheme;
+          this.activeTheme.isSwapIn = false;
+          this.activeTheme.setMobileActive(true);
+        }
       }
     }.bind(this));
   }
@@ -75,22 +112,22 @@ export default class GlobalStyles {
   }
 
   static constantForKey(key) {
-    var value = this.get().constants[key];
+    var defaultValue = this.get().constants[key];
 
-    // For the platform value, if the active theme does not have a specific value, but the defaults do, we don't
-    // want to use the defaults, but instead just look at the activeTheme. Because default platform values only apply
-    // to the default theme
-    var platform = Platform.OS == "android" ? "Android" : "IOS";
-    if(!this.get().activeTheme.mobileRules) {
-      return null;
-    }
+    try {
+      // For the platform value, if the active theme does not have a specific value, but the defaults do, we don't
+      // want to use the defaults, but instead just look at the activeTheme. Because default platform values only apply
+      // to the default theme
+      var platform = Platform.OS == "android" ? "Android" : "IOS";
+      var platformValue = this.get().activeTheme.getMobileRules().constants[key+platform];
 
-    var platformValue = this.get().activeTheme.mobileRules.constants[key+platform];
-
-    if(platformValue) {
-      return platformValue;
-    } else {
-      return value;
+      if(platformValue) {
+        return platformValue;
+      } else {
+        return defaultValue;
+      }
+    } catch (e) {
+      return defaultValue;
     }
   }
 
@@ -98,18 +135,22 @@ export default class GlobalStyles {
     if(this._systemTheme) {
       return this._systemTheme;
     }
+
     var constants = this.defaultConstants();
+
     this._systemTheme = new Theme({
       name: "Default",
       default: true,
-      uuid: 0,
-      mobileRules: {
-        name: "Default",
-        rules: this.defaultRules(constants),
-        constants: constants,
-        statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
-      }
+      uuid: 0
     });
+
+    this._systemTheme.setMobileRules({
+      name: "Default",
+      rules: this.defaultRules(constants),
+      constants: constants,
+      statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
+    })
+
     return this._systemTheme;
   }
 
@@ -118,21 +159,24 @@ export default class GlobalStyles {
   }
 
   isThemeActive(theme) {
-    return this.activateThemeId === theme.uuid;
+    if(this.activeTheme) {
+      return theme.uuid == this.activeTheme.uuid;
+    }
+    return theme.isMobileActive();
   }
 
   activateTheme(theme, writeToStorage = true) {
     if(this.activeTheme) {
-      this.activeTheme.active = false;
+      this.activeTheme.setMobileActive(false);
     }
 
     var run = () => {
-      var constants = _.merge(this.defaultConstants(), theme.mobileRules.constants);
-      var rules = _.merge(this.defaultRules(constants), theme.mobileRules.rules);
-      this.setStyles(rules, constants, theme.mobileRules.statusBar);
+      var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
+      var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
+      this.setStyles(rules, constants, theme.getMobileRules().statusBar);
 
       this.activeTheme = theme;
-      theme.active = true;
+      theme.setMobileActive(true);
 
       if(theme.default) {
         Storage.removeItem("activeTheme");
@@ -143,11 +187,12 @@ export default class GlobalStyles {
       App.get().reload();
     }
 
-    if(!theme.mobileRules) {
+    if(!theme.hasMobileRules()) {
       this.downloadTheme(theme, function(){
-        if(theme.notAvailableOnMobile) {
+        if(theme.getNotAvailOnMobile()) {
           Alert.alert("Not Available", "This theme is not available on mobile.");
         } else {
+          Sync.getInstance().sync();
           run();
         }
       });
@@ -158,8 +203,8 @@ export default class GlobalStyles {
 
   async downloadTheme(theme, callback) {
     let errorBlock = (error) => {
-      if(!theme.notAvailableOnMobile) {
-        theme.notAvailableOnMobile = true;
+      if(!theme.getNotAvailOnMobile()) {
+        theme.setNotAvailOnMobile(true);
         theme.setDirty(true);
       }
 
@@ -168,17 +213,19 @@ export default class GlobalStyles {
       console.error("Theme download error", error);
     }
 
-    if(!theme.url) {
+    var url = theme.hosted_url || theme.url;
+
+    if(!url) {
       errorBlock(null);
       return;
     }
 
-    var url;
-
-    if(theme.url.includes("?")) {
-      url = theme.url.replace("?", ".json?");
+    if(url.includes("?")) {
+      url = url.replace("?", ".json?");
+    } else if(url.includes(".css?")) {
+      url = url.replace(".css?", ".json?");
     } else {
-      url = theme.url + ".json";
+      url = url + ".json";
     }
 
     if(App.isAndroid && url.includes("localhost")) {
@@ -187,13 +234,13 @@ export default class GlobalStyles {
 
     return Server.getInstance().getAbsolute(url, {}, function(response){
       // success
-      if(response !== theme.mobileRules) {
-        theme.mobileRules = response;
+      if(response !== theme.getMobileRules()) {
+        theme.setMobileRules(response);
         theme.setDirty(true);
       }
 
-      if(theme.notAvailableOnMobile) {
-        theme.notAvailableOnMobile = false;
+      if(theme.getNotAvailOnMobile()) {
+        theme.setNotAvailOnMobile(false);
         theme.setDirty(true);
       }
 
@@ -228,6 +275,16 @@ export default class GlobalStyles {
     setTimeout(function () {
       StatusBar.setBarStyle(statusBar, true);
     }, Platform.OS == "android" ? 100 : 0);
+  }
+
+  static isIPhoneX() {
+    // See https://mydevice.io/devices/ for device dimensions
+    const X_WIDTH = 375;
+    const X_HEIGHT = 812;
+    const { height: D_HEIGHT, width: D_WIDTH } = Dimensions.get('window');
+    return Platform.OS === 'ios' &&
+      ((D_HEIGHT === X_HEIGHT && D_WIDTH === X_WIDTH) ||
+        (D_HEIGHT === X_WIDTH && D_WIDTH === X_HEIGHT));
   }
 
   defaultConstants() {
@@ -295,13 +352,25 @@ export default class GlobalStyles {
         backgroundColor: constants.mainBackgroundColor
       },
 
+      sectionHeaderContainer: {
+        flex: 1,
+        flexGrow: 0,
+        justifyContent: "space-between",
+        flexDirection: 'row',
+        paddingRight: constants.paddingLeft,
+        paddingBottom: 10,
+        paddingTop: 10,
+      },
+
       sectionHeader: {
         fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
-        paddingBottom: 10,
-        paddingTop: 10,
         color: constants.mainDimColor,
         fontWeight: Platform.OS == "android" ? "bold" : "normal"
+      },
+
+      sectionHeaderButton: {
+        color: constants.mainTintColor
       },
 
       sectionHeaderAndroid: {
@@ -321,13 +390,16 @@ export default class GlobalStyles {
       },
 
       textInputCell: {
-        maxHeight: 50
+        maxHeight: 50,
+        paddingTop: 0,
+        paddingBottom: 0
       },
 
       sectionedTableCellTextInput: {
         fontSize: constants.mainTextFontSize,
         padding: 0,
         color: constants.mainTextColor,
+        height: "100%"
       },
 
       sectionedTableCellFirst: {

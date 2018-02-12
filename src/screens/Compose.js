@@ -281,7 +281,7 @@ export default class Compose extends Abstract {
           underlineColorAndroid={'transparent'}
           placeholderTextColor={GlobalStyles.constants().mainDimColor}
           autoCorrect={true}
-          autoCapitalize={'words'}
+          autoCapitalize={'sentences'}
         />
 
         {Platform.OS == "android" &&

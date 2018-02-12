@@ -20,7 +20,7 @@ export default class OptionsState {
   }
 
   async loadSaved() {
-    Storage.getItem("options").then(function(result){
+    return Storage.getItem("options").then(function(result){
       _.merge(this, _.omit(JSON.parse(result), ["changeObservers"]));
       this.notifyObservers();
     }.bind(this))

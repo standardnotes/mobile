@@ -91,13 +91,13 @@ export default class Auth {
     }
   }
 
-  login = (email, inputtedPassword, server, callback) => {
+  login = (email, inputtedPassword, server, extraParams, callback) => {
 
     this.postEvent(Auth.WillSignInEvent);
 
     var root = this;
 
-    this.getAuthParams(email, server, function(authParams, error){
+    this.getAuthParams(email, server, extraParams, function(authParams, error){
       if(error) {
         callback(null, error);
         return;
@@ -105,7 +105,7 @@ export default class Auth {
 
       Crypto.generateKeys(inputtedPassword, authParams, function(keys){
 
-        root.performLoginRequest(email, keys.pw, server, async function(response, error) {
+        root.performLoginRequest(email, keys.pw, server, extraParams, async function(response, error) {
           if(error) {
             callback(null, error);
             return;
@@ -152,9 +152,9 @@ export default class Auth {
     });
   }
 
-  async performLoginRequest(email, pw, server, callback) {
+  async performLoginRequest(email, pw, server, extraParams, callback) {
     var url = this.urlForPath("auth/sign_in", server);
-    Server.getInstance().postAbsolute(url, {email: email, password: pw}, function(response){
+    Server.getInstance().postAbsolute(url, _.merge({email: email, password: pw}, extraParams), function(response){
       callback(response, null);
     }, function(error){
       callback(null, error.error);
@@ -186,9 +186,9 @@ export default class Auth {
     }
   }
 
-  async getAuthParams(email, server, callback) {
+  async getAuthParams(email, server, extraParams, callback) {
     var url = this.urlForPath("auth/params", server);
-    Server.getInstance().getAbsolute(url, {email: email}, function(response){
+    Server.getInstance().getAbsolute(url, _.merge({email: email}, extraParams), function(response){
       callback(response, null);
     }, function(response){
       console.log("Error getting auth params", response);

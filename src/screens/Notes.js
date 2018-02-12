@@ -79,7 +79,9 @@ export default class Notes extends Abstract {
     Sync.getInstance().removeSyncObserver(this.syncObserver);
     Sync.getInstance().removeSyncStatusObserver(this.syncStatusObserver);
     Auth.getInstance().removeEventObserver(this.signoutObserver);
-    this.options.removeChangeObserver(this.optionsObserver);
+    if(this.options) {
+      this.options.removeChangeObserver(this.optionsObserver);
+    }
     clearInterval(this.syncTimer);
   }
 
@@ -370,12 +372,7 @@ export default class Notes extends Abstract {
     }
 
     if(item.errorDecrypting) {
-      AlertManager.showConfirmationAlert(
-        "Unable to Decrypt", "This note could not be decrypted. Perhaps it was encrypted with another key? Please visit standardnotes.org/help for more. Note: Editing this note may damage its original contents.", "Edit Anyway",
-        function(){
-          run();
-        }.bind(this)
-      )
+      Alert.alert("Unable to Decrypt", "This note could not be decrypted. Perhaps it was encrypted with another key? Please try signing out then signing back in, or visit standardnotes.org/help to learn more.");
     } else {
       run();
     }

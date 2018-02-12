@@ -34,7 +34,7 @@ export default class SortSection extends Component {
       <TableSection>
         <SectionHeader title={this.props.title} />
           <SectionedAccessoryTableCell
-            iconName={nameForIcon("flag")}
+            iconName={nameForIcon("bookmark")}
             onPress={() => {this.onPress(pinEvent)}}
             first={true} text={pinAction}
             leftAlignIcon={true}

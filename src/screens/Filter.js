@@ -165,7 +165,7 @@ export default class Filter extends Abstract {
         } else {
           this.didNotifyParent = true;
           this.notifyParentOfOptionsChange();
-          this.props.navigator.dismissModal({animationType: "slide-down"})
+          this.dismiss();
         }
       } else if(event.id == 'new-tag') {
         this.props.navigator.showModal({
@@ -187,6 +187,10 @@ export default class Filter extends Abstract {
         });
       }
     }
+  }
+
+  dismiss = () => {
+    this.props.navigator.dismissModal({animationType: "slide-down"})
   }
 
   createTag(text, callback) {
@@ -224,9 +228,13 @@ export default class Filter extends Abstract {
       }
     }
 
+    this.setSelectedTags(selectedTags);
+  }
+
+  setSelectedTags = (selectedTags) => {
     this.selectedTags = selectedTags.slice();
     this.options.setSelectedTags(selectedTags);
-    this.mergeState({selectedTags: selectedTags});
+    this.setState({selectedTags: selectedTags});
 
     if(this.props.singleSelectMode) {
       this.notifyParentOfOptionsChange();
@@ -269,6 +277,11 @@ export default class Filter extends Abstract {
     }
   }
 
+  clearTags = (close) => {
+    this.setSelectedTags([]);
+    if(close) { this.dismiss(); }
+  }
+
   render() {
     var viewStyles = [GlobalStyles.styles().container];
 
@@ -307,13 +320,15 @@ export default class Filter extends Abstract {
           }
 
           { this.note &&
-              <ManageNote note={this.note} title={"Manage Note"} onEvent={this.onManageNoteEvent.bind(this)}/>
+            <ManageNote note={this.note} title={"Manage Note"} onEvent={this.onManageNoteEvent.bind(this)}/>
           }
 
           <TagsSection
             tags={this.tags}
             selected={this.state.selectedTags}
             onTagSelect={this.onTagSelect}
+            hasClearButton={!this.props.singleSelectMode && this.state.selectedTags.length > 0}
+            clearSelection={this.clearTags}
             onManageTagEvent={this.onManageTagEvent}
             title={"Tags"}
            />
@@ -328,7 +343,7 @@ export default class Filter extends Abstract {
 class TagsSection extends Component {
   constructor(props) {
     super(props);
-    this.state = {selected: props.selected};
+    this.state = {};
   }
 
   onPress = (tag) => {
@@ -383,7 +398,7 @@ class TagsSection extends Component {
           key={item.uuid}
           first={this.props.tags.indexOf(item) == 0}
           last={this.props.tags.indexOf(item) == this.props.tags.length - 1}
-          selected={() => {return this.state.selected.includes(item.uuid)}}
+          selected={() => {return this.props.selected.includes(item.uuid)}}
         />
 
         <ActionSheet
@@ -402,7 +417,7 @@ class TagsSection extends Component {
   render() {
     return (
       <TableSection style={GlobalStyles.styles().view}>
-        <SectionHeader title={this.props.title} />
+        <SectionHeader title={this.props.title} buttonText={this.props.hasClearButton && "Clear"} buttonAction={() => {this.props.clearSelection(true)}}/>
 
         <FlatList style={{height: "100%"}}
           initialNumToRender={10}

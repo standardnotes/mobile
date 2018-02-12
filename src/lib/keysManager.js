@@ -8,6 +8,7 @@ var _ = require('lodash')
 import FlagSecure from 'react-native-flag-secure-android';
 import App from "../app"
 import ApplicationState from "../ApplicationState"
+import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 let OfflineParamsKey = "pc_params";
 let FirstRunKey = "first_run";
@@ -346,6 +347,21 @@ export default class KeysManager {
       {title: "Immediately", key: "immediately", selected: this.fingerprintTiming == "immediately"},
       {title: "On Quit", key: "on-quit", selected: this.fingerprintTiming == "on-quit"},
     ]
+  }
+
+  static getDeviceBiometricsAvailability(callback) {
+    if(__DEV__) {
+      callback(true, "touch", "Fingerprint");
+      return;
+    }
+    FingerprintScanner.isSensorAvailable()
+    .then((type) => {
+      var noun = (!type || type == "touch") ? "Fingerprint" : "Face ID";
+      callback(true, type, noun);
+    })
+    .catch((error) => {
+      callback(false);
+    })
   }
 
 }
