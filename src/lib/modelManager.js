@@ -6,6 +6,7 @@ import Item from "../models/api/item"
 import Note from "../models/app/note"
 import Tag from "../models/app/tag"
 import Theme from "../models/app/theme"
+import Component from "../models/app/component"
 
 export default class ModelManager {
 
@@ -27,7 +28,7 @@ export default class ModelManager {
     this.itemsPendingRemoval = [];
     this.itemSyncObservers = [];
 
-    this.acceptableContentTypes = ["Note", "Tag", "SN|Theme"];
+    this.acceptableContentTypes = ["Note", "Tag", "SN|Theme", "SN|Component"];
   }
 
   handleSignout() {
@@ -108,7 +109,7 @@ export default class ModelManager {
       }
 
       // Lodash's _.omit, which was previously used, seems to cause unexpected behavior
-      // when json_obj is an ES6 item class. So we instead manually omit each key. 
+      // when json_obj is an ES6 item class. So we instead manually omit each key.
       if(Array.isArray(omitFields)) {
         for(var key of omitFields) {
           delete json_obj[key];
@@ -176,6 +177,8 @@ export default class ModelManager {
       item = new Tag(json_obj);
     } else if(json_obj.content_type == "SN|Theme") {
       item = new Theme(json_obj);
+    } else if(json_obj.content_type == "SN|Component") {
+      item = new Component(json_obj);
     }
 
     else {

@@ -7,6 +7,7 @@ import Authenticate from './Authenticate'
 import Filter from './Filter'
 import InputModal from './InputModal'
 import Sync from '../lib/sync'
+import Webview from './Webview'
 
 export function registerScreens() {
   Navigation.registerComponent('sn.Notes', () => Notes);
@@ -15,4 +16,5 @@ export function registerScreens() {
   Navigation.registerComponent('sn.Filter', () => Filter);
   Navigation.registerComponent('sn.InputModal', () => InputModal);
   Navigation.registerComponent('sn.Authenticate', () => Authenticate);
+  Navigation.registerComponent('sn.Webview', () => Webview);
 }
