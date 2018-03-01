@@ -15,6 +15,9 @@ export default class ItemActionManager {
   static ArchiveEvent = "ArchiveEvent";
   static UnarchiveEvent = "UnarchiveEvent";
 
+  static LockEvent = "LockEvent";
+  static UnlockEvent = "UnlockEvent";
+
   static ShareEvent = "ShareEvent";
 
   /* The afterConfirmCallback is called after user confirms deletion pop up */
@@ -44,6 +47,13 @@ export default class ItemActionManager {
       Sync.getInstance().sync();
       callback && callback();
     }
+
+    else if(event == this.LockEvent || event == this.UnlockEvent) {
+     item.setAppDataItem("locked", event == this.LockEvent);
+     item.setDirty(true);
+     Sync.getInstance().sync();
+     callback && callback();
+   }
 
      else if(event == this.ArchiveEvent || event == this.UnarchiveEvent) {
       item.setAppDataItem("archived", event == this.ArchiveEvent);

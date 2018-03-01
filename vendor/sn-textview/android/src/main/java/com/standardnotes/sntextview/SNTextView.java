@@ -117,6 +117,10 @@ public class SNTextView extends LinearLayout {
         }
     }
 
+    public void setEditable(boolean editable) {
+        editText.setEnabled(editable);
+    }
+
     public void blur() {
         editText.clearFocus();
 

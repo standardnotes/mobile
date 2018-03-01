@@ -14,7 +14,7 @@
 
 @property (nonatomic, copy) RCTBubblingEventBlock onChangeText;
 @property (nonatomic, assign) UIScrollViewKeyboardDismissMode keyboardDismissMode;
-
+@property (nonatomic, assign) BOOL editable;
 @property (nonatomic, assign) CGFloat paddingTop;
 @property (nonatomic, assign) CGFloat paddingLeft;
 @property (nonatomic, assign) CGFloat paddingRight;

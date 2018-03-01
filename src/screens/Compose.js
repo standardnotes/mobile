@@ -7,6 +7,7 @@ import Abstract from "./Abstract"
 import Icons from '../Icons';
 import App from '../app'
 import LockedView from "../containers/LockedView";
+import Icon from 'react-native-vector-icons/Ionicons';
 var _ = require('lodash');
 
 import TextView from "sn-textview";
@@ -17,7 +18,8 @@ import {
   View,
   KeyboardAvoidingView,
   Platform,
-  Keyboard
+  Keyboard,
+  Text
 } from 'react-native';
 
 import GlobalStyles from "../Styles"
@@ -144,6 +146,7 @@ export default class Compose extends Abstract {
       animationType: 'slide-up',
       passProps: {
         noteId: this.note.uuid,
+        onManageNoteEvent: () => {this.forceUpdate()},
         singleSelectMode: false,
         options: JSON.stringify(this.previousOptions),
         onOptionsChange: (options) => {
@@ -272,6 +275,14 @@ export default class Compose extends Abstract {
 
     return (
       <View style={[this.styles.container, GlobalStyles.styles().container]}>
+
+        {this.note.locked &&
+          <View style={this.styles.lockedContainer}>
+            <Icon name={Icons.nameForIcon("lock")} size={20} color={GlobalStyles.constants().mainTintColor} />
+            <Text style={this.styles.lockedText}>Note Locked</Text>
+          </View>
+        }
+
         <TextInput
           style={this.styles.noteTitle}
           onChangeText={this.onTitleChange}
@@ -282,6 +293,7 @@ export default class Compose extends Abstract {
           placeholderTextColor={GlobalStyles.constants().mainDimColor}
           autoCorrect={true}
           autoCapitalize={'sentences'}
+          editable={!this.note.locked}
         />
 
         {Platform.OS == "android" &&
@@ -293,6 +305,7 @@ export default class Compose extends Abstract {
               selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
               handlesColor={GlobalStyles.constants().mainTintColor}
               onChangeText={this.onTextChange}
+              editable={!this.note.locked}
             />
           </View>
         }
@@ -305,6 +318,7 @@ export default class Compose extends Abstract {
             keyboardDismissMode={'interactive'}
             selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
             onChangeText={this.onTextChange}
+            editable={!this.note.locked}
           />
         }
       </View>
@@ -329,6 +343,25 @@ export default class Compose extends Abstract {
         paddingTop: Platform.OS === "ios" ? 5 : 12,
         paddingLeft: GlobalStyles.constants().paddingLeft,
         paddingRight: GlobalStyles.constants().paddingLeft,
+      },
+
+      lockedContainer: {
+        flex: 1,
+        justifyContent: 'flex-start',
+        flexDirection: 'row',
+        alignItems: "center",
+        height: 30,
+        maxHeight: 30,
+        paddingLeft: GlobalStyles.constants().paddingLeft,
+        backgroundColor: GlobalStyles.constants().selectedBackgroundColor,
+        borderBottomColor: GlobalStyles.constants().plainCellBorderColor,
+        borderBottomWidth: 1
+      },
+
+      lockedText: {
+        fontWeight: "bold",
+        color: GlobalStyles.constants().mainTintColor,
+        paddingLeft: 10
       },
 
       textContainer: {

@@ -260,6 +260,7 @@ export default class Filter extends Abstract {
 
   onManageNoteEvent(event) {
     ItemActionManager.handleEvent(event, this.note, () => {
+        this.props.onManageNoteEvent();
         if(event == ItemActionManager.DeleteEvent) {
           this.props.navigator.popToRoot({
             animated: true,
