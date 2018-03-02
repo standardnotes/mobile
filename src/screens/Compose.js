@@ -278,7 +278,7 @@ export default class Compose extends Abstract {
 
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
-            <Icon name={Icons.nameForIcon("lock")} size={20} color={GlobalStyles.constants().mainTintColor} />
+            <Icon name={Icons.nameForIcon("lock")} size={20} color={GlobalStyles.constants().mainBackgroundColor} />
             <Text style={this.styles.lockedText}>Note Locked</Text>
           </View>
         }
@@ -353,14 +353,14 @@ export default class Compose extends Abstract {
         height: 30,
         maxHeight: 30,
         paddingLeft: GlobalStyles.constants().paddingLeft,
-        backgroundColor: GlobalStyles.constants().selectedBackgroundColor,
+        backgroundColor: GlobalStyles.constants().mainTintColor,
         borderBottomColor: GlobalStyles.constants().plainCellBorderColor,
         borderBottomWidth: 1
       },
 
       lockedText: {
         fontWeight: "bold",
-        color: GlobalStyles.constants().mainTintColor,
+        color: GlobalStyles.constants().mainBackgroundColor,
         paddingLeft: 10
       },
 
