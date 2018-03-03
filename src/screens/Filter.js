@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, SectionList, ScrollView, View, Text, Share, Platform, StatusBar, FlatList, Dimensions } from 'react-native';
+import { TextInput, SectionList, ScrollView, View, Text, Share, Platform, StatusBar, FlatList, Dimensions, Alert } from 'react-native';
 var _ = require('lodash')
 
 import Sync from '../lib/sync'
@@ -168,6 +168,7 @@ export default class Filter extends Abstract {
           this.dismiss();
         }
       } else if(event.id == 'new-tag') {
+	var tags = ModelManager.getInstance().tags.slice();
         this.props.navigator.showModal({
           screen: 'sn.InputModal',
           title: 'New Tag',
@@ -175,6 +176,13 @@ export default class Filter extends Abstract {
           passProps: {
             title: 'New Tag',
             placeholder: "New tag name",
+	    validate: (text) => {
+	      var tagExists = !!_.find(tags, { title: text });
+	      return !tagExists;
+	    },
+	    onError: (text) => {
+              Alert.alert('Duplicate Tag', `You already have a tag named '${text}'.`, [{text: 'OK'}]);
+	    },
             onSave: (text) => {
               this.createTag(text, function(tag){
                 if(this.note) {
