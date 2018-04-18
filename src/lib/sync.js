@@ -292,6 +292,10 @@ export default class Sync {
         itemParams.additionalFields = options.additionalFields;
         var result = await itemParams.paramsForSync();
         params.items.push(result);
+
+        // Reset dirty counter to 0, since we're about to sync it.
+        // This means anyone marking the item as dirty after this will cause it so sync again and not be cleared on sync completion.
+        item.dirtyCount = 0;
       }
     }
 
@@ -304,7 +308,16 @@ export default class Sync {
 
     var onSyncSuccess = async function(response) {
       console.log("Sync completed.");
-      ModelManager.getInstance().clearDirtyItems(subItems);
+
+      // Check to make sure any subItem hasn't been marked as dirty again while a sync was ongoing
+      var itemsToClearAsDirty = [];
+      for(var item of subItems) {
+        if(item.dirtyCount == 0) {
+          // Safe to clear as dirty
+          itemsToClearAsDirty.push(item);
+        }
+      }
+      ModelManager.getInstance().clearDirtyItems(itemsToClearAsDirty);
       this.syncStatus.error = null;
 
       // this.$rootScope.$broadcast("sync:updated_token", this.syncToken);
