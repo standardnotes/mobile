@@ -1,5 +1,5 @@
 const Ionicons = require('react-native-vector-icons/Ionicons');
-
+import { Platform } from 'react-native';
 import GlobalStyles from "./Styles"
 
 let iconsMap = {};
@@ -22,6 +22,12 @@ export default class Icons {
 
   constructor() {
     this.loadIcons();
+  }
+
+  static nameForIcon(iconName) {
+    const iconPrefix = Platform.OS == "android" ? "md" : "ios";
+    const suffix = Platform.OS == "android" ? "" : "-outline";
+    return iconPrefix + "-" + iconName + suffix;
   }
 
   async loadIcons(callback) {

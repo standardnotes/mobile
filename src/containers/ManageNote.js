@@ -4,6 +4,7 @@ import SectionHeader from "../components/SectionHeader";
 import TableSection from "../components/TableSection";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import ItemActionManager from '../lib/itemActionManager'
+import Icons from "../Icons";
 
 import GlobalStyles from "../Styles"
 
@@ -25,37 +26,42 @@ export default class SortSection extends Component {
     var archiveOption = this.props.note.archived ? "Unarchive" : "Archive";
     let archiveEvent = archiveOption == "Archive" ? ItemActionManager.ArchiveEvent : ItemActionManager.UnarchiveEvent;
 
-    var iconPrefix = Platform.OS == "android" ? "md" : "ios";
-    var suffix = Platform.OS == "android" ? "" : "-outline";
-    function nameForIcon(iconName) {
-      return iconPrefix + "-" + iconName + suffix;
-    }
+    var lockOption = this.props.note.locked ? "Unlock" : "Lock";
+    let lockEvent = lockOption == "Lock" ? ItemActionManager.LockEvent : ItemActionManager.UnlockEvent;
+
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
           <SectionedAccessoryTableCell
-            iconName={nameForIcon("bookmark")}
+            iconName={Icons.nameForIcon("bookmark")}
             onPress={() => {this.onPress(pinEvent)}}
             first={true} text={pinAction}
             leftAlignIcon={true}
           />
 
           <SectionedAccessoryTableCell
-            iconName={nameForIcon("archive")}
+            iconName={Icons.nameForIcon("archive")}
             onPress={() => {this.onPress(archiveEvent)}}
             text={archiveOption}
             leftAlignIcon={true}
           />
 
           <SectionedAccessoryTableCell
-          iconName={nameForIcon("share")}
+            iconName={Icons.nameForIcon("lock")}
+            onPress={() => {this.onPress(lockEvent)}}
+            text={lockOption}
+            leftAlignIcon={true}
+          />
+
+          <SectionedAccessoryTableCell
+          iconName={Icons.nameForIcon("share")}
           onPress={() => {this.onPress(ItemActionManager.ShareEvent)}}
           text={"Share"}
           leftAlignIcon={true}
           />
 
           <SectionedAccessoryTableCell
-          iconName={nameForIcon("trash")}
+          iconName={Icons.nameForIcon("trash")}
           onPress={() => {this.onPress(ItemActionManager.DeleteEvent)}}
           text={"Delete"}
           last={true}

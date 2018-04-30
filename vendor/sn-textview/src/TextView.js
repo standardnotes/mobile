@@ -48,6 +48,7 @@ TextView.propTypes = {
   onChangeText: PropTypes.func,
   text: PropTypes.string,
   autoFocus: PropTypes.bool,
+  editable: PropTypes.bool,
   handlesColor: ColorPropType,
   keyboardDismissMode: PropTypes.oneOf([
       'none', // default

@@ -16,6 +16,7 @@ RCT_EXPORT_MODULE()
 RCT_EXPORT_VIEW_PROPERTY(text, NSString)
 RCT_EXPORT_VIEW_PROPERTY(onChangeText, RCTBubblingEventBlock)
 RCT_REMAP_VIEW_PROPERTY(keyboardDismissMode, keyboardDismissMode, UIScrollViewKeyboardDismissMode)
+RCT_REMAP_VIEW_PROPERTY(editable, editable, BOOL)
 RCT_REMAP_VIEW_PROPERTY(color, textColor, UIColor)
 RCT_REMAP_VIEW_PROPERTY(selectionColor, tintColor, UIColor)
 RCT_EXPORT_VIEW_PROPERTY(paddingTop, CGFloat)
@@ -50,7 +51,7 @@ RCT_CUSTOM_VIEW_PROPERTY(fontFamily, NSString, SNTextView)
 # pragma Text View Delegate
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-    
+
 }
 
 - (void)textViewDidChange:(SNTextView *)textView

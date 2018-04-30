@@ -66,6 +66,16 @@ export default class Item {
 
   setDirty(dirty) {
     this.dirty = dirty;
+
+    // Allows the syncManager to check if an item has been marked dirty after a sync has been started
+    // This prevents it from clearing it as a dirty item after sync completion, if someone else has marked it dirty
+    // again after an ongoing sync.
+    if(!this.dirtyCount) { this.dirtyCount = 0; }
+    if(dirty) {
+      this.dirtyCount++;
+    } else {
+      this.dirtyCount = 0;
+    }
   }
 
   markAllReferencesDirty() {
@@ -152,6 +162,18 @@ export default class Item {
 
   doNotEncrypt() {
     return false;
+  }
+
+  get pinned() {
+    return this.getAppDataItem("pinned");
+  }
+
+  get archived() {
+    return this.getAppDataItem("archived");
+  }
+
+  get locked() {
+    return this.getAppDataItem("locked");
   }
 
   /*

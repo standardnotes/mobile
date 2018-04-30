@@ -86,6 +86,11 @@ public class SNTextViewManager extends SimpleViewManager<SNTextView> {
         view.setAutoFocus(autoFocus);
     }
 
+    @ReactProp(name = "editable")
+    public void setEditable(SNTextView view, boolean editable) {
+        view.setEditable(editable);
+    }
+
     @ReactMethod
     public void blur(SNTextView view) {
         view.blur();
