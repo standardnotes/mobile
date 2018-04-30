@@ -50,6 +50,42 @@ export default class Compose extends Abstract {
     });
 
     this.configureNavBar(true);
+
+    // A delay is required. Otherwise, on iOS, if loading without delay, then dismissing, clicking "Manage" doesn't work.
+    setTimeout(() => {
+      this.loadEditor();
+    }, App.isIOS ? 550 : 25);
+  }
+
+  loadEditor() {
+    var noteEditor;
+    let editors = ModelManager.getInstance().itemsForContentType("SN|Component").filter(function(component){
+      return component.area == "editor-editor";
+    })
+    for(var editor of editors) {
+      if(editor.isExplicitlyEnabledForItem(this.note)) {
+        noteEditor = editor;
+      }
+    }
+
+    if(!noteEditor) {
+      // No editor found for note. Use default editor, if note does not prefer system editor
+      if(!this.note.getAppDataItem("prefersPlainEditor")) {
+        return editors.filter((e) => {return e.isDefaultEditor()})[0];
+      }
+    }
+
+    if(noteEditor) {
+      this.props.navigator.showModal({
+        screen: 'sn.Webview',
+        title: noteEditor.name,
+        animationType: 'slide-up',
+        passProps: {
+          noteId: this.note.uuid,
+          editorId: noteEditor.uuid
+        }
+      });
+    }
   }
 
   componentWillUnmount() {

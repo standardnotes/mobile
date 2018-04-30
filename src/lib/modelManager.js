@@ -21,6 +21,15 @@ export default class ModelManager {
   }
 
   constructor() {
+    ModelManager.MappingSourceRemoteRetrieved = "MappingSourceRemoteRetrieved";
+    ModelManager.MappingSourceRemoteSaved = "MappingSourceRemoteSaved";
+    ModelManager.MappingSourceLocalSaved = "MappingSourceLocalSaved";
+    ModelManager.MappingSourceLocalRetrieved = "MappingSourceLocalRetrieved";
+    ModelManager.MappingSourceComponentRetrieved = "MappingSourceComponentRetrieved";
+    ModelManager.MappingSourceDesktopInstalled = "MappingSourceDesktopInstalled"; // When a component is installed by the desktop and some of its values change
+    ModelManager.MappingSourceRemoteActionRetrieved = "MappingSourceRemoteActionRetrieved"; /* aciton-based Extensions like note history */
+    ModelManager.MappingSourceFileImport = "MappingSourceFileImport";
+
     this.items = [];
     this.notes = [];
     this.tags = [];
@@ -93,11 +102,11 @@ export default class ModelManager {
     return tag;
   }
 
-  mapResponseItemsToLocalModels(items) {
-    return this.mapResponseItemsToLocalModelsOmittingFields(items, null);
+  mapResponseItemsToLocalModels(items, source) {
+    return this.mapResponseItemsToLocalModelsOmittingFields(items, null, source);
   }
 
-  mapResponseItemsToLocalModelsOmittingFields(items, omitFields) {
+  mapResponseItemsToLocalModelsOmittingFields(items, omitFields, source) {
     var models = [], processedObjects = [], modelsToNotifyObserversOf = [];
 
     // first loop should add and process items
@@ -155,16 +164,16 @@ export default class ModelManager {
       }
     }
 
-    this.notifySyncObserversOfModels(modelsToNotifyObserversOf);
+    this.notifySyncObserversOfModels(modelsToNotifyObserversOf, source);
 
     return models;
   }
 
-  notifySyncObserversOfModels(models) {
+  notifySyncObserversOfModels(models, source) {
     for(var observer of this.itemSyncObservers) {
       var relevantItems = models.filter(function(item){return item.content_type == observer.type || observer.type == "*"});
       if(relevantItems.length > 0) {
-        observer.callback(relevantItems);
+        observer.callback(relevantItems, source);
       }
     }
   }

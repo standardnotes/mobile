@@ -283,9 +283,8 @@ export default class Filter extends Abstract {
       title: editor.name,
       animationType: 'slide-up',
       passProps: {
-        note: this.note,
-        editor: editor,
-        onChangesMade: this.props.onChangesMade
+        noteId: this.note.uuid,
+        editorId: editor.uuid
       }
     });
   }
@@ -343,7 +342,7 @@ export default class Filter extends Abstract {
           }
 
           { this.note &&
-            <EditorsSection editors={this.getEditors()} title={"Editors"} onEditorSelect={this.onEditorSelect.bind(this)}/>
+            <EditorsSection editors={this.getEditors()} title={"Web Editors"} onEditorSelect={this.onEditorSelect.bind(this)}/>
           }
 
           <TagsSection
@@ -524,7 +523,6 @@ class SortSection extends Component {
 
 class EditorsSection extends Component {
   constructor(props) {
-    console.log("Constructing editor section", props);
     super(props);
   }
 
