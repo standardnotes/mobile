@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Sync from '../lib/sync'
 import Auth from '../lib/auth'
 import ModelManager from '../lib/modelManager'
+import ComponentManager from '../lib/componentManager'
 import Note from '../models/app/note'
 import Abstract from "./Abstract"
 import Icons from '../Icons';
@@ -58,22 +59,7 @@ export default class Compose extends Abstract {
   }
 
   loadEditor() {
-    var noteEditor;
-    let editors = ModelManager.getInstance().itemsForContentType("SN|Component").filter(function(component){
-      return component.area == "editor-editor";
-    })
-    for(var editor of editors) {
-      if(editor.isExplicitlyEnabledForItem(this.note)) {
-        noteEditor = editor;
-      }
-    }
-
-    if(!noteEditor) {
-      // No editor found for note. Use default editor, if note does not prefer system editor
-      if(!this.note.getAppDataItem("prefersPlainEditor")) {
-        return editors.filter((e) => {return e.isDefaultEditor()})[0];
-      }
-    }
+    var noteEditor = ComponentManager.get().editorForNote(this.note);
 
     if(noteEditor) {
       this.props.navigator.showModal({

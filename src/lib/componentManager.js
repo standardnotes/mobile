@@ -350,10 +350,69 @@ export default class ComponentManager {
 
   postActiveThemeToComponent(component) {
     var activeTheme = GlobalStyles.get().activeTheme;
+
     var data = {
-      themes: [activeTheme ? this.urlForComponent(activeTheme) : null]
+      themes: [(activeTheme && !activeTheme.default) ? this.urlForComponent(activeTheme) : null]
     }
 
     this.sendMessageToComponent(component, {action: "themes", data: data})
+  }
+
+  editorForNote(note) {
+    let editors = ModelManager.getInstance().itemsForContentType("SN|Component").filter(function(component){
+      return component.area == "editor-editor";
+    })
+
+    for(var editor of editors) {
+      if(editor.isExplicitlyEnabledForItem(note)) {
+        return editor;
+      }
+    }
+
+    // No editor found for note. Use default editor, if note does not prefer system editor
+    if(!note.getAppDataItem("prefersPlainEditor")) {
+      return editors.filter((e) => {return e.isDefaultEditor()})[0];
+    }
+  }
+
+  associateEditorWithNote(editor, note) {
+    var currentEditor = this.editorForNote(note);
+    if(currentEditor && currentEditor !== editor) {
+      // Disassociate currentEditor with note
+      currentEditor.associatedItemIds = currentEditor.associatedItemIds.filter((id) => {return id !== note.uuid});
+
+      if(!currentEditor.disassociatedItemIds.includes(note.uuid)) {
+        currentEditor.disassociatedItemIds.push(note.uuid);
+      }
+
+      currentEditor.setDirty(true);
+    }
+
+    if(editor) {
+      if(note.getAppDataItem("prefersPlainEditor") == true) {
+        note.setAppDataItem("prefersPlainEditor", false);
+        note.setDirty(true);
+      }
+
+      editor.disassociatedItemIds = editor.disassociatedItemIds.filter((id) => {return id !== note.uuid});
+
+      if(!editor.associatedItemIds.includes(note.uuid)) {
+        editor.associatedItemIds.push(note.uuid);
+      }
+
+      editor.setDirty(true);
+    } else {
+      // Note prefers plain editor
+      if(!note.getAppDataItem("prefersPlainEditor")) {
+        note.setAppDataItem("prefersPlainEditor", true);
+        note.setDirty(true);
+      }
+    }
+
+    Sync.getInstance().sync();
+  }
+
+  clearEditorForNote(note) {
+    this.associateEditorWithNote(null, note);
   }
 }
