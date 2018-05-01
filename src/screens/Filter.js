@@ -283,6 +283,8 @@ export default class Filter extends Abstract {
   }
 
   onEditorSelect = (editor) => {
+    this.props.onEditorSelect && this.props.onEditorSelect(editor);
+    
     if(editor) {
       this.props.navigator.showModal({
         screen: 'sn.Webview',
