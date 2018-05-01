@@ -95,7 +95,6 @@ export default class Webview extends Abstract {
           title: 'Done',
           id: 'accept',
           showAsAction: 'ifRoom',
-          buttonColor: GlobalStyles.constants().mainTintColor,
           buttonFontSize: 17
         }
       ],

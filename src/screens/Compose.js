@@ -55,7 +55,7 @@ export default class Compose extends Abstract {
     // A delay is required. Otherwise, on iOS, if loading without delay, then dismissing, clicking "Manage" doesn't work.
     setTimeout(() => {
       this.loadEditor();
-    }, App.isIOS ? 550 : 25);
+    }, App.isIOS ? 550 : 50);
   }
 
   refreshContent() {

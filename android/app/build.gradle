@@ -97,7 +97,7 @@ android {
         applicationId "com.standardnotes"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 2010300
+        versionCode 2010301
         versionName "2.1.30"
         multiDexEnabled  true
         ndk {
