@@ -150,7 +150,11 @@ export default class ComponentManager {
 
   urlForComponent(component) {
     var localReplacement = App.isIOS ? "localhost" : "10.0.2.2";
-    return (component.hosted_url || component.url).replace("localhost", localReplacement).replace("sn.local", localReplacement);
+    var url = component.hosted_url || component.url;
+    if(url) {
+      url = url.replace("localhost", localReplacement).replace("sn.local", localReplacement);
+    }
+    return url;
   }
 
   componentForUrl(url) {

@@ -9,7 +9,7 @@ import Abstract from "./Abstract"
 import GlobalStyles from "../Styles"
 var _ = require('lodash')
 
-import { View, WebView } from 'react-native';
+import { Alert, View, WebView } from 'react-native';
 
 export default class Webview extends Abstract {
 
@@ -18,6 +18,11 @@ export default class Webview extends Abstract {
 
     this.editor = ModelManager.getInstance().findItem(props.editorId);
     this.note = ModelManager.getInstance().findItem(props.noteId);
+
+    if(!ComponentManager.get().urlForComponent(this.editor)) {
+      Alert.alert('Re-install Extension', `This extension is not installed correctly. Please use the web or desktop application to reinstall ${this.editor.name}, then try again.`, [{text: 'OK'}])
+      return;
+    }
 
     this.handler = ComponentManager.get().registerHandler({identifier: "editor", areas: ["note-tags", "editor-stack", "editor-editor"],
        contextRequestHandler: (component) => {
