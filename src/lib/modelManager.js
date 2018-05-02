@@ -6,6 +6,7 @@ import Item from "../models/api/item"
 import Note from "../models/app/note"
 import Tag from "../models/app/tag"
 import Theme from "../models/app/theme"
+import Component from "../models/app/component"
 
 export default class ModelManager {
 
@@ -20,6 +21,15 @@ export default class ModelManager {
   }
 
   constructor() {
+    ModelManager.MappingSourceRemoteRetrieved = "MappingSourceRemoteRetrieved";
+    ModelManager.MappingSourceRemoteSaved = "MappingSourceRemoteSaved";
+    ModelManager.MappingSourceLocalSaved = "MappingSourceLocalSaved";
+    ModelManager.MappingSourceLocalRetrieved = "MappingSourceLocalRetrieved";
+    ModelManager.MappingSourceComponentRetrieved = "MappingSourceComponentRetrieved";
+    ModelManager.MappingSourceDesktopInstalled = "MappingSourceDesktopInstalled"; // When a component is installed by the desktop and some of its values change
+    ModelManager.MappingSourceRemoteActionRetrieved = "MappingSourceRemoteActionRetrieved"; /* aciton-based Extensions like note history */
+    ModelManager.MappingSourceFileImport = "MappingSourceFileImport";
+
     this.items = [];
     this.notes = [];
     this.tags = [];
@@ -27,7 +37,7 @@ export default class ModelManager {
     this.itemsPendingRemoval = [];
     this.itemSyncObservers = [];
 
-    this.acceptableContentTypes = ["Note", "Tag", "SN|Theme"];
+    this.acceptableContentTypes = ["Note", "Tag", "SN|Theme", "SN|Component"];
   }
 
   handleSignout() {
@@ -92,11 +102,11 @@ export default class ModelManager {
     return tag;
   }
 
-  mapResponseItemsToLocalModels(items) {
-    return this.mapResponseItemsToLocalModelsOmittingFields(items, null);
+  mapResponseItemsToLocalModels(items, source) {
+    return this.mapResponseItemsToLocalModelsOmittingFields(items, null, source);
   }
 
-  mapResponseItemsToLocalModelsOmittingFields(items, omitFields) {
+  mapResponseItemsToLocalModelsOmittingFields(items, omitFields, source) {
     var models = [], processedObjects = [], modelsToNotifyObserversOf = [];
 
     // first loop should add and process items
@@ -108,7 +118,7 @@ export default class ModelManager {
       }
 
       // Lodash's _.omit, which was previously used, seems to cause unexpected behavior
-      // when json_obj is an ES6 item class. So we instead manually omit each key. 
+      // when json_obj is an ES6 item class. So we instead manually omit each key.
       if(Array.isArray(omitFields)) {
         for(var key of omitFields) {
           delete json_obj[key];
@@ -154,16 +164,16 @@ export default class ModelManager {
       }
     }
 
-    this.notifySyncObserversOfModels(modelsToNotifyObserversOf);
+    this.notifySyncObserversOfModels(modelsToNotifyObserversOf, source);
 
     return models;
   }
 
-  notifySyncObserversOfModels(models) {
+  notifySyncObserversOfModels(models, source) {
     for(var observer of this.itemSyncObservers) {
       var relevantItems = models.filter(function(item){return item.content_type == observer.type || observer.type == "*"});
       if(relevantItems.length > 0) {
-        observer.callback(relevantItems);
+        observer.callback(relevantItems, source);
       }
     }
   }
@@ -176,6 +186,8 @@ export default class ModelManager {
       item = new Tag(json_obj);
     } else if(json_obj.content_type == "SN|Theme") {
       item = new Theme(json_obj);
+    } else if(json_obj.content_type == "SN|Component") {
+      item = new Component(json_obj);
     }
 
     else {

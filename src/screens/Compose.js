@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Sync from '../lib/sync'
 import Auth from '../lib/auth'
 import ModelManager from '../lib/modelManager'
+import ComponentManager from '../lib/componentManager'
 import Note from '../models/app/note'
 import Abstract from "./Abstract"
 import Icons from '../Icons';
@@ -45,11 +46,37 @@ export default class Compose extends Abstract {
 
     this.syncObserver = Sync.getInstance().registerSyncObserver((changesMade, retreived, saved) => {
       if(retreived && this.note.uuid && retreived.map((i) => i.uuid).includes(this.note.uuid)) {
-        this.mergeState({title: this.note.title, text: this.note.text});
+        this.refreshContent();
       }
     });
 
     this.configureNavBar(true);
+
+    // A delay is required. Otherwise, on iOS, if loading without delay, then dismissing, clicking "Manage" doesn't work.
+    setTimeout(() => {
+      this.loadEditor();
+    }, App.isIOS ? 550 : 50);
+  }
+
+  refreshContent() {
+    this.mergeState({title: this.note.title, text: this.note.text});
+  }
+
+  loadEditor() {
+    var noteEditor = ComponentManager.get().editorForNote(this.note);
+
+    if(noteEditor) {
+      this.presentedEditor = true;
+      this.props.navigator.showModal({
+        screen: 'sn.Webview',
+        title: noteEditor.name,
+        animationType: 'slide-up',
+        passProps: {
+          noteId: this.note.uuid,
+          editorId: noteEditor.uuid
+        }
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -120,6 +147,12 @@ export default class Compose extends Abstract {
         }
       }
     } else if(event.id == "willAppear") {
+      // Changes made in an external editor are not reflected automatically
+      if(this.presentedEditor) {
+        this.presentedEditor = false;
+        this.refreshContent();
+      }
+
       if(this.note.dirty) {
         // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
         setTimeout(() => {
@@ -149,6 +182,7 @@ export default class Compose extends Abstract {
         onManageNoteEvent: () => {this.forceUpdate()},
         singleSelectMode: false,
         options: JSON.stringify(this.previousOptions),
+        onEditorSelect: () => {this.presentedEditor = true},
         onOptionsChange: (options) => {
           if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
             var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);

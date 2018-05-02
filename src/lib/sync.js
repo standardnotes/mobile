@@ -78,7 +78,7 @@ export default class Sync {
     }
 
     return DBManager.getAllItems(function(items){
-      this.handleItemsResponse(items, null).then(function(mappedItems){
+      this.handleItemsResponse(items, null, ModelManager.MappingSourceLocalRetrieved).then(function(mappedItems){
         Item.sortItemsByDate(mappedItems);
 
         this.dataLoaded = true;
@@ -322,7 +322,7 @@ export default class Sync {
 
       // this.$rootScope.$broadcast("sync:updated_token", this.syncToken);
 
-      var retrieved = await this.handleItemsResponse(response.retrieved_items, null);
+      var retrieved = await this.handleItemsResponse(response.retrieved_items, null, ModelManager.MappingSourceRemoteRetrieved);
       this.allRetreivedItems = this.allRetreivedItems.concat(retrieved);
       this.syncStatus.retrievedCount = this.allRetreivedItems.length;
 
@@ -330,7 +330,7 @@ export default class Sync {
       // we write saved items to disk now because it clears their dirty status then saves
       // if we saved items before completion, we had have to save them as dirty and save them again on success as clean
       var omitFields = ["content", "auth_hash"];
-      var saved = await this.handleItemsResponse(response.saved_items, omitFields);
+      var saved = await this.handleItemsResponse(response.saved_items, omitFields, ModelManager.MappingSourceRemoteSaved);
 
       var unsaved = await this.handleUnsavedItemsResponse(response.unsaved)
       this.writeItemsToStorage(saved, false, null);
@@ -407,10 +407,10 @@ export default class Sync {
     }
   }
 
-  async handleItemsResponse(responseItems, omitFields) {
+  async handleItemsResponse(responseItems, omitFields, source) {
     var keys = KeysManager.get().activeKeys();
     await Encryptor.decryptMultipleItems(responseItems, keys);
-    var items = ModelManager.getInstance().mapResponseItemsToLocalModelsOmittingFields(responseItems, omitFields);
+    var items = ModelManager.getInstance().mapResponseItemsToLocalModelsOmittingFields(responseItems, omitFields, source);
 
     // During the decryption process, items may be marked as "errorDecrypting". If so, we want to be sure
     // to persist this new state by writing these items back to local storage. When an item's "errorDecrypting"
@@ -431,7 +431,7 @@ export default class Sync {
   async refreshErroredItems() {
     var erroredItems = ModelManager.getInstance().allItems.filter((item) => {return item.errorDecrypting == true});
     if(erroredItems.length > 0) {
-      return this.handleItemsResponse(erroredItems, null);
+      return this.handleItemsResponse(erroredItems, null, ModelManager.MappingSourceLocalRetrieved);
     }
     return null;
   }

@@ -231,7 +231,7 @@ export default class Account extends Abstract {
     )
   }
 
-  async onExportPress(callback) {
+  async onExportPress(encrypted, callback) {
     var version = Auth.getInstance().protocolVersion();
     var keys = KeysManager.get().activeKeys();
 
@@ -257,8 +257,6 @@ export default class Account extends Abstract {
       data["auth_params"] = authParams;
     }
 
-    var encrypted = keys && keys !== null;
-
     var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
     var base64String = base64.encode(jsonString);
     var fileType = App.isAndroid ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
@@ -270,10 +268,10 @@ export default class Account extends Abstract {
       isHTML: true,
       attachment: { data: App.isIOS ? jsonString : base64String, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
     }, (error, event) => {
-        callback();
-        if(error) {
-          Alert.alert('Error', 'Unable to send email.');
-        }
+      callback();
+      if(error) {
+        Alert.alert('Error', 'Unable to send email.');
+      }
     });
   }
 
@@ -425,17 +423,18 @@ export default class Account extends Abstract {
 
           {this.state.confirmRegistration &&
             <RegistrationConfirmSection
-            title={"Confirm your password"}
-            password={this.state.params.password}
-            registering={this.state.registering}
-            onSuccess={this.onRegisterConfirmSuccess}
-            onCancel={this.onRegisterConfirmCancel}
+              title={"Confirm your password"}
+              password={this.state.params.password}
+              registering={this.state.registering}
+              onSuccess={this.onRegisterConfirmSuccess}
+              onCancel={this.onRegisterConfirmCancel}
             />
           }
 
           <OptionsSection
             signedIn={signedIn}
             title={"Options"}
+            encryptionAvailable={KeysManager.get().activeKeys()}
             onSignOutPress={this.onSignOutPress}
             onExportPress={this.onExportPress}
             email={KeysManager.get().getUserEmail()}

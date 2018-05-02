@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { TextInput, SectionList, ScrollView, View, Text, Share, Platform, StatusBar, FlatList, Dimensions } from 'react-native';
+import { TextInput, SectionList, ScrollView, View, Text, Linking, Share, Platform, StatusBar, FlatList, Dimensions } from 'react-native';
 var _ = require('lodash')
 
 import Sync from '../lib/sync'
 import ModelManager from '../lib/modelManager'
+import ComponentManager from '../lib/componentManager'
 import AlertManager from '../lib/alertManager'
 import ItemActionManager from '../lib/itemActionManager'
 import SectionHeader from "../components/SectionHeader";
@@ -73,7 +74,6 @@ export default class Filter extends Abstract {
         this.forceUpdate();
       }
     });
-
   }
 
   componentWillUnmount() {
@@ -190,7 +190,11 @@ export default class Filter extends Abstract {
   }
 
   dismiss = () => {
-    this.props.navigator.dismissModal({animationType: "slide-down"})
+    if(this.note) {
+      this.props.navigator.pop();
+    } else {
+      this.props.navigator.dismissModal({animationType: "slide-down"})
+    }
   }
 
   createTag(text, callback) {
@@ -278,6 +282,32 @@ export default class Filter extends Abstract {
     }
   }
 
+  onEditorSelect = (editor) => {
+    this.props.onEditorSelect && this.props.onEditorSelect(editor);
+    
+    if(editor) {
+      this.props.navigator.showModal({
+        screen: 'sn.Webview',
+        title: editor.name,
+        animationType: 'slide-up',
+        passProps: {
+          noteId: this.note.uuid,
+          editorId: editor.uuid
+        }
+      });
+      ComponentManager.get().associateEditorWithNote(editor, this.note);
+    } else {
+      ComponentManager.get().clearEditorForNote(this.note);
+      this.dismiss();
+    }
+  }
+
+  getEditors() {
+    return ModelManager.getInstance().itemsForContentType("SN|Component").filter(function(component){
+      return component.area == "editor-editor";
+    })
+  }
+
   clearTags = (close) => {
     this.setSelectedTags([]);
     if(close) { this.dismiss(); }
@@ -322,6 +352,10 @@ export default class Filter extends Abstract {
 
           { this.note &&
             <ManageNote note={this.note} title={"Manage Note"} onEvent={this.onManageNoteEvent.bind(this)}/>
+          }
+
+          { this.note &&
+            <EditorsSection editors={this.getEditors()} selectedEditor={ComponentManager.get().editorForNote(this.note)} title={"Web Editors"} onEditorSelect={this.onEditorSelect.bind(this)}/>
           }
 
           <TagsSection
@@ -494,6 +528,56 @@ class SortSection extends Component {
             />
           )
         })}
+
+      </TableSection>
+    );
+  }
+}
+
+class EditorsSection extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  onPress = (editor) => {
+    this.props.onEditorSelect(editor);
+  }
+
+  getEditors = () => {
+    Linking.openURL("https://standardnotes.org/extensions");
+  }
+
+  clearEditorSelection = () => {
+    this.props.onEditorSelect(null);
+  }
+
+  render() {
+    let root = this;
+    return (
+      <TableSection style={GlobalStyles.styles().view}>
+        <SectionHeader title={this.props.title} buttonText={this.props.selectedEditor && "Use Plain"} buttonAction={() => {this.clearEditorSelection()}}/>
+        {this.props.editors.map(function(editor, i){
+          return (
+            <SectionedAccessoryTableCell
+              onPress={() => {root.onPress(editor)}}
+              text={editor.name}
+              key={editor.uuid}
+              first={i == 0}
+              selected={() => {return editor == root.props.selectedEditor}}
+              buttonCell={true}
+            />
+          )
+        })}
+
+        {this.props.editors.length == 0 &&
+          <SectionedAccessoryTableCell
+            onPress={() => {root.getEditors()}}
+            text={"Get Editors  →"}
+            first={true}
+            buttonCell={true}
+          />
+        }
+
 
       </TableSection>
     );

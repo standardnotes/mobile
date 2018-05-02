@@ -1,8 +1,8 @@
 {
   "name": "StandardNotes",
-  "version": "2.1.28",
-  "versionIOS": "2.1.28",
-  "versionAndroid": "2.1.28",
+  "version": "2.1.31",
+  "versionIOS": "2.1.31",
+  "versionAndroid": "2.1.30",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
