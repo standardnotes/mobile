@@ -19,7 +19,14 @@ export default class Webview extends Abstract {
     this.editor = ModelManager.getInstance().findItem(props.editorId);
     this.note = ModelManager.getInstance().findItem(props.noteId);
 
-    if(!ComponentManager.get().urlForComponent(this.editor)) {
+    if(!this.note) {
+      console.log("Unable to find note with ID", props.noteId);
+    }
+
+    let url = ComponentManager.get().urlForComponent(this.editor);
+    console.log("Loading editor", url);
+
+    if(!url) {
       Alert.alert('Re-install Extension', `This extension is not installed correctly. Please use the web or desktop application to reinstall ${this.editor.name}, then try again.`, [{text: 'OK'}])
       return;
     }

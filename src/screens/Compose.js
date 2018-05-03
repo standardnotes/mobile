@@ -35,7 +35,8 @@ export default class Compose extends Abstract {
     super(props);
     var note = ModelManager.getInstance().findItem(props.noteId);
     if(!note) {
-      note = new Note({});
+      note = ModelManager.getInstance().createItem({content_type: "Note", dummy: true, text: ""});
+      ModelManager.getInstance().addItem(note);
       note.dummy = true;
     }
 
@@ -55,7 +56,7 @@ export default class Compose extends Abstract {
     // A delay is required. Otherwise, on iOS, if loading without delay, then dismissing, clicking "Manage" doesn't work.
     setTimeout(() => {
       this.loadEditor();
-    }, App.isIOS ? 550 : 50);
+    }, App.isIOS ? 550 : 200);
   }
 
   refreshContent() {
@@ -66,16 +67,25 @@ export default class Compose extends Abstract {
     var noteEditor = ComponentManager.get().editorForNote(this.note);
 
     if(noteEditor) {
-      this.presentedEditor = true;
-      this.props.navigator.showModal({
-        screen: 'sn.Webview',
-        title: noteEditor.name,
-        animationType: 'slide-up',
-        passProps: {
-          noteId: this.note.uuid,
-          editorId: noteEditor.uuid
-        }
-      });
+      let presentEditor = () => {
+        this.presentedEditor = true;
+        this.props.navigator.showModal({
+          screen: 'sn.Webview',
+          title: noteEditor.name,
+          animationType: 'slide-up',
+          passProps: {
+            noteId: this.note.uuid,
+            editorId: noteEditor.uuid
+          }
+        });
+      }
+      if(!this.note.uuid) {
+        this.note.initUUID().then(() => {
+          presentEditor();
+        })
+      } else {
+        presentEditor();
+      }
     }
   }
 
