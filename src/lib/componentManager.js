@@ -328,7 +328,7 @@ export default class ComponentManager {
       componentData: component.componentData,
       data: {
         uuid: component.uuid,
-        environment: "web"
+        environment: "mobile"
       }
     });
 
