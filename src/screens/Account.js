@@ -114,6 +114,11 @@ export default class Account extends Abstract {
   onSignInPress = (params, callback) => {
     Keyboard.dismiss();
 
+    // Merge params back into our own state.params. The reason is, if you have immediate passcode enabled, and 2FA enabled
+    // When you press sign in, see your 2fa prompt, exit the app to get your code and come back, the AuthSection component is destroyed.
+    // Its data will need to be repopulated, and will use this.state.params
+    this.mergeState({params: params});
+
     var email = params.email;
     var password = params.password;
 
