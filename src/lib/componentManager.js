@@ -167,6 +167,12 @@ export default class ComponentManager {
     return _.find(this.components, {sessionKey: key});
   }
 
+  isReadOnlyMessage(message)  {
+    let writeActions = ["save-items", "delete-items", "create-item"]
+    // Ensure the message action is not one of the writeActions
+    return !writeActions.includes(message.action);
+  }
+
   handleMessage(component, message) {
 
     if(!component) {

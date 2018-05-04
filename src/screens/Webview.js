@@ -97,7 +97,10 @@ export default class Webview extends Abstract {
   }
 
   dismiss() {
-    this.props.navigator.dismissModal({animationType: "slide-down"})
+    // There is an issue on iOS where if this modal is dismissed with an animation, and the user presses "Manage" too quickly, the navigation stack will go into an invalid state.
+    // So, no animation on iOS, but slide-down on Android
+    let animationType = App.isIOS ? "none" : "slide-down";
+    this.props.navigator.dismissModal({animationType: animationType})
   }
 
   configureNavBar() {
@@ -115,7 +118,17 @@ export default class Webview extends Abstract {
   }
 
   onMessage = (message) => {
+    // Ignore any incoming events (like save events) if the note is locked. Allow messages that are required for component setup (administrative)
     let data = JSON.parse(message.nativeEvent.data);
+
+    if(this.note.locked && !ComponentManager.get().isReadOnlyMessage(data)) {
+      if(!this.didShowLockAlert) {
+        Alert.alert('Note Locked', "This note is locked. Changes you make in the web editor will not be saved. Please unlock this note to make changes.", [{text: 'OK'}])
+        this.didShowLockAlert = true;
+      }
+      this.setNavBarSubtitle("Note Locked");
+      return;
+    }
     ComponentManager.get().handleMessage(this.editor, data);
   }
 
