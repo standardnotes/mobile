@@ -94,6 +94,10 @@ export default class Sync {
   }
 
   syncOffline(items, callback) {
+    // Update all items updated_at to now
+    for(var item of items) {
+      item.updated_at = new Date();
+    }
     this.writeItemsToStorage(items, true, function(responseItems){
       // delete anything needing to be deleted
       for(var item of items) {
