@@ -105,7 +105,11 @@ public class SNTextView extends LinearLayout {
     }
 
     public void setText(String text) {
-        ignoreNextLocalTextChange = true;
+        // Fix for issue where first character typed does not trigger save event.
+        // setText is called with an empty string originally as soon as the text view is initialized.
+        // Thus, ignoreNextLocalTextChange would be set to true, and would ignore the first character typed.
+        boolean isEmpty = text == null || text.trim().length() == 0;
+        ignoreNextLocalTextChange = !isEmpty;
         editText.setText(text);
     }
 
