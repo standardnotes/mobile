@@ -3,15 +3,24 @@ import App from '../app'
 import ComponentManager from '../lib/componentManager'
 import ModelManager from '../lib/modelManager'
 import TableSection from "../components/TableSection";
+import Icons from '../Icons';
 
 import Abstract from "./Abstract"
 
 import GlobalStyles from "../Styles"
 var _ = require('lodash')
 
-import { Alert, View, WebView } from 'react-native';
+import { Alert, View, WebView, Linking, Platform } from 'react-native';
 
 export default class Webview extends Abstract {
+
+  static navigatorButtons = Platform.OS == 'android' ? {} : {
+    rightButtons: [{
+      title: "Info",
+      id: 'info',
+      showAsAction: 'ifRoom',
+    }]
+  };
 
   constructor(props) {
     super(props);
@@ -56,6 +65,26 @@ export default class Webview extends Abstract {
         }
       }
     });
+
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+
+    var infoButton = {
+      title: "Info",
+      id: 'info',
+      showAsAction: 'ifRoom',
+    }
+
+    if(Platform.OS === "android") {
+      infoButton.icon = Icons.getIcon("md-information-circle");
+    }
+
+    this.props.navigator.setButtons({
+      rightButtons: [infoButton],
+      animated: false
+    });
   }
 
   componentWillUnmount() {
@@ -92,14 +121,20 @@ export default class Webview extends Abstract {
     if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
       if (event.id == 'accept') { // this is the same id field from the static navigatorButtons definition
         this.dismiss();
+      } else if (event.id == 'info') {
+        Alert.alert('Mobile Editors', "Mobile editors allow you to access your desktop editors directly from your mobile device. Note however that editors are primarily web-based and designed for a full desktop experience. Desktop editors are complex and stretch the possibilities of a web browser, let alone a mobile browser. It’s best to treat web editors on mobile as a way to view your marked up data, and if necessary, make minor modifications.", [
+          {text: 'OK'},
+          {text: 'Send Feedback', onPress: () => {
+            var platformString = App.isIOS ? "iOS" : "Android";
+            Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} editors feedback (v${App.version})`);
+          }}
+        ])
       }
     }
   }
 
   dismiss() {
-    // There is an issue on iOS where if this modal is dismissed with an animation, and the user presses "Manage" too quickly, the navigation stack will go into an invalid state.
-    // So, no animation on iOS, but slide-down on Android
-    let animationType = App.isIOS ? "none" : "slide-down";
+    let animationType = "slide-down";
     this.props.navigator.dismissModal({animationType: animationType})
   }
 

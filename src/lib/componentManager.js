@@ -378,11 +378,6 @@ export default class ComponentManager {
         return editor;
       }
     }
-
-    // No editor found for note. Use default editor, if note does not prefer system editor
-    if(!note.getAppDataItem("prefersPlainEditor")) {
-      return editors.filter((e) => {return e.isDefaultEditor()})[0];
-    }
   }
 
   associateEditorWithNote(editor, note) {
