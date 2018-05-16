@@ -36,7 +36,10 @@ export default class Compose extends Abstract {
     var note = ModelManager.getInstance().findItem(props.noteId);
     if(!note) {
       note = ModelManager.getInstance().createItem({content_type: "Note", dummy: true, text: ""});
-      ModelManager.getInstance().addItem(note);
+      // We needed to add the item originally for default editors to work, but default editors was removed
+      // So the only way to select an editor is to make a change to the note, which will add it.
+      // The problem with adding it here is that if you open Compose and close it without making changes, it will save an empty note.
+      // ModelManager.getInstance().addItem(note);
       note.dummy = true;
     }
 
