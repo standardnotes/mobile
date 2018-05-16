@@ -132,8 +132,17 @@ export default class Account extends Abstract {
       extraParams[this.state.mfa.payload.mfa_key] = params.mfa_token;
     }
 
-    Auth.getInstance().login(email, password, params.server, extraParams, function(user, error) {
+    // Prevent a timed sync from occuring while signing in. There may be a race condition where when
+    // calling `markAllItemsDirtyAndSaveOffline` during sign in, if an authenticated sync happens to occur
+    // right before that's called, items retreived from that sync will be marked as dirty, then resynced, causing mass duplication.
+    // Unlock sync after all sign in processes are complete.
+    Sync.getInstance().lockSyncing();
+
+    Auth.getInstance().login(email, password, params.server, extraParams, (user, error) => {
+
       if(error) {
+        Sync.getInstance().unlockSyncing();
+
         if(error.tag == "mfa-required" || error.tag == "mfa-invalid") {
           this.mergeState({mfa: error});
         } else {
@@ -147,11 +156,13 @@ export default class Account extends Abstract {
         this.mergeState({mfa: null});
       }
 
-      this.onAuthSuccess();
-      if(callback) {
-        callback(true);
-      }
-    }.bind(this));
+      this.onAuthSuccess(() => {
+        Sync.getInstance().unlockSyncing();
+        Sync.getInstance().sync();
+      });
+
+      callback && callback(true);
+    });
   }
 
   onRegisterPress = (params, callback) => {
@@ -173,18 +184,18 @@ export default class Account extends Abstract {
 
     var params = this.state.params;
 
-    Auth.getInstance().register(params.email, params.password, params.server, function(user, error) {
+    Auth.getInstance().register(params.email, params.password, params.server, (user, error) => {
       this.mergeState({registering: false, confirmRegistration: false});
 
       if(error) {
-        Alert.alert(
-          'Oops', error.message, [{text: 'OK'}]
-        )
+        Alert.alert('Oops', error.message, [{text: 'OK'}])
         return;
       }
 
-      this.onAuthSuccess();
-    }.bind(this));
+      this.onAuthSuccess(() => {
+        Sync.getInstance().sync();
+      });
+    });
   }
 
   onRegisterConfirmCancel = () => {
@@ -200,18 +211,11 @@ export default class Account extends Abstract {
     });
   }
 
-  markAllDataDirtyAndSync(updateAfter = false) {
-    Sync.getInstance().markAllItemsDirtyAndSaveOffline();
-    Sync.getInstance().sync(function(response){
-      if(updateAfter) {
-        this.forceUpdate();
-      }
-    }.bind(this));
-  }
-
-  onAuthSuccess = () => {
-    this.markAllDataDirtyAndSync();
-    this.returnToNotesScreen();
+  onAuthSuccess = (callback) => {
+    Sync.getInstance().markAllItemsDirtyAndSaveOffline(() => {
+      callback && callback();
+      this.returnToNotesScreen();
+    });
   }
 
   returnToNotesScreen = () => {

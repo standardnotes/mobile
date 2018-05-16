@@ -221,7 +221,20 @@ export default class Sync {
     clearInterval(this.syncStatus.checker);
   }
 
+  lockSyncing() {
+    this.syncLocked = true;
+  }
+
+  unlockSyncing() {
+    this.syncLocked = false;
+  }
+
   async sync(callback, options = {}) {
+
+    if(this.syncLocked) {
+      console.log("Sync Locked, Returning;");
+      return;
+    }
 
     var allDirtyItems = ModelManager.getInstance().getDirtyItems();
 
