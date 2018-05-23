@@ -1,10 +1,9 @@
-import Crypto from './crypto'
+import SFJS from './sfjs'
 import Server from './server'
 import Auth from './auth'
 import ModelManager from './modelManager'
 import DBManager from './dbManager'
 import Storage from './storage'
-import Encryptor from './encryptor'
 import KeysManager from './keysManager'
 
 import Item from "../models/api/item"
@@ -426,7 +425,7 @@ export default class Sync {
 
   async handleItemsResponse(responseItems, omitFields, source) {
     var keys = KeysManager.get().activeKeys();
-    await Encryptor.decryptMultipleItems(responseItems, keys);
+    await SFJS.itemTransformer().decryptMultipleItems(responseItems, keys);
     var items = ModelManager.getInstance().mapResponseItemsToLocalModelsOmittingFields(responseItems, omitFields, source);
 
     // During the decryption process, items may be marked as "errorDecrypting". If so, we want to be sure
@@ -464,7 +463,7 @@ export default class Sync {
       return mapping.item;
     })
 
-    await Encryptor.decryptMultipleItems(items, KeysManager.get().activeKeys());
+    await SFJS.itemTransformer().decryptMultipleItems(items, KeysManager.get().activeKeys());
 
     for(var mapping of unsaved) {
       var itemResponse = mapping.item;

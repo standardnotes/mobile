@@ -1,4 +1,4 @@
-import Crypto from './crypto'
+import SFJS from './sfjs'
 import Server from './server'
 import Storage from './storage'
 import ModelManager from './modelManager'

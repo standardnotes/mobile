@@ -1,4 +1,4 @@
-import Crypto from "../../lib/crypto"
+import SFJS from "../../lib/sfjs"
 import {moment} from "../../app"
 
 var _ = require('lodash')
@@ -14,9 +14,9 @@ export default class Item {
 
   async initUUID() {
     if(!this.uuid) {
-      return Crypto.generateUUID().then(function(uuid){
+      return SFJS.crypto().generateUUID().then((uuid) => {
         this.uuid = uuid;
-      }.bind(this))
+      })
     }
   }
 

@@ -1,4 +1,4 @@
-import Crypto from "./crypto"
+import SFJS from "./sfjs"
 import DBManager from "./dbManager"
 var _ = require('lodash')
 
@@ -57,7 +57,7 @@ export default class ModelManager {
   async alternateUUIDForItem(item) {
     // we need to clone this item and give it a new uuid, then delete item with old uuid from db (you can't mofidy uuid's in our indexeddb setup)
     var newItem = this.createItem(item);
-    newItem.uuid = await Crypto.generateUUID();
+    newItem.uuid = await SFJS.crypto().generateUUID();
     newItem.informReferencesOfUUIDChange(item.uuid, newItem.uuid);
     this.informModelsOfUUIDChangeForItem(newItem, item.uuid, newItem.uuid);
     return this.removeItemLocally(item).then(function(){

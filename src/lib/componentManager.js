@@ -5,7 +5,7 @@ import ModelManager from './modelManager'
 import GlobalStyles from '../Styles'
 import App from '../app'
 import Sync from './sync'
-import Crypto from "./crypto"
+import SFJS from "./sfjs"
 var _ = require('lodash')
 
 export default class ComponentManager {
@@ -326,7 +326,7 @@ export default class ComponentManager {
     }
 
     component.window = componentWindow;
-    component.sessionKey = await Crypto.generateUUID();
+    component.sessionKey = await SFJS.crypto().generateUUID();
 
     this.sendMessageToComponent(component, {
       action: "component-registered",

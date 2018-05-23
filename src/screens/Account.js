@@ -132,20 +132,22 @@ export default class Account extends Abstract {
       extraParams[this.state.mfa.payload.mfa_key] = params.mfa_token;
     }
 
+    var strict = params.strictSignIn;
+
     // Prevent a timed sync from occuring while signing in. There may be a race condition where when
     // calling `markAllItemsDirtyAndSaveOffline` during sign in, if an authenticated sync happens to occur
     // right before that's called, items retreived from that sync will be marked as dirty, then resynced, causing mass duplication.
     // Unlock sync after all sign in processes are complete.
     Sync.getInstance().lockSyncing();
 
-    Auth.getInstance().login(email, password, params.server, extraParams, (user, error) => {
+    Auth.getInstance().login(email, password, params.server, strict, extraParams, (user, error) => {
 
       if(error) {
         Sync.getInstance().unlockSyncing();
 
         if(error.tag == "mfa-required" || error.tag == "mfa-invalid") {
           this.mergeState({mfa: error});
-        } else {
+        } else if(error.message) {
           Alert.alert('Oops', error.message, [{text: 'OK'}])
         }
         if(callback) {callback(false);}
@@ -230,7 +232,7 @@ export default class Account extends Abstract {
   }
 
   onSignOutPress = () => {
-    AlertManager.showConfirmationAlert(
+    AlertManager.confirm(
       "Sign Out?", "Signing out will remove all data from this device, including notes and tags. Make sure your data is synced before proceeding.", "Sign Out",
       function(){
         Auth.getInstance().signout(() => {
@@ -289,7 +291,7 @@ export default class Account extends Abstract {
   }
 
   onThemeLongPress = (theme) => {
-    AlertManager.showConfirmationAlert(
+    AlertManager.confirm(
       "Redownload Theme", "Themes are cached when downloaded. To retrieve the latest version, press Redownload.", "Redownload",
       function(){
         GlobalStyles.get().downloadThemeAndReload(theme);
@@ -298,7 +300,7 @@ export default class Account extends Abstract {
   }
 
   onStorageEncryptionEnable = () => {
-    AlertManager.showConfirmationAlert(
+    AlertManager.confirm(
       "Enable Storage Encryption?", "Storage encryption improves your security by encrypting your data on your device. It may increase app start-up speed.", "Enable",
       () => {
         this.mergeState({storageEncryptionLoading: true});
@@ -311,7 +313,7 @@ export default class Account extends Abstract {
   }
 
   onStorageEncryptionDisable = () => {
-    AlertManager.showConfirmationAlert(
+    AlertManager.confirm(
       "Disable Storage Encryption?", "Storage encryption improves your security by encrypting your data on your device. Disabling it can improve app start-up speed.", "Disable",
       () => {
         this.mergeState({storageEncryptionLoading: true});
@@ -349,7 +351,7 @@ export default class Account extends Abstract {
       message = "Are you sure you want to disable your local passcode? This will disable encryption on your data.";
     }
 
-    AlertManager.showConfirmationAlert(
+    AlertManager.confirm(
       "Disable Passcode", message, "Disable Passcode",
       function(){
         var result = KeysManager.get().clearOfflineKeysAndData();
