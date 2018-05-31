@@ -25,7 +25,9 @@ export default class SFJS extends StandardFile {
 class SFReactNativeCrypto extends SFAbstractCrypto {
 
   async generateUUID() {
-    return Aes.randomUuid();
+    return Aes.randomUuid().then((uuid) => {
+      return uuid.toLowerCase();
+    });
   }
 
   async encryptText(text, key, iv) {
