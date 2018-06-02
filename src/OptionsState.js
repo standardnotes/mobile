@@ -7,6 +7,11 @@ export default class OptionsState {
     this.init();
     _.merge(this, _.omit(json, ["changeObservers"]));
     this.changeObservers = [];
+
+    if(this.sortBy == "updated_at") {
+      // migrate to client modified date if using old property
+      this.sortBy = "client_updated_at";
+    }
   }
 
   init() {
@@ -27,7 +32,6 @@ export default class OptionsState {
   }
 
   persist() {
-    console.log("Persisting Options", JSON.stringify(this));
     Storage.setItem("options", JSON.stringify(this));
   }
 

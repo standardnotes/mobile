@@ -199,7 +199,7 @@ export default class NoteCell extends React.PureComponent {
             <Text
               numberOfLines={1}
               style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>
-              {this.props.sortType == "updated_at" ? "Modified " + note.updatedAt() : note.createdAt()}
+              {this.props.sortType == "client_updated_at" ? "Modified " + note.updatedAt() : note.createdAt()}
             </Text>
 
             <ActionSheet

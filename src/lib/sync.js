@@ -147,7 +147,7 @@ export default class Sync {
   markAllItemsDirtyAndSaveOffline(callback) {
     var items = ModelManager.getInstance().allItems.filter((item) => {return !item.errorDecrypting});
     for(var item of items) {
-      item.setDirty(true);
+      item.setDirty(true, true);
     }
     this.writeItemsToStorage(items, false, callback);
   }
