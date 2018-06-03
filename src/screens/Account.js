@@ -154,6 +154,10 @@ export default class Account extends Abstract {
         return;
       }
 
+      params.email = null;
+      params.password = null;
+      this.setState({params: params});
+
       if(this.state.mfa) {
         this.mergeState({mfa: null});
       }

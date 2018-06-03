@@ -57,7 +57,7 @@ export default class ModelManager {
   async alternateUUIDForItem(item) {
     // Collapse in memory properties to item's content object, as the new item will be created based on the content object, and not the physical properties. (like note.text or note.title)
     item.refreshContentObject();
-    
+
     // we need to clone this item and give it a new uuid, then delete item with old uuid from db (you can't mofidy uuid's in our indexeddb setup)
     var newItem = this.createItem(item);
     newItem.uuid = await SFJS.crypto().generateUUID();
@@ -277,8 +277,11 @@ export default class ModelManager {
   }
 
   getDirtyItems() {
-    // Items that have errorDecrypting should never be synced back up to the server
-    return this.items.filter(function(item){return item.dirty == true && !item.dummy && !item.errorDecrypting})
+    return this.items.filter(function(item){
+      // An item that has an error decrypting can be synced only if it is being deleted.
+      // Otherwise, we don't want to send corrupt content up to the server.
+      return item.dirty == true && !item.dummy && (!item.errorDecrypting || item.deleted);
+    })
   }
 
   clearDirtyItems(items) {

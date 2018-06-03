@@ -77,7 +77,6 @@ export default class Sync {
     }
 
     DBManager.getAllItems((items) => {
-      console.log("Got all items", items.length);
       // break it up into chunks to make interface more responsive for large item counts
       let total = items.length;
       let iteration = 50;
@@ -107,7 +106,7 @@ export default class Sync {
           setTimeout(() => {
             incrementalCallback && incrementalCallback();
             decryptNext();
-          });
+          }, 0);
         } else {
           completion();
         }

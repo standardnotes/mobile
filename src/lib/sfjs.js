@@ -59,11 +59,11 @@ class SFReactNativeCrypto extends SFAbstractCrypto {
   }
 
   async generateRandomKey(length) {
-    return Aes.randomKey(length);
+    return Aes.randomKey(length/8);
   }
 
   async generateRandomEncryptionKey() {
-    return this.generateRandomKey(512/8);
+    return this.generateRandomKey(512);
   }
 
   async base64(text) {
