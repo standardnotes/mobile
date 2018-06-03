@@ -70,15 +70,22 @@ export default class Sync {
     _.pull(this.dataLoadObservers, observer);
   }
 
-  async loadLocalItems(callback) {
+  async loadLocalItems(callback, incrementalCallback) {
     if(this.dataLoaded) {
       callback();
       return;
     }
 
-    return DBManager.getAllItems(function(items){
-      this.handleItemsResponse(items, null, ModelManager.MappingSourceLocalRetrieved).then(function(mappedItems){
-        Item.sortItemsByDate(mappedItems);
+    DBManager.getAllItems((items) => {
+      console.log("Got all items", items.length);
+      // break it up into chunks to make interface more responsive for large item counts
+      let total = items.length;
+      let iteration = 50;
+      var current = 0;
+      var processed = [];
+
+      var completion = () => {
+        Item.sortItemsByDate(processed);
 
         this.dataLoaded = true;
 
@@ -86,10 +93,28 @@ export default class Sync {
           observer.callback();
         })
 
-        callback(mappedItems);
-      }.bind(this))
+        callback(processed);
+      }
 
-    }.bind(this))
+      var decryptNext = async () => {
+        var subitems = items.slice(current, current + iteration);
+        var processedSubitems = await this.handleItemsResponse(subitems, null, ModelManager.MappingSourceLocalRetrieved);
+        processed.push(processedSubitems);
+
+        current += subitems.length;
+
+        if(current < total) {
+          setTimeout(() => {
+            incrementalCallback && incrementalCallback();
+            decryptNext();
+          });
+        } else {
+          completion();
+        }
+      }
+
+      decryptNext();
+    })
   }
 
   syncOffline(items, callback) {
@@ -101,7 +126,7 @@ export default class Sync {
       // delete anything needing to be deleted
       for(var item of items) {
         if(item.deleted) {
-            ModelManager.getInstance().removeItemLocally(item);
+          ModelManager.getInstance().removeItemLocally(item);
         }
       }
 
@@ -302,7 +327,7 @@ export default class Sync {
       for(var item of subItems) {
         if(!item.uuid) {
           console.error("Item doesn't have uuid!", item);
-          return;
+          continue;
         }
         var itemParams = new ItemParams(item, keys, version);
         itemParams.additionalFields = options.additionalFields;
@@ -323,8 +348,6 @@ export default class Sync {
     }.bind(this);
 
     var onSyncSuccess = async function(response) {
-      console.log("Sync completed.");
-
       // Check to make sure any subItem hasn't been marked as dirty again while a sync was ongoing
       var itemsToClearAsDirty = [];
       for(var item of subItems) {
@@ -374,17 +397,19 @@ export default class Sync {
       } else {
         this.writeItemsToStorage(this.allRetreivedItems, false, () => {
           this.syncStatus.retrievedCount = 0;
+
           this.syncStatusDidChange();
+
+          this.callQueuedCallbacksAndCurrent(callback, response);
+
+          this.syncObservers.forEach((mapping) => {
+            var changesMade = this.allRetreivedItems.length > 0 || response.unsaved.length > 0;
+            mapping.callback(changesMade, this.allRetreivedItems, saved, unsaved);
+          })
+
+          this.allRetreivedItems = [];
         });
 
-        this.callQueuedCallbacksAndCurrent(callback, response);
-
-        this.syncObservers.forEach((mapping) => {
-          var changesMade = this.allRetreivedItems.length > 0 || response.unsaved.length > 0;
-          mapping.callback(changesMade, this.allRetreivedItems, saved, unsaved);
-        })
-
-        this.allRetreivedItems = [];
       }
     }.bind(this);
 

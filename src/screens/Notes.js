@@ -110,14 +110,14 @@ export default class Notes extends Abstract {
 
     this.syncStatusObserver = Sync.getInstance().registerSyncStatusObserver((status) => {
       if(status.retrievedCount > 20) {
-        if(!this.state.showSyncBar) {
-          this.mergeState({showSyncBar: true});
-        }
+        this.mergeState({showSyncBar: true});
+        // Allow download bar to reflect current count
+        this.forceUpdate();
       } else if(this.state.showSyncBar) {
         this.mergeState({syncBarComplete: true});
         setTimeout(() => {
           this.mergeState({showSyncBar: false, syncBarComplete: false});
-        }, 1000);
+        }, 2000);
       }
     })
 
@@ -153,8 +153,8 @@ export default class Notes extends Abstract {
     var encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
-    Sync.getInstance().loadLocalItems(function(items) {
-      setTimeout(function () {
+    Sync.getInstance().loadLocalItems((items) => {
+      setTimeout(() => {
         this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
         this.dataLoaded = true;
         this.reloadList();
@@ -162,8 +162,15 @@ export default class Notes extends Abstract {
         this.mergeState({decrypting: false, loading: false});
         // perform initial sync
         Sync.getInstance().sync(null);
-      }.bind(this), 0);
-    }.bind(this));
+      }, 0);
+    }, () => {
+      // Incremental Callback
+      if(!this.dataLoaded) {
+        this.dataLoaded = true;
+        this.configureNavBar(true);
+      }
+      this.reloadList();
+    });
   }
 
   /* If there is at least one item that has an error decrypting, and there are no account keys saved,
@@ -188,7 +195,7 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
-    if(this.state.lockContent) {
+    if(this.state.lockContent || !this.visible || !this.willBeVisible) {
       return;
     }
 
@@ -296,6 +303,11 @@ export default class Notes extends Abstract {
     }
 
     if (event.type == 'NavBarButtonPress') {
+
+      // During incremental load, we wan't to avoid race conditions where we wait for navigator callback for this
+      // to be set in Abstract. Setting it here immediately will avoid updating the nav bar while we navigated away.
+      this.willBeVisible = false;
+
       if (event.id == 'new') {
         this.presentNewComposer();
       } else if (event.id == 'sideMenu') {
