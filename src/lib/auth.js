@@ -254,7 +254,7 @@ export default class Auth {
     ModelManager.getInstance().handleSignout();
     KeysManager.get().clearAccountKeysAndData();
 
-    DBManager.clearAllItems(function(){
+    DBManager.clearAllItems(() => {
       Sync.getInstance().handleSignout();
 
       this.postEvent(Auth.DidSignOutEvent);
@@ -262,7 +262,7 @@ export default class Auth {
       if(callback) {
         callback();
       }
-    }.bind(this));
+    });
   }
 
   postEvent(event) {
