@@ -140,12 +140,20 @@ export default class ModelManager {
       }
 
       var unknownContentType = !_.includes(this.acceptableContentTypes, json_obj["content_type"]);
+      var isDirtyItemPendingDelete = false;
       if(json_obj.deleted == true || unknownContentType) {
-        if(item && !unknownContentType) {
-          modelsToNotifyObserversOf.push(item);
-          this.removeItemLocally(item)
+        if(json_obj.deleted && json_obj.dirty) {
+          // Item was marked as deleted but not yet synced
+          // We need to create this item as usual, but just not add it to individual arrays
+          // i.e add to this.items but not this.notes (so that it can be retrieved with getDirtyItems)
+          isDirtyItemPendingDelete = true;
+        } else {
+          if(item && !unknownContentType) {
+            modelsToNotifyObserversOf.push(item);
+            this.removeItemLocally(item)
+          }
+          continue;
         }
-        continue;
       }
 
       if(!item) {
@@ -200,33 +208,37 @@ export default class ModelManager {
     return item;
   }
 
-  addItems(items) {
-    items.forEach(function(item) {
-      if(item.content_type == "Tag") {
-        if(!_.find(this.tags, {uuid: item.uuid})) {
-          this.tags.splice(_.sortedIndexBy(this.tags, item, function(item){
-            if (item.title) return item.title.toLowerCase();
-            else return ''
-          }), 0, item);
-        }
-      } else if(item.content_type == "Note") {
-        if(!_.find(this.notes, {uuid: item.uuid})) {
-          this.notes.unshift(item);
-        }
-      } else if(item.content_type == "SN|Theme") {
-       if(!_.find(this.themes, {uuid: item.uuid})) {
-         this.themes.unshift(item);
+  addItems(items, globalOnly = false) {
+    items.forEach((item) => {
+      // In some cases, you just want to add the item to this.items, and not to the individual arrays
+      // This applies when you want to keep an item syncable, but not display it via the individual arrays
+      if(!globalOnly) {
+        if(item.content_type == "Tag") {
+          if(!_.find(this.tags, {uuid: item.uuid})) {
+            this.tags.splice(_.sortedIndexBy(this.tags, item, function(item){
+              if (item.title) return item.title.toLowerCase();
+              else return ''
+            }), 0, item);
+          }
+        } else if(item.content_type == "Note") {
+          if(!_.find(this.notes, {uuid: item.uuid})) {
+            this.notes.unshift(item);
+          }
+        } else if(item.content_type == "SN|Theme") {
+         if(!_.find(this.themes, {uuid: item.uuid})) {
+           this.themes.unshift(item);
+         }
        }
      }
 
      if(!_.find(this.items, {uuid: item.uuid})) {
        this.items.push(item);
      }
-    }.bind(this));
+    });
   }
 
-  addItem(item) {
-    this.addItems([item]);
+  addItem(item, globalOnly = false) {
+    this.addItems([item], globalOnly);
   }
 
   createDuplicateItem(itemResponse) {
