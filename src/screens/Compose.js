@@ -304,11 +304,14 @@ export default class Compose extends Abstract {
       subtitle: title
     });
 
-    var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
-    this.props.navigator.setStyle({
-      navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
-      navBarSubtitleFontSize: 12
-    });
+    if(!this.didSetNavBarStyle) {
+      this.didSetNavBarStyle = true;
+      var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
+      this.props.navigator.setStyle({
+        navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
+        navBarSubtitleFontSize: 12
+      });
+    }
   }
 
   render() {
