@@ -90,12 +90,9 @@ export default class Compose extends Abstract {
   componentDidMount() {
     super.componentDidMount();
 
-    // A delay is required until the Compose push animation is complete. (for iOS)
-    // Otherwise, the modal will be presented on a confused navigation stack (thinking it belongs to the root)
-    // On iOS, if loading without delay, then dismissing, clicking "Manage" doesn't work.
     setTimeout(() => {
       this.loadEditor();
-    }, App.isIOS ? 1000 : 200);
+    }, 100);
   }
 
   componentWillUnmount() {
