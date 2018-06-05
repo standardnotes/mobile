@@ -110,13 +110,15 @@ export default class Notes extends Abstract {
 
     this.syncStatusObserver = Sync.getInstance().registerSyncStatusObserver((status) => {
       if(status.retrievedCount > 20) {
-        this.mergeState({showSyncBar: true});
-        // Allow download bar to reflect current count
-        this.forceUpdate();
-      } else if(this.state.showSyncBar) {
-        this.mergeState({syncBarComplete: true});
+        var text = `Downloading ${status.retrievedCount} items. Keep app opened.`
+        this.setStatusBarText(text);
+        this.showingDownloadStatus = true;
+      } else if(this.showingDownloadStatus) {
+        this.showingDownloadStatus = false;
+        var text = "Download Complete.";
+        this.setStatusBarText(text);
         setTimeout(() => {
-          this.mergeState({showSyncBar: false, syncBarComplete: false});
+          this.setStatusBarText(null);
         }, 2000);
       }
     })
@@ -131,6 +133,10 @@ export default class Notes extends Abstract {
         })
       }
     });
+  }
+
+  setStatusBarText(text) {
+    this.mergeState({showSyncBar: text != null, syncBarText: text});
   }
 
   loadTabbarIcons() {
@@ -153,15 +159,19 @@ export default class Notes extends Abstract {
     var encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
+    this.setStatusBarText(encryptionEnabled ? "Decrypting notes..." : "Loading notes...");
     Sync.getInstance().loadLocalItems((items) => {
       setTimeout(() => {
+        this.setStatusBarText("Syncing...");
         this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
         this.dataLoaded = true;
         this.reloadList();
         this.configureNavBar(true);
         this.mergeState({decrypting: false, loading: false});
         // perform initial sync
-        Sync.getInstance().sync(null);
+        Sync.getInstance().sync(() => {
+          this.setStatusBarText(null);
+        });
       }, 0);
     }, () => {
       // Incremental Callback
@@ -432,7 +442,7 @@ export default class Notes extends Abstract {
 
         {this.state.showSyncBar &&
           <View style={GlobalStyles.styles().syncBar}>
-            <Text style={GlobalStyles.styles().syncBarText}>{this.state.syncBarComplete ? "Download Complete." : `Downloading ${syncStatus.retrievedCount} items. Keep app opened.`}</Text>
+            <Text style={GlobalStyles.styles().syncBarText}>{this.state.syncBarText}</Text>
           </View>
         }
       </View>
