@@ -77,26 +77,39 @@ export default class AuthModal extends Component {
     }
   }
 
+  onAuthenticateSuccess = () => {
+    // First hide Modal
+    this.setState({visible: false});
+    this.forceUpdate();
+
+    // Wait for it to begin dismissing, then trigger callback. Otherwise, AuthModal can be deallocated before Modal is removed, causing problems.
+    setTimeout(() => {
+      this.state.authProps.onAuthenticate();
+    }, 0);
+  }
+
   render() {
     let authProps = this.state.authProps;
     return (
-      <Modal
-       animationType={"slide"}
-       transparent={false}
-       visible={this.state.visible}
-       onRequestClose={() => {}}>
+      <View style={[GlobalStyles.styles().container]}>
+        <Modal
+         animationType={"slide"}
+         transparent={true}
+         visible={this.state.visible}
+         onRequestClose={() => {}}>
 
-        <Authenticate
-          ref={'authenticate'}
-          title={authProps.title}
-          onAuthenticateSuccess={authProps.onAuthenticate}
-          mode={"authenticate"}
-          requirePasscode={authProps.passcode}
-          requireFingerprint={authProps.fingerprint}
-          pseudoModal={true}
-          authProps={authProps}
-        />
-      </Modal>
+          <Authenticate
+            ref={'authenticate'}
+            title={authProps.title}
+            onAuthenticateSuccess={this.onAuthenticateSuccess}
+            mode={"authenticate"}
+            requirePasscode={authProps.passcode}
+            requireFingerprint={authProps.fingerprint}
+            pseudoModal={true}
+            authProps={authProps}
+          />
+        </Modal>
+      </View>
     )
   }
 

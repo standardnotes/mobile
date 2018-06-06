@@ -88,6 +88,7 @@ export default class Webview extends Abstract {
   }
 
   componentWillUnmount() {
+    super.componentWillMount();
     ComponentManager.get().deregisterHandler(this.handler);
     ComponentManager.get().deactivateComponent(this.editor);
   }
@@ -109,11 +110,14 @@ export default class Webview extends Abstract {
       subtitle: title
     });
 
-    var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
-    this.props.navigator.setStyle({
-      navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
-      navBarSubtitleFontSize: 12
-    });
+    if(!this.didSetNavBarStyle) {
+      this.didSetNavBarStyle = true;
+      var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
+      this.props.navigator.setStyle({
+        navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
+        navBarSubtitleFontSize: 12
+      });
+    }
   }
 
   onNavigatorEvent(event) {

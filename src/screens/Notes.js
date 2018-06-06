@@ -205,15 +205,20 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
+
     if(this.state.lockContent || !this.visible || !this.willBeVisible) {
+      this.needsConfigureNavBar = true;
       return;
     }
 
     if(!this.dataLoaded) {
       this.notesTitle = "Notes";
       this.props.navigator.setTitle({title: this.notesTitle, animated: false});
+      this.needsConfigureNavBar = true;
       return;
     }
+
+    this.needsConfigureNavBar = false;
 
     super.configureNavBar();
 
@@ -305,6 +310,11 @@ export default class Notes extends Abstract {
     if(event.id == "willAppear" || event.id == "didAppear") {
       if(event.id == "willAppear") {
         this.forceUpdate();
+      }
+      else if(event.id == "didAppear") {
+        if(this.needsConfigureNavBar) {
+          this.configureNavBar(false);
+        }
       }
       if(this.loadNotesOnVisible) {
         this.loadNotesOnVisible = false;

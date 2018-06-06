@@ -127,6 +127,7 @@ export default class Abstract extends Component {
         this.configureNavBar(false);
        break;
       case 'didAppear':
+        this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
         this.viewDidAppear();
         break;
       case 'willDisappear':
