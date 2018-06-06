@@ -4,7 +4,7 @@ import ComponentManager from '../lib/componentManager'
 import ModelManager from '../lib/modelManager'
 import TableSection from "../components/TableSection";
 import Icons from '../Icons';
-
+import LockedView from "../containers/LockedView";
 import Abstract from "./Abstract"
 
 import GlobalStyles from "../Styles"
@@ -172,6 +172,10 @@ export default class Webview extends Abstract {
   }
 
   render() {
+    if(this.state.lockContent) {
+      return (<LockedView />);
+    }
+
     var editor = this.editor;
     var url = ComponentManager.get().urlForComponent(editor);
 
