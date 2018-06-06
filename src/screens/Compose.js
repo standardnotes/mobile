@@ -92,7 +92,7 @@ export default class Compose extends Abstract {
 
     setTimeout(() => {
       this.loadEditor();
-    }, 100);
+    }, 150 /* This is an aesthetic delay and not functional. It doesn't look too good when it comes up so fast. */);
   }
 
   componentWillUnmount() {
