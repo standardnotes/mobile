@@ -95,13 +95,9 @@ export default class Tag extends Item {
     return this.notes;
   }
 
-  static arrayToDisplayString(tags, includeComma) {
-    return tags.map(function(tag, i){
-      var text = "#" + tag.title;
-      if(i != tags.length - 1) {
-        text += includeComma ? ", " : " ";
-      }
-      return text;
-    })
+  static arrayToDisplayString(tags) {
+    return tags.sort((a, b) => {return a.title > b.title}).map((tag, i) => {
+      return "#" + tag.title;
+    }).join(" ");
   }
 }

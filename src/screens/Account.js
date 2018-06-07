@@ -404,7 +404,7 @@ export default class Account extends Abstract {
       let url = "https://standardnotes.org";
       // Android ignores url. iOS ignores title.
       if(App.isAndroid) {
-        message += "\n\n https://standardnotes.org";
+        message += "\n\nhttps://standardnotes.org";
       }
 
       ApplicationState.get().performActionWithoutStateChangeImpact(() => {

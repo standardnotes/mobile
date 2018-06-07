@@ -120,7 +120,6 @@ export default class Abstract extends Component {
   }
 
   onNavigatorEvent(event) {
-
     switch(event.id) {
       case 'willAppear':
         this.willBeVisible = true;
