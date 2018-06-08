@@ -91,6 +91,9 @@ export default class Item {
     if(dirty && !dontUpdateClientDate) {
       // Set the client modified date to now if marking the item as dirty
       this.client_updated_at = new Date();
+    } else if(!this.hasRawClientUpdatedAtValue()) {
+      // copy updated_at
+      this.client_updated_at = new Date(this.updated_at);
     }
   }
 
@@ -160,6 +163,28 @@ export default class Item {
     return [];
   }
 
+  hasRawClientUpdatedAtValue() {
+    return this.getAppDataItem("client_updated_at") != null;
+  }
+
+  get client_updated_at() {
+    if(!this._client_updated_at) {
+      var saved = this.getAppDataItem("client_updated_at");
+      if(saved) {
+        this._client_updated_at = new Date(saved);
+      } else {
+        this._client_updated_at = new Date(this.updated_at);
+      }
+    }
+    return this._client_updated_at;
+  }
+
+  set client_updated_at(date) {
+    this._client_updated_at = date;
+
+    this.setAppDataItem("client_updated_at", date);
+  }
+
   createdAt() {
     return this.dateToString(this.created_at, true);
   }
@@ -190,24 +215,6 @@ export default class Item {
 
   get locked() {
     return this.getAppDataItem("locked");
-  }
-
-  get client_updated_at() {
-    if(!this._client_updated_at) {
-      var saved = this.getAppDataItem("client_updated_at");
-      if(saved) {
-        this._client_updated_at = new Date(saved);
-      } else {
-        this._client_updated_at = new Date(this.updated_at);
-      }
-    }
-    return this._client_updated_at;
-  }
-
-  set client_updated_at(date) {
-    this._client_updated_at = date;
-
-    this.setAppDataItem("client_updated_at", date);
   }
 
   /*
