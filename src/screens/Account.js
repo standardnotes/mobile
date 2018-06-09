@@ -248,7 +248,7 @@ export default class Account extends Abstract {
 
   async onExportPress(encrypted, callback) {
     var version = Auth.getInstance().protocolVersion();
-    var keys = KeysManager.get().activeKeys();
+    var keys = encrypted ? KeysManager.get().activeKeys() : null;
 
     var items = [];
 
