@@ -284,7 +284,7 @@ export default class Filter extends Abstract {
 
   onEditorSelect = (editor) => {
     this.props.onEditorSelect && this.props.onEditorSelect(editor);
-    
+
     if(editor) {
       this.props.navigator.showModal({
         screen: 'sn.Webview',
@@ -500,8 +500,8 @@ class SortSection extends Component {
     super(props);
     this.state = {sortBy: props.sortBy}
     this.options = [
-      {key: "created_at", label: "Created date"},
-      {key: "updated_at", label: "Modified date"},
+      {key: "created_at", label: "Date Added"},
+      {key: "client_updated_at", label: "Date Modified"},
       {key: "title", label: "Title"},
     ];
   }

@@ -1,4 +1,4 @@
-import Crypto from './crypto'
+import SFJS from './sfjs'
 import Server from './server'
 import Storage from './storage'
 import ModelManager from './modelManager'
@@ -351,7 +351,7 @@ export default class KeysManager {
 
   static getDeviceBiometricsAvailability(callback) {
     if(__DEV__) {
-      callback(true, "touch", "Fingerprint");
+      callback(true, "face", "Face ID");
       return;
     }
     FingerprintScanner.isSensorAvailable()

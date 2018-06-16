@@ -28,7 +28,7 @@ export default class ItemActionManager {
       var title = `Delete ${item.displayName}`;
       var message = `Are you sure you want to delete this ${item.displayName.toLowerCase()}?`;
 
-      AlertManager.showConfirmationAlert(title, message, "Delete",
+      AlertManager.confirm(title, message, "Delete",
         () => {
           ModelManager.getInstance().setItemToBeDeleted(item);
 

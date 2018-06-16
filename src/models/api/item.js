@@ -1,4 +1,4 @@
-import Crypto from "../../lib/crypto"
+import SFJS from "../../lib/sfjs"
 import {moment} from "../../app"
 
 var _ = require('lodash')
@@ -14,9 +14,9 @@ export default class Item {
 
   async initUUID() {
     if(!this.uuid) {
-      return Crypto.generateUUID().then(function(uuid){
+      return SFJS.crypto().generateUUID().then((uuid) => {
         this.uuid = uuid;
-      }.bind(this))
+      })
     }
   }
 
@@ -59,12 +59,23 @@ export default class Item {
       this.updated_at = moment(new Date());
     }
 
+    // Allows the getter to be re-invoked
+    this._client_updated_at = null;
+
     if(json.content) {
       this.mapContentToLocalProperties(this.contentObject);
     }
   }
 
-  setDirty(dirty) {
+  refreshContentObject() {
+    // Before an item can be duplicated or cloned, we must update this.content (if it is an object) with the object's
+    // current physical properties, because updateFromJSON, which is what all new items must go through,
+    // will call this.mapContentToLocalProperties(this.contentObject), which may have stale values if not explicitly updated.
+
+    this.content = this.structureParams();
+  }
+
+  setDirty(dirty, dontUpdateClientDate) {
     this.dirty = dirty;
 
     // Allows the syncManager to check if an item has been marked dirty after a sync has been started
@@ -75,6 +86,14 @@ export default class Item {
       this.dirtyCount++;
     } else {
       this.dirtyCount = 0;
+    }
+
+    if(dirty && !dontUpdateClientDate) {
+      // Set the client modified date to now if marking the item as dirty
+      this.client_updated_at = new Date();
+    } else if(!this.hasRawClientUpdatedAtValue()) {
+      // copy updated_at
+      this.client_updated_at = new Date(this.updated_at);
     }
   }
 
@@ -144,12 +163,34 @@ export default class Item {
     return [];
   }
 
+  hasRawClientUpdatedAtValue() {
+    return this.getAppDataItem("client_updated_at") != null;
+  }
+
+  get client_updated_at() {
+    if(!this._client_updated_at) {
+      var saved = this.getAppDataItem("client_updated_at");
+      if(saved) {
+        this._client_updated_at = new Date(saved);
+      } else {
+        this._client_updated_at = new Date(this.updated_at);
+      }
+    }
+    return this._client_updated_at;
+  }
+
+  set client_updated_at(date) {
+    this._client_updated_at = date;
+
+    this.setAppDataItem("client_updated_at", date);
+  }
+
   createdAt() {
     return this.dateToString(this.created_at, true);
   }
 
   updatedAt() {
-    return this.dateToString(this.updated_at, true);
+    return this.dateToString(this.client_updated_at, true);
   }
 
   dateToString(date, withTime) {

@@ -120,13 +120,13 @@ export default class Abstract extends Component {
   }
 
   onNavigatorEvent(event) {
-
     switch(event.id) {
       case 'willAppear':
         this.willBeVisible = true;
         this.configureNavBar(false);
        break;
       case 'didAppear':
+        this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
         this.viewDidAppear();
         break;
       case 'willDisappear':

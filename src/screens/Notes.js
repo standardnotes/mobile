@@ -110,14 +110,16 @@ export default class Notes extends Abstract {
 
     this.syncStatusObserver = Sync.getInstance().registerSyncStatusObserver((status) => {
       if(status.retrievedCount > 20) {
-        if(!this.state.showSyncBar) {
-          this.mergeState({showSyncBar: true});
-        }
-      } else if(this.state.showSyncBar) {
-        this.mergeState({syncBarComplete: true});
+        var text = `Downloading ${status.retrievedCount} items. Keep app opened.`
+        this.setStatusBarText(text);
+        this.showingDownloadStatus = true;
+      } else if(this.showingDownloadStatus) {
+        this.showingDownloadStatus = false;
+        var text = "Download Complete.";
+        this.setStatusBarText(text);
         setTimeout(() => {
-          this.mergeState({showSyncBar: false, syncBarComplete: false});
-        }, 1000);
+          this.setStatusBarText(null);
+        }, 2000);
       }
     })
 
@@ -131,6 +133,10 @@ export default class Notes extends Abstract {
         })
       }
     });
+  }
+
+  setStatusBarText(text) {
+    this.mergeState({showSyncBar: text != null, syncBarText: text});
   }
 
   loadTabbarIcons() {
@@ -153,24 +159,35 @@ export default class Notes extends Abstract {
     var encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
-    Sync.getInstance().loadLocalItems(function(items) {
-      setTimeout(function () {
+    this.setStatusBarText(encryptionEnabled ? "Decrypting notes..." : "Loading notes...");
+    Sync.getInstance().loadLocalItems((items) => {
+      setTimeout(() => {
+        this.setStatusBarText("Syncing...");
         this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
         this.dataLoaded = true;
         this.reloadList();
         this.configureNavBar(true);
         this.mergeState({decrypting: false, loading: false});
         // perform initial sync
-        Sync.getInstance().sync(null);
-      }.bind(this), 0);
-    }.bind(this));
+        Sync.getInstance().sync(() => {
+          this.setStatusBarText(null);
+        });
+      }, 0);
+    }, () => {
+      // Incremental Callback
+      if(!this.dataLoaded) {
+        this.dataLoaded = true;
+        this.configureNavBar(true);
+      }
+      this.reloadList();
+    });
   }
 
   /* If there is at least one item that has an error decrypting, and there are no account keys saved,
     display an alert instructing the user to log in. This happens when restoring from iCloud and data is restored but keys are not.
    */
   displayNeedSignInAlertForLocalItemsIfApplicable(items) {
-    if(KeysManager.get().hasAccountKeys()) {
+    if(!items || KeysManager.get().hasAccountKeys()) {
       return;
     }
 
@@ -188,15 +205,20 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
-    if(this.state.lockContent) {
+
+    if(this.state.lockContent || !this.visible || !this.willBeVisible) {
+      this.needsConfigureNavBar = true;
       return;
     }
 
     if(!this.dataLoaded) {
       this.notesTitle = "Notes";
       this.props.navigator.setTitle({title: this.notesTitle, animated: false});
+      this.needsConfigureNavBar = true;
       return;
     }
+
+    this.needsConfigureNavBar = false;
 
     super.configureNavBar();
 
@@ -289,13 +311,24 @@ export default class Notes extends Abstract {
       if(event.id == "willAppear") {
         this.forceUpdate();
       }
+      else if(event.id == "didAppear") {
+        if(this.needsConfigureNavBar) {
+          this.configureNavBar(false);
+        }
+      }
       if(this.loadNotesOnVisible) {
         this.loadNotesOnVisible = false;
         this.reloadList();
       }
     }
 
-    if (event.type == 'NavBarButtonPress') {
+    if(event.type == 'NavBarButtonPress') {
+
+      // During incremental load, we wan't to avoid race conditions where we wait for navigator callback for this
+      // to be set in Abstract. Setting it here immediately will avoid updating the nav bar while we navigated away.
+      // Don't set this for Android if just opening side menu.
+      this.willBeVisible = (App.isAndroid && event.id == 'sideMenu'); // this value is only false (what we want) if it's not Android side menu
+
       if (event.id == 'new') {
         this.presentNewComposer();
       } else if (event.id == 'sideMenu') {
@@ -420,7 +453,7 @@ export default class Notes extends Abstract {
 
         {this.state.showSyncBar &&
           <View style={GlobalStyles.styles().syncBar}>
-            <Text style={GlobalStyles.styles().syncBarText}>{this.state.syncBarComplete ? "Download Complete." : `Downloading ${syncStatus.retrievedCount} items. Keep app opened.`}</Text>
+            <Text style={GlobalStyles.styles().syncBarText}>{this.state.syncBarText}</Text>
           </View>
         }
       </View>

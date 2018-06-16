@@ -1,5 +1,4 @@
-import Crypto from "../../lib/crypto"
-import Encryptor from '../../lib/encryptor'
+import SFJS from "../../lib/sfjs";
 
 var _ = require('lodash')
 
@@ -37,7 +36,7 @@ export default class ItemParams {
     var params = {uuid: this.item.uuid, content_type: this.item.content_type, deleted: this.item.deleted, created_at: this.item.created_at};
     if(!this.item.errorDecrypting) {
       if(this.keys && !this.item.doNotEncrypt()) {
-        var encryptedParams = await Encryptor.encryptItem(this.item, this.keys, this.version);
+        var encryptedParams = await SFJS.itemTransformer().encryptItem(this.item, this.keys, this.version);
         _.merge(params, encryptedParams);
 
         if(this.version !== "001") {
@@ -45,7 +44,7 @@ export default class ItemParams {
         }
       }
       else {
-        params.content = this.forExportFile ? this.item.createContentJSONFromProperties() : "000" + await Crypto.base64(JSON.stringify(this.item.createContentJSONFromProperties()));
+        params.content = this.forExportFile ? this.item.createContentJSONFromProperties() : "000" + await SFJS.crypto().base64(JSON.stringify(this.item.createContentJSONFromProperties()));
         if(!this.forExportFile) {
           delete params.auth_hash;
           delete params.enc_item_key;

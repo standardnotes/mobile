@@ -92,7 +92,7 @@ export default class Compose extends Abstract {
 
     setTimeout(() => {
       this.loadEditor();
-    }, 100);
+    }, 150 /* This is an aesthetic delay and not functional. It doesn't look too good when it comes up so fast. */);
   }
 
   componentWillUnmount() {
@@ -227,10 +227,10 @@ export default class Compose extends Abstract {
 
     if(this.saveTimeout) clearTimeout(this.saveTimeout);
     if(this.statusTimeout) clearTimeout(this.statusTimeout);
-    this.saveTimeout = setTimeout(function(){
+    this.saveTimeout = setTimeout(() => {
       this.setNavBarSubtitle("Saving...");
       if(!this.note.uuid) {
-        this.note.initUUID().then(function(){
+        this.note.initUUID().then(() => {
           if(this.props.selectedTagId) {
             var tag = ModelManager.getInstance().findItem(this.props.selectedTagId);
             this.note.addItemAsRelationship(tag);
@@ -238,17 +238,17 @@ export default class Compose extends Abstract {
           }
           this.save();
           this.configureNavBar(true);
-        }.bind(this));
+        });
       } else {
         this.save();
       }
-    }.bind(this), 275)
+    }, 275)
   }
 
   sync(note, callback) {
     note.setDirty(true);
 
-    Sync.getInstance().sync(function(response){
+    Sync.getInstance().sync((response) => {
       if(response && response.error) {
         if(!this.didShowErrorAlert) {
           this.didShowErrorAlert = true;
@@ -263,7 +263,7 @@ export default class Compose extends Abstract {
           callback(true);
         }
       }
-    }.bind(this))
+    })
   }
 
   save() {

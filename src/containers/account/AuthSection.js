@@ -20,6 +20,7 @@ export default class AuthSection extends AbstractComponent {
     this.state = _.merge(props.params, {
       signingIn: false,
       registering: false,
+      strictSignIn: false,
       signInButtonText: DEFAULT_SIGN_IN_TEXT,
       registerButtonText: DEFAULT_REGISTER_TEXT
     });
@@ -44,6 +45,12 @@ export default class AuthSection extends AbstractComponent {
       if(!success) {
         this.mergeState({registering: false, registerButtonText: DEFAULT_REGISTER_TEXT});
       }
+    })
+  }
+
+  toggleStrictMode = () => {
+    this.setState((prevState) => {
+      return {strictSignIn: !prevState.strictSignIn};
     })
   }
 
@@ -105,19 +112,30 @@ export default class AuthSection extends AbstractComponent {
         }
 
         {(this.state.showAdvanced || !this.state.server) && !this.props.mfa &&
-          <SectionedTableCell textInputCell={true}>
-            <TextInput
-              style={GlobalStyles.styles().sectionedTableCellTextInput}
-              placeholder={"Sync Server"}
-              onChangeText={(text) => this.setState({server: text})}
-              value={this.state.server}
-              autoCorrect={false}
-              autoCapitalize={'none'}
-              keyboardType={'url'}
-              underlineColorAndroid={'transparent'}
-              placeholderTextColor={GlobalStyles.constants().mainDimColor}
+          <View>
+            <SectionHeader title={"Advanced"} />
+            <SectionedTableCell textInputCell={true} first={true}>
+              <TextInput
+                style={GlobalStyles.styles().sectionedTableCellTextInput}
+                placeholder={"Sync Server"}
+                onChangeText={(text) => this.setState({server: text})}
+                value={this.state.server}
+                autoCorrect={false}
+                autoCapitalize={'none'}
+                keyboardType={'url'}
+                underlineColorAndroid={'transparent'}
+                placeholderTextColor={GlobalStyles.constants().mainDimColor}
+              />
+            </SectionedTableCell>
+
+            <SectionedAccessoryTableCell
+              onPress={() => this.toggleStrictMode()}
+              text={"Use strict sign in"}
+              selected={() => {return this.state.strictSignIn}}
+              first={false}
+              last={true}
             />
-          </SectionedTableCell>
+          </View>
         }
 
         <ButtonCell title={this.state.signInButtonText} disabled={this.state.signingIn} bold={true} onPress={() => this.onSignInPress()} />

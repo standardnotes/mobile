@@ -69,6 +69,8 @@ export default class DBManager {
   }
 
   static clearAllItems(callback) {
+    // 06/2018: Why aren't we just using AsyncStorage.clear()?
+
     this.getAllItemKeys(function(itemKeys){
       AsyncStorage.multiRemove(itemKeys, function(){
         callback();

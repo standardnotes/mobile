@@ -72,7 +72,7 @@ export default class ApplicationState {
     var isEnteringBackground = nextAppState == 'background';
     var isLosingFocus = nextAppState == 'inactive';
 
-    console.log("APP STATE CHANGE FROM", this.mostRecentState, "TO STATE", this.applicationStateForNativeState(nextAppState));
+    // console.log("APP STATE CHANGE FROM", this.mostRecentState, "TO STATE", this.applicationStateForNativeState(nextAppState));
 
     if(isEnteringBackground) {
       this.didEnterBackground();
@@ -147,7 +147,7 @@ export default class ApplicationState {
 
   notifyOfState(state) {
     if(this.ignoreStateChanges) {return;}
-    console.log("ApplicationState notifying of state:", state);
+    // console.log("ApplicationState notifying of state:", state);
     for(var observer of this.observers) {
       observer.callback(state);
     }

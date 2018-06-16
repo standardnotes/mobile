@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Auth from '../lib/auth'
-import Crypto from '../lib/crypto'
+import SFJS from '../lib/sfjs'
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
@@ -209,13 +209,6 @@ class PasscodeSection extends Abstract {
       })
     }
 
-    defaultPasswordParams() {
-      return {
-        pw_cost: __DEV__ ? 3000 : 100000,
-        version: "002"
-      };
-    }
-
     beginAuthentication() {
       this.authenticationBegan = true;
       this.refs.input.focus();
@@ -232,21 +225,23 @@ class PasscodeSection extends Abstract {
 
       // Allow UI to update before executing block task. InteractionManager.runAfterInteractions doesn't seem to work.
       setTimeout(async () => {
-        var salt = await Crypto.generateRandomKey(256);
-        var params = _.merge(this.defaultPasswordParams(), {pw_salt: salt});
+        let identifier = await SFJS.crypto().generateUUID();
 
-        Crypto.generateKeys(passcode, params, function(keys){
+        SFJS.crypto().generateInitialKeysAndAuthParamsForUser(identifier, passcode).then((results) => {
+          let keys = results.keys;
+          let authParams = results.authParams;
+
           // make sure it has valid items
           if(_.keys(keys).length > 0) {
             KeysManager.get().persistOfflineKeys(keys);
-            KeysManager.get().setOfflineAuthParams(params);
+            KeysManager.get().setOfflineAuthParams(authParams);
 
             this.props.onSetupSuccess();
           } else {
             this.mergeState({setupButtonText: SAVE_BUTTON_DEFAULT_TEXT, setupButtonEnabled: true});
             Alert.alert("Passcode Error", "There was an error setting up your passcode. Please try again.");
           }
-        }.bind(this));
+        });
       }, 125);
 
     }
@@ -267,8 +262,9 @@ class PasscodeSection extends Abstract {
 
       // Allow UI to update before executing block task. InteractionManager.runAfterInteractions doesn't seem to work.
       setTimeout(() => {
-         var params = KeysManager.get().offlineAuthParams;
-         Crypto.generateKeys(passcode, params, function(keys){
+
+         var authParams = KeysManager.get().offlineAuthParams;
+         SFJS.crypto().computeEncryptionKeysForUser(passcode, authParams).then((keys) => {
            if(keys.pw === KeysManager.get().offlinePasscodeHash()) {
              KeysManager.get().setOfflineKeys(keys);
              this.props.onAuthenticateSuccess();
@@ -278,7 +274,8 @@ class PasscodeSection extends Abstract {
            } else {
              invalid();
            }
-         }.bind(this));
+         });
+
       }, 125);
     }
 
