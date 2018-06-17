@@ -298,7 +298,7 @@ export default class ComponentManager {
   handleSetComponentDataMessage(component, message) {
     component.componentData = message.data.componentData;
     component.setDirty(true);
-    this.syncManager.sync();
+    Sync.getInstance().sync();
   }
 
   registerHandler(handler) {
