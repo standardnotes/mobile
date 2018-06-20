@@ -47,7 +47,7 @@ export default class Server {
           onsuccess(response);
        } else {
           console.log("Request error");
-          onerror(response)
+          onerror(response, xmlhttp.status)
        }
      }
    }.bind(this)

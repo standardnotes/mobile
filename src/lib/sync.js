@@ -5,6 +5,7 @@ import ModelManager from './modelManager'
 import DBManager from './dbManager'
 import Storage from './storage'
 import KeysManager from './keysManager'
+import AlertManager from './alertManager'
 
 import Item from "../models/api/item"
 import ItemParams from "../models/local/itemParams"
@@ -422,9 +423,25 @@ export default class Sync {
           console.log("Caught sync success exception:", e);
         }
 
-      }.bind(this), function(response){
+      }.bind(this), function(response, statusCode){
+        if(statusCode == 401) {
+          if(!this.errorAlertShown) {
+            this.errorAlertShown = true;
+            AlertManager.confirm(
+              "Session Expired",
+              "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.", "Sign Out",
+              () => {
+                this.errorAlertShown = false;
+                Auth.getInstance().signout();
+              },
+              () => {
+                this.errorAlertShown = false;
+              }
+            )
+          }
+        }
         console.log("Sync error: ", response);
-        var error = response ? response.error : {message: "Could not connect to server."};
+        var error = (response && response.error) ? response.error : {message: "Could not connect to server."};
 
         this.syncStatus.syncOpInProgress = false;
         this.syncStatus.error = error;

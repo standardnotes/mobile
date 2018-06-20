@@ -109,7 +109,13 @@ export default class Notes extends Abstract {
     }.bind(this))
 
     this.syncStatusObserver = Sync.getInstance().registerSyncStatusObserver((status) => {
-      if(status.retrievedCount > 20) {
+      if(status.error) {
+        var text = `Unable to connect to sync server.`
+        setTimeout( () => {
+          // need timeout for syncing on app launch
+          this.setStatusBarText(text);
+        }, 250);
+      } else if(status.retrievedCount > 20) {
         var text = `Downloading ${status.retrievedCount} items. Keep app opened.`
         this.setStatusBarText(text);
         this.showingDownloadStatus = true;
@@ -120,6 +126,8 @@ export default class Notes extends Abstract {
         setTimeout(() => {
           this.setStatusBarText(null);
         }, 2000);
+      } else {
+        this.setStatusBarText(null);
       }
     })
 
@@ -131,6 +139,8 @@ export default class Notes extends Abstract {
         Sync.getInstance().refreshErroredItems().then(() => {
           this.reloadList();
         })
+      } else if(event == Auth.DidSignOutEvent) {
+        this.setStatusBarText(null);
       }
     });
   }
