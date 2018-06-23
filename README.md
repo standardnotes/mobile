@@ -17,8 +17,8 @@ This is a React Native implementation of Standard Notes. React Native allows us 
 
 Clone the project, then:
 
-1. If you haven't already associated a SSH key with your github account, follow the directions on https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/ to do so. 
-2.`git submodule update --init`
+1. If you haven't arlready associated a SSH key with your github account, follow the directions on on https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/ to do so.
+2. `git submodule update --init`
 3. `npm install`
 4. `react-native run-ios` or `react-native run-android`
 
