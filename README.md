@@ -21,6 +21,8 @@ Clone the project, then:
 2. `npm install`
 3. `react-native run-ios` or `react-native run-android`
 
+Note: You may need to set up an SSH key on GitHub to pull in submodules. Please follow [these instructions](https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/) to do so.
+
 ### Running on Device
 
 - For iOS:
