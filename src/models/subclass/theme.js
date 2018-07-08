@@ -1,19 +1,6 @@
-import Component from "./component"
-var _ = require('lodash')
+import SF from "../../lib/sfjs"
 
-export default class Theme extends Component {
-
-  constructor(json_obj) {
-    super(json_obj);
-  }
-
-  get content_type() {
-    return "SN|Theme";
-  }
-
-  get displayName() {
-    return "Theme";
-  }
+export default class Theme extends SNTheme {
 
   setMobileRules(rules) {
     this.setAppDataItem("mobileRules", rules);

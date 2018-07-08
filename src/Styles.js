@@ -1,5 +1,3 @@
-var _ = require('lodash')
-
 import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
 import App from "./app"
 import ModelManager from "./lib/modelManager"
@@ -7,9 +5,8 @@ import Server from "./lib/server"
 import Sync from "./lib/sync"
 import Storage from "./lib/storage"
 import Auth from "./lib/auth"
-import Theme from "./models/app/theme"
+import Theme from "./models/subclass/theme"
 import KeysManager from './lib/keysManager'
-
 
 export default class GlobalStyles {
 
@@ -25,7 +22,7 @@ export default class GlobalStyles {
 
   async resolveInitialTheme() {
     // Get the active theme from storage rather than waiting for local database to load
-    return Storage.getItem("activeTheme").then(function(themeResult) {
+    return Storage.get().getItem("activeTheme").then(function(themeResult) {
       let runDefaultTheme = () => {
         try {
           var theme = this.systemTheme();
@@ -80,7 +77,7 @@ export default class GlobalStyles {
   constructor() {
     KeysManager.get().registerAccountRelatedStorageKeys(["activeTheme"]);
 
-    ModelManager.getInstance().addItemSyncObserver("themes", "SN|Theme", function(items){
+    ModelManager.get().addItemSyncObserver("themes", "SN|Theme", function(items){
       if(this.activeTheme && this.activeTheme.isSwapIn) {
         var matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
         if(matchingTheme) {
@@ -155,7 +152,7 @@ export default class GlobalStyles {
   }
 
   themes() {
-    return [this.systemTheme()].concat(ModelManager.getInstance().themes);
+    return [this.systemTheme()].concat(ModelManager.get().themes);
   }
 
   isThemeActive(theme) {
@@ -179,9 +176,9 @@ export default class GlobalStyles {
       theme.setMobileActive(true);
 
       if(theme.default) {
-        Storage.removeItem("activeTheme");
+        Storage.get().removeItem("activeTheme");
       } else if(writeToStorage) {
-        Storage.setItem("activeTheme", JSON.stringify(theme));
+        Storage.get().setItem("activeTheme", JSON.stringify(theme));
       }
 
       App.get().reload();
@@ -192,7 +189,7 @@ export default class GlobalStyles {
         if(theme.getNotAvailOnMobile()) {
           Alert.alert("Not Available", "This theme is not available on mobile.");
         } else {
-          Sync.getInstance().sync();
+          Sync.get().sync();
           run();
         }
       });
@@ -232,7 +229,7 @@ export default class GlobalStyles {
       url = url.replace("localhost", "10.0.2.2");
     }
 
-    return Server.getInstance().getAbsolute(url, {}, function(response){
+    return Server.get().getAbsolute(url, {}, function(response){
       // success
       if(response !== theme.getMobileRules()) {
         theme.setMobileRules(response);
@@ -254,7 +251,7 @@ export default class GlobalStyles {
 
   downloadThemeAndReload(theme) {
     this.downloadTheme(theme, function(){
-      Sync.getInstance().sync(function(){
+      Sync.get().sync(function(){
         this.activateTheme(theme);
       }.bind(this));
     }.bind(this))

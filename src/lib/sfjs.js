@@ -3,22 +3,18 @@ import { StandardFile, SFAbstractCrypto, SFItemTransformer } from 'standard-file
 var base64 = require('base-64');
 var Aes = NativeModules.Aes;
 
-export default class SFJS extends StandardFile {
+export default class SF extends StandardFile {
 
   static instance = null;
   static get() {
     if (this.instance == null) {
-      this.instance = new SFJS(new SFReactNativeCrypto());
+      // We don't want SFJS using this function, since we can only generate uuid async here.
+      // SFJS will check to make sure `generateUUIDSync` is defined before using it.
+      SFReactNativeCrypto.prototype.generateUUIDSync = null;
+      let cryptoInstance = new SFReactNativeCrypto();
+      this.instance = new SF(cryptoInstance);
     }
     return this.instance;
-  }
-
-  static crypto() {
-    return this.get().crypto;
-  }
-
-  static itemTransformer() {
-    return this.get().itemTransformer;
   }
 }
 

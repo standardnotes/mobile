@@ -8,7 +8,6 @@ import LockedView from "../containers/LockedView";
 import Abstract from "./Abstract"
 
 import GlobalStyles from "../Styles"
-var _ = require('lodash')
 
 import { Alert, View, WebView, Linking, Platform } from 'react-native';
 
@@ -25,8 +24,8 @@ export default class Webview extends Abstract {
   constructor(props) {
     super(props);
 
-    this.editor = ModelManager.getInstance().findItem(props.editorId);
-    this.note = ModelManager.getInstance().findItem(props.noteId);
+    this.editor = ModelManager.get().findItem(props.editorId);
+    this.note = ModelManager.get().findItem(props.noteId);
 
     if(!this.note) {
       console.log("Unable to find note with ID", props.noteId);

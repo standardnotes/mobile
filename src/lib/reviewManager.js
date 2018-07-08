@@ -22,13 +22,13 @@ export default class ReviewManager {
   }
 
   static async getRunCount() {
-    return Storage.getItem("runCount").then((runCount) => {
+    return Storage.get().getItem("runCount").then((runCount) => {
       return JSON.parse(runCount);
     })
   }
 
   static async setRunCount(runCount) {
-    return Storage.setItem("runCount", JSON.stringify(runCount));
+    return Storage.get().setItem("runCount", JSON.stringify(runCount));
   }
 
 }

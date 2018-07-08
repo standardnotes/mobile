@@ -28,37 +28,40 @@ export default class ItemActionManager {
       var title = `Delete ${item.displayName}`;
       var message = `Are you sure you want to delete this ${item.displayName.toLowerCase()}?`;
 
-      AlertManager.confirm(title, message, "Delete",
-        () => {
-          ModelManager.getInstance().setItemToBeDeleted(item);
+      AlertManager.get().confirm({
+        title: title,
+        text: message,
+        confirmButtonText: "Delete",
+        onConfirm: () => {
+          ModelManager.get().setItemToBeDeleted(item);
 
           afterConfirmCallback && afterConfirmCallback();
 
-          Sync.getInstance().sync(() => {
+          Sync.get().sync().then(() => {
             callback && callback();
           });
         }
-      )
+      })
     }
 
      else if(event == this.PinEvent || event == this.UnpinEvent) {
       item.setAppDataItem("pinned", event == this.PinEvent);
       item.setDirty(true);
-      Sync.getInstance().sync();
+      Sync.get().sync();
       callback && callback();
     }
 
     else if(event == this.LockEvent || event == this.UnlockEvent) {
      item.setAppDataItem("locked", event == this.LockEvent);
      item.setDirty(true);
-     Sync.getInstance().sync();
+     Sync.get().sync();
      callback && callback();
    }
 
      else if(event == this.ArchiveEvent || event == this.UnarchiveEvent) {
       item.setAppDataItem("archived", event == this.ArchiveEvent);
       item.setDirty(true);
-      Sync.getInstance().sync();
+      Sync.get().sync();
       callback && callback();
     }
 

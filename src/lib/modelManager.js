@@ -1,18 +1,26 @@
-import SFJS from "./sfjs"
-import DBManager from "./dbManager"
-var _ = require('lodash')
+import Storage from "./storage"
+import Theme from "../models/subclass/theme"
+import "../models/extend/item.js";
 
-import Item from "../models/api/item"
-import Note from "../models/app/note"
-import Tag from "../models/app/tag"
-import Theme from "../models/app/theme"
-import Component from "../models/app/component"
+SFModelManager.ContentTypeClassMapping = {
+  "Note" : SNNote,
+  "Tag" : SNTag,
+  "SN|SmartTag" : SNSmartTag,
+  "Extension" : SNExtension,
+  "SN|Editor" : SNEditor,
+  "SN|Theme" : Theme,
+  "SN|Component" : SNComponent,
+  "SF|Extension" : SNServerExtension,
+  "SF|MFA" : SNMfa
+};
 
-export default class ModelManager {
+SFItem.AppDomain = "org.standardnotes.sn";
+
+export default class ModelManager extends SFModelManager {
 
   static instance = null;
 
-  static getInstance() {
+  static get() {
     if (this.instance == null) {
       this.instance = new ModelManager();
     }
@@ -21,79 +29,20 @@ export default class ModelManager {
   }
 
   constructor() {
-    ModelManager.MappingSourceRemoteRetrieved = "MappingSourceRemoteRetrieved";
-    ModelManager.MappingSourceRemoteSaved = "MappingSourceRemoteSaved";
-    ModelManager.MappingSourceLocalSaved = "MappingSourceLocalSaved";
-    ModelManager.MappingSourceLocalRetrieved = "MappingSourceLocalRetrieved";
-    ModelManager.MappingSourceComponentRetrieved = "MappingSourceComponentRetrieved";
-    ModelManager.MappingSourceDesktopInstalled = "MappingSourceDesktopInstalled"; // When a component is installed by the desktop and some of its values change
-    ModelManager.MappingSourceRemoteActionRetrieved = "MappingSourceRemoteActionRetrieved"; /* aciton-based Extensions like note history */
-    ModelManager.MappingSourceFileImport = "MappingSourceFileImport";
+    super();
 
-    this.items = [];
     this.notes = [];
     this.tags = [];
     this.themes = [];
-    this.itemsPendingRemoval = [];
-    this.itemSyncObservers = [];
 
     this.acceptableContentTypes = ["Note", "Tag", "SN|Theme", "SN|Component"];
   }
 
   handleSignout() {
-    // empty the following arrays by settings its length to 0
+    super.handleSignout();
     this.notes.length = 0;
     this.tags.length = 0;
     this.themes.length = 0;
-    this.items.length = 0;
-  }
-
-  get allItems() {
-    return this.items.filter(function(item){
-      return !item.dummy;
-    })
-  }
-
-  async alternateUUIDForItem(item) {
-    // Collapse in memory properties to item's content object, as the new item will be created based on the content object, and not the physical properties. (like note.text or note.title)
-    item.refreshContentObject();
-
-    // we need to clone this item and give it a new uuid, then delete item with old uuid from db (you can't mofidy uuid's in our indexeddb setup)
-    var newItem = this.createItem(item);
-    newItem.uuid = await SFJS.crypto().generateUUID();
-    newItem.informReferencesOfUUIDChange(item.uuid, newItem.uuid);
-    this.informModelsOfUUIDChangeForItem(newItem, item.uuid, newItem.uuid);
-    return this.removeItemLocally(item).then(function(){
-      this.addItem(newItem);
-      newItem.setDirty(true);
-      newItem.markAllReferencesDirty();
-    }.bind(this))
-  }
-
-  informModelsOfUUIDChangeForItem(newItem, oldUUID, newUUID) {
-    // some models that only have one-way relationships might be interested to hear that an item has changed its uuid
-    // for example, editors have a one way relationship with notes. When a note changes its UUID, it has no way to inform the editor
-    // to update its relationships
-
-    for(var model of this.items) {
-      model.potentialItemOfInterestHasChangedItsUUID(newItem, oldUUID, newUUID);
-    }
-  }
-
-  allItemsMatchingTypes(contentTypes) {
-    return this.items.filter(function(item){
-      return (_.includes(contentTypes, item.content_type) || _.includes(contentTypes, "*")) && !item.dummy;
-    })
-  }
-
-  findItem(itemId) {
-    return _.find(this.items, {uuid: itemId});
-  }
-
-  getItemsWithIds(ids) {
-    return this.items.filter(function(item){
-      return ids.includes(item.uuid);
-    })
   }
 
   findOrCreateTagByTitle(title) {
@@ -105,110 +54,9 @@ export default class ModelManager {
     return tag;
   }
 
-  mapResponseItemsToLocalModels(items, source) {
-    return this.mapResponseItemsToLocalModelsOmittingFields(items, null, source);
-  }
-
-  mapResponseItemsToLocalModelsOmittingFields(items, omitFields, source) {
-    var models = [], processedObjects = [], modelsToNotifyObserversOf = [];
-
-    // first loop should add and process items
-    for (var json_obj of items) {
-      if((!json_obj.content_type || !json_obj.content) && !json_obj.deleted) {
-        // An item that is not deleted should never have empty content
-        console.log("Server response item is corrupt:", json_obj);
-        continue;
-      }
-
-      // Lodash's _.omit, which was previously used, seems to cause unexpected behavior
-      // when json_obj is an ES6 item class. So we instead manually omit each key.
-      if(Array.isArray(omitFields)) {
-        for(var key of omitFields) {
-          delete json_obj[key];
-        }
-      }
-
-      var item = this.findItem(json_obj.uuid);
-
-      if(item) {
-        item.updateFromJSON(json_obj);
-      }
-
-      if(this.itemsPendingRemoval.includes(json_obj.uuid)) {
-        _.pull(this.itemsPendingRemoval, json_obj.uuid);
-        continue;
-      }
-
-      var unknownContentType = !_.includes(this.acceptableContentTypes, json_obj["content_type"]);
-      var isDirtyItemPendingDelete = false;
-      if(json_obj.deleted == true || unknownContentType) {
-        if(json_obj.deleted && json_obj.dirty) {
-          // Item was marked as deleted but not yet synced
-          // We need to create this item as usual, but just not add it to individual arrays
-          // i.e add to this.items but not this.notes (so that it can be retrieved with getDirtyItems)
-          isDirtyItemPendingDelete = true;
-        } else {
-          if(item && !unknownContentType) {
-            modelsToNotifyObserversOf.push(item);
-            this.removeItemLocally(item)
-          }
-          continue;
-        }
-      }
-
-      if(!item) {
-        item = this.createItem(json_obj);
-      }
-
-      this.addItem(item);
-
-      modelsToNotifyObserversOf.push(item);
-      models.push(item);
-      processedObjects.push(json_obj);
-    }
-
-    // second loop should process references
-    for (var index in processedObjects) {
-      var json_obj = processedObjects[index];
-      if(json_obj.content) {
-        this.resolveReferencesForItem(models[index]);
-      }
-    }
-
-    this.notifySyncObserversOfModels(modelsToNotifyObserversOf, source);
-
-    return models;
-  }
-
-  notifySyncObserversOfModels(models, source) {
-    for(var observer of this.itemSyncObservers) {
-      var relevantItems = models.filter(function(item){return item.content_type == observer.type || observer.type == "*"});
-      if(relevantItems.length > 0) {
-        observer.callback(relevantItems, source);
-      }
-    }
-  }
-
-  createItem(json_obj) {
-    var item;
-    if(json_obj.content_type == "Note") {
-      item = new Note(json_obj);
-    } else if(json_obj.content_type == "Tag") {
-      item = new Tag(json_obj);
-    } else if(json_obj.content_type == "SN|Theme") {
-      item = new Theme(json_obj);
-    } else if(json_obj.content_type == "SN|Component") {
-      item = new Component(json_obj);
-    }
-
-    else {
-      item = new Item(json_obj);
-    }
-
-    return item;
-  }
-
   addItems(items, globalOnly = false) {
+    super.addItems(items, globalOnly);
+
     items.forEach((item) => {
       // In some cases, you just want to add the item to this.items, and not to the individual arrays
       // This applies when you want to keep an item syncable, but not display it via the individual arrays
@@ -230,113 +78,28 @@ export default class ModelManager {
          }
        }
      }
-
-     if(!_.find(this.items, {uuid: item.uuid})) {
-       this.items.push(item);
-     }
     });
-  }
-
-  addItem(item, globalOnly = false) {
-    this.addItems([item], globalOnly);
-  }
-
-  createDuplicateItem(itemResponse) {
-    var dup = this.createItem(itemResponse);
-    this.resolveReferencesForItem(dup);
-    return dup;
-  }
-
-  itemsForContentType(contentType) {
-    return this.items.filter(function(item){
-      return item.content_type == contentType;
-    });
-  }
-
-  resolveReferencesForItem(item) {
-
-    var contentObject = item.contentObject;
-
-    // If another client removes an item's references, this client won't pick up the removal unless
-    // we remove everything not present in the current list of references
-    item.removeReferencesNotPresentIn(contentObject.references || []);
-
-    if(!contentObject.references) {
-      return;
-    }
-
-    for(var reference of contentObject.references) {
-      var referencedItem = this.findItem(reference.uuid);
-      if(referencedItem) {
-        item.addItemAsRelationship(referencedItem);
-        referencedItem.addItemAsRelationship(item);
-      } else {
-        // console.error("Unable to find reference:", reference.uuid, "for item:", item);
-      }
-    }
-  }
-
-  addItemSyncObserver(id, type, callback) {
-    this.itemSyncObservers.push({id: id, type: type, callback: callback});
-  }
-
-  removeItemSyncObserver(id) {
-    _.remove(this.itemSyncObservers, _.find(this.itemSyncObservers, {id: id}));
-  }
-
-  get filteredNotes() {
-    return Note.filterDummyNotes(this.notes);
-  }
-
-  getDirtyItems() {
-    return this.items.filter(function(item){
-      // An item that has an error decrypting can be synced only if it is being deleted.
-      // Otherwise, we don't want to send corrupt content up to the server.
-      return item.dirty == true && !item.dummy && (!item.errorDecrypting || item.deleted);
-    })
-  }
-
-  clearDirtyItems(items) {
-    for(var item of items) {
-      item.setDirty(false);
-    }
-  }
-
-  clearAllDirtyItems() {
-    this.clearDirtyItems(this.getDirtyItems());
-  }
-
-  setItemToBeDeleted(item) {
-    item.deleted = true;
-    if(!item.dummy) {
-      item.setDirty(true);
-    }
-    item.removeAndDirtyAllRelationships();
   }
 
   async removeItemLocally(item) {
-    _.pull(this.items, item);
-
-    this.itemsPendingRemoval.push(item.uuid);
-
-    item.isBeingRemovedLocally();
+    super.removeItemLocally(item);
 
     if(item.content_type == "Tag") {
-      _.pull(this.tags, item);
+      _.remove(this.tags, {uuid: item.uuid});
     } else if(item.content_type == "Note") {
-      this.notes = _.pull(this.notes, item);
+      _.remove(this.notes, {uuid: item.uuid});
     } else if(item.content_type == "SN|Theme") {
-      _.pull(this.themes, item);
+      _.remove(this.themes, {uuid: item.uuid});
     }
 
-    return DBManager.deleteItem(item);
+    return Storage.get().deleteModel(item);
   }
 
   getNotes(options = {}) {
     var notes;
     var tags = [];
     if(options.selectedTags && options.selectedTags.length > 0 && options.selectedTags[0].key !== "all") {
-      tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
+      tags = ModelManager.get().findItems(options.selectedTags);
       if(tags.length > 0) {
         var taggedNotes = new Set();
         for(var tag of tags) {

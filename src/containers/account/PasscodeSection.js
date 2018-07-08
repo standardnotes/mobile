@@ -12,8 +12,6 @@ import SectionedOptionsTableCell from "../../components/SectionedOptionsTableCel
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import KeysManager from "../../lib/keysManager"
 
-var _ = require('lodash')
-
 export default class PasscodeSection extends Component {
 
   constructor(props) {

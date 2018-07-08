@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { TextInput, SectionList, ScrollView, View, Text, Linking, Share, Platform, StatusBar, FlatList, Dimensions } from 'react-native';
-var _ = require('lodash')
-
 import Sync from '../lib/sync'
 import ModelManager from '../lib/modelManager'
 import ComponentManager from '../lib/componentManager'
@@ -14,7 +12,6 @@ import ManageNote from "../containers/ManageNote";
 import LockedView from "../containers/LockedView";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
-import Tag from "../models/app/tag"
 import Icons from '../Icons';
 import OptionsState from "../OptionsState"
 import GlobalStyles from "../Styles"
@@ -47,7 +44,7 @@ export default class Filter extends Abstract {
     this.mergeState({tags: [], selectedTags: selectedTags, archivedOnly: this.options.archivedOnly});
 
     if(this.props.noteId) {
-      this.note = ModelManager.getInstance().findItem(this.props.noteId);
+      this.note = ModelManager.get().findItem(this.props.noteId);
     }
 
     // React Native Navigation has an issue where navigation pushes are pushed first, then rendered.
@@ -55,32 +52,33 @@ export default class Filter extends Abstract {
     // then wait a little to render the rest, such as a dynamic list of tags
     // See https://github.com/wix/react-native-navigation/issues/358
 
-    this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
-      if(!this.props.singleSelectMode) {
-        // Load tags after delay
-        setTimeout(function () {
+    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+      if(event == "local-data-loaded") {
+        if(!this.props.singleSelectMode) {
+          // Load tags after delay
+          setTimeout(function () {
+            this.loadTags = true;
+            this.forceUpdate();
+          }.bind(this), 10);
+        } else {
+          // Load tags immediately on every render
           this.loadTags = true;
           this.forceUpdate();
-        }.bind(this), 10);
-      } else {
-        // Load tags immediately on every render
-        this.loadTags = true;
-        this.forceUpdate();
+        }
       }
-    }.bind(this))
 
-    this.syncObserver = Sync.getInstance().registerSyncObserver((changesMade, retreived, saved) => {
-      if(retreived && _.find(retreived, {content_type: "Tag"})) {
-        this.forceUpdate();
+      else if(event == "sync:completed") {
+        if(data.retrievedItems && _.find(data.retrievedItems, {content_type: "Tag"})) {
+          this.forceUpdate();
+        }
       }
-    });
+    })
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
-    Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
-    Sync.getInstance().removeSyncObserver(this.syncObserver);
+    Sync.get().removeEventHandler(this.syncEventHandler);
   }
 
   notifyParentOfOptionsChange() {
@@ -198,11 +196,11 @@ export default class Filter extends Abstract {
   }
 
   createTag(text, callback) {
-    var tag = new Tag({title: text});
+    var tag = new SNTag({title: text});
     tag.initUUID().then(() => {
       tag.setDirty(true);
-      ModelManager.getInstance().addItem(tag);
-      Sync.getInstance().sync();
+      ModelManager.get().addItem(tag);
+      Sync.get().sync();
       callback(tag);
       this.forceUpdate();
     })
@@ -303,7 +301,7 @@ export default class Filter extends Abstract {
   }
 
   getEditors() {
-    return ModelManager.getInstance().itemsForContentType("SN|Component").filter(function(component){
+    return ModelManager.get().validItemsForContentType("SN|Component").filter(function(component){
       return component.area == "editor-editor";
     })
   }
@@ -331,7 +329,7 @@ export default class Filter extends Abstract {
     }
 
     if(this.loadTags) {
-      var tags = ModelManager.getInstance().tags.slice();
+      var tags = ModelManager.get().tags.slice();
       if(this.props.singleSelectMode) {
         tags.unshift({title: "All notes", key: "all", uuid: 100})
       }

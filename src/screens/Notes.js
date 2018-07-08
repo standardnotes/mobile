@@ -15,7 +15,6 @@ import OptionsState from "../OptionsState"
 import App from "../app"
 import AuthModal from "../containers/AuthModal"
 import LockedView from "../containers/LockedView"
-var _ = require('lodash')
 import ApplicationState from "../ApplicationState";
 
 export default class Notes extends Abstract {
@@ -29,7 +28,7 @@ export default class Notes extends Abstract {
       if(state == ApplicationState.Resuming) {
         // we only want to perform sync here if the app is resuming, not if it's a fresh start
         if(this.dataLoaded) {
-          Sync.getInstance().sync();
+          Sync.get().sync();
         }
 
         var authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
@@ -76,8 +75,10 @@ export default class Notes extends Abstract {
   componentWillUnmount() {
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
-    Sync.getInstance().removeSyncObserver(this.syncObserver);
-    Sync.getInstance().removeSyncStatusObserver(this.syncStatusObserver);
+
+    Sync.get().removeEventHandler(this.syncObserver);
+    Sync.get().removeSyncStatusObserver(this.syncStatusObserver);
+
     Auth.getInstance().removeEventObserver(this.signoutObserver);
     if(this.options) {
       this.options.removeChangeObserver(this.optionsObserver);
@@ -88,7 +89,7 @@ export default class Notes extends Abstract {
   beginSyncTimer() {
     // Refresh every 30s
     this.syncTimer = setInterval(function () {
-      Sync.getInstance().sync(null);
+      Sync.get().sync(null);
     }, 30000);
   }
 
@@ -101,14 +102,16 @@ export default class Notes extends Abstract {
       }
     })
 
-    this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade, retrieved, saved, unsaved){
-      if(_.find(retrieved, {content_type: "Note"}) || _.find(unsaved, {content_type: "Note"})) {
-        this.reloadList();
+    this.syncObserver = Sync.get().addEventHandler((event, data) => {
+      if(event == "sync:completed") {
+        if(_.find(data.retrievedItems, {content_type: "Note"}) || _.find(data.unsavedItems, {content_type: "Note"})) {
+          this.reloadList();
+        }
+        this.mergeState({refreshing: false, loading: false});
       }
-      this.mergeState({refreshing: false, loading: false});
-    }.bind(this))
+    })
 
-    this.syncStatusObserver = Sync.getInstance().registerSyncStatusObserver((status) => {
+    this.syncStatusObserver = Sync.get().registerSyncStatusObserver((status) => {
       if(status.error) {
         var text = `Unable to connect to sync server.`
         setTimeout( () => {
@@ -136,7 +139,7 @@ export default class Notes extends Abstract {
         this.mergeState({loading: true})
       } else if(event == Auth.DidSignInEvent) {
         // Check if there are items that are errorDecrypting and try decrypting with new keys
-        Sync.getInstance().refreshErroredItems().then(() => {
+        Sync.get().refreshErroredItems().then(() => {
           this.reloadList();
         })
       } else if(event == Auth.DidSignOutEvent) {
@@ -170,7 +173,16 @@ export default class Notes extends Abstract {
     this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
     this.setStatusBarText(encryptionEnabled ? "Decrypting notes..." : "Loading notes...");
-    Sync.getInstance().loadLocalItems((items) => {
+    let incrementalCallback = () => {
+      // Incremental Callback
+      if(!this.dataLoaded) {
+        this.dataLoaded = true;
+        this.configureNavBar(true);
+      }
+      this.reloadList();
+    }
+
+    Sync.get().loadLocalItems(incrementalCallback).then((items) => {
       setTimeout(() => {
         this.setStatusBarText("Syncing...");
         this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
@@ -179,17 +191,10 @@ export default class Notes extends Abstract {
         this.configureNavBar(true);
         this.mergeState({decrypting: false, loading: false});
         // perform initial sync
-        Sync.getInstance().sync(() => {
+        Sync.get().sync().then(() => {
           this.setStatusBarText(null);
         });
       }, 0);
-    }, () => {
-      // Incremental Callback
-      if(!this.dataLoaded) {
-        this.dataLoaded = true;
-        this.configureNavBar(true);
-      }
-      this.reloadList();
     });
   }
 
@@ -248,7 +253,7 @@ export default class Notes extends Abstract {
     // Android only allows 1 tag selection
     if(App.isAndroid) {
       if(numTags > 0) {
-        var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
+        var tags = ModelManager.get().findItems(options.selectedTags);
         if(tags.length > 0) {
           var tag = tags[0];
           notesTitle = tag.title + " notes";
@@ -397,7 +402,7 @@ export default class Notes extends Abstract {
 
   _onRefresh() {
     this.setState({refreshing: true});
-    Sync.getInstance().sync();
+    Sync.get().sync();
   }
 
   _onPressItem = (item: hash) => {
@@ -438,11 +443,11 @@ export default class Notes extends Abstract {
       return <AuthModal />;
     }
 
-    var result = ModelManager.getInstance().getNotes(this.options);
+    var result = ModelManager.get().getNotes(this.options);
     var notes = result.notes;
     var tags = this.selectedTags = result.tags;
 
-    var syncStatus = Sync.getInstance().syncStatus;
+    var syncStatus = Sync.get().syncStatus;
 
     return (
       <View style={GlobalStyles.styles().container}>

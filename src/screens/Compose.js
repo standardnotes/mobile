@@ -3,13 +3,11 @@ import Sync from '../lib/sync'
 import Auth from '../lib/auth'
 import ModelManager from '../lib/modelManager'
 import ComponentManager from '../lib/componentManager'
-import Note from '../models/app/note'
 import Abstract from "./Abstract"
 import Icons from '../Icons';
 import App from '../app'
 import LockedView from "../containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
-var _ = require('lodash');
 
 import TextView from "sn-textview";
 
@@ -33,13 +31,13 @@ export default class Compose extends Abstract {
 
   constructor(props) {
     super(props);
-    var note = ModelManager.getInstance().findItem(props.noteId);
+    var note = ModelManager.get().findItem(props.noteId);
     if(!note) {
-      note = ModelManager.getInstance().createItem({content_type: "Note", dummy: true, text: ""});
+      note = ModelManager.get().createItem({content_type: "Note", dummy: true, text: ""});
       // We needed to add the item originally for default editors to work, but default editors was removed
       // So the only way to select an editor is to make a change to the note, which will add it.
       // The problem with adding it here is that if you open Compose and close it without making changes, it will save an empty note.
-      // ModelManager.getInstance().addItem(note);
+      // ModelManager.get().addItem(note);
       note.dummy = true;
     }
 
@@ -48,11 +46,13 @@ export default class Compose extends Abstract {
 
     this.loadStyles();
 
-    this.syncObserver = Sync.getInstance().registerSyncObserver((changesMade, retreived, saved) => {
-      if(retreived && this.note.uuid && retreived.map((i) => i.uuid).includes(this.note.uuid)) {
-        this.refreshContent();
+    this.syncObserver = Sync.get().addEventHandler((event, data) => {
+      if(event == "sync:completed") {
+        if(data.retrievedItems && this.note.uuid && data.retrievedItems.map((i) => i.uuid).includes(this.note.uuid)) {
+          this.refreshContent();
+        }
       }
-    });
+    })
 
     this.configureNavBar(true);
   }
@@ -97,7 +97,7 @@ export default class Compose extends Abstract {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    Sync.getInstance().removeSyncObserver(this.syncObserver);
+    Sync.get().removeEventHandler(this.syncObserver);
   }
 
   viewDidAppear() {
@@ -201,7 +201,7 @@ export default class Compose extends Abstract {
         onEditorSelect: () => {this.presentedEditor = true},
         onOptionsChange: (options) => {
           if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
-            var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
+            var tags = ModelManager.get().findItems(options.selectedTags);
             this.note.replaceTags(tags);
             this.note.setDirty(true);
             this.changesMade();
@@ -232,7 +232,7 @@ export default class Compose extends Abstract {
       if(!this.note.uuid) {
         this.note.initUUID().then(() => {
           if(this.props.selectedTagId) {
-            var tag = ModelManager.getInstance().findItem(this.props.selectedTagId);
+            var tag = ModelManager.get().findItem(this.props.selectedTagId);
             this.note.addItemAsRelationship(tag);
             tag.addItemAsRelationship(this.note);
           }
@@ -248,7 +248,7 @@ export default class Compose extends Abstract {
   sync(note, callback) {
     note.setDirty(true);
 
-    Sync.getInstance().sync((response) => {
+    Sync.get().sync().then((response) => {
       if(response && response.error) {
         if(!this.didShowErrorAlert) {
           this.didShowErrorAlert = true;
@@ -270,7 +270,7 @@ export default class Compose extends Abstract {
     var note = this.note;
     if(note.dummy) {
       note.dummy = false;
-      ModelManager.getInstance().addItem(note);
+      ModelManager.get().addItem(note);
     }
     this.sync(note, function(success){
       if(success) {

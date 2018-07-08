@@ -1,8 +1,6 @@
 import {AppState} from 'react-native';
 import App from "./app"
 import KeysManager from "./lib/keysManager"
-var _ = require('lodash');
-
 
 export default class ApplicationState {
 

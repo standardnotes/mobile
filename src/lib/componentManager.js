@@ -5,8 +5,7 @@ import ModelManager from './modelManager'
 import GlobalStyles from '../Styles'
 import App from '../app'
 import Sync from './sync'
-import SFJS from "./sfjs"
-var _ = require('lodash')
+import SF from "./sfjs"
 
 export default class ComponentManager {
 
@@ -29,7 +28,7 @@ export default class ComponentManager {
 
     this.handlers = [];
 
-    ModelManager.getInstance().addItemSyncObserver("component-manager", "*", (allItems, source) => {
+    ModelManager.get().addItemSyncObserver("component-manager", "*", (allItems, source) => {
 
       /* If the source of these new or updated items is from a Component itself saving items, we don't need to notify
         components again of the same item. Regarding notifying other components than the issuing component, other mapping sources
@@ -139,7 +138,7 @@ export default class ComponentManager {
   }
 
   get components() {
-    return ModelManager.getInstance().allItemsMatchingTypes(["SN|Component", "SN|Theme"]);
+    return ModelManager.get().allItemsMatchingTypes(["SN|Component", "SN|Theme"]);
   }
 
   componentsForArea(area) {
@@ -275,7 +274,7 @@ export default class ComponentManager {
     We map the items here because modelManager is what updates the UI. If you were to instead get the items directly,
     this would update them server side via sync, but would never make its way back to the UI.
     */
-    var localItems = ModelManager.getInstance().mapResponseItemsToLocalModels(responseItems, ModelManager.MappingSourceComponentRetrieved);
+    var localItems = ModelManager.get().mapResponseItemsToLocalModels(responseItems, ModelManager.MappingSourceComponentRetrieved);
 
     for(var item of localItems) {
       var responseItem = _.find(responseItems, {uuid: item.uuid});
@@ -286,7 +285,7 @@ export default class ComponentManager {
       item.setDirty(true);
     }
 
-    Sync.getInstance().sync((response) => {
+    Sync.get().sync().then((response) => {
       // Allow handlers to be notified when a save begins and ends, to update the UI
       var saveMessage = Object.assign({}, message);
       saveMessage.action = response && response.error ? "save-error" : "save-success";
@@ -298,7 +297,7 @@ export default class ComponentManager {
   handleSetComponentDataMessage(component, message) {
     component.componentData = message.data.componentData;
     component.setDirty(true);
-    Sync.getInstance().sync();
+    Sync.get().sync();
   }
 
   registerHandler(handler) {
@@ -326,7 +325,7 @@ export default class ComponentManager {
     }
 
     component.window = componentWindow;
-    component.sessionKey = await SFJS.crypto().generateUUID();
+    component.sessionKey = await SF.get().crypto().generateUUID();
 
     this.sendMessageToComponent(component, {
       action: "component-registered",
@@ -369,7 +368,7 @@ export default class ComponentManager {
   }
 
   editorForNote(note) {
-    let editors = ModelManager.getInstance().itemsForContentType("SN|Component").filter(function(component){
+    let editors = ModelManager.get().validItemsForContentType("SN|Component").filter(function(component){
       return component.area == "editor-editor";
     })
 
@@ -414,7 +413,7 @@ export default class ComponentManager {
       }
     }
 
-    Sync.getInstance().sync();
+    Sync.get().sync();
   }
 
   clearEditorForNote(note) {

@@ -1,14 +1,12 @@
-import SFJS from './sfjs'
+import SF from './sfjs'
 import Server from './server'
 import Storage from './storage'
-import DBManager from './dbManager'
 import Sync from './sync'
 import ModelManager from './modelManager'
 import AlertManager from './alertManager'
 import {Platform} from 'react-native';
 import Keychain from "./keychain"
 import KeysManager from "./keysManager"
-var _ = require('lodash');
 
 let accountRelatedStorageKeys = [];
 
@@ -94,9 +92,9 @@ export default class Auth {
   }
 
   validateLogin = (authParams, strictSignIn, callback) => {
-    if(!SFJS.get().supportedVersions().includes(authParams.version)) {
+    if(!SF.get().supportedVersions().includes(authParams.version)) {
       var message;
-      if(SFJS.get().isVersionNewerThanLibraryVersion(authParams.version)) {
+      if(SF.get().isVersionNewerThanLibraryVersion(authParams.version)) {
         // The user has a new account type, but is signing in to an older client.
         message = "This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.";
       } else {
@@ -109,7 +107,7 @@ export default class Auth {
 
     // need to put this in a block due to asyncrounous confirm alert
     var otherValidation = () => {
-      var minimum = SFJS.get().costMinimumForVersion(authParams.version);
+      var minimum = SF.get().costMinimumForVersion(authParams.version);
       if(authParams.pw_cost < minimum) {
         let message = "Unable to login due to insecure password parameters. Please visit standardnotes.org/help/security for more information.";
         callback({message: message});
@@ -118,7 +116,7 @@ export default class Auth {
 
       if(strictSignIn) {
         // Refuse sign in if authParams.version is anything but the latest version
-        var latestVersion = SFJS.get().version();
+        var latestVersion = SF.get().version();
         if(authParams.version !== latestVersion) {
           let message = `Strict sign in refused server sign in parameters. The latest security version is ${latestVersion}, but your account is reported to have version ${authParams.version}. If you'd like to proceed with sign in anyway, please disable strict sign in and try again.`;
           callback({message: message});
@@ -128,14 +126,18 @@ export default class Auth {
       callback(null);
     }
 
-    if(SFJS.get().isProtocolVersionOutdated(authParams.version)) {
+    if(SF.get().isProtocolVersionOutdated(authParams.version)) {
       let message = `The encryption version for your account, ${authParams.version}, is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.`
-      AlertManager.confirm("Update Needed", message, "Sign In", () => {
-        // continue validation
-        otherValidation();
-      }, () => {
-        // cancel
-        callback({});
+      AlertManager.get().confirm({
+        title: "Update Needed",
+        text: message,
+        confirmButtonText: "Sign In",
+        onConfirm: () => {
+          otherValidation();
+        },
+        onCancel: () => {
+          callback({});
+        }
       })
       return;
     } else {
@@ -163,7 +165,7 @@ export default class Auth {
           return;
         }
 
-        SFJS.crypto().computeEncryptionKeysForUser(inputtedPassword, authParams).then((keys) => {
+        SF.get().crypto().computeEncryptionKeysForUser(inputtedPassword, authParams).then((keys) => {
           root.performLoginRequest(email, keys.pw, server, extraParams, async (response, error) => {
             if(error) {
               callback(null, error);
@@ -187,7 +189,7 @@ export default class Auth {
 
     // if(__DEV__) { authParams.pw_cost = 3000; }
 
-    SFJS.crypto().generateInitialKeysAndAuthParamsForUser(email, inputtedPassword).then((results) => {
+    SF.get().crypto().generateInitialKeysAndAuthParamsForUser(email, inputtedPassword).then((results) => {
       let keys = results.keys;
       let authParams = results.authParams;
 
@@ -207,7 +209,7 @@ export default class Auth {
 
   async performLoginRequest(email, pw, server, extraParams, callback) {
     var url = this.urlForPath("auth/sign_in", server);
-    Server.getInstance().postAbsolute(url, _.merge({email: email, password: pw}, extraParams), function(response){
+    Server.get().postAbsolute(url, _.merge({email: email, password: pw}, extraParams), function(response){
       callback(response, null);
     }, function(error){
       callback(null, error.error);
@@ -216,7 +218,7 @@ export default class Auth {
 
   async performRegistrationRequest(email, pw, authParams, server, callback) {
     var url = this.urlForPath("auth/", server);
-    Server.getInstance().postAbsolute(url, _.merge({email: email, password: pw}, authParams), function(response){
+    Server.get().postAbsolute(url, _.merge({email: email, password: pw}, authParams), function(response){
       callback(response, null);
     }, function(error){
       callback(null, error.error);
@@ -241,27 +243,22 @@ export default class Auth {
 
   async getAuthParams(email, server, extraParams, callback) {
     var url = this.urlForPath("auth/params", server);
-    Server.getInstance().getAbsolute(url, _.merge({email: email}, extraParams), function(response){
+    Server.get().getAbsolute(url, _.merge({email: email}, extraParams), (response) => {
       callback(response, null);
-    }, function(response){
+    }, (response) => {
       console.log("Error getting auth params", response);
       var error = response.error || {message: response};
       callback(null, error);
     })
   }
 
-  signout(callback) {
-    ModelManager.getInstance().handleSignout();
+  signout() {
+    ModelManager.get().handleSignout();
     KeysManager.get().clearAccountKeysAndData();
 
-    DBManager.clearAllItems(() => {
-      Sync.getInstance().handleSignout();
-
+    return Storage.get().clearAllModels().then(() => {
+      Sync.get().handleSignout();
       this.postEvent(Auth.DidSignOutEvent);
-
-      if(callback) {
-        callback();
-      }
     });
   }
 

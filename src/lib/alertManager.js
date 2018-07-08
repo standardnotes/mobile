@@ -1,9 +1,19 @@
 import { Alert } from 'react-native';
 import App from "../app"
 
-export default class AlertManager {
+export default class AlertManager extends SFAlertManager {
 
-  static confirm(title, message, confirmButtonText = "OK", onConfirm, onCancel) {
+  static instance = null;
+
+  static get() {
+    if (this.instance == null) {
+      this.instance = new AlertManager();
+    }
+
+    return this.instance;
+  }
+
+  confirm({title, text, confirmButtonText = "OK", onConfirm, onCancel} = {}) {
     // On iOS, confirm should go first. On Android, cancel should go first.
     let buttons = [
       {text: 'Cancel', onPress: onCancel},
@@ -11,7 +21,7 @@ export default class AlertManager {
     ];
     Alert.alert(
       title,
-      message,
+      text,
       buttons,
       { cancelable: true }
     )

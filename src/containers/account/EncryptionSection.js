@@ -27,7 +27,7 @@ export default class PasscodeSection extends Component {
     var sourceString = source == "account" ? "Account Keys" : "Passcode";
     var encryptionType = "AES-256";
 
-    var items = ModelManager.getInstance().allItemsMatchingTypes(["Note", "Tag"]);
+    var items = ModelManager.get().allItemsMatchingTypes(["Note", "Tag"]);
     var itemsStatus = items.length + "/" + items.length + " notes and tags encrypted";
 
     var textStyles = {

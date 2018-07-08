@@ -1,5 +1,4 @@
 import Storage from "./lib/storage"
-var _ = require('lodash');
 
 export default class OptionsState {
 
@@ -25,14 +24,14 @@ export default class OptionsState {
   }
 
   async loadSaved() {
-    return Storage.getItem("options").then(function(result){
+    return Storage.get().getItem("options").then(function(result){
       _.merge(this, _.omit(JSON.parse(result), ["changeObservers"]));
       this.notifyObservers();
     }.bind(this))
   }
 
   persist() {
-    Storage.setItem("options", JSON.stringify(this));
+    Storage.get().setItem("options", JSON.stringify(this));
   }
 
   toJSON() {

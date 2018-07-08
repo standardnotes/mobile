@@ -17,7 +17,6 @@ import OptionsState from "./OptionsState"
 import { Client } from 'bugsnag-react-native';
 import Authenticate from "./screens/Authenticate";
 var moment = require('moment/min/moment-with-locales.min.js');
-var _ = require('lodash');
 var pjson = require('../package.json');
 import ApplicationState from "./ApplicationState";
 

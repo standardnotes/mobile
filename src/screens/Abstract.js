@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {DeviceEventEmitter, Modal, View} from 'react-native';
-var _ = require('lodash')
 import GlobalStyles from "../Styles"
 import App from "../app"
 import ApplicationState from "../ApplicationState"
