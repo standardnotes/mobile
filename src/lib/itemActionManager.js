@@ -1,9 +1,8 @@
-import {Platform} from 'react-native';
-import AlertManager from './alertManager'
-import ModelManager from './modelManager'
-import Sync from './sync'
+import {Platform, Share} from 'react-native';
 import ApplicationState from '../ApplicationState'
-import {Share} from 'react-native';
+import AlertManager from './sfjs/alertManager'
+import ModelManager from './sfjs/modelManager'
+import Sync from './sfjs/syncManager'
 
 export default class ItemActionManager {
 

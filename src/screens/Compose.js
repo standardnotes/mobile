@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import Sync from '../lib/sync'
-import Auth from '../lib/auth'
-import ModelManager from '../lib/modelManager'
-import ComponentManager from '../lib/componentManager'
-import Abstract from "./Abstract"
-import Icons from '../Icons';
 import App from '../app'
+import Sync from '../lib/sfjs/syncManager'
+import ModelManager from '../lib/sfjs/modelManager'
+import Auth from '../lib/authManager'
+
+import Abstract from "./Abstract"
+import ComponentManager from '../lib/componentManager'
+import Icons from '../Icons';
 import LockedView from "../containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -202,13 +203,33 @@ export default class Compose extends Abstract {
         onOptionsChange: (options) => {
           if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
             var tags = ModelManager.get().findItems(options.selectedTags);
-            this.note.replaceTags(tags);
+            this.replaceTagsForNote(tags);
             this.note.setDirty(true);
             this.changesMade();
           }
         }
       }
     });
+  }
+
+  replaceTagsForNote(newTags) {
+    let note = this.note;
+
+    var oldTags = note.tags.slice(); // original array will be modified in the for loop so we make a copy
+    for(var oldTag of oldTags) {
+      if(!newTags.includes(oldTag)) {
+        oldTag.removeItemAsRelationship(note);
+        oldTag.setDirty(true);
+        note.removeItemAsRelationship(oldTag);
+      }
+    }
+
+    for(var newTag of newTags) {
+      newTag.setDirty(true);
+      newTag.addItemAsRelationship(note);
+    }
+
+    note.tags = newTags;
   }
 
   onTitleChange = (text) => {

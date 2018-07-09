@@ -1,9 +1,10 @@
-import SF from './sfjs'
-import Server from './server'
-import Storage from './storage'
-import Sync from './sync'
-import ModelManager from './modelManager'
-import AlertManager from './alertManager'
+import SF from './sfjs/sfjs'
+import Server from './sfjs/httpManager'
+import Storage from './sfjs/storageManager'
+import Sync from './sfjs/syncManager'
+import ModelManager from './sfjs/modelManager'
+import AlertManager from './sfjs/alertManager'
+
 import {Platform} from 'react-native';
 import Keychain from "./keychain"
 import KeysManager from "./keysManager"
@@ -165,7 +166,7 @@ export default class Auth {
           return;
         }
 
-        SF.get().crypto().computeEncryptionKeysForUser(inputtedPassword, authParams).then((keys) => {
+        SF.get().crypto.computeEncryptionKeysForUser(inputtedPassword, authParams).then((keys) => {
           root.performLoginRequest(email, keys.pw, server, extraParams, async (response, error) => {
             if(error) {
               callback(null, error);
@@ -189,7 +190,7 @@ export default class Auth {
 
     // if(__DEV__) { authParams.pw_cost = 3000; }
 
-    SF.get().crypto().generateInitialKeysAndAuthParamsForUser(email, inputtedPassword).then((results) => {
+    SF.get().crypto.generateInitialKeysAndAuthParamsForUser(email, inputtedPassword).then((results) => {
       let keys = results.keys;
       let authParams = results.authParams;
 

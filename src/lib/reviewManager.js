@@ -1,6 +1,6 @@
-import * as StoreReview from 'react-native-store-review';
 import {Platform} from 'react-native';
-import Storage from "./storage";
+import * as StoreReview from 'react-native-store-review';
+import Storage from "./sfjs/storageManager";
 
 let NumRunsBeforeAskingForReview = [20, 65, 120]
 

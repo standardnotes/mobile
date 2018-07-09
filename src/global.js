@@ -18,7 +18,7 @@ global.SFAlertManager = SFAlertManager;
 global.SFStorageManager = SFStorageManager;
 global.SFHttpManager = SFHttpManager;
 
-import SF from "./lib/sfjs"
+import SF from "./lib/sfjs/sfjs"
 global.SFJS = SF.get();
 
 import 'sn-models';

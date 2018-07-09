@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-import Auth from '../lib/auth'
-import SF from '../lib/sfjs'
+import App from "../app"
+import SF from '../lib/sfjs/sfjs'
+import Storage from '../lib/sfjs/storageManager'
+import Auth from '../lib/authManager'
+import KeysManager from '../lib/keysManager'
+
+import Abstract from "./Abstract"
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import SectionedOptionsTableCell from "../components/SectionedOptionsTableCell";
-import Abstract from "./Abstract"
-import Storage from '../lib/storage'
-import KeysManager from '../lib/keysManager'
 import GlobalStyles from "../Styles"
-import App from "../app"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -224,9 +225,9 @@ class PasscodeSection extends Abstract {
 
       // Allow UI to update before executing block task. InteractionManager.runAfterInteractions doesn't seem to work.
       setTimeout(async () => {
-        let identifier = await SF.get().crypto().generateUUID();
+        let identifier = await SF.get().crypto.generateUUID();
 
-        SF.get().crypto().generateInitialKeysAndAuthParamsForUser(identifier, passcode).then((results) => {
+        SF.get().crypto.generateInitialKeysAndAuthParamsForUser(identifier, passcode).then((results) => {
           let keys = results.keys;
           let authParams = results.authParams;
 
@@ -263,7 +264,7 @@ class PasscodeSection extends Abstract {
       setTimeout(() => {
 
          var authParams = KeysManager.get().offlineAuthParams;
-         SF.get().crypto().computeEncryptionKeysForUser(passcode, authParams).then((keys) => {
+         SF.get().crypto.computeEncryptionKeysForUser(passcode, authParams).then((keys) => {
            if(keys.pw === KeysManager.get().offlinePasscodeHash()) {
              KeysManager.get().setOfflineKeys(keys);
              this.props.onAuthenticateSuccess();

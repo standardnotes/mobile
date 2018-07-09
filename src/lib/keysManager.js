@@ -1,13 +1,13 @@
-import SF from './sfjs'
-import Server from './server'
-import Storage from './storage'
-import ModelManager from './modelManager'
 import {Platform} from 'react-native';
-import Keychain from "./keychain"
-import FlagSecure from 'react-native-flag-secure-android';
 import App from "../app"
+import FlagSecure from 'react-native-flag-secure-android';
 import ApplicationState from "../ApplicationState"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
+
+import SF from './sfjs/sfjs'
+import ModelManager from './sfjs/modelManager'
+import Storage from './sfjs/storageManager'
+import Keychain from "./keychain"
 
 let OfflineParamsKey = "pc_params";
 let FirstRunKey = "first_run";

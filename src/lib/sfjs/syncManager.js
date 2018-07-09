@@ -1,10 +1,11 @@
 import SF from './sfjs'
-import Server from './server'
-import Auth from './auth'
+import Server from './httpManager'
 import ModelManager from './modelManager'
-import Storage from './storage'
-import KeysManager from './keysManager'
+import Storage from './storageManager'
 import AlertManager from './alertManager'
+
+import Auth from '../authManager'
+import KeysManager from '../keysManager'
 
 export default class Sync extends SFSyncManager {
 
@@ -23,6 +24,7 @@ export default class Sync extends SFSyncManager {
     KeysManager.get().registerAccountRelatedStorageKeys(["syncToken", "cursorToken"]);
 
     this.setKeyRequestHandler((request) => {
+      console.log(request);
       var keys;
       if(request == SFSyncManager.KeyRequestLoadSaveAccount || request == SFSyncManager.KeyRequestLoadLocal) {
         keys = KeysManager.get().activeKeys();
@@ -40,7 +42,7 @@ export default class Sync extends SFSyncManager {
 
   async resaveOfflineData() {
     var items = ModelManager.get().allItems;
-    return this.writeItemsToStorage(items, false);
+    return this.writeItemsToLocalStorage(items, false);
   }
 
   async getServerURL() {

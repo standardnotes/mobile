@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Platform, Text, StatusBar, Modal, Alert } from 'react-native';
-import ModelManager from '../lib/modelManager'
-import Storage from '../lib/storage'
-import Sync from '../lib/sync'
-import Auth from '../lib/auth'
+
+import App from "../app"
+import ModelManager from '../lib/sfjs/modelManager'
+import Storage from '../lib/sfjs/storageManager'
+import Sync from '../lib/sfjs/syncManager'
+import AlertManager from '../lib/sfjs/alertManager'
+
+import Auth from '../lib/authManager'
 import KeysManager from '../lib/keysManager'
-import AlertManager from '../lib/alertManager'
-import GlobalStyles from "../Styles"
 import Keychain from "../lib/keychain"
+
+import Abstract from "./Abstract"
+import GlobalStyles from "../Styles"
 import Icons from '../Icons';
 import NoteList from "../containers/NoteList"
-import Abstract from "./Abstract"
 import OptionsState from "../OptionsState"
-import App from "../app"
 import AuthModal from "../containers/AuthModal"
 import LockedView from "../containers/LockedView"
 import ApplicationState from "../ApplicationState";

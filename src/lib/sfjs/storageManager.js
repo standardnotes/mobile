@@ -102,7 +102,9 @@ export default class Storage extends SFStorageManager {
       return;
     }
 
+
     return Promise.all(items.map((item) => {
+      console.log("Saving model", JSON.stringify(item));
       return AsyncStorage.setItem(this.keyForItem(item), JSON.stringify(item));
     }));
   }

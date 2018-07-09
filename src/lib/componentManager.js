@@ -1,11 +1,11 @@
 /* This domain will be used to save context item client data */
 let ClientDataDomain = "org.standardnotes.sn.components";
 
-import ModelManager from './modelManager'
 import GlobalStyles from '../Styles'
 import App from '../app'
-import Sync from './sync'
-import SF from "./sfjs"
+import ModelManager from './sfjs/modelManager'
+import Sync from './sfjs/syncManager'
+import SF from "./sfjs/sfjs"
 
 export default class ComponentManager {
 
@@ -325,7 +325,7 @@ export default class ComponentManager {
     }
 
     component.window = componentWindow;
-    component.sessionKey = await SF.get().crypto().generateUUID();
+    component.sessionKey = await SF.get().crypto.generateUUID();
 
     this.sendMessageToComponent(component, {
       action: "component-registered",

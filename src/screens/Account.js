@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import {ScrollView, View, Alert, Keyboard, Linking, Platform, Share, NativeModules} from 'react-native';
 
-import Sync from '../lib/sync'
-import Auth from '../lib/auth'
-import AlertManager from '../lib/alertManager'
+import Sync from '../lib/sfjs/syncManager'
+import ModelManager from '../lib/sfjs/modelManager'
+import AlertManager from '../lib/sfjs/alertManager'
+
+import Auth from '../lib/authManager'
 import KeysManager from '../lib/keysManager'
-import ModelManager from '../lib/modelManager'
+
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";

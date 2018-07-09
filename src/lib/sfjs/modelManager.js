@@ -1,17 +1,12 @@
-import Storage from "./storage"
-import Theme from "../models/subclass/theme"
-import "../models/extend/item.js";
+import Storage from "./storageManager"
+import Theme from "../../models/subclass/theme"
+import "../../models/extend/item.js";
 
 SFModelManager.ContentTypeClassMapping = {
   "Note" : SNNote,
   "Tag" : SNTag,
-  "SN|SmartTag" : SNSmartTag,
-  "Extension" : SNExtension,
-  "SN|Editor" : SNEditor,
   "SN|Theme" : Theme,
-  "SN|Component" : SNComponent,
-  "SF|Extension" : SNServerExtension,
-  "SF|MFA" : SNMfa
+  "SN|Component" : SNComponent
 };
 
 SFItem.AppDomain = "org.standardnotes.sn";

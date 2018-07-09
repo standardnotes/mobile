@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { TextInput, SectionList, ScrollView, View, Text, Linking, Share, Platform, StatusBar, FlatList, Dimensions } from 'react-native';
-import Sync from '../lib/sync'
-import ModelManager from '../lib/modelManager'
+import App from "../app"
+import Sync from '../lib/sfjs/syncManager'
+import ModelManager from '../lib/sfjs/modelManager'
 import ComponentManager from '../lib/componentManager'
-import AlertManager from '../lib/alertManager'
+import AlertManager from '../lib/sfjs/alertManager'
 import ItemActionManager from '../lib/itemActionManager'
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
@@ -15,7 +16,6 @@ import Abstract from "./Abstract"
 import Icons from '../Icons';
 import OptionsState from "../OptionsState"
 import GlobalStyles from "../Styles"
-import App from "../app"
 import ApplicationState from "../ApplicationState";
 import ActionSheet from 'react-native-actionsheet'
 
@@ -52,19 +52,30 @@ export default class Filter extends Abstract {
     // then wait a little to render the rest, such as a dynamic list of tags
     // See https://github.com/wix/react-native-navigation/issues/358
 
-    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
-      if(event == "local-data-loaded") {
-        if(!this.props.singleSelectMode) {
-          // Load tags after delay
-          setTimeout(function () {
-            this.loadTags = true;
-            this.forceUpdate();
-          }.bind(this), 10);
-        } else {
-          // Load tags immediately on every render
+    let handleInitialDataLoad = () => {
+      if(this.handledDataLoad) { return; }
+      this.handledDataLoad = true;
+
+      if(!this.props.singleSelectMode) {
+        // Load tags after delay
+        setTimeout(function () {
           this.loadTags = true;
           this.forceUpdate();
-        }
+        }.bind(this), 10);
+      } else {
+        // Load tags immediately on every render
+        this.loadTags = true;
+        this.forceUpdate();
+      }
+    }
+
+    if(Sync.get().initialDataLoaded()) {
+      handleInitialDataLoad();
+    }
+
+    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+      if(event == "local-data-loaded") {
+        handleInitialDataLoad();
       }
 
       else if(event == "sync:completed") {
@@ -196,7 +207,7 @@ export default class Filter extends Abstract {
   }
 
   createTag(text, callback) {
-    var tag = new SNTag({title: text});
+    var tag = new SNTag({content: {title: text}});
     tag.initUUID().then(() => {
       tag.setDirty(true);
       ModelManager.get().addItem(tag);

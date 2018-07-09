@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import GlobalStyles from "../../Styles"
 import {Text, View} from 'react-native';
 import KeysManager from "../../lib/keysManager"
-import ModelManager from "../../lib/modelManager"
+import ModelManager from "../../lib/sfjs/modelManager"
 
 import SectionHeader from "../../components/SectionHeader";
 import ButtonCell from "../../components/ButtonCell";

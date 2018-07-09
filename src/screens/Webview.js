@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import App from '../app'
 import ComponentManager from '../lib/componentManager'
-import ModelManager from '../lib/modelManager'
+import ModelManager from '../lib/sfjs/modelManager'
 import TableSection from "../components/TableSection";
 import Icons from '../Icons';
 import LockedView from "../containers/LockedView";

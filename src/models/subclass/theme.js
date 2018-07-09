@@ -1,4 +1,4 @@
-import SF from "../../lib/sfjs"
+import SF from "../../lib/sfjs/sfjs"
 
 export default class Theme extends SNTheme {
 

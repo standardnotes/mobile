@@ -9,7 +9,7 @@ import {Navigation, ScreenVisibilityListener} from 'react-native-navigation';
 import {registerScreens} from './screens';
 
 import KeysManager from './lib/keysManager'
-import Auth from './lib/auth'
+import Auth from './lib/authManager'
 import ReviewManager from './lib/reviewManager';
 import GlobalStyles from "./Styles"
 import Icons from "./Icons"
