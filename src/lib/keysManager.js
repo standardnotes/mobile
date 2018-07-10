@@ -125,10 +125,15 @@ export default class KeysManager {
       this.loadLocalStateFromKeys(null);
       this.accountAuthParams = null;
       this.user = null;
-      Storage.get().setItem(FirstRunKey, "false")
+      Storage.get().setItem(FirstRunKey, "false");
     }.bind(this));
   }
 
+  /*
+    We need to register local storage keys, so that when we want to sign out, we don't accidentally
+    clear internal keys, like first_run. (If you accidentally delete the first_run key when you sign out,
+    then the next time you sign in and refresh, it will treat it as a new run, and delete all data.)
+  */
   registerAccountRelatedStorageKeys(storageKeys) {
     this.accountRelatedStorageKeys = _.uniq(this.accountRelatedStorageKeys.concat(storageKeys));
   }

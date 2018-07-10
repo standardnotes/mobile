@@ -37,6 +37,11 @@ export default class Auth extends SFAuthManager {
     return !keys.jwt;
   }
 
+  async signout(clearAllData) {
+    // DONT clear all data. We will do this ourselves manually, as we need to preserve certain data keys.
+    super.signout(false);
+  }
+
   async getAuthParams() {
     return KeysManager.get().activeAuthParams();
   }

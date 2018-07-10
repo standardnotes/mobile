@@ -12,6 +12,7 @@ import KeysManager from './lib/keysManager'
 import Auth from './lib/sfjs/authManager'
 import ModelManager from './lib/sfjs/modelManager'
 import Sync from './lib/sfjs/syncManager'
+import Storage from './lib/sfjs/storageManager'
 import ReviewManager from './lib/reviewManager';
 import GlobalStyles from "./Styles"
 import Icons from "./Icons"
@@ -78,6 +79,7 @@ export default class App {
     this.signoutObserver = Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
         this.optionsState.reset();
+        Storage.get().clearAllModels();
         KeysManager.get().clearAccountKeysAndData();
         ModelManager.get().handleSignout();
         Sync.get().handleSignout();
