@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import App from '../app'
 import Sync from '../lib/sfjs/syncManager'
 import ModelManager from '../lib/sfjs/modelManager'
-import Auth from '../lib/authManager'
+import Auth from '../lib/sfjs/authManager'
 
 import Abstract from "./Abstract"
 import ComponentManager from '../lib/componentManager'
@@ -220,6 +220,7 @@ export default class Compose extends Abstract {
       if(!newTags.includes(oldTag)) {
         oldTag.removeItemAsRelationship(note);
         oldTag.setDirty(true);
+        // Notes don't have tags as relationships anymore, but we'll keep this to clean up old notes.
         note.removeItemAsRelationship(oldTag);
       }
     }
@@ -254,7 +255,6 @@ export default class Compose extends Abstract {
         this.note.initUUID().then(() => {
           if(this.props.selectedTagId) {
             var tag = ModelManager.get().findItem(this.props.selectedTagId);
-            this.note.addItemAsRelationship(tag);
             tag.addItemAsRelationship(this.note);
           }
           this.save();
@@ -298,7 +298,7 @@ export default class Compose extends Abstract {
         if(this.statusTimeout) clearTimeout(this.statusTimeout);
         this.statusTimeout = setTimeout(function(){
           var status = "All changes saved"
-          if(Auth.getInstance().offline()) {
+          if(Auth.get().offline()) {
             status += " (offline)";
           }
           this.saveError = false;
@@ -314,25 +314,6 @@ export default class Compose extends Abstract {
         }.bind(this), 200)
       }
     }.bind(this));
-  }
-
-  setNavBarSubtitle(title) {
-    if(!this.visible || !this.willBeVisible) {
-      return;
-    }
-
-    this.props.navigator.setSubTitle({
-      subtitle: title
-    });
-
-    if(!this.didSetNavBarStyle) {
-      this.didSetNavBarStyle = true;
-      var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
-      this.props.navigator.setStyle({
-        navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
-        navBarSubtitleFontSize: 12
-      });
-    }
   }
 
   render() {

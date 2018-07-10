@@ -28,13 +28,13 @@ export default class ComponentManager {
 
     this.handlers = [];
 
-    ModelManager.get().addItemSyncObserver("component-manager", "*", (allItems, source) => {
+    ModelManager.get().addItemSyncObserver("component-manager", "*", (allItems, validItems, deletedItems, source) => {
 
       /* If the source of these new or updated items is from a Component itself saving items, we don't need to notify
         components again of the same item. Regarding notifying other components than the issuing component, other mapping sources
         will take care of that, like ModelManager.MappingSourceRemoteSaved
        */
-      if(source == ModelManager.MappingSourceComponentRetrieved) {
+      if(source == SFModelManager.MappingSourceComponentRetrieved) {
         return;
       }
 
@@ -78,8 +78,7 @@ export default class ComponentManager {
   jsonForItem(item, component, source) {
     var params = {uuid: item.uuid, content_type: item.content_type, created_at: item.created_at, updated_at: item.updated_at, deleted: item.deleted};
     params.content = item.createContentJSONFromProperties();
-    /* Legacy is using component.url key, so if it's present, use it, otherwise use uuid */
-    params.clientData = item.getDomainDataItem(component.url || component.uuid, ClientDataDomain) || {};
+    params.clientData = item.getDomainDataItem(component.getClientDataKey(), ClientDataDomain) || {};
 
     /* This means the this function is being triggered through a remote Saving response, which should not update
       actual local content values. The reason is, Save responses may be delayed, and a user may have changed some values
@@ -88,7 +87,7 @@ export default class ComponentManager {
 
       3/7/18: Add MappingSourceLocalSaved as well to handle fully offline saving. github.com/standardnotes/forum/issues/169
      */
-    if(source && (source == ModelManager.MappingSourceRemoteSaved || source == ModelManager.MappingSourceLocalSaved)) {
+    if(source && (source == SFModelManager.MappingSourceRemoteSaved || source == SFModelManager.MappingSourceLocalSaved)) {
       params.isMetadataUpdate = true;
     }
     this.removePrivatePropertiesFromResponseItems([params], component);
@@ -191,7 +190,7 @@ export default class ComponentManager {
 
     */
 
-     if(message.action === "stream-context-item") {
+    if(message.action === "stream-context-item") {
       this.handleStreamContextItemMessage(component, message);
     } else if(message.action === "set-component-data") {
       this.handleSetComponentDataMessage(component, message);
@@ -274,7 +273,7 @@ export default class ComponentManager {
     We map the items here because modelManager is what updates the UI. If you were to instead get the items directly,
     this would update them server side via sync, but would never make its way back to the UI.
     */
-    var localItems = ModelManager.get().mapResponseItemsToLocalModels(responseItems, ModelManager.MappingSourceComponentRetrieved);
+    var localItems = ModelManager.get().mapResponseItemsToLocalModels(responseItems, SFModelManager.MappingSourceComponentRetrieved);
 
     for(var item of localItems) {
       var responseItem = _.find(responseItems, {uuid: item.uuid});
@@ -288,7 +287,7 @@ export default class ComponentManager {
     Sync.get().sync().then((response) => {
       // Allow handlers to be notified when a save begins and ends, to update the UI
       var saveMessage = Object.assign({}, message);
-      saveMessage.action = response && response.error ? "save-error" : "save-success";
+      saveMessage.action = (response && response.error) ? "save-error" : "save-success";
       this.replyToMessage(component, message, {error: response.error})
       this.handleMessage(component, saveMessage);
     });

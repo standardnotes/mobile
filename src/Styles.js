@@ -4,8 +4,7 @@ import ModelManager from "./lib/sfjs/modelManager"
 import Server from "./lib/sfjs/httpManager"
 import Sync from './lib/sfjs/syncManager'
 import Storage from "./lib/sfjs/storageManager"
-import Auth from "./lib/authManager"
-import Theme from "./models/subclass/theme"
+import Auth from "./lib/sfjs/authManager"
 import KeysManager from './lib/keysManager'
 
 export default class GlobalStyles {
@@ -54,7 +53,7 @@ export default class GlobalStyles {
         let content = Object.assign({}, parsedTheme);
         parsedTheme.content = content;
 
-        var theme = new Theme(parsedTheme);
+        var theme = new SNTheme(parsedTheme);
         if(needsMigration) {
           theme.setMobileRules(parsedTheme.mobileRules);
           theme.mobileRules = null;
@@ -78,7 +77,7 @@ export default class GlobalStyles {
   constructor() {
     KeysManager.get().registerAccountRelatedStorageKeys(["activeTheme"]);
 
-    ModelManager.get().addItemSyncObserver("themes", "SN|Theme", function(items){
+    ModelManager.get().addItemSyncObserver("themes", "SN|Theme", function(allItems, validItems, deletedItems, source){
       if(this.activeTheme && this.activeTheme.isSwapIn) {
         var matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
         if(matchingTheme) {
@@ -136,7 +135,7 @@ export default class GlobalStyles {
 
     var constants = this.defaultConstants();
 
-    this._systemTheme = new Theme({
+    this._systemTheme = new SNTheme({
       uuid: 0,
       content: {
         isDefault: true,

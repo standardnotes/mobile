@@ -144,7 +144,6 @@ export default class NoteCell extends React.PureComponent {
       // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
       this.forceUpdate();
     });
-
   }
 
   render() {
@@ -171,7 +170,7 @@ export default class NoteCell extends React.PureComponent {
             {this.props.renderTags && note.tags.length > 0 &&
               <View style={this.styles.noteTags}>
                 <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag)}>
-                {SNTag.arrayToDisplayString(note.tags)}
+                {this.props.tagsString}
                 </Text>
               </View>
             }

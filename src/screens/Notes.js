@@ -7,7 +7,7 @@ import Storage from '../lib/sfjs/storageManager'
 import Sync from '../lib/sfjs/syncManager'
 import AlertManager from '../lib/sfjs/alertManager'
 
-import Auth from '../lib/authManager'
+import Auth from '../lib/sfjs/authManager'
 import KeysManager from '../lib/keysManager'
 import Keychain from "../lib/keychain"
 
@@ -82,7 +82,7 @@ export default class Notes extends Abstract {
     Sync.get().removeEventHandler(this.syncObserver);
     Sync.get().removeSyncStatusObserver(this.syncStatusObserver);
 
-    Auth.getInstance().removeEventObserver(this.signoutObserver);
+    Auth.get().removeEventHandler(this.signoutObserver);
     if(this.options) {
       this.options.removeChangeObserver(this.optionsObserver);
     }
@@ -107,7 +107,12 @@ export default class Notes extends Abstract {
 
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
       if(event == "sync:completed") {
-        if(_.find(data.retrievedItems, {content_type: "Note"}) || _.find(data.unsavedItems, {content_type: "Note"})) {
+        // We want to reload the list of the retrieved items contains notes or tags.
+        // Since Notes no longer have relationships on tags, if a note's tags change, only the tag will be synced.
+        var retrievedHasNoteOrTag = data.retrievedItems && data.retrievedItems.find((item) => {
+          return ["Note", "Tag"].includes(item.content_type);
+        })
+        if(retrievedHasNoteOrTag || _.find(data.unsavedItems, {content_type: "Note"})) {
           this.reloadList();
         }
         this.mergeState({refreshing: false, loading: false});
@@ -137,21 +142,22 @@ export default class Notes extends Abstract {
       }
     })
 
-    this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent, Auth.DidSignInEvent], (event) => {
-      if(event == Auth.WillSignInEvent) {
+    this.signoutObserver = Auth.get().addEventHandler((event) => {
+      if(event == SFAuthManager.WillSignInEvent) {
         this.mergeState({loading: true})
-      } else if(event == Auth.DidSignInEvent) {
+      } else if(event == SFAuthManager.DidSignInEvent) {
         // Check if there are items that are errorDecrypting and try decrypting with new keys
         Sync.get().refreshErroredItems().then(() => {
           this.reloadList();
         })
-      } else if(event == Auth.DidSignOutEvent) {
+      } else if(event == SFAuthManager.DidSignOutEvent) {
         this.setStatusBarText(null);
       }
     });
   }
 
   setStatusBarText(text) {
+    // this.setNavBarSubtitle(text);
     this.mergeState({showSyncBar: text != null, syncBarText: text});
   }
 

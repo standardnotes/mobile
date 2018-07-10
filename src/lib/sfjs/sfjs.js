@@ -16,6 +16,10 @@ export default class SF extends StandardFile {
     }
     return this.instance;
   }
+
+  supportsPasswordDerivationCost(cost) {
+    return true;
+  }
 }
 
 class SFReactNativeCrypto extends SFAbstractCrypto {

@@ -1,11 +1,10 @@
 import Storage from "./storageManager"
-import Theme from "../../models/subclass/theme"
 import "../../models/extend/item.js";
 
 SFModelManager.ContentTypeClassMapping = {
   "Note" : SNNote,
   "Tag" : SNTag,
-  "SN|Theme" : Theme,
+  "SN|Theme" : SNTheme,
   "SN|Component" : SNComponent
 };
 

@@ -12,6 +12,13 @@ export default class Storage extends SFStorageManager {
     return this.instance;
   }
 
+  constructor() {
+    super();
+    AsyncStorage.getAllKeys().then((keys) => {
+      console.log("all model keys", keys);
+    })
+  }
+
   async getItem(key) {
     try {
       return AsyncStorage.getItem(key);
@@ -102,9 +109,7 @@ export default class Storage extends SFStorageManager {
       return;
     }
 
-
     return Promise.all(items.map((item) => {
-      console.log("Saving model", JSON.stringify(item));
       return AsyncStorage.setItem(this.keyForItem(item), JSON.stringify(item));
     }));
   }

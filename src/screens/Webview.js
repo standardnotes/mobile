@@ -104,21 +104,6 @@ export default class Webview extends Abstract {
     this.setNavBarSubtitle("Error saving");
   }
 
-  setNavBarSubtitle(title) {
-    this.props.navigator.setSubTitle({
-      subtitle: title
-    });
-
-    if(!this.didSetNavBarStyle) {
-      this.didSetNavBarStyle = true;
-      var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
-      this.props.navigator.setStyle({
-        navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
-        navBarSubtitleFontSize: 12
-      });
-    }
-  }
-
   onNavigatorEvent(event) {
     super.onNavigatorEvent(event);
     if (event.type == 'NavBarButtonPress') { // this is the event type for button presses

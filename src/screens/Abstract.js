@@ -106,6 +106,25 @@ export default class Abstract extends Component {
 
   }
 
+  setNavBarSubtitle(title) {
+    if(!this.visible || !this.willBeVisible) {
+      return;
+    }
+
+    this.props.navigator.setSubTitle({
+      subtitle: title
+    });
+
+    if(!this.didSetNavBarStyle) {
+      this.didSetNavBarStyle = true;
+      var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
+      this.props.navigator.setStyle({
+        navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
+        navBarSubtitleFontSize: 12
+      });
+    }
+  }
+
   dismissModal() {
     this.props.navigator.dismissModal({animationType: "slide-down"})
   }

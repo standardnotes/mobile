@@ -5,7 +5,7 @@ import Sync from '../lib/sfjs/syncManager'
 import ModelManager from '../lib/sfjs/modelManager'
 import AlertManager from '../lib/sfjs/alertManager'
 
-import Auth from '../lib/authManager'
+import Auth from '../lib/sfjs/authManager'
 import KeysManager from '../lib/keysManager'
 
 import SectionHeader from "../components/SectionHeader";
@@ -42,7 +42,7 @@ export default class Account extends Abstract {
   loadInitialState() {
     super.loadInitialState();
 
-    this.mergeState({params: {server: Auth.getInstance().serverUrl()}})
+    this.mergeState({params: {server: Auth.get().serverUrl()}})
 
     this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
       if(event == "local-data-loaded") {
@@ -50,17 +50,18 @@ export default class Account extends Abstract {
       } else if(event == "sync-session-invalid") {
         if(!this.didShowSessionInvalidAlert) {
           this.didShowSessionInvalidAlert = true;
-          AlertManager.get().confirm(
-            "Session Expired",
-            "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.", "Sign Out",
-            () => {
+          AlertManager.get().confirm({
+            title: "Session Expired",
+            text: "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.",
+            confirmButtonText: "Sign Out",
+            onConfirm: () => {
               this.didShowSessionInvalidAlert = false;
-              Auth.getInstance().signout();
+              Auth.get().signout();
             },
-            () => {
+            onCancel: () => {
               this.didShowSessionInvalidAlert = false;
             }
-          )
+          })
         }
       }
     })
@@ -157,9 +158,11 @@ export default class Account extends Abstract {
     // Unlock sync after all sign in processes are complete.
     Sync.get().lockSyncing();
 
-    Auth.getInstance().login(email, password, params.server, strict, extraParams, (user, error) => {
+    Auth.get().login(params.server, email, password, strict, extraParams).then((response) => {
 
-      if(error) {
+      if(!response || response.error) {
+        var error = response ? response.error : {message: "An unknown error occured."}
+
         Sync.get().unlockSyncing();
 
         if(error.tag == "mfa-required" || error.tag == "mfa-invalid") {
@@ -207,10 +210,11 @@ export default class Account extends Abstract {
 
     var params = this.state.params;
 
-    Auth.getInstance().register(params.email, params.password, params.server, (user, error) => {
+    Auth.get().register( params.server, params.email, params.password).then((response) => {
       this.mergeState({registering: false, confirmRegistration: false});
 
-      if(error) {
+      if(!response || response.error) {
+        var error = response ? response.error : {message: "An unknown error occured."}
         Alert.alert('Oops', error.message, [{text: 'OK'}])
         return;
       }
@@ -258,7 +262,7 @@ export default class Account extends Abstract {
       text: "Signing out will remove all data from this device, including notes and tags. Make sure your data is synced before proceeding.",
       confirmButtonText: "Sign Out",
       onConfirm: () => {
-        Auth.getInstance().signout().then(() => {
+        Auth.get().signout().then(() => {
           this.forceUpdate();
         })
       }
@@ -266,13 +270,13 @@ export default class Account extends Abstract {
   }
 
   async onExportPress(encrypted, callback) {
-    var version = Auth.getInstance().protocolVersion();
+    var auth_params = await Auth.get().getAuthParams();
     var keys = encrypted ? KeysManager.get().activeKeys() : null;
 
     var items = [];
 
     for(var item of ModelManager.get().allItems) {
-      var itemParams = new SFItemParams(item, keys, version);
+      var itemParams = new SFItemParams(item, keys, auth_params);
       var params = await itemParams.paramsForExportFile();
       items.push(params);
     }
@@ -443,7 +447,7 @@ export default class Account extends Abstract {
       return (<LockedView />);
     }
 
-    let signedIn = !Auth.getInstance().offline();
+    let signedIn = !Auth.get().offline();
     var themes = GlobalStyles.get().themes();
 
     return (

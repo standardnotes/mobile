@@ -7,7 +7,8 @@ import {
   SFItemParams,
   SFAlertManager,
   SFStorageManager,
-  SFHttpManager
+  SFHttpManager,
+  SFAuthManager
 } from 'standard-file-js';
 
 global.SFItem = SFItem;
@@ -17,6 +18,7 @@ global.SFSyncManager = SFSyncManager;
 global.SFAlertManager = SFAlertManager;
 global.SFStorageManager = SFStorageManager;
 global.SFHttpManager = SFHttpManager;
+global.SFAuthManager = SFAuthManager;
 
 import SF from "./lib/sfjs/sfjs"
 global.SFJS = SF.get();

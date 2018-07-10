@@ -4,7 +4,7 @@ import ModelManager from './modelManager'
 import Storage from './storageManager'
 import AlertManager from './alertManager'
 
-import Auth from '../authManager'
+import Auth from '../sfjs/authManager'
 import KeysManager from '../keysManager'
 
 export default class Sync extends SFSyncManager {
@@ -24,7 +24,6 @@ export default class Sync extends SFSyncManager {
     KeysManager.get().registerAccountRelatedStorageKeys(["syncToken", "cursorToken"]);
 
     this.setKeyRequestHandler((request) => {
-      console.log(request);
       var keys;
       if(request == SFSyncManager.KeyRequestLoadSaveAccount || request == SFSyncManager.KeyRequestLoadLocal) {
         keys = KeysManager.get().activeKeys();
@@ -34,7 +33,7 @@ export default class Sync extends SFSyncManager {
       }
 
       let auth_params = KeysManager.get().activeAuthParams();
-      let offline = Auth.getInstance().offline();
+      let offline = Auth.get().offline();
 
       return {keys, auth_params, offline}
     })
@@ -46,7 +45,7 @@ export default class Sync extends SFSyncManager {
   }
 
   async getServerURL() {
-    return Auth.getInstance().serverUrl();
+    return Auth.get().serverUrl();
   }
 
   handleSignout() {

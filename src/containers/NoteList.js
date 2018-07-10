@@ -62,6 +62,7 @@ export default class NoteList extends Component {
         title={item.title}
         text={item.text}
         tags={item.tags}
+        tagsString={item.tagsString()}
         pinned={item.pinned}
         deleted={item.deleted}
         archived={item.archived}

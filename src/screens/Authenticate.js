@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import App from "../app"
 import SF from '../lib/sfjs/sfjs'
 import Storage from '../lib/sfjs/storageManager'
-import Auth from '../lib/authManager'
+import Auth from '../lib/sfjs/authManager'
 import KeysManager from '../lib/keysManager'
 
 import Abstract from "./Abstract"

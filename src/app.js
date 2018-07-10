@@ -9,7 +9,9 @@ import {Navigation, ScreenVisibilityListener} from 'react-native-navigation';
 import {registerScreens} from './screens';
 
 import KeysManager from './lib/keysManager'
-import Auth from './lib/authManager'
+import Auth from './lib/sfjs/authManager'
+import ModelManager from './lib/sfjs/modelManager'
+import Sync from './lib/sfjs/syncManager'
 import ReviewManager from './lib/reviewManager';
 import GlobalStyles from "./Styles"
 import Icons from "./Icons"
@@ -73,11 +75,14 @@ export default class App {
     this.listener.register();
 
     // Listen to sign out event
-    this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent], function(event){
-      if(event == Auth.DidSignOutEvent) {
+    this.signoutObserver = Auth.get().addEventHandler((event) => {
+      if(event == SFAuthManager.DidSignOutEvent) {
         this.optionsState.reset();
+        KeysManager.get().clearAccountKeysAndData();
+        ModelManager.get().handleSignout();
+        Sync.get().handleSignout();
       }
-    }.bind(this));
+    });
 
   }
 
