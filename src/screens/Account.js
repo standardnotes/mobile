@@ -388,8 +388,8 @@ export default class Account extends Abstract {
       title: "Disable Passcode",
       text: message,
       confirmButtonText: "Disable Passcode",
-      onConfirm: () => {
-        var result = KeysManager.get().clearOfflineKeysAndData();
+      onConfirm: async () => {
+        var result = await KeysManager.get().clearOfflineKeysAndData();
         if(encryptionSource == "offline") {
           // remove encryption from all items
           this.resaveOfflineData(null, true);

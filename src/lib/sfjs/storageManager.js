@@ -53,7 +53,7 @@ export default class Storage extends SFStorageManager {
   }
 
   async removeItem(key) {
-    return await AsyncStorage.removeItem(key);
+    return AsyncStorage.removeItem(key);
   }
 
   async clearKeys(keys) {

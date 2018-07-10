@@ -212,7 +212,7 @@ export default class KeysManager {
     this.accountKeys = null;
     this.accountAuthParams = null;
     this.user = null;
-    Storage.get().clearKeys(this.accountRelatedStorageKeys);
+    await Storage.get().clearKeys(this.accountRelatedStorageKeys);
     return this.persistKeysToKeychain();
   }
 
@@ -274,7 +274,7 @@ export default class KeysManager {
 
   // Local Security
 
-  clearOfflineKeysAndData() {
+  async clearOfflineKeysAndData() {
     // make sure user is authenticated before performing this step
     if(!this.offlineKeys.mk) {
       alert("Unable to remove passcode. Make sure you are properly authenticated and try again.");
@@ -282,7 +282,7 @@ export default class KeysManager {
     }
     this.offlineKeys = null;
     this.offlineAuthParams = null;
-    Storage.get().removeItem(OfflineParamsKey);
+    await Storage.get().removeItem(OfflineParamsKey);
     return this.persistKeysToKeychain();
   }
 

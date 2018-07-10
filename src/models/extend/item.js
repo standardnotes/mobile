@@ -23,15 +23,7 @@ SFItem.prototype.dateToLocalizedString = function(date) {
 
 // Define these new methods
 
-SFItem.prototype.initUUID = async function(date) {
-  if(!this.uuid) {
-    return SFJS.crypto.generateUUID().then((uuid) => {
-      this.uuid = uuid;
-    })
-  }
-}
-
-SFItem.prototype.initUUID = async function(date) {
+SFItem.prototype.initUUID = async function() {
   if(!this.uuid) {
     return SFJS.crypto.generateUUID().then((uuid) => {
       this.uuid = uuid;
@@ -42,7 +34,7 @@ SFItem.prototype.initUUID = async function(date) {
 // Define these getters
 
 Object.defineProperty(SFItem.prototype, "key", {
-    get: function key() {
-        return this.uuid;
-    }
+  get: function key() {
+    return this.uuid;
+  }
 });

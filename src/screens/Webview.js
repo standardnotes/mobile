@@ -64,7 +64,6 @@ export default class Webview extends Abstract {
         }
       }
     });
-
   }
 
   componentDidMount() {

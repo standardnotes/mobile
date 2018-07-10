@@ -76,7 +76,7 @@ export default class ModelManager extends SFModelManager {
   }
 
   async removeItemLocally(item) {
-    super.removeItemLocally(item);
+    await super.removeItemLocally(item);
 
     if(item.content_type == "Tag") {
       _.remove(this.tags, {uuid: item.uuid});

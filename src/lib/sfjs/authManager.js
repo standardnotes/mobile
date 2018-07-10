@@ -42,10 +42,12 @@ export default class Auth extends SFAuthManager {
   }
 
   async handleAuthResponse(response, email, url, authParams, keys) {
-    super.handleAuthResponse(response, email, url, authParams, keys);
+    // We don't want to call super, as the super implementation is meant for web credentials
+    // super will save keys to storage, which we don't want.
+    // await super.handleAuthResponse(response, email, url, authParams, keys);
     try {
       this._keys = keys;
-      return await Promise.all([
+      return Promise.all([
         KeysManager.get().persistAccountKeys(_.merge(keys, {jwt: response.token})),
         KeysManager.get().setAccountAuthParams(authParams),
         KeysManager.get().saveUser({server: url, email: email})
