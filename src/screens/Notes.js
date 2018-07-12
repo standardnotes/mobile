@@ -98,6 +98,8 @@ export default class Notes extends Abstract {
 
   registerObservers() {
     this.optionsObserver = this.options.addChangeObserver((options) => {
+      this.setNavBarSubtitle("Loading...");
+      this.showingNavBarLoadingStatus = true;
       this.reloadList(true);
       // On iOS, configureNavBar would be handle by viewWillAppear. However, we're using a drawer in Android.
       if(Platform.OS == "android" && !this.skipUpdatingNavBar) {
@@ -420,6 +422,16 @@ export default class Notes extends Abstract {
 
     this.forceUpdate();
     this.mergeState({refreshing: false})
+  }
+
+  componentDidUpdate() {
+    // Called when render is complete
+    if(this.showingNavBarLoadingStatus) {
+      setTimeout(() => {
+        this.setNavBarSubtitle(null);
+        this.showingNavBarLoadingStatus = false;
+      }, 50);
+    }
   }
 
   _onRefresh() {
