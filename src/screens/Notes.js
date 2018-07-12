@@ -183,7 +183,7 @@ export default class Notes extends Abstract {
 
     this.setStatusBarText(encryptionEnabled ? "Decrypting notes..." : "Loading notes...");
     let incrementalCallback = (current, total) => {
-      let notesString = `${current}/${total} notes...`
+      let notesString = `${current}/${total} items...`
       this.setStatusBarText(encryptionEnabled ? `Decrypting ${notesString}` : `Loading ${notesString}`);
       // Incremental Callback
       if(!this.dataLoaded) {
@@ -193,22 +193,31 @@ export default class Notes extends Abstract {
       this.reloadList();
     }
 
-    let batchSize = 100;
+    let loadLocalCompletion = (items) => {
+      this.setStatusBarText("Syncing...");
+      this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
+      this.dataLoaded = true;
+      this.reloadList();
+      this.configureNavBar(true);
+      this.mergeState({decrypting: false, loading: false});
+      // perform initial sync
+      Sync.get().sync().then(() => {
+        this.setStatusBarText(null);
+      });
+    }
 
-    Sync.get().loadLocalItems(incrementalCallback, batchSize).then((items) => {
-      setTimeout(() => {
-        this.setStatusBarText("Syncing...");
-        this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
-        this.dataLoaded = true;
-        this.reloadList();
-        this.configureNavBar(true);
-        this.mergeState({decrypting: false, loading: false});
-        // perform initial sync
-        Sync.get().sync().then(() => {
-          this.setStatusBarText(null);
+    if(Sync.get().initialDataLoaded()) {
+      // Data can be already loaded in the case of a theme change
+      loadLocalCompletion();
+    } else {
+      let batchSize = 100;
+      Sync.get().loadLocalItems(incrementalCallback, batchSize).then((items) => {
+        setTimeout(() => {
+          loadLocalCompletion(items);
         });
       });
-    });
+    }
+
   }
 
   /* If there is at least one item that has an error decrypting, and there are no account keys saved,
@@ -414,8 +423,13 @@ export default class Notes extends Abstract {
   }
 
   _onRefresh() {
+    this.setStatusBarText("Syncing...");
     this.setState({refreshing: true});
-    Sync.get().sync();
+    Sync.get().sync().then(() => {
+      setTimeout(() => {
+        this.setStatusBarText(null);
+      }, 100);
+    })
   }
 
   _onPressItem = (item: hash) => {

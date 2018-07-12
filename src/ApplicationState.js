@@ -59,7 +59,6 @@ export default class ApplicationState {
     this.notifyOfState(ApplicationState.ThemeChangeEnd);
   }
 
-
   handleAppStateChange = (nextAppState) => {
 
     if(this.themeChangeInProgress || this.ignoreStateChanges) {
@@ -165,8 +164,6 @@ export default class ApplicationState {
       this.ignoreStateChanges = false;
     }, 350);
   }
-
-
 
   getMostRecentState() {
     return this.mostRecentState;
