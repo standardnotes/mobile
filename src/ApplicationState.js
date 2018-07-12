@@ -99,7 +99,7 @@ export default class ApplicationState {
     }
   }
 
-  // An app cycle change  are natural events like active, inactive, background,
+  // An app cycle change are natural events like active, inactive, background,
   // while non-app cycle events are custom events like locking and unlocking
 
   isStateAppCycleChange(state) {

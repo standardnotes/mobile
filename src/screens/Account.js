@@ -395,7 +395,7 @@ export default class Account extends Abstract {
           this.resaveOfflineData(null, true);
         }
 
-        this.mergeState({hasPasscode: !result});
+        this.mergeState({hasPasscode: false});
         this.forceUpdate();
       }
     })
