@@ -122,6 +122,7 @@ export default class Notes extends Abstract {
     this.syncStatusObserver = Sync.get().registerSyncStatusObserver((status) => {
       if(status.error) {
         var text = `Unable to connect to sync server.`
+        this.showingErrorStatus = true;
         setTimeout( () => {
           // need timeout for syncing on app launch
           this.setStatusBarText(text);
@@ -137,7 +138,7 @@ export default class Notes extends Abstract {
         setTimeout(() => {
           this.setStatusBarText(null);
         }, 2000);
-      } else {
+      } else if(this.showingErrorStatus) {
         this.setStatusBarText(null);
       }
     })
@@ -157,7 +158,6 @@ export default class Notes extends Abstract {
   }
 
   setStatusBarText(text) {
-    // this.setNavBarSubtitle(text);
     this.mergeState({showSyncBar: text != null, syncBarText: text});
   }
 
@@ -182,7 +182,9 @@ export default class Notes extends Abstract {
     this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
     this.setStatusBarText(encryptionEnabled ? "Decrypting notes..." : "Loading notes...");
-    let incrementalCallback = () => {
+    let incrementalCallback = (current, total) => {
+      let notesString = `${current}/${total} notes...`
+      this.setStatusBarText(encryptionEnabled ? `Decrypting ${notesString}` : `Loading ${notesString}`);
       // Incremental Callback
       if(!this.dataLoaded) {
         this.dataLoaded = true;
@@ -191,7 +193,9 @@ export default class Notes extends Abstract {
       this.reloadList();
     }
 
-    Sync.get().loadLocalItems(incrementalCallback).then((items) => {
+    let batchSize = 100;
+
+    Sync.get().loadLocalItems(incrementalCallback, batchSize).then((items) => {
       setTimeout(() => {
         this.setStatusBarText("Syncing...");
         this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
@@ -203,7 +207,7 @@ export default class Notes extends Abstract {
         Sync.get().sync().then(() => {
           this.setStatusBarText(null);
         });
-      }, 0);
+      });
     });
   }
 
