@@ -97,9 +97,12 @@ export default class Notes extends Abstract {
   }
 
   registerObservers() {
-    this.optionsObserver = this.options.addChangeObserver((options) => {
-      this.setNavBarSubtitle("Loading...");
-      this.showingNavBarLoadingStatus = true;
+    this.optionsObserver = this.options.addChangeObserver((options, eventType) => {
+      // should only show for non-search term change
+      if(eventType !== OptionsState.OptionsStateChangeEventSearch) {
+        this.setNavBarSubtitle("Loading...");
+        this.showingNavBarLoadingStatus = true;
+      }
       this.reloadList(true);
       // On iOS, configureNavBar would be handle by viewWillAppear. However, we're using a drawer in Android.
       if(Platform.OS == "android" && !this.skipUpdatingNavBar) {
@@ -244,8 +247,8 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
-
-    if(this.state.lockContent || !this.visible || !this.willBeVisible) {
+    // If you change anything here, be sure to test how it interacts with filtering, when you change which tags to show.
+    if(this.state.lockContent || (!this.visible && !this.willBeVisible)) {
       this.needsConfigureNavBar = true;
       return;
     }
