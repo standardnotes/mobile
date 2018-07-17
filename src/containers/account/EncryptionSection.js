@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import GlobalStyles from "../../Styles"
 import {Text, View} from 'react-native';
 import KeysManager from "../../lib/keysManager"
-import ModelManager from "../../lib/modelManager"
+import ModelManager from "../../lib/sfjs/modelManager"
 
 import SectionHeader from "../../components/SectionHeader";
 import ButtonCell from "../../components/ButtonCell";
@@ -27,7 +27,7 @@ export default class PasscodeSection extends Component {
     var sourceString = source == "account" ? "Account Keys" : "Passcode";
     var encryptionType = "AES-256";
 
-    var items = ModelManager.getInstance().allItemsMatchingTypes(["Note", "Tag"]);
+    var items = ModelManager.get().allItemsMatchingTypes(["Note", "Tag"]);
     var itemsStatus = items.length + "/" + items.length + " notes and tags encrypted";
 
     var textStyles = {

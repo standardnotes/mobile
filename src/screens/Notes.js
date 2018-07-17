@@ -1,21 +1,23 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Platform, Text, StatusBar, Modal, Alert } from 'react-native';
-import ModelManager from '../lib/modelManager'
-import Storage from '../lib/storage'
-import Sync from '../lib/sync'
-import Auth from '../lib/auth'
+
+import App from "../app"
+import ModelManager from '../lib/sfjs/modelManager'
+import Storage from '../lib/sfjs/storageManager'
+import Sync from '../lib/sfjs/syncManager'
+import AlertManager from '../lib/sfjs/alertManager'
+
+import Auth from '../lib/sfjs/authManager'
 import KeysManager from '../lib/keysManager'
-import AlertManager from '../lib/alertManager'
-import GlobalStyles from "../Styles"
 import Keychain from "../lib/keychain"
+
+import Abstract from "./Abstract"
+import GlobalStyles from "../Styles"
 import Icons from '../Icons';
 import NoteList from "../containers/NoteList"
-import Abstract from "./Abstract"
 import OptionsState from "../OptionsState"
-import App from "../app"
 import AuthModal from "../containers/AuthModal"
 import LockedView from "../containers/LockedView"
-var _ = require('lodash')
 import ApplicationState from "../ApplicationState";
 
 export default class Notes extends Abstract {
@@ -29,7 +31,7 @@ export default class Notes extends Abstract {
       if(state == ApplicationState.Resuming) {
         // we only want to perform sync here if the app is resuming, not if it's a fresh start
         if(this.dataLoaded) {
-          Sync.getInstance().sync();
+          Sync.get().sync();
         }
 
         var authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
@@ -76,9 +78,11 @@ export default class Notes extends Abstract {
   componentWillUnmount() {
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
-    Sync.getInstance().removeSyncObserver(this.syncObserver);
-    Sync.getInstance().removeSyncStatusObserver(this.syncStatusObserver);
-    Auth.getInstance().removeEventObserver(this.signoutObserver);
+
+    Sync.get().removeEventHandler(this.syncObserver);
+    Sync.get().removeSyncStatusObserver(this.syncStatusObserver);
+
+    Auth.get().removeEventHandler(this.signoutObserver);
     if(this.options) {
       this.options.removeChangeObserver(this.optionsObserver);
     }
@@ -88,12 +92,17 @@ export default class Notes extends Abstract {
   beginSyncTimer() {
     // Refresh every 30s
     this.syncTimer = setInterval(function () {
-      Sync.getInstance().sync(null);
+      Sync.get().sync(null);
     }, 30000);
   }
 
   registerObservers() {
-    this.optionsObserver = this.options.addChangeObserver((options) => {
+    this.optionsObserver = this.options.addChangeObserver((options, eventType) => {
+      // should only show for non-search term change
+      if(eventType !== OptionsState.OptionsStateChangeEventSearch) {
+        this.setNavBarSubtitle("Loading...");
+        this.showingNavBarLoadingStatus = true;
+      }
       this.reloadList(true);
       // On iOS, configureNavBar would be handle by viewWillAppear. However, we're using a drawer in Android.
       if(Platform.OS == "android" && !this.skipUpdatingNavBar) {
@@ -101,16 +110,24 @@ export default class Notes extends Abstract {
       }
     })
 
-    this.syncObserver = Sync.getInstance().registerSyncObserver(function(changesMade, retrieved, saved, unsaved){
-      if(_.find(retrieved, {content_type: "Note"}) || _.find(unsaved, {content_type: "Note"})) {
-        this.reloadList();
+    this.syncObserver = Sync.get().addEventHandler((event, data) => {
+      if(event == "sync:completed") {
+        // We want to reload the list of the retrieved items contains notes or tags.
+        // Since Notes no longer have relationships on tags, if a note's tags change, only the tag will be synced.
+        var retrievedHasNoteOrTag = data.retrievedItems && data.retrievedItems.find((item) => {
+          return ["Note", "Tag"].includes(item.content_type);
+        })
+        if(retrievedHasNoteOrTag || _.find(data.unsavedItems, {content_type: "Note"})) {
+          this.reloadList();
+        }
+        this.mergeState({refreshing: false, loading: false});
       }
-      this.mergeState({refreshing: false, loading: false});
-    }.bind(this))
+    })
 
-    this.syncStatusObserver = Sync.getInstance().registerSyncStatusObserver((status) => {
+    this.syncStatusObserver = Sync.get().registerSyncStatusObserver((status) => {
       if(status.error) {
         var text = `Unable to connect to sync server.`
+        this.showingErrorStatus = true;
         setTimeout( () => {
           // need timeout for syncing on app launch
           this.setStatusBarText(text);
@@ -126,20 +143,20 @@ export default class Notes extends Abstract {
         setTimeout(() => {
           this.setStatusBarText(null);
         }, 2000);
-      } else {
+      } else if(this.showingErrorStatus) {
         this.setStatusBarText(null);
       }
     })
 
-    this.signoutObserver = Auth.getInstance().addEventObserver([Auth.DidSignOutEvent, Auth.WillSignInEvent, Auth.DidSignInEvent], (event) => {
-      if(event == Auth.WillSignInEvent) {
+    this.signoutObserver = Auth.get().addEventHandler((event) => {
+      if(event == SFAuthManager.WillSignInEvent) {
         this.mergeState({loading: true})
-      } else if(event == Auth.DidSignInEvent) {
+      } else if(event == SFAuthManager.DidSignInEvent) {
         // Check if there are items that are errorDecrypting and try decrypting with new keys
-        Sync.getInstance().refreshErroredItems().then(() => {
+        Sync.get().refreshErroredItems().then(() => {
           this.reloadList();
         })
-      } else if(event == Auth.DidSignOutEvent) {
+      } else if(event == SFAuthManager.DidSignOutEvent) {
         this.setStatusBarText(null);
       }
     });
@@ -170,27 +187,42 @@ export default class Notes extends Abstract {
     this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
 
     this.setStatusBarText(encryptionEnabled ? "Decrypting notes..." : "Loading notes...");
-    Sync.getInstance().loadLocalItems((items) => {
-      setTimeout(() => {
-        this.setStatusBarText("Syncing...");
-        this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
-        this.dataLoaded = true;
-        this.reloadList();
-        this.configureNavBar(true);
-        this.mergeState({decrypting: false, loading: false});
-        // perform initial sync
-        Sync.getInstance().sync(() => {
-          this.setStatusBarText(null);
-        });
-      }, 0);
-    }, () => {
+    let incrementalCallback = (current, total) => {
+      let notesString = `${current}/${total} items...`
+      this.setStatusBarText(encryptionEnabled ? `Decrypting ${notesString}` : `Loading ${notesString}`);
       // Incremental Callback
       if(!this.dataLoaded) {
         this.dataLoaded = true;
         this.configureNavBar(true);
       }
       this.reloadList();
-    });
+    }
+
+    let loadLocalCompletion = (items) => {
+      this.setStatusBarText("Syncing...");
+      this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
+      this.dataLoaded = true;
+      this.reloadList();
+      this.configureNavBar(true);
+      this.mergeState({decrypting: false, loading: false});
+      // perform initial sync
+      Sync.get().sync().then(() => {
+        this.setStatusBarText(null);
+      });
+    }
+
+    if(Sync.get().initialDataLoaded()) {
+      // Data can be already loaded in the case of a theme change
+      loadLocalCompletion();
+    } else {
+      let batchSize = 100;
+      Sync.get().loadLocalItems(incrementalCallback, batchSize).then((items) => {
+        setTimeout(() => {
+          loadLocalCompletion(items);
+        });
+      });
+    }
+
   }
 
   /* If there is at least one item that has an error decrypting, and there are no account keys saved,
@@ -215,8 +247,8 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
-
-    if(this.state.lockContent || !this.visible || !this.willBeVisible) {
+    // If you change anything here, be sure to test how it interacts with filtering, when you change which tags to show.
+    if(this.state.lockContent || (!this.visible && !this.willBeVisible)) {
       this.needsConfigureNavBar = true;
       return;
     }
@@ -248,7 +280,7 @@ export default class Notes extends Abstract {
     // Android only allows 1 tag selection
     if(App.isAndroid) {
       if(numTags > 0) {
-        var tags = ModelManager.getInstance().getItemsWithIds(options.selectedTags);
+        var tags = ModelManager.get().findItems(options.selectedTags);
         if(tags.length > 0) {
           var tag = tags[0];
           notesTitle = tag.title + " notes";
@@ -395,9 +427,24 @@ export default class Notes extends Abstract {
     this.mergeState({refreshing: false})
   }
 
+  componentDidUpdate() {
+    // Called when render is complete
+    if(this.showingNavBarLoadingStatus) {
+      setTimeout(() => {
+        this.setNavBarSubtitle(null);
+        this.showingNavBarLoadingStatus = false;
+      }, 50);
+    }
+  }
+
   _onRefresh() {
+    this.setStatusBarText("Syncing...");
     this.setState({refreshing: true});
-    Sync.getInstance().sync();
+    Sync.get().sync().then(() => {
+      setTimeout(() => {
+        this.setStatusBarText(null);
+      }, 100);
+    })
   }
 
   _onPressItem = (item: hash) => {
@@ -438,11 +485,11 @@ export default class Notes extends Abstract {
       return <AuthModal />;
     }
 
-    var result = ModelManager.getInstance().getNotes(this.options);
+    var result = ModelManager.get().getNotes(this.options);
     var notes = result.notes;
     var tags = this.selectedTags = result.tags;
 
-    var syncStatus = Sync.getInstance().syncStatus;
+    var syncStatus = Sync.get().syncStatus;
 
     return (
       <View style={GlobalStyles.styles().container}>

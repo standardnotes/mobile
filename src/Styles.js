@@ -1,15 +1,11 @@
-var _ = require('lodash')
-
 import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
 import App from "./app"
-import ModelManager from "./lib/modelManager"
-import Server from "./lib/server"
-import Sync from "./lib/sync"
-import Storage from "./lib/storage"
-import Auth from "./lib/auth"
-import Theme from "./models/app/theme"
+import ModelManager from "./lib/sfjs/modelManager"
+import Server from "./lib/sfjs/httpManager"
+import Sync from './lib/sfjs/syncManager'
+import Storage from "./lib/sfjs/storageManager"
+import Auth from "./lib/sfjs/authManager"
 import KeysManager from './lib/keysManager'
-
 
 export default class GlobalStyles {
 
@@ -25,62 +21,63 @@ export default class GlobalStyles {
 
   async resolveInitialTheme() {
     // Get the active theme from storage rather than waiting for local database to load
-    return Storage.getItem("activeTheme").then(function(themeResult) {
-      let runDefaultTheme = () => {
-        try {
-          var theme = this.systemTheme();
-          theme.setMobileActive(true);
-          this.activeTheme = theme;
-          var constants = this.defaultConstants();
-          this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
-        } catch (e) {
-          var constants = this.defaultConstants();
-          this.setStyles(this.defaultRules(constants), constants, Platform.OS == "android" ? "light-content" : "dark-content");
-          console.log("Default theme error", e);
-        }
+    var themeResult = await Storage.get().getItem("activeTheme");
+    let runDefaultTheme = () => {
+      try {
+        var theme = this.systemTheme();
+        theme.setMobileActive(true);
+        this.activeTheme = theme;
+        var constants = this.defaultConstants();
+        this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
+      } catch (e) {
+        var constants = this.defaultConstants();
+        this.setStyles(this.defaultRules(constants), constants, Platform.OS == "android" ? "light-content" : "dark-content");
+        console.log("Default theme error", e);
       }
+    }
 
-      if(themeResult) {
-        // JSON stringified content is generic and includes all items property at time of stringification
-        // So we parse it, then set content to itself, so that the mapping can be handled correctly.
-        try {
-          var parsedTheme = JSON.parse(themeResult);
-          var needsMigration = false;
-          if(parsedTheme.mobileRules) {
-            // Newer versions of the app persist a Theme object where mobileRules are nested in AppData.
-            // We want to check if the currently saved data is of the old format, which uses theme.mobileRules
-            // instead of theme.getMobileRules(). If so, we want to prepare it for the new format.
-            needsMigration = true;
-          }
-          let content = Object.assign({}, parsedTheme);
-          parsedTheme.content = content;
+    console.log("Theme result", themeResult);
 
-          var theme = new Theme(parsedTheme);
-          if(needsMigration) {
-            theme.setMobileRules(parsedTheme.mobileRules);
-            theme.mobileRules = null;
-          }
-
-          theme.isSwapIn = true;
-          var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
-          var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
-          this.setStyles(rules, constants, theme.getMobileRules().statusBar);
-
-          this.activeTheme = theme;
-        } catch (e) {
-          console.error("Error parsing initial theme", e);
-          runDefaultTheme();
+    if(themeResult) {
+      // JSON stringified content is generic and includes all items property at time of stringification
+      // So we parse it, then set content to itself, so that the mapping can be handled correctly.
+      try {
+        var parsedTheme = JSON.parse(themeResult);
+        var needsMigration = false;
+        if(parsedTheme.mobileRules) {
+          // Newer versions of the app persist a Theme object where mobileRules are nested in AppData.
+          // We want to check if the currently saved data is of the old format, which uses theme.mobileRules
+          // instead of theme.getMobileRules(). If so, we want to prepare it for the new format.
+          needsMigration = true;
         }
-      } else {
+        let content = Object.assign({}, parsedTheme);
+        parsedTheme.content = content;
+
+        var theme = new SNTheme(parsedTheme);
+        if(needsMigration) {
+          theme.setMobileRules(parsedTheme.mobileRules);
+          theme.mobileRules = null;
+        }
+
+        theme.isSwapIn = true;
+        var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
+        var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
+        this.setStyles(rules, constants, theme.getMobileRules().statusBar);
+
+        this.activeTheme = theme;
+      } catch (e) {
+        console.error("Error parsing initial theme", e);
         runDefaultTheme();
       }
-    }.bind(this));
+    } else {
+      runDefaultTheme();
+    }
   }
 
   constructor() {
     KeysManager.get().registerAccountRelatedStorageKeys(["activeTheme"]);
 
-    ModelManager.getInstance().addItemSyncObserver("themes", "SN|Theme", function(items){
+    ModelManager.get().addItemSyncObserver("themes", "SN|Theme", function(allItems, validItems, deletedItems, source){
       if(this.activeTheme && this.activeTheme.isSwapIn) {
         var matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
         if(matchingTheme) {
@@ -138,10 +135,12 @@ export default class GlobalStyles {
 
     var constants = this.defaultConstants();
 
-    this._systemTheme = new Theme({
-      name: "Default",
-      default: true,
-      uuid: 0
+    this._systemTheme = new SNTheme({
+      uuid: 0,
+      content: {
+        isDefault: true,
+        name: "Default",
+      }
     });
 
     this._systemTheme.setMobileRules({
@@ -155,7 +154,7 @@ export default class GlobalStyles {
   }
 
   themes() {
-    return [this.systemTheme()].concat(ModelManager.getInstance().themes);
+    return [this.systemTheme()].concat(ModelManager.get().themes);
   }
 
   isThemeActive(theme) {
@@ -178,10 +177,10 @@ export default class GlobalStyles {
       this.activeTheme = theme;
       theme.setMobileActive(true);
 
-      if(theme.default) {
-        Storage.removeItem("activeTheme");
+      if(theme.content.isDefault) {
+        Storage.get().removeItem("activeTheme");
       } else if(writeToStorage) {
-        Storage.setItem("activeTheme", JSON.stringify(theme));
+        Storage.get().setItem("activeTheme", JSON.stringify(theme));
       }
 
       App.get().reload();
@@ -192,7 +191,7 @@ export default class GlobalStyles {
         if(theme.getNotAvailOnMobile()) {
           Alert.alert("Not Available", "This theme is not available on mobile.");
         } else {
-          Sync.getInstance().sync();
+          Sync.get().sync();
           run();
         }
       });
@@ -232,7 +231,7 @@ export default class GlobalStyles {
       url = url.replace("localhost", "10.0.2.2");
     }
 
-    return Server.getInstance().getAbsolute(url, {}, function(response){
+    return Server.get().getAbsolute(url, {}, function(response){
       // success
       if(response !== theme.getMobileRules()) {
         theme.setMobileRules(response);
@@ -254,16 +253,14 @@ export default class GlobalStyles {
 
   downloadThemeAndReload(theme) {
     this.downloadTheme(theme, function(){
-      Sync.getInstance().sync(function(){
+      Sync.get().sync(function(){
         this.activateTheme(theme);
       }.bind(this));
     }.bind(this))
   }
 
   setStyles(rules, constants, statusBar) {
-    if(!statusBar) {
-      statusBar = "light-content";
-    }
+    if(!statusBar) { statusBar = "light-content";}
     this.statusBar = statusBar;
     this.constants = constants;
     this.styles = {

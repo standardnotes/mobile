@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import App from '../app'
 import ComponentManager from '../lib/componentManager'
-import ModelManager from '../lib/modelManager'
+import ModelManager from '../lib/sfjs/modelManager'
 import TableSection from "../components/TableSection";
 import Icons from '../Icons';
 import LockedView from "../containers/LockedView";
 import Abstract from "./Abstract"
 
 import GlobalStyles from "../Styles"
-var _ = require('lodash')
 
 import { Alert, View, WebView, Linking, Platform } from 'react-native';
 
@@ -25,8 +24,8 @@ export default class Webview extends Abstract {
   constructor(props) {
     super(props);
 
-    this.editor = ModelManager.getInstance().findItem(props.editorId);
-    this.note = ModelManager.getInstance().findItem(props.noteId);
+    this.editor = ModelManager.get().findItem(props.editorId);
+    this.note = ModelManager.get().findItem(props.noteId);
 
     if(!this.note) {
       console.log("Unable to find note with ID", props.noteId);
@@ -65,7 +64,6 @@ export default class Webview extends Abstract {
         }
       }
     });
-
   }
 
   componentDidMount() {
@@ -103,21 +101,6 @@ export default class Webview extends Abstract {
 
   showErrorStatus() {
     this.setNavBarSubtitle("Error saving");
-  }
-
-  setNavBarSubtitle(title) {
-    this.props.navigator.setSubTitle({
-      subtitle: title
-    });
-
-    if(!this.didSetNavBarStyle) {
-      this.didSetNavBarStyle = true;
-      var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
-      this.props.navigator.setStyle({
-        navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
-        navBarSubtitleFontSize: 12
-      });
-    }
   }
 
   onNavigatorEvent(event) {

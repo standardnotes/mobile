@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
-import Auth from '../lib/auth'
-import SFJS from '../lib/sfjs'
+import App from "../app"
+import SF from '../lib/sfjs/sfjs'
+import Storage from '../lib/sfjs/storageManager'
+import Auth from '../lib/sfjs/authManager'
+import KeysManager from '../lib/keysManager'
+
+import Abstract from "./Abstract"
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import SectionedOptionsTableCell from "../components/SectionedOptionsTableCell";
-import Abstract from "./Abstract"
-import Storage from '../lib/storage'
-import KeysManager from '../lib/keysManager'
 import GlobalStyles from "../Styles"
-var _ = require('lodash')
-import App from "../app"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -197,7 +197,7 @@ class PasscodeSection extends Abstract {
         unlockButtonEnabled: true,
       };
 
-      Storage.getItem("passcodeKeyboardType").then((result) => {
+      Storage.get().getItem("passcodeKeyboardType").then((result) => {
         this.keyboardType = result || 'default';
         if(this.keyboardType !== "default") {
           this.renderOnMount(() => {
@@ -225,9 +225,9 @@ class PasscodeSection extends Abstract {
 
       // Allow UI to update before executing block task. InteractionManager.runAfterInteractions doesn't seem to work.
       setTimeout(async () => {
-        let identifier = await SFJS.crypto().generateUUID();
+        let identifier = await SF.get().crypto.generateUUID();
 
-        SFJS.crypto().generateInitialKeysAndAuthParamsForUser(identifier, passcode).then((results) => {
+        SF.get().crypto.generateInitialKeysAndAuthParamsForUser(identifier, passcode).then((results) => {
           let keys = results.keys;
           let authParams = results.authParams;
 
@@ -264,7 +264,7 @@ class PasscodeSection extends Abstract {
       setTimeout(() => {
 
          var authParams = KeysManager.get().offlineAuthParams;
-         SFJS.crypto().computeEncryptionKeysForUser(passcode, authParams).then((keys) => {
+         SF.get().crypto.computeEncryptionKeysForUser(passcode, authParams).then((keys) => {
            if(keys.pw === KeysManager.get().offlinePasscodeHash()) {
              KeysManager.get().setOfflineKeys(keys);
              this.props.onAuthenticateSuccess();
@@ -282,7 +282,7 @@ class PasscodeSection extends Abstract {
     onKeyboardOptionsSelect = (option) => {
       if(option.key !== this.keyboardType) {
         this.keyboardType = option.key;
-        Storage.setItem("passcodeKeyboardType", option.key);
+        Storage.get().setItem("passcodeKeyboardType", option.key);
         this.forceUpdate();
         this.refreshKeyboard();
       }

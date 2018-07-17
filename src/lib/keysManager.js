@@ -1,14 +1,13 @@
-import SFJS from './sfjs'
-import Server from './server'
-import Storage from './storage'
-import ModelManager from './modelManager'
 import {Platform} from 'react-native';
-import Keychain from "./keychain"
-var _ = require('lodash')
-import FlagSecure from 'react-native-flag-secure-android';
 import App from "../app"
+import FlagSecure from 'react-native-flag-secure-android';
 import ApplicationState from "../ApplicationState"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
+
+import SF from './sfjs/sfjs'
+import ModelManager from './sfjs/modelManager'
+import Storage from './sfjs/storageManager'
+import Keychain from "./keychain"
 
 let OfflineParamsKey = "pc_params";
 let FirstRunKey = "first_run";
@@ -71,7 +70,7 @@ export default class KeysManager {
         }
       }.bind(this)),
 
-      Storage.getMultiItems(storageKeys).then(function(items){
+      Storage.get().getMultiItems(storageKeys).then(function(items){
         // first run
         this.firstRun = items[FirstRunKey] === null || items[FirstRunKey] === undefined;
 
@@ -120,16 +119,21 @@ export default class KeysManager {
     console.log("===Handling First Run===");
 
     return Promise.all([
-      Storage.clear(),
+      Storage.get().clear(),
       Keychain.clearKeys()
     ]).then(function(){
       this.loadLocalStateFromKeys(null);
       this.accountAuthParams = null;
       this.user = null;
-      Storage.setItem(FirstRunKey, "false")
+      Storage.get().setItem(FirstRunKey, "false");
     }.bind(this));
   }
 
+  /*
+    We need to register local storage keys, so that when we want to sign out, we don't accidentally
+    clear internal keys, like first_run. (If you accidentally delete the first_run key when you sign out,
+    then the next time you sign in and refresh, it will treat it as a new run, and delete all data.)
+  */
   registerAccountRelatedStorageKeys(storageKeys) {
     this.accountRelatedStorageKeys = _.uniq(this.accountRelatedStorageKeys.concat(storageKeys));
   }
@@ -177,7 +181,7 @@ export default class KeysManager {
 
   async saveUser(user) {
     this.user = user;
-    return Storage.setItem("user", JSON.stringify(user));
+    return Storage.get().setItem("user", JSON.stringify(user));
   }
 
   /* The keys to use for encryption. If user is signed in, use those keys, otherwise use offline keys */
@@ -213,7 +217,7 @@ export default class KeysManager {
     this.accountKeys = null;
     this.accountAuthParams = null;
     this.user = null;
-    Storage.clearKeys(this.accountRelatedStorageKeys);
+    await Storage.get().clearKeys(this.accountRelatedStorageKeys);
     return this.persistKeysToKeychain();
   }
 
@@ -229,12 +233,12 @@ export default class KeysManager {
 
   async enableStorageEncryption() {
     this.storageEncryptionEnabled = true;
-    return Storage.setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
+    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
   }
 
   async disableStorageEncryption() {
     this.storageEncryptionEnabled = false;
-    return Storage.setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
+    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
   }
 
   isStorageEncryptionEnabled() {
@@ -247,12 +251,12 @@ export default class KeysManager {
 
   async setAccountAuthParams(authParams) {
     this.accountAuthParams = authParams;
-    return Storage.setItem("auth_params", JSON.stringify(authParams));
+    return Storage.get().setItem("auth_params", JSON.stringify(authParams));
   }
 
   async setOfflineAuthParams(authParams) {
     this.offlineAuthParams = authParams;
-    return Storage.setItem(OfflineParamsKey, JSON.stringify(authParams));
+    return Storage.get().setItem(OfflineParamsKey, JSON.stringify(authParams));
   }
 
   activeAuthParams() {
@@ -275,7 +279,7 @@ export default class KeysManager {
 
   // Local Security
 
-  clearOfflineKeysAndData() {
+  async clearOfflineKeysAndData() {
     // make sure user is authenticated before performing this step
     if(!this.offlineKeys.mk) {
       alert("Unable to remove passcode. Make sure you are properly authenticated and try again.");
@@ -283,7 +287,7 @@ export default class KeysManager {
     }
     this.offlineKeys = null;
     this.offlineAuthParams = null;
-    Storage.removeItem(OfflineParamsKey);
+    await Storage.get().removeItem(OfflineParamsKey);
     return this.persistKeysToKeychain();
   }
 

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import GlobalStyles from "../Styles"
-import Tag from "../models/app/tag"
 import ActionSheet from 'react-native-actionsheet'
 import ItemActionManager from '../lib/itemActionManager'
 
@@ -145,7 +144,6 @@ export default class NoteCell extends React.PureComponent {
       // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
       this.forceUpdate();
     });
-
   }
 
   render() {
@@ -172,7 +170,7 @@ export default class NoteCell extends React.PureComponent {
             {this.props.renderTags && note.tags.length > 0 &&
               <View style={this.styles.noteTags}>
                 <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag)}>
-                {Tag.arrayToDisplayString(note.tags)}
+                {this.props.tagsString}
                 </Text>
               </View>
             }
@@ -199,7 +197,7 @@ export default class NoteCell extends React.PureComponent {
             <Text
               numberOfLines={1}
               style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>
-              {this.props.sortType == "client_updated_at" ? "Modified " + note.updatedAt() : note.createdAt()}
+              {this.props.sortType == "client_updated_at" ? "Modified " + note.updatedAtString() : note.createdAtString()}
             </Text>
 
             <ActionSheet

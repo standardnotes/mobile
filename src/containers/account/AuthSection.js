@@ -9,8 +9,6 @@ import SectionedTableCell from "../../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../../components/SectionedAccessoryTableCell";
 import AbstractComponent from "../../components/AbstractComponent"
 
-var _ = require('lodash')
-
 const DEFAULT_SIGN_IN_TEXT = "Sign In";
 const DEFAULT_REGISTER_TEXT = "Register";
 

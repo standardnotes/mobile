@@ -6,7 +6,7 @@ import Account from './Account'
 import Authenticate from './Authenticate'
 import Filter from './Filter'
 import InputModal from './InputModal'
-import Sync from '../lib/sync'
+import Sync from '../lib/sfjs/syncManager'
 import Webview from './Webview'
 
 export function registerScreens() {

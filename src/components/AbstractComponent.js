@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {TextInput, View} from 'react-native';
-var _ = require('lodash')
 
 export default class AbstractComponent extends Component {
 

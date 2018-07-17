@@ -1,9 +1,14 @@
-import Storage from "./lib/storage"
-var _ = require('lodash');
+import Storage from "./lib/sfjs/storageManager"
 
 export default class OptionsState {
 
+  static OptionsStateChangeEventSearch = "OptionsStateChangeEventSearch";
+  static OptionsStateChangeEventTags = "OptionsStateChangeEventTags";
+  static OptionsStateChangeEventViews = "OptionsStateChangeEventViews"
+  static OptionsStateChangeEventTags = "OptionsStateChangeEventSort"
+
   constructor(json) {
+
     this.init();
     _.merge(this, _.omit(json, ["changeObservers"]));
     this.changeObservers = [];
@@ -25,14 +30,14 @@ export default class OptionsState {
   }
 
   async loadSaved() {
-    return Storage.getItem("options").then(function(result){
+    return Storage.get().getItem("options").then(function(result){
       _.merge(this, _.omit(JSON.parse(result), ["changeObservers"]));
       this.notifyObservers();
     }.bind(this))
   }
 
   persist() {
-    Storage.setItem("options", JSON.stringify(this));
+    Storage.get().setItem("options", JSON.stringify(this));
   }
 
   toJSON() {
@@ -49,9 +54,9 @@ export default class OptionsState {
     _.pull(this.changeObservers, observer);
   }
 
-  notifyObservers() {
+  notifyObservers(event) {
     this.changeObservers.forEach(function(observer){
-      observer.callback(this);
+      observer.callback(this, event);
     }.bind(this))
   }
 
@@ -64,21 +69,21 @@ export default class OptionsState {
 
   setSearchTerm(term) {
     this.searchTerm = term;
-    this.notifyObservers();
+    this.notifyObservers(OptionsState.OptionsStateChangeEventSearch);
   }
 
   setSortBy(sortBy) {
     this.sortBy = sortBy;
-    this.notifyObservers();
+    this.notifyObservers(OptionsState.OptionsStateChangeEventSort);
   }
 
   setArchivedOnly(archived) {
     this.archivedOnly = archived;
-    this.notifyObservers();
+    this.notifyObservers(OptionsState.OptionsStateChangeEventViews);
   }
 
   setSelectedTags(selectedTags) {
     this.selectedTags = selectedTags;
-    this.notifyObservers();
+    this.notifyObservers(OptionsState.OptionsStateChangeEventTags);
   }
 }

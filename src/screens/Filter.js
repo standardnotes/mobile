@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { TextInput, SectionList, ScrollView, View, Text, Linking, Share, Platform, StatusBar, FlatList, Dimensions } from 'react-native';
-var _ = require('lodash')
-
-import Sync from '../lib/sync'
-import ModelManager from '../lib/modelManager'
+import App from "../app"
+import Sync from '../lib/sfjs/syncManager'
+import ModelManager from '../lib/sfjs/modelManager'
 import ComponentManager from '../lib/componentManager'
-import AlertManager from '../lib/alertManager'
+import AlertManager from '../lib/sfjs/alertManager'
 import ItemActionManager from '../lib/itemActionManager'
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
@@ -14,11 +13,9 @@ import ManageNote from "../containers/ManageNote";
 import LockedView from "../containers/LockedView";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
-import Tag from "../models/app/tag"
 import Icons from '../Icons';
 import OptionsState from "../OptionsState"
 import GlobalStyles from "../Styles"
-import App from "../app"
 import ApplicationState from "../ApplicationState";
 import ActionSheet from 'react-native-actionsheet'
 
@@ -47,7 +44,7 @@ export default class Filter extends Abstract {
     this.mergeState({tags: [], selectedTags: selectedTags, archivedOnly: this.options.archivedOnly});
 
     if(this.props.noteId) {
-      this.note = ModelManager.getInstance().findItem(this.props.noteId);
+      this.note = ModelManager.get().findItem(this.props.noteId);
     }
 
     // React Native Navigation has an issue where navigation pushes are pushed first, then rendered.
@@ -55,7 +52,10 @@ export default class Filter extends Abstract {
     // then wait a little to render the rest, such as a dynamic list of tags
     // See https://github.com/wix/react-native-navigation/issues/358
 
-    this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
+    let handleInitialDataLoad = () => {
+      if(this.handledDataLoad) { return; }
+      this.handledDataLoad = true;
+
       if(!this.props.singleSelectMode) {
         // Load tags after delay
         setTimeout(function () {
@@ -67,20 +67,29 @@ export default class Filter extends Abstract {
         this.loadTags = true;
         this.forceUpdate();
       }
-    }.bind(this))
+    }
 
-    this.syncObserver = Sync.getInstance().registerSyncObserver((changesMade, retreived, saved) => {
-      if(retreived && _.find(retreived, {content_type: "Tag"})) {
-        this.forceUpdate();
+    if(Sync.get().initialDataLoaded()) {
+      handleInitialDataLoad();
+    }
+
+    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+      if(event == "local-data-loaded") {
+        handleInitialDataLoad();
       }
-    });
+
+      else if(event == "sync:completed") {
+        if(data.retrievedItems && _.find(data.retrievedItems, {content_type: "Tag"})) {
+          this.forceUpdate();
+        }
+      }
+    })
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
-    Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
-    Sync.getInstance().removeSyncObserver(this.syncObserver);
+    Sync.get().removeEventHandler(this.syncEventHandler);
   }
 
   notifyParentOfOptionsChange() {
@@ -198,11 +207,11 @@ export default class Filter extends Abstract {
   }
 
   createTag(text, callback) {
-    var tag = new Tag({title: text});
+    var tag = new SNTag({content: {title: text}});
     tag.initUUID().then(() => {
       tag.setDirty(true);
-      ModelManager.getInstance().addItem(tag);
-      Sync.getInstance().sync();
+      ModelManager.get().addItem(tag);
+      Sync.get().sync();
       callback(tag);
       this.forceUpdate();
     })
@@ -303,7 +312,7 @@ export default class Filter extends Abstract {
   }
 
   getEditors() {
-    return ModelManager.getInstance().itemsForContentType("SN|Component").filter(function(component){
+    return ModelManager.get().validItemsForContentType("SN|Component").filter(function(component){
       return component.area == "editor-editor";
     })
   }
@@ -331,7 +340,7 @@ export default class Filter extends Abstract {
     }
 
     if(this.loadTags) {
-      var tags = ModelManager.getInstance().tags.slice();
+      var tags = ModelManager.get().tags.slice();
       if(this.props.singleSelectMode) {
         tags.unshift({title: "All notes", key: "all", uuid: 100})
       }

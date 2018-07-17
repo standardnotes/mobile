@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import {ScrollView, View, Alert, Keyboard, Linking, Platform, Share, NativeModules} from 'react-native';
 
-import Sync from '../lib/sync'
-import Auth from '../lib/auth'
-import AlertManager from '../lib/alertManager'
+import Sync from '../lib/sfjs/syncManager'
+import ModelManager from '../lib/sfjs/modelManager'
+import AlertManager from '../lib/sfjs/alertManager'
+
+import Auth from '../lib/sfjs/authManager'
 import KeysManager from '../lib/keysManager'
-import ModelManager from '../lib/modelManager'
+
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
@@ -13,7 +15,6 @@ import SectionedTableCell from "../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
 import Authenticate from "./Authenticate"
-import ItemParams from "../models/local/itemParams"
 import AuthModal from "../containers/AuthModal"
 import AuthSection from "../containers/account/AuthSection"
 import RegistrationConfirmSection from "../containers/account/RegistrationConfirmSection"
@@ -28,7 +29,6 @@ import GlobalStyles from "../Styles"
 import App from "../app"
 
 var base64 = require('base-64');
-var _ = require('lodash')
 var Mailer = require('NativeModules').RNMail;
 
 export default class Account extends Abstract {
@@ -42,11 +42,29 @@ export default class Account extends Abstract {
   loadInitialState() {
     super.loadInitialState();
 
-    this.mergeState({params: {server: Auth.getInstance().serverUrl()}})
+    this.mergeState({params: {server: Auth.get().serverUrl()}})
 
-    this.dataLoadObserver = Sync.getInstance().registerInitialDataLoadObserver(function(){
-      this.forceUpdate();
-    }.bind(this))
+    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+      if(event == "local-data-loaded") {
+        this.forceUpdate();
+      } else if(event == "sync-session-invalid") {
+        if(!this.didShowSessionInvalidAlert) {
+          this.didShowSessionInvalidAlert = true;
+          AlertManager.get().confirm({
+            title: "Session Expired",
+            text: "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.",
+            confirmButtonText: "Sign Out",
+            onConfirm: () => {
+              this.didShowSessionInvalidAlert = false;
+              Auth.get().signout();
+            },
+            onCancel: () => {
+              this.didShowSessionInvalidAlert = false;
+            }
+          })
+        }
+      }
+    })
 
     this.loadSecurityStatus();
   }
@@ -60,7 +78,7 @@ export default class Account extends Abstract {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    Sync.getInstance().removeDataLoadObserver(this.dataLoadObserver);
+    Sync.get().removeEventHandler(this.syncEventHandler);
   }
 
   configureNavBar() {
@@ -138,12 +156,14 @@ export default class Account extends Abstract {
     // calling `markAllItemsDirtyAndSaveOffline` during sign in, if an authenticated sync happens to occur
     // right before that's called, items retreived from that sync will be marked as dirty, then resynced, causing mass duplication.
     // Unlock sync after all sign in processes are complete.
-    Sync.getInstance().lockSyncing();
+    Sync.get().lockSyncing();
 
-    Auth.getInstance().login(email, password, params.server, strict, extraParams, (user, error) => {
+    Auth.get().login(params.server, email, password, strict, extraParams).then((response) => {
 
-      if(error) {
-        Sync.getInstance().unlockSyncing();
+      if(!response || response.error) {
+        var error = response ? response.error : {message: "An unknown error occured."}
+
+        Sync.get().unlockSyncing();
 
         if(error.tag == "mfa-required" || error.tag == "mfa-invalid") {
           this.mergeState({mfa: error});
@@ -163,8 +183,8 @@ export default class Account extends Abstract {
       }
 
       this.onAuthSuccess(() => {
-        Sync.getInstance().unlockSyncing();
-        Sync.getInstance().sync();
+        Sync.get().unlockSyncing();
+        Sync.get().sync();
       });
 
       callback && callback(true);
@@ -190,16 +210,17 @@ export default class Account extends Abstract {
 
     var params = this.state.params;
 
-    Auth.getInstance().register(params.email, params.password, params.server, (user, error) => {
+    Auth.get().register( params.server, params.email, params.password).then((response) => {
       this.mergeState({registering: false, confirmRegistration: false});
 
-      if(error) {
+      if(!response || response.error) {
+        var error = response ? response.error : {message: "An unknown error occured."}
         Alert.alert('Oops', error.message, [{text: 'OK'}])
         return;
       }
 
       this.onAuthSuccess(() => {
-        Sync.getInstance().sync();
+        Sync.get().sync();
       });
     });
   }
@@ -209,7 +230,7 @@ export default class Account extends Abstract {
   }
 
   resaveOfflineData(callback, updateAfter = false) {
-    Sync.getInstance().resaveOfflineData(() => {
+    Sync.get().resaveOfflineData().then(() => {
       if(updateAfter) {
         this.forceUpdate();
       }
@@ -218,7 +239,7 @@ export default class Account extends Abstract {
   }
 
   onAuthSuccess = (callback) => {
-    Sync.getInstance().markAllItemsDirtyAndSaveOffline(() => {
+    Sync.get().markAllItemsDirtyAndSaveOffline(false).then(() => {
       callback && callback();
       this.returnToNotesScreen();
     });
@@ -236,24 +257,26 @@ export default class Account extends Abstract {
   }
 
   onSignOutPress = () => {
-    AlertManager.confirm(
-      "Sign Out?", "Signing out will remove all data from this device, including notes and tags. Make sure your data is synced before proceeding.", "Sign Out",
-      function(){
-        Auth.getInstance().signout(() => {
+    AlertManager.get().confirm({
+      title: "Sign Out?",
+      text: "Signing out will remove all data from this device, including notes and tags. Make sure your data is synced before proceeding.",
+      confirmButtonText: "Sign Out",
+      onConfirm: () => {
+        Auth.get().signout().then(() => {
           this.forceUpdate();
         })
-      }.bind(this)
-    )
+      }
+    })
   }
 
   async onExportPress(encrypted, callback) {
-    var version = Auth.getInstance().protocolVersion();
+    var auth_params = await Auth.get().getAuthParams();
     var keys = encrypted ? KeysManager.get().activeKeys() : null;
 
     var items = [];
 
-    for(var item of ModelManager.getInstance().allItems) {
-      var itemParams = new ItemParams(item, keys, version);
+    for(var item of ModelManager.get().allItems) {
+      var itemParams = new SFItemParams(item, keys, auth_params);
       var params = await itemParams.paramsForExportFile();
       items.push(params);
     }
@@ -295,38 +318,44 @@ export default class Account extends Abstract {
   }
 
   onThemeLongPress = (theme) => {
-    AlertManager.confirm(
-      "Redownload Theme", "Themes are cached when downloaded. To retrieve the latest version, press Redownload.", "Redownload",
-      function(){
+    AlertManager.get().confirm({
+      title: "Redownload Theme",
+      text: "Themes are cached when downloaded. To retrieve the latest version, press Redownload.",
+      confirmButtonText: "Redownload",
+      onConfirm: () => {
         GlobalStyles.get().downloadThemeAndReload(theme);
-      }.bind(this)
-    )
+      }
+    })
   }
 
   onStorageEncryptionEnable = () => {
-    AlertManager.confirm(
-      "Enable Storage Encryption?", "Storage encryption improves your security by encrypting your data on your device. It may increase app start-up speed.", "Enable",
-      () => {
+    AlertManager.get().confirm({
+      title: "Enable Storage Encryption?",
+      text: "Storage encryption improves your security by encrypting your data on your device. It may increase app start-up speed.",
+      confirmButtonText: "Enable",
+      onConfirm: () => {
         this.mergeState({storageEncryptionLoading: true});
         KeysManager.get().enableStorageEncryption();
         this.resaveOfflineData(() => {
           this.mergeState({storageEncryption: true, storageEncryptionLoading: false});
         });
       }
-    )
+    })
   }
 
   onStorageEncryptionDisable = () => {
-    AlertManager.confirm(
-      "Disable Storage Encryption?", "Storage encryption improves your security by encrypting your data on your device. Disabling it can improve app start-up speed.", "Disable",
-      () => {
+    AlertManager.get().confirm({
+      title: "Disable Storage Encryption?",
+      text: "Storage encryption improves your security by encrypting your data on your device. Disabling it can improve app start-up speed.",
+      confirmButtonText: "Disable",
+      onConfirm: () => {
         this.mergeState({storageEncryptionLoading: true});
         KeysManager.get().disableStorageEncryption();
         this.resaveOfflineData(() => {
           this.mergeState({storageEncryption: false, storageEncryptionLoading: false});
         });
       }
-    )
+    })
   }
 
   onPasscodeEnable = () => {
@@ -355,21 +384,21 @@ export default class Account extends Abstract {
       message = "Are you sure you want to disable your local passcode? This will disable encryption on your data.";
     }
 
-    AlertManager.confirm(
-      "Disable Passcode", message, "Disable Passcode",
-      function(){
-        var result = KeysManager.get().clearOfflineKeysAndData();
-
+    AlertManager.get().confirm({
+      title: "Disable Passcode",
+      text: message,
+      confirmButtonText: "Disable Passcode",
+      onConfirm: async () => {
+        var result = await KeysManager.get().clearOfflineKeysAndData();
         if(encryptionSource == "offline") {
           // remove encryption from all items
           this.resaveOfflineData(null, true);
         }
 
-        this.mergeState({hasPasscode: !result});
-
+        this.mergeState({hasPasscode: false});
         this.forceUpdate();
-      }.bind(this)
-    )
+      }
+    })
   }
 
   onFingerprintEnable = () => {
@@ -418,7 +447,7 @@ export default class Account extends Abstract {
       return (<LockedView />);
     }
 
-    let signedIn = !Auth.getInstance().offline();
+    let signedIn = !Auth.get().offline();
     var themes = GlobalStyles.get().themes();
 
     return (

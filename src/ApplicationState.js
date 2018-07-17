@@ -1,8 +1,6 @@
 import {AppState} from 'react-native';
 import App from "./app"
 import KeysManager from "./lib/keysManager"
-var _ = require('lodash');
-
 
 export default class ApplicationState {
 
@@ -61,7 +59,6 @@ export default class ApplicationState {
     this.notifyOfState(ApplicationState.ThemeChangeEnd);
   }
 
-
   handleAppStateChange = (nextAppState) => {
 
     if(this.themeChangeInProgress || this.ignoreStateChanges) {
@@ -101,7 +98,7 @@ export default class ApplicationState {
     }
   }
 
-  // An app cycle change  are natural events like active, inactive, background,
+  // An app cycle change are natural events like active, inactive, background,
   // while non-app cycle events are custom events like locking and unlocking
 
   isStateAppCycleChange(state) {
@@ -167,8 +164,6 @@ export default class ApplicationState {
       this.ignoreStateChanges = false;
     }, 350);
   }
-
-
 
   getMostRecentState() {
     return this.mostRecentState;
