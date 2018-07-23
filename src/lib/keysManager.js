@@ -271,11 +271,15 @@ export default class KeysManager {
   activeAuthParams() {
     if(this.accountKeys) {
       var params = this.accountAuthParams;
-      if(!params.version) { params.version = this.defaultProtocolVersionForKeys(this.accountKeys); }
+      if(params && !params.version) {
+        params.version = this.defaultProtocolVersionForKeys(this.accountKeys);
+      }
       return params;
-    } else {
+    } else if(this.offlineAuthParams) {
       var params = this.offlineAuthParams;
-      if(!params.version) { params.version = this.defaultProtocolVersionForKeys(this.offlineKeys); }
+      if(params && !params.version) {
+        params.version = this.defaultProtocolVersionForKeys(this.offlineKeys);
+      }
       return params;
     }
   }
