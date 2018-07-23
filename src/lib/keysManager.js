@@ -259,11 +259,24 @@ export default class KeysManager {
     return Storage.get().setItem(OfflineParamsKey, JSON.stringify(authParams));
   }
 
+  defaultProtocolVersionForKeys(keys) {
+    if(keys && keys.ak) {
+      // If there's no version stored, and there's an ak, it has to be 002. Newer versions would have thier version stored in authParams.
+      return "002";
+    } else {
+      return "001";
+    }
+  }
+
   activeAuthParams() {
     if(this.accountKeys) {
-      return this.accountAuthParams;
+      var params = this.accountAuthParams;
+      if(!params.version) { params.version = this.defaultProtocolVersionForKeys(this.accountKeys); }
+      return params;
     } else {
-      return this.offlineAuthParams;
+      var params = this.offlineAuthParams;
+      if(!params.version) { params.version = this.defaultProtocolVersionForKeys(this.offlineKeys); }
+      return params;
     }
   }
 

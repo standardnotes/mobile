@@ -121,6 +121,8 @@ export default class Notes extends Abstract {
           this.reloadList();
         }
         this.mergeState({refreshing: false, loading: false});
+      } else if(event == "sync-exception") {
+        Alert.alert("Issue Syncing", `There was an error while trying to save your items. Please contact support and share this message: ${data}`);
       }
     })
 
