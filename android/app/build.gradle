@@ -97,8 +97,8 @@ android {
         applicationId "com.standardnotes"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 2020110
-        versionName "2.2.11"
+        versionCode 2030000
+        versionName "2.3.0"
         multiDexEnabled  true
         ndk {
             abiFilters "armeabi-v7a", "x86"
