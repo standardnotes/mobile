@@ -296,7 +296,7 @@ export default class Account extends Abstract {
     }
 
     var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
-    var base64String = base64.encode(jsonString);
+    var stringData = App.isIOS ? jsonString : base64.encode(jsonString)
     var fileType = App.isAndroid ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
 
     Mailer.mail({
@@ -304,7 +304,7 @@ export default class Account extends Abstract {
       recipients: [''],
       body: '',
       isHTML: true,
-      attachment: { data: App.isIOS ? jsonString : base64String, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
+      attachment: { data: stringData, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
     }, (error, event) => {
       callback();
       if(error) {
