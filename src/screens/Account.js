@@ -296,8 +296,10 @@ export default class Account extends Abstract {
     }
 
     var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
-    var stringData = App.isIOS ? jsonString : base64.encode(jsonString)
+    var stringData = App.isIOS ? jsonString : base64.encode(unescape(encodeURIComponent(jsonString)))
     var fileType = App.isAndroid ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
+
+    var calledCallback = false;
 
     Mailer.mail({
       subject: 'Standard Notes Backup',
@@ -307,10 +309,18 @@ export default class Account extends Abstract {
       attachment: { data: stringData, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
     }, (error, event) => {
       callback();
+      calledCallback = true;
       if(error) {
         Alert.alert('Error', 'Unable to send email.');
       }
     });
+
+    // On Android the Mailer callback event isn't always triggered.
+    setTimeout(function () {
+      if(!calledCallback) {
+        callback();
+      }
+    }, 2500);
   }
 
   onThemeSelect = (theme) => {

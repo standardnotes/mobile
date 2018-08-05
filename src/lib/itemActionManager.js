@@ -52,7 +52,7 @@ export default class ItemActionManager {
 
     else if(event == this.LockEvent || event == this.UnlockEvent) {
      item.setAppDataItem("locked", event == this.LockEvent);
-     item.setDirty(true);
+     item.setDirty(true, true);
      Sync.get().sync();
      callback && callback();
    }
