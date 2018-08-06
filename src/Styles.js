@@ -448,7 +448,6 @@ export default class GlobalStyles {
       },
 
       noteText: {
-        flexGrow: 1,
         marginTop: 0,
         paddingTop: 10,
         color: constants.mainTextColor,
@@ -460,6 +459,11 @@ export default class GlobalStyles {
       noteTextIOS: {
         paddingLeft: constants.paddingLeft - 5,
         paddingRight: constants.paddingLeft - 5,
+      },
+
+      noteTextNoPadding: {
+        paddingLeft: 0,
+        paddingRight: 0
       },
 
       syncBar: {

@@ -79,10 +79,12 @@ export default class Webview extends Abstract {
       infoButton.icon = Icons.getIcon("md-information-circle");
     }
 
-    this.props.navigator.setButtons({
-      rightButtons: [infoButton],
-      animated: false
-    });
+    if(this.props.navigator) {
+      this.props.navigator.setButtons({
+        rightButtons: [infoButton],
+        animated: false
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -126,6 +128,10 @@ export default class Webview extends Abstract {
   }
 
   configureNavBar() {
+    if(!this.props.navigator) {
+      return;
+    }
+
     this.props.navigator.setButtons({
       leftButtons: [
         {
@@ -169,7 +175,7 @@ export default class Webview extends Abstract {
     let bottomPadding = -34; // For some reason iOS inserts padding on bottom
 
     return (
-      <View style={GlobalStyles.styles().flexContainer}>
+      <View style={[GlobalStyles.styles().flexContainer]}>
         <WebView
              style={GlobalStyles.styles().flexContainer, {backgroundColor: "transparent"}}
              source={{uri: url}}

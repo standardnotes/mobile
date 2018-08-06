@@ -5,6 +5,7 @@ import ModelManager from '../lib/sfjs/modelManager'
 import Auth from '../lib/sfjs/authManager'
 
 import Abstract from "./Abstract"
+import Webview from "./Webview"
 import ComponentManager from '../lib/componentManager'
 import Icons from '../Icons';
 import LockedView from "../containers/LockedView";
@@ -19,7 +20,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  Text
+  Text,
+  ScrollView,
+  Dimensions
 } from 'react-native';
 
 import GlobalStyles from "../Styles"
@@ -92,7 +95,7 @@ export default class Compose extends Abstract {
     super.componentDidMount();
 
     setTimeout(() => {
-      this.loadEditor();
+      // this.loadEditor();
     }, 150 /* This is an aesthetic delay and not functional. It doesn't look too good when it comes up so fast. */);
   }
 
@@ -328,6 +331,11 @@ export default class Compose extends Abstract {
       this.state.title for the value. We also update the state onTitleChange.
     */
 
+    var noteEditor = ComponentManager.get().editorForNote(this.note);
+
+    const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
+    var scrollViewWidth = noteEditor ? deviceWidth * 2.0 : deviceWidth;
+
     return (
       <View style={[this.styles.container, GlobalStyles.styles().container]}>
 
@@ -351,34 +359,52 @@ export default class Compose extends Abstract {
           editable={!this.note.locked}
         />
 
-        {Platform.OS == "android" &&
-          <View style={this.styles.noteTextContainer}>
-            <TextView style={[GlobalStyles.stylesForKey("noteText")]}
+        <ScrollView
+          horizontal={true}
+          pagingEnabled={true}
+          contentContainerStyle={{flexGrow: 1, flexDirection: 'row', width: scrollViewWidth}}
+        >
+
+          {noteEditor &&
+            <Webview
+              noteId={this.note.uuid}
+              editorId={noteEditor.uuid}
+            />
+          }
+
+          {Platform.OS == "android" &&
+            <View style={this.styles.noteTextContainer}>
+              <TextView style={[GlobalStyles.stylesForKey("noteText")]}
+                ref={(ref) => this.input = ref}
+                autoFocus={this.note.dummy}
+                value={this.note.text}
+                selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
+                handlesColor={GlobalStyles.constants().mainTintColor}
+                onChangeText={this.onTextChange}
+                editable={!this.note.locked}
+              />
+            </View>
+          }
+
+          {Platform.OS == "ios" &&
+            <TextView style={[GlobalStyles.stylesForKey("noteText"), (noteEditor ? GlobalStyles.stylesForKey("noteTextNoPadding") : undefined), {flex: 1, paddingBottom: 10}]}
               ref={(ref) => this.input = ref}
-              autoFocus={this.note.dummy}
+              autoFocus={false}
               value={this.note.text}
-              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
-              handlesColor={GlobalStyles.constants().mainTintColor}
+              keyboardDismissMode={'interactive'}
+              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
               onChangeText={this.onTextChange}
               editable={!this.note.locked}
             />
-          </View>
-        }
+          }
 
-        {Platform.OS == "ios" &&
-          <TextView style={[...GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10}]}
-            ref={(ref) => this.input = ref}
-            autoFocus={false}
-            value={this.note.text}
-            keyboardDismissMode={'interactive'}
-            selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
-            onChangeText={this.onTextChange}
-            editable={!this.note.locked}
-          />
-        }
+        </ScrollView>
       </View>
     );
   }
+
+  // <View style={{flex: 1, backgroundColor: "green"}} />
+  // <View style={{flex: 1, backgroundColor: "blue"}} />
 
   loadStyles() {
     this.rawStyles = {
