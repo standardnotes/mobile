@@ -21,7 +21,7 @@
     "react-native-store-review": "^0.1.3",
     "react-native-vector-icons": "^4.3.0",
     "regenerator": "^0.13.2",
-    "sn-models": "0.1.1",
+    "sn-models": "0.1.8",
     "standard-file-js": "0.3.10"
   },
   "devDependencies": {

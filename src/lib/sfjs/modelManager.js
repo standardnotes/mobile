@@ -8,8 +8,6 @@ SFModelManager.ContentTypeClassMapping = {
   "SN|Component" : SNComponent
 };
 
-SFItem.AppDomain = "org.standardnotes.sn";
-
 export default class ModelManager extends SFModelManager {
 
   static instance = null;
