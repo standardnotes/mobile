@@ -37,15 +37,6 @@ export default class ModelManager extends SFModelManager {
     this.themes.length = 0;
   }
 
-  findOrCreateTagByTitle(title) {
-    var tag = _.find(this.tags, {title: title})
-    if(!tag) {
-      tag = this.createItem({content_type: "Tag", title: title});
-      this.addItem(tag);
-    }
-    return tag;
-  }
-
   addItems(items, globalOnly = false) {
     super.addItems(items, globalOnly);
 
