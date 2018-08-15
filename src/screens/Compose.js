@@ -229,8 +229,6 @@ export default class Compose extends Abstract {
       newTag.addItemAsRelationship(note);
       newTag.setDirty(true);
     }
-
-    note.tags = newTags;
   }
 
   onTitleChange = (text) => {
