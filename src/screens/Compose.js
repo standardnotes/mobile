@@ -226,8 +226,8 @@ export default class Compose extends Abstract {
     }
 
     for(var newTag of newTags) {
-      newTag.setDirty(true);
       newTag.addItemAsRelationship(note);
+      newTag.setDirty(true);
     }
 
     note.tags = newTags;
@@ -256,6 +256,7 @@ export default class Compose extends Abstract {
           if(this.props.selectedTagId) {
             var tag = ModelManager.get().findItem(this.props.selectedTagId);
             tag.addItemAsRelationship(this.note);
+            tag.setDirty(true);
           }
           this.save();
           this.configureNavBar(true);
