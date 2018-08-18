@@ -498,6 +498,7 @@ export default class Notes extends Abstract {
         {notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}
+            hasRefreshControl={!Auth.get().offline()}
             onPressItem={this._onPressItem}
             refreshing={this.state.refreshing}
             onSearchChange={this.onSearchTextChange}

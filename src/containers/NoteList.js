@@ -96,7 +96,7 @@ export default class NoteList extends Component {
           maxToRenderPerBatch={6}
           keyboardDismissMode={'interactive'}
           keyboardShouldPersistTaps={'always'}
-          refreshControl={
+          refreshControl={!this.props.hasRefreshControl ? null : 
             <RefreshControl
               refreshing={this.props.refreshing}
               onRefresh={this.props.onRefresh}
