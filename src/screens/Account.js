@@ -7,6 +7,7 @@ import AlertManager from '../lib/sfjs/alertManager'
 
 import Auth from '../lib/sfjs/authManager'
 import KeysManager from '../lib/keysManager'
+import UserPrefsManager from '../lib/userPrefsManager'
 
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
@@ -79,6 +80,17 @@ export default class Account extends Abstract {
   componentWillUnmount() {
     super.componentWillUnmount();
     Sync.get().removeEventHandler(this.syncEventHandler);
+  }
+
+  componentWillMount() {
+    super.componentWillMount();
+    this.loadLastExportDate();
+  }
+
+  async loadLastExportDate() {
+    UserPrefsManager.get().getLastExportDate().then((date) => {
+      this.setState({lastExportDate: date});
+    })
   }
 
   configureNavBar() {
@@ -269,7 +281,16 @@ export default class Account extends Abstract {
     })
   }
 
-  async onExportPress(encrypted, callback) {
+  onExportPress = async (encrypted, callback) => {
+    let customCallback = (success) => {
+      if(success) {
+        // UserPrefsManager.get().clearLastExportDate();
+        var date = new Date();
+        this.setState({lastExportDate: date});
+        UserPrefsManager.get().setLastExportDate(date);
+      }
+      callback();
+    }
     var auth_params = await Auth.get().getAuthParams();
     var keys = encrypted ? KeysManager.get().activeKeys() : null;
 
@@ -283,7 +304,7 @@ export default class Account extends Abstract {
 
     if(items.length == 0) {
       Alert.alert('No Data', "You don't have any notes yet.");
-      callback();
+      customCallback();
       return;
     }
 
@@ -308,7 +329,7 @@ export default class Account extends Abstract {
       isHTML: true,
       attachment: { data: stringData, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
     }, (error, event) => {
-      callback();
+      customCallback(false);
       calledCallback = true;
       if(error) {
         Alert.alert('Error', 'Unable to send email.');
@@ -318,7 +339,7 @@ export default class Account extends Abstract {
     // On Android the Mailer callback event isn't always triggered.
     setTimeout(function () {
       if(!calledCallback) {
-        callback();
+        customCallback(true);
       }
     }, 2500);
   }
@@ -487,6 +508,7 @@ export default class Account extends Abstract {
 
           <OptionsSection
             signedIn={signedIn}
+            lastExportDate={this.state.lastExportDate}
             title={"Options"}
             encryptionAvailable={KeysManager.get().activeKeys()}
             onSignOutPress={this.onSignOutPress}
