@@ -108,8 +108,11 @@ export default class Abstract extends Component {
 
   setNavBarSubtitle(title) {
     if(!this.visible || !this.willBeVisible) {
-      return;
+      this.queuedSubtitle = title;
+      return false;
     }
+
+    this.queuedSubtitle = null;
 
     this.props.navigator.setSubTitle({
       subtitle: title
@@ -123,6 +126,8 @@ export default class Abstract extends Component {
         navBarSubtitleFontSize: 12
       });
     }
+
+    return true;
   }
 
   dismissModal() {
@@ -146,6 +151,9 @@ export default class Abstract extends Component {
       case 'didAppear':
         this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
         this.viewDidAppear();
+        if(this.queuedSubtitle) {
+          this.setNavBarSubtitle(this.queuedSubtitle);
+        }
         break;
       case 'willDisappear':
         this.willBeVisible = false;
