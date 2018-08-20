@@ -451,8 +451,8 @@ export default class Notes extends Abstract {
 
   _onPressItem = (item: hash) => {
     var run = () => {
-      if(item.conflictOf) {
-        item.conflictOf = null;
+      if(item.conflict_of) {
+        item.conflict_of = null;
       }
 
       this.props.navigator.push({
@@ -498,6 +498,7 @@ export default class Notes extends Abstract {
         {notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}
+            hasRefreshControl={!Auth.get().offline()}
             onPressItem={this._onPressItem}
             refreshing={this.state.refreshing}
             onSearchChange={this.onSearchTextChange}

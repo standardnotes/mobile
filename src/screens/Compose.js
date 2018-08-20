@@ -229,11 +229,9 @@ export default class Compose extends Abstract {
     }
 
     for(var newTag of newTags) {
-      newTag.setDirty(true);
       newTag.addItemAsRelationship(note);
+      newTag.setDirty(true);
     }
-
-    note.tags = newTags;
   }
 
   onTitleChange = (text) => {
@@ -259,6 +257,7 @@ export default class Compose extends Abstract {
           if(this.props.selectedTagId) {
             var tag = ModelManager.get().findItem(this.props.selectedTagId);
             tag.addItemAsRelationship(this.note);
+            tag.setDirty(true);
           }
           this.save();
           this.configureNavBar(true);
@@ -296,18 +295,18 @@ export default class Compose extends Abstract {
       note.dummy = false;
       ModelManager.get().addItem(note);
     }
-    this.sync(note, function(success){
+    this.sync(note, (success) => {
       if(success) {
         if(this.statusTimeout) clearTimeout(this.statusTimeout);
-        this.statusTimeout = setTimeout(function(){
+        this.statusTimeout = setTimeout(() => {
           var status = "All changes saved"
           if(Auth.get().offline()) {
             status += " (offline)";
           }
           this.saveError = false;
           this.syncTakingTooLong = false;
-          this.noteStatus = this.setNavBarSubtitle(status);
-        }.bind(this), 200)
+          this.setNavBarSubtitle(status);
+        }, 200)
       } else {
         if(this.statusTimeout) clearTimeout(this.statusTimeout);
         this.statusTimeout = setTimeout(function(){
@@ -316,7 +315,7 @@ export default class Compose extends Abstract {
           this.setNavBarSubtitle("Error syncing (changes saved offline)");
         }.bind(this), 200)
       }
-    }.bind(this));
+    });
   }
 
   render() {

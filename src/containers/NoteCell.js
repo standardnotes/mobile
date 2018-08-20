@@ -156,7 +156,7 @@ export default class NoteCell extends React.PureComponent {
               <Text style={this.styles.deleting}>Deleting...</Text>
             }
 
-            {note.conflictOf &&
+            {note.conflict_of &&
               <Text style={this.styles.deleting}>Conflicted Copy</Text>
             }
 

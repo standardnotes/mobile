@@ -25,6 +25,8 @@ import {
   SFAuthManager
 } from 'standard-file-js';
 
+SFItem.AppDomain = "org.standardnotes.sn";
+
 global.SFItem = SFItem;
 global.SFItemParams = SFItemParams;
 global.SFModelManager = SFModelManager;

@@ -8,8 +8,6 @@ SFModelManager.ContentTypeClassMapping = {
   "SN|Component" : SNComponent
 };
 
-SFItem.AppDomain = "org.standardnotes.sn";
-
 export default class ModelManager extends SFModelManager {
 
   static instance = null;
@@ -37,15 +35,6 @@ export default class ModelManager extends SFModelManager {
     this.notes.length = 0;
     this.tags.length = 0;
     this.themes.length = 0;
-  }
-
-  findOrCreateTagByTitle(title) {
-    var tag = _.find(this.tags, {title: title})
-    if(!tag) {
-      tag = this.createItem({content_type: "Tag", title: title});
-      this.addItem(tag);
-    }
-    return tag;
   }
 
   addItems(items, globalOnly = false) {

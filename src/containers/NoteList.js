@@ -39,6 +39,7 @@ export default class NoteList extends Component {
           onChangeText={this.props.onSearchChange}
           onCancel={this.props.onSearchCancel}
           onDelete={this.props.onSearchCancel}
+          blurOnSubmit={true}
           backgroundColor={GlobalStyles.constants().mainBackgroundColor}
           titleCancelColor={GlobalStyles.constants().mainTintColor}
           keyboardDismissMode={'interactive'}
@@ -96,7 +97,7 @@ export default class NoteList extends Component {
           maxToRenderPerBatch={6}
           keyboardDismissMode={'interactive'}
           keyboardShouldPersistTaps={'always'}
-          refreshControl={
+          refreshControl={!this.props.hasRefreshControl ? null :
             <RefreshControl
               refreshing={this.props.refreshing}
               onRefresh={this.props.onRefresh}
