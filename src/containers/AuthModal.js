@@ -29,14 +29,23 @@ export default class AuthModal extends Component {
   componentDidMount() {
     this.mounted = true;
 
+    console.log("authModal registering state observer");
+
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      if(ApplicationState.get().isStateAppCycleChange(state) && !ApplicationState.get().isAuthenticationInProgress()) {
+      console.log("AuthModal | stateObserver | state:", state);
+      if(!this.didSetVisibleToTrue && ApplicationState.get().isStateAppCycleChange(state)
+        && !ApplicationState.get().isAuthenticationInProgress()) {
         let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
+        let visible = (authProps.passcode || authProps.fingerprint) || false;
+        console.log("authProps for state", state, authProps);
         this.setState({
           authProps: authProps,
           applicationState: state,
-          visible: (authProps.passcode || authProps.fingerprint) || false
+          visible: visible
         });
+        this.didSetVisibleToTrue = visible;
+        console.log("setting visible to", (authProps.passcode || authProps.fingerprint) || false);
+        console.log("AuthModal visible state:", this.state.visible);
         this.stateChanged();
       }
     });
@@ -79,7 +88,9 @@ export default class AuthModal extends Component {
 
   onAuthenticateSuccess = () => {
     // First hide Modal
+    console.log("onAuthenticateSuccess setting visible to true");
     this.setState({visible: false});
+    this.didSetVisibleToTrue = false;
     this.forceUpdate();
 
     // Wait for it to begin dismissing, then trigger callback. Otherwise, AuthModal can be deallocated before Modal is removed, causing problems.

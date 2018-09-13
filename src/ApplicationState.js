@@ -37,6 +37,8 @@ export default class ApplicationState {
   constructor() {
     this.observers = [];
     this.locked = true;
+    this.previousEvents = [];
+
     AppState.addEventListener('change', this.handleAppStateChange);
     this.didLaunch();
   }
@@ -143,11 +145,14 @@ export default class ApplicationState {
   }
 
   notifyOfState(state) {
+    console.log("Notifiying of state", state);
     if(this.ignoreStateChanges) {return;}
     // console.log("ApplicationState notifying of state:", state);
     for(var observer of this.observers) {
       observer.callback(state);
     }
+
+    this.previousEvents.push(state);
   }
 
   /* End State */
@@ -172,6 +177,11 @@ export default class ApplicationState {
   addStateObserver(callback) {
     var observer = {key: Math.random, callback: callback};
     this.observers.push(observer);
+
+    for(var prevState of this.previousEvents) {
+      callback(prevState);
+    }
+
     return observer;
   }
 

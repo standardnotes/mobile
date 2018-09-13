@@ -36,8 +36,6 @@ export default class GlobalStyles {
       }
     }
 
-    console.log("Theme result", themeResult);
-
     if(themeResult) {
       // JSON stringified content is generic and includes all items property at time of stringification
       // So we parse it, then set content to itself, so that the mapping can be handled correctly.
