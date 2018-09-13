@@ -34,7 +34,6 @@ export default class Authenticate extends Abstract {
   constructor(props) {
     super(props);
     this.authProps = props.authProps;
-    console.log("Initializing authenticate with auth props", this.authProps);
     this.state = {biometricsType: "touch", biometricsNoun: "Fingerprint"};
   }
 
