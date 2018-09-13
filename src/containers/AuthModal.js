@@ -12,12 +12,13 @@ export default class AuthModal extends Component {
   constructor(props) {
     super(props);
 
-    let mostRecentState = ApplicationState.get().getMostRecentState();
-    let authProps = ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState);
+    // let mostRecentState = ApplicationState.get().getMostRecentState();
+    // let authProps = ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState);
     this.state = {
-      authProps: authProps,
-      applicationState: mostRecentState,
-      visible: (authProps.passcode || authProps.fingerprint) || false
+      authProps: {}
+      // authProps: authProps,
+      // applicationState: mostRecentState,
+      // visible: (authProps.passcode || authProps.fingerprint) || false
     };
     this.stateChanged();
   }
@@ -100,6 +101,10 @@ export default class AuthModal extends Component {
   }
 
   render() {
+    if(!this.state.visible) {
+      return <View/>;
+    }
+    
     let authProps = this.state.authProps;
     return (
       <View style={[GlobalStyles.styles().container]}>
