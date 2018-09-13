@@ -7,19 +7,41 @@ import App from "../app"
 import Authenticate from "../screens/Authenticate"
 import ApplicationState from "../ApplicationState";
 
+/*
+
+  Wednesday, Sept 12, 2018:
+  There was an issue which could be best replicated in Android by either:
+  1. Going into Developer settings, disabling background activities.
+    Then open app with Fingperint on quit, close app, reopen, and you would see blank screen with just "Notes"
+  2. Pressing r+r / cmr + r in dev mode with fingerprint on quit.
+
+  This issue would result in blank screen, because this.state.visible would never be set to true, because
+  the application states that would trigger an actual authentication were being propagted before the observer was registered.
+  (i.e ApplicationStateLaunching).
+
+  So, as part of one fix, when we register an observer, we now forward previous events.
+
+  However, after received previous events like Launching, we would have quickly received other events like "Resuming".
+  Launching would require passcode, but resuming wouldn't, so this.state.visible would be set to true, then quickly to set to false,
+  never giving the chance for authentication to be visible.
+
+  To fix this, when we set visible to true, we set the flag this.didSetVisibleToTrue = visible, and don't update the state again after that if this
+  flag is true.
+
+  Finally, because in the constructor we would access the most recent state, which would not always be an authentication state,
+  the Authenticate componenet would be initialized with the first value of authProps, and never updated.
+  So now we initialize with empty values, and in the render method, return empty if false (so we don't initialize unwanted Authenticate component).
+*/
+
 export default class AuthModal extends Component {
 
   constructor(props) {
     super(props);
 
-    // let mostRecentState = ApplicationState.get().getMostRecentState();
-    // let authProps = ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState);
     this.state = {
       authProps: {}
-      // authProps: authProps,
-      // applicationState: mostRecentState,
-      // visible: (authProps.passcode || authProps.fingerprint) || false
     };
+    
     this.stateChanged();
   }
 
@@ -30,23 +52,17 @@ export default class AuthModal extends Component {
   componentDidMount() {
     this.mounted = true;
 
-    console.log("authModal registering state observer");
-
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      console.log("AuthModal | stateObserver | state:", state);
       if(!this.didSetVisibleToTrue && ApplicationState.get().isStateAppCycleChange(state)
         && !ApplicationState.get().isAuthenticationInProgress()) {
         let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
         let visible = (authProps.passcode || authProps.fingerprint) || false;
-        console.log("authProps for state", state, authProps);
         this.setState({
           authProps: authProps,
           applicationState: state,
           visible: visible
         });
         this.didSetVisibleToTrue = visible;
-        console.log("setting visible to", (authProps.passcode || authProps.fingerprint) || false);
-        console.log("AuthModal visible state:", this.state.visible);
         this.stateChanged();
       }
     });
@@ -89,7 +105,6 @@ export default class AuthModal extends Component {
 
   onAuthenticateSuccess = () => {
     // First hide Modal
-    console.log("onAuthenticateSuccess setting visible to true");
     this.setState({visible: false});
     this.didSetVisibleToTrue = false;
     this.forceUpdate();
@@ -104,7 +119,7 @@ export default class AuthModal extends Component {
     if(!this.state.visible) {
       return <View/>;
     }
-    
+
     let authProps = this.state.authProps;
     return (
       <View style={[GlobalStyles.styles().container]}>

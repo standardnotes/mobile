@@ -145,7 +145,6 @@ export default class ApplicationState {
   }
 
   notifyOfState(state) {
-    console.log("Notifiying of state", state);
     if(this.ignoreStateChanges) {return;}
     // console.log("ApplicationState notifying of state:", state);
     for(var observer of this.observers) {
