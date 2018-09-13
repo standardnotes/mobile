@@ -154,6 +154,10 @@ export default class ApplicationState {
     this.previousEvents.push(state);
   }
 
+  clearEventHistory() {
+    this.previousEvents = [];
+  }
+
   /* End State */
 
 

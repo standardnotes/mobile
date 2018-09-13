@@ -41,8 +41,6 @@ export default class AuthModal extends Component {
     this.state = {
       authProps: {}
     };
-    
-    this.stateChanged();
   }
 
   componentWillUnmount() {
@@ -61,9 +59,23 @@ export default class AuthModal extends Component {
           authProps: authProps,
           applicationState: state,
           visible: visible
+        }, () => {
+          // setState is async, we want to wait for this callback before calling this.
+          this.beginAuthIfNecessary();
         });
         this.didSetVisibleToTrue = visible;
-        this.stateChanged();
+
+        // After coming inside this part of the code, it means we're handling auth props as we needed.
+        // We should now clear previous event history. Otherwise, if we go to the background and come back,
+        // all events will be forwared again, like Launch event, meaning things set to On Quit will be prompted
+        // when coming back from the background.
+        ApplicationState.get().clearEventHistory();
+      } else {
+        // We want to set the applicationState here either way in case we don't make it inside the above if clause.
+        // This way beginAuthIfNecessary has the correct most recent state, and can use that to make the best decision
+        // as to whether it should begin auth.
+        this.setState({applicationState: state});
+        this.beginAuthIfNecessary();
       }
     });
 
@@ -73,7 +85,9 @@ export default class AuthModal extends Component {
     }
   }
 
-  stateChanged() {
+  beginAuthIfNecessary() {
+    // Note that the comment below wasn't updated as part of the huge lock fix updates in 9/2018:
+
     // Once visible is true even once, we need to lock it in place,
     // and only make it in-visible after authentication completes.
     // This value is checked above in the application state observer to make sure we
