@@ -50,7 +50,6 @@ export default class Abstract extends Component {
   componentWillMount() {
     this.willUnmount = false;
     this.mounted = false;
-
     if(ApplicationState.get().isUnlocked() && this.state.lockContent) {
       this.unlockContent();
     }
