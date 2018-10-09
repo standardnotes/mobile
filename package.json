@@ -3,6 +3,7 @@
   "version": "2.3.7",
   "versionIOS": "2.3.7",
   "versionAndroid": "2.3.7",
+  "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
