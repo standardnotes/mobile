@@ -318,6 +318,22 @@ export default class Compose extends Abstract {
     });
   }
 
+  onScroll = (e) => {
+    let contentWidth = this.scrollViewContentWidth;
+    let pageNum = Math.ceil(e.nativeEvent.contentOffset.x / contentWidth);
+    this.setState({currentPage: pageNum});
+  }
+
+  onContentSizeChange = (width, height) => {
+    this.scrollViewContentWidth = width;
+  }
+
+  onLayout = () => {
+    // Called on rotation events, amongst other things.
+    const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
+    this.setState({deviceWidth: deviceWidth});
+  }
+
   render() {
     if(this.state.lockContent) {
       return (<LockedView />);
@@ -331,12 +347,17 @@ export default class Compose extends Abstract {
     */
 
     var noteEditor = ComponentManager.get().editorForNote(this.note);
-
     const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
     var scrollViewWidth = noteEditor ? deviceWidth * 2.0 : deviceWidth;
+    var shouldDisplayEditor = noteEditor != null;
+
+    if(noteEditor && this.state.currentPage == 1) {
+      shouldDisplayEditor = false;
+    }
 
     return (
-      <View style={[this.styles.container, GlobalStyles.styles().container]}>
+      <View style={[this.styles.container, GlobalStyles.styles().container]}
+        onLayout={this.onLayout}>
 
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
@@ -359,19 +380,31 @@ export default class Compose extends Abstract {
         />
 
         <ScrollView
+          onScroll={this.onScroll}
+          onContentSizeChange={this.onContentSizeChange}
           horizontal={true}
           pagingEnabled={true}
-          contentContainerStyle={{flexGrow: 1, flexDirection: 'row', width: scrollViewWidth}}
+          contentContainerStyle={{width: scrollViewWidth}}
         >
 
-          {noteEditor &&
+          {/* Place an empty container before the webview so that the plain editor does not flex grow to occupy all space. */}
+          {noteEditor && !shouldDisplayEditor &&
+            <View style={[this.styles.noteTextContainer, {width: deviceWidth}]} />
+          }
+
+          {shouldDisplayEditor &&
             <Webview
               noteId={this.note.uuid}
               editorId={noteEditor.uuid}
             />
           }
 
-          {Platform.OS == "android" &&
+          {/* Place an empty container so that the webview does not flex grow to occupy all space. */}
+          {shouldDisplayEditor &&
+            <View style={this.styles.noteTextContainer} />
+          }
+
+          {!shouldDisplayEditor && Platform.OS == "android" &&
             <View style={this.styles.noteTextContainer}>
               <TextView style={[GlobalStyles.stylesForKey("noteText")]}
                 ref={(ref) => this.input = ref}
@@ -385,8 +418,8 @@ export default class Compose extends Abstract {
             </View>
           }
 
-          {Platform.OS == "ios" &&
-            <TextView style={[GlobalStyles.stylesForKey("noteText"), (noteEditor ? GlobalStyles.stylesForKey("noteTextNoPadding") : undefined), {flex: 1, paddingBottom: 10}]}
+          {!shouldDisplayEditor && Platform.OS == "ios" &&
+            <TextView style={[GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10, width: deviceWidth}]}
               ref={(ref) => this.input = ref}
               autoFocus={false}
               value={this.note.text}
@@ -455,7 +488,7 @@ export default class Compose extends Abstract {
 
       noteTextContainer: {
         flexGrow: 1,
-        flex: 1,
+        flex: 1
       },
     }
 
