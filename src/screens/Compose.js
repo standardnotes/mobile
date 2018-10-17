@@ -56,7 +56,22 @@ export default class Compose extends Abstract {
           this.refreshContent();
         }
       }
-    })
+    });
+
+    this.componentHandler = ComponentManager.get().registerHandler({identifier: "composer", areas: ["editor-editor"],
+      actionHandler: (component, action, data) => {
+        if(action === "save-items" || action === "save-success" || action == "save-error") {
+          if(data.items.map((item) => {return item.uuid}).includes(this.note.uuid)) {
+            if(action == "save-items") {
+              if(this.componentSaveTimeout) clearTimeout(this.componentSaveTimeout);
+              this.componentSaveTimeout = setTimeout(this.showSavingStatus.bind(this), 10);
+            } else {
+              this.showSavedStatus(action == "save-success");
+            }
+          }
+        }
+      }
+    });
 
     this.configureNavBar(true);
   }
@@ -65,43 +80,14 @@ export default class Compose extends Abstract {
     this.mergeState({title: this.note.title, text: this.note.text});
   }
 
-  loadEditor() {
-    var noteEditor = ComponentManager.get().editorForNote(this.note);
-
-    if(noteEditor) {
-      let presentEditor = () => {
-        this.presentedEditor = true;
-        this.props.navigator.showModal({
-          screen: 'sn.Webview',
-          title: noteEditor.name,
-          animationType: 'slide-up',
-          passProps: {
-            noteId: this.note.uuid,
-            editorId: noteEditor.uuid
-          }
-        });
-      }
-      if(!this.note.uuid) {
-        this.note.initUUID().then(() => {
-          presentEditor();
-        })
-      } else {
-        presentEditor();
-      }
-    }
-  }
-
   componentDidMount() {
     super.componentDidMount();
-
-    setTimeout(() => {
-      // this.loadEditor();
-    }, 150 /* This is an aesthetic delay and not functional. It doesn't look too good when it comes up so fast. */);
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
     Sync.get().removeEventHandler(this.syncObserver);
+    ComponentManager.get().deregisterHandler(this.componentHandler);
   }
 
   viewDidAppear() {
@@ -167,12 +153,10 @@ export default class Compose extends Abstract {
         }
       }
     } else if(event.id == "willAppear") {
-      // Changes made in an external editor are not reflected automatically
-      if(this.presentedEditor) {
-        this.presentedEditor = false;
-        this.refreshContent();
+      if(this.needsEditorReload) {
+        this.forceUpdate();
+        this.needsEditorReload = false;
       }
-
       if(this.note.dirty) {
         // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
         setTimeout(() => {
@@ -202,7 +186,9 @@ export default class Compose extends Abstract {
         onManageNoteEvent: () => {this.forceUpdate()},
         singleSelectMode: false,
         options: JSON.stringify(this.previousOptions),
-        onEditorSelect: () => {this.presentedEditor = true},
+        onEditorSelect: () => {
+          this.needsEditorReload = true;
+        },
         onOptionsChange: (options) => {
           if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
             var tags = ModelManager.get().findItems(options.selectedTags);
@@ -245,13 +231,39 @@ export default class Compose extends Abstract {
     this.changesMade();
   }
 
+  showSavingStatus() {
+    this.setNavBarSubtitle("Saving...");
+  }
+
+  showSavedStatus(success) {
+    if(success) {
+      if(this.statusTimeout) clearTimeout(this.statusTimeout);
+      this.statusTimeout = setTimeout(() => {
+        var status = "All changes saved"
+        if(Auth.get().offline()) {
+          status += " (offline)";
+        }
+        this.saveError = false;
+        this.syncTakingTooLong = false;
+        this.setNavBarSubtitle(status);
+      }, 200)
+    } else {
+      if(this.statusTimeout) clearTimeout(this.statusTimeout);
+      this.statusTimeout = setTimeout(function(){
+        this.saveError = true;
+        this.syncTakingTooLong = false;
+        this.setNavBarSubtitle("Error syncing (changes saved offline)");
+      }.bind(this), 200)
+    }
+  }
+
   changesMade() {
     this.note.hasChanges = true;
 
     if(this.saveTimeout) clearTimeout(this.saveTimeout);
     if(this.statusTimeout) clearTimeout(this.statusTimeout);
     this.saveTimeout = setTimeout(() => {
-      this.setNavBarSubtitle("Saving...");
+      this.showSavingStatus();
       if(!this.note.uuid) {
         this.note.initUUID().then(() => {
           if(this.props.selectedTagId) {
@@ -296,25 +308,7 @@ export default class Compose extends Abstract {
       ModelManager.get().addItem(note);
     }
     this.sync(note, (success) => {
-      if(success) {
-        if(this.statusTimeout) clearTimeout(this.statusTimeout);
-        this.statusTimeout = setTimeout(() => {
-          var status = "All changes saved"
-          if(Auth.get().offline()) {
-            status += " (offline)";
-          }
-          this.saveError = false;
-          this.syncTakingTooLong = false;
-          this.setNavBarSubtitle(status);
-        }, 200)
-      } else {
-        if(this.statusTimeout) clearTimeout(this.statusTimeout);
-        this.statusTimeout = setTimeout(function(){
-          this.saveError = true;
-          this.syncTakingTooLong = false;
-          this.setNavBarSubtitle("Error syncing (changes saved offline)");
-        }.bind(this), 200)
-      }
+      this.showSavedStatus(success);
     });
   }
 
@@ -394,6 +388,7 @@ export default class Compose extends Abstract {
 
           {shouldDisplayEditor &&
             <Webview
+              key={noteEditor.uuid}
               noteId={this.note.uuid}
               editorId={noteEditor.uuid}
             />

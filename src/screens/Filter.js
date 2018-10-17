@@ -292,23 +292,16 @@ export default class Filter extends Abstract {
   }
 
   onEditorSelect = (editor) => {
-    this.props.onEditorSelect && this.props.onEditorSelect(editor);
 
     if(editor) {
-      this.props.navigator.showModal({
-        screen: 'sn.Webview',
-        title: editor.name,
-        animationType: 'slide-up',
-        passProps: {
-          noteId: this.note.uuid,
-          editorId: editor.uuid
-        }
-      });
       ComponentManager.get().associateEditorWithNote(editor, this.note);
     } else {
       ComponentManager.get().clearEditorForNote(this.note);
-      this.dismiss();
     }
+
+    this.props.onEditorSelect && this.props.onEditorSelect(editor);
+
+    this.dismiss();
   }
 
   getEditors() {
