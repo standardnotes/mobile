@@ -228,6 +228,11 @@ export default class Compose extends Abstract {
 
   onTextChange = (text) => {
     this.note.text = text;
+
+    // Clear dynamic previews if using plain editor
+    this.note.content.preview_html = null;
+    this.note.content.preview_plain = null;
+
     this.changesMade();
   }
 

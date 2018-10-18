@@ -146,6 +146,15 @@ export default class NoteCell extends React.PureComponent {
     });
   }
 
+  getHTMLStyles = () => {
+    var html = "";
+    html += "<style>";
+    html += `html {font-family: sans-serif;}`
+    html += `html, body, div, p, h1, h2, h3, h4 {color: ${GlobalStyles.constants().mainTextColor};}`;
+    html += "</style>";
+    return html;
+  }
+
   render() {
     var note = this.props.item;
     return (
@@ -190,7 +199,11 @@ export default class NoteCell extends React.PureComponent {
               <Text style={this.aggregateStyles(this.styles.noteTitle, this.styles.noteTitleSelected, this.state.selected)}>{note.title}</Text>
             }
 
-            {note.safeText().length > 0 &&
+            {note.content.preview_plain &&
+              <Text style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>{note.content.preview_plain}</Text>
+            }
+
+            {!note.content.preview_plain && note.safeText().length > 0 &&
               <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>{note.text}</Text>
             }
 
