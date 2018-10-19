@@ -69,6 +69,7 @@ export default class NoteList extends Component {
         archived={item.archived}
         sortType={this.props.sortType}
         renderTags={renderTags}
+        options={this.props.options}
       />
     )
   }
@@ -82,6 +83,7 @@ export default class NoteList extends Component {
     } else if(this.props.notes.length == 0) {
       placeholderText = "No notes.";
     }
+    
     return (
       <View style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
 
@@ -104,6 +106,7 @@ export default class NoteList extends Component {
             />
           }
           data={this.props.notes}
+          options={this.props.options}
           renderItem={this._renderItem}
           ListHeaderComponent={this.renderHeader}
         />

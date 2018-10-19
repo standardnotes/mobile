@@ -146,9 +146,15 @@ export default class Webview extends Abstract {
   }
 
   onMessage = (message) => {
-    // Ignore any incoming events (like save events) if the note is locked. Allow messages that are required for component setup (administrative)
-    let data = JSON.parse(message.nativeEvent.data);
+    var data;
+    try {
+      data = JSON.parse(message.nativeEvent.data);
+    } catch (e) {
+      console.log("Message is not valid JSON, returning");
+      return;
+    }
 
+    // Ignore any incoming events (like save events) if the note is locked. Allow messages that are required for component setup (administrative)
     if(this.note.locked && !ComponentManager.get().isReadOnlyMessage(data)) {
       if(!this.didShowLockAlert) {
         Alert.alert('Note Locked', "This note is locked. Changes you make in the web editor will not be saved. Please unlock this note to make changes.", [{text: 'OK'}])
