@@ -318,8 +318,10 @@ export default class Compose extends Abstract {
   }
 
   onScroll = (e) => {
+    let xOffset = e.nativeEvent.contentOffset.x;
     let contentWidth = this.scrollViewContentWidth;
-    let pageNum = Math.ceil(e.nativeEvent.contentOffset.x / contentWidth);
+    let pageNum = Math.ceil(xOffset / contentWidth);
+
     this.setState({currentPage: pageNum});
   }
 
@@ -365,6 +367,13 @@ export default class Compose extends Abstract {
           </View>
         }
 
+        {this.state.loadingWebView &&
+          <View style={[this.styles.loadingWebViewContainer]}>
+            <Text style={[this.styles.loadingWebViewText, {fontWeight: 'bold'}]}>Loading Editor...</Text>
+            <Text style={[this.styles.loadingWebViewText]}>Swipe to switch to plain.</Text>
+          </View>
+        }
+
         <TextInput
           style={this.styles.noteTitle}
           onChangeText={this.onTitleChange}
@@ -383,6 +392,7 @@ export default class Compose extends Abstract {
           onContentSizeChange={this.onContentSizeChange}
           horizontal={true}
           pagingEnabled={true}
+          bounces={false}
           contentContainerStyle={{width: scrollViewWidth}}
         >
 
@@ -396,6 +406,8 @@ export default class Compose extends Abstract {
               key={noteEditor.uuid}
               noteId={this.note.uuid}
               editorId={noteEditor.uuid}
+              onLoadStart={() => {this.setState({loadingWebView: true})}}
+              onLoadEnd={() => {this.setState({loadingWebView: false})}}
             />
           }
 
@@ -431,12 +443,16 @@ export default class Compose extends Abstract {
           }
 
         </ScrollView>
+
+        {App.isIOS &&
+          // Required for iOS back swipe gesture to work with ScrollView
+          <View
+            style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 10 }}
+          />
+        }
       </View>
     );
   }
-
-  // <View style={{flex: 1, backgroundColor: "green"}} />
-  // <View style={{flex: 1, backgroundColor: "blue"}} />
 
   loadStyles() {
     this.rawStyles = {
@@ -469,6 +485,23 @@ export default class Compose extends Abstract {
         backgroundColor: GlobalStyles.constants().mainTintColor,
         borderBottomColor: GlobalStyles.constants().plainCellBorderColor,
         borderBottomWidth: 1
+      },
+
+      loadingWebViewContainer: {
+        position: "absolute",
+        height: "100%",
+        width: "100%",
+        bottom: 0,
+        zIndex: 300,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: 'center',
+      },
+
+      loadingWebViewText: {
+        paddingLeft: 0,
+        color: GlobalStyles.constants().mainTextColor,
+        opacity: 0.7
       },
 
       lockedText: {

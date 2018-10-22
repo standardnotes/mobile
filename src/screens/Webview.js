@@ -168,6 +168,17 @@ export default class Webview extends Abstract {
 
   onFrameLoad = (event) => {
     ComponentManager.get().registerComponentWindow(this.editor, this.webView);
+    this.props.onLoadEnd();
+  }
+
+  onLoadStart = () => {
+    // There is a known issue where using the PostMessage API will lead to double trigger
+    // of this function: https://github.com/facebook/react-native/issues/16547.
+    // We only care about initial load, so after it's been set once, no need to unset it.
+    if(!this.alreadyTriggeredLoad) {
+      this.alreadyTriggeredLoad = true;
+      this.props.onLoadStart();
+    }
   }
 
   render() {
@@ -183,16 +194,18 @@ export default class Webview extends Abstract {
     return (
       <View style={[GlobalStyles.styles().flexContainer]}>
         <WebView
-             style={GlobalStyles.styles().flexContainer, {backgroundColor: "transparent"}}
-             source={{uri: url}}
-             ref={(webView) => this.webView = webView}
-             onLoad={this.onFrameLoad}
-             onMessage={this.onMessage}
-             contentInset={{top: 0, left: 0, bottom: bottomPadding, right: 0}}
-             scalesPageToFit={App.isIOS ? false : true}
-             injectedJavaScript={
-               `window.isNative = "true"`
-             }
+           style={GlobalStyles.styles().flexContainer, {backgroundColor: "transparent"}}
+           source={{uri: url}}
+           key={this.editor.uuid}
+           ref={(webView) => this.webView = webView}
+           onLoad={this.onFrameLoad}
+           onLoadStart={this.onLoadStart}
+           onMessage={this.onMessage}
+           contentInset={{top: 0, left: 0, bottom: bottomPadding, right: 0}}
+           scalesPageToFit={App.isIOS ? false : true}
+           injectedJavaScript = {
+             `window.isNative = "true"`
+          }
          />
       </View>
     );

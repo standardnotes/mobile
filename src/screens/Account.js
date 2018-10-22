@@ -460,7 +460,7 @@ export default class Account extends Abstract {
       }
     } else if(action == "friend") {
       let title = "Standard Notes";
-      var message = "Check out Standard Notes. It's a simple and private notes app. Thought you'd find it useful.";
+      var message = "Check out Standard Notes, a free, open-source, and completely encrypted notes app.";
       let url = "https://standardnotes.org";
       // Android ignores url. iOS ignores title.
       if(App.isAndroid) {
