@@ -181,6 +181,10 @@ export default class Webview extends Abstract {
     }
   }
 
+  onLoadError = () => {
+    this.props.onLoadError();
+  }
+
   render() {
     if(this.state.lockContent) {
       return (<LockedView />);
@@ -200,6 +204,7 @@ export default class Webview extends Abstract {
            ref={(webView) => this.webView = webView}
            onLoad={this.onFrameLoad}
            onLoadStart={this.onLoadStart}
+           onError={this.onLoadError}
            onMessage={this.onMessage}
            contentInset={{top: 0, left: 0, bottom: bottomPadding, right: 0}}
            scalesPageToFit={App.isIOS ? false : true}

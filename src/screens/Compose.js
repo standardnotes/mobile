@@ -172,7 +172,7 @@ export default class Compose extends Abstract {
   }
 
   showOptions() {
-    if(App.isAndroid) {
+    if(App.isAndroid && this.input) {
       this.input.blur();
     }
 
@@ -367,13 +367,6 @@ export default class Compose extends Abstract {
           </View>
         }
 
-        {this.state.loadingWebView &&
-          <View style={[this.styles.loadingWebViewContainer]}>
-            <Text style={[this.styles.loadingWebViewText, {fontWeight: 'bold'}]}>Loading Editor...</Text>
-            <Text style={[this.styles.loadingWebViewText]}>Swipe to switch to plain.</Text>
-          </View>
-        }
-
         <TextInput
           style={this.styles.noteTitle}
           onChangeText={this.onTitleChange}
@@ -396,6 +389,15 @@ export default class Compose extends Abstract {
           contentContainerStyle={{width: scrollViewWidth}}
         >
 
+          {(this.state.loadingWebView || this.state.webViewError) &&
+            <View style={[this.styles.loadingWebViewContainer]}>
+              <Text style={[this.styles.loadingWebViewText, {fontWeight: 'bold'}]}>
+                {this.state.webViewError ? "Unable to Load Editor" : "Loading Editor..."}
+              </Text>
+              <Text style={[this.styles.loadingWebViewText]}>Swipe to switch to plain.</Text>
+            </View>
+          }
+
           {/* Place an empty container before the webview so that the plain editor does not flex grow to occupy all space. */}
           {noteEditor && !shouldDisplayEditor &&
             <View style={[this.styles.noteTextContainer, {width: deviceWidth}]} />
@@ -407,7 +409,8 @@ export default class Compose extends Abstract {
               noteId={this.note.uuid}
               editorId={noteEditor.uuid}
               onLoadStart={() => {this.setState({loadingWebView: true})}}
-              onLoadEnd={() => {this.setState({loadingWebView: false})}}
+              onLoadEnd={() => {this.setState({loadingWebView: false, webViewError: false})}}
+              onLoadError={() => {this.setState({webViewError: true})}}
             />
           }
 
@@ -417,8 +420,8 @@ export default class Compose extends Abstract {
           }
 
           {!shouldDisplayEditor && Platform.OS == "android" &&
-            <View style={this.styles.noteTextContainer}>
-              <TextView style={[GlobalStyles.stylesForKey("noteText")]}
+            <View style={[this.styles.noteTextContainer]}>
+              <TextView style={[GlobalStyles.stylesForKey("noteText"), this.styles.textContentAndroid]}
                 ref={(ref) => this.input = ref}
                 autoFocus={this.note.dummy}
                 value={this.note.text}
@@ -490,7 +493,7 @@ export default class Compose extends Abstract {
       loadingWebViewContainer: {
         position: "absolute",
         height: "100%",
-        width: "100%",
+        width: "50%",
         bottom: 0,
         zIndex: 300,
         display: "flex",
@@ -510,7 +513,7 @@ export default class Compose extends Abstract {
         paddingLeft: 10
       },
 
-      textContainer: {
+      textContentAndroid: {
         flexGrow: 1,
         flex: 1,
       },
