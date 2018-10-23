@@ -283,7 +283,6 @@ export default class Filter extends Abstract {
   }
 
   onOptionSelect = (option) => {
-    console.log("option select", option);
     this.options.setDisplayOptionKeyValue(option, !this.options.getDisplayOptionValue(option));
     this.forceUpdate();
     // this.mergeState({archivedOnly: this.options.archivedOnly});

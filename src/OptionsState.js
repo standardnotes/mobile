@@ -94,7 +94,6 @@ export default class OptionsState {
   }
 
   rebuildOptions() {
-    console.log("Rebuilding display options");
     this.displayOptions = {
       archivedOnly: this.getDisplayOptionValue("archivedOnly"),
       hidePreviews: this.getDisplayOptionValue("hidePreviews"),
