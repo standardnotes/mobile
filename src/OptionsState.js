@@ -32,6 +32,7 @@ export default class OptionsState {
   async loadSaved() {
     return Storage.get().getItem("options").then(function(result){
       _.merge(this, _.omit(JSON.parse(result), ["changeObservers"]));
+      this.rebuildOptions();
       this.notifyObservers();
     }.bind(this))
   }
@@ -41,7 +42,10 @@ export default class OptionsState {
   }
 
   toJSON() {
-    return {sortBy: this.sortBy, archivedOnly: this.archivedOnly, selectedTags: this.selectedTags};
+    return _.merge({
+      sortBy: this.sortBy,
+      selectedTags: this.selectedTags
+    }, this.getDisplayOptionValues());
   }
 
   addChangeObserver(callback) {
@@ -77,13 +81,52 @@ export default class OptionsState {
     this.notifyObservers(OptionsState.OptionsStateChangeEventSort);
   }
 
-  setArchivedOnly(archived) {
-    this.archivedOnly = archived;
-    this.notifyObservers(OptionsState.OptionsStateChangeEventViews);
-  }
-
   setSelectedTags(selectedTags) {
     this.selectedTags = selectedTags;
     this.notifyObservers(OptionsState.OptionsStateChangeEventTags);
+  }
+
+  getDisplayOptionValues() {
+    if(!this.displayOptions) {
+      this.rebuildOptions();
+    }
+    return this.displayOptions;
+  }
+
+  rebuildOptions() {
+    this.displayOptions = {
+      archivedOnly: this.getDisplayOptionValue("archivedOnly"),
+      hidePreviews: this.getDisplayOptionValue("hidePreviews"),
+      hideTags:     this.getDisplayOptionValue("hideTags"),
+      hideDates:    this.getDisplayOptionValue("hideDates")
+    }
+  }
+
+  getDisplayOptionValue(key) {
+    if(key == "archivedOnly") {
+      return this.archivedOnly;
+    } else if(key == "hidePreviews") {
+      return this.hidePreviews;
+    } else if(key == "hideDates") {
+      return this.hideDates;
+    } else if(key == "hideTags") {
+      return this.hideTags;
+    }
+  }
+
+  setDisplayOptionKeyValue(key, value) {
+    if(key == "archivedOnly") {
+      this.archivedOnly = value;
+    } else if(key == "hidePreviews") {
+      this.hidePreviews = value;
+    } else if(key == "hideDates") {
+      this.hideDates = value;
+    } else if(key == "hideTags") {
+      this.hideTags = value;
+    }
+
+    this.rebuildOptions();
+
+    this.notifyObservers(OptionsState.OptionsStateChangeEventViews);
   }
 }

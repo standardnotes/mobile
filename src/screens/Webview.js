@@ -79,10 +79,12 @@ export default class Webview extends Abstract {
       infoButton.icon = Icons.getIcon("md-information-circle");
     }
 
-    this.props.navigator.setButtons({
-      rightButtons: [infoButton],
-      animated: false
-    });
+    if(this.props.navigator) {
+      this.props.navigator.setButtons({
+        rightButtons: [infoButton],
+        animated: false
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -126,6 +128,10 @@ export default class Webview extends Abstract {
   }
 
   configureNavBar() {
+    if(!this.props.navigator) {
+      return;
+    }
+
     this.props.navigator.setButtons({
       leftButtons: [
         {
@@ -140,9 +146,15 @@ export default class Webview extends Abstract {
   }
 
   onMessage = (message) => {
-    // Ignore any incoming events (like save events) if the note is locked. Allow messages that are required for component setup (administrative)
-    let data = JSON.parse(message.nativeEvent.data);
+    var data;
+    try {
+      data = JSON.parse(message.nativeEvent.data);
+    } catch (e) {
+      console.log("Message is not valid JSON, returning");
+      return;
+    }
 
+    // Ignore any incoming events (like save events) if the note is locked. Allow messages that are required for component setup (administrative)
     if(this.note.locked && !ComponentManager.get().isReadOnlyMessage(data)) {
       if(!this.didShowLockAlert) {
         Alert.alert('Note Locked', "This note is locked. Changes you make in the web editor will not be saved. Please unlock this note to make changes.", [{text: 'OK'}])
@@ -156,6 +168,21 @@ export default class Webview extends Abstract {
 
   onFrameLoad = (event) => {
     ComponentManager.get().registerComponentWindow(this.editor, this.webView);
+    this.props.onLoadEnd();
+  }
+
+  onLoadStart = () => {
+    // There is a known issue where using the PostMessage API will lead to double trigger
+    // of this function: https://github.com/facebook/react-native/issues/16547.
+    // We only care about initial load, so after it's been set once, no need to unset it.
+    if(!this.alreadyTriggeredLoad) {
+      this.alreadyTriggeredLoad = true;
+      this.props.onLoadStart();
+    }
+  }
+
+  onLoadError = () => {
+    this.props.onLoadError();
   }
 
   render() {
@@ -169,18 +196,21 @@ export default class Webview extends Abstract {
     let bottomPadding = -34; // For some reason iOS inserts padding on bottom
 
     return (
-      <View style={GlobalStyles.styles().flexContainer}>
+      <View style={[GlobalStyles.styles().flexContainer]}>
         <WebView
-             style={GlobalStyles.styles().flexContainer, {backgroundColor: "transparent"}}
-             source={{uri: url}}
-             ref={(webView) => this.webView = webView}
-             onLoad={this.onFrameLoad}
-             onMessage={this.onMessage}
-             contentInset={{top: 0, left: 0, bottom: bottomPadding, right: 0}}
-             scalesPageToFit={App.isIOS ? false : true}
-             injectedJavaScript={
-               `window.isNative = "true"`
-             }
+           style={GlobalStyles.styles().flexContainer, {backgroundColor: "transparent"}}
+           source={{uri: url}}
+           key={this.editor.uuid}
+           ref={(webView) => this.webView = webView}
+           onLoad={this.onFrameLoad}
+           onLoadStart={this.onLoadStart}
+           onError={this.onLoadError}
+           onMessage={this.onMessage}
+           contentInset={{top: 0, left: 0, bottom: bottomPadding, right: 0}}
+           scalesPageToFit={App.isIOS ? false : true}
+           injectedJavaScript = {
+             `window.isNative = "true"`
+          }
          />
       </View>
     );

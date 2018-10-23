@@ -41,7 +41,7 @@ export default class Filter extends Abstract {
       selectedTags = [];
     }
 
-    this.mergeState({tags: [], selectedTags: selectedTags, archivedOnly: this.options.archivedOnly});
+    this.mergeState({tags: [], selectedTags: selectedTags, options: this.options});
 
     if(this.props.noteId) {
       this.note = ModelManager.get().findItem(this.props.noteId);
@@ -161,7 +161,7 @@ export default class Filter extends Abstract {
 
     if(event.id == "willDisappear" && !this.props.singleSelectMode) {
       // we prefer to notify the parent via NavBarButtonPress.accept, but when this view is presented via nav push,
-      // the user can swipe back and miss that. So we do it here as a backup
+      // the user can swipe back and miss that. So we do it here as a backup.
       if(!this.didNotifyParent) {
         this.notifyParentOfOptionsChange();
       }
@@ -282,9 +282,10 @@ export default class Filter extends Abstract {
     })
   }
 
-  onArchiveSelect = () => {
-    this.options.setArchivedOnly(!this.options.archivedOnly);
-    this.mergeState({archivedOnly: this.options.archivedOnly});
+  onOptionSelect = (option) => {
+    this.options.setDisplayOptionKeyValue(option, !this.options.getDisplayOptionValue(option));
+    this.forceUpdate();
+    // this.mergeState({archivedOnly: this.options.archivedOnly});
 
     if(this.props.singleSelectMode) {
       this.notifyParentOfOptionsChange();
@@ -292,23 +293,16 @@ export default class Filter extends Abstract {
   }
 
   onEditorSelect = (editor) => {
-    this.props.onEditorSelect && this.props.onEditorSelect(editor);
 
     if(editor) {
-      this.props.navigator.showModal({
-        screen: 'sn.Webview',
-        title: editor.name,
-        animationType: 'slide-up',
-        passProps: {
-          noteId: this.note.uuid,
-          editorId: editor.uuid
-        }
-      });
       ComponentManager.get().associateEditorWithNote(editor, this.note);
     } else {
       ComponentManager.get().clearEditorForNote(this.note);
-      this.dismiss();
     }
+
+    this.props.onEditorSelect && this.props.onEditorSelect(editor);
+
+    this.dismiss();
   }
 
   getEditors() {
@@ -356,7 +350,7 @@ export default class Filter extends Abstract {
           }
 
           {!this.note &&
-            <OptionsSection archivedOnly={this.state.archivedOnly} onArchiveSelect={this.onArchiveSelect} title={"Options"} />
+            <OptionsSection options={this.options.getDisplayOptionValues()} onOptionSelect={this.onOptionSelect} title={"Options"} />
           }
 
           { this.note &&
@@ -364,7 +358,7 @@ export default class Filter extends Abstract {
           }
 
           { this.note &&
-            <EditorsSection editors={this.getEditors()} selectedEditor={ComponentManager.get().editorForNote(this.note)} title={"Web Editors"} onEditorSelect={this.onEditorSelect.bind(this)}/>
+            <EditorsSection editors={this.getEditors()} selectedEditor={ComponentManager.get().editorForNote(this.note)} title={"Edit With Web Editor"} onEditorSelect={this.onEditorSelect.bind(this)}/>
           }
 
           <TagsSection
@@ -479,11 +473,11 @@ class TagsSection extends Component {
 class OptionsSection extends Component {
   constructor(props) {
     super(props);
-    this.state = {archivedOnly: props.archivedOnly}
+    // this.state = {archivedOnly: props.archivedOnly}
   }
 
-  onPressArchive = () => {
-    this.props.onArchiveSelect();
+  onOptionSelect = (option) => {
+    this.props.onOptionSelect(option);
   }
 
   render() {
@@ -492,11 +486,29 @@ class OptionsSection extends Component {
         <SectionHeader title={this.props.title} />
 
         <SectionedAccessoryTableCell
-          onPress={this.onPressArchive}
+          onPress={() => {this.onOptionSelect('archivedOnly')}}
           text={"Show only archived notes"}
           first={true}
+          selected={() => {return this.props.options.archivedOnly}}
+        />
+
+        <SectionedAccessoryTableCell
+          onPress={() => {this.onOptionSelect('hidePreviews')}}
+          text={"Hide note previews"}
+          selected={() => {return this.props.options.hidePreviews}}
+        />
+
+        <SectionedAccessoryTableCell
+          onPress={() => {this.onOptionSelect('hideTags')}}
+          text={"Hide note tags"}
+          selected={() => {return this.props.options.hideTags}}
+        />
+
+        <SectionedAccessoryTableCell
+          onPress={() => {this.onOptionSelect('hideDates')}}
+          text={"Hide note dates"}
           last={true}
-          selected={() => {return this.props.archivedOnly}}
+          selected={() => {return this.props.options.hideDates}}
         />
 
       </TableSection>

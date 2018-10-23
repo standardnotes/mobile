@@ -5,6 +5,7 @@ import ModelManager from '../lib/sfjs/modelManager'
 import Auth from '../lib/sfjs/authManager'
 
 import Abstract from "./Abstract"
+import Webview from "./Webview"
 import ComponentManager from '../lib/componentManager'
 import Icons from '../Icons';
 import LockedView from "../containers/LockedView";
@@ -19,7 +20,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  Text
+  Text,
+  ScrollView,
+  Dimensions
 } from 'react-native';
 
 import GlobalStyles from "../Styles"
@@ -53,7 +56,22 @@ export default class Compose extends Abstract {
           this.refreshContent();
         }
       }
-    })
+    });
+
+    this.componentHandler = ComponentManager.get().registerHandler({identifier: "composer", areas: ["editor-editor"],
+      actionHandler: (component, action, data) => {
+        if(action === "save-items" || action === "save-success" || action == "save-error") {
+          if(data.items.map((item) => {return item.uuid}).includes(this.note.uuid)) {
+            if(action == "save-items") {
+              if(this.componentSaveTimeout) clearTimeout(this.componentSaveTimeout);
+              this.componentSaveTimeout = setTimeout(this.showSavingStatus.bind(this), 10);
+            } else {
+              this.showSavedStatus(action == "save-success");
+            }
+          }
+        }
+      }
+    });
 
     this.configureNavBar(true);
   }
@@ -62,43 +80,14 @@ export default class Compose extends Abstract {
     this.mergeState({title: this.note.title, text: this.note.text});
   }
 
-  loadEditor() {
-    var noteEditor = ComponentManager.get().editorForNote(this.note);
-
-    if(noteEditor) {
-      let presentEditor = () => {
-        this.presentedEditor = true;
-        this.props.navigator.showModal({
-          screen: 'sn.Webview',
-          title: noteEditor.name,
-          animationType: 'slide-up',
-          passProps: {
-            noteId: this.note.uuid,
-            editorId: noteEditor.uuid
-          }
-        });
-      }
-      if(!this.note.uuid) {
-        this.note.initUUID().then(() => {
-          presentEditor();
-        })
-      } else {
-        presentEditor();
-      }
-    }
-  }
-
   componentDidMount() {
     super.componentDidMount();
-
-    setTimeout(() => {
-      this.loadEditor();
-    }, 150 /* This is an aesthetic delay and not functional. It doesn't look too good when it comes up so fast. */);
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
     Sync.get().removeEventHandler(this.syncObserver);
+    ComponentManager.get().deregisterHandler(this.componentHandler);
   }
 
   viewDidAppear() {
@@ -164,12 +153,10 @@ export default class Compose extends Abstract {
         }
       }
     } else if(event.id == "willAppear") {
-      // Changes made in an external editor are not reflected automatically
-      if(this.presentedEditor) {
-        this.presentedEditor = false;
-        this.refreshContent();
+      if(this.needsEditorReload) {
+        this.forceUpdate();
+        this.needsEditorReload = false;
       }
-
       if(this.note.dirty) {
         // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
         setTimeout(() => {
@@ -185,7 +172,7 @@ export default class Compose extends Abstract {
   }
 
   showOptions() {
-    if(App.isAndroid) {
+    if(App.isAndroid && this.input) {
       this.input.blur();
     }
 
@@ -199,7 +186,9 @@ export default class Compose extends Abstract {
         onManageNoteEvent: () => {this.forceUpdate()},
         singleSelectMode: false,
         options: JSON.stringify(this.previousOptions),
-        onEditorSelect: () => {this.presentedEditor = true},
+        onEditorSelect: () => {
+          this.needsEditorReload = true;
+        },
         onOptionsChange: (options) => {
           if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
             var tags = ModelManager.get().findItems(options.selectedTags);
@@ -239,7 +228,38 @@ export default class Compose extends Abstract {
 
   onTextChange = (text) => {
     this.note.text = text;
+
+    // Clear dynamic previews if using plain editor
+    this.note.content.preview_html = null;
+    this.note.content.preview_plain = null;
+
     this.changesMade();
+  }
+
+  showSavingStatus() {
+    this.setNavBarSubtitle("Saving...");
+  }
+
+  showSavedStatus(success) {
+    if(success) {
+      if(this.statusTimeout) clearTimeout(this.statusTimeout);
+      this.statusTimeout = setTimeout(() => {
+        var status = "All changes saved"
+        if(Auth.get().offline()) {
+          status += " (offline)";
+        }
+        this.saveError = false;
+        this.syncTakingTooLong = false;
+        this.setNavBarSubtitle(status);
+      }, 200)
+    } else {
+      if(this.statusTimeout) clearTimeout(this.statusTimeout);
+      this.statusTimeout = setTimeout(function(){
+        this.saveError = true;
+        this.syncTakingTooLong = false;
+        this.setNavBarSubtitle("Error syncing (changes saved offline)");
+      }.bind(this), 200)
+    }
   }
 
   changesMade() {
@@ -248,7 +268,7 @@ export default class Compose extends Abstract {
     if(this.saveTimeout) clearTimeout(this.saveTimeout);
     if(this.statusTimeout) clearTimeout(this.statusTimeout);
     this.saveTimeout = setTimeout(() => {
-      this.setNavBarSubtitle("Saving...");
+      this.showSavingStatus();
       if(!this.note.uuid) {
         this.note.initUUID().then(() => {
           if(this.props.selectedTagId) {
@@ -293,26 +313,26 @@ export default class Compose extends Abstract {
       ModelManager.get().addItem(note);
     }
     this.sync(note, (success) => {
-      if(success) {
-        if(this.statusTimeout) clearTimeout(this.statusTimeout);
-        this.statusTimeout = setTimeout(() => {
-          var status = "All changes saved"
-          if(Auth.get().offline()) {
-            status += " (offline)";
-          }
-          this.saveError = false;
-          this.syncTakingTooLong = false;
-          this.setNavBarSubtitle(status);
-        }, 200)
-      } else {
-        if(this.statusTimeout) clearTimeout(this.statusTimeout);
-        this.statusTimeout = setTimeout(function(){
-          this.saveError = true;
-          this.syncTakingTooLong = false;
-          this.setNavBarSubtitle("Error syncing (changes saved offline)");
-        }.bind(this), 200)
-      }
+      this.showSavedStatus(success);
     });
+  }
+
+  onScroll = (e) => {
+    let xOffset = e.nativeEvent.contentOffset.x;
+    let contentWidth = this.scrollViewContentWidth;
+    let pageNum = Math.ceil(xOffset / contentWidth);
+
+    this.setState({currentPage: pageNum});
+  }
+
+  onContentSizeChange = (width, height) => {
+    this.scrollViewContentWidth = width;
+  }
+
+  onLayout = () => {
+    // Called on rotation events, amongst other things.
+    const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
+    this.setState({deviceWidth: deviceWidth});
   }
 
   render() {
@@ -327,8 +347,18 @@ export default class Compose extends Abstract {
       this.state.title for the value. We also update the state onTitleChange.
     */
 
+    var noteEditor = ComponentManager.get().editorForNote(this.note);
+    const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
+    var scrollViewWidth = noteEditor ? deviceWidth * 2.0 : deviceWidth;
+    var shouldDisplayEditor = noteEditor != null;
+
+    if(noteEditor && this.state.currentPage == 1) {
+      shouldDisplayEditor = false;
+    }
+
     return (
-      <View style={[this.styles.container, GlobalStyles.styles().container]}>
+      <View style={[this.styles.container, GlobalStyles.styles().container]}
+        onLayout={this.onLayout}>
 
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
@@ -350,29 +380,77 @@ export default class Compose extends Abstract {
           editable={!this.note.locked}
         />
 
-        {Platform.OS == "android" &&
-          <View style={this.styles.noteTextContainer}>
-            <TextView style={[GlobalStyles.stylesForKey("noteText")]}
+        <ScrollView
+          onScroll={this.onScroll}
+          onContentSizeChange={this.onContentSizeChange}
+          horizontal={true}
+          pagingEnabled={true}
+          bounces={false}
+          contentContainerStyle={{width: scrollViewWidth}}
+        >
+
+          {(this.state.loadingWebView || this.state.webViewError) &&
+            <View style={[this.styles.loadingWebViewContainer]}>
+              <Text style={[this.styles.loadingWebViewText, {fontWeight: 'bold'}]}>
+                {this.state.webViewError ? "Unable to Load Editor" : "Loading Editor..."}
+              </Text>
+              <Text style={[this.styles.loadingWebViewText]}>Swipe to switch to plain.</Text>
+            </View>
+          }
+
+          {/* Place an empty container before the webview so that the plain editor does not flex grow to occupy all space. */}
+          {noteEditor && !shouldDisplayEditor &&
+            <View style={[this.styles.noteTextContainer, {width: deviceWidth}]} />
+          }
+
+          {shouldDisplayEditor &&
+            <Webview
+              key={noteEditor.uuid}
+              noteId={this.note.uuid}
+              editorId={noteEditor.uuid}
+              onLoadStart={() => {this.setState({loadingWebView: true})}}
+              onLoadEnd={() => {this.setState({loadingWebView: false, webViewError: false})}}
+              onLoadError={() => {this.setState({webViewError: true})}}
+            />
+          }
+
+          {/* Place an empty container so that the webview does not flex grow to occupy all space. */}
+          {shouldDisplayEditor &&
+            <View style={this.styles.noteTextContainer} />
+          }
+
+          {!shouldDisplayEditor && Platform.OS == "android" &&
+            <View style={[this.styles.noteTextContainer]}>
+              <TextView style={[GlobalStyles.stylesForKey("noteText"), this.styles.textContentAndroid]}
+                ref={(ref) => this.input = ref}
+                autoFocus={this.note.dummy}
+                value={this.note.text}
+                selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
+                handlesColor={GlobalStyles.constants().mainTintColor}
+                onChangeText={this.onTextChange}
+                editable={!this.note.locked}
+              />
+            </View>
+          }
+
+          {!shouldDisplayEditor && Platform.OS == "ios" &&
+            <TextView style={[GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10, width: deviceWidth}]}
               ref={(ref) => this.input = ref}
-              autoFocus={this.note.dummy}
+              autoFocus={false}
               value={this.note.text}
-              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
-              handlesColor={GlobalStyles.constants().mainTintColor}
+              keyboardDismissMode={'interactive'}
+              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
               onChangeText={this.onTextChange}
               editable={!this.note.locked}
             />
-          </View>
-        }
+          }
 
-        {Platform.OS == "ios" &&
-          <TextView style={[...GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10}]}
-            ref={(ref) => this.input = ref}
-            autoFocus={false}
-            value={this.note.text}
-            keyboardDismissMode={'interactive'}
-            selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
-            onChangeText={this.onTextChange}
-            editable={!this.note.locked}
+        </ScrollView>
+
+        {App.isIOS &&
+          // Required for iOS back swipe gesture to work with ScrollView
+          <View
+            style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 10 }}
           />
         }
       </View>
@@ -412,13 +490,30 @@ export default class Compose extends Abstract {
         borderBottomWidth: 1
       },
 
+      loadingWebViewContainer: {
+        position: "absolute",
+        height: "100%",
+        width: "50%",
+        bottom: 0,
+        zIndex: 300,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: 'center',
+      },
+
+      loadingWebViewText: {
+        paddingLeft: 0,
+        color: GlobalStyles.constants().mainTextColor,
+        opacity: 0.7
+      },
+
       lockedText: {
         fontWeight: "bold",
         color: GlobalStyles.constants().mainBackgroundColor,
         paddingLeft: 10
       },
 
-      textContainer: {
+      textContentAndroid: {
         flexGrow: 1,
         flex: 1,
       },
@@ -429,7 +524,7 @@ export default class Compose extends Abstract {
 
       noteTextContainer: {
         flexGrow: 1,
-        flex: 1,
+        flex: 1
       },
     }
 

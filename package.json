@@ -1,8 +1,8 @@
 {
   "name": "StandardNotes",
-  "version": "2.3.7",
-  "versionIOS": "2.3.7",
-  "versionAndroid": "2.3.7",
+  "version": "2.3.8",
+  "versionIOS": "2.3.8",
+  "versionAndroid": "2.3.8",
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
@@ -23,7 +23,7 @@
     "react-native-vector-icons": "^4.3.0",
     "regenerator": "^0.13.2",
     "sn-models": "0.1.8",
-    "standard-file-js": "0.3.14"
+    "standard-file-js": "0.3.18"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

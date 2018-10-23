@@ -10,7 +10,7 @@ export default class NoteCell extends React.PureComponent {
 
   constructor(props) {
     super(props);
-    this.state = {selected: false};
+    this.state = {selected: false, options: props.options || {}};
     let Padding = 14;
 
     this.styles = StyleSheet.create({
@@ -77,6 +77,10 @@ export default class NoteCell extends React.PureComponent {
         marginBottom: 5,
       }
     });
+  }
+
+  componentWillReceiveProps(props) {
+    this.setState({options: props.options || {}});
   }
 
   _onPress = () => {
@@ -146,6 +150,15 @@ export default class NoteCell extends React.PureComponent {
     });
   }
 
+  getHTMLStyles = () => {
+    var html = "";
+    html += "<style>";
+    html += `html {font-family: sans-serif;}`
+    html += `html, body, div, p, h1, h2, h3, h4 {color: ${GlobalStyles.constants().mainTextColor};}`;
+    html += "</style>";
+    return html;
+  }
+
   render() {
     var note = this.props.item;
     return (
@@ -167,7 +180,7 @@ export default class NoteCell extends React.PureComponent {
               </View>
             }
 
-            {this.props.renderTags && note.tags.length > 0 &&
+            {this.props.renderTags && !this.state.options.hideTags && note.tags.length > 0 &&
               <View style={this.styles.noteTags}>
                 <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag)}>
                 {this.props.tagsString}
@@ -190,15 +203,21 @@ export default class NoteCell extends React.PureComponent {
               <Text style={this.aggregateStyles(this.styles.noteTitle, this.styles.noteTitleSelected, this.state.selected)}>{note.title}</Text>
             }
 
-            {note.safeText().length > 0 &&
+            {note.content.preview_plain && !this.state.options.hidePreviews &&
+              <Text style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>{note.content.preview_plain}</Text>
+            }
+
+            {!note.content.preview_plain && !this.state.options.hidePreviews && note.safeText().length > 0 &&
               <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>{note.text}</Text>
             }
 
-            <Text
-              numberOfLines={1}
-              style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>
-              {this.props.sortType == "client_updated_at" ? "Modified " + note.updatedAtString() : note.createdAtString()}
-            </Text>
+            {!this.state.options.hideDates &&
+              <Text
+                numberOfLines={1}
+                style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>
+                {this.props.sortType == "client_updated_at" ? "Modified " + note.updatedAtString() : note.createdAtString()}
+              </Text>
+            }
 
             <ActionSheet
               ref={o => this.actionSheet = o}
