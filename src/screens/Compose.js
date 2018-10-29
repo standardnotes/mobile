@@ -329,12 +329,6 @@ export default class Compose extends Abstract {
     this.scrollViewContentWidth = width;
   }
 
-  onLayout = () => {
-    // Called on rotation events, amongst other things.
-    const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
-    this.setState({deviceWidth: deviceWidth});
-  }
-
   render() {
     if(this.state.lockContent) {
       return (<LockedView />);
@@ -348,8 +342,10 @@ export default class Compose extends Abstract {
     */
 
     var noteEditor = ComponentManager.get().editorForNote(this.note);
-    const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
-    var scrollViewWidth = noteEditor ? deviceWidth * 2.0 : deviceWidth;
+    // const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
+
+    let windowWidth = this.state.windowWidth || Dimensions.get('window').width;
+    var scrollViewWidth = noteEditor ? windowWidth * 2.0 : windowWidth;
     var shouldDisplayEditor = noteEditor != null;
 
     if(noteEditor && this.state.currentPage == 1) {
@@ -357,8 +353,13 @@ export default class Compose extends Abstract {
     }
 
     return (
-      <View style={[this.styles.container, GlobalStyles.styles().container]}
-        onLayout={this.onLayout}>
+      <View
+        style={[this.styles.container, GlobalStyles.styles().container]}
+        onLayout={(e) => {
+          let width = e.nativeEvent.layout.width;
+          this.setState({windowWidth: width})
+        }}
+      >
 
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
@@ -400,7 +401,7 @@ export default class Compose extends Abstract {
 
           {/* Place an empty container before the webview so that the plain editor does not flex grow to occupy all space. */}
           {(noteEditor != null && !shouldDisplayEditor) &&
-            <View style={[this.styles.noteTextContainer, {width: deviceWidth}]} />
+            <View style={[this.styles.noteTextContainer, {width: windowWidth}]} />
           }
 
           {shouldDisplayEditor &&
@@ -434,7 +435,7 @@ export default class Compose extends Abstract {
           }
 
           {!shouldDisplayEditor && Platform.OS == "ios" &&
-            <TextView style={[GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10, width: deviceWidth}]}
+            <TextView style={[GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10, width: windowWidth}]}
               ref={(ref) => this.input = ref}
               autoFocus={false}
               value={this.note.text}

@@ -196,7 +196,7 @@ export default class Webview extends Abstract {
     let bottomPadding = -34; // For some reason iOS inserts padding on bottom
 
     return (
-      <View style={[GlobalStyles.styles().flexContainer]}>
+      <View style={[GlobalStyles.styles().flexContainer, this.props.style]}>
         <WebView
            style={GlobalStyles.styles().flexContainer, {backgroundColor: "transparent"}}
            source={{uri: url}}
