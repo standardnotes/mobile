@@ -358,7 +358,7 @@ export default class Filter extends Abstract {
           }
 
           { this.note &&
-            <EditorsSection editors={this.getEditors()} selectedEditor={ComponentManager.get().editorForNote(this.note)} title={"Edit With Web Editor"} onEditorSelect={this.onEditorSelect.bind(this)}/>
+            <EditorsSection editors={this.getEditors()} selectedEditor={ComponentManager.get().editorForNote(this.note)} title={"Edit With"} onEditorSelect={this.onEditorSelect.bind(this)}/>
           }
 
           <TagsSection

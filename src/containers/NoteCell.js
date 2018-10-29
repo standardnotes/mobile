@@ -204,7 +204,7 @@ export default class NoteCell extends React.PureComponent {
             }
 
             {(note.content.preview_plain != null && !this.state.options.hidePreviews) &&
-              <Text style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}> {note.content.preview_plain} </Text>
+              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}> {note.content.preview_plain} </Text>
             }
 
             {(!note.content.preview_plain && !this.state.options.hidePreviews && note.safeText().length > 0) &&

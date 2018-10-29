@@ -446,6 +446,7 @@ export default class GlobalStyles {
       },
 
       noteText: {
+        flexGrow: 1,
         marginTop: 0,
         paddingTop: 10,
         color: constants.mainTextColor,

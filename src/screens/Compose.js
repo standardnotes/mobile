@@ -317,18 +317,6 @@ export default class Compose extends Abstract {
     });
   }
 
-  onScroll = (e) => {
-    let xOffset = e.nativeEvent.contentOffset.x;
-    let contentWidth = this.scrollViewContentWidth;
-    let pageNum = Math.ceil(xOffset / contentWidth);
-
-    this.setState({currentPage: pageNum});
-  }
-
-  onContentSizeChange = (width, height) => {
-    this.scrollViewContentWidth = width;
-  }
-
   render() {
     if(this.state.lockContent) {
       return (<LockedView />);
@@ -342,25 +330,11 @@ export default class Compose extends Abstract {
     */
 
     var noteEditor = ComponentManager.get().editorForNote(this.note);
-    // const { height: deviceHeight, width: deviceWidth } = Dimensions.get('window');
-
     let windowWidth = this.state.windowWidth || Dimensions.get('window').width;
-    var scrollViewWidth = noteEditor ? windowWidth * 2.0 : windowWidth;
     var shouldDisplayEditor = noteEditor != null;
 
-    if(noteEditor && this.state.currentPage == 1) {
-      shouldDisplayEditor = false;
-    }
-
     return (
-      <View
-        style={[this.styles.container, GlobalStyles.styles().container]}
-        onLayout={(e) => {
-          let width = e.nativeEvent.layout.width;
-          this.setState({windowWidth: width})
-        }}
-      >
-
+      <View style={[this.styles.container, GlobalStyles.styles().container]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
             <Icon name={Icons.nameForIcon("lock")} size={20} color={GlobalStyles.constants().mainBackgroundColor} />
@@ -381,77 +355,48 @@ export default class Compose extends Abstract {
           editable={!this.note.locked}
         />
 
-        <ScrollView
-          onScroll={this.onScroll}
-          onContentSizeChange={this.onContentSizeChange}
-          horizontal={true}
-          pagingEnabled={true}
-          bounces={false}
-          contentContainerStyle={{width: scrollViewWidth}}
-        >
+        {(this.state.loadingWebView || this.state.webViewError) &&
+          <View style={[this.styles.loadingWebViewContainer]}>
+            <Text style={[this.styles.loadingWebViewText, {fontWeight: 'bold'}]}>
+              {this.state.webViewError ? "Unable to Load Editor" : "Loading Editor..."}
+            </Text>
+          </View>
+        }
 
-          {(this.state.loadingWebView || this.state.webViewError) &&
-            <View style={[this.styles.loadingWebViewContainer]}>
-              <Text style={[this.styles.loadingWebViewText, {fontWeight: 'bold'}]}>
-                {this.state.webViewError ? "Unable to Load Editor" : "Loading Editor..."}
-              </Text>
-              <Text style={[this.styles.loadingWebViewText]}>Swipe to switch to plain.</Text>
-            </View>
-          }
+        {shouldDisplayEditor &&
+          <Webview
+            key={noteEditor.uuid}
+            noteId={this.note.uuid}
+            editorId={noteEditor.uuid}
+            onLoadStart={() => {this.setState({loadingWebView: true})}}
+            onLoadEnd={() => {this.setState({loadingWebView: false, webViewError: false})}}
+            onLoadError={() => {this.setState({webViewError: true})}}
+          />
+        }
 
-          {/* Place an empty container before the webview so that the plain editor does not flex grow to occupy all space. */}
-          {(noteEditor != null && !shouldDisplayEditor) &&
-            <View style={[this.styles.noteTextContainer, {width: windowWidth}]} />
-          }
-
-          {shouldDisplayEditor &&
-            <Webview
-              key={noteEditor.uuid}
-              noteId={this.note.uuid}
-              editorId={noteEditor.uuid}
-              onLoadStart={() => {this.setState({loadingWebView: true})}}
-              onLoadEnd={() => {this.setState({loadingWebView: false, webViewError: false})}}
-              onLoadError={() => {this.setState({webViewError: true})}}
-            />
-          }
-
-          {/* Place an empty container so that the webview does not flex grow to occupy all space. */}
-          {shouldDisplayEditor &&
-            <View style={this.styles.noteTextContainer} />
-          }
-
-          {!shouldDisplayEditor && Platform.OS == "android" &&
-            <View style={[this.styles.noteTextContainer]}>
-              <TextView style={[GlobalStyles.stylesForKey("noteText"), this.styles.textContentAndroid]}
-                ref={(ref) => this.input = ref}
-                autoFocus={this.note.dummy}
-                value={this.note.text}
-                selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
-                handlesColor={GlobalStyles.constants().mainTintColor}
-                onChangeText={this.onTextChange}
-                editable={!this.note.locked}
-              />
-            </View>
-          }
-
-          {!shouldDisplayEditor && Platform.OS == "ios" &&
-            <TextView style={[GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10, width: windowWidth}]}
+        {!shouldDisplayEditor && Platform.OS == "android" &&
+          <View style={[this.styles.noteTextContainer]}>
+            <TextView style={[GlobalStyles.stylesForKey("noteText"), this.styles.textContentAndroid]}
               ref={(ref) => this.input = ref}
-              autoFocus={false}
+              autoFocus={this.note.dummy}
               value={this.note.text}
-              keyboardDismissMode={'interactive'}
-              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
+              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
+              handlesColor={GlobalStyles.constants().mainTintColor}
               onChangeText={this.onTextChange}
               editable={!this.note.locked}
             />
-          }
+          </View>
+        }
 
-        </ScrollView>
-
-        {App.isIOS &&
-          // Required for iOS back swipe gesture to work with ScrollView
-          <View
-            style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 10 }}
+        {!shouldDisplayEditor && Platform.OS == "ios" &&
+          <TextView style={[GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10}]}
+            ref={(ref) => this.input = ref}
+            autoFocus={false}
+            value={this.note.text}
+            keyboardDismissMode={'interactive'}
+            selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
+            onChangeText={this.onTextChange}
+            editable={!this.note.locked}
           />
         }
       </View>
@@ -494,7 +439,7 @@ export default class Compose extends Abstract {
       loadingWebViewContainer: {
         position: "absolute",
         height: "100%",
-        width: "50%",
+        width: "100%",
         bottom: 0,
         zIndex: 300,
         display: "flex",
