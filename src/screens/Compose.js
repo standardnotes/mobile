@@ -399,7 +399,7 @@ export default class Compose extends Abstract {
           }
 
           {/* Place an empty container before the webview so that the plain editor does not flex grow to occupy all space. */}
-          {noteEditor && !shouldDisplayEditor &&
+          {(noteEditor != null && !shouldDisplayEditor) &&
             <View style={[this.styles.noteTextContainer, {width: deviceWidth}]} />
           }
 

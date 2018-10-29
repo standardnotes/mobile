@@ -200,15 +200,15 @@ export default class NoteCell extends React.PureComponent {
             }
 
             {note.safeTitle().length > 0 &&
-              <Text style={this.aggregateStyles(this.styles.noteTitle, this.styles.noteTitleSelected, this.state.selected)}>{note.title}</Text>
+              <Text style={this.aggregateStyles(this.styles.noteTitle, this.styles.noteTitleSelected, this.state.selected)}> {note.title} </Text>
             }
 
-            {note.content.preview_plain && !this.state.options.hidePreviews &&
-              <Text style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>{note.content.preview_plain}</Text>
+            {(note.content.preview_plain != null && !this.state.options.hidePreviews) &&
+              <Text style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}> {note.content.preview_plain} </Text>
             }
 
-            {!note.content.preview_plain && !this.state.options.hidePreviews && note.safeText().length > 0 &&
-              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>{note.text}</Text>
+            {(!note.content.preview_plain && !this.state.options.hidePreviews && note.safeText().length > 0) &&
+              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}> {note.text} </Text>
             }
 
             {!this.state.options.hideDates &&
