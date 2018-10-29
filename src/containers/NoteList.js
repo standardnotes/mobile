@@ -83,13 +83,15 @@ export default class NoteList extends Component {
     } else if(this.props.notes.length == 0) {
       placeholderText = "No notes.";
     }
-    
+
     return (
       <View style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
 
         {placeholderText.length > 0 &&
           <View style={this.styles.decryptNoticeContainer}>
-            <Text style={this.styles.decryptNotice}> { placeholderText } </Text>
+            <Text style={this.styles.decryptNotice}>
+              {placeholderText}
+            </Text>
           </View>
         }
 
