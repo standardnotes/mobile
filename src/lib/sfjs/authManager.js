@@ -42,6 +42,10 @@ export default class Auth extends SFAuthManager {
     super.signout(false);
   }
 
+  async keys() {
+    return KeysManager.get().activeKeys();
+  }
+
   async getAuthParams() {
     return KeysManager.get().activeAuthParams();
   }
