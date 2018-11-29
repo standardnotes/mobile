@@ -12,7 +12,7 @@ export default class InputModal extends Abstract {
 
   constructor(props) {
     super(props);
-    this.constructState({text: ""});
+    this.constructState({text: props.value || ""});
   }
 
   configureNavBar() {

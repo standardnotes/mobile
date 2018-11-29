@@ -369,6 +369,7 @@ export default class Filter extends Abstract {
             clearSelection={this.clearTags}
             onManageTagEvent={this.onManageTagEvent}
             title={"Tags"}
+            navigator={this.props.navigator}
            />
 
         </ScrollView>
@@ -393,11 +394,13 @@ class TagsSection extends Component {
   }
 
   static ActionSheetCancelIndex = 0;
-  static ActionSheetDestructiveIndex = 1;
+  static ActionSheetRenameIndex = 1;
+  static ActionSheetDestructiveIndex = 2;
 
   actionSheetActions() {
     return [
       ['Cancel', ""],
+      ['Rename', "Rename"],
       ['Delete', ItemActionManager.DeleteEvent]
     ];
   }
@@ -415,6 +418,30 @@ class TagsSection extends Component {
 
   handleActionSheetPress = (index) => {
     if(index == 0) {
+      return;
+    }
+
+    if(index == TagsSection.ActionSheetRenameIndex) {
+      this.props.navigator.showModal({
+        screen: 'sn.InputModal',
+        title: 'Rename Tag',
+        animationType: 'slide-up',
+        passProps: {
+          title: 'Rename Tag',
+          value: this.actionSheetItem.title,
+          onSave: (text) => {
+            var tag = this.actionSheetItem;
+
+            if(tag) {
+              tag.title = text; // Update the text on the tag to the input text
+              tag.setDirty(true);
+              Sync.get().sync();
+              this.forceUpdate();
+            }
+          }
+        }
+      });
+
       return;
     }
 
