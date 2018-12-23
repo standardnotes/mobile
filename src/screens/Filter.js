@@ -18,6 +18,7 @@ import OptionsState from "../OptionsState"
 import GlobalStyles from "../Styles"
 import ApplicationState from "../ApplicationState";
 import ActionSheet from 'react-native-actionsheet'
+import {Navigation} from 'react-native-navigation';
 
 export default class Filter extends Abstract {
 
@@ -96,7 +97,7 @@ export default class Filter extends Abstract {
     this.props.onOptionsChange(this.options);
 
     if(App.isAndroid && this.props.singleSelectMode) {
-      this.props.navigator.toggleDrawer({
+      Navigation.toggleDrawer({
         side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
         animated: true, // does the toggle have transition animation or does it happen immediately (optional)
         to: 'closed' // optional, 'open' = open the drawer, 'closed' = close it, missing = the opposite of current state
@@ -108,7 +109,7 @@ export default class Filter extends Abstract {
 
   static navigatorButtons = Platform.OS == 'android' ? {} : {
     rightButtons: [{
-      title: 'New Tag',
+      text: 'New Tag',
       id: 'new-tag',
       showAsAction: 'ifRoom',
     }]
@@ -121,7 +122,7 @@ export default class Filter extends Abstract {
     if(!this.note || Platform.OS == "android") {
       // tags only means we're presenting horizontally, only want left button on modal
       leftButtons.push({
-        title: 'Done',
+        text: 'Done',
         id: 'accept',
         showAsAction: 'ifRoom',
         buttonFontWeight: "bold",
@@ -129,7 +130,7 @@ export default class Filter extends Abstract {
       })
     }
     var rightButton = {
-      title: 'New Tag',
+      text: 'New Tag',
       id: 'new-tag',
       showAsAction: 'ifRoom',
     };
@@ -139,70 +140,89 @@ export default class Filter extends Abstract {
       rightButton = {};
     }
 
-    this.props.navigator.setButtons({
-      rightButtons: [rightButton],
-      leftButtons: leftButtons,
-      animated: false,
-      fab: {
-        collapsedId: 'new-tag',
-        collapsedIcon: Icons.getIcon('md-add'),
-        backgroundColor: GlobalStyles.constants().mainTintColor
-      },
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [rightButton],
+        leftButtons: leftButtons,
+        animated: false,
+        title: {
+          text: 'Options'
+        }
+        // fab: {
+        //   collapsedId: 'new-tag',
+        //   collapsedIcon: Icons.getIcon('md-add'),
+        //   backgroundColor: GlobalStyles.constants().mainTintColor
+        // },
+      }
     });
+  }
+
+  navigationButtonPressed({ buttonId }) {
+    if (buttonId == 'accept') { // this is the same id field from the static navigatorButtons definition
+      if(this.note) {
+        Navigation.pop(this.props.componentId);
+      } else {
+        this.didNotifyParent = true;
+        this.notifyParentOfOptionsChange();
+        this.dismiss();
+      }
+    } else if(buttonId == 'new-tag') {
+      Navigation.showModal({
+        stack: {
+          children: [{
+            component: {
+              name: 'sn.InputModal',
+              animationType: 'slide-up',
+              options: {
+                topBar: {
+                  title: {
+                    text: 'New Tag'
+                  }
+                }
+              },
+              passProps: {
+                title: 'New Tag',
+                placeholder: "New tag name",
+                onSave: (text) => {
+                  this.createTag(text, (tag) => {
+                    if(this.note) {
+                      // select this tag
+                      this.onTagSelect(tag)
+                    }
+                  });
+                }
+              }
+            }
+          }]
+        }
+      });
+    }
   }
 
   onNavigatorEvent(event) {
 
     super.onNavigatorEvent(event);
 
-    if(event.id == "willAppear") {
+    if(event == "willAppear") {
       this.forceUpdate();
     }
 
-    if(event.id == "willDisappear" && !this.props.singleSelectMode) {
+    if(event == "willDisappear" && !this.props.singleSelectMode) {
       // we prefer to notify the parent via NavBarButtonPress.accept, but when this view is presented via nav push,
       // the user can swipe back and miss that. So we do it here as a backup.
       if(!this.didNotifyParent) {
         this.notifyParentOfOptionsChange();
       }
     }
-
-    if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
-      if (event.id == 'accept') { // this is the same id field from the static navigatorButtons definition
-        if(this.note) {
-          this.props.navigator.pop();
-        } else {
-          this.didNotifyParent = true;
-          this.notifyParentOfOptionsChange();
-          this.dismiss();
-        }
-      } else if(event.id == 'new-tag') {
-        this.props.navigator.showModal({
-          screen: 'sn.InputModal',
-          title: 'New Tag',
-          animationType: 'slide-up',
-          passProps: {
-            title: 'New Tag',
-            placeholder: "New tag name",
-            onSave: (text) => {
-              this.createTag(text, function(tag){
-                if(this.note) {
-                  // select this tag
-                  this.onTagSelect(tag)
-                }
-              }.bind(this));
-            }
-          }
-        });
-      }
-    }
   }
 
   dismiss = () => {
     if(this.note) {
-      this.props.navigator.pop();
+      Navigation.pop(this.props.componentId);
     } else {
-      this.props.navigator.dismissModal({animationType: "slide-down"})
+      Navigation.dismissModal(this.props.componentId, {
+        animationType: "slide-down"
+      });
     }
   }
 
@@ -275,7 +295,7 @@ export default class Filter extends Abstract {
     ItemActionManager.handleEvent(event, this.note, () => {
         this.props.onManageNoteEvent();
         if(event == ItemActionManager.DeleteEvent) {
-          this.props.navigator.popToRoot({
+          Navigation.popToRoot({
             animated: true,
           });
         }

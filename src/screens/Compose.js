@@ -12,6 +12,7 @@ import LockedView from "../containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import TextView from "sn-textview";
+import {Navigation} from 'react-native-navigation';
 
 import {
   StyleSheet,
@@ -95,7 +96,7 @@ export default class Compose extends Abstract {
 
     // Autofocus doesn't work properly on iOS due to navigation push, so we'll focus manually
     if(App.isIOS) {
-      if(this.note.dummy) {
+      if(this.note.dummy && this.input) {
         this.input.focus();
       }
     }
@@ -120,7 +121,7 @@ export default class Compose extends Abstract {
     }
 
     var tagButton = {
-      title: "Manage",
+      text: "Manage",
       id: 'tags',
       showAsAction: 'ifRoom',
     }
@@ -137,22 +138,24 @@ export default class Compose extends Abstract {
       }
     }
 
-    this.props.navigator.setButtons({
-      rightButtons: [tagButton],
-      animated: false
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [tagButton],
+        animated: false
+      }
     });
   }
 
   onNavigatorEvent(event) {
     super.onNavigatorEvent(event);
 
-    if(event.id == 'didAppear') {
+    if(event == 'didAppear') {
       if(this.note.dummy) {
         if(this.refs.input) {
           this.refs.input.focus();
         }
       }
-    } else if(event.id == "willAppear") {
+    } else if(event == "willAppear") {
       if(this.needsEditorReload) {
         this.forceUpdate();
         this.needsEditorReload = false;
@@ -164,12 +167,14 @@ export default class Compose extends Abstract {
         }, 300);
       }
     }
-    if (event.type == 'NavBarButtonPress') {
-      if (event.id == 'tags') {
-        this.showOptions();
-      }
+  }
+
+  navigationButtonPressed({ buttonId }) {
+    if (buttonId == 'tags') {
+      this.showOptions();
     }
   }
+
 
   showOptions() {
     if(App.isAndroid && this.input) {
@@ -177,27 +182,27 @@ export default class Compose extends Abstract {
     }
 
     this.previousOptions = {selectedTags: this.note.tags.map(function(tag){return tag.uuid})};
-    this.props.navigator.push({
-      screen: 'sn.Filter',
-      title: 'Options',
-      animationType: 'slide-up',
-      passProps: {
-        noteId: this.note.uuid,
-        onManageNoteEvent: () => {this.forceUpdate()},
-        singleSelectMode: false,
-        options: JSON.stringify(this.previousOptions),
-        onEditorSelect: () => {
-          this.needsEditorReload = true;
-        },
-        onOptionsChange: (options) => {
-          if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
-            var tags = ModelManager.get().findItems(options.selectedTags);
-            this.replaceTagsForNote(tags);
-            this.note.setDirty(true);
-            this.changesMade();
-          }
-        }
-      }
+     Navigation.push(this.props.componentId, {
+       component: {
+         name: 'sn.Filter',
+         passProps: {
+           noteId: this.note.uuid,
+           onManageNoteEvent: () => {this.forceUpdate()},
+           singleSelectMode: false,
+           options: JSON.stringify(this.previousOptions),
+           onEditorSelect: () => {
+             this.needsEditorReload = true;
+           },
+           onOptionsChange: (options) => {
+             if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
+               var tags = ModelManager.get().findItems(options.selectedTags);
+               this.replaceTagsForNote(tags);
+               this.note.setDirty(true);
+               this.changesMade();
+             }
+           }
+         }
+       }
     });
   }
 
@@ -365,6 +370,7 @@ export default class Compose extends Abstract {
 
         {shouldDisplayEditor &&
           <Webview
+            componentId="sn.Webview"
             key={noteEditor.uuid}
             noteId={this.note.uuid}
             editorId={noteEditor.uuid}
@@ -470,7 +476,7 @@ export default class Compose extends Abstract {
 
       noteTextContainer: {
         flexGrow: 1,
-        flex: 1
+        flex: 1,
       },
     }
 

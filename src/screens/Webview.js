@@ -66,27 +66,6 @@ export default class Webview extends Abstract {
     });
   }
 
-  componentDidMount() {
-    super.componentDidMount();
-
-    var infoButton = {
-      title: "Info",
-      id: 'info',
-      showAsAction: 'ifRoom',
-    }
-
-    if(Platform.OS === "android") {
-      infoButton.icon = Icons.getIcon("md-information-circle");
-    }
-
-    if(this.props.navigator) {
-      this.props.navigator.setButtons({
-        rightButtons: [infoButton],
-        animated: false
-      });
-    }
-  }
-
   componentWillUnmount() {
     super.componentWillMount();
     ComponentManager.get().deregisterHandler(this.handler);
@@ -103,46 +82,6 @@ export default class Webview extends Abstract {
 
   showErrorStatus() {
     this.setNavBarSubtitle("Error saving");
-  }
-
-  onNavigatorEvent(event) {
-    super.onNavigatorEvent(event);
-    if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
-      if (event.id == 'accept') { // this is the same id field from the static navigatorButtons definition
-        this.dismiss();
-      } else if (event.id == 'info') {
-        Alert.alert('Mobile Editors', "Mobile editors allow you to access your desktop editors directly from your mobile device. Note however that editors are primarily web-based and designed for a full desktop experience. Desktop editors are complex and stretch the possibilities of a web browser, let alone a mobile browser. It’s best to treat web editors on mobile as a way to view your marked up data, and if necessary, make minor modifications.", [
-          {text: 'OK'},
-          {text: 'Send Feedback', onPress: () => {
-            var platformString = App.isIOS ? "iOS" : "Android";
-            Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} editors feedback (v${App.version})`);
-          }}
-        ])
-      }
-    }
-  }
-
-  dismiss() {
-    let animationType = "slide-down";
-    this.props.navigator.dismissModal({animationType: animationType})
-  }
-
-  configureNavBar() {
-    if(!this.props.navigator) {
-      return;
-    }
-
-    this.props.navigator.setButtons({
-      leftButtons: [
-        {
-          title: 'Done',
-          id: 'accept',
-          showAsAction: 'ifRoom',
-          buttonFontSize: 17
-        }
-      ],
-      animated: false
-    });
   }
 
   onMessage = (message) => {

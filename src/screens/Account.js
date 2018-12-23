@@ -28,6 +28,7 @@ import LockedView from "../containers/LockedView";
 import ApplicationState from "../ApplicationState";
 import GlobalStyles from "../Styles"
 import App from "../app"
+import {Navigation} from 'react-native-navigation';
 
 var base64 = require('base-64');
 var Mailer = require('NativeModules').RNMail;
@@ -97,15 +98,17 @@ export default class Account extends Abstract {
     super.configureNavBar();
 
     if(App.get().isAndroid) {
-      this.props.navigator.setButtons({
-        leftButtons: [
-          {
-            title: "Close",
-            id: 'cancel',
-            showAsAction: 'ifRoom',
-          },
-        ],
-        animated: false
+      Navigation.mergeOptions(this.props.componentId, {
+        topBar: {
+          leftButtons: [
+            {
+              text: "Close",
+              id: 'cancel',
+              showAsAction: 'ifRoom',
+            },
+          ],
+        }
+        // animated: false
       });
     }
   }
@@ -113,17 +116,17 @@ export default class Account extends Abstract {
   onNavigatorEvent(event) {
     super.onNavigatorEvent(event);
 
-    switch(event.id) {
+    switch(event) {
       case 'willAppear':
        this.loadSecurityStatus();
        this.forceUpdate();
        break;
     }
+  }
 
-    if (event.type == 'NavBarButtonPress') {
-      if (event.id == 'cancel') {
-        this.returnToNotesScreen();
-      }
+  navigationButtonPressed({ buttonId }) {
+    if(buttonId == 'cancel') {
+      this.returnToNotesScreen();
     }
   }
 
@@ -259,8 +262,10 @@ export default class Account extends Abstract {
 
   returnToNotesScreen = () => {
     if(App.isIOS) {
-      this.props.navigator.switchToTab({
-        tabIndex: 0
+      Navigation.mergeOptions('MainTabBar', {
+        bottomTabs: {
+          currentTabIndex: 0
+        }
       });
       this.forceUpdate();
     } else {
@@ -390,18 +395,29 @@ export default class Account extends Abstract {
   }
 
   onPasscodeEnable = () => {
-    this.props.navigator.showModal({
-      screen: 'sn.Authenticate',
-      title: 'Setup Passcode',
-      animationType: 'slide-up',
-      passProps: {
-        mode: "setup",
-        onSetupSuccess: () => {
-          var encryptionSource = KeysManager.get().encryptionSource();
-          if(encryptionSource == "offline") {
-            this.resaveOfflineData(null, true);
+    Navigation.showModal({
+      stack: {
+        children: [{
+          component: {
+            name: 'sn.Authenticate',
+            passProps: {
+              mode: "setup",
+              onSetupSuccess: () => {
+                var encryptionSource = KeysManager.get().encryptionSource();
+                if(encryptionSource == "offline") {
+                  this.resaveOfflineData(null, true);
+                }
+              }
+            },
+            options: {
+              topBar: {
+                title: {
+                  text: 'Setup Passcode',
+                }
+              }
+            }
           }
-        }
+        }]
       }
     });
   }

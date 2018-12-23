@@ -5,7 +5,7 @@
 import React, { Component } from 'react';
 import {AppState, Platform, StatusBar, BackHandler, DeviceEventEmitter, NativeModules} from 'react-native';
 
-import {Navigation, ScreenVisibilityListener} from 'react-native-navigation';
+import {Navigation} from 'react-native-navigation';
 import {registerScreens} from './screens';
 
 import KeysManager from './lib/keysManager'
@@ -66,15 +66,6 @@ export default class App {
       }
     })
 
-    // Screen visibility listener
-    this.listener = new ScreenVisibilityListener({
-      willAppear: ({screen, startTime, endTime, commandType}) => {
-        this._currentScreen = screen;
-      },
-    });
-
-    this.listener.register();
-
     // Listen to sign out event
     this.signoutObserver = Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
@@ -86,10 +77,6 @@ export default class App {
       }
     });
 
-  }
-
-  currentScreen() {
-    return this._currentScreen;
   }
 
   getLocale() {
@@ -169,8 +156,10 @@ export default class App {
       ]).then(function(){
         this.loading = false;
         var run = () => {
-          this.startApp();
-          ApplicationState.get().receiveApplicationStartEvent();
+          Navigation.events().registerAppLaunchedListener(() => {
+            this.startApp();
+            ApplicationState.get().receiveApplicationStartEvent();
+          });
         }
         if(KeysManager.get().isFirstRun()) {
           KeysManager.get().handleFirstRun().then(run);
@@ -185,27 +174,68 @@ export default class App {
     console.log("===Starting App===");
 
     if(this.isIOS) {
-      let tabs = [{
-        label: 'Notes',
-        screen: 'sn.Notes',
-        title: 'Notes',
-      },
-      {
-        label: 'Account',
-        screen: 'sn.Account',
-        title: 'Account',
-        }
-      ];
+      Navigation.setDefaultOptions({
+        bottomTabs: {
+          visible: true,
+          animate: false, // Controls whether BottomTabs visibility changes should be animated
+          drawBehind: true,
+          backgroundColor: GlobalStyles.constants().mainBackgroundColor
+        },
+        bottomTab: {
+           iconColor: GlobalStyles.constants().mainDimColor,
+           selectedIconColor: GlobalStyles.constants().mainTintColor,
+           textColor: GlobalStyles.constants().mainDimColor,
+           selectedTextColor: GlobalStyles.constants().mainTintColor
+         },
+      });
 
-      Navigation.startTabBasedApp(
-        {
-          tabs: tabs,
-          animationType: this.isIOS ? 'slide-down' : 'fade',
-          tabsStyle: _.clone(this.tabStyles), // for iOS
-          appStyle: _.clone(this.tabStyles), // for Android
-          animationType: 'none'
+      Navigation.setRoot({
+        root: {
+          bottomTabs: {
+            id: 'MainTabBar',
+            children: [{
+              stack: {
+                children: [{
+                  component: {
+                    name: 'sn.Notes',
+                    options: {
+                      bottomTab: {
+                        text: 'Notes',
+                        icon: Icons.getIcon('ios-menu-outline')
+                      },
+                      topBar: {
+                        title: {
+                          text: "Notes",
+                        }
+                      }
+                    }
+                  }
+                }]
+              }
+            },
+            {
+              stack: {
+                children: [{
+                  component: {
+                    name: 'sn.Account',
+                    options: {
+                      bottomTab: {
+                        text: 'Account',
+                        icon: Icons.getIcon('ios-contact-outline')
+                      },
+                      topBar: {
+                        title: {
+                          text: "Account"
+                        }
+                      }
+                    }
+                  }
+                }]
+              }
+            }]
+          }
         }
-      );
+      });
     } else {
       let drawer = {
         left: {

@@ -7,6 +7,7 @@ import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import Abstract from "./Abstract"
 import LockedView from "../containers/LockedView";
+import {Navigation} from 'react-native-navigation';
 
 export default class InputModal extends Abstract {
 
@@ -16,24 +17,24 @@ export default class InputModal extends Abstract {
   }
 
   configureNavBar() {
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
-    this.props.navigator.setButtons({
-      leftButtons: [
-        {
-          title: 'Cancel',
-          id: 'cancel',
-          showAsAction: 'ifRoom'
-        },
-      ],
-      animated: false
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        leftButtons: [
+          {
+            text: 'Cancel',
+            id: 'cancel',
+            showAsAction: 'ifRoom'
+          },
+        ],
+        title: {
+          text: this.props.title
+        }
+      }
     });
   }
 
-
-  onNavigatorEvent(event) {
-      if (event.type == 'NavBarButtonPress') {
-        this.props.navigator.dismissModal({animationType: "slide-down"});
-      }
+  navigationButtonPressed({ buttonId }) {
+    Navigation.dismissModal(this.props.componentId);
   }
 
   onSave = () => {
@@ -44,7 +45,7 @@ export default class InputModal extends Abstract {
       }
     }
     this.props.onSave(this.state.text);
-    this.props.navigator.dismissModal({animationType: "slide-down"});
+    Navigation.dismissModal(this.props.componentId, {animationType: "slide-down"});
   }
 
   onTextChange = (text) => {

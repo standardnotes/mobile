@@ -453,6 +453,7 @@ export default class GlobalStyles {
         paddingLeft: constants.paddingLeft,
         paddingRight: constants.paddingLeft,
         paddingBottom: 10,
+        backgroundColor: constants.mainBackgroundColor
       },
 
       noteTextIOS: {

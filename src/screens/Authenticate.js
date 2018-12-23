@@ -15,6 +15,7 @@ import SectionedOptionsTableCell from "../components/SectionedOptionsTableCell";
 import GlobalStyles from "../Styles"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {Navigation} from 'react-native-navigation';
 
 import {
   TextInput,
@@ -76,24 +77,22 @@ export default class Authenticate extends Abstract {
     }
   }
 
-  onNavigatorEvent(event) {
-    super.onNavigatorEvent(event);
-    if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
-      if (event.id == 'cancel') { // this is the same id field from the static navigatorButtons definition
-        this.dismiss();
-      }
+  navigationButtonPressed({ buttonId }) {
+    if (buttonId == 'cancel') { // this is the same id field from the static navigatorButtons definition
+      this.dismiss();
     }
   }
 
   configureNavBar() {
     if(this.props.mode === "setup") {
-      this.props.navigator.setButtons({
-        leftButtons: [{
-            title: 'Cancel',
-            id: 'cancel',
-            showAsAction: 'ifRoom',
-          }],
-        animated: false
+       Navigation.mergeOptions(this.props.componentId, {
+         topBar: {
+           leftButtons: [{
+             text: 'Cancel',
+             id: 'cancel',
+             showAsAction: 'ifRoom',
+           }],
+         }
       });
     }
   }

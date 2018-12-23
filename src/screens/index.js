@@ -1,4 +1,4 @@
-import {Navigation, ScreenVisibilityListener} from 'react-native-navigation';
+import {Navigation} from 'react-native-navigation';
 
 import Notes from './Notes'
 import Compose from './Compose'

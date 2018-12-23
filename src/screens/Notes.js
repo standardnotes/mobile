@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Platform, Text, StatusBar, Modal, Alert } from 'react-native';
+import {Navigation} from 'react-native-navigation';
 
 import App from "../app"
 import ModelManager from '../lib/sfjs/modelManager'
@@ -39,13 +40,15 @@ export default class Notes extends Abstract {
           // Android can handle presenting modals no matter which screen you're on
           if(App.isIOS) {
             // The auth modal is only presented if the Notes screen is visible.
-            this.props.navigator.popToRoot();
+            Navigation.popToRoot(this.props.componentId);
 
             // Don't use the below as it will also for some reason dismiss the non RNN auth modal as well
-            // this.props.navigator.dismissAllModals({animationType: 'none'});
+            // Navigation.dismissAllModals({animationType: 'none'});
 
-            this.props.navigator.switchToTab({
-              tabIndex: 0
+            Navigation.mergeOptions('MainTabBar', {
+              bottomTabs: {
+                currentTabIndex: 0
+              }
             });
           }
         }
@@ -68,7 +71,6 @@ export default class Notes extends Abstract {
     });
 
     this.registerObservers();
-    this.loadTabbarIcons();
     this.initializeNotes();
     this.beginSyncTimer();
 
@@ -168,22 +170,6 @@ export default class Notes extends Abstract {
     this.mergeState({showSyncBar: text != null, syncBarText: text});
   }
 
-  loadTabbarIcons() {
-    if(!App.get().isIOS) {
-      return;
-    }
-    this.props.navigator.setTabButton({
-      tabIndex: 0,
-      icon: Icons.getIcon('ios-menu-outline'),
-      selectedIcon: Icons.getIcon('ios-menu-outline')
-    });
-    this.props.navigator.setTabButton({
-      tabIndex: 1,
-      icon: Icons.getIcon('ios-contact-outline'),
-      selectedIcon: Icons.getIcon('ios-contact-outline')
-    });
-  }
-
   initializeNotes() {
     var encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
@@ -249,7 +235,9 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
+    console.log("Configure Nav Bar");
     // If you change anything here, be sure to test how it interacts with filtering, when you change which tags to show.
+    console.log(this.visible, this.willBeVisible);
     if(this.state.lockContent || (!this.visible && !this.willBeVisible)) {
       this.needsConfigureNavBar = true;
       return;
@@ -257,7 +245,7 @@ export default class Notes extends Abstract {
 
     if(!this.dataLoaded) {
       this.notesTitle = "Notes";
-      this.props.navigator.setTitle({title: this.notesTitle, animated: false});
+      this.setTitle(this.notesTitle);
       this.needsConfigureNavBar = true;
       return;
     }
@@ -296,13 +284,13 @@ export default class Notes extends Abstract {
       }
     }
 
-    if(notesTitle !== this.notesTitle) {
-      // no changes, return. We do this so when swiping back from compose to here,
-      // we don't change the title while a transition is taking place
-      this.notesTitle = notesTitle;
-
-      this.props.navigator.setTitle({title: notesTitle, animated: false});
-    }
+    // if(notesTitle !== this.notesTitle) {
+    //   // no changes, return. We do this so when swiping back from compose to here,
+    //   // we don't change the title while a transition is taking place
+    //
+    //   this.setTitle({title: notesTitle, animated: false});
+    // }
+    this.notesTitle = notesTitle;
 
     if(!initial && App.isIOS && filterTitle === this.filterTitle) {
       // On Android, we want to always run the bottom code in the case of the FAB that doesn't
@@ -316,46 +304,72 @@ export default class Notes extends Abstract {
     var rightButtons = [];
     if(App.get().isIOS) {
       rightButtons.push({
-        title: 'New',
+        text: 'New',
         id: 'new',
         showAsAction: 'ifRoom',
       })
     } else {
       rightButtons.push({
-        title: 'Settings',
+        text: 'Settings',
         id: 'settings',
         showAsAction: 'ifRoom',
         icon: Icons.getIcon('md-settings'),
       })
     }
 
-    this.props.navigator.setButtons({
-      rightButtons: rightButtons,
-      leftButtons: [
-        {
-          title: filterTitle,
-          id: 'sideMenu',
-          showAsAction: 'ifRoom',
-        },
-      ],
-      fab: {
-        collapsedId: 'new',
-        collapsedIcon: Icons.getIcon('md-add'),
-        backgroundColor: GlobalStyles.constants().mainTintColor
+    let leftButtons = [
+      {
+        text: filterTitle,
+        id: 'sideMenu',
+        showAsAction: 'ifRoom',
       },
-      animated: false
+    ]
+
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        leftButtons: leftButtons,
+        rightButtons: rightButtons,
+        title: {
+          text: notesTitle
+        }
+      }
     });
+
+    //   fab: {
+    //     collapsedId: 'new',
+    //     collapsedIcon: Icons.getIcon('md-add'),
+    //     backgroundColor: GlobalStyles.constants().mainTintColor
+    //   },
+    //   animated: false
+  }
+
+  navigationButtonPressed({ buttonId }) {
+    // During incremental load, we wan't to avoid race conditions where we wait for navigator callback for this
+    // to be set in Abstract. Setting it here immediately will avoid updating the nav bar while we navigated away.
+    // Don't set this for Android if just opening side menu.
+    this.willBeVisible = (App.isAndroid && buttonId == 'sideMenu'); // this value is only false (what we want) if it's not Android side menu
+
+    if (buttonId == 'new') {
+      this.presentNewComposer();
+    } else if (buttonId == 'sideMenu') {
+      // Android is handled by the drawer attribute of rn-navigation
+      if(Platform.OS == "ios") {
+        this.presentFilterScreen();
+      }
+    } else if(buttonId == "settings") {
+      this.presentSettingsScreen();
+    }
   }
 
   onNavigatorEvent(event) {
 
     super.onNavigatorEvent(event);
 
-    if(event.id == "willAppear" || event.id == "didAppear") {
-      if(event.id == "willAppear") {
+    if(event == "willAppear" || event == "didAppear") {
+      if(event == "willAppear") {
         this.forceUpdate();
       }
-      else if(event.id == "didAppear") {
+      else if(event == "didAppear") {
         if(this.needsConfigureNavBar) {
           this.configureNavBar(false);
         }
@@ -365,54 +379,56 @@ export default class Notes extends Abstract {
         this.reloadList();
       }
     }
-
-    if(event.type == 'NavBarButtonPress') {
-
-      // During incremental load, we wan't to avoid race conditions where we wait for navigator callback for this
-      // to be set in Abstract. Setting it here immediately will avoid updating the nav bar while we navigated away.
-      // Don't set this for Android if just opening side menu.
-      this.willBeVisible = (App.isAndroid && event.id == 'sideMenu'); // this value is only false (what we want) if it's not Android side menu
-
-      if (event.id == 'new') {
-        this.presentNewComposer();
-      } else if (event.id == 'sideMenu') {
-        // Android is handled by the drawer attribute of rn-navigation
-        if(Platform.OS == "ios") {
-          this.presentFilterScreen();
-        }
-      } else if(event.id == "settings") {
-        this.presentSettingsScreen();
-      }
-    }
   }
 
   presentNewComposer() {
-    this.props.navigator.push({
-      screen: 'sn.Compose',
-      title: 'Compose',
-      passProps: {selectedTagId: this.selectedTags.length && this.selectedTags[0].uuid}, // For Android
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: 'sn.Compose',
+        passProps: {
+          selectedTagId: this.selectedTags.length && this.selectedTags[0].uuid // For Android
+        },
+        options: {
+          bottomTabs: {visible: false},
+          topBar: {
+            title: {
+              text: 'Compose'
+            }
+          }
+        }
+      }
     });
   }
 
   presentFilterScreen() {
-    this.props.navigator.showModal({
-      screen: 'sn.Filter',
-      title: 'Options',
-      animationType: 'slide-up',
-      passProps: {
-        options: JSON.stringify(this.options),
-        onOptionsChange: (options) => {
-          this.options.mergeWith(options);
-        }
+    Navigation.showModal({
+      stack: {
+        children: [{
+          component: {
+            name: 'sn.Filter',
+            passProps: {
+              options: JSON.stringify(this.options),
+              onOptionsChange: (options) => {
+                this.options.mergeWith(options);
+              }
+            }
+          }
+        }]
       }
     });
   }
 
   presentSettingsScreen() {
-    this.props.navigator.showModal({
-      screen: 'sn.Account',
-      title: 'Account',
-      animationType: 'slide-up'
+    Navigation.showModal({
+      stack: {
+        children: [{
+          component: {
+            name: 'sn.Account',
+            title: 'Account',
+            animationType: 'slide-up'
+          }
+        }]
+      }
     });
   }
 
@@ -455,11 +471,21 @@ export default class Notes extends Abstract {
         item.conflict_of = null;
       }
 
-      this.props.navigator.push({
-        screen: 'sn.Compose',
-        title: 'Compose',
-        passProps: {noteId: item.uuid},
-        animationType: "slide-horizontal"
+      Navigation.push(this.props.componentId, {
+        component: {
+          name: 'sn.Compose',
+          passProps: {
+            noteId: item.uuid
+          },
+          options: {
+            bottomTabs: {visible: false},
+            topBar: {
+              title: {
+                text: 'Compose'
+              }
+            }
+          }
+        }
       });
     }
 

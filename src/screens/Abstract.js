@@ -1,18 +1,53 @@
 import React, { Component } from 'react';
 import {DeviceEventEmitter, Modal, View} from 'react-native';
-import GlobalStyles from "../Styles"
-import App from "../app"
-import ApplicationState from "../ApplicationState"
+import GlobalStyles from "../Styles";
+import App from "../app";
+import ApplicationState from "../ApplicationState";
+import {Navigation} from 'react-native-navigation';
 
 export default class Abstract extends Component {
 
+  static options(passProps) {
+    var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
+    return {
+      topBar: {
+        visible: true,
+        animate: false, // Controls whether TopBar visibility changes should be animated
+        hideOnScroll: false,
+        buttonColor: GlobalStyles.constants().mainTintColor,
+        drawBehind: false,
+        backButton: {
+          visible: true,
+          color: GlobalStyles.constants().mainTintColor
+        },
+        background: {
+          color: GlobalStyles.constants().mainBackgroundColor
+        },
+        title: {
+          color: GlobalStyles.constants().mainTextColor,
+          fontWeight: 'bold'
+        },
+        subtitle: {
+          color: GlobalStyles.hexToRGBA(color, 0.5),
+          fontSize: 12
+        }
+      }
+    };
+  }
+
   constructor(props) {
     super(props);
+
+    Navigation.events().bindComponent(this);
     this.state = {lockContent: true};
 
-    if(this.props.navigator) {
-      this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
-    }
+    Navigation.events().registerComponentDidAppearListener(({ componentId, componentName }) => {
+      this.onNavigatorEvent('didAppear');
+    });
+
+    Navigation.events().registerComponentDidDisappearListener(({ componentId, componentName }) => {
+      this.onNavigatorEvent('didDisappear');
+    });
 
     this._stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(!this.isMounted()) {
@@ -27,6 +62,38 @@ export default class Abstract extends Component {
         this.lockContent();
       }
     })
+  }
+
+  setTitle(title) {
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        title: {
+          text: title
+        }
+      }
+    })
+  }
+
+  onNavigatorEvent(event) {
+    switch(event) {
+      case 'willAppear':
+        this.willBeVisible = true;
+        this.configureNavBar(false);
+       break;
+      case 'didAppear':
+        this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
+        this.viewDidAppear();
+        if(this.queuedSubtitle) {
+          this.setNavBarSubtitle(this.queuedSubtitle);
+        }
+        break;
+      case 'willDisappear':
+        this.willBeVisible = false;
+        break;
+      case 'didDisappear':
+        this.visible = false;
+        break;
+      }
   }
 
   lockContent() {
@@ -113,54 +180,24 @@ export default class Abstract extends Component {
 
     this.queuedSubtitle = null;
 
-    this.props.navigator.setSubTitle({
-      subtitle: title
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        subtitle: {
+          text: title,
+        }
+      }
     });
-
-    if(!this.didSetNavBarStyle) {
-      this.didSetNavBarStyle = true;
-      var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
-      this.props.navigator.setStyle({
-        navBarSubtitleColor: GlobalStyles.hexToRGBA(color, 0.5),
-        navBarSubtitleFontSize: 12
-      });
-    }
 
     return true;
   }
 
   dismissModal() {
-    this.props.navigator.dismissModal({animationType: "slide-down"})
-  }
-
-  dismissLightBox() {
-    this.props.navigator.dismissLightBox({animationType: "slide-down"})
+    Navigation.dismissModal();
   }
 
   viewDidAppear() {
     this.visible = true;
   }
 
-  onNavigatorEvent(event) {
-    switch(event.id) {
-      case 'willAppear':
-        this.willBeVisible = true;
-        this.configureNavBar(false);
-       break;
-      case 'didAppear':
-        this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
-        this.viewDidAppear();
-        if(this.queuedSubtitle) {
-          this.setNavBarSubtitle(this.queuedSubtitle);
-        }
-        break;
-      case 'willDisappear':
-        this.willBeVisible = false;
-        break;
-      case 'didDisappear':
-        this.visible = false;
-        break;
-      }
-  }
 
 }

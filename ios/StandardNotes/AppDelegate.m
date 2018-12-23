@@ -1,10 +1,9 @@
 #import "AppDelegate.h"
 
 #import <React/RCTBundleURLProvider.h>
-#import "RCCManager.h"
+ #import <ReactNativeNavigation/ReactNativeNavigation.h>
 #import <React/RCTRootView.h>
 #import <BugsnagReactNative/BugsnagReactNative.h>
-//#import "RCTTextView.h"
 
 @implementation AppDelegate
 
@@ -22,26 +21,8 @@
   }
   
   NSURL *jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];
-  
-//=======
-//  NSURL *jsCodeLocation;
-//
-//  #ifdef DEBUG
-//    jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-//  #else
-//    jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-//  #endif
-//
-//  RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
-//                                                      moduleName:@"StandardNotes"
-//                                               initialProperties:nil
-//                                                   launchOptions:launchOptions];
-//  rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
-//
-//>>>>>>> theirs
-  self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-  self.window.backgroundColor = [UIColor whiteColor];
-  [[RCCManager sharedInstance] initBridgeWithBundleURL:jsCodeLocation launchOptions:launchOptions];
+  [ReactNativeNavigation bootstrap:jsCodeLocation launchOptions:launchOptions];
+
   return YES;
 }
 
