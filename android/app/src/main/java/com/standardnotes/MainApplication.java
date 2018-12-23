@@ -59,6 +59,20 @@ public class MainApplication extends NavigationApplication {
             new FlagSecurePackage()
     );
   }
+// =======
+//     @Override
+//     protected List<ReactPackage> getPackages() {
+//       return Arrays.<ReactPackage>asList(
+//           new MainReactPackage()
+//       );
+//     }
+//
+//     @Override
+//     protected String getJSMainModuleName() {
+//       return "index";
+//     }
+//   };
+// >>>>>>> theirs
 
   @Override
   @Nullable
