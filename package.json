@@ -7,11 +7,12 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
+    "android": "cd ./android && ./gradlew app:assembleDebug && ./gradlew installDebug",
     "test": "jest"
   },
   "dependencies": {
     "base-64": "^0.1.0",
-    "bugsnag-react-native": "^2.3.2",
+    "bugsnag-react-native": "^2.12.6",
     "immutable": "^3.8.1",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
@@ -26,14 +27,12 @@
     "standard-file-js": "0.3.19"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-jest": "21.0.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-react-native": "3.0.2",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "babel-jest": "^23.4.2",
+    "babel-loader": "^8.0.4",
     "jest": "21.0.1",
-    "react-test-renderer": "16.0.0-alpha.12"
-  },
-  "jest": {
-    "preset": "react-native"
+    "react-test-renderer": "16.6.3",
+    "metro-react-native-babel-preset": "^0.51.1"
   }
 }

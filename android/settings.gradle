@@ -1,7 +1,5 @@
 rootProject.name = 'StandardNotes'
-
-include ':ReactAndroid'
-project(':ReactAndroid').projectDir = new File(rootProject.projectDir, '../node_modules/react-native/ReactAndroid')
+include ':app'
 
 include ':SNTextView'
 project(':SNTextView').projectDir = new File(rootProject.projectDir, '../vendor/sn-textview/android')
@@ -10,7 +8,7 @@ include ':bugsnag-react-native'
 project(':bugsnag-react-native').projectDir = new File(rootProject.projectDir, '../node_modules/bugsnag-react-native/android')
 
 include ':react-native-navigation'
-project(':react-native-navigation').projectDir = new File(rootProject.projectDir, '../vendor/react-native-navigation/android/app')
+project(':react-native-navigation').projectDir = new File(rootProject.projectDir, '../vendor/react-native-navigation/lib/android/app')
 
 include ':react-native-keychain'
 project(':react-native-keychain').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-keychain/android')
@@ -30,4 +28,3 @@ project(':react-native-fingerprint-scanner').projectDir = new File(rootProject.p
 include ':react-native-flag-secure-android'
 project(':react-native-flag-secure-android').projectDir = new File(rootProject.projectDir, '../vendor/react-native-flag-secure-android/android')
 
-include ':app'

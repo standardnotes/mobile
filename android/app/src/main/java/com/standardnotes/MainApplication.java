@@ -1,5 +1,6 @@
 package com.standardnotes;
 
+import android.app.Application;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,33 +8,44 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
-import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactNativeHost;
+import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.modules.storage.ReactDatabaseSupplier;
+import com.facebook.react.shell.MainReactPackage;
+import com.facebook.soloader.SoLoader;
 
 import com.chirag.RNMail.RNMail;
-import com.facebook.react.ReactPackage;
-import com.facebook.react.shell.MainReactPackage;
-import com.facebook.react.modules.core.PermissionAwareActivity;
-import com.facebook.react.uimanager.ViewManager;
-import com.facebook.soloader.SoLoader;
 import com.kristiansorens.flagsecure.FlagSecure;
 import com.oblador.keychain.KeychainPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
-import com.reactnativenavigation.NavigationApplication;
-import com.reactnativenavigation.controllers.ActivityCallbacks;
 import com.standardnotes.sntextview.SNTextViewPackage;
 import com.tectiv3.aes.RCTAesPackage;
 import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 import com.kristiansorens.flagsecure.FlagSecurePackage;
+import com.bugsnag.BugsnagReactNative;
+
+import com.reactnativenavigation.NavigationApplication;
+import com.reactnativenavigation.react.NavigationReactNativeHost;
+import com.reactnativenavigation.react.ReactGateway;
 
 import java.util.Arrays;
 import java.util.List;
-import com.bugsnag.BugsnagReactNative;
 
 
 public class MainApplication extends NavigationApplication {
+
+    @Override
+    protected ReactGateway createReactGateway() {
+        ReactNativeHost host = new NavigationReactNativeHost(this, isDebug(), createAdditionalReactPackages()) {
+            @Override
+            protected String getJSMainModuleName() {
+                return "index";
+            }
+        };
+        return new ReactGateway(this, isDebug(), host);
+    }
 
   @Override
   public boolean isDebug() {
@@ -41,9 +53,9 @@ public class MainApplication extends NavigationApplication {
     return BuildConfig.DEBUG;
   }
 
-  protected  List<ViewManager> createViewManagers(ReactApplicationContext reactContext){
-    return Arrays.<ViewManager>asList();
-  }
+//  protected  List<ViewManager> createViewManagers(ReactApplicationContext reactContext){
+//    return Arrays.<ViewManager>asList();
+//  }
 
 
   protected List<ReactPackage> getPackages() {
@@ -121,9 +133,10 @@ public class MainApplication extends NavigationApplication {
       }
 
       public void sendEvent(String eventName) {
-        ReactContext context = getReactGateway().getReactContext();
+        ReactContext context = getReactGateway().getReactNativeHost().getReactInstanceManager().getCurrentReactContext();
         if(context != null) {
           context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, null);
+
         }
       }
 
