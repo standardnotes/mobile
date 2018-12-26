@@ -113,15 +113,10 @@ export default class Account extends Abstract {
     }
   }
 
-  onNavigatorEvent(event) {
-    super.onNavigatorEvent(event);
-
-    switch(event) {
-      case 'willAppear':
-       this.loadSecurityStatus();
-       this.forceUpdate();
-       break;
-    }
+  componentDidAppear() {
+    super.componentDidAppear();
+    this.loadSecurityStatus();
+    this.forceUpdate();
   }
 
   navigationButtonPressed({ buttonId }) {

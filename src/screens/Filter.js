@@ -199,15 +199,16 @@ export default class Filter extends Abstract {
     }
   }
 
-  onNavigatorEvent(event) {
+  componentDidAppear() {
+    super.componentDidAppear();
+    this.forceUpdate();
+  }
 
-    super.onNavigatorEvent(event);
+  componentDidDisappear() {
+    super.componentDidDisappear();
 
-    if(event == "willAppear") {
-      this.forceUpdate();
-    }
-
-    if(event == "willDisappear" && !this.props.singleSelectMode) {
+    // will disappear
+    if(!this.props.singleSelectMode) {
       // we prefer to notify the parent via NavBarButtonPress.accept, but when this view is presented via nav push,
       // the user can swipe back and miss that. So we do it here as a backup.
       if(!this.didNotifyParent) {

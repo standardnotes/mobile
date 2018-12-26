@@ -91,17 +91,6 @@ export default class Compose extends Abstract {
     ComponentManager.get().deregisterHandler(this.componentHandler);
   }
 
-  viewDidAppear() {
-    super.viewDidAppear();
-
-    // Autofocus doesn't work properly on iOS due to navigation push, so we'll focus manually
-    if(App.isIOS) {
-      if(this.note.dummy && this.input) {
-        this.input.focus();
-      }
-    }
-  }
-
   // on iOS, declaring nav bar buttons as static prevents the flickering issue that occurs on nav push
 
   static navigatorButtons = Platform.OS == 'android' ? {} : {
@@ -146,27 +135,37 @@ export default class Compose extends Abstract {
     });
   }
 
-  onNavigatorEvent(event) {
-    super.onNavigatorEvent(event);
+  componentDidAppear() {
+    super.componentDidAppear();
+    // Will appear
+    if(this.needsEditorReload) {
+      this.forceUpdate();
+      this.needsEditorReload = false;
+    }
 
-    if(event == 'didAppear') {
-      if(this.note.dummy) {
-        if(this.refs.input) {
-          this.refs.input.focus();
-        }
-      }
-    } else if(event == "willAppear") {
-      if(this.needsEditorReload) {
-        this.forceUpdate();
-        this.needsEditorReload = false;
-      }
-      if(this.note.dirty) {
-        // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
-        setTimeout(() => {
-          this.changesMade();
-        }, 300);
+    if(this.note.dirty) {
+      // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
+      setTimeout(() => {
+        this.changesMade();
+      }, 300);
+    }
+
+    // Did Appear
+    if(this.note.dummy) {
+      if(this.refs.input) {
+        this.refs.input.focus();
       }
     }
+
+    if(App.isIOS) {
+      if(this.note.dummy && this.input) {
+        this.input.focus();
+      }
+    }
+  }
+
+  componentDidDisappear() {
+    super.componentDidDisappear();
   }
 
   navigationButtonPressed({ buttonId }) {

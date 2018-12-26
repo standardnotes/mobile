@@ -297,7 +297,7 @@ export default class GlobalStyles {
         navBarTextColor: tintColor,
 
         navBarColorAndroid: tintColor,
-        navBarTextColorAndroid: "#ffffff",
+        navBarTextColorAndroid: "#000000",
 
         paddingLeft: 14,
         plainCellBorderColor: "#efefef",

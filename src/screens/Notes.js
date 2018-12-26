@@ -21,12 +21,29 @@ import AuthModal from "../containers/AuthModal"
 import LockedView from "../containers/LockedView"
 import ApplicationState from "../ApplicationState";
 
+import Icon from 'react-native-vector-icons/Ionicons';
+import FAB from 'react-native-fab';
+
 export default class Notes extends Abstract {
 
   constructor(props) {
     super(props);
 
     this.rendersLockscreen = true;
+
+    Navigation.events().registerComponentDidAppearListener(({ componentId }) => {
+      console.log("registerComponentDidAppearListener", componentId);
+			if (componentId === "SideMenu") {
+				this.sideMenuVisible = true;
+			}
+		});
+
+		Navigation.events().registerComponentDidDisappearListener(({ componentId }) => {
+      console.log("registerComponentDidDisappearListener", componentId);
+			if (componentId === "SideMenu") {
+        this.sideMenuVisible = false;
+			}
+		});
 
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(state == ApplicationState.Resuming) {
@@ -235,9 +252,7 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
-    console.log("Configure Nav Bar");
     // If you change anything here, be sure to test how it interacts with filtering, when you change which tags to show.
-    console.log(this.visible, this.willBeVisible);
     if(this.state.lockContent || (!this.visible && !this.willBeVisible)) {
       this.needsConfigureNavBar = true;
       return;
@@ -319,9 +334,10 @@ export default class Notes extends Abstract {
 
     let leftButtons = [
       {
-        text: filterTitle,
         id: 'sideMenu',
         showAsAction: 'ifRoom',
+        icon: Icons.getIcon('ios-menu-outline'),
+        color: GlobalStyles.constants().mainTintColor
       },
     ]
 
@@ -349,36 +365,39 @@ export default class Notes extends Abstract {
     // Don't set this for Android if just opening side menu.
     this.willBeVisible = (App.isAndroid && buttonId == 'sideMenu'); // this value is only false (what we want) if it's not Android side menu
 
+    console.log("Button pressed", buttonId);
+
     if (buttonId == 'new') {
       this.presentNewComposer();
     } else if (buttonId == 'sideMenu') {
       // Android is handled by the drawer attribute of rn-navigation
       if(Platform.OS == "ios") {
         this.presentFilterScreen();
+      } else {
+        this.toggleSideMenu();
       }
     } else if(buttonId == "settings") {
       this.presentSettingsScreen();
     }
   }
 
-  onNavigatorEvent(event) {
+  componentDidAppear() {
+    super.componentDidAppear();
 
-    super.onNavigatorEvent(event);
+    this.forceUpdate();
 
-    if(event == "willAppear" || event == "didAppear") {
-      if(event == "willAppear") {
-        this.forceUpdate();
-      }
-      else if(event == "didAppear") {
-        if(this.needsConfigureNavBar) {
-          this.configureNavBar(false);
-        }
-      }
-      if(this.loadNotesOnVisible) {
-        this.loadNotesOnVisible = false;
-        this.reloadList();
-      }
+    if(this.needsConfigureNavBar) {
+      this.configureNavBar(false);
     }
+
+    if(this.loadNotesOnVisible) {
+      this.loadNotesOnVisible = false;
+      this.reloadList();
+    }
+  }
+
+  componentDidDisappear() {
+    super.componentDidDisappear();
   }
 
   presentNewComposer() {
@@ -398,6 +417,11 @@ export default class Notes extends Abstract {
         }
       }
     });
+  }
+
+  toggleSideMenu() {
+    console.log("toggleSideMenu");
+     Navigation.mergeOptions(this.props.componentId, { sideMenu: { left: { visible: !this.sideMenuVisible } } });
   }
 
   presentFilterScreen() {
@@ -543,6 +567,14 @@ export default class Notes extends Abstract {
             <Text style={GlobalStyles.styles().syncBarText}>{this.state.syncBarText}</Text>
           </View>
         }
+
+        <FAB
+          buttonColor={GlobalStyles.constants().mainTintColor}
+          iconTextColor={GlobalStyles.constants().mainBackgroundColor}
+          onClickAction={() => {this.presentNewComposer()}}
+          visible={true}
+          iconTextComponent={<Icon name="md-add"/>}
+        />
       </View>
     );
   }

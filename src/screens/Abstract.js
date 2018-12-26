@@ -8,7 +8,7 @@ import {Navigation} from 'react-native-navigation';
 export default class Abstract extends Component {
 
   static options(passProps) {
-    var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
+
     return {
       topBar: {
         visible: true,
@@ -26,10 +26,6 @@ export default class Abstract extends Component {
         title: {
           color: GlobalStyles.constants().mainTextColor,
           fontWeight: 'bold'
-        },
-        subtitle: {
-          color: GlobalStyles.hexToRGBA(color, 0.5),
-          fontSize: 12
         }
       }
     };
@@ -38,16 +34,9 @@ export default class Abstract extends Component {
   constructor(props) {
     super(props);
 
-    Navigation.events().bindComponent(this);
     this.state = {lockContent: true};
 
-    Navigation.events().registerComponentDidAppearListener(({ componentId, componentName }) => {
-      this.onNavigatorEvent('didAppear');
-    });
-
-    Navigation.events().registerComponentDidDisappearListener(({ componentId, componentName }) => {
-      this.onNavigatorEvent('didDisappear');
-    });
+    Navigation.events().bindComponent(this);
 
     this._stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(!this.isMounted()) {
@@ -74,26 +63,22 @@ export default class Abstract extends Component {
     })
   }
 
-  onNavigatorEvent(event) {
-    switch(event) {
-      case 'willAppear':
-        this.willBeVisible = true;
-        this.configureNavBar(false);
-       break;
-      case 'didAppear':
-        this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
-        this.viewDidAppear();
-        if(this.queuedSubtitle) {
-          this.setNavBarSubtitle(this.queuedSubtitle);
-        }
-        break;
-      case 'willDisappear':
-        this.willBeVisible = false;
-        break;
-      case 'didDisappear':
-        this.visible = false;
-        break;
-      }
+  // Called by RNN
+  componentDidAppear() {
+    console.log("Component did appear", this);
+    this.visible = true;
+    this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
+    this.configureNavBar(false);
+    if(this.queuedSubtitle) {
+      this.setNavBarSubtitle(this.queuedSubtitle);
+    }
+  }
+
+  // Called by RNN
+  componentDidDisappear() {
+    console.log("Component did disappear", this);
+    this.willBeVisible = false;
+    this.visible = false;
   }
 
   lockContent() {
@@ -180,10 +165,15 @@ export default class Abstract extends Component {
 
     this.queuedSubtitle = null;
 
+    console.log("Setting subtitle text", title);
+
+    var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
     Navigation.mergeOptions(this.props.componentId, {
       topBar: {
         subtitle: {
           text: title,
+          color: GlobalStyles.hexToRGBA(color, 0.5),
+          fontSize: 12
         }
       }
     });
@@ -195,9 +185,7 @@ export default class Abstract extends Component {
     Navigation.dismissModal();
   }
 
-  viewDidAppear() {
-    this.visible = true;
-  }
+
 
 
 }

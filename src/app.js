@@ -147,6 +147,19 @@ export default class App {
   }
 
   start() {
+
+    let startApp = () => {
+      this.startApp();
+      ApplicationState.get().receiveApplicationStartEvent();
+    }
+
+    Navigation.events().registerAppLaunchedListener(() => {
+      this.appLaunched = true;
+      if(this.startAppOnLaunch) {
+        startApp();
+      }
+    });
+
     this.loading = true;
     GlobalStyles.get().resolveInitialTheme().then(function(){
       Promise.all([
@@ -156,10 +169,11 @@ export default class App {
       ]).then(function(){
         this.loading = false;
         var run = () => {
-          Navigation.events().registerAppLaunchedListener(() => {
-            this.startApp();
-            ApplicationState.get().receiveApplicationStartEvent();
-          });
+          if(this.appLaunched) {
+            startApp();
+          } else {
+            this.startAppOnLaunch = true;
+          }
         }
         if(KeysManager.get().isFirstRun()) {
           KeysManager.get().handleFirstRun().then(run);
@@ -173,22 +187,22 @@ export default class App {
   startApp(options = {}) {
     console.log("===Starting App===");
 
-    if(this.isIOS) {
-      Navigation.setDefaultOptions({
-        bottomTabs: {
-          visible: true,
-          animate: false, // Controls whether BottomTabs visibility changes should be animated
-          drawBehind: true,
-          backgroundColor: GlobalStyles.constants().mainBackgroundColor
-        },
-        bottomTab: {
-           iconColor: GlobalStyles.constants().mainDimColor,
-           selectedIconColor: GlobalStyles.constants().mainTintColor,
-           textColor: GlobalStyles.constants().mainDimColor,
-           selectedTextColor: GlobalStyles.constants().mainTintColor
-         },
-      });
+    Navigation.setDefaultOptions({
+      bottomTabs: {
+        visible: true,
+        animate: false, // Controls whether BottomTabs visibility changes should be animated
+        drawBehind: true,
+        backgroundColor: GlobalStyles.constants().mainBackgroundColor
+      },
+      bottomTab: {
+        iconColor: GlobalStyles.constants().mainDimColor,
+        selectedIconColor: GlobalStyles.constants().mainTintColor,
+        textColor: GlobalStyles.constants().mainDimColor,
+        selectedTextColor: GlobalStyles.constants().mainTintColor
+      },
+    });
 
+    if(this.isIOS) {
       Navigation.setRoot({
         root: {
           bottomTabs: {
@@ -236,34 +250,49 @@ export default class App {
           }
         }
       });
-    } else {
-      let drawer = {
-        left: {
-          screen: 'sn.Filter',
-          passProps: {
-            singleSelectMode: true,
-            options: JSON.stringify(this.optionsState),
-            onOptionsChange: (options) => {
-              this.optionsState.mergeWith(options);
-            }
-          }
-        },
-        disableOpenGesture: false
-      };
+    }
+    else {
 
-      Navigation.startSingleScreenApp(
-        {
-          screen: {
-            label: 'Notes',
-            screen: 'sn.Notes',
-            title: 'Notes',
-          },
-          tabsStyle: _.clone(this.tabStyles), // for iOS
-          appStyle: _.clone(this.tabStyles), // for Android
-          drawer: drawer,
-          animationType: 'none'
+      Navigation.setRoot({
+        root: {
+          sideMenu: {
+            center: {
+              stack: {
+                children: [{
+                  component: {
+                    name: 'sn.Notes',
+                    options: {
+                      bottomTab: {
+                        text: 'Notes',
+                        icon: Icons.getIcon('ios-menu-outline')
+                      },
+                      topBar: {
+                        title: {
+                          text: "Notes",
+                        }
+                      }
+                    }
+                  }
+                }]
+              }
+            },
+            left: {
+              component: {
+                name: 'sn.Filter',
+                id: "SideMenu",
+                passProps: {
+                  singleSelectMode: true,
+                  options: JSON.stringify(this.optionsState),
+                  onOptionsChange: (options) => {
+                    this.optionsState.mergeWith(options);
+                  }
+                }
+              }
+            },
+            disableOpenGesture: false
+          }
         }
-      );
+      });
     }
   }
 
