@@ -1,5 +1,4 @@
 import { Alert } from 'react-native';
-import App from "../../app"
 
 export default class AlertManager extends SFAlertManager {
 

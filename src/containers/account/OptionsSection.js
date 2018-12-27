@@ -9,7 +9,7 @@ import SectionedTableCell from "../../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../../components/SectionedAccessoryTableCell";
 import SectionedOptionsTableCell from "../../components/SectionedOptionsTableCell";
 
-import {moment} from "../../app"
+import {moment} from "../../lib/moment"
 
 export default class OptionsSection extends Component {
 

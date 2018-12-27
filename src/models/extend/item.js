@@ -1,4 +1,4 @@
-import {moment} from "../../app"
+import moment from "../../lib/moment";
 
 // Override Item instance methods without overriding actual class, since we'd then need
 // to override all individual classes, like Note and Tag.

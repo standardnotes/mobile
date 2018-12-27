@@ -7,45 +7,46 @@ import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
 import Abstract from "./Abstract"
 import LockedView from "../containers/LockedView";
-import {Navigation} from 'react-native-navigation';
 
 export default class InputModal extends Abstract {
 
+  static navigationOptions = ({ navigation, navigationOptions }) => {
+    let templateOptions = {
+      leftButton: {
+        title: "Done"
+      }
+    }
+    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
+  };
+
   constructor(props) {
     super(props);
+
+    props.navigation.setParams({
+      leftButton: {
+        title: "Done",
+        onPress: () => {
+          this.dismiss();
+        }
+      }
+    })
+
     this.constructState({text: ""});
   }
 
-  configureNavBar() {
-    Navigation.mergeOptions(this.props.componentId, {
-      topBar: {
-        leftButtons: [
-          {
-            text: 'Cancel',
-            id: 'cancel',
-            showAsAction: 'ifRoom'
-          },
-        ],
-        title: {
-          text: this.props.title
-        }
-      }
-    });
-  }
-
-  navigationButtonPressed({ buttonId }) {
-    Navigation.dismissModal(this.props.componentId);
+  dismiss() {
+    this.props.navigation.goBack(null);
   }
 
   onSave = () => {
-    if(this.props.validate) {
-      if(!this.props.validate(this.state.text)) {
-        this.props.onError(this.state.text);
+    if(this.getProp("validate")) {
+      if(!this.getProp("validate")(this.state.text)) {
+        this.getProp("onError")(this.state.text);
         return;
       }
     }
-    this.props.onSave(this.state.text);
-    Navigation.dismissModal(this.props.componentId, {animationType: "slide-down"});
+    this.getProp("onSave")(this.state.text);
+    this.dismiss();
   }
 
   onTextChange = (text) => {
@@ -60,11 +61,11 @@ export default class InputModal extends Abstract {
     return (
       <View style={GlobalStyles.styles().container}>
         <TableSection extraStyles={[GlobalStyles.styles().container]}>
-          <SectionHeader title={this.props.title} />
+          <SectionHeader title={this.getProp("title")} />
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
               style={[GlobalStyles.styles().sectionedTableCellTextInput]}
-              placeholder={this.props.placeholder}
+              placeholder={this.getProp("placeholder")}
               onChangeText={this.onTextChange}
               value={this.state.text}
               autoCorrect={false}

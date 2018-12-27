@@ -1,75 +1,70 @@
-/**
- * Standard Notes React Native App
- */
-
-import React, { Component } from 'react';
-import {AppState, Platform, StatusBar, BackHandler, DeviceEventEmitter, NativeModules} from 'react-native';
-
-import {Navigation} from 'react-native-navigation';
-import {registerScreens} from './screens';
+import React, {Component} from 'react';
+import { View, Text } from "react-native";
+import { createStackNavigator, createAppContainer, createDrawerNavigator } from "react-navigation";
 
 import KeysManager from './lib/keysManager'
+import GlobalStyles from "./Styles"
+import Icons from "./Icons"
+import ApplicationState from "./ApplicationState"
 import Auth from './lib/sfjs/authManager'
 import ModelManager from './lib/sfjs/modelManager'
 import Sync from './lib/sfjs/syncManager'
 import Storage from './lib/sfjs/storageManager'
 import ReviewManager from './lib/reviewManager';
-import GlobalStyles from "./Styles"
-import Icons from "./Icons"
-import OptionsState from "./OptionsState"
-import { Client } from 'bugsnag-react-native';
-import Authenticate from "./screens/Authenticate";
-var moment = require('moment/min/moment-with-locales.min.js');
-var pjson = require('../package.json');
-import ApplicationState from "./ApplicationState";
 
-if(__DEV__ === false) {
-  const bugsnag = new Client()
+import Compose from "./screens/Compose"
+import Notes from "./screens/Notes"
+import Filter from "./screens/Filter"
+import Account from "./screens/Account"
+import InputModal from "./screens/InputModal"
 
-  // Disable console.log for non-dev builds
-  console.log = () => {};
-}
+const AppStack = createStackNavigator({
+  Notes: {screen: Notes},
+  Compose: {screen: Compose},
+  NoteOptions: {screen : Filter},
+}, {
+  initialRouteName: 'Notes'
+})
 
-registerScreens();
+const SettingsStack = createStackNavigator({
+  Screen1: Account
+})
 
-const COLD_LAUNCH_STATE = "COLD_LAUNCH_STATE";
-const WARM_LAUNCH_STATE = "WARM_LAUNCH_STATE";
+const InputModalStack = createStackNavigator({
+  Screen1: InputModal
+})
 
-export default class App {
+const ModalStack = createStackNavigator({
+  Home: AppStack,
+  Settings: SettingsStack,
+  NewTag: InputModalStack
+}, {
+  mode: "modal",
+  headerMode: 'none',
+})
 
-  static instance = null;
+const DrawerStack = createDrawerNavigator({
+  Main: ModalStack
+}, {
+  contentComponent: Filter,
+});
 
-  static get() {
-    if (this.instance == null) {
-      this.instance = new App();
-    }
+const AppContainer = createAppContainer(DrawerStack);
 
-    return this.instance;
-  }
+export default class App extends Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
+
     KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
-
-    this._isAndroid = Platform.OS === "android";
 
     // Initialize iOS review manager. Will automatically handle requesting review logic.
     ReviewManager.initialize();
 
-    // Configure Moment locale
-    moment.locale(this.getLocale());
-
-    // Initialize Options (sort by, filter, selected tags, etc)
-    this.optionsState = new OptionsState();
-    this.optionsState.addChangeObserver((options) => {
-      if(!this.loading) {
-        options.persist();
-      }
-    })
-
     // Listen to sign out event
-    this.signoutObserver = Auth.get().addEventHandler((event) => {
+    Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
-        this.optionsState.reset();
+        ApplicationState.getOptions().reset();
         Storage.get().clearAllModels();
         KeysManager.get().clearAccountKeysAndData();
         ModelManager.get().handleSignout();
@@ -77,239 +72,35 @@ export default class App {
       }
     });
 
+    this.state = {ready: false};
+
+    this.loadInitialData();
   }
 
-  getLocale() {
-    if (Platform.OS === 'android') {
-      return NativeModules.I18nManager.localeIdentifier;
-    } else {
-      return NativeModules.SettingsManager.settings.AppleLocale;
-    }
-  }
+  async loadInitialData() {
+    await GlobalStyles.get().resolveInitialTheme();
+    await Promise.all([
+      Icons.get().loadIcons(),
+      KeysManager.get().loadInitialData(),
+    ])
 
-  static get isAndroid() {
-    return this.get().isAndroid;
-  }
-
-  static get isIOS() {
-    return this.get().isIOS;
-  }
-
-  static get version() {
-    return this.isAndroid ? pjson.versionAndroid : pjson.versionIOS;
-  }
-
-  get isAndroid() {
-    return this._isAndroid;
-  }
-
-  get isIOS() {
-    return !this._isAndroid;
-  }
-
-  globalOptions() {
-    return this.optionsState;
-  }
-
-  get tabStyles() {
-    var navBarColor = GlobalStyles.constantForKey("navBarColor");
-    var navBarTextColor = GlobalStyles.constantForKey("navBarTextColor");
-    var statusBarColor = GlobalStyles.constants().mainBackgroundColor;
-
-    if(this.isAndroid) {
-      statusBarColor = GlobalStyles.darken(navBarColor);
-      // Android <= v22 does not support changing status bar text color. It will always be white
-      // So we have to make sure background color has proper contrast
-      if(Platform.Version <= 22) {
-        statusBarColor = "black";
-      }
-    }
-
-    return {
-      tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
-      tabBarTranslucent: true,
-      tabBarButtonColor: 'gray',
-      tabBarSelectedButtonColor: GlobalStyles.constants().mainTintColor,
-
-      // navBarBlur: true,
-      navBarButtonColor: navBarTextColor,
-      navBarTextColor: navBarTextColor,
-      navigationBarColor: 'black', // android built in bar
-      navBarBackgroundColor: navBarColor, // actual top nav bar
-
-      statusBarColor: statusBarColor, // Android only
-      statusBarTextColorScheme: 'dark',
-      statusBarTextColorSchemeSingleScreen: 'dark',
-      topBarElevationShadowEnabled: true,
-
-      screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
-    }
-  }
-
-  start() {
-
-    let startApp = () => {
-      this.startApp();
+    let ready = () => {
       ApplicationState.get().receiveApplicationStartEvent();
+      this.setState({ready: true});
     }
 
-    Navigation.events().registerAppLaunchedListener(() => {
-      this.appLaunched = true;
-      if(this.startAppOnLaunch) {
-        startApp();
-      }
-    });
-
-    this.loading = true;
-    GlobalStyles.get().resolveInitialTheme().then(function(){
-      Promise.all([
-        Icons.get().loadIcons(),
-        KeysManager.get().loadInitialData(),
-        this.optionsState.loadSaved()
-      ]).then(function(){
-        this.loading = false;
-        var run = () => {
-          if(this.appLaunched) {
-            startApp();
-          } else {
-            this.startAppOnLaunch = true;
-          }
-        }
-        if(KeysManager.get().isFirstRun()) {
-          KeysManager.get().handleFirstRun().then(run);
-        } else {
-          run();
-        }
-      }.bind(this))
-    }.bind(this))
-  }
-
-  startApp(options = {}) {
-    console.log("===Starting App===");
-
-    Navigation.setDefaultOptions({
-      bottomTabs: {
-        visible: true,
-        animate: false, // Controls whether BottomTabs visibility changes should be animated
-        drawBehind: true,
-        backgroundColor: GlobalStyles.constants().mainBackgroundColor
-      },
-      bottomTab: {
-        iconColor: GlobalStyles.constants().mainDimColor,
-        selectedIconColor: GlobalStyles.constants().mainTintColor,
-        textColor: GlobalStyles.constants().mainDimColor,
-        selectedTextColor: GlobalStyles.constants().mainTintColor
-      },
-    });
-
-    if(this.isIOS) {
-      Navigation.setRoot({
-        root: {
-          bottomTabs: {
-            id: 'MainTabBar',
-            children: [{
-              stack: {
-                children: [{
-                  component: {
-                    name: 'sn.Notes',
-                    options: {
-                      bottomTab: {
-                        text: 'Notes',
-                        icon: Icons.getIcon('ios-menu-outline')
-                      },
-                      topBar: {
-                        title: {
-                          text: "Notes",
-                        }
-                      }
-                    }
-                  }
-                }]
-              }
-            },
-            {
-              stack: {
-                children: [{
-                  component: {
-                    name: 'sn.Account',
-                    options: {
-                      bottomTab: {
-                        text: 'Account',
-                        icon: Icons.getIcon('ios-contact-outline')
-                      },
-                      topBar: {
-                        title: {
-                          text: "Account"
-                        }
-                      }
-                    }
-                  }
-                }]
-              }
-            }]
-          }
-        }
-      });
-    }
-    else {
-
-      Navigation.setRoot({
-        root: {
-          sideMenu: {
-            center: {
-              stack: {
-                children: [{
-                  component: {
-                    name: 'sn.Notes',
-                    options: {
-                      bottomTab: {
-                        text: 'Notes',
-                        icon: Icons.getIcon('ios-menu-outline')
-                      },
-                      topBar: {
-                        title: {
-                          text: "Notes",
-                        }
-                      }
-                    }
-                  }
-                }]
-              }
-            },
-            left: {
-              component: {
-                name: 'sn.Filter',
-                id: "SideMenu",
-                passProps: {
-                  singleSelectMode: true,
-                  options: JSON.stringify(this.optionsState),
-                  onOptionsChange: (options) => {
-                    this.optionsState.mergeWith(options);
-                  }
-                }
-              }
-            },
-            disableOpenGesture: false
-          }
-        }
-      });
+    if(KeysManager.get().isFirstRun()) {
+      KeysManager.get().handleFirstRun().then(ready);
+    } else {
+      ready();
     }
   }
 
-  reload() {
-    ApplicationState.get().setThemeChangeBegan();
+  render() {
+    if(!this.state.ready) {
+      return null;
+    }
 
-    Icons.get().loadIcons();
-
-    // reset search box
-    this.optionsState.setSearchTerm(null);
-
-    this.startApp();
-
-    setTimeout(function () {
-      ApplicationState.get().setThemeChangeEnded();
-    }, 100);
+    return <AppContainer /* persistenceKey="if-you-want-it" */ />;
   }
 }
-
-export {moment}

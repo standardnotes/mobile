@@ -1,42 +1,74 @@
 import React, { Component } from 'react';
-import {DeviceEventEmitter, Modal, View} from 'react-native';
+import {DeviceEventEmitter, Modal, View, Text} from 'react-native';
 import GlobalStyles from "../Styles";
-import App from "../app";
 import ApplicationState from "../ApplicationState";
-import {Navigation} from 'react-native-navigation';
+import HeaderTitleView from "../components/HeaderTitleView"
+import HeaderButtons, { HeaderButton, Item } from 'react-navigation-header-buttons';
+import Icon from 'react-native-vector-icons/Ionicons';
+
+const IoniconsHeaderButton = passMeFurther => (
+  // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
+  // and it is important to pass those props to `HeaderButton`
+  // then you may add some information like icon size or color (if you use icons)
+  <HeaderButton {...passMeFurther} IconComponent={Icon} iconSize={30} color={GlobalStyles.constants().mainTintColor} />
+);
 
 export default class Abstract extends Component {
 
-  static options(passProps) {
+  static getDefaultNavigationOptions = ({ navigation, navigationOptions, templateOptions }) => {
+    // templateOptions allow subclasses to specifiy things they want to display in nav bar before it actually loads.
+    // this way, things like title and the Done button in the top left are visible during transition
+    if(!templateOptions) { templateOptions = {}; }
+    let options = {
+      headerTitle:<HeaderTitleView title={navigation.getParam("title") || templateOptions.title} subtitle={navigation.getParam("subtitle") || templateOptions.subtitle}/>,
+      headerStyle: {
+        backgroundColor: GlobalStyles.constants().mainBackgroundColor
+      },
+      headerTintColor: GlobalStyles.constants().mainTintColor,
+      drawerLockMode: navigation.getParam("drawerLockMode") || templateOptions.drawerLockMode
+    }
 
-    return {
-      topBar: {
-        visible: true,
-        animate: false, // Controls whether TopBar visibility changes should be animated
-        hideOnScroll: false,
-        buttonColor: GlobalStyles.constants().mainTintColor,
-        drawBehind: false,
-        backButton: {
-          visible: true,
-          color: GlobalStyles.constants().mainTintColor
-        },
-        background: {
-          color: GlobalStyles.constants().mainBackgroundColor
-        },
-        title: {
-          color: GlobalStyles.constants().mainTextColor,
-          fontWeight: 'bold'
-        }
-      }
-    };
+    let headerLeft, headerRight;
+    let leftButton = navigation.getParam('leftButton') || templateOptions.leftButton;
+    if(leftButton) {
+      headerLeft = (
+        <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+          <Item disabled={leftButton.disabled} title={leftButton.title} iconName={leftButton.iconName} onPress={leftButton.onPress} />
+        </HeaderButtons>
+      )
+
+      options.headerLeft = headerLeft;
+    }
+
+    let rightButton = navigation.getParam('rightButton') || templateOptions.rightButton;
+    if(rightButton) {
+      headerRight = (
+        <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+          <Item disabled={rightButton.disabled} title={rightButton.title} iconName={rightButton.iconName} onPress={rightButton.onPress} />
+        </HeaderButtons>
+      )
+
+      options.headerRight = headerRight;
+    }
+
+    return options;
   }
+
+  static navigationOptions = ({ navigation, navigationOptions }) => {
+    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions});
+  };
 
   constructor(props) {
     super(props);
 
     this.state = {lockContent: true};
 
-    Navigation.events().bindComponent(this);
+    this.listeners = [
+      this.props.navigation.addListener('willFocus', payload => {this.componentWillFocus();}),
+      this.props.navigation.addListener('didFocus', payload => {this.componentDidFocus();}),
+      this.props.navigation.addListener('willBlur', payload => {this.componentWillBlur();}),
+      this.props.navigation.addListener('didBlur', payload => {this.componentDidBlur();})
+    ];
 
     this._stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(!this.isMounted()) {
@@ -53,25 +85,45 @@ export default class Abstract extends Component {
     })
   }
 
-  setTitle(title) {
-    Navigation.mergeOptions(this.props.componentId, {
-      topBar: {
-        title: {
-          text: title
-        }
-      }
-    })
+  componentWillUnmount() {
+    for(var listener of this.listeners) {
+      listener.remove();
+    }
+  }
+
+  componentWillFocus(){
+
+  }
+
+  componentDidFocus(){
+
+  }
+
+  componentWillBlur(){
+
+  }
+
+  componentDidBlur(){
+
+  }
+
+  getProp(prop) {
+    // this.props.navigation could be undefined if we're in the drawer
+    return this.props.navigation.getParam && this.props.navigation.getParam(prop);
+  }
+
+  setTitle(title, subtitle) {
+    let options = {};
+    options.title = title;
+    options.subtitle = subtitle;
+    this.props.navigation.setParams(options);
   }
 
   // Called by RNN
   componentDidAppear() {
-    console.log("Component did appear", this);
     this.visible = true;
     this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
     this.configureNavBar(false);
-    if(this.queuedSubtitle) {
-      this.setNavBarSubtitle(this.queuedSubtitle);
-    }
   }
 
   // Called by RNN
@@ -157,35 +209,7 @@ export default class Abstract extends Component {
 
   }
 
-  setNavBarSubtitle(title) {
-    if(!this.visible || !this.willBeVisible) {
-      this.queuedSubtitle = title;
-      return false;
-    }
-
-    this.queuedSubtitle = null;
-
-    console.log("Setting subtitle text", title);
-
-    var color = GlobalStyles.constantForKey(App.isIOS ? "mainTextColor" : "navBarTextColor");
-    Navigation.mergeOptions(this.props.componentId, {
-      topBar: {
-        subtitle: {
-          text: title,
-          color: GlobalStyles.hexToRGBA(color, 0.5),
-          fontSize: 12
-        }
-      }
-    });
-
-    return true;
-  }
-
   dismissModal() {
     Navigation.dismissModal();
   }
-
-
-
-
 }

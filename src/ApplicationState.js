@@ -1,6 +1,7 @@
-import {AppState} from 'react-native';
-import App from "./app"
+import {AppState, Platform} from 'react-native'
 import KeysManager from "./lib/keysManager"
+import OptionsState from "./OptionsState"
+var pjson = require('../package.json')
 
 export default class ApplicationState {
 
@@ -38,9 +39,52 @@ export default class ApplicationState {
     this.observers = [];
     this.locked = true;
     this.previousEvents = [];
+    this._isAndroid = Platform.OS === "android";
+
+    this.initializeOptions();
 
     AppState.addEventListener('change', this.handleAppStateChange);
     this.didLaunch();
+  }
+
+  initializeOptions() {
+    // Initialize Options (sort by, filter, selected tags, etc)
+    this.optionsState = new OptionsState();
+    this.optionsState.addChangeObserver((options) => {
+      if(!this.loading) {
+        options.persist();
+      }
+    });
+
+    this.optionsState.loadSaved();
+  }
+
+  getOptions() {
+    return this.optionsState;
+  }
+
+  static getOptions() {
+    return this.get().getOptions();
+  }
+
+  static get isAndroid() {
+    return this.get().isAndroid;
+  }
+
+  static get isIOS() {
+    return this.get().isIOS;
+  }
+
+  static get version() {
+    return this.isAndroid ? pjson.versionAndroid : pjson.versionIOS;
+  }
+
+  get isAndroid() {
+    return this._isAndroid;
+  }
+
+  get isIOS() {
+    return !this._isAndroid;
   }
 
   // Sent from App.js

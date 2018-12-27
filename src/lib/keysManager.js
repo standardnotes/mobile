@@ -1,5 +1,4 @@
 import {Platform} from 'react-native';
-import App from "../app"
 import FlagSecure from 'react-native-flag-secure-android';
 import ApplicationState from "../ApplicationState"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
@@ -159,7 +158,7 @@ export default class KeysManager {
   }
 
   updateScreenshotPrivacy(enabled) {
-    if(App.isIOS) {
+    if(ApplicationState.isIOS) {
       return;
     }
 

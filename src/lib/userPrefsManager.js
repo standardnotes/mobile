@@ -1,5 +1,4 @@
 import Storage from './sfjs/storageManager'
-import {moment} from "../app"
 
 const LastExportDateKey = "LastExportDateKey";
 

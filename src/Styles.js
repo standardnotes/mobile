@@ -1,11 +1,11 @@
 import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
-import App from "./app"
 import ModelManager from "./lib/sfjs/modelManager"
 import Server from "./lib/sfjs/httpManager"
 import Sync from './lib/sfjs/syncManager'
 import Storage from "./lib/sfjs/storageManager"
 import Auth from "./lib/sfjs/authManager"
 import KeysManager from './lib/keysManager'
+import ApplicationState from './ApplicationState'
 
 export default class GlobalStyles {
 
@@ -181,7 +181,7 @@ export default class GlobalStyles {
         Storage.get().setItem("activeTheme", JSON.stringify(theme));
       }
 
-      App.get().reload();
+      // App.get().reload();
     }
 
     if(!theme.hasMobileRules()) {
@@ -225,7 +225,7 @@ export default class GlobalStyles {
       url = url + ".json";
     }
 
-    if(App.isAndroid && url.includes("localhost")) {
+    if(ApplicationState.isAndroid && url.includes("localhost")) {
       url = url.replace("localhost", "10.0.2.2");
     }
 
@@ -538,7 +538,7 @@ export default class GlobalStyles {
 
       titleWrapperStyle: GlobalStyles.styles().actionSheetTitleWrapper,
       titleTextStyle: GlobalStyles.styles().actionSheetTitleText,
-      tintColor: App.isIOS ? undefined : GlobalStyles.constants().mainTintColor,
+      tintColor: ApplicationState.isIOS ? undefined : GlobalStyles.constants().mainTintColor,
 
       buttonUnderlayColor: GlobalStyles.constants().plainCellBorderColor,
 

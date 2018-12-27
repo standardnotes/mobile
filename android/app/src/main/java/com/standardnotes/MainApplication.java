@@ -9,8 +9,10 @@ import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import com.facebook.react.ReactApplication;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.shell.MainReactPackage;
@@ -26,82 +28,60 @@ import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 import com.kristiansorens.flagsecure.FlagSecurePackage;
 import com.bugsnag.BugsnagReactNative;
 
-import com.reactnativenavigation.NavigationApplication;
-import com.reactnativenavigation.react.NavigationReactNativeHost;
-import com.reactnativenavigation.react.ReactGateway;
-
 import java.util.Arrays;
 import java.util.List;
 
 
-public class MainApplication extends NavigationApplication {
+public class MainApplication extends Application implements ReactApplication {
 
+  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
-    protected ReactGateway createReactGateway() {
-        ReactNativeHost host = new NavigationReactNativeHost(this, isDebug(), createAdditionalReactPackages()) {
-            @Override
-            protected String getJSMainModuleName() {
-                return "index";
-            }
-        };
-        return new ReactGateway(this, isDebug(), host);
+    public boolean getUseDeveloperSupport() {
+      return BuildConfig.DEBUG;
     }
 
-  @Override
-  public boolean isDebug() {
-    // Make sure you are using BuildConfig from your own application
-    return BuildConfig.DEBUG;
-  }
+    @Override
+    protected List<ReactPackage> getPackages() {
+      return Arrays.<ReactPackage>asList(
+              new MainReactPackage(),
+            new RNGestureHandlerPackage(),
+              BugsnagReactNative.getPackage(),
+              new KeychainPackage(),
+              new VectorIconsPackage(),
+              new RCTAesPackage(),
+              new RNMail(),
+              new ReactNativeFingerprintScannerPackage(),
+              new SNTextViewPackage(),
+              new FlagSecurePackage()
+      );
+    }
 
-//  protected  List<ViewManager> createViewManagers(ReactApplicationContext reactContext){
-//    return Arrays.<ViewManager>asList();
-//  }
-
-
-  protected List<ReactPackage> getPackages() {
-    return Arrays.asList(
-//            new MainReactPackage(),
-            BugsnagReactNative.getPackage(),
-            new KeychainPackage(),
-            new VectorIconsPackage(),
-            new RCTAesPackage(),
-            new RNMail(),
-            new ReactNativeFingerprintScannerPackage(),
-            new SNTextViewPackage(),
-            new FlagSecurePackage()
-    );
-  }
-// =======
-//     @Override
-//     protected List<ReactPackage> getPackages() {
-//       return Arrays.<ReactPackage>asList(
-//           new MainReactPackage()
-//       );
-//     }
-//
-//     @Override
-//     protected String getJSMainModuleName() {
-//       return "index";
-//     }
-//   };
-// >>>>>>> theirs
+    @Override
+    protected String getJSMainModuleName() {
+      return "index";
+    }
+  };
 
   @Override
-  @Nullable
-  public List<ReactPackage> createAdditionalReactPackages() {
-    return getPackages();
+  public ReactNativeHost getReactNativeHost() {
+    return mReactNativeHost;
   }
 
   @Override
   public void onCreate() {
     super.onCreate();
 
+    SoLoader.init(this, /* native exopackage */ false);
+
+    // Set AsyncStorage size, default is 6mb
+    long size = 50L * 1024L * 1024L; // 50 MB
+    com.facebook.react.modules.storage.ReactDatabaseSupplier.getInstance(getApplicationContext()).setMaximumSize(size);
+
     registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
       @Override
       public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
       }
-
 
 
       @Override
@@ -132,24 +112,10 @@ public class MainApplication extends NavigationApplication {
       public void onActivityDestroyed(Activity activity) {
       }
 
-      public void sendEvent(String eventName) {
-        ReactContext context = getReactGateway().getReactNativeHost().getReactInstanceManager().getCurrentReactContext();
-        if(context != null) {
-          context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, null);
-
-        }
-      }
-
     });
 
-    if(!isDebug()) {
+    if(!BuildConfig.DEBUG) {
       BugsnagReactNative.start(this);
     }
-
-    SoLoader.init(this, /* native exopackage */ false);
-
-    // Set AsyncStorage size, default is 6mb
-    long size = 50L * 1024L * 1024L; // 50 MB
-    com.facebook.react.modules.storage.ReactDatabaseSupplier.getInstance(getApplicationContext()).setMaximumSize(size);
   }
 }

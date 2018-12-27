@@ -3,7 +3,6 @@ import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text, Modal, Ap
 import NoteCell from "./NoteCell"
 import Search from 'react-native-search-box'
 import GlobalStyles from "../Styles"
-import App from "../app"
 import Authenticate from "../screens/Authenticate"
 import ApplicationState from "../ApplicationState";
 

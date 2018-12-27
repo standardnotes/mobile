@@ -28,21 +28,6 @@ buildscript {
     }
 }
 
-subprojects { subproject ->
-        afterEvaluate {
-                if ((subproject.plugins.hasPlugin('android') || subproject.plugins.hasPlugin('android-library'))) {
-                        android {
-                                variantFilter { variant ->
-                                        def names = variant.flavors*.name
-                                    if (names.contains("reactNative51") || names.contains("reactNative55") || names.contains("reactNative56") || names.contains("reactNative57")) {
-                                                setIgnore(true)
-                                            }
-                                    }
-                            }
-                    }
-            }
-    }
-
 allprojects {
     repositories {
         mavenLocal()

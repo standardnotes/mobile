@@ -1,5 +1,3 @@
-import {Navigation} from 'react-native-navigation';
-
 import Notes from './Notes'
 import Compose from './Compose'
 import Account from './Account'

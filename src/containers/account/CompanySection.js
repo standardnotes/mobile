@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import GlobalStyles from "../../Styles"
+import ApplicationState from "../../ApplicationState"
 import {TextInput, View, Text, Platform} from 'react-native';
 
 import SectionHeader from "../../components/SectionHeader";
@@ -7,8 +8,6 @@ import ButtonCell from "../../components/ButtonCell";
 import TableSection from "../../components/TableSection";
 import SectionedTableCell from "../../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../../components/SectionedAccessoryTableCell";
-
-import App from "../../app"
 
 export default class CompanySection extends Component {
   render() {
@@ -30,7 +29,7 @@ export default class CompanySection extends Component {
 
         <ButtonCell last={true} leftAligned={true} title="Rate Standard Notes" onPress={() => this.props.onAction("rate")} >
           <View style={{display: "flex", flexDirection: "column"}}>
-            <Text style={{color: GlobalStyles.constants().mainDimColor, marginTop: 3}}>Version {App.version}</Text>
+            <Text style={{color: GlobalStyles.constants().mainDimColor, marginTop: 3}}>Version {ApplicationState.version}</Text>
             <Text style={{color: GlobalStyles.constants().mainDimColor, marginTop: 3}}>Help support us with a review on the {storeName}.</Text>
           </View>
         </ButtonCell>

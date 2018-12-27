@@ -3,7 +3,7 @@ import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text } from 're
 import NoteCell from "./NoteCell"
 import Search from 'react-native-search-box'
 import GlobalStyles from "../Styles"
-import App from "../app"
+import ApplicationState from "../ApplicationState"
 
 export default class NoteList extends Component {
 
@@ -54,7 +54,7 @@ export default class NoteList extends Component {
     // On Android, only one tag is selected at a time. If it is selected, we don't need to display the tags string
     // above the note cell
     let selectedTags = this.props.selectedTags || [];
-    let renderTags = App.isIOS || selectedTags.length == 0 || (!item.tags.includes(selectedTags[0]));
+    let renderTags = ApplicationState.isIOS || selectedTags.length == 0 || (!item.tags.includes(selectedTags[0]));
 
     return (
       <NoteCell

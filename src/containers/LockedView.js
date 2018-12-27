@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import GlobalStyles from "../Styles"
-import App from "../app"
 import Icon from 'react-native-vector-icons/Ionicons';
 
 export default class LockedView extends Component {

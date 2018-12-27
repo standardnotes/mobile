@@ -2,10 +2,10 @@
 let ClientDataDomain = "org.standardnotes.sn.components";
 
 import GlobalStyles from '../Styles'
-import App from '../app'
 import ModelManager from './sfjs/modelManager'
 import Sync from './sfjs/syncManager'
 import SF from "./sfjs/sfjs"
+import ApplicationState from "../ApplicationState"
 
 export default class ComponentManager {
 
@@ -147,7 +147,7 @@ export default class ComponentManager {
   }
 
   urlForComponent(component) {
-    var localReplacement = App.isIOS ? "localhost" : "10.0.2.2";
+    var localReplacement = ApplicationState.isIOS ? "localhost" : "10.0.2.2";
     var url = component.hosted_url || component.url;
     if(url) {
       url = url.replace("localhost", localReplacement).replace("sn.local", localReplacement);
@@ -202,7 +202,7 @@ export default class ComponentManager {
     for(let handler of this.handlers) {
       if(handler.areas.includes(component.area) || handler.areas.includes("*")) {
         setTimeout(function () {
-          handler.actionHandler(component, message.action, message.data);
+          handler.actionHandler && handler.actionHandler(component, message.action, message.data);
         }, 10);
       }
     }

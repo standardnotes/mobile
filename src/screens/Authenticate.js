@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import App from "../app"
 import SF from '../lib/sfjs/sfjs'
 import Storage from '../lib/sfjs/storageManager'
 import Auth from '../lib/sfjs/authManager'
@@ -15,7 +14,8 @@ import SectionedOptionsTableCell from "../components/SectionedOptionsTableCell";
 import GlobalStyles from "../Styles"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {Navigation} from 'react-native-navigation';
+
+import ApplicationState from "../ApplicationState"
 
 import {
   TextInput,
@@ -143,7 +143,7 @@ export default class Authenticate extends Abstract {
 
     var isAuthenticating = this.props.mode === "authenticate";
     var isSetup = !isAuthenticating;
-    var paddingTop = (App.isIOS && GlobalStyles.isIPhoneX()) ? 30 : 15;
+    var paddingTop = (ApplicationState.isIOS && GlobalStyles.isIPhoneX()) ? 30 : 15;
 
     return (
       <View style={GlobalStyles.styles().flexContainer}>
@@ -288,7 +288,7 @@ class PasscodeSection extends Abstract {
     }
 
     refreshKeyboard() {
-      if(App.isIOS) {
+      if(ApplicationState.isIOS) {
         // on Android, keyboard will update right away
         Keyboard.dismiss();
         setTimeout(() => {
@@ -401,7 +401,7 @@ class FingerprintSection extends Abstract {
     this.mergeState({began: true, error: null});
 
     console.log("Creating FingerprintScanner Instance");
-    if(App.isAndroid) {
+    if(ApplicationState.isAndroid) {
       FingerprintScanner.authenticate({ onAttempt: this.handleInvalidAttempt }).then(() => {
         this.handleSuccessfulAuth();
       })
@@ -465,7 +465,7 @@ class FingerprintSection extends Abstract {
   render() {
     let iconColor = this.state.success ? "green" : GlobalStyles.constants().mainTextColor;
     let textStyles = [this.styles.text];
-    var iconName = App.isAndroid ? "md-finger-print" : 'ios-finger-print';
+    var iconName = ApplicationState.isAndroid ? "md-finger-print" : 'ios-finger-print';
 
     var text;
     if(this.state.began) {
@@ -483,7 +483,7 @@ class FingerprintSection extends Abstract {
     }
 
     if(this.state.success) {
-      iconName = App.isAndroid ? "md-checkmark-circle-outline" : "ios-checkmark-circle-outline";
+      iconName = ApplicationState.isAndroid ? "md-checkmark-circle-outline" : "ios-checkmark-circle-outline";
       text = `${this.props.biometricsNoun} Successful`;
       textStyles.push(this.styles.success);
     }

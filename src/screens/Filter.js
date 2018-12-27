@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { TextInput, SectionList, ScrollView, View, Text, Linking, Share, Platform, StatusBar, FlatList, Dimensions } from 'react-native';
-import App from "../app"
 import Sync from '../lib/sfjs/syncManager'
 import ModelManager from '../lib/sfjs/modelManager'
 import ComponentManager from '../lib/componentManager'
@@ -18,12 +17,18 @@ import OptionsState from "../OptionsState"
 import GlobalStyles from "../Styles"
 import ApplicationState from "../ApplicationState";
 import ActionSheet from 'react-native-actionsheet'
-import {Navigation} from 'react-native-navigation';
+
+import { SafeAreaView } from 'react-navigation';
+import Icon from 'react-native-vector-icons/Ionicons';
+import FAB from 'react-native-fab';
 
 export default class Filter extends Abstract {
 
-  static navigatorStyle = {
-    tabBarHidden: true
+  static navigationOptions = ({ navigation, navigationOptions }) => {
+    let templateOptions = {
+      title: "Options"
+    }
+    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
   };
 
   constructor(props) {
@@ -33,7 +38,11 @@ export default class Filter extends Abstract {
 
   loadInitialState() {
     super.loadInitialState();
-    this.options = new OptionsState(JSON.parse(this.props.options));
+    if(this.getProp("options")) {
+      this.options = new OptionsState(JSON.parse(this.getProp("options")));
+    } else {
+      this.options = ApplicationState.getOptions();
+    }
 
     var selectedTags;
     if(this.options.selectedTags) {
@@ -44,30 +53,16 @@ export default class Filter extends Abstract {
 
     this.mergeState({tags: [], selectedTags: selectedTags, options: this.options});
 
-    if(this.props.noteId) {
-      this.note = ModelManager.get().findItem(this.props.noteId);
+    if(this.getProp("noteId")) {
+      this.note = ModelManager.get().findItem(this.getProp("noteId"));
     }
-
-    // React Native Navigation has an issue where navigation pushes are pushed first, then rendered.
-    // This causes an undesired flash while content loads. To reduce the flash, we load the easy stuff first
-    // then wait a little to render the rest, such as a dynamic list of tags
-    // See https://github.com/wix/react-native-navigation/issues/358
 
     let handleInitialDataLoad = () => {
       if(this.handledDataLoad) { return; }
       this.handledDataLoad = true;
 
-      if(!this.props.singleSelectMode) {
-        // Load tags after delay
-        setTimeout(function () {
-          this.loadTags = true;
-          this.forceUpdate();
-        }.bind(this), 10);
-      } else {
-        // Load tags immediately on every render
-        this.loadTags = true;
-        this.forceUpdate();
-      }
+      this.loadTags = true;
+      this.forceUpdate();
     }
 
     if(Sync.get().initialDataLoaded()) {
@@ -93,122 +88,16 @@ export default class Filter extends Abstract {
     Sync.get().removeEventHandler(this.syncEventHandler);
   }
 
-  notifyParentOfOptionsChange() {
-    this.props.onOptionsChange(this.options);
-
-    if(App.isAndroid && this.props.singleSelectMode) {
-      Navigation.toggleDrawer({
-        side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
-        animated: true, // does the toggle have transition animation or does it happen immediately (optional)
-        to: 'closed' // optional, 'open' = open the drawer, 'closed' = close it, missing = the opposite of current state
-      });
-    }
-  }
-
-  // on iOS, declaring nav bar buttons as static prevents the flickering issue that occurs on nav push
-
-  static navigatorButtons = Platform.OS == 'android' ? {} : {
-    rightButtons: [{
-      text: 'New Tag',
-      id: 'new-tag',
-      showAsAction: 'ifRoom',
-    }]
-  };
-
-  configureNavBar() {
-    super.configureNavBar();
-
-    var leftButtons = [];
-    if(!this.note || Platform.OS == "android") {
-      // tags only means we're presenting horizontally, only want left button on modal
-      leftButtons.push({
-        text: 'Done',
-        id: 'accept',
-        showAsAction: 'ifRoom',
-        buttonFontWeight: "bold",
-        buttonFontSize: 17
-      })
-    }
-    var rightButton = {
-      text: 'New Tag',
-      id: 'new-tag',
-      showAsAction: 'ifRoom',
-    };
-
-    if(Platform.OS === "android") {
-      // Android will use FAB for new tag instead
-      rightButton = {};
-    }
-
-    Navigation.mergeOptions(this.props.componentId, {
-      topBar: {
-        rightButtons: [rightButton],
-        leftButtons: leftButtons,
-        animated: false,
-        title: {
-          text: 'Options'
-        }
-        // fab: {
-        //   collapsedId: 'new-tag',
-        //   collapsedIcon: Icons.getIcon('md-add'),
-        //   backgroundColor: GlobalStyles.constants().mainTintColor
-        // },
-      }
-    });
-  }
-
-  navigationButtonPressed({ buttonId }) {
-    if (buttonId == 'accept') { // this is the same id field from the static navigatorButtons definition
-      if(this.note) {
-        Navigation.pop(this.props.componentId);
-      } else {
-        this.didNotifyParent = true;
-        this.notifyParentOfOptionsChange();
-        this.dismiss();
-      }
-    } else if(buttonId == 'new-tag') {
-      Navigation.showModal({
-        stack: {
-          children: [{
-            component: {
-              name: 'sn.InputModal',
-              animationType: 'slide-up',
-              options: {
-                topBar: {
-                  title: {
-                    text: 'New Tag'
-                  }
-                }
-              },
-              passProps: {
-                title: 'New Tag',
-                placeholder: "New tag name",
-                onSave: (text) => {
-                  this.createTag(text, (tag) => {
-                    if(this.note) {
-                      // select this tag
-                      this.onTagSelect(tag)
-                    }
-                  });
-                }
-              }
-            }
-          }]
-        }
-      });
-    }
-  }
-
-  componentDidAppear() {
-    super.componentDidAppear();
+  componentDidFocus() {
+    super.componentDidFocus();
     this.forceUpdate();
   }
 
-  componentDidDisappear() {
-    super.componentDidDisappear();
+  componentDidBlur() {
+    super.componentDidBlur();
 
     // will disappear
-    if(!this.props.singleSelectMode) {
+    if(!this.isSingleSelectMode) {
       // we prefer to notify the parent via NavBarButtonPress.accept, but when this view is presented via nav push,
       // the user can swipe back and miss that. So we do it here as a backup.
       if(!this.didNotifyParent) {
@@ -218,13 +107,26 @@ export default class Filter extends Abstract {
   }
 
   dismiss = () => {
-    if(this.note) {
-      Navigation.pop(this.props.componentId);
-    } else {
-      Navigation.dismissModal(this.props.componentId, {
-        animationType: "slide-down"
-      });
-    }
+    this.props.navigation.goBack();
+  }
+
+  notifyParentOfOptionsChange() {
+    this.getProp("onOptionsChange")(this.options);
+  }
+
+  presentNewTag() {
+    this.props.navigation.navigate("NewTag", {
+      title: 'New Tag',
+      placeholder: "New tag name",
+      onSave: (text) => {
+        this.createTag(text, (tag) => {
+          if(this.note) {
+            // select this tag
+            this.onTagSelect(tag)
+          }
+        });
+      }
+    })
   }
 
   createTag(text, callback) {
@@ -240,7 +142,7 @@ export default class Filter extends Abstract {
 
   onSortChange = (key) => {
     this.options.setSortBy(key);
-    if(this.props.singleSelectMode) {
+    if(this.isSingleSelectMode) {
       this.notifyParentOfOptionsChange();
     }
   }
@@ -248,7 +150,7 @@ export default class Filter extends Abstract {
   onTagSelect = (tag) => {
     var selectedTags;
 
-    if(this.props.singleSelectMode) {
+    if(this.isSingleSelectMode) {
       selectedTags = [tag.uuid];
     } else {
       selectedTags = this.state.selectedTags;
@@ -270,7 +172,7 @@ export default class Filter extends Abstract {
     this.options.setSelectedTags(selectedTags);
     this.setState({selectedTags: selectedTags});
 
-    if(this.props.singleSelectMode) {
+    if(this.isSingleSelectMode) {
       this.notifyParentOfOptionsChange();
     }
   }
@@ -294,7 +196,7 @@ export default class Filter extends Abstract {
 
   onManageNoteEvent(event) {
     ItemActionManager.handleEvent(event, this.note, () => {
-        this.props.onManageNoteEvent();
+        this.getProp("onManageNoteEvent")();
         if(event == ItemActionManager.DeleteEvent) {
           Navigation.popToRoot({
             animated: true,
@@ -308,7 +210,7 @@ export default class Filter extends Abstract {
     this.forceUpdate();
     // this.mergeState({archivedOnly: this.options.archivedOnly});
 
-    if(this.props.singleSelectMode) {
+    if(this.isSingleSelectMode) {
       this.notifyParentOfOptionsChange();
     }
   }
@@ -321,7 +223,7 @@ export default class Filter extends Abstract {
       ComponentManager.get().clearEditorForNote(this.note);
     }
 
-    this.props.onEditorSelect && this.props.onEditorSelect(editor);
+    this.getProp("onEditorSelect") && this.getProp("onEditorSelect")(editor);
 
     this.dismiss();
   }
@@ -337,18 +239,16 @@ export default class Filter extends Abstract {
     if(close) { this.dismiss(); }
   }
 
+  presentSettings() {
+    this.props.navigation.navigate("Settings");
+  }
+
+  get isSingleSelectMode() {
+    return this.getProp("singleSelectMode");
+  }
+
   render() {
     var viewStyles = [GlobalStyles.styles().container];
-
-    if(App.isAndroid && this.props.singleSelectMode) {
-      // See https://github.com/wix/react-native-navigation/issues/1942
-      var {height, width} = Dimensions.get('window');
-      var drawerWidth = Math.min(width * 0.8, 450);
-      if(drawerWidth == 0) {
-        drawerWidth = 320;
-      }
-      viewStyles.push({width: drawerWidth});
-    }
 
     if(this.state.lockContent) {
       return (<LockedView style={viewStyles} />);
@@ -356,14 +256,14 @@ export default class Filter extends Abstract {
 
     if(this.loadTags) {
       var tags = ModelManager.get().tags.slice();
-      if(this.props.singleSelectMode) {
+      if(this.isSingleSelectMode) {
         tags.unshift({title: "All notes", key: "all", uuid: 100})
       }
       this.tags = tags;
     }
 
     return (
-      <View style={viewStyles}>
+      <SafeAreaView style={viewStyles}>
         <ScrollView style={GlobalStyles.styles().view}>
 
           {!this.note &&
@@ -386,14 +286,22 @@ export default class Filter extends Abstract {
             tags={this.tags}
             selected={this.state.selectedTags}
             onTagSelect={this.onTagSelect}
-            hasClearButton={!this.props.singleSelectMode && this.state.selectedTags.length > 0}
+            hasClearButton={!this.isSingleSelectMode && this.state.selectedTags.length > 0}
             clearSelection={this.clearTags}
             onManageTagEvent={this.onManageTagEvent}
             title={"Tags"}
            />
-
         </ScrollView>
-      </View>
+
+        <FAB
+          buttonColor={GlobalStyles.constants().mainTintColor}
+          iconTextColor={GlobalStyles.constants().mainBackgroundColor}
+          onClickAction={() => {this.note ? this.presentNewTag() : this.presentSettings()}}
+          visible={true}
+          iconTextComponent={<Icon name={this.note ? "md-pricetag" : "md-settings"}/>}
+        />
+
+      </SafeAreaView>
     );
   }
 }

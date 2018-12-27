@@ -27,16 +27,33 @@ import CompanySection from "../containers/account/CompanySection"
 import LockedView from "../containers/LockedView";
 import ApplicationState from "../ApplicationState";
 import GlobalStyles from "../Styles"
-import App from "../app"
-import {Navigation} from 'react-native-navigation';
 
 var base64 = require('base-64');
 var Mailer = require('NativeModules').RNMail;
 
 export default class Account extends Abstract {
 
+  static navigationOptions = ({ navigation, navigationOptions }) => {
+    let templateOptions = {
+      title: "Settings",
+      leftButton: {
+        title: "Done"
+      }
+    }
+    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
+  };
+
   constructor(props) {
     super(props);
+
+    props.navigation.setParams({
+      leftButton: {
+        title: "Done",
+        onPress: () => {
+          this.dismiss();
+        }
+      }
+    })
 
     this.constructState({params: {}});
   }
@@ -71,6 +88,13 @@ export default class Account extends Abstract {
     this.loadSecurityStatus();
   }
 
+  dismiss() {
+    /*
+      the `null` parameter is actually very important: https://reactnavigation.org/docs/en/navigation-prop.html#goback-close-the-active-screen-and-move-back
+    */
+    this.props.navigation.goBack(null);
+  }
+
   loadSecurityStatus() {
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
     var hasFingerprint = KeysManager.get().hasFingerprint();
@@ -94,35 +118,10 @@ export default class Account extends Abstract {
     })
   }
 
-  configureNavBar() {
-    super.configureNavBar();
-
-    if(App.get().isAndroid) {
-      Navigation.mergeOptions(this.props.componentId, {
-        topBar: {
-          leftButtons: [
-            {
-              text: "Close",
-              id: 'cancel',
-              showAsAction: 'ifRoom',
-            },
-          ],
-        }
-        // animated: false
-      });
-    }
-  }
-
-  componentDidAppear() {
-    super.componentDidAppear();
+  componentDidFocus() {
+    super.componentDidFocus();
     this.loadSecurityStatus();
     this.forceUpdate();
-  }
-
-  navigationButtonPressed({ buttonId }) {
-    if(buttonId == 'cancel') {
-      this.returnToNotesScreen();
-    }
   }
 
   validate(email, password) {
@@ -251,21 +250,8 @@ export default class Account extends Abstract {
   onAuthSuccess = (callback) => {
     Sync.get().markAllItemsDirtyAndSaveOffline(false).then(() => {
       callback && callback();
-      this.returnToNotesScreen();
+      this.dismiss();
     });
-  }
-
-  returnToNotesScreen = () => {
-    if(App.isIOS) {
-      Navigation.mergeOptions('MainTabBar', {
-        bottomTabs: {
-          currentTabIndex: 0
-        }
-      });
-      this.forceUpdate();
-    } else {
-      this.dismissModal();
-    }
   }
 
   onSignOutPress = () => {
@@ -275,6 +261,7 @@ export default class Account extends Abstract {
       confirmButtonText: "Sign Out",
       onConfirm: () => {
         Auth.get().signout().then(() => {
+          console.log("Signed out");
           this.forceUpdate();
         })
       }
@@ -317,8 +304,8 @@ export default class Account extends Abstract {
     }
 
     var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
-    var stringData = App.isIOS ? jsonString : base64.encode(unescape(encodeURIComponent(jsonString)))
-    var fileType = App.isAndroid ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
+    var stringData = ApplicationState.isIOS ? jsonString : base64.encode(unescape(encodeURIComponent(jsonString)))
+    var fileType = ApplicationState.isAndroid ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
 
     var calledCallback = false;
 
@@ -456,7 +443,7 @@ export default class Account extends Abstract {
   onCompanyAction = (action) => {
     if(action == "feedback") {
       var platformString = Platform.OS == "android" ? "Android" : "iOS";
-      Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} app feedback (v${App.version})`);
+      Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} app feedback (v${ApplicationState.version})`);
     } else if(action == "learn_more") {
       Linking.openURL("https://standardnotes.org");
     } else if(action == "privacy") {
@@ -464,7 +451,7 @@ export default class Account extends Abstract {
     } else if(action == "help") {
       Linking.openURL("https://standardnotes.org/help");
     } else if(action == "rate") {
-      if(App.isIOS) {
+      if(ApplicationState.isIOS) {
         Linking.openURL("https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8");
       } else {
         Linking.openURL("market://details?id=com.standardnotes");
@@ -474,7 +461,7 @@ export default class Account extends Abstract {
       var message = "Check out Standard Notes, a free, open-source, and completely encrypted notes app.";
       let url = "https://standardnotes.org";
       // Android ignores url. iOS ignores title.
-      if(App.isAndroid) {
+      if(ApplicationState.isAndroid) {
         message += "\n\nhttps://standardnotes.org";
       }
 

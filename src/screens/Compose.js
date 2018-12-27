@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import App from '../app'
 import Sync from '../lib/sfjs/syncManager'
 import ModelManager from '../lib/sfjs/modelManager'
 import Auth from '../lib/sfjs/authManager'
@@ -8,11 +7,11 @@ import Abstract from "./Abstract"
 import Webview from "./Webview"
 import ComponentManager from '../lib/componentManager'
 import Icons from '../Icons';
+import ApplicationState from '../ApplicationState';
 import LockedView from "../containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import TextView from "sn-textview";
-import {Navigation} from 'react-native-navigation';
 
 import {
   StyleSheet,
@@ -30,13 +29,21 @@ import GlobalStyles from "../Styles"
 
 export default class Compose extends Abstract {
 
-  static navigatorStyle = {
-    tabBarHidden: true
+  static navigationOptions = ({ navigation, navigationOptions }) => {
+    let templateOptions = {
+      title: "Compose",
+      rightButton: {
+        title: "Options"
+      }
+    }
+    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
   };
 
   constructor(props) {
     super(props);
-    var note = ModelManager.get().findItem(props.noteId);
+
+    let note, noteId = this.getProp("noteId");
+    if(noteId) { note = ModelManager.get().findItem(noteId);}
     if(!note) {
       note = ModelManager.get().createItem({content_type: "Note", dummy: true, text: ""});
       // We needed to add the item originally for default editors to work, but default editors was removed
@@ -48,6 +55,16 @@ export default class Compose extends Abstract {
 
     this.note = note;
     this.constructState({title: note.title, text: note.text});
+
+    props.navigation.setParams({
+      title: 'Compose',
+      drawerLockMode: "locked-closed",
+      rightButton: {
+        title: "Options",
+        onPress: () => {this.presentOptions();},
+        disabled: !this.note.uuid
+      }
+    })
 
     this.loadStyles();
 
@@ -91,53 +108,8 @@ export default class Compose extends Abstract {
     ComponentManager.get().deregisterHandler(this.componentHandler);
   }
 
-  // on iOS, declaring nav bar buttons as static prevents the flickering issue that occurs on nav push
-
-  static navigatorButtons = Platform.OS == 'android' ? {} : {
-    rightButtons: [{
-      title: "Manage",
-      id: 'tags',
-      showAsAction: 'ifRoom',
-    }]
-  };
-
-  configureNavBar(initial) {
-    super.configureNavBar();
-
-    // Only edit the nav bar once, it wont be changed
-    if(!initial) {
-      return;
-    }
-
-    var tagButton = {
-      text: "Manage",
-      id: 'tags',
-      showAsAction: 'ifRoom',
-    }
-
-    if(Platform.OS === "android") {
-      tagButton.icon = Icons.getIcon("md-pricetag");
-    }
-
-    if(!this.note.uuid) {
-      if(App.isIOS) {
-        tagButton.disabled = true;
-      } else {
-        tagButton = {};
-      }
-    }
-
-    Navigation.mergeOptions(this.props.componentId, {
-      topBar: {
-        rightButtons: [tagButton],
-        animated: false
-      }
-    });
-  }
-
-  componentDidAppear() {
-    super.componentDidAppear();
-    // Will appear
+  componentWillFocus() {
+    super.componentWillFocus();
     if(this.needsEditorReload) {
       this.forceUpdate();
       this.needsEditorReload = false;
@@ -149,59 +121,47 @@ export default class Compose extends Abstract {
         this.changesMade();
       }, 300);
     }
+  }
 
-    // Did Appear
+  componentDidFocus() {
+    super.componentDidFocus();
+
     if(this.note.dummy) {
       if(this.refs.input) {
         this.refs.input.focus();
       }
     }
 
-    if(App.isIOS) {
+    if(ApplicationState.isIOS) {
       if(this.note.dummy && this.input) {
         this.input.focus();
       }
     }
   }
 
-  componentDidDisappear() {
-    super.componentDidDisappear();
-  }
-
-  navigationButtonPressed({ buttonId }) {
-    if (buttonId == 'tags') {
-      this.showOptions();
-    }
-  }
-
-
-  showOptions() {
-    if(App.isAndroid && this.input) {
+  presentOptions() {
+    if(ApplicationState.isAndroid && this.input) {
       this.input.blur();
     }
 
-    this.previousOptions = {selectedTags: this.note.tags.map(function(tag){return tag.uuid})};
-     Navigation.push(this.props.componentId, {
-       component: {
-         name: 'sn.Filter',
-         passProps: {
-           noteId: this.note.uuid,
-           onManageNoteEvent: () => {this.forceUpdate()},
-           singleSelectMode: false,
-           options: JSON.stringify(this.previousOptions),
-           onEditorSelect: () => {
-             this.needsEditorReload = true;
-           },
-           onOptionsChange: (options) => {
-             if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
-               var tags = ModelManager.get().findItems(options.selectedTags);
-               this.replaceTagsForNote(tags);
-               this.note.setDirty(true);
-               this.changesMade();
-             }
-           }
-         }
-       }
+    this.previousOptions = {selectedTags: this.note.tags.map((tag) => {return tag.uuid})};
+
+    this.props.navigation.navigate("NoteOptions", {
+      noteId: this.note.uuid,
+      onManageNoteEvent: () => {this.forceUpdate()},
+      singleSelectMode: false,
+      options: JSON.stringify(this.previousOptions),
+      onEditorSelect: () => {
+        this.needsEditorReload = true;
+      },
+      onOptionsChange: (options) => {
+        if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
+          var tags = ModelManager.get().findItems(options.selectedTags);
+          this.replaceTagsForNote(tags);
+          this.note.setDirty(true);
+          this.changesMade();
+        }
+      }
     });
   }
 
@@ -241,7 +201,7 @@ export default class Compose extends Abstract {
   }
 
   showSavingStatus() {
-    this.setNavBarSubtitle("Saving...");
+    this.setTitle(null, "Saving...");
   }
 
   showSavedStatus(success) {
@@ -254,14 +214,14 @@ export default class Compose extends Abstract {
         }
         this.saveError = false;
         this.syncTakingTooLong = false;
-        this.setNavBarSubtitle(status);
+        this.setTitle(null, status);
       }, 200)
     } else {
       if(this.statusTimeout) clearTimeout(this.statusTimeout);
       this.statusTimeout = setTimeout(function(){
         this.saveError = true;
         this.syncTakingTooLong = false;
-        this.setNavBarSubtitle("Error syncing (changes saved offline)");
+        this.setTitle(null, "Error syncing (changes saved offline)");
       }.bind(this), 200)
     }
   }
@@ -275,8 +235,8 @@ export default class Compose extends Abstract {
       this.showSavingStatus();
       if(!this.note.uuid) {
         this.note.initUUID().then(() => {
-          if(this.props.selectedTagId) {
-            var tag = ModelManager.get().findItem(this.props.selectedTagId);
+          if(this.getProp("selectedTagId")) {
+            var tag = ModelManager.get().findItem(this.getProp("selectedTagId"));
             tag.addItemAsRelationship(this.note);
             tag.setDirty(true);
           }
@@ -369,7 +329,6 @@ export default class Compose extends Abstract {
 
         {shouldDisplayEditor &&
           <Webview
-            componentId="sn.Webview"
             key={noteEditor.uuid}
             noteId={this.note.uuid}
             editorId={noteEditor.uuid}

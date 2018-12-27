@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, StatusBar, Modal, Alert } from 'react-native';
-import {Navigation} from 'react-native-navigation';
+import { StyleSheet, View, Platform, Text, StatusBar, Modal, Alert, Button } from 'react-native';
 
-import App from "../app"
 import ModelManager from '../lib/sfjs/modelManager'
 import Storage from '../lib/sfjs/storageManager'
 import Sync from '../lib/sfjs/syncManager'
@@ -21,29 +19,34 @@ import AuthModal from "../containers/AuthModal"
 import LockedView from "../containers/LockedView"
 import ApplicationState from "../ApplicationState";
 
+import { DrawerActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
+import HeaderButtons, { HeaderButton, Item } from 'react-navigation-header-buttons';
+
+const IoniconsHeaderButton = passMeFurther => (
+  // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
+  // and it is important to pass those props to `HeaderButton`
+  // then you may add some information like icon size or color (if you use icons)
+  <HeaderButton {...passMeFurther} IconComponent={Icon} iconSize={30} color={GlobalStyles.constants().mainTintColor} />
+);
 
 export default class Notes extends Abstract {
-
   constructor(props) {
     super(props);
 
     this.rendersLockscreen = true;
 
-    Navigation.events().registerComponentDidAppearListener(({ componentId }) => {
-      console.log("registerComponentDidAppearListener", componentId);
-			if (componentId === "SideMenu") {
-				this.sideMenuVisible = true;
-			}
-		});
-
-		Navigation.events().registerComponentDidDisappearListener(({ componentId }) => {
-      console.log("registerComponentDidDisappearListener", componentId);
-			if (componentId === "SideMenu") {
-        this.sideMenuVisible = false;
-			}
-		});
+    props.navigation.setParams({
+      title: "Notes",
+      leftButton: {
+        title: null,
+        iconName: "ios-menu-outline",
+        onPress: () => {
+          this.openDrawer();
+        }
+      }
+    })
 
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(state == ApplicationState.Resuming) {
@@ -55,18 +58,9 @@ export default class Notes extends Abstract {
         var authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
         if((authProps.passcode || authProps.fingerprint)) {
           // Android can handle presenting modals no matter which screen you're on
-          if(App.isIOS) {
+          if(ApplicationState.isIOS) {
             // The auth modal is only presented if the Notes screen is visible.
-            Navigation.popToRoot(this.props.componentId);
-
-            // Don't use the below as it will also for some reason dismiss the non RNN auth modal as well
-            // Navigation.dismissAllModals({animationType: 'none'});
-
-            Navigation.mergeOptions('MainTabBar', {
-              bottomTabs: {
-                currentTabIndex: 0
-              }
-            });
+            this.props.navigation.popToTop();
           }
         }
       }
@@ -79,7 +73,7 @@ export default class Notes extends Abstract {
   }
 
   loadInitialState() {
-    this.options = App.get().globalOptions();
+    this.options = ApplicationState.getOptions();
 
     this.mergeState({
       refreshing: false,
@@ -92,6 +86,10 @@ export default class Notes extends Abstract {
     this.beginSyncTimer();
 
     super.loadInitialState();
+  }
+
+  componentDidMount() {
+    this.props.navigation.setParams({ toggleDrawer: this.toggleDrawer });
   }
 
   componentWillUnmount() {
@@ -117,16 +115,14 @@ export default class Notes extends Abstract {
 
   registerObservers() {
     this.optionsObserver = this.options.addChangeObserver((options, eventType) => {
+      this.closeDrawer();
       // should only show for non-search term change
       if(eventType !== OptionsState.OptionsStateChangeEventSearch) {
-        this.setNavBarSubtitle("Loading...");
+        this.setTitle(null, "Loading...");
         this.showingNavBarLoadingStatus = true;
       }
       this.reloadList(true);
-      // On iOS, configureNavBar would be handle by viewWillAppear. However, we're using a drawer in Android.
-      if(Platform.OS == "android" && !this.skipUpdatingNavBar) {
-        this.configureNavBar();
-      }
+      this.configureNavBar();
     })
 
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
@@ -253,14 +249,7 @@ export default class Notes extends Abstract {
 
   configureNavBar(initial = false) {
     // If you change anything here, be sure to test how it interacts with filtering, when you change which tags to show.
-    if(this.state.lockContent || (!this.visible && !this.willBeVisible)) {
-      this.needsConfigureNavBar = true;
-      return;
-    }
-
-    if(!this.dataLoaded) {
-      this.notesTitle = "Notes";
-      this.setTitle(this.notesTitle);
+    if(this.state.lockContent ) {
       this.needsConfigureNavBar = true;
       return;
     }
@@ -270,119 +259,37 @@ export default class Notes extends Abstract {
     super.configureNavBar();
 
     var options = this.options;
-
     var notesTitle = "Notes";
-    var filterTitle = "Filter";
     var numTags = options.selectedTags.length;
 
-    if(App.isIOS && (numTags > 0 || options.archivedOnly)) {
-      if(numTags > 0) {
-        filterTitle += ` (${numTags})`
-      }
-      notesTitle = options.archivedOnly ? "Archived Notes" : "Filtered Notes";
-    }
-
-    // Android only allows 1 tag selection
-    if(App.isAndroid) {
-      if(numTags > 0) {
-        var tags = ModelManager.get().findItems(options.selectedTags);
-        if(tags.length > 0) {
-          var tag = tags[0];
-          notesTitle = tag.title + " notes";
-        } else {
-          notesTitle = "Notes";
-        }
-      }
-
-      if(options.archivedOnly) {
-        notesTitle = "Archived " + notesTitle;
-      }
-    }
-
-    // if(notesTitle !== this.notesTitle) {
-    //   // no changes, return. We do this so when swiping back from compose to here,
-    //   // we don't change the title while a transition is taking place
-    //
-    //   this.setTitle({title: notesTitle, animated: false});
-    // }
-    this.notesTitle = notesTitle;
-
-    if(!initial && App.isIOS && filterTitle === this.filterTitle) {
-      // On Android, we want to always run the bottom code in the case of the FAB that doesn't
-      // reappaer if on the next screen a keyboard is present and you hit back.
-      // on iOS, navigation button stack is saved so it only needs to be configured once
-      return;
-    }
-
-    this.filterTitle = filterTitle;
-
-    var rightButtons = [];
-    if(App.get().isIOS) {
-      rightButtons.push({
-        text: 'New',
-        id: 'new',
-        showAsAction: 'ifRoom',
-      })
-    } else {
-      rightButtons.push({
-        text: 'Settings',
-        id: 'settings',
-        showAsAction: 'ifRoom',
-        icon: Icons.getIcon('md-settings'),
-      })
-    }
-
-    let leftButtons = [
-      {
-        id: 'sideMenu',
-        showAsAction: 'ifRoom',
-        icon: Icons.getIcon('ios-menu-outline'),
-        color: GlobalStyles.constants().mainTintColor
-      },
-    ]
-
-    Navigation.mergeOptions(this.props.componentId, {
-      topBar: {
-        leftButtons: leftButtons,
-        rightButtons: rightButtons,
-        title: {
-          text: notesTitle
-        }
-      }
-    });
-
-    //   fab: {
-    //     collapsedId: 'new',
-    //     collapsedIcon: Icons.getIcon('md-add'),
-    //     backgroundColor: GlobalStyles.constants().mainTintColor
-    //   },
-    //   animated: false
-  }
-
-  navigationButtonPressed({ buttonId }) {
-    // During incremental load, we wan't to avoid race conditions where we wait for navigator callback for this
-    // to be set in Abstract. Setting it here immediately will avoid updating the nav bar while we navigated away.
-    // Don't set this for Android if just opening side menu.
-    this.willBeVisible = (App.isAndroid && buttonId == 'sideMenu'); // this value is only false (what we want) if it's not Android side menu
-
-    console.log("Button pressed", buttonId);
-
-    if (buttonId == 'new') {
-      this.presentNewComposer();
-    } else if (buttonId == 'sideMenu') {
-      // Android is handled by the drawer attribute of rn-navigation
-      if(Platform.OS == "ios") {
-        this.presentFilterScreen();
+    if(numTags > 0) {
+      var tags = ModelManager.get().findItems(options.selectedTags);
+      if(tags.length > 0) {
+        var tag = tags[0];
+        notesTitle = tag.title + " notes";
       } else {
-        this.toggleSideMenu();
+        notesTitle = "Notes";
       }
-    } else if(buttonId == "settings") {
-      this.presentSettingsScreen();
+    }
+
+    if(options.archivedOnly) {
+      notesTitle = "Archived Notes";
+    }
+
+    this.setTitle(notesTitle, null);
+  }
+
+  componentDidUpdate() {
+    // Called when render is complete
+    if(this.showingNavBarLoadingStatus) {
+      setTimeout(() => {
+        this.showingNavBarLoadingStatus = false;
+      }, 50);
     }
   }
 
-  componentDidAppear() {
-    super.componentDidAppear();
+  componentDidFocus() {
+    super.componentDidFocus();
 
     this.forceUpdate();
 
@@ -396,32 +303,23 @@ export default class Notes extends Abstract {
     }
   }
 
-  componentDidDisappear() {
-    super.componentDidDisappear();
-  }
-
-  presentNewComposer() {
-    Navigation.push(this.props.componentId, {
-      component: {
-        name: 'sn.Compose',
-        passProps: {
-          selectedTagId: this.selectedTags.length && this.selectedTags[0].uuid // For Android
-        },
-        options: {
-          bottomTabs: {visible: false},
-          topBar: {
-            title: {
-              text: 'Compose'
-            }
-          }
-        }
-      }
+  presentComposer(item) {
+    this.props.navigation.navigate("Compose", {
+      noteId: item && item.uuid,
+      selectedTagId: this.selectedTags.length && this.selectedTags[0].uuid,
     });
   }
 
-  toggleSideMenu() {
-    console.log("toggleSideMenu");
-     Navigation.mergeOptions(this.props.componentId, { sideMenu: { left: { visible: !this.sideMenuVisible } } });
+  toggleDrawer = () => {
+    this.props.navigation.toggleDrawer();
+  }
+
+  openDrawer = () => {
+    this.props.navigation.openDrawer();
+  }
+
+  closeDrawer = () => {
+    this.props.navigation.closeDrawer();
   }
 
   presentFilterScreen() {
@@ -469,16 +367,6 @@ export default class Notes extends Abstract {
     this.mergeState({refreshing: false})
   }
 
-  componentDidUpdate() {
-    // Called when render is complete
-    if(this.showingNavBarLoadingStatus) {
-      setTimeout(() => {
-        this.setNavBarSubtitle(null);
-        this.showingNavBarLoadingStatus = false;
-      }, 50);
-    }
-  }
-
   _onRefresh() {
     this.setStatusBarText("Syncing...");
     this.setState({refreshing: true});
@@ -495,22 +383,7 @@ export default class Notes extends Abstract {
         item.conflict_of = null;
       }
 
-      Navigation.push(this.props.componentId, {
-        component: {
-          name: 'sn.Compose',
-          passProps: {
-            noteId: item.uuid
-          },
-          options: {
-            bottomTabs: {visible: false},
-            topBar: {
-              title: {
-                text: 'Compose'
-              }
-            }
-          }
-        }
-      });
+      this.presentComposer(item);
     }
 
     if(item.errorDecrypting) {
@@ -571,7 +444,7 @@ export default class Notes extends Abstract {
         <FAB
           buttonColor={GlobalStyles.constants().mainTintColor}
           iconTextColor={GlobalStyles.constants().mainBackgroundColor}
-          onClickAction={() => {this.presentNewComposer()}}
+          onClickAction={() => {this.presentComposer()}}
           visible={true}
           iconTextComponent={<Icon name="md-add"/>}
         />
