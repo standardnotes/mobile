@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Alert} from 'react-native';
-import GlobalStyles from "../../Styles"
+import StyleKit from "../../style/StyleKit"
 import {TextInput, View, Text} from 'react-native';
 import SectionHeader from "../../components/SectionHeader";
 import ButtonCell from "../../components/ButtonCell";

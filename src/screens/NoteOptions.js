@@ -15,7 +15,7 @@ import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCe
 import TagList from "../containers/TagList";
 
 import Icons from '../Icons';
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import ApplicationState from "../ApplicationState";
 import OptionsState from "../OptionsState";
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -199,7 +199,7 @@ export default class NoteOptions extends Abstract {
   }
 
   render() {
-    var viewStyles = [GlobalStyles.styles().container];
+    var viewStyles = [StyleKit.styles().container];
 
     if(this.state.lockContent) {
       return (<LockedView style={viewStyles} />);
@@ -225,7 +225,7 @@ export default class NoteOptions extends Abstract {
 
     return (
       <View style={viewStyles}>
-        <ScrollView style={GlobalStyles.styles().view}>
+        <ScrollView style={StyleKit.styles().view}>
 
           <TableSection>
             <SectionHeader title={"Manage Note"} />
@@ -266,7 +266,7 @@ export default class NoteOptions extends Abstract {
               />
           </TableSection>
 
-          <TableSection style={GlobalStyles.styles().view}>
+          <TableSection style={StyleKit.styles().view}>
             <SectionHeader
               title={"Edit With"}
               buttonText={selectedEditor && "Use Plain"}
@@ -307,8 +307,8 @@ export default class NoteOptions extends Abstract {
         </ScrollView>
 
         <FAB
-          buttonColor={GlobalStyles.constants().mainTintColor}
-          iconTextColor={GlobalStyles.constants().mainBackgroundColor}
+          buttonColor={StyleKit.variable("stylekitInfoColor")}
+          iconTextColor={StyleKit.variable("stylekitBackgroundColor")}
           onClickAction={() => {this.presentNewTag()}}
           visible={true}
           iconTextComponent={<Icon name={"md-pricetag"}/>}

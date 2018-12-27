@@ -27,7 +27,7 @@ import EncryptionSection from "../containers/account/EncryptionSection"
 import CompanySection from "../containers/account/CompanySection"
 import LockedView from "../containers/LockedView";
 import ApplicationState from "../ApplicationState";
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 
 var base64 = require('base-64');
 var Mailer = require('NativeModules').RNMail;
@@ -333,7 +333,7 @@ export default class Settings extends Abstract {
   }
 
   onThemeSelect = (theme) => {
-    GlobalStyles.get().activateTheme(theme);
+    StyleKit.get().activateTheme(theme);
   }
 
   onThemeLongPress = (theme) => {
@@ -342,7 +342,7 @@ export default class Settings extends Abstract {
       text: "Themes are cached when downloaded. To retrieve the latest version, press Redownload.",
       confirmButtonText: "Redownload",
       onConfirm: () => {
-        GlobalStyles.get().downloadThemeAndReload(theme);
+        StyleKit.get().downloadThemeAndReload(theme);
       }
     })
   }
@@ -488,11 +488,11 @@ export default class Settings extends Abstract {
     }
 
     let signedIn = !Auth.get().offline();
-    var themes = GlobalStyles.get().themes();
+    var themes = StyleKit.get().themes();
 
     return (
-      <View style={GlobalStyles.styles().container}>
-        <ScrollView style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
+      <View style={StyleKit.styles().container}>
+        <ScrollView style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
 
           {!signedIn && !this.state.confirmRegistration &&
             <AuthSection

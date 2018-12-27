@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text, Modal, AppState } from 'react-native';
 import NoteCell from "./NoteCell"
 import Search from 'react-native-search-box'
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import Authenticate from "../screens/Authenticate"
 import ApplicationState from "../ApplicationState";
 
@@ -135,7 +135,7 @@ export default class AuthModal extends Component {
 
     let authProps = this.state.authProps;
     return (
-      <View style={[GlobalStyles.styles().container]}>
+      <View style={[StyleKit.styles().container]}>
         <Modal
          animationType={"slide"}
          transparent={true}

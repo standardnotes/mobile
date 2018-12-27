@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import GlobalStyles from "../../Styles"
+import StyleKit from "../../style/StyleKit"
 import {TextInput, View, Linking} from 'react-native';
 
 import SectionHeader from "../../components/SectionHeader";
@@ -23,7 +23,7 @@ export default class ThemesSection extends Component {
               text={theme.name}
               key={theme.uuid}
               first={i == 0}
-              selected={() => {return GlobalStyles.get().isThemeActive(theme)}}
+              selected={() => {return StyleKit.get().isThemeActive(theme)}}
               dimmed={theme.getNotAvailOnMobile()}
               last={i == this.props.themes.length - 1 && this.props.themes.length > 1}
             />

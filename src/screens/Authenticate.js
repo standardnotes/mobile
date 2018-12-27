@@ -11,7 +11,7 @@ import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import SectionedOptionsTableCell from "../components/SectionedOptionsTableCell";
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -143,10 +143,10 @@ export default class Authenticate extends Abstract {
 
     var isAuthenticating = this.props.mode === "authenticate";
     var isSetup = !isAuthenticating;
-    var paddingTop = (ApplicationState.isIOS && GlobalStyles.isIPhoneX()) ? 30 : 15;
+    var paddingTop = (ApplicationState.isIOS && StyleKit.isIPhoneX()) ? 30 : 15;
 
     return (
-      <View style={GlobalStyles.styles().flexContainer}>
+      <View style={StyleKit.styles().flexContainer}>
         <ScrollView style={{paddingTop: this.props.mode == 'authenticate' ? paddingTop : 0}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
           <TableSection>
 
@@ -312,7 +312,7 @@ class PasscodeSection extends Abstract {
           <SectionedTableCell textInputCell={true} first={this.props.first}>
             <TextInput
               ref={'input'}
-              style={GlobalStyles.styles().sectionedTableCellTextInput}
+              style={StyleKit.styles().sectionedTableCellTextInput}
               placeholder={"Local passcode"}
               onChangeText={(text) => this.setState({passcode: text})}
               value={this.state.passcode}
@@ -322,7 +322,7 @@ class PasscodeSection extends Abstract {
               secureTextEntry={true}
               keyboardType={this.keyboardType}
               underlineColorAndroid={'transparent'}
-              placeholderTextColor={GlobalStyles.constants().mainDimColor}
+              placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               onSubmitEditing={this.props.mode == 'authenticate' ? this.onUnlockPress.bind(this) : this.onSavePress.bind(this)}
             />
           </SectionedTableCell>
@@ -358,7 +358,7 @@ class FingerprintSection extends Abstract {
 
       text: {
         fontWeight: "bold",
-        color: GlobalStyles.constants().mainTextColor,
+        color: StyleKit.variable("stylekitForegroundColor"),
         textAlign: 'center',
         width: "100%"
       },
@@ -377,7 +377,7 @@ class FingerprintSection extends Abstract {
 
       dev: {
         marginTop: 50,
-        backgroundColor: GlobalStyles.constants().mainDimColor,
+        backgroundColor: StyleKit.variable("stylekitNeutralColor"),
         padding: 15,
         paddingTop: 20,
         borderRadius: 5,
@@ -386,7 +386,7 @@ class FingerprintSection extends Abstract {
 
       centered: {
         textAlign: "center",
-        color: GlobalStyles.constants().mainTextColor
+        color: StyleKit.variable("stylekitForegroundColor")
       },
     });
 
@@ -463,7 +463,7 @@ class FingerprintSection extends Abstract {
   }
 
   render() {
-    let iconColor = this.state.success ? "green" : GlobalStyles.constants().mainTextColor;
+    let iconColor = this.state.success ? "green" : StyleKit.variable("stylekitForegroundColor");
     let textStyles = [this.styles.text];
     var iconName = ApplicationState.isAndroid ? "md-finger-print" : 'ios-finger-print';
 
@@ -496,7 +496,7 @@ class FingerprintSection extends Abstract {
           iconName={iconName}
           onPress={this.onPress}
           text={text}
-          color={ this.state.success ? GlobalStyles.constants().mainTintColor : null}
+          color={ this.state.success ? StyleKit.variable("stylekitInfoColor") : null}
           leftAlignIcon={true}
         />
       </View>

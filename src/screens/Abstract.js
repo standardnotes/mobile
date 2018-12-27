@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {DeviceEventEmitter, Modal, View, Text} from 'react-native';
-import GlobalStyles from "../Styles";
+import StyleKit from "../style/StyleKit";
 import ApplicationState from "../ApplicationState";
 import HeaderTitleView from "../components/HeaderTitleView"
 import HeaderButtons, { HeaderButton, Item } from 'react-navigation-header-buttons';
@@ -10,7 +10,7 @@ const IoniconsHeaderButton = passMeFurther => (
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
   // and it is important to pass those props to `HeaderButton`
   // then you may add some information like icon size or color (if you use icons)
-  <HeaderButton {...passMeFurther} IconComponent={Icon} iconSize={30} color={GlobalStyles.constants().mainTintColor} />
+  <HeaderButton {...passMeFurther} IconComponent={Icon} iconSize={30} color={StyleKit.variable("stylekitInfoColor")} />
 );
 
 export default class Abstract extends Component {
@@ -22,9 +22,9 @@ export default class Abstract extends Component {
     let options = {
       headerTitle:<HeaderTitleView title={navigation.getParam("title") || templateOptions.title} subtitle={navigation.getParam("subtitle") || templateOptions.subtitle}/>,
       headerStyle: {
-        backgroundColor: GlobalStyles.constants().mainBackgroundColor
+        backgroundColor: StyleKit.variable("stylekitBackgroundColor")
       },
-      headerTintColor: GlobalStyles.constants().mainTintColor,
+      headerTintColor: StyleKit.variable("stylekitInfoColor"),
       drawerLockMode: navigation.getParam("drawerLockMode") || templateOptions.drawerLockMode
     }
 
@@ -94,10 +94,8 @@ export default class Abstract extends Component {
   componentDidMount() {
     this.mounted = true;
     this.configureNavBar(true);
-    console.log("componentDidMount");
 
     if(ApplicationState.get().isUnlocked() && !this.loadedInitialState) {
-      console.log("Loading initial state");
       this.loadInitialState();
     }
 

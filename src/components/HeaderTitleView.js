@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {DeviceEventEmitter, Modal, View, Text} from 'react-native';
-import GlobalStyles from "../Styles";
+import StyleKit from "../style/StyleKit";
 import PlatformStyles from "../models/PlatformStyles";
 
 export default class HeaderTitleView extends Component {
@@ -25,7 +25,7 @@ export default class HeaderTitleView extends Component {
   getStyles() {
     return new PlatformStyles({
       headerContainer: {
-        backgroundColor: GlobalStyles.constants().mainBackgroundColor,
+        backgroundColor: StyleKit.variable("stylekitBackgroundColor"),
         flex: 1,
         justifyContent: 'flex-start',
         flexDirection: "column"
@@ -36,14 +36,14 @@ export default class HeaderTitleView extends Component {
       },
 
       headerTitle: {
-        color: GlobalStyles.constants().mainTextColor,
+        color: StyleKit.variable("stylekitForegroundColor"),
         fontWeight: "bold",
         fontSize: 18,
         textAlign: "center",
       },
 
       headerSubtitle: {
-        color: GlobalStyles.constants().mainTextColor,
+        color: StyleKit.variable("stylekitForegroundColor"),
         opacity: 0.6,
         fontSize: 12,
       },

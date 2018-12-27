@@ -1,19 +1,23 @@
 import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
-import ModelManager from "./lib/sfjs/modelManager"
-import Server from "./lib/sfjs/httpManager"
-import Sync from './lib/sfjs/syncManager'
-import Storage from "./lib/sfjs/storageManager"
-import Auth from "./lib/sfjs/authManager"
-import KeysManager from './lib/keysManager'
-import ApplicationState from './ApplicationState'
+import ModelManager from "../lib/sfjs/modelManager"
+import Server from "../lib/sfjs/httpManager"
+import Sync from '../lib/sfjs/syncManager'
+import Storage from "../lib/sfjs/storageManager"
+import Auth from "../lib/sfjs/authManager"
+import KeysManager from '../lib/keysManager'
+import ApplicationState from '../ApplicationState'
+import CSSParser from "./CSSParser";
 
-export default class GlobalStyles {
+import redJSON from './red.json';
+import blueJSON from './blue.json';
+
+export default class StyleKit {
 
   static instance = null;
 
   static get() {
     if (this.instance == null) {
-      this.instance = new GlobalStyles();
+      this.instance = new StyleKit();
     }
 
     return this.instance;
@@ -28,10 +32,10 @@ export default class GlobalStyles {
         theme.setMobileActive(true);
         this.activeTheme = theme;
         var constants = this.defaultConstants();
-        this.setStyles(this.defaultRules(constants), constants, theme.getMobileRules().statusBar);
+        this.setStyles(this.defaultRules(constants, theme.getMobileRules().variables), constants, theme.getMobileRules().statusBar);
       } catch (e) {
         var constants = this.defaultConstants();
-        this.setStyles(this.defaultRules(constants), constants, Platform.OS == "android" ? "light-content" : "dark-content");
+        this.setStyles(this.defaultRules(constants, {}), constants, Platform.OS == "android" ? "light-content" : "dark-content");
         console.log("Default theme error", e);
       }
     }
@@ -59,7 +63,7 @@ export default class GlobalStyles {
 
         theme.isSwapIn = true;
         var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
-        var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
+        var rules = _.merge(this.defaultRules(constants, theme.getMobileRules().variables), theme.getMobileRules().rules);
         this.setStyles(rules, constants, theme.getMobileRules().statusBar);
 
         this.activeTheme = theme;
@@ -85,6 +89,10 @@ export default class GlobalStyles {
         }
       }
     }.bind(this));
+  }
+
+  static variable(name) {
+    return this.get().activeTheme.getMobileRules().variables[name];
   }
 
   static styles() {
@@ -131,7 +139,10 @@ export default class GlobalStyles {
       return this._systemTheme;
     }
 
-    var constants = this.defaultConstants();
+    let constants = this.defaultConstants();
+    let variables = redJSON;
+
+    console.log("StyleKit variables", variables);
 
     this._systemTheme = new SNTheme({
       uuid: 0,
@@ -143,7 +154,8 @@ export default class GlobalStyles {
 
     this._systemTheme.setMobileRules({
       name: "Default",
-      rules: this.defaultRules(constants),
+      rules: this.defaultRules(constants, variables),
+      variables: variables,
       constants: constants,
       statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
     })
@@ -169,7 +181,7 @@ export default class GlobalStyles {
 
     var run = () => {
       var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
-      var rules = _.merge(this.defaultRules(constants), theme.getMobileRules().rules);
+      var rules = _.merge(this.defaultRules(constants, theme.getMobileRules().variables), theme.getMobileRules().rules);
       this.setStyles(rules, constants, theme.getMobileRules().statusBar);
 
       this.activeTheme = theme;
@@ -249,6 +261,14 @@ export default class GlobalStyles {
     })
   }
 
+  async readCSSUrl(url) {
+    return Server.get().getAbsolute(url, {}, (response) => {
+      return response;
+    }, function(response) {
+      return response;
+    })
+  }
+
   downloadThemeAndReload(theme) {
     this.downloadTheme(theme, function(){
       Sync.get().sync(function(){
@@ -283,42 +303,41 @@ export default class GlobalStyles {
   }
 
   defaultConstants() {
-    var tintColor = "#fb0206";
+    // var tintColor = "#fb0206";
     return {
-        composeBorderColor: "#F5F5F5",
-        mainBackgroundColor: "#ffffff",
-        mainTintColor: tintColor,
-        mainDimColor: "#9d9d9d",
-        mainTextColor: "#000000",
-        mainTextFontSize: 16,
-        mainHeaderFontSize: 16,
+      // composeBorderColor: "#F5F5F5",
+      // mainBackgroundColor: "#ffffff",
+      // mainTintColor: tintColor,
+      // mainDimColor: "#9d9d9d",
+      // mainTextColor: "#000000",
 
-        navBarColor: "white",
-        navBarTextColor: tintColor,
+      // navBarColor: "white",
+      // navBarTextColor: tintColor,
 
-        navBarColorAndroid: tintColor,
-        navBarTextColorAndroid: "#000000",
+      // navBarColorAndroid: tintColor,
+      // navBarTextColorAndroid: "#000000",
+      // plainCellBorderColor: "#efefef",
+      // selectedBackgroundColor: "#efefef",
 
-        paddingLeft: 14,
-        plainCellBorderColor: "#efefef",
-        sectionedCellHorizontalPadding: 14,
-        selectedBackgroundColor: "#efefef",
-
-        maxSettingsCellHeight: 45
-      }
+      mainTextFontSize: 16,
+      mainHeaderFontSize: 16,
+      paddingLeft: 14,
+      sectionedCellHorizontalPadding: 14,
+      maxSettingsCellHeight: 45
+    }
   }
 
-  defaultRules(constants) {
+  defaultRules(constants, variables) {
     return {
       container: {
-        backgroundColor: constants.mainBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor,
         height: "100%",
       },
 
       flexContainer: {
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: constants.mainBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor,
       },
 
       centeredContainer: {
@@ -333,18 +352,18 @@ export default class GlobalStyles {
       },
 
       uiText: {
-        color: constants.mainTextColor,
+        color: variables.stylekitForegroundColor,
         fontSize: constants.mainTextFontSize,
       },
 
       view: {
-        backgroundColor: constants.mainBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor,
       },
 
       tableSection: {
         marginTop: 10,
         marginBottom: 10,
-        backgroundColor: constants.mainBackgroundColor
+        backgroundColor: variables.stylekitBackgroundColor
       },
 
       sectionHeaderContainer: {
@@ -360,27 +379,27 @@ export default class GlobalStyles {
       sectionHeader: {
         fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
-        color: constants.mainDimColor,
+        color: variables.stylekitNeutralColor,
         fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
 
       sectionHeaderButton: {
-        color: constants.mainTintColor
+        color: variables.stylekitInfoColor
       },
 
       sectionHeaderAndroid: {
         fontSize: constants.mainTextFontSize - 2,
-        color: constants.mainTintColor
+        color: variables.stylekitInfoColor
       },
 
       sectionedTableCell: {
-        borderBottomColor: constants.plainCellBorderColor,
+        borderBottomColor: variables.stylekitBorderColor,
         borderBottomWidth: 1,
         paddingLeft: constants.paddingLeft,
         paddingRight: constants.paddingLeft,
         paddingTop: 13,
         paddingBottom: 12,
-        backgroundColor: constants.mainBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor,
         flex: 1,
       },
 
@@ -393,12 +412,12 @@ export default class GlobalStyles {
       sectionedTableCellTextInput: {
         fontSize: constants.mainTextFontSize,
         padding: 0,
-        color: constants.mainTextColor,
+        color: variables.stylekitForegroundColor,
         height: "100%"
       },
 
       sectionedTableCellFirst: {
-        borderTopColor: constants.plainCellBorderColor,
+        borderTopColor: variables.stylekitBorderColor,
         borderTopWidth: 1,
       },
 
@@ -406,14 +425,14 @@ export default class GlobalStyles {
 
       },
 
-      sectionedTableCellFirstAndroid: {
-        borderTopWidth: 0,
-      },
-
-      sectionedTableCellLastAndroid: {
-        borderBottomWidth: 0,
-        borderTopWidth: 0,
-      },
+      // sectionedTableCellFirstAndroid: {
+      //   borderTopWidth: 0,
+      // },
+      //
+      // sectionedTableCellLastAndroid: {
+      //   borderBottomWidth: 0,
+      //   borderTopWidth: 0,
+      // },
 
       sectionedAccessoryTableCell: {
         paddingTop: 0,
@@ -423,7 +442,7 @@ export default class GlobalStyles {
 
       sectionedAccessoryTableCellLabel: {
         fontSize: constants.mainTextFontSize,
-        color: constants.mainTextColor,
+        color: variables.stylekitForegroundColor,
         minWidth: "80%"
       },
 
@@ -437,7 +456,7 @@ export default class GlobalStyles {
       buttonCellButton: {
         textAlign: "center",
         textAlignVertical: "center",
-        color: Platform.OS == "android" ? constants.mainTextColor : constants.mainTintColor,
+        color: Platform.OS == "android" ? variables.stylekitForegroundColor : variables.stylekitInfoColor,
         fontSize: constants.mainTextFontSize,
       },
 
@@ -449,11 +468,11 @@ export default class GlobalStyles {
         flexGrow: 1,
         marginTop: 0,
         paddingTop: 10,
-        color: constants.mainTextColor,
+        color: variables.stylekitForegroundColor,
         paddingLeft: constants.paddingLeft,
         paddingRight: constants.paddingLeft,
         paddingBottom: 10,
-        backgroundColor: constants.mainBackgroundColor
+        backgroundColor: variables.stylekitBackgroundColor
       },
 
       noteTextIOS: {
@@ -470,13 +489,13 @@ export default class GlobalStyles {
         position: "absolute",
         bottom: 0,
         width: "100%",
-        backgroundColor: constants.mainTextColor,
+        backgroundColor: variables.stylekitContrastBackgroundColor,
         padding: 5
       },
 
       syncBarText: {
         textAlign: "center",
-        color: constants.mainBackgroundColor
+        color: variables.stylekitContrastForegroundColor
       },
 
       actionSheetWrapper: {
@@ -485,31 +504,31 @@ export default class GlobalStyles {
 
       actionSheetOverlay: {
         // This is the dimmed background
-        // backgroundColor: constants.mainDimColor
+        // backgroundColor: variables.stylekitNeutralColor
       },
 
       actionSheetBody: {
         // This will also set button border bottoms, since margin is used instead of borders
-        backgroundColor: constants.plainCellBorderColor
+        backgroundColor: variables.stylekitBorderColor
       },
 
       actionSheetTitleWrapper: {
-        backgroundColor: constants.mainBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor,
         marginBottom: 1
       },
 
       actionSheetTitleText: {
-        color: constants.mainTextColor,
+        color: variables.stylekitForegroundColor,
         opacity: 0.5
       },
 
       actionSheetButtonWrapper: {
-        backgroundColor: constants.mainBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor,
         marginTop: 0
       },
 
       actionSheetButtonTitle: {
-        color: constants.mainTextColor,
+        color: variables.stylekitForegroundColor,
       },
 
       actionSheetCancelButtonWrapper: {
@@ -517,7 +536,7 @@ export default class GlobalStyles {
       },
 
       actionSheetCancelButtonTitle: {
-        color: constants.mainTintColor,
+        color: variables.stylekitInfoColor,
         fontWeight: "normal"
       },
 
@@ -529,21 +548,21 @@ export default class GlobalStyles {
 
   static actionSheetStyles() {
     return {
-      wrapperStyle: GlobalStyles.styles().actionSheetWrapper,
-      overlayStyle: GlobalStyles.styles().actionSheetOverlay,
-      bodyStyle : GlobalStyles.styles().actionSheetBody,
+      wrapperStyle: StyleKit.styles().actionSheetWrapper,
+      overlayStyle: StyleKit.styles().actionSheetOverlay,
+      bodyStyle : StyleKit.styles().actionSheetBody,
 
-      buttonWrapperStyle: GlobalStyles.styles().actionSheetButtonWrapper,
-      buttonTitleStyle: GlobalStyles.styles().actionSheetButtonTitle,
+      buttonWrapperStyle: StyleKit.styles().actionSheetButtonWrapper,
+      buttonTitleStyle: StyleKit.styles().actionSheetButtonTitle,
 
-      titleWrapperStyle: GlobalStyles.styles().actionSheetTitleWrapper,
-      titleTextStyle: GlobalStyles.styles().actionSheetTitleText,
-      tintColor: ApplicationState.isIOS ? undefined : GlobalStyles.constants().mainTintColor,
+      titleWrapperStyle: StyleKit.styles().actionSheetTitleWrapper,
+      titleTextStyle: StyleKit.styles().actionSheetTitleText,
+      tintColor: ApplicationState.isIOS ? undefined : StyleKit.variable("stylekitInfoColor"),
 
-      buttonUnderlayColor: GlobalStyles.constants().plainCellBorderColor,
+      buttonUnderlayColor: StyleKit.variable("stylekitBorderColor"),
 
-      cancelButtonWrapperStyle: GlobalStyles.styles().actionSheetCancelButtonWrapper,
-      cancelButtonTitleStyle: GlobalStyles.styles().actionSheetCancelButtonTitle,
+      cancelButtonWrapperStyle: StyleKit.styles().actionSheetCancelButtonWrapper,
+      cancelButtonTitleStyle: StyleKit.styles().actionSheetCancelButtonTitle,
       cancelMargin: StyleSheet.hairlineWidth
     }
   }

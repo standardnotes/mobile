@@ -1,6 +1,6 @@
 const Ionicons = require('react-native-vector-icons/Ionicons');
 import { Platform } from 'react-native';
-import GlobalStyles from "./Styles"
+import StyleKit from "./style/StyleKit"
 
 let iconsMap = {};
 
@@ -31,7 +31,7 @@ export default class Icons {
   }
 
   async loadIcons(callback) {
-    var color = GlobalStyles.constants().mainBackgroundColor; //#FFFFFF
+    var color = StyleKit.variable("stylekitBackgroundColor"); //#FFFFFF
 
     let icons = {
       "ios-menu-outline": [Ionicons, 25, color],

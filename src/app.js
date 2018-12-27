@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { createStackNavigator, createAppContainer, createDrawerNavigator } from "react-navigation";
 
 import KeysManager from './lib/keysManager'
-import GlobalStyles from "./Styles"
+import StyleKit from "./style/StyleKit"
 import Icons from "./Icons"
 import ApplicationState from "./ApplicationState"
 import Auth from './lib/sfjs/authManager'
@@ -79,7 +79,7 @@ export default class App extends Component {
   }
 
   async loadInitialData() {
-    await GlobalStyles.get().resolveInitialTheme();
+    await StyleKit.get().resolveInitialTheme();
     await Promise.all([
       Icons.get().loadIcons(),
       KeysManager.get().loadInitialData(),

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import GlobalStyles from "../../Styles"
+import StyleKit from "../../style/StyleKit"
 import {Text, View} from 'react-native';
 import KeysManager from "../../lib/keysManager"
 import ModelManager from "../../lib/sfjs/modelManager"
@@ -31,8 +31,8 @@ export default class PasscodeSection extends Component {
     var itemsStatus = items.length + "/" + items.length + " notes and tags encrypted";
 
     var textStyles = {
-      color: GlobalStyles.constants().mainTextColor,
-      fontSize: GlobalStyles.constants().mainTextFontSize,
+      color: StyleKit.variable("stylekitForegroundColor"),
+      fontSize: StyleKit.constants().mainTextFontSize,
       lineHeight: 22
     }
 
@@ -49,7 +49,7 @@ export default class PasscodeSection extends Component {
             }
           </Text>
           {!enabled &&
-            <Text style={[textStyles, {marginTop: 4, color: GlobalStyles.constants().mainDimColor}]}>
+            <Text style={[textStyles, {marginTop: 4, color: StyleKit.variable("stylekitNeutralColor")}]}>
             {storageEncryptionAvailable
               ? "To enable encryption, sign in, register, or enable storage encryption."
               : "Sign in, register, or add a local passcode to enable encryption."

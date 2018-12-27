@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import {View, Text, TouchableHighlight} from 'react-native';
 
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 
 export default class SectionedOptionsTableCell extends Component {
 
   rules() {
-    var rules = [GlobalStyles.styles().sectionedTableCell];
-    if(this.props.first) { rules.push(GlobalStyles.styles().sectionedTableCellFirst); }
+    var rules = [StyleKit.styles().sectionedTableCell];
+    if(this.props.first) { rules.push(StyleKit.styles().sectionedTableCellFirst); }
     if(this.props.height) {rules.push({height: this.props.height})};
     if(this.props.extraStyles) {
       rules = rules.concat(this.props.extraStyles);
@@ -21,7 +21,7 @@ export default class SectionedOptionsTableCell extends Component {
       paddingTop: 0,
       paddingBottom: 0,
       paddingRight: 5,
-      maxHeight: GlobalStyles.constants().maxSettingsCellHeight
+      maxHeight: StyleKit.constants().maxSettingsCellHeight
     })
     return rules;
   }
@@ -40,11 +40,11 @@ export default class SectionedOptionsTableCell extends Component {
       flexDirection: 'row',
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: GlobalStyles.constants().mainBackgroundColor
+      backgroundColor: StyleKit.variable("stylekitBackgroundColor")
     }
 
     this.buttonContainerStyles = {
-      borderLeftColor: GlobalStyles.constants().plainCellBorderColor,
+      borderLeftColor: StyleKit.variable("stylekitBorderColor"),
       borderLeftWidth: 1,
       height: "100%",
       flexGrow: 1,
@@ -53,21 +53,21 @@ export default class SectionedOptionsTableCell extends Component {
     };
 
     this.buttonStyles = {
-      color: GlobalStyles.constants().mainDimColor,
-      fontSize: GlobalStyles.constants().mainTextFontSize,
+      color: StyleKit.variable("stylekitNeutralColor"),
+      fontSize: StyleKit.constants().mainTextFontSize,
       textAlign: "center",
       width: "100%",
     }
 
     this.selectedButtonStyles = {
-      color: GlobalStyles.constants().mainTintColor,
+      color: StyleKit.variable("stylekitInfoColor"),
     }
   }
 
   render() {
     return (
       <View style={this.rules()}>
-        <Text style={[GlobalStyles.styles().sectionedAccessoryTableCellLabel, this.titleStyles]}>{this.props.title}</Text>
+        <Text style={[StyleKit.styles().sectionedAccessoryTableCellLabel, this.titleStyles]}>{this.props.title}</Text>
         <View style={this.optionsContainerStyle}>
           {this.props.options.map((option) => {
             var buttonStyles = [this.buttonStyles];
@@ -75,7 +75,7 @@ export default class SectionedOptionsTableCell extends Component {
               buttonStyles.push(this.selectedButtonStyles);
             }
             return (
-              <TouchableHighlight underlayColor={GlobalStyles.constants().plainCellBorderColor} key={option.title} style={[GlobalStyles.styles().view, this.buttonContainerStyles]} onPress={() => {this.props.onPress(option)}}>
+              <TouchableHighlight underlayColor={StyleKit.variable("stylekitBorderColor")} key={option.title} style={[StyleKit.styles().view, this.buttonContainerStyles]} onPress={() => {this.props.onPress(option)}}>
                 <Text style={buttonStyles}>{option.title}</Text>
               </TouchableHighlight>
             )

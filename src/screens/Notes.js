@@ -11,7 +11,7 @@ import KeysManager from '../lib/keysManager'
 import Keychain from "../lib/keychain"
 
 import Abstract from "./Abstract"
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import Icons from '../Icons';
 import NoteList from "../containers/NoteList"
 import OptionsState from "../OptionsState"
@@ -28,7 +28,7 @@ const IoniconsHeaderButton = passMeFurther => (
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
   // and it is important to pass those props to `HeaderButton`
   // then you may add some information like icon size or color (if you use icons)
-  <HeaderButton {...passMeFurther} IconComponent={Icon} iconSize={30} color={GlobalStyles.constants().mainTintColor} />
+  <HeaderButton {...passMeFurther} IconComponent={Icon} iconSize={30} color={StyleKit.variable("stylekitInfoColor")} />
 );
 
 export default class Notes extends Abstract {
@@ -418,7 +418,7 @@ export default class Notes extends Abstract {
     var syncStatus = Sync.get().syncStatus;
 
     return (
-      <View style={GlobalStyles.styles().container}>
+      <View style={StyleKit.styles().container}>
         {notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}
@@ -437,14 +437,14 @@ export default class Notes extends Abstract {
         }
 
         {this.state.showSyncBar &&
-          <View style={GlobalStyles.styles().syncBar}>
-            <Text style={GlobalStyles.styles().syncBarText}>{this.state.syncBarText}</Text>
+          <View style={StyleKit.styles().syncBar}>
+            <Text style={StyleKit.styles().syncBarText}>{this.state.syncBarText}</Text>
           </View>
         }
 
         <FAB
-          buttonColor={GlobalStyles.constants().mainTintColor}
-          iconTextColor={GlobalStyles.constants().mainBackgroundColor}
+          buttonColor={StyleKit.variable("stylekitInfoColor")}
+          iconTextColor={StyleKit.variable("stylekitInfoContrastColor")}
           onClickAction={() => {this.presentComposer()}}
           visible={true}
           iconTextComponent={<Icon name="md-add"/>}

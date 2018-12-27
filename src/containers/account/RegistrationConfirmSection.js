@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import GlobalStyles from "../../Styles"
+import StyleKit from "../../style/StyleKit"
 import {TextInput, Text, View, Alert} from 'react-native';
 
 import SectionHeader from "../../components/SectionHeader";
@@ -27,19 +27,19 @@ export default class RegistrationConfirmSection extends Component {
   }
 
   render() {
-    var padding = GlobalStyles.constants().paddingLeft;
+    var padding = StyleKit.constants().paddingLeft;
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
 
-        <Text style={[GlobalStyles.styles().uiText, {paddingLeft: padding, paddingRight: padding, marginBottom: padding}]}>
+        <Text style={[StyleKit.styles().uiText, {paddingLeft: padding, paddingRight: padding, marginBottom: padding}]}>
         Due to the nature of our encryption, Standard Notes cannot offer password reset functionality.
         If you forget your password, you will permanently lose access to your data.
         </Text>
 
         <SectionedTableCell first={true} textInputCell={true}>
           <TextInput
-            style={GlobalStyles.styles().sectionedTableCellTextInput}
+            style={StyleKit.styles().sectionedTableCellTextInput}
             placeholder={"Password confirmation"}
             onChangeText={(text) => this.setState({passwordConfirmation: text})}
             value={this.state.passwordConfirmation}

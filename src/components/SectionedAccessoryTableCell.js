@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {View, Image, Text, TouchableHighlight, Platform} from 'react-native';
 
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import SectionedTableCell from "./SectionedTableCell"
 
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -10,9 +10,9 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
   rules() {
     var rules = super.rules().concat([
-      GlobalStyles.styles().view,
-      GlobalStyles.styles().flexContainer,
-      ...GlobalStyles.stylesForKey("sectionedAccessoryTableCell")
+      StyleKit.styles().view,
+      StyleKit.styles().flexContainer,
+      ...StyleKit.stylesForKey("sectionedAccessoryTableCell")
     ]);
     return rules;
   }
@@ -39,7 +39,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
     var left = this.props.leftAlignIcon;
     var iconSize = left ? 25: 30;
-    var color = left ? GlobalStyles.constants().mainTextColor : GlobalStyles.constants().mainTintColor;
+    var color = left ? StyleKit.variable("stylekitForegroundColor") : StyleKit.variable("stylekitInfoColor");
 
 
     if(Platform.OS == "android") { iconSize -= 5; }
@@ -58,16 +58,16 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
       icon = null;
     }
 
-    var textStyles = [GlobalStyles.styles().sectionedAccessoryTableCellLabel];
+    var textStyles = [StyleKit.styles().sectionedAccessoryTableCellLabel];
 
     if(this.props.bold || (this.props.selected && this.props.selected())) {
-      textStyles.push(GlobalStyles.styles().bold)
+      textStyles.push(StyleKit.styles().bold)
     }
     if(this.props.tinted) {
-      textStyles.push({color: GlobalStyles.constants().mainTintColor})
+      textStyles.push({color: StyleKit.variable("stylekitInfoColor")})
     }
     if(this.props.dimmed) {
-      textStyles.push({color: GlobalStyles.constants().mainDimColor})
+      textStyles.push({color: StyleKit.variable("stylekitNeutralColor")})
     }
     if(this.props.color) {
       textStyles.push({color: this.props.color})
@@ -83,7 +83,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     }
 
     return (
-      <TouchableHighlight underlayColor={GlobalStyles.constants().plainCellBorderColor} style={this.rules()} onPress={this.onPress} onLongPress={this.onLongPress}>
+      <TouchableHighlight underlayColor={StyleKit.variable("stylekitBorderColor")} style={this.rules()} onPress={this.onPress} onLongPress={this.onLongPress}>
         <View style={containerStyles}>
         {
           this.props.leftAlignIcon

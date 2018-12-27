@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text } from 'react-native';
 import NoteCell from "./NoteCell"
 import Search from 'react-native-search-box'
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import ApplicationState from "../ApplicationState"
 
 export default class NoteList extends Component {
@@ -27,23 +27,23 @@ export default class NoteList extends Component {
       decryptNotice: {
         position: "absolute",
         opacity: 0.5,
-        color: GlobalStyles.constants().mainTextColor
+        color: StyleKit.variable("stylekitForegroundColor")
       }
     });
   }
 
   renderHeader = () => {
     return (
-      <View style={{paddingLeft: 5, paddingRight: 5, paddingTop: 5, backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
+      <View style={{paddingLeft: 5, paddingRight: 5, paddingTop: 5, backgroundColor: StyleKit.variable("stylekitBackgroundColor")}}>
         <Search
           onChangeText={this.props.onSearchChange}
           onCancel={this.props.onSearchCancel}
           onDelete={this.props.onSearchCancel}
           blurOnSubmit={true}
-          backgroundColor={GlobalStyles.constants().mainBackgroundColor}
-          titleCancelColor={GlobalStyles.constants().mainTintColor}
+          backgroundColor={StyleKit.variable("stylekitBackgroundColor")}
+          titleCancelColor={StyleKit.variable("stylekitInfoColor")}
           keyboardDismissMode={'interactive'}
-          inputStyle={{backgroundColor: GlobalStyles.constants().plainCellBorderColor, color: GlobalStyles.constants().mainTextColor}}
+          inputStyle={{backgroundColor: StyleKit.variable("stylekitBorderColor"), color: StyleKit.variable("stylekitForegroundColor")}}
         />
       </View>
     );
@@ -85,7 +85,7 @@ export default class NoteList extends Component {
     }
 
     return (
-      <View style={{backgroundColor: GlobalStyles.constants().mainBackgroundColor}}>
+      <View style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}}>
 
         {placeholderText.length > 0 &&
           <View style={this.styles.decryptNoticeContainer}>

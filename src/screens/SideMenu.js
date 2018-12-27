@@ -10,7 +10,7 @@ import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCe
 import Abstract from "./Abstract"
 import Icons from '../Icons';
 import OptionsState from "../OptionsState"
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import ApplicationState from "../ApplicationState";
 import TagList from "../containers/TagList";
 
@@ -135,7 +135,7 @@ export default class SideMenu extends Abstract {
   }
 
   render() {
-    var viewStyles = [GlobalStyles.styles().container];
+    var viewStyles = [StyleKit.styles().container];
 
     if(this.state.lockContent || !this.state.initialDataLoaded) {
       return (<LockedView style={viewStyles} />);
@@ -150,7 +150,7 @@ export default class SideMenu extends Abstract {
 
     return (
       <SafeAreaView style={viewStyles}>
-        <ScrollView style={GlobalStyles.styles().view}>
+        <ScrollView style={StyleKit.styles().view}>
           <TagList
             tags={this.tags}
             selected={this.state.selectedTags}
@@ -161,8 +161,8 @@ export default class SideMenu extends Abstract {
         </ScrollView>
 
         <FAB
-          buttonColor={GlobalStyles.constants().mainTintColor}
-          iconTextColor={GlobalStyles.constants().mainBackgroundColor}
+          buttonColor={StyleKit.variable("stylekitInfoColor")}
+          iconTextColor={StyleKit.variable("stylekitInfoContrastColor")}
           onClickAction={() => {this.note ? this.presentNewTag() : this.presentSettings()}}
           visible={true}
           iconTextComponent={<Icon name={this.note ? "md-pricetag" : "md-settings"}/>}

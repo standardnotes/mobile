@@ -25,7 +25,7 @@ import {
   Dimensions
 } from 'react-native';
 
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 
 export default class Compose extends Abstract {
 
@@ -298,10 +298,10 @@ export default class Compose extends Abstract {
     var shouldDisplayEditor = noteEditor != null;
 
     return (
-      <View style={[this.styles.container, GlobalStyles.styles().container]}>
+      <View style={[this.styles.container, StyleKit.styles().container]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
-            <Icon name={Icons.nameForIcon("lock")} size={20} color={GlobalStyles.constants().mainBackgroundColor} />
+            <Icon name={Icons.nameForIcon("lock")} size={20} color={StyleKit.variable("stylekitBackgroundColor")} />
             <Text style={this.styles.lockedText}>Note Locked</Text>
           </View>
         }
@@ -311,9 +311,9 @@ export default class Compose extends Abstract {
           onChangeText={this.onTitleChange}
           value={this.state.title}
           placeholder={"Add Title"}
-          selectionColor={GlobalStyles.constants().mainTintColor}
+          selectionColor={StyleKit.variable("stylekitInfoColor")}
           underlineColorAndroid={'transparent'}
-          placeholderTextColor={GlobalStyles.constants().mainDimColor}
+          placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
           autoCorrect={true}
           autoCapitalize={'sentences'}
           editable={!this.note.locked}
@@ -340,12 +340,12 @@ export default class Compose extends Abstract {
 
         {!shouldDisplayEditor && Platform.OS == "android" &&
           <View style={[this.styles.noteTextContainer]}>
-            <TextView style={[GlobalStyles.stylesForKey("noteText"), this.styles.textContentAndroid]}
+            <TextView style={[StyleKit.stylesForKey("noteText"), this.styles.textContentAndroid]}
               ref={(ref) => this.input = ref}
               autoFocus={this.note.dummy}
               value={this.note.text}
-              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
-              handlesColor={GlobalStyles.constants().mainTintColor}
+              selectionColor={StyleKit.lighten(StyleKit.variable("stylekitInfoColor"), 0.35)}
+              handlesColor={StyleKit.variable("stylekitInfoColor")}
               onChangeText={this.onTextChange}
               editable={!this.note.locked}
             />
@@ -353,12 +353,12 @@ export default class Compose extends Abstract {
         }
 
         {!shouldDisplayEditor && Platform.OS == "ios" &&
-          <TextView style={[GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10}]}
+          <TextView style={[StyleKit.stylesForKey("noteText"), {paddingBottom: 10}]}
             ref={(ref) => this.input = ref}
             autoFocus={false}
             value={this.note.text}
             keyboardDismissMode={'interactive'}
-            selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
+            selectionColor={StyleKit.lighten(StyleKit.variable("stylekitInfoColor"))}
             onChangeText={this.onTextChange}
             editable={!this.note.locked}
           />
@@ -378,13 +378,13 @@ export default class Compose extends Abstract {
       noteTitle: {
         fontWeight: "600",
         fontSize: 16,
-        color: GlobalStyles.constants().mainTextColor,
+        color: StyleKit.variable("stylekitForegroundColor"),
         height: 50,
-        borderBottomColor: GlobalStyles.constants().composeBorderColor,
+        borderBottomColor: StyleKit.variable("stylekitBorderColor"),
         borderBottomWidth: 1,
         paddingTop: Platform.OS === "ios" ? 5 : 12,
-        paddingLeft: GlobalStyles.constants().paddingLeft,
-        paddingRight: GlobalStyles.constants().paddingLeft,
+        paddingLeft: StyleKit.constants().paddingLeft,
+        paddingRight: StyleKit.constants().paddingLeft,
       },
 
       lockedContainer: {
@@ -394,9 +394,9 @@ export default class Compose extends Abstract {
         alignItems: "center",
         height: 30,
         maxHeight: 30,
-        paddingLeft: GlobalStyles.constants().paddingLeft,
-        backgroundColor: GlobalStyles.constants().mainTintColor,
-        borderBottomColor: GlobalStyles.constants().plainCellBorderColor,
+        paddingLeft: StyleKit.constants().paddingLeft,
+        backgroundColor: StyleKit.variable("stylekitInfoColor"),
+        borderBottomColor: StyleKit.variable("stylekitBorderColor"),
         borderBottomWidth: 1
       },
 
@@ -413,13 +413,13 @@ export default class Compose extends Abstract {
 
       loadingWebViewText: {
         paddingLeft: 0,
-        color: GlobalStyles.constants().mainTextColor,
+        color: StyleKit.variable("stylekitForegroundColor"),
         opacity: 0.7
       },
 
       lockedText: {
         fontWeight: "bold",
-        color: GlobalStyles.constants().mainBackgroundColor,
+        color: StyleKit.variable("stylekitBackgroundColor"),
         paddingLeft: 10
       },
 

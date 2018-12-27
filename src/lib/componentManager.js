@@ -1,7 +1,7 @@
 /* This domain will be used to save context item client data */
 let ClientDataDomain = "org.standardnotes.sn.components";
 
-import GlobalStyles from '../Styles'
+import StyleKit from '../style/StyleKit'
 import ModelManager from './sfjs/modelManager'
 import Sync from './sfjs/syncManager'
 import SF from "./sfjs/sfjs"
@@ -357,7 +357,7 @@ export default class ComponentManager {
   }
 
   postActiveThemeToComponent(component) {
-    var activeTheme = GlobalStyles.get().activeTheme;
+    var activeTheme = StyleKit.get().activeTheme;
 
     var data = {
       themes: [(activeTheme && !activeTheme.default) ? this.urlForComponent(activeTheme) : null]

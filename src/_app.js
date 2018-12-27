@@ -7,7 +7,7 @@ import {AppState, Platform, StatusBar, BackHandler, DeviceEventEmitter, NativeMo
 
 import {registerScreens} from './screens';
 
-import GlobalStyles from "./Styles"
+import StyleKit from "./style/StyleKit"
 import Icons from "./Icons"
 import OptionsState from "./OptionsState"
 import { Client } from 'bugsnag-react-native';
@@ -34,12 +34,12 @@ export default class App {
   static instance = null;
 
   get tabStyles() {
-    var navBarColor = GlobalStyles.constantForKey("navBarColor");
-    var navBarTextColor = GlobalStyles.constantForKey("navBarTextColor");
-    var statusBarColor = GlobalStyles.constants().mainBackgroundColor;
+    var navBarColor = StyleKit.constantForKey("navBarColor");
+    var navBarTextColor = StyleKit.constantForKey("navBarTextColor");
+    var statusBarColor = StyleKit.variable("stylekitBackgroundColor");
 
     if(this.isAndroid) {
-      statusBarColor = GlobalStyles.darken(navBarColor);
+      statusBarColor = StyleKit.darken(navBarColor);
       // Android <= v22 does not support changing status bar text color. It will always be white
       // So we have to make sure background color has proper contrast
       if(Platform.Version <= 22) {
@@ -48,10 +48,10 @@ export default class App {
     }
 
     return {
-      tabBarBackgroundColor: GlobalStyles.constants().mainBackgroundColor,
+      tabBarBackgroundColor: StyleKit.variable("stylekitBackgroundColor"),
       tabBarTranslucent: true,
       tabBarButtonColor: 'gray',
-      tabBarSelectedButtonColor: GlobalStyles.constants().mainTintColor,
+      tabBarSelectedButtonColor: StyleKit.variable("stylekitInfoColor"),
 
       // navBarBlur: true,
       navBarButtonColor: navBarTextColor,
@@ -64,7 +64,7 @@ export default class App {
       statusBarTextColorSchemeSingleScreen: 'dark',
       topBarElevationShadowEnabled: true,
 
-      screenBackgroundColor: GlobalStyles.constants().mainBackgroundColor
+      screenBackgroundColor: StyleKit.variable("stylekitBackgroundColor")
     }
   }
 
@@ -83,7 +83,7 @@ export default class App {
     });
 
     this.loading = true;
-    GlobalStyles.get().resolveInitialTheme().then(function(){
+    StyleKit.get().resolveInitialTheme().then(function(){
       Promise.all([
         Icons.get().loadIcons(),
         KeysManager.get().loadInitialData(),
@@ -114,13 +114,13 @@ export default class App {
         visible: true,
         animate: false, // Controls whether BottomTabs visibility changes should be animated
         drawBehind: true,
-        backgroundColor: GlobalStyles.constants().mainBackgroundColor
+        backgroundColor: StyleKit.variable("stylekitBackgroundColor")
       },
       bottomTab: {
-        iconColor: GlobalStyles.constants().mainDimColor,
-        selectedIconColor: GlobalStyles.constants().mainTintColor,
-        textColor: GlobalStyles.constants().mainDimColor,
-        selectedTextColor: GlobalStyles.constants().mainTintColor
+        iconColor: StyleKit.variable("stylekitNeutralColor"),
+        selectedIconColor: StyleKit.variable("stylekitInfoColor"),
+        textColor: StyleKit.variable("stylekitNeutralColor"),
+        selectedTextColor: StyleKit.variable("stylekitInfoColor")
       },
     });
 

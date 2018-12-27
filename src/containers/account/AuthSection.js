@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {TextInput, View, Text} from 'react-native';
-import GlobalStyles from "../../Styles"
+import StyleKit from "../../style/StyleKit"
 
 import SectionHeader from "../../components/SectionHeader";
 import ButtonCell from "../../components/ButtonCell";
@@ -53,7 +53,7 @@ export default class AuthSection extends AbstractComponent {
   }
 
   render() {
-    let textPadding = GlobalStyles.constants().paddingLeft;
+    let textPadding = StyleKit.constants().paddingLeft;
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
@@ -62,7 +62,7 @@ export default class AuthSection extends AbstractComponent {
           <View>
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
-                style={GlobalStyles.styles().sectionedTableCellTextInput}
+                style={StyleKit.styles().sectionedTableCellTextInput}
                 placeholder={"Email"}
                 onChangeText={(text) => this.setState({email: text})}
                 value={this.state.email}
@@ -70,19 +70,19 @@ export default class AuthSection extends AbstractComponent {
                 autoCapitalize={'none'}
                 keyboardType={'email-address'}
                 underlineColorAndroid={'transparent'}
-                placeholderTextColor={GlobalStyles.constants().mainDimColor}
+                placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               />
             </SectionedTableCell>
 
             <SectionedTableCell textInputCell={true}>
               <TextInput
-                style={GlobalStyles.styles().sectionedTableCellTextInput}
+                style={StyleKit.styles().sectionedTableCellTextInput}
                 placeholder={"Password"}
                 onChangeText={(text) => this.setState({password: text})}
                 value={this.state.password}
                 secureTextEntry={true}
                 underlineColorAndroid={'transparent'}
-                placeholderTextColor={GlobalStyles.constants().mainDimColor}
+                placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               />
             </SectionedTableCell>
           </View>
@@ -90,19 +90,19 @@ export default class AuthSection extends AbstractComponent {
 
         {this.props.mfa &&
           <View>
-            <Text style={[GlobalStyles.styles().uiText, {paddingLeft: textPadding, paddingRight: textPadding, marginBottom: textPadding}]}>
+            <Text style={[StyleKit.styles().uiText, {paddingLeft: textPadding, paddingRight: textPadding, marginBottom: textPadding}]}>
               {this.props.mfa.message}
             </Text>
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
-                style={GlobalStyles.styles().sectionedTableCellTextInput}
+                style={StyleKit.styles().sectionedTableCellTextInput}
                 placeholder=""
                 onChangeText={(text) => this.setState({mfa_token: text})}
                 value={this.state.mfa_token}
                 keyboardType={'numeric'}
                 autoFocus={true}
                 underlineColorAndroid={'transparent'}
-                placeholderTextColor={GlobalStyles.constants().mainDimColor}
+                placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
                 onSubmitEditing={this.onSignInPress}
               />
             </SectionedTableCell>
@@ -114,7 +114,7 @@ export default class AuthSection extends AbstractComponent {
             <SectionHeader title={"Advanced"} />
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
-                style={GlobalStyles.styles().sectionedTableCellTextInput}
+                style={StyleKit.styles().sectionedTableCellTextInput}
                 placeholder={"Sync Server"}
                 onChangeText={(text) => this.setState({server: text})}
                 value={this.state.server}
@@ -122,7 +122,7 @@ export default class AuthSection extends AbstractComponent {
                 autoCapitalize={'none'}
                 keyboardType={'url'}
                 underlineColorAndroid={'transparent'}
-                placeholderTextColor={GlobalStyles.constants().mainDimColor}
+                placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               />
             </SectionedTableCell>
 

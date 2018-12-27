@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text } from 'react-native';
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import TableSection from "../components/TableSection";
 import SectionHeader from "../components/SectionHeader";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
@@ -62,7 +62,7 @@ export default class TagList extends Component {
           onPress={() => {this.onPress(item)}}
           onLongPress={() => this.showActionSheet(item)}
           text={item.deleted ? "Deleting..." : item.title}
-          color={item.deleted ? GlobalStyles.constants().mainTintColor : undefined}
+          color={item.deleted ? StyleKit.variable("stylekitInfoColor") : undefined}
           key={item.uuid}
           first={this.props.tags.indexOf(item) == 0}
           last={this.props.tags.indexOf(item) == this.props.tags.length - 1}
@@ -76,7 +76,7 @@ export default class TagList extends Component {
           cancelButtonIndex={TagList.ActionSheetCancelIndex}
           destructiveButtonIndex={TagList.ActionSheetDestructiveIndex}
           onPress={this.handleActionSheetPress}
-          {...GlobalStyles.actionSheetStyles()}
+          {...StyleKit.actionSheetStyles()}
         />
       </View>
     )
@@ -84,7 +84,7 @@ export default class TagList extends Component {
 
   render() {
     return (
-      <TableSection style={GlobalStyles.styles().view}>
+      <TableSection style={StyleKit.styles().view}>
         <SectionHeader title={this.props.title} buttonText={this.props.hasClearButton && "Clear"} buttonAction={() => {this.props.clearSelection(true)}}/>
 
         <FlatList style={{height: "100%"}}

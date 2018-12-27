@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import Icon from 'react-native-vector-icons/Ionicons';
 
 export default class LockedView extends Component {
@@ -10,8 +10,8 @@ export default class LockedView extends Component {
   }
 
   render() {
-    let color = GlobalStyles.constants().mainTintColor;
-    var styles = [GlobalStyles.styles().centeredContainer];
+    let color = StyleKit.variable("stylekitInfoColor");
+    var styles = [StyleKit.styles().centeredContainer];
     if(this.props.style) {
       styles.push(this.props.style);
     }

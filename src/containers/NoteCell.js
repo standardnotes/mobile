@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import ActionSheet from 'react-native-actionsheet'
 import ItemActionManager from '../lib/itemActionManager'
 
@@ -18,13 +18,13 @@ export default class NoteCell extends React.PureComponent {
       noteCell: {
         padding: Padding,
         paddingRight: Padding * 2,
-        borderBottomColor: GlobalStyles.constants().plainCellBorderColor,
+        borderBottomColor: StyleKit.variable("stylekitBorderColor"),
         borderBottomWidth: 1,
-        backgroundColor: GlobalStyles.constants().mainBackgroundColor,
+        backgroundColor: StyleKit.variable("stylekitBackgroundColor"),
       },
 
       noteCellSelected: {
-        backgroundColor: GlobalStyles.constants().selectedBackgroundColor,
+        backgroundColor: StyleKit.variable("stylekitInfoColor"),
       },
 
       noteTags: {
@@ -40,40 +40,60 @@ export default class NoteCell extends React.PureComponent {
       },
 
       pinnedText: {
-        color: GlobalStyles.constants().mainTintColor,
+        color: StyleKit.variable("stylekitInfoColor"),
         marginLeft: 8,
         fontWeight: "bold",
         fontSize: 12
       },
 
+      pinnedTextSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor"),
+      },
+
       noteTag: {
         marginRight: 2,
         fontSize: 12,
-        color: GlobalStyles.constants().mainTextColor,
+        color: StyleKit.variable("stylekitForegroundColor"),
         opacity: 0.5,
+      },
+
+      noteTagSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor"),
       },
 
       noteTitle: {
         fontWeight: "bold",
-        fontSize: GlobalStyles.constants().mainHeaderFontSize,
-        color: GlobalStyles.constants().mainTextColor
+        fontSize: StyleKit.constants().mainHeaderFontSize,
+        color: StyleKit.variable("stylekitForegroundColor")
+      },
+
+      noteTitleSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor")
       },
 
       noteText: {
-        fontSize: GlobalStyles.constants().mainTextFontSize,
+        fontSize: StyleKit.constants().mainTextFontSize,
         marginTop: 4,
-        color: GlobalStyles.constants().mainTextColor
+        color: StyleKit.variable("stylekitForegroundColor")
+      },
+
+      noteTextSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor")
       },
 
       noteDate: {
         marginTop: 5,
         fontSize: 12,
-        color: GlobalStyles.constants().mainTextColor,
+        color: StyleKit.variable("stylekitForegroundColor"),
         opacity: 0.5
       },
 
+      noteDateSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor")
+      },
+
       deleting: {
-        color: GlobalStyles.constants().mainTintColor,
+        color: StyleKit.variable("stylekitInfoColor"),
         marginBottom: 5,
       }
     });
@@ -150,15 +170,6 @@ export default class NoteCell extends React.PureComponent {
     });
   }
 
-  getHTMLStyles = () => {
-    var html = "";
-    html += "<style>";
-    html += `html {font-family: sans-serif;}`
-    html += `html, body, div, p, h1, h2, h3, h4 {color: ${GlobalStyles.constants().mainTextColor};}`;
-    html += "</style>";
-    return html;
-  }
-
   render() {
     var note = this.props.item;
     return (
@@ -175,14 +186,14 @@ export default class NoteCell extends React.PureComponent {
 
             {note.pinned &&
               <View style={this.styles.pinnedView}>
-                <Icon name={"ios-bookmark"} size={14} color={GlobalStyles.constants().mainTintColor} />
-                <Text style={this.styles.pinnedText}>Pinned</Text>
+                <Icon name={"ios-bookmark"} size={14} color={this.state.selected ? StyleKit.variable("stylekitInfoContrastColor") : StyleKit.variable("stylekitInfoColor")} />
+                <Text style={this.aggregateStyles(this.styles.pinnedText, this.styles.pinnedTextSelected, this.state.selected)}>Pinned</Text>
               </View>
             }
 
             {this.props.renderTags && !this.state.options.hideTags && note.tags.length > 0 &&
               <View style={this.styles.noteTags}>
-                <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag)}>
+                <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag, this.styles.noteTagSelected, this.state.selected)}>
                 {this.props.tagsString}
                 </Text>
               </View>
@@ -232,7 +243,7 @@ export default class NoteCell extends React.PureComponent {
               cancelButtonIndex={NoteCell.ActionSheetCancelIndex}
               destructiveButtonIndex={NoteCell.ActionSheetDestructiveIndex}
               onPress={this.handleActionSheetPress}
-              {...GlobalStyles.actionSheetStyles()}
+              {...StyleKit.actionSheetStyles()}
             />
         </View>
       </TouchableWithoutFeedback>

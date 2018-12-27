@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import GlobalStyles from "../../Styles"
+import StyleKit from "../../style/StyleKit"
 import {TextInput, View, Alert, Text} from 'react-native';
 
 import SectionHeader from "../../components/SectionHeader";
@@ -83,7 +83,7 @@ export default class PasscodeSection extends Component {
         <SectionHeader title={this.props.title} />
 
         <ButtonCell first={true} leftAligned={true} title={storageEncryptionTitle} onPress={storageOnPress}>
-          <Text style={{color: GlobalStyles.constants().mainDimColor, marginTop: 2}}>{storageSubText}</Text>
+          <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 2}}>{storageSubText}</Text>
         </ButtonCell>
 
         <ButtonCell leftAligned={true} title={passcodeTitle} onPress={passcodeOnPress} />

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { TextInput, View, TouchableHighlight, Platform} from 'react-native';
-import GlobalStyles from "../Styles"
+import StyleKit from "../style/StyleKit"
 import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import SectionHeader from "../components/SectionHeader";
@@ -59,19 +59,19 @@ export default class InputModal extends Abstract {
     }
 
     return (
-      <View style={GlobalStyles.styles().container}>
-        <TableSection extraStyles={[GlobalStyles.styles().container]}>
+      <View style={StyleKit.styles().container}>
+        <TableSection extraStyles={[StyleKit.styles().container]}>
           <SectionHeader title={this.getProp("title")} />
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
-              style={[GlobalStyles.styles().sectionedTableCellTextInput]}
+              style={[StyleKit.styles().sectionedTableCellTextInput]}
               placeholder={this.getProp("placeholder")}
               onChangeText={this.onTextChange}
               value={this.state.text}
               autoCorrect={false}
               autoCapitalize={'none'}
               autoFocus={true}
-              placeholderTextColor={GlobalStyles.constants().mainDimColor}
+              placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               underlineColorAndroid={'transparent'}
               onSubmitEditing={this.onSave.bind(this)}
             />
