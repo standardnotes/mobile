@@ -86,84 +86,18 @@ export default class Abstract extends Component {
   }
 
   componentWillUnmount() {
-    for(var listener of this.listeners) {
-      listener.remove();
-    }
-  }
-
-  componentWillFocus(){
-
-  }
-
-  componentDidFocus(){
-
-  }
-
-  componentWillBlur(){
-
-  }
-
-  componentDidBlur(){
-
-  }
-
-  getProp(prop) {
-    // this.props.navigation could be undefined if we're in the drawer
-    return this.props.navigation.getParam && this.props.navigation.getParam(prop);
-  }
-
-  setTitle(title, subtitle) {
-    let options = {};
-    options.title = title;
-    options.subtitle = subtitle;
-    this.props.navigation.setParams(options);
-  }
-
-  // Called by RNN
-  componentDidAppear() {
-    this.visible = true;
-    this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
-    this.configureNavBar(false);
-  }
-
-  // Called by RNN
-  componentDidDisappear() {
-    console.log("Component did disappear", this);
-    this.willBeVisible = false;
-    this.visible = false;
-  }
-
-  lockContent() {
-    this.mergeState({lockContent: true});
-    this.configureNavBar();
-  }
-
-  unlockContent() {
-    if(!this.loadedInitialState) {
-      this.loadInitialState();
-    }
-    this.mergeState({lockContent: false});
-  }
-
-  componentWillUnmount() {
     this.willUnmount = true;
     this.mounted = false;
     ApplicationState.get().removeStateObserver(this._stateObserver);
   }
 
-  componentWillMount() {
-    this.willUnmount = false;
-    this.mounted = false;
-    if(ApplicationState.get().isUnlocked() && this.state.lockContent) {
-      this.unlockContent();
-    }
-  }
-
   componentDidMount() {
     this.mounted = true;
     this.configureNavBar(true);
+    console.log("componentDidMount");
 
     if(ApplicationState.get().isUnlocked() && !this.loadedInitialState) {
+      console.log("Loading initial state");
       this.loadInitialState();
     }
 
@@ -179,6 +113,59 @@ export default class Abstract extends Component {
   loadInitialState() {
     this.loadedInitialState = true;
     this.configureNavBar(true);
+  }
+
+  componentWillUnmount() {
+    for(var listener of this.listeners) {
+      listener.remove();
+    }
+  }
+
+  componentWillFocus() {
+    this.willUnmount = false;
+    this.mounted = false;
+    if(ApplicationState.get().isUnlocked() && this.state.lockContent) {
+      this.unlockContent();
+    }
+  }
+
+  componentDidFocus() {
+    this.visible = true;
+    this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
+    this.configureNavBar(false);
+  }
+
+  componentWillBlur(){
+
+  }
+
+  componentDidBlur(){
+    this.willBeVisible = false;
+    this.visible = false;
+  }
+
+  getProp = (prop) => {
+    // this.props.navigation could be undefined if we're in the drawer
+    return this.props.navigation.getParam && this.props.navigation.getParam(prop);
+  }
+
+  setTitle(title, subtitle) {
+    let options = {};
+    options.title = title;
+    options.subtitle = subtitle;
+    this.props.navigation.setParams(options);
+  }
+
+  lockContent() {
+    this.mergeState({lockContent: true});
+    this.configureNavBar();
+  }
+
+  unlockContent() {
+    if(!this.loadedInitialState) {
+      this.loadInitialState();
+    }
+    this.mergeState({lockContent: false});
   }
 
   constructState(state) {
@@ -209,7 +196,14 @@ export default class Abstract extends Component {
 
   }
 
-  dismissModal() {
-    Navigation.dismissModal();
+  popToRoot() {
+    this.props.navigation.popToTop();
+  }
+
+  dismiss() {
+    /*
+      the `null` parameter is actually very important: https://reactnavigation.org/docs/en/navigation-prop.html#goback-close-the-active-screen-and-move-back
+    */
+    this.props.navigation.goBack(null);
   }
 }

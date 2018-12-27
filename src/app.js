@@ -14,20 +14,21 @@ import ReviewManager from './lib/reviewManager';
 
 import Compose from "./screens/Compose"
 import Notes from "./screens/Notes"
-import Filter from "./screens/Filter"
-import Account from "./screens/Account"
+import SideMenu from "./screens/SideMenu"
+import Settings from "./screens/Settings"
+import NoteOptions from "./screens/NoteOptions"
 import InputModal from "./screens/InputModal"
 
 const AppStack = createStackNavigator({
   Notes: {screen: Notes},
   Compose: {screen: Compose},
-  NoteOptions: {screen : Filter},
+  NoteOptions: {screen : NoteOptions},
 }, {
   initialRouteName: 'Notes'
 })
 
 const SettingsStack = createStackNavigator({
-  Screen1: Account
+  Screen1: Settings
 })
 
 const InputModalStack = createStackNavigator({
@@ -46,7 +47,7 @@ const ModalStack = createStackNavigator({
 const DrawerStack = createDrawerNavigator({
   Main: ModalStack
 }, {
-  contentComponent: Filter,
+  contentComponent: SideMenu,
 });
 
 const AppContainer = createAppContainer(DrawerStack);

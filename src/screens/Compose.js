@@ -56,15 +56,7 @@ export default class Compose extends Abstract {
     this.note = note;
     this.constructState({title: note.title, text: note.text});
 
-    props.navigation.setParams({
-      title: 'Compose',
-      drawerLockMode: "locked-closed",
-      rightButton: {
-        title: "Options",
-        onPress: () => {this.presentOptions();},
-        disabled: !this.note.uuid
-      }
-    })
+    this.configureHeaderBar();
 
     this.loadStyles();
 
@@ -91,15 +83,23 @@ export default class Compose extends Abstract {
       }
     });
 
-    this.configureNavBar(true);
+    this.configureHeaderBar();
+  }
+
+  configureHeaderBar() {
+    this.props.navigation.setParams({
+      title: 'Compose',
+      drawerLockMode: "locked-closed",
+      rightButton: {
+        title: "Options",
+        onPress: () => {this.presentOptions();},
+        disabled: !this.note.uuid
+      }
+    })
   }
 
   refreshContent() {
     this.mergeState({title: this.note.title, text: this.note.text});
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
   }
 
   componentWillUnmount() {
@@ -241,7 +241,7 @@ export default class Compose extends Abstract {
             tag.setDirty(true);
           }
           this.save();
-          this.configureNavBar(true);
+          this.configureHeaderBar();
         });
       } else {
         this.save();

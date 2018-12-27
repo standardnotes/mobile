@@ -73,7 +73,7 @@ export default class Authenticate extends Abstract {
 
   dismiss() {
     if(!this.props.pseudoModal) {
-      this.dismissModal();
+      this.dismiss();
     }
   }
 

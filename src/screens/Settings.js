@@ -8,6 +8,7 @@ import AlertManager from '../lib/sfjs/alertManager'
 import Auth from '../lib/sfjs/authManager'
 import KeysManager from '../lib/keysManager'
 import UserPrefsManager from '../lib/userPrefsManager'
+import OptionsState from "../OptionsState";
 
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
@@ -31,7 +32,7 @@ import GlobalStyles from "../Styles"
 var base64 = require('base-64');
 var Mailer = require('NativeModules').RNMail;
 
-export default class Account extends Abstract {
+export default class Settings extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
     let templateOptions = {
@@ -55,6 +56,13 @@ export default class Account extends Abstract {
       }
     })
 
+    this.sortOptions = [
+      {key: "created_at", label: "Date Added"},
+      {key: "client_updated_at", label: "Date Modified"},
+      {key: "title", label: "Title"},
+    ];
+
+    this.options = ApplicationState.getOptions();
     this.constructState({params: {}});
   }
 
@@ -88,13 +96,6 @@ export default class Account extends Abstract {
     this.loadSecurityStatus();
   }
 
-  dismiss() {
-    /*
-      the `null` parameter is actually very important: https://reactnavigation.org/docs/en/navigation-prop.html#goback-close-the-active-screen-and-move-back
-    */
-    this.props.navigation.goBack(null);
-  }
-
   loadSecurityStatus() {
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
     var hasFingerprint = KeysManager.get().hasFingerprint();
@@ -107,8 +108,8 @@ export default class Account extends Abstract {
     Sync.get().removeEventHandler(this.syncEventHandler);
   }
 
-  componentWillMount() {
-    super.componentWillMount();
+  componentWillFocus() {
+    super.componentWillFocus();
     this.loadLastExportDate();
   }
 
@@ -471,6 +472,16 @@ export default class Account extends Abstract {
     }
   }
 
+  onSortChange = (key) => {
+    this.options.setSortBy(key);
+    this.forceUpdate();
+  }
+
+  onOptionSelect = (option) => {
+    this.options.setDisplayOptionKeyValue(option, !this.options.getDisplayOptionValue(option));
+    this.forceUpdate();
+  }
+
   render() {
     if(this.state.lockContent) {
       return (<LockedView />);
@@ -513,6 +524,55 @@ export default class Account extends Abstract {
             onExportPress={this.onExportPress}
             email={KeysManager.get().getUserEmail()}
           />
+
+
+          <TableSection>
+            <SectionHeader title={"Sort By"} />
+            {this.sortOptions.map((option, i) => {
+              return (
+                <SectionedAccessoryTableCell
+                  onPress={() => {this.onSortChange(option.key)}}
+                  text={option.label}
+                  key={option.key}
+                  first={i == 0}
+                  last={i == this.sortOptions.length - 1}
+                  selected={() => {return option.key == this.options.sortBy}}
+                />
+              )
+            })}
+          </TableSection>
+
+          <TableSection>
+            <SectionHeader title={"Options"} />
+
+            <SectionedAccessoryTableCell
+              onPress={() => {this.onOptionSelect('archivedOnly')}}
+              text={"Show only archived notes"}
+              first={true}
+              selected={() => {return this.options.archivedOnly}}
+            />
+
+            <SectionedAccessoryTableCell
+              onPress={() => {this.onOptionSelect('hidePreviews')}}
+              text={"Hide note previews"}
+              selected={() => {return this.options.hidePreviews}}
+            />
+
+            <SectionedAccessoryTableCell
+              onPress={() => {this.onOptionSelect('hideTags')}}
+              text={"Hide note tags"}
+              selected={() => {return this.options.hideTags}}
+            />
+
+            <SectionedAccessoryTableCell
+              onPress={() => {this.onOptionSelect('hideDates')}}
+              text={"Hide note dates"}
+              last={true}
+              selected={() => {return this.options.hideDates}}
+            />
+
+          </TableSection>
+
 
           <ThemesSection themes={themes} title={"Themes"} onThemeSelect={this.onThemeSelect} onThemeLongPress={this.onThemeLongPress} />
 

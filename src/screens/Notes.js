@@ -89,6 +89,7 @@ export default class Notes extends Abstract {
   }
 
   componentDidMount() {
+    super.componentDidMount();
     this.props.navigation.setParams({ toggleDrawer: this.toggleDrawer });
   }
 
