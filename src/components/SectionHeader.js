@@ -10,7 +10,7 @@ export default class SectionHeader extends Component {
       title = title.toUpperCase();
     }
     return (
-      <View style={StyleKit.stylesForKey("sectionHeaderContainer")}>
+      <View style={[StyleKit.stylesForKey("sectionHeaderContainer"), {backgroundColor: this.props.backgroundColor, color: this.props.foregroundColor}]}>
         <Text style={StyleKit.stylesForKey("sectionHeader")}>{title}</Text>
         {this.props.buttonText &&
           <TouchableOpacity onPress={this.props.buttonAction}>

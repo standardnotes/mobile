@@ -72,9 +72,12 @@ export default class NoteCell extends React.PureComponent {
       },
 
       noteText: {
-        fontSize: StyleKit.constants().mainTextFontSize,
+        fontSize: 15,
+        // fontSize: StyleKit.constants().mainTextFontSize,
         marginTop: 4,
-        color: StyleKit.variable("stylekitForegroundColor")
+        color: StyleKit.variable("stylekitForegroundColor"),
+        opacity: 0.8,
+        lineHeight: 21
       },
 
       noteTextSelected: {
@@ -89,7 +92,8 @@ export default class NoteCell extends React.PureComponent {
       },
 
       noteDateSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor")
+        color: StyleKit.variable("stylekitInfoContrastColor"),
+        opacity: 0.8
       },
 
       deleting: {

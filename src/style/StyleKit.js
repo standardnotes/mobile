@@ -95,6 +95,10 @@ export default class StyleKit {
     return this.get().activeTheme.getMobileRules().variables[name];
   }
 
+  static get variables() {
+    return this.get().activeTheme.getMobileRules().variables;
+  }
+
   static styles() {
     return this.get().styles.rules;
   }
@@ -330,14 +334,12 @@ export default class StyleKit {
   defaultRules(constants, variables) {
     return {
       container: {
-        backgroundColor: variables.stylekitBackgroundColor,
         height: "100%",
       },
 
       flexContainer: {
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: variables.stylekitBackgroundColor,
       },
 
       centeredContainer: {
@@ -357,7 +359,11 @@ export default class StyleKit {
       },
 
       view: {
-        backgroundColor: variables.stylekitBackgroundColor,
+
+      },
+
+      contrastView: {
+
       },
 
       tableSection: {
@@ -374,9 +380,11 @@ export default class StyleKit {
         paddingRight: constants.paddingLeft,
         paddingBottom: 10,
         paddingTop: 10,
+        backgroundColor: 'rgba(52, 52, 52, 0.0)'
       },
 
       sectionHeader: {
+        backgroundColor: "transparent",
         fontSize: constants.mainTextFontSize - 4,
         paddingLeft: constants.paddingLeft,
         color: variables.stylekitNeutralColor,
@@ -438,6 +446,7 @@ export default class StyleKit {
         paddingTop: 0,
         paddingBottom: 0,
         minHeight: 47,
+        backgroundColor: "transparent"
       },
 
       sectionedAccessoryTableCellLabel: {

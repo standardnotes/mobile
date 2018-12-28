@@ -1,6 +1,6 @@
 const Ionicons = require('react-native-vector-icons/Ionicons');
 import { Platform } from 'react-native';
-import StyleKit from "./style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 
 let iconsMap = {};
 

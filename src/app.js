@@ -4,7 +4,7 @@ import { createStackNavigator, createAppContainer, createDrawerNavigator } from 
 
 import KeysManager from './lib/keysManager'
 import StyleKit from "./style/StyleKit"
-import Icons from "./Icons"
+import Icons from '@Style/Icons';
 import ApplicationState from "./ApplicationState"
 import Auth from './lib/sfjs/authManager'
 import ModelManager from './lib/sfjs/modelManager'
@@ -14,7 +14,7 @@ import ReviewManager from './lib/reviewManager';
 
 import Compose from "./screens/Compose"
 import Notes from "./screens/Notes"
-import SideMenu from "./screens/SideMenu"
+import SideMenu from "@SideMenu/SideMenu"
 import Settings from "./screens/Settings"
 import NoteOptions from "./screens/NoteOptions"
 import InputModal from "./screens/InputModal"

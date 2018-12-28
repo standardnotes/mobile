@@ -6,7 +6,7 @@ import Auth from '../lib/sfjs/authManager'
 import Abstract from "./Abstract"
 import Webview from "./Webview"
 import ComponentManager from '../lib/componentManager'
-import Icons from '../Icons';
+import Icons from '@Style/Icons';
 import ApplicationState from '../ApplicationState';
 import LockedView from "../containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';

@@ -22,7 +22,6 @@ import AuthSection from "../containers/account/AuthSection"
 import RegistrationConfirmSection from "../containers/account/RegistrationConfirmSection"
 import OptionsSection from "../containers/account/OptionsSection"
 import PasscodeSection from "../containers/account/PasscodeSection"
-import ThemesSection from "../containers/account/ThemesSection"
 import EncryptionSection from "../containers/account/EncryptionSection"
 import CompanySection from "../containers/account/CompanySection"
 import LockedView from "../containers/LockedView";
@@ -332,21 +331,6 @@ export default class Settings extends Abstract {
     }, 2500);
   }
 
-  onThemeSelect = (theme) => {
-    StyleKit.get().activateTheme(theme);
-  }
-
-  onThemeLongPress = (theme) => {
-    AlertManager.get().confirm({
-      title: "Redownload Theme",
-      text: "Themes are cached when downloaded. To retrieve the latest version, press Redownload.",
-      confirmButtonText: "Redownload",
-      onConfirm: () => {
-        StyleKit.get().downloadThemeAndReload(theme);
-      }
-    })
-  }
-
   onStorageEncryptionEnable = () => {
     AlertManager.get().confirm({
       title: "Enable Storage Encryption?",
@@ -488,7 +472,6 @@ export default class Settings extends Abstract {
     }
 
     let signedIn = !Auth.get().offline();
-    var themes = StyleKit.get().themes();
 
     return (
       <View style={StyleKit.styles().container}>
@@ -572,9 +555,6 @@ export default class Settings extends Abstract {
             />
 
           </TableSection>
-
-
-          <ThemesSection themes={themes} title={"Themes"} onThemeSelect={this.onThemeSelect} onThemeLongPress={this.onThemeLongPress} />
 
           <PasscodeSection
             hasPasscode={this.state.hasPasscode}

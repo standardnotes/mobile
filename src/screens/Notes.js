@@ -12,7 +12,7 @@ import Keychain from "../lib/keychain"
 
 import Abstract from "./Abstract"
 import StyleKit from "../style/StyleKit"
-import Icons from '../Icons';
+import Icons from '@Style/Icons';
 import NoteList from "../containers/NoteList"
 import OptionsState from "../OptionsState"
 import AuthModal from "../containers/AuthModal"

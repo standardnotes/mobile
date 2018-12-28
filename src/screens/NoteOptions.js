@@ -14,8 +14,9 @@ import LockedView from "../containers/LockedView";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import TagList from "../containers/TagList";
 
-import Icons from '../Icons';
-import StyleKit from "../style/StyleKit"
+import Icons from '@Style/Icons';
+import StyleKit from "@Style/StyleKit"
+
 import ApplicationState from "../ApplicationState";
 import OptionsState from "../OptionsState";
 import Icon from 'react-native-vector-icons/Ionicons';

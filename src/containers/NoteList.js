@@ -43,7 +43,13 @@ export default class NoteList extends Component {
           backgroundColor={StyleKit.variable("stylekitBackgroundColor")}
           titleCancelColor={StyleKit.variable("stylekitInfoColor")}
           keyboardDismissMode={'interactive'}
-          inputStyle={{backgroundColor: StyleKit.variable("stylekitBorderColor"), color: StyleKit.variable("stylekitForegroundColor")}}
+          inputStyle={
+            {
+              backgroundColor: StyleKit.variable("stylekitContrastBackgroundColor"),
+              color: StyleKit.variable("stylekitForegroundColor"),
+              height: 35
+            }
+          }
         />
       </View>
     );

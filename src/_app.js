@@ -8,7 +8,7 @@ import {AppState, Platform, StatusBar, BackHandler, DeviceEventEmitter, NativeMo
 import {registerScreens} from './screens';
 
 import StyleKit from "./style/StyleKit"
-import Icons from "./Icons"
+import Icons from '@Style/Icons';
 import OptionsState from "./OptionsState"
 import { Client } from 'bugsnag-react-native';
 import Authenticate from "./screens/Authenticate";
