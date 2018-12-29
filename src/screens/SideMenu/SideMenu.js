@@ -16,7 +16,6 @@ import TableSection from "@Components/TableSection";
 import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
 
 import LockedView from "@Containers/LockedView";
-// import TagList from "@Containers/TagList";
 
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
@@ -236,7 +235,26 @@ export default class SideMenu extends Abstract {
   */
 
   iconDescriptorForTheme = (theme) => {
-    return theme.content.package_info && theme.content.package_info.dock_icon;
+    let desc = {
+      type: "circle",
+      side: "right"
+    };
+
+    let dockIcon = theme.content.package_info && theme.content.package_info.dock_icon;
+
+    if(dockIcon) {
+      _.merge(desc, {
+        backgroundColor: dockIcon.background_color,
+        borderColor: dockIcon.border_color,
+      })
+    } else {
+      _.merge(desc, {
+        backgroundColor: "red",
+        borderColor: "red"
+      })
+    }
+
+    return desc;
   }
 
   iconDescriptorForTag = (tag) => {
@@ -244,6 +262,35 @@ export default class SideMenu extends Abstract {
       type: "ascii",
       value: "#"
     };
+  }
+
+  buildOptionsForThemes() {
+    let themes = StyleKit.get().themes();
+    let options = [];
+    for(var theme of themes) {
+      let option = SideMenuSection.BuildOption({
+        text: theme.name,
+        key: theme.uuid || theme.name,
+        iconDesc: this.iconDescriptorForTheme(theme),
+        dimmed: theme.getNotAvailOnMobile(),
+        selected: StyleKit.get().isThemeActive(theme),
+        onSelect: () => {this.onThemeSelect(theme)},
+        onLongPress: () => {this.onThemeLongPress(theme)}
+      })
+
+      options.push(option);
+    }
+
+    // Red and Blue default
+    if(themes.length == 2) {
+      options.push(SideMenuSection.BuildOption({
+        text: "Get Themes",
+        key: "get-theme",
+        onSelect: () => { Linking.openURL("https://standardnotes.org/extensions")},
+      }));
+    }
+
+    return options;
   }
 
   // must pass title, text, and tags as props so that it re-renders when either of those change
@@ -284,7 +331,7 @@ export default class SideMenu extends Abstract {
       this.reloadTags();
     }
 
-    let themes = StyleKit.get().themes();
+    let themeOptions = this.buildOptionsForThemes();
 
     return (
       <Fragment>
@@ -296,6 +343,8 @@ export default class SideMenu extends Abstract {
 
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
 
+            <SideMenuSection title="Themes" options={themeOptions} collapsed={false} />
+
             <SideMenuSection title="Tags">
               <FlatList
                 initialNumToRender={10}
@@ -304,29 +353,6 @@ export default class SideMenu extends Abstract {
                 data={this.tags}
                 renderItem={this.renderTagCell}
               />
-            </SideMenuSection>
-
-            <SideMenuSection title="Themes">
-              {themes.map((theme) => {
-                return (
-                  <SideMenuCell
-                    text={theme.name}
-                    key={theme.uuid}
-                    iconDesc={this.iconDescriptorForTheme(theme)}
-                    dimmed={theme.getNotAvailOnMobile()}
-                    selected={StyleKit.get().isThemeActive(theme)}
-                    onSelect={() => {this.onThemeSelect(theme)}}
-                    onLongPress={() => {this.onThemeLongPress(theme)}}
-                  />
-                )
-              })}
-
-              {themes.length == 1 &&
-                <SideMenuCell
-                  text={"Get Themes"}
-                  onSelect={() => { Linking.openURL("https://standardnotes.org/extensions")}}
-                />
-              }
             </SideMenuSection>
 
             <SideMenuSection title="Sort By">

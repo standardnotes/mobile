@@ -4,12 +4,28 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
+import Circle from "@Components/Circle"
 
 export default class SideMenuCell extends Component {
 
   constructor(props) {
     super(props);
     this.loadStyles();
+    this.updateStyles();
+  }
+
+  componentDidUpdate() {
+    this.updateStyles();
+  }
+
+  updateStyles() {
+    if(this.props.iconDesc && this.props.iconDesc.side == "right") {
+      if(!this.styles.cellContent.justifyContent) {
+        let styles = _.cloneDeep(this.styles);
+        styles.cellContent.justifyContent = "space-between";
+        this.styles = styles;
+      }
+    }
   }
 
   onPress = () => {
@@ -34,6 +50,10 @@ export default class SideMenuCell extends Component {
         return (
           <Text style={this.styles.iconAscii}>{desc.value}</Text>
         )
+    } else if(desc.type == "circle") {
+      return (
+        <Circle backgroundColor={desc.backgroundColor} borderColor={desc.borderColor} />
+      )
     } else {
       return (
         <Text>*</Text>
@@ -42,6 +62,7 @@ export default class SideMenuCell extends Component {
   }
 
   render() {
+    let iconSide = this.props.iconDesc.side ? this.props.iconDesc.side : "left";
     return (
       <TouchableHighlight
         style={this.styles.cell}
@@ -50,13 +71,21 @@ export default class SideMenuCell extends Component {
         onLongPress={this.onLongPress}
       >
         <View style={this.styles.cellContent}>
-          <View style={this.styles.iconContainer}>
-            {this.getIconElement()}
-          </View>
+          {iconSide == "left" &&
+            <View style={this.styles.iconContainerLeft}>
+              {this.getIconElement()}
+            </View>
+          }
 
           <Text style={this.styles.text}>{this.props.text}</Text>
 
           {this.props.children}
+
+          {iconSide == "right" &&
+            <View style={this.styles.iconContainerRight}>
+              {this.getIconElement()}
+            </View>
+          }
         </View>
       </TouchableHighlight>
     )
@@ -72,11 +101,16 @@ export default class SideMenuCell extends Component {
 
       cellContent: {
         flex: 1,
-        flexDirection: 'row',
+        flexDirection: 'row'
       },
 
-      iconContainer: {
+      iconContainerLeft: {
         marginRight: 6
+      },
+
+      iconContainerRight: {
+        marginLeft: 6,
+        marginRight: 3
       },
 
       text: {
