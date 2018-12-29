@@ -24,14 +24,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
 import HeaderButtons, { HeaderButton, Item } from 'react-navigation-header-buttons';
 
-const IoniconsHeaderButton = passMeFurther => (
-  // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
-  // and it is important to pass those props to `HeaderButton`
-  // then you may add some information like icon size or color (if you use icons)
-  <HeaderButton {...passMeFurther} IconComponent={Icon} iconSize={30} color={StyleKit.variable("stylekitInfoColor")} />
-);
-
 export default class Notes extends Abstract {
+
   constructor(props) {
     super(props);
 
@@ -43,7 +37,7 @@ export default class Notes extends Abstract {
         title: null,
         iconName: "ios-menu-outline",
         onPress: () => {
-          this.openDrawer();
+          this.props.navigation.openLeftDrawer();
         }
       }
     })
@@ -90,7 +84,6 @@ export default class Notes extends Abstract {
 
   componentDidMount() {
     super.componentDidMount();
-    this.props.navigation.setParams({ toggleDrawer: this.toggleDrawer });
   }
 
   componentWillUnmount() {
@@ -116,7 +109,7 @@ export default class Notes extends Abstract {
 
   registerObservers() {
     this.optionsObserver = this.options.addChangeObserver((options, eventType) => {
-      this.closeDrawer();
+      this.props.navigation.closeLeftDrawer();
       // should only show for non-search term change
       if(eventType !== OptionsState.OptionsStateChangeEventSearch) {
         this.setTitle(null, "Loading...");
@@ -309,18 +302,6 @@ export default class Notes extends Abstract {
       noteId: item && item.uuid,
       selectedTagId: this.selectedTags.length && this.selectedTags[0].uuid,
     });
-  }
-
-  toggleDrawer = () => {
-    this.props.navigation.toggleDrawer();
-  }
-
-  openDrawer = () => {
-    this.props.navigation.openDrawer();
-  }
-
-  closeDrawer = () => {
-    this.props.navigation.closeDrawer();
   }
 
   presentFilterScreen() {

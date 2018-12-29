@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { View, Text } from "react-native";
-import { createStackNavigator, createAppContainer, createDrawerNavigator } from "react-navigation";
+import { createStackNavigator, createAppContainer, createDrawerNavigator, DrawerActions, NavigationActions } from "react-navigation";
 
 import KeysManager from './lib/keysManager'
 import StyleKit from "./style/StyleKit"
@@ -19,12 +19,39 @@ import Settings from "./screens/Settings"
 import NoteOptions from "./screens/NoteOptions"
 import InputModal from "./screens/InputModal"
 
+let leftDrawerLocked = false;
+let rightDrawerLocked = true;
+
 const AppStack = createStackNavigator({
   Notes: {screen: Notes},
   Compose: {screen: Compose},
   NoteOptions: {screen : NoteOptions},
 }, {
-  initialRouteName: 'Notes'
+  initialRouteName: 'Notes',
+})
+
+AppStack.navigationOptions = ({ navigation }) => {
+  return {drawerLockMode: rightDrawerLocked ? "locked-closed" : null}
+};
+
+const AppDrawerStack = createDrawerNavigator({
+  Main: AppStack
+}, {
+  contentComponent: SideMenu,
+  drawerPosition: "right",
+  drawerType: 'slide',
+  getCustomActionCreators: (route, stateKey) => {
+    return {
+      openRightDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
+      closeRightDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
+      lockRightDrawer: (lock) => {
+        // this is the key part
+        rightDrawerLocked = lock;
+        // We have to return something
+        return NavigationActions.setParams({params: { dummy: true }, key: route.key})
+      }
+    };
+  },
 })
 
 const SettingsStack = createStackNavigator({
@@ -35,8 +62,8 @@ const InputModalStack = createStackNavigator({
   Screen1: InputModal
 })
 
-const ModalStack = createStackNavigator({
-  Home: AppStack,
+const AppDrawer = createStackNavigator({
+  Home: AppDrawerStack,
   Settings: SettingsStack,
   NewTag: InputModalStack
 }, {
@@ -44,10 +71,29 @@ const ModalStack = createStackNavigator({
   headerMode: 'none',
 })
 
+AppDrawer.navigationOptions = ({ navigation }) => {
+  return {drawerLockMode: leftDrawerLocked ? "locked-closed" : null}
+};
+
+
 const DrawerStack = createDrawerNavigator({
-  Main: ModalStack
+  Main: AppDrawer,
 }, {
   contentComponent: SideMenu,
+  drawerPosition: "left",
+  drawerType: 'slide',
+  getCustomActionCreators: (route, stateKey) => {
+    return {
+      openLeftDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
+      closeLeftDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
+      lockLeftDrawer: (lock) => {
+        // this is the key part
+        leftDrawerLocked = lock;
+        // We have to return something
+        return NavigationActions.setParams({params: { dummy: true }, key: route.key})
+      }
+    };
+  },
 });
 
 const AppContainer = createAppContainer(DrawerStack);

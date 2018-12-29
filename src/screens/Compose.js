@@ -33,7 +33,8 @@ export default class Compose extends Abstract {
     let templateOptions = {
       title: "Compose",
       rightButton: {
-        title: "Options"
+        title: null,
+        iconName: "ios-menu-outline",
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -89,10 +90,12 @@ export default class Compose extends Abstract {
   configureHeaderBar() {
     this.props.navigation.setParams({
       title: 'Compose',
-      drawerLockMode: "locked-closed",
       rightButton: {
-        title: "Options",
-        onPress: () => {this.presentOptions();},
+        title: null,
+        iconName: "ios-menu-outline",
+        onPress: () => {
+          this.props.navigation.openRightDrawer();
+        },
         disabled: !this.note.uuid
       }
     })
@@ -126,6 +129,9 @@ export default class Compose extends Abstract {
   componentDidFocus() {
     super.componentDidFocus();
 
+    this.props.navigation.lockLeftDrawer(true);
+    this.props.navigation.lockRightDrawer(false);
+
     if(this.note.dummy) {
       if(this.refs.input) {
         this.refs.input.focus();
@@ -137,6 +143,12 @@ export default class Compose extends Abstract {
         this.input.focus();
       }
     }
+  }
+
+  componentDidBlur() {
+    super.componentDidBlur();
+    this.props.navigation.lockLeftDrawer(false);
+    this.props.navigation.lockRightDrawer(true);
   }
 
   presentOptions() {

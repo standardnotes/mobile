@@ -24,8 +24,7 @@ export default class Abstract extends Component {
       headerStyle: {
         backgroundColor: StyleKit.variable("stylekitBackgroundColor")
       },
-      headerTintColor: StyleKit.variable("stylekitInfoColor"),
-      drawerLockMode: navigation.getParam("drawerLockMode") || templateOptions.drawerLockMode
+      headerTintColor: StyleKit.variable("stylekitInfoColor")
     }
 
     let headerLeft, headerRight;
@@ -88,7 +87,11 @@ export default class Abstract extends Component {
   componentWillUnmount() {
     this.willUnmount = true;
     this.mounted = false;
+    for(var listener of this.listeners) {
+      listener.remove();
+    }
     ApplicationState.get().removeStateObserver(this._stateObserver);
+    this.componentDidBlur(); // This is not called automatically when the component unmounts. https://github.com/react-navigation/react-navigation/issues/4003
   }
 
   componentDidMount() {
@@ -113,12 +116,6 @@ export default class Abstract extends Component {
     this.configureNavBar(true);
   }
 
-  componentWillUnmount() {
-    for(var listener of this.listeners) {
-      listener.remove();
-    }
-  }
-
   componentWillFocus() {
     this.willUnmount = false;
     this.mounted = false;
@@ -133,11 +130,11 @@ export default class Abstract extends Component {
     this.configureNavBar(false);
   }
 
-  componentWillBlur(){
+  componentWillBlur() {
 
   }
 
-  componentDidBlur(){
+  componentDidBlur() {
     this.willBeVisible = false;
     this.visible = false;
   }
