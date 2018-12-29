@@ -10,6 +10,8 @@ import Auth from '../lib/sfjs/authManager'
 import KeysManager from '../lib/keysManager'
 import Keychain from "../lib/keychain"
 
+import SideMenuManager from "@SideMenu/SideMenuManager"
+
 import Abstract from "./Abstract"
 import StyleKit from "../style/StyleKit"
 import Icons from '@Style/Icons';
@@ -109,7 +111,7 @@ export default class Notes extends Abstract {
 
   registerObservers() {
     this.optionsObserver = this.options.addChangeObserver((options, eventType) => {
-      this.props.navigation.closeLeftDrawer();
+      // this.props.navigation.closeLeftDrawer();
       // should only show for non-search term change
       if(eventType !== OptionsState.OptionsStateChangeEventSearch) {
         this.setTitle(null, "Loading...");
@@ -254,10 +256,10 @@ export default class Notes extends Abstract {
 
     var options = this.options;
     var notesTitle = "Notes";
-    var numTags = options.selectedTags.length;
+    var numTags = options.selectedTagIds.length;
 
     if(numTags > 0) {
-      var tags = ModelManager.get().findItems(options.selectedTags);
+      var tags = ModelManager.get().findItems(options.selectedTagIds);
       if(tags.length > 0) {
         var tag = tags[0];
         notesTitle = tag.title + " notes";
@@ -282,8 +284,24 @@ export default class Notes extends Abstract {
     }
   }
 
+  setSideMenuHandler() {
+    SideMenuManager.get().setHandlerForLeftSideMenu({
+      onTagSelect: (tag) => {
+        // Single tag at a time only
+        this.options.setSelectedTagIds([tag.uuid]);
+        // this.props.navigation.closeLeftDrawer();
+      },
+      getSelectedTags: () => {
+        let ids = this.options.getSelectedTagIds();
+        return ModelManager.get().findItems(ids);
+      }
+    })
+  }
+
   componentDidFocus() {
     super.componentDidFocus();
+
+    this.setSideMenuHandler();
 
     this.forceUpdate();
 
@@ -300,7 +318,7 @@ export default class Notes extends Abstract {
   presentComposer(item) {
     this.props.navigation.navigate("Compose", {
       noteId: item && item.uuid,
-      selectedTagId: this.selectedTags.length && this.selectedTags[0].uuid,
+      selectedTagId: this.options.selectedTagIds.length && this.options.selectedTagIds[0],
     });
   }
 
@@ -394,7 +412,7 @@ export default class Notes extends Abstract {
 
     var result = ModelManager.get().getNotes(this.options);
     var notes = result.notes;
-    var tags = this.selectedTags = result.tags;
+    var tags = result.tags;
 
     var syncStatus = Sync.get().syncStatus;
 

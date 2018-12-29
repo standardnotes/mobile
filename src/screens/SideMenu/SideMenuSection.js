@@ -65,7 +65,7 @@ export default class SideMenuSection extends Component {
   loadStyles() {
     this.styles = {
       header: {
-        height: 30
+        height: 22
       },
       collapsedHeader: {
         height: 50

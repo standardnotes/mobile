@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import Sync from '../lib/sfjs/syncManager'
 import ModelManager from '../lib/sfjs/modelManager'
 import Auth from '../lib/sfjs/authManager'
+import OptionsState from "@Root/OptionsState"
+
+import SideMenuManager from "@SideMenu/SideMenuManager"
 
 import Abstract from "./Abstract"
 import Webview from "./Webview"
@@ -55,6 +58,7 @@ export default class Compose extends Abstract {
     }
 
     this.note = note;
+
     this.constructState({title: note.title, text: note.text});
 
     this.configureHeaderBar();
@@ -143,38 +147,37 @@ export default class Compose extends Abstract {
         this.input.focus();
       }
     }
+
+    SideMenuManager.get().setHandlerForRightSideMenu({
+      onEditorSelect: (editor) => {
+        this.needsEditorReload = true;
+      },
+      onTagSelect: (tag) => {
+        let selectedTags = this.note.tags;
+        var selected = selectedTags.includes(tag);
+        if(selected) {
+          // deselect
+          selectedTags.splice(selectedTags.indexOf(tag), 1);
+        } else {
+          // select
+          selectedTags.push(tag);
+        }
+        this.replaceTagsForNote(selectedTags);
+        this.changesMade();
+      },
+      getSelectedTags: () => {
+        // Return copy so that list re-renders every time if they change
+        return this.note.tags.slice();
+      }
+    })
   }
 
   componentDidBlur() {
     super.componentDidBlur();
+
+    SideMenuManager.get().removeHandlerForRightSideMenu();
     this.props.navigation.lockLeftDrawer(false);
     this.props.navigation.lockRightDrawer(true);
-  }
-
-  presentOptions() {
-    if(ApplicationState.isAndroid && this.input) {
-      this.input.blur();
-    }
-
-    this.previousOptions = {selectedTags: this.note.tags.map((tag) => {return tag.uuid})};
-
-    this.props.navigation.navigate("NoteOptions", {
-      noteId: this.note.uuid,
-      onManageNoteEvent: () => {this.forceUpdate()},
-      singleSelectMode: false,
-      options: JSON.stringify(this.previousOptions),
-      onEditorSelect: () => {
-        this.needsEditorReload = true;
-      },
-      onOptionsChange: (options) => {
-        if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
-          var tags = ModelManager.get().findItems(options.selectedTags);
-          this.replaceTagsForNote(tags);
-          this.note.setDirty(true);
-          this.changesMade();
-        }
-      }
-    });
   }
 
   replaceTagsForNote(newTags) {
@@ -191,8 +194,10 @@ export default class Compose extends Abstract {
     }
 
     for(var newTag of newTags) {
-      newTag.addItemAsRelationship(note);
-      newTag.setDirty(true);
+      if(!oldTags.includes(newTag)) {
+        newTag.addItemAsRelationship(note);
+        newTag.setDirty(true);
+      }
     }
   }
 

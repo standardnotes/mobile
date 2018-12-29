@@ -81,8 +81,9 @@ export default class ModelManager extends SFModelManager {
   getNotes(options = {}) {
     var notes;
     var tags = [];
-    if(options.selectedTags && options.selectedTags.length > 0 && options.selectedTags[0].key !== "all") {
-      tags = ModelManager.get().findItems(options.selectedTags);
+    // if(options.selectedTagIds && options.selectedTagIds.length > 0 && options.selectedTagIds[0].key !== "all") {
+    if(options.selectedTagIds && options.selectedTagIds.length > 0) {
+      tags = ModelManager.get().findItems(options.selectedTagIds);
       if(tags.length > 0) {
         var taggedNotes = new Set();
         for(var tag of tags) {

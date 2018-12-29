@@ -20,7 +20,7 @@ export default class OptionsState {
   }
 
   init() {
-    this.selectedTags = [];
+    this.selectedTagIds = [];
     this.sortBy = "created_at";
   }
 
@@ -44,7 +44,7 @@ export default class OptionsState {
   toJSON() {
     return _.merge({
       sortBy: this.sortBy,
-      selectedTags: this.selectedTags
+      selectedTagIds: this.selectedTagIds
     }, this.getDisplayOptionValues());
   }
 
@@ -81,9 +81,13 @@ export default class OptionsState {
     this.notifyObservers(OptionsState.OptionsStateChangeEventSort);
   }
 
-  setSelectedTags(selectedTags) {
-    this.selectedTags = selectedTags;
+  setSelectedTagIds(selectedTagIds) {
+    this.selectedTagIds = selectedTagIds;
     this.notifyObservers(OptionsState.OptionsStateChangeEventTags);
+  }
+
+  getSelectedTagIds() {
+    return this.selectedTagIds;
   }
 
   getDisplayOptionValues() {

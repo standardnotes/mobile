@@ -27,7 +27,7 @@ export default class NoteCell extends React.PureComponent {
         backgroundColor: StyleKit.variable("stylekitInfoColor"),
       },
 
-      noteTags: {
+      noteTagsContainer: {
         flex: 1,
         flexDirection: 'row',
         marginBottom: 5,
@@ -59,6 +59,7 @@ export default class NoteCell extends React.PureComponent {
 
       noteTagSelected: {
         color: StyleKit.variable("stylekitInfoContrastColor"),
+        opacity: 0.8
       },
 
       noteTitle: {
@@ -73,7 +74,6 @@ export default class NoteCell extends React.PureComponent {
 
       noteText: {
         fontSize: 15,
-        // fontSize: StyleKit.constants().mainTextFontSize,
         marginTop: 4,
         color: StyleKit.variable("stylekitForegroundColor"),
         opacity: 0.8,
@@ -196,9 +196,9 @@ export default class NoteCell extends React.PureComponent {
             }
 
             {this.props.renderTags && !this.state.options.hideTags && note.tags.length > 0 &&
-              <View style={this.styles.noteTags}>
+              <View style={this.styles.noteTagsContainer}>
                 <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag, this.styles.noteTagSelected, this.state.selected)}>
-                {this.props.tagsString}
+                  {this.props.tagsString}
                 </Text>
               </View>
             }

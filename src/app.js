@@ -15,12 +15,12 @@ import ReviewManager from './lib/reviewManager';
 import Compose from "./screens/Compose"
 import Notes from "./screens/Notes"
 import SideMenu from "@SideMenu/SideMenu"
+import NoteSideMenu from "@SideMenu/NoteSideMenu"
 import Settings from "./screens/Settings"
 import NoteOptions from "./screens/NoteOptions"
 import InputModal from "./screens/InputModal"
 
-let leftDrawerLocked = false;
-let rightDrawerLocked = true;
+import SideMenuManager from "@SideMenu/SideMenuManager"
 
 const AppStack = createStackNavigator({
   Notes: {screen: Notes},
@@ -31,13 +31,15 @@ const AppStack = createStackNavigator({
 })
 
 AppStack.navigationOptions = ({ navigation }) => {
-  return {drawerLockMode: rightDrawerLocked ? "locked-closed" : null}
+  return {drawerLockMode: SideMenuManager.get().isRightSideMenuLocked() ? "locked-closed" : null}
 };
 
 const AppDrawerStack = createDrawerNavigator({
   Main: AppStack
 }, {
-  contentComponent: SideMenu,
+  contentComponent: ({ navigation }) => (
+    <NoteSideMenu ref={(ref) => {SideMenuManager.get().setRightSideMenuReference(ref)}} navigation={navigation} />
+  ),
   drawerPosition: "right",
   drawerType: 'slide',
   getCustomActionCreators: (route, stateKey) => {
@@ -46,7 +48,7 @@ const AppDrawerStack = createDrawerNavigator({
       closeRightDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
       lockRightDrawer: (lock) => {
         // this is the key part
-        rightDrawerLocked = lock;
+        SideMenuManager.get().setLockedForRightSideMenu(lock);
         // We have to return something
         return NavigationActions.setParams({params: { dummy: true }, key: route.key})
       }
@@ -72,14 +74,15 @@ const AppDrawer = createStackNavigator({
 })
 
 AppDrawer.navigationOptions = ({ navigation }) => {
-  return {drawerLockMode: leftDrawerLocked ? "locked-closed" : null}
+  return {drawerLockMode: SideMenuManager.get().isLeftSideMenuLocked() ? "locked-closed" : null}
 };
-
 
 const DrawerStack = createDrawerNavigator({
   Main: AppDrawer,
 }, {
-  contentComponent: SideMenu,
+  contentComponent: ({ navigation }) => (
+    <SideMenu ref={(ref) => {SideMenuManager.get().setLeftSideMenuReference(ref)}} navigation={navigation} />
+  ),
   drawerPosition: "left",
   drawerType: 'slide',
   getCustomActionCreators: (route, stateKey) => {
@@ -88,7 +91,7 @@ const DrawerStack = createDrawerNavigator({
       closeLeftDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
       lockLeftDrawer: (lock) => {
         // this is the key part
-        leftDrawerLocked = lock;
+        SideMenuManager.get().setLockedForLeftSideMenu(lock)
         // We have to return something
         return NavigationActions.setParams({params: { dummy: true }, key: route.key})
       }

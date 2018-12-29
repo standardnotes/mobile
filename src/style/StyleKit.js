@@ -146,8 +146,6 @@ export default class StyleKit {
     let constants = this.defaultConstants();
     let variables = redJSON;
 
-    console.log("StyleKit variables", variables);
-
     this._systemTheme = new SNTheme({
       uuid: 0,
       content: {

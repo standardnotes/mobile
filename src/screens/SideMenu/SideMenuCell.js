@@ -61,28 +61,38 @@ export default class SideMenuCell extends Component {
     }
   }
 
+  aggregateStyles(base, addition, condition) {
+    if(condition) {
+      return [base, addition];
+    } else {
+      return base;
+    }
+  }
+
   render() {
     let iconSide = this.props.iconDesc.side ? this.props.iconDesc.side : "left";
     return (
       <TouchableHighlight
         style={this.styles.cell}
-        underlayColor={StyleKit.variable("stylekitBorderColor")}
+        underlayColor={this.styles.selectionBgColor}
         onPress={this.onPress}
         onLongPress={this.onLongPress}
       >
         <View style={this.styles.cellContent}>
           {iconSide == "left" &&
-            <View style={this.styles.iconContainerLeft}>
+            <View style={[this.styles.iconContainer, this.styles.iconContainerLeft]}>
               {this.getIconElement()}
             </View>
           }
 
-          <Text style={this.styles.text}>{this.props.text}</Text>
+          <View style={this.aggregateStyles(this.styles.textContainer, this.styles.textContainerSelected, this.props.selected)}>
+            <Text style={this.aggregateStyles(this.styles.text, this.styles.textSelected, this.props.selected)}>{this.props.text}</Text>
+          </View>
 
           {this.props.children}
 
           {iconSide == "right" &&
-            <View style={this.styles.iconContainerRight}>
+            <View style={[this.styles.iconContainer, this.styles.iconContainerRight]}>
               {this.getIconElement()}
             </View>
           }
@@ -94,29 +104,49 @@ export default class SideMenuCell extends Component {
   loadStyles() {
     this.styles = {
       iconColor: StyleKit.variable("stylekitContrastInfoColor"),
+      selectionBgColor: StyleKit.hexToRGBA(StyleKit.variable("stylekitInfoColor"), 0.1),
 
       cell: {
-        minHeight: 42 ,
+        minHeight: 42,
       },
 
       cellContent: {
         flex: 1,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        alignItems: "center"
+      },
+
+      iconContainer: {
+        flex: 0,
+        justifyContent: "center",
+        flexDirection: 'column',
       },
 
       iconContainerLeft: {
-        marginRight: 6
+        marginRight: 6,
+        height: "100%",
       },
 
       iconContainerRight: {
         marginLeft: 6,
-        marginRight: 3
+        marginRight: 3,
+        height: "100%",
+      },
+
+      textContainer: {
+        height: 24
+      },
+
+      textContainerSelected: {
+        borderBottomColor: StyleKit.variable("stylekitInfoColor"),
+        borderBottomWidth: 2,
       },
 
       text: {
+        height: "100%",
         color: StyleKit.variable("stylekitContrastForegroundColor"),
         fontWeight: 'bold',
-        fontSize: 15
+        fontSize: 15,
       },
 
       iconAscii: {
@@ -124,6 +154,7 @@ export default class SideMenuCell extends Component {
         fontWeight: "bold",
         color: StyleKit.variable("stylekitNeutralColor"),
         opacity: 0.6,
+        marginTop: -4
       }
     }
   }
