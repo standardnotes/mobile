@@ -57,7 +57,6 @@ export default class TagSelectionList extends Component {
 
   reloadTags() {
     var tags = ModelManager.get().tags.slice();
-    console.log("Setting tags", tags);
     tags.unshift({title: "All notes", key: "all", uuid: 100})
     this.setState({tags: tags});
   }

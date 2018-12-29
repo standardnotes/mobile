@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { View, Text } from "react-native";
+import { Client } from 'bugsnag-react-native';
 import { createStackNavigator, createAppContainer, createDrawerNavigator, DrawerActions, NavigationActions } from "react-navigation";
 
 import KeysManager from './lib/keysManager'
@@ -21,6 +22,13 @@ import NoteOptions from "./screens/NoteOptions"
 import InputModal from "./screens/InputModal"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
+
+if(__DEV__ === false) {
+  const bugsnag = new Client()
+
+  // Disable console.log for non-dev builds
+  console.log = () => {};
+}
 
 const AppStack = createStackNavigator({
   Notes: {screen: Notes},
@@ -153,4 +161,19 @@ export default class App extends Component {
 
     return <AppContainer /* persistenceKey="if-you-want-it" */ />;
   }
+
+  // reloadAfterThemeChange() {
+  //   ApplicationState.get().setThemeChangeBegan();
+  //
+  //   Icons.get().loadIcons();
+  //
+  //   // reset search box
+  //   this.optionsState.setSearchTerm(null);
+  //
+  //   this.startApp();
+  //
+  //   setTimeout(function () {
+  //     ApplicationState.get().setThemeChangeEnded();
+  //   }, 100);
+  // }
 }
