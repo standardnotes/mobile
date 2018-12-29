@@ -11,13 +11,14 @@ export default class NoteCell extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {selected: false, options: props.options || {}};
-    let Padding = 14;
+
+    let padding = 14;
 
     this.styles = StyleSheet.create({
 
       noteCell: {
-        padding: Padding,
-        paddingRight: Padding * 2,
+        padding: padding,
+        paddingRight: padding * 2,
         borderBottomColor: StyleKit.variable("stylekitBorderColor"),
         borderBottomWidth: 1,
         backgroundColor: StyleKit.variable("stylekitBackgroundColor"),
@@ -64,7 +65,7 @@ export default class NoteCell extends React.PureComponent {
 
       noteTitle: {
         fontWeight: "bold",
-        fontSize: StyleKit.constants().mainHeaderFontSize,
+        fontSize: 16,
         color: StyleKit.variable("stylekitForegroundColor")
       },
 

@@ -21,7 +21,7 @@ export default class SectionedOptionsTableCell extends Component {
       paddingTop: 0,
       paddingBottom: 0,
       paddingRight: 5,
-      maxHeight: StyleKit.constants().maxSettingsCellHeight
+      maxHeight: 45
     })
     return rules;
   }
@@ -54,7 +54,7 @@ export default class SectionedOptionsTableCell extends Component {
 
     this.buttonStyles = {
       color: StyleKit.variable("stylekitNeutralColor"),
-      fontSize: StyleKit.constants().mainTextFontSize,
+      fontSize: 16,
       textAlign: "center",
       width: "100%",
     }

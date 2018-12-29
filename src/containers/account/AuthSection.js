@@ -53,7 +53,7 @@ export default class AuthSection extends AbstractComponent {
   }
 
   render() {
-    let textPadding = StyleKit.constants().paddingLeft;
+    let textPadding = 14;
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />

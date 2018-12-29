@@ -102,8 +102,6 @@ export default class NoteSideMenu extends Abstract {
     let editorOptions = this.buildOptionsForEditors();
     let selectedTags = this.handler.getSelectedTags();
 
-    console.log("NoteSideMenu selected tags", selectedTags);
-
     return (
       <Fragment>
         <SafeAreaView style={[viewStyles, this.styles.safeArea]}>

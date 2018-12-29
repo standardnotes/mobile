@@ -385,6 +385,7 @@ export default class Compose extends Abstract {
   }
 
   loadStyles() {
+    let padding = 14;
     this.rawStyles = {
       container: {
         flex: 1,
@@ -400,8 +401,8 @@ export default class Compose extends Abstract {
         borderBottomColor: StyleKit.variable("stylekitBorderColor"),
         borderBottomWidth: 1,
         paddingTop: Platform.OS === "ios" ? 5 : 12,
-        paddingLeft: StyleKit.constants().paddingLeft,
-        paddingRight: StyleKit.constants().paddingLeft,
+        paddingLeft: padding,
+        paddingRight: padding
       },
 
       lockedContainer: {
@@ -411,7 +412,7 @@ export default class Compose extends Abstract {
         alignItems: "center",
         height: 30,
         maxHeight: 30,
-        paddingLeft: StyleKit.constants().paddingLeft,
+        paddingLeft: padding,
         backgroundColor: StyleKit.variable("stylekitInfoColor"),
         borderBottomColor: StyleKit.variable("stylekitBorderColor"),
         borderBottomWidth: 1

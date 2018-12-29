@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, View, Text, TouchableHighlight } from 'react-native';
+import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Icons from '@Style/Icons';
@@ -72,9 +72,9 @@ export default class SideMenuCell extends Component {
   render() {
     let iconSide = this.props.iconDesc.side ? this.props.iconDesc.side : "left";
     return (
-      <TouchableHighlight
+      <TouchableOpacity
         style={this.styles.cell}
-        underlayColor={this.styles.selectionBgColor}
+
         onPress={this.onPress}
         onLongPress={this.onLongPress}
       >
@@ -97,7 +97,7 @@ export default class SideMenuCell extends Component {
             </View>
           }
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     )
   }
 

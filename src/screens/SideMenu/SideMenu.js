@@ -43,11 +43,11 @@ export default class SideMenu extends Abstract {
 
   onTagSelect = (tag) => {
     this.handler.onTagSelect(tag);
-    // this.forceUpdate();
   }
 
   onThemeSelect = (theme) => {
     StyleKit.get().activateTheme(theme);
+    this.forceUpdate();
   }
 
   onThemeLongPress = (theme) => {
@@ -69,15 +69,15 @@ export default class SideMenu extends Abstract {
 
     let dockIcon = theme.content.package_info && theme.content.package_info.dock_icon;
 
-    if(dockIcon) {
+    if(dockIcon && dockIcon.type == "circle") {
       _.merge(desc, {
         backgroundColor: dockIcon.background_color,
         borderColor: dockIcon.border_color,
       })
     } else {
       _.merge(desc, {
-        backgroundColor: "red",
-        borderColor: "red"
+        backgroundColor: StyleKit.variables.stylekitInfoColor,
+        borderColor: StyleKit.variables.stylekitInfoColor
       })
     }
 
@@ -87,7 +87,7 @@ export default class SideMenu extends Abstract {
   buildOptionsForThemes() {
     let themes = StyleKit.get().themes();
     let options = [];
-    for(var theme of themes) {
+    for(let theme of themes) {
       let option = SideMenuSection.BuildOption({
         text: theme.name,
         key: theme.uuid || theme.name,

@@ -27,7 +27,7 @@ export default class RegistrationConfirmSection extends Component {
   }
 
   render() {
-    var padding = StyleKit.constants().paddingLeft;
+    var padding = 14;
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />

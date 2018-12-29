@@ -31,6 +31,8 @@ export default class Notes extends Abstract {
   constructor(props) {
     super(props);
 
+    this.loadStyles();
+
     this.rendersLockscreen = true;
 
     props.navigation.setParams({
@@ -289,7 +291,7 @@ export default class Notes extends Abstract {
       onTagSelect: (tag) => {
         // Single tag at a time only
         this.options.setSelectedTagIds([tag.uuid]);
-        // this.props.navigation.closeLeftDrawer();
+        this.props.navigation.closeLeftDrawer();
       },
       getSelectedTags: () => {
         let ids = this.options.getSelectedTagIds();
@@ -436,8 +438,8 @@ export default class Notes extends Abstract {
         }
 
         {this.state.showSyncBar &&
-          <View style={StyleKit.styles().syncBar}>
-            <Text style={StyleKit.styles().syncBarText}>{this.state.syncBarText}</Text>
+          <View style={this.styles.syncBar}>
+            <Text style={this.styles.syncBarText}>{this.state.syncBarText}</Text>
           </View>
         }
 
@@ -450,5 +452,22 @@ export default class Notes extends Abstract {
         />
       </View>
     );
+  }
+
+  loadStyles() {
+    this.styles = {
+      syncBar: {
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
+        padding: 5
+      },
+
+      syncBarText: {
+        textAlign: "center",
+        color: StyleKit.variables.stylekitContrastForegroundColor
+      },
+    }
   }
 }

@@ -31,7 +31,7 @@ export default class Icons {
   }
 
   async loadIcons(callback) {
-    var color = StyleKit.variable("stylekitBackgroundColor"); //#FFFFFF
+    var color = StyleKit.variables.stylekitBackgroundColor;
 
     let icons = {
       "ios-menu-outline": [Ionicons, 25, color],

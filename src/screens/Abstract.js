@@ -82,6 +82,10 @@ export default class Abstract extends Component {
         this.lockContent();
       }
     })
+
+    this.themeChangeObserver = StyleKit.get().addThemeChangeObserver(() => {
+      this.forceUpdate();
+    });
   }
 
   componentWillUnmount() {
@@ -90,6 +94,7 @@ export default class Abstract extends Component {
     for(var listener of this.listeners) {
       listener.remove();
     }
+    StyleKit.get().removeThemeChangeObserver(this.themeChangeObserver);
     ApplicationState.get().removeStateObserver(this._stateObserver);
     this.componentDidBlur(); // This is not called automatically when the component unmounts. https://github.com/react-navigation/react-navigation/issues/4003
   }

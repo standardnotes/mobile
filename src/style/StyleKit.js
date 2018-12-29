@@ -7,6 +7,8 @@ import Auth from "../lib/sfjs/authManager"
 import KeysManager from '../lib/keysManager'
 import ApplicationState from '../ApplicationState'
 import CSSParser from "./CSSParser";
+import ThemeDownloader from "@Style/ThemeDownloader"
+import Icons from '@Style/Icons';
 
 import redJSON from './red.json';
 import blueJSON from './blue.json';
@@ -23,72 +25,122 @@ export default class StyleKit {
     return this.instance;
   }
 
-  async resolveInitialTheme() {
-    // Get the active theme from storage rather than waiting for local database to load
-    var themeResult = await Storage.get().getItem("activeTheme");
-    let runDefaultTheme = () => {
-      try {
-        var theme = this.systemTheme();
-        theme.setMobileActive(true);
-        this.activeTheme = theme;
-        var constants = this.defaultConstants();
-        this.setStyles(this.defaultRules(constants, theme.getMobileRules().variables), constants, theme.getMobileRules().statusBar);
-      } catch (e) {
-        var constants = this.defaultConstants();
-        this.setStyles(this.defaultRules(constants, {}), constants, Platform.OS == "android" ? "light-content" : "dark-content");
-        console.log("Default theme error", e);
-      }
-    }
-
-    if(themeResult) {
-      // JSON stringified content is generic and includes all items property at time of stringification
-      // So we parse it, then set content to itself, so that the mapping can be handled correctly.
-      try {
-        var parsedTheme = JSON.parse(themeResult);
-        var needsMigration = false;
-        if(parsedTheme.mobileRules) {
-          // Newer versions of the app persist a Theme object where mobileRules are nested in AppData.
-          // We want to check if the currently saved data is of the old format, which uses theme.mobileRules
-          // instead of theme.getMobileRules(). If so, we want to prepare it for the new format.
-          needsMigration = true;
-        }
-        let content = Object.assign({}, parsedTheme);
-        parsedTheme.content = content;
-
-        var theme = new SNTheme(parsedTheme);
-        if(needsMigration) {
-          theme.setMobileRules(parsedTheme.mobileRules);
-          theme.mobileRules = null;
-        }
-
-        theme.isSwapIn = true;
-        var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
-        var rules = _.merge(this.defaultRules(constants, theme.getMobileRules().variables), theme.getMobileRules().rules);
-        this.setStyles(rules, constants, theme.getMobileRules().statusBar);
-
-        this.activeTheme = theme;
-      } catch (e) {
-        console.error("Error parsing initial theme", e);
-        runDefaultTheme();
-      }
-    } else {
-      runDefaultTheme();
-    }
-  }
-
   constructor() {
+    this.themeChangeObservers = [];
+
+    this.createDefaultThemes();
+
     KeysManager.get().registerAccountRelatedStorageKeys(["activeTheme"]);
 
     ModelManager.get().addItemSyncObserver("themes", "SN|Theme", function(allItems, validItems, deletedItems, source){
       if(this.activeTheme && this.activeTheme.isSwapIn) {
         var matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
         if(matchingTheme) {
-          this.activeTheme = matchingTheme;
+          this.setActiveTheme(matchingTheme);
           this.activeTheme.isSwapIn = false;
           this.activeTheme.setMobileActive(true);
         }
       }
     }.bind(this));
+  }
+
+  addThemeChangeObserver(observer) {
+    this.themeChangeObservers.push(observer);
+    return observer;
+  }
+
+  removeThemeChangeObserver(observer) {
+    _.remove(this.themeChangeObservers, observer);
+  }
+
+  notifyObserversOfThemeChange() {
+    for(var observer of this.themeChangeObservers) {
+      observer();
+    }
+  }
+
+  // When downloading an external theme, we can't depend on it having all the variables present.
+  // So we will merge them with this template variable list to make sure the end result has all
+  // variables the app expects.
+  templateVariables() {
+    return redJSON;
+  }
+
+  createDefaultThemes() {
+    this.systemThemes = [];
+    let options = [
+      {
+        variables: redJSON,
+        name: "Red"
+      },
+      {
+        variables: blueJSON,
+        name: "Blue"
+      }
+    ];
+
+    for(var option of options) {
+      let variables = option.variables;
+
+      let theme = new SNTheme({
+        uuid: option.name,
+        content: {
+          isSystemTheme: true,
+          name: option.name,
+        }
+      });
+
+      theme.setMobileRules({
+        name: option.name,
+        rules: this.defaultRules(variables),
+        variables: variables,
+        statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
+      })
+
+      this.systemThemes.push(theme);
+    }
+  }
+
+  async resolveInitialTheme() {
+    let runDefaultTheme = () => {
+      var theme = this.systemThemes[0];
+      theme.setMobileActive(true);
+      this.setActiveTheme(theme);
+    }
+
+    // Get the active theme from storage rather than waiting for local database to load
+    var themeResult = await Storage.get().getItem("activeTheme");
+    if(!themeResult) {
+      runDefaultTheme();
+      return;
+    }
+
+    // JSON stringified content is generic and includes all items property at time of stringification
+    // So we parse it, then set content to itself, so that the mapping can be handled correctly.
+    try {
+      var parsedTheme = JSON.parse(themeResult);
+      var needsMigration = false;
+      if(parsedTheme.mobileRules) {
+        // Newer versions of the app persist a Theme object where mobileRules are nested in AppData.
+        // We want to check if the currently saved data is of the old format, which uses theme.mobileRules
+        // instead of theme.getMobileRules(). If so, we want to prepare it for the new format.
+        needsMigration = true;
+      }
+      let content = Object.assign({}, parsedTheme);
+      parsedTheme.content = content;
+
+      var theme = new SNTheme(parsedTheme);
+      if(needsMigration) {
+        theme.setMobileRules(parsedTheme.mobileRules);
+        theme.mobileRules = null;
+      }
+
+      theme.isSwapIn = true;
+      this.setActiveTheme(theme);
+    } catch (e) {
+      console.error("Error parsing initial theme", e);
+      runDefaultTheme();
+    }
   }
 
   static variable(name) {
@@ -100,15 +152,11 @@ export default class StyleKit {
   }
 
   static styles() {
-    return this.get().styles.rules;
-  }
-
-  static constants() {
-    return this.get().styles.constants;
+    return this.get().activeTheme.getMobileRules();
   }
 
   static stylesForKey(key) {
-    var rules = this.get().styles.rules;
+    var rules = this.styles();
     var styles = [rules[key]];
     var platform = Platform.OS == "android" ? "Android" : "IOS";
     var platformRules = rules[key+platform];
@@ -118,55 +166,8 @@ export default class StyleKit {
     return styles;
   }
 
-  static constantForKey(key) {
-    var defaultValue = this.get().constants[key];
-
-    try {
-      // For the platform value, if the active theme does not have a specific value, but the defaults do, we don't
-      // want to use the defaults, but instead just look at the activeTheme. Because default platform values only apply
-      // to the default theme
-      var platform = Platform.OS == "android" ? "Android" : "IOS";
-      var platformValue = this.get().activeTheme.getMobileRules().constants[key+platform];
-
-      if(platformValue) {
-        return platformValue;
-      } else {
-        return defaultValue;
-      }
-    } catch (e) {
-      return defaultValue;
-    }
-  }
-
-  systemTheme() {
-    if(this._systemTheme) {
-      return this._systemTheme;
-    }
-
-    let constants = this.defaultConstants();
-    let variables = redJSON;
-
-    this._systemTheme = new SNTheme({
-      uuid: 0,
-      content: {
-        isDefault: true,
-        name: "Default",
-      }
-    });
-
-    this._systemTheme.setMobileRules({
-      name: "Default",
-      rules: this.defaultRules(constants, variables),
-      variables: variables,
-      constants: constants,
-      statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
-    })
-
-    return this._systemTheme;
-  }
-
   themes() {
-    return [this.systemTheme()].concat(ModelManager.get().themes);
+    return this.systemThemes.concat(ModelManager.get().themes);
   }
 
   isThemeActive(theme) {
@@ -176,20 +177,30 @@ export default class StyleKit {
     return theme.isMobileActive();
   }
 
+  setActiveTheme(theme) {
+    // merge default variables in case these theme has variables that are missing
+    let mobileRules = theme.getMobileRules();
+    mobileRules.variables = _.merge(this.templateVariables(), mobileRules.variables);
+    theme.setMobileRules(mobileRules);
+
+    this.activeTheme = theme;
+
+    Icons.get().loadIcons();
+
+    this.notifyObserversOfThemeChange();
+  }
+
   activateTheme(theme, writeToStorage = true) {
     if(this.activeTheme) {
       this.activeTheme.setMobileActive(false);
     }
 
-    var run = () => {
-      var constants = _.merge(this.defaultConstants(), theme.getMobileRules().constants);
-      var rules = _.merge(this.defaultRules(constants, theme.getMobileRules().variables), theme.getMobileRules().rules);
-      this.setStyles(rules, constants, theme.getMobileRules().statusBar);
-
-      this.activeTheme = theme;
+    var performActivation = () => {
+      this.setActiveTheme(theme);
       theme.setMobileActive(true);
 
-      if(theme.content.isDefault) {
+      if(theme.content.isSystemTheme) {
+        Storage.get().setItem("activeSystemTheme", theme.name);
         Storage.get().removeItem("activeTheme");
       } else if(writeToStorage) {
         Storage.get().setItem("activeTheme", JSON.stringify(theme));
@@ -199,99 +210,23 @@ export default class StyleKit {
     }
 
     if(!theme.hasMobileRules()) {
-      this.downloadTheme(theme, function(){
+      ThemeDownloader.get().downloadTheme(theme).then(() => {
         if(theme.getNotAvailOnMobile()) {
           Alert.alert("Not Available", "This theme is not available on mobile.");
         } else {
           Sync.get().sync();
-          run();
+          performActivation();
         }
       });
     } else {
-      run();
+      performActivation();
     }
   }
 
-  async downloadTheme(theme, callback) {
-    let errorBlock = (error) => {
-      if(!theme.getNotAvailOnMobile()) {
-        theme.setNotAvailOnMobile(true);
-        theme.setDirty(true);
-      }
-
-      callback && callback();
-
-      console.error("Theme download error", error);
-    }
-
-    var url = theme.hosted_url || theme.url;
-
-    if(!url) {
-      errorBlock(null);
-      return;
-    }
-
-    if(url.includes("?")) {
-      url = url.replace("?", ".json?");
-    } else if(url.includes(".css?")) {
-      url = url.replace(".css?", ".json?");
-    } else {
-      url = url + ".json";
-    }
-
-    if(ApplicationState.isAndroid && url.includes("localhost")) {
-      url = url.replace("localhost", "10.0.2.2");
-    }
-
-    return Server.get().getAbsolute(url, {}, function(response){
-      // success
-      if(response !== theme.getMobileRules()) {
-        theme.setMobileRules(response);
-        theme.setDirty(true);
-      }
-
-      if(theme.getNotAvailOnMobile()) {
-        theme.setNotAvailOnMobile(false);
-        theme.setDirty(true);
-      }
-
-      if(callback) {
-        callback();
-      }
-    }, function(response) {
-      errorBlock(response);
-    })
-  }
-
-  async readCSSUrl(url) {
-    return Server.get().getAbsolute(url, {}, (response) => {
-      return response;
-    }, function(response) {
-      return response;
-    })
-  }
-
-  downloadThemeAndReload(theme) {
-    this.downloadTheme(theme, function(){
-      Sync.get().sync(function(){
-        this.activateTheme(theme);
-      }.bind(this));
-    }.bind(this))
-  }
-
-  setStyles(rules, constants, statusBar) {
-    if(!statusBar) { statusBar = "light-content";}
-    this.statusBar = statusBar;
-    this.constants = constants;
-    this.styles = {
-      rules: StyleSheet.create(rules),
-      constants: constants
-    }
-
-    // On Android, a time out is required, especially during app startup
-    setTimeout(function () {
-      StatusBar.setBarStyle(statusBar, true);
-    }, Platform.OS == "android" ? 100 : 0);
+  async downloadThemeAndReload(theme) {
+    await ThemeDownloader.get().downloadTheme(theme);
+    await Sync.get().sync();
+    this.activateTheme(theme);
   }
 
   static isIPhoneX() {
@@ -304,32 +239,9 @@ export default class StyleKit {
         (D_HEIGHT === X_WIDTH && D_WIDTH === X_HEIGHT));
   }
 
-  defaultConstants() {
-    // var tintColor = "#fb0206";
-    return {
-      // composeBorderColor: "#F5F5F5",
-      // mainBackgroundColor: "#ffffff",
-      // mainTintColor: tintColor,
-      // mainDimColor: "#9d9d9d",
-      // mainTextColor: "#000000",
-
-      // navBarColor: "white",
-      // navBarTextColor: tintColor,
-
-      // navBarColorAndroid: tintColor,
-      // navBarTextColorAndroid: "#000000",
-      // plainCellBorderColor: "#efefef",
-      // selectedBackgroundColor: "#efefef",
-
-      mainTextFontSize: 16,
-      mainHeaderFontSize: 16,
-      paddingLeft: 14,
-      sectionedCellHorizontalPadding: 14,
-      maxSettingsCellHeight: 45
-    }
-  }
-
-  defaultRules(constants, variables) {
+  defaultRules(variables) {
+    let mainTextFontSize = 16;
+    let paddingLeft = 14;
     return {
       container: {
         height: "100%",
@@ -353,7 +265,7 @@ export default class StyleKit {
 
       uiText: {
         color: variables.stylekitForegroundColor,
-        fontSize: constants.mainTextFontSize,
+        fontSize: mainTextFontSize,
       },
 
       view: {
@@ -375,7 +287,7 @@ export default class StyleKit {
         flexGrow: 0,
         justifyContent: "space-between",
         flexDirection: 'row',
-        paddingRight: constants.paddingLeft,
+        paddingRight: paddingLeft,
         paddingBottom: 10,
         paddingTop: 10,
         backgroundColor: 'rgba(52, 52, 52, 0.0)'
@@ -383,8 +295,8 @@ export default class StyleKit {
 
       sectionHeader: {
         backgroundColor: "transparent",
-        fontSize: constants.mainTextFontSize - 4,
-        paddingLeft: constants.paddingLeft,
+        fontSize: mainTextFontSize - 4,
+        paddingLeft: paddingLeft,
         color: variables.stylekitNeutralColor,
         fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
@@ -394,15 +306,15 @@ export default class StyleKit {
       },
 
       sectionHeaderAndroid: {
-        fontSize: constants.mainTextFontSize - 2,
+        fontSize: mainTextFontSize - 2,
         color: variables.stylekitInfoColor
       },
 
       sectionedTableCell: {
         borderBottomColor: variables.stylekitBorderColor,
         borderBottomWidth: 1,
-        paddingLeft: constants.paddingLeft,
-        paddingRight: constants.paddingLeft,
+        paddingLeft: paddingLeft,
+        paddingRight: paddingLeft,
         paddingTop: 13,
         paddingBottom: 12,
         backgroundColor: variables.stylekitBackgroundColor,
@@ -416,7 +328,7 @@ export default class StyleKit {
       },
 
       sectionedTableCellTextInput: {
-        fontSize: constants.mainTextFontSize,
+        fontSize: mainTextFontSize,
         padding: 0,
         color: variables.stylekitForegroundColor,
         height: "100%"
@@ -431,15 +343,6 @@ export default class StyleKit {
 
       },
 
-      // sectionedTableCellFirstAndroid: {
-      //   borderTopWidth: 0,
-      // },
-      //
-      // sectionedTableCellLastAndroid: {
-      //   borderBottomWidth: 0,
-      //   borderTopWidth: 0,
-      // },
-
       sectionedAccessoryTableCell: {
         paddingTop: 0,
         paddingBottom: 0,
@@ -448,7 +351,7 @@ export default class StyleKit {
       },
 
       sectionedAccessoryTableCellLabel: {
-        fontSize: constants.mainTextFontSize,
+        fontSize: mainTextFontSize,
         color: variables.stylekitForegroundColor,
         minWidth: "80%"
       },
@@ -464,7 +367,7 @@ export default class StyleKit {
         textAlign: "center",
         textAlignVertical: "center",
         color: Platform.OS == "android" ? variables.stylekitForegroundColor : variables.stylekitInfoColor,
-        fontSize: constants.mainTextFontSize,
+        fontSize: mainTextFontSize,
       },
 
       buttonCellButtonLeft: {
@@ -476,33 +379,20 @@ export default class StyleKit {
         marginTop: 0,
         paddingTop: 10,
         color: variables.stylekitForegroundColor,
-        paddingLeft: constants.paddingLeft,
-        paddingRight: constants.paddingLeft,
+        paddingLeft: paddingLeft,
+        paddingRight: paddingLeft,
         paddingBottom: 10,
         backgroundColor: variables.stylekitBackgroundColor
       },
 
       noteTextIOS: {
-        paddingLeft: constants.paddingLeft - 5,
-        paddingRight: constants.paddingLeft - 5,
+        paddingLeft: paddingLeft - 5,
+        paddingRight: paddingLeft - 5,
       },
 
       noteTextNoPadding: {
         paddingLeft: 0,
         paddingRight: 0
-      },
-
-      syncBar: {
-        position: "absolute",
-        bottom: 0,
-        width: "100%",
-        backgroundColor: variables.stylekitContrastBackgroundColor,
-        padding: 5
-      },
-
-      syncBarText: {
-        textAlign: "center",
-        color: variables.stylekitContrastForegroundColor
       },
 
       actionSheetWrapper: {

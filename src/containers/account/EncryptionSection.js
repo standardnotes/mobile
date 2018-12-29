@@ -32,7 +32,7 @@ export default class PasscodeSection extends Component {
 
     var textStyles = {
       color: StyleKit.variable("stylekitForegroundColor"),
-      fontSize: StyleKit.constants().mainTextFontSize,
+      fontSize: 16,
       lineHeight: 22
     }
 
