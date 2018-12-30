@@ -49,6 +49,7 @@ export default class SideMenuManager {
   /*
     @param handler.onTagSelect
     @param handler.getSelectedTags
+    @param handler.getCurrentNote
   */
   setHandlerForRightSideMenu(handler) {
     this.rightSideMenuHandler = handler;

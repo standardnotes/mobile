@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import StyleKit from "../style/StyleKit"
 import ActionSheet from 'react-native-actionsheet'
+import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 import ItemActionManager from '../lib/itemActionManager'
 import ThemedPureComponent from "@Components/ThemedPureComponent";
 
@@ -47,41 +48,37 @@ export default class NoteCell extends ThemedPureComponent {
     }
   }
 
-  static ActionSheetCancelIndex = 0;
-  static ActionSheetDestructiveIndex = 4;
-
-  actionSheetActions() {
-    var pinAction = this.props.item.pinned ? "Unpin" : "Pin";
-    let pinEvent = pinAction == "Pin" ? ItemActionManager.PinEvent : ItemActionManager.UnpinEvent;
-
-    var archiveOption = this.props.item.archived ? "Unarchive" : "Archive";
-    let archiveEvent = archiveOption == "Archive" ? ItemActionManager.ArchiveEvent : ItemActionManager.UnarchiveEvent;
-
-    return [
-      ['Cancel', ""],
-      [pinAction, pinEvent],
-      [archiveOption, archiveEvent],
-      ['Share', ItemActionManager.ShareEvent],
-      ['Delete', ItemActionManager.DeleteEvent]
-    ];
-  }
-
   showActionSheet = () => {
-    this.actionSheet.show();
-  }
-
-  handleActionSheetPress = (index) => {
-    if(index == 0) {
-      return;
+    let callbackForOption = (option) => {
+      ItemActionManager.handleEvent(option.key, this.props.item, () => {
+        this.forceUpdate();
+      }, () => {
+        // afterConfirmCallback
+        // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
+        this.forceUpdate();
+      });
     }
 
-    ItemActionManager.handleEvent(this.actionSheetActions()[index][1], this.props.item, () => {
-      this.forceUpdate();
-    }, () => {
-      // afterConfirmCallback
-      // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
-      this.forceUpdate();
+    var pinLabel = this.props.item.pinned ? "Unpin" : "Pin";
+    let pinEvent = pinLabel == "Pin" ? ItemActionManager.PinEvent : ItemActionManager.UnpinEvent;
+
+    var archiveLabel = this.props.item.archived ? "Unarchive" : "Archive";
+    let archiveEvent = archiveLabel == "Archive" ? ItemActionManager.ArchiveEvent : ItemActionManager.UnarchiveEvent;
+
+    let sheet = new ActionSheetWrapper({
+      title: this.props.item.safeTitle(),
+      options: [
+        ActionSheetWrapper.BuildOption({text: pinLabel, key: pinEvent, callback: callbackForOption}),
+        ActionSheetWrapper.BuildOption({text: archiveLabel, key: archiveEvent, callback: callbackForOption}),
+        ActionSheetWrapper.BuildOption({text: "Share", key: ItemActionManager.ShareEvent, callback: callbackForOption}),
+        ActionSheetWrapper.BuildOption({text: "Delete", key: ItemActionManager.DeleteEvent, destructive: true, callback: callbackForOption}),
+      ], onCancel: () => {
+        this.setState({actionSheet: null});
+      }
     });
+
+    this.setState({actionSheet: sheet.actionSheetElement()});
+    sheet.show();
   }
 
   render() {
@@ -150,15 +147,7 @@ export default class NoteCell extends ThemedPureComponent {
               </Text>
             }
 
-            <ActionSheet
-              ref={o => this.actionSheet = o}
-              title={note.safeTitle()}
-              options={this.actionSheetActions().map((action) => {return action[0]})}
-              cancelButtonIndex={NoteCell.ActionSheetCancelIndex}
-              destructiveButtonIndex={NoteCell.ActionSheetDestructiveIndex}
-              onPress={this.handleActionSheetPress}
-              {...StyleKit.actionSheetStyles()}
-            />
+            {this.state.actionSheet && this.state.actionSheet}
         </View>
       </TouchableWithoutFeedback>
     )

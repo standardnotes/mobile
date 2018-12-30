@@ -23,6 +23,8 @@ export default class ItemActionManager {
 
   static handleEvent(event, item, callback, afterConfirmCallback) {
 
+    console.log("Handling event", event);
+
     if(event == this.DeleteEvent) {
       var title = `Delete ${item.displayName}`;
       var message = `Are you sure you want to delete this ${item.displayName.toLowerCase()}?`;

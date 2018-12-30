@@ -65,7 +65,7 @@ export default class SideMenuCell extends ThemedComponent {
   }
 
   render() {
-    let iconSide = this.props.iconDesc.side ? this.props.iconDesc.side : "left";
+    let iconSide = (this.props.iconDesc && this.props.iconDesc.side) ? this.props.iconDesc.side : "left";
     return (
       <TouchableOpacity
         style={this.styles.cell}

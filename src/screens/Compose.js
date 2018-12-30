@@ -50,11 +50,15 @@ export default class Compose extends Abstract {
     if(noteId) { note = ModelManager.get().findItem(noteId);}
     if(!note) {
       note = ModelManager.get().createItem({content_type: "Note", dummy: true, text: ""});
-      // We needed to add the item originally for default editors to work, but default editors was removed
-      // So the only way to select an editor is to make a change to the note, which will add it.
-      // The problem with adding it here is that if you open Compose and close it without making changes, it will save an empty note.
-      // ModelManager.get().addItem(note);
       note.dummy = true;
+      // Editors need a valid note with uuid and modelmanager mapped in order to interact with it
+      // Note that this can create dummy notes that aren't deleted automatically.
+      // Also useful to keep right menu enabled at all times. If the note has a uuid and is a dummy,
+      // it will be removed locally on blur
+      note.initUUID().then(() => {
+        ModelManager.get().addItem(note);
+        this.forceUpdate();
+      })
     }
 
     this.note = note;
@@ -99,8 +103,7 @@ export default class Compose extends Abstract {
         iconName: "ios-menu-outline",
         onPress: () => {
           this.props.navigation.openRightDrawer();
-        },
-        disabled: !this.note.uuid
+        }
       }
     })
   }
@@ -117,10 +120,6 @@ export default class Compose extends Abstract {
 
   componentWillFocus() {
     super.componentWillFocus();
-    if(this.needsEditorReload) {
-      this.forceUpdate();
-      this.needsEditorReload = false;
-    }
 
     if(this.note.dirty) {
       // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
@@ -149,8 +148,17 @@ export default class Compose extends Abstract {
     }
 
     SideMenuManager.get().setHandlerForRightSideMenu({
+      getCurrentNote: () => {
+        return this.note
+      },
       onEditorSelect: (editor) => {
-        this.needsEditorReload = true;
+        if(editor) {
+          ComponentManager.get().associateEditorWithNote(editor, this.note);
+        } else {
+          ComponentManager.get().clearEditorForNote(this.note);
+        }
+        this.forceUpdate();
+        this.props.navigation.closeRightDrawer();
       },
       onTagSelect: (tag) => {
         let selectedTags = this.note.tags;
@@ -170,6 +178,14 @@ export default class Compose extends Abstract {
         return this.note.tags.slice();
       }
     })
+  }
+
+  componentWillBlur() {
+    super.componentWillBlur();
+    if(this.note.uuid && this.note.dummy) {
+      // A dummy note created to work with default external editor. Safe to delete.
+      ModelManager.get().removeItemLocally(this.note);
+    }
   }
 
   componentDidBlur() {
@@ -312,7 +328,8 @@ export default class Compose extends Abstract {
 
     var noteEditor = ComponentManager.get().editorForNote(this.note);
     let windowWidth = this.state.windowWidth || Dimensions.get('window').width;
-    var shouldDisplayEditor = noteEditor != null;
+    // If new note with default editor, note.uuid may not be ready
+    var shouldDisplayEditor = noteEditor != null && this.note.uuid;
 
     return (
       <View style={[this.styles.container, StyleKit.styles().container]}>

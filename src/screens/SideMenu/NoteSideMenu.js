@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
 import ActionSheet from 'react-native-actionsheet'
-
+import ComponentManager from "@Lib/componentManager"
 import Abstract from "@Screens/Abstract"
 
 import SectionHeader from "@Components/SectionHeader";
@@ -14,6 +14,7 @@ import LockedView from "@Containers/LockedView";
 
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
+import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 import SideMenuCell from "@SideMenu/SideMenuCell"
@@ -36,7 +37,8 @@ export default class NoteSideMenu extends Abstract {
   }
 
   onEditorSelect = (editor) => {
-    this.handler.onEditorSelect(editor)
+    this.handler.onEditorSelect(editor);
+    this.forceUpdate();
   }
 
   onTagSelect = (tag) => {
@@ -44,32 +46,65 @@ export default class NoteSideMenu extends Abstract {
     this.forceUpdate();
   }
 
+  get note() {
+    return this.handler.getCurrentNote();
+  }
+
+  onEditorLongPress = (editor) => {
+    let currentDefaultEDitor = ComponentManager.get().getDefaultEditor();
+    let isDefault = false;
+    if(!editor) {
+      // System editor
+      if(currentDefaultEDitor)  {
+        isDefault = false;
+      }
+    } else {
+      isDefault = editor.content.isMobileDefault;
+    }
+
+    let action = isDefault ? "Remove as Default Editor" : "Set as Default Editor";
+    let sheet = new ActionSheetWrapper({
+      title: editor && editor.name,
+      options: [
+        ActionSheetWrapper.BuildOption({text: action, callback: () => {
+          if(!editor) {
+            // Default to plain
+            ComponentManager.get().setEditorAsMobileDefault(currentDefaultEDitor, false);
+          } else {
+            ComponentManager.get().setEditorAsMobileDefault(editor, !isDefault);
+          }
+        }}),
+      ], onCancel: () => {
+        this.setState({actionSheet: null});
+      }
+    });
+
+    this.setState({actionSheet: sheet.actionSheetElement()});
+    sheet.show();
+  }
 
   /*
   Render
   */
 
-  iconDescriptorForEditor = (editor) => {
-    let desc = {
-      type: "circle",
-      side: "right",
-      backgroundColor: "red",
-      borderColor: "red"
-    };
-
-    return desc;
-  }
-
   buildOptionsForEditors() {
-    let editors = []; // TODO
-    let options = [];
-    for(var editor of editors) {
+    let editors = ComponentManager.get().getEditors();
+    let selectedEditor = ComponentManager.get().editorForNote(this.note);
+    let options = [{
+      text: "Plain Editor",
+      key: "plain-editor",
+      selected: !selectedEditor,
+      onSelect: () => {this.onEditorSelect(null)},
+      onLongPress: () => {this.onEditorLongPress(null)}
+    }];
+
+    for(let editor of editors) {
       let option = SideMenuSection.BuildOption({
         text: editor.name,
         key: editor.uuid || editor.name,
-        iconDesc: this.iconDescriptorForEditor(editor),
-        selected: editor.active,
+        selected: editor == selectedEditor,
         onSelect: () => {this.onEditorSelect(editor)},
+        onLongPress: () => {this.onEditorLongPress(editor)}
       })
 
       options.push(option);
@@ -115,6 +150,7 @@ export default class NoteSideMenu extends Abstract {
 
           </ScrollView>
         </SafeAreaView>
+        {this.state.actionSheet && this.state.actionSheet}
       </Fragment>
     );
   }

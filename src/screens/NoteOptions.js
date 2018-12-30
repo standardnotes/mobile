@@ -173,30 +173,9 @@ export default class NoteOptions extends Abstract {
     })
   }
 
-  onEditorSelect = (editor) => {
-    if(editor) {
-      ComponentManager.get().associateEditorWithNote(editor, this.note);
-    } else {
-      ComponentManager.get().clearEditorForNote(this.note);
-    }
-
-    this.getProp("onEditorSelect") && this.getProp("onEditorSelect")(editor);
-    this.dismiss();
-  }
-
-  getEditors() {
-    return ModelManager.get().validItemsForContentType("SN|Component").filter((component) => {
-      return component.area == "editor-editor";
-    })
-  }
-
   clearTags = (close) => {
     this.setSelectedTags([]);
     if(close) { this.dismiss(); }
-  }
-
-  openExternalEditorsLink() {
-    Linking.openURL("https://standardnotes.org/extensions");
   }
 
   render() {
@@ -220,9 +199,6 @@ export default class NoteOptions extends Abstract {
 
     var lockOption = this.note.locked ? "Unlock" : "Lock";
     let lockEvent = lockOption == "Lock" ? ItemActionManager.LockEvent : ItemActionManager.UnlockEvent;
-
-    let editors = this.getEditors();
-    let selectedEditor = ComponentManager.get().editorForNote(this.note);
 
     return (
       <View style={viewStyles}>
@@ -265,35 +241,6 @@ export default class NoteOptions extends Abstract {
                 last={true}
                 leftAlignIcon={true}
               />
-          </TableSection>
-
-          <TableSection style={StyleKit.styles().view}>
-            <SectionHeader
-              title={"Edit With"}
-              buttonText={selectedEditor && "Use Plain"}
-              buttonAction={() => {this.onEditorSelect(null)}}
-            />
-            {editors.map((editor, i) => {
-              return (
-                <SectionedAccessoryTableCell
-                  onPress={() => {this.onEditorSelect(editor)}}
-                  text={editor.name}
-                  key={editor.uuid}
-                  first={i == 0}
-                  selected={() => {return editor == selectedEditor}}
-                  buttonCell={true}
-                />
-              )
-            })}
-
-            {editors.length == 0 &&
-              <SectionedAccessoryTableCell
-                onPress={() => {this.openExternalEditorsLink()}}
-                text={"Get Editors  →"}
-                first={true}
-                buttonCell={true}
-              />
-            }
           </TableSection>
 
           <TagList

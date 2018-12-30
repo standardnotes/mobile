@@ -159,6 +159,8 @@ export default class App extends Component {
       return null;
     }
 
-    return <AppContainer /* persistenceKey="if-you-want-it" */ />;
+    return (
+      <AppContainer /* persistenceKey="if-you-want-it" */ />
+    )
   }
 }

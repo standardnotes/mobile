@@ -366,6 +366,14 @@ export default class ComponentManager {
     this.sendMessageToComponent(component, {action: "themes", data: data})
   }
 
+  getEditors() {
+    return this.componentsForArea("editor-editor");
+  }
+
+  getDefaultEditor() {
+    return this.getEditors().filter((e) => {return e.content.isMobileDefault})[0];
+  }
+
   editorForNote(note) {
     let editors = ModelManager.get().validItemsForContentType("SN|Component").filter(function(component){
       return component.area == "editor-editor";
@@ -376,6 +384,17 @@ export default class ComponentManager {
         return editor;
       }
     }
+
+    // No editor found for note. Use default editor, if note does not prefer system editor
+    if(!note.content.mobilePrefersPlainEditor) {
+      return editors.filter((e) => {return e.content.isMobileDefault})[0];
+    }
+  }
+
+  setEditorAsMobileDefault(editor, isDefault) {
+    editor.content.isMobileDefault = isDefault;
+    editor.setDirty(true);
+    Sync.get().sync();
   }
 
   associateEditorWithNote(editor, note) {
@@ -392,8 +411,8 @@ export default class ComponentManager {
     }
 
     if(editor) {
-      if(note.getAppDataItem("prefersPlainEditor") == true) {
-        note.setAppDataItem("prefersPlainEditor", false);
+      if(note.content.mobilePrefersPlainEditor == true) {
+        note.content.mobilePrefersPlainEditor = false;
         note.setDirty(true);
       }
 
@@ -406,8 +425,8 @@ export default class ComponentManager {
       editor.setDirty(true);
     } else {
       // Note prefers plain editor
-      if(!note.getAppDataItem("prefersPlainEditor")) {
-        note.setAppDataItem("prefersPlainEditor", true);
+      if(!note.content.mobilePrefersPlainEditor) {
+        note.content.mobilePrefersPlainEditor = true;
         note.setDirty(true);
       }
     }
