@@ -54,7 +54,7 @@ export default class KeysManager {
 
   async loadInitialData() {
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      if(state == ApplicationState.Unlocking || state == ApplicationState.ThemeChangeBegin) {
+      if(state == ApplicationState.Unlocking) {
         this.updateScreenshotPrivacy();
       }
     })

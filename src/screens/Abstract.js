@@ -5,6 +5,7 @@ import ApplicationState from "../ApplicationState";
 import HeaderTitleView from "../components/HeaderTitleView"
 import HeaderButtons, { HeaderButton, Item } from 'react-navigation-header-buttons';
 import Icon from 'react-native-vector-icons/Ionicons';
+import ThemedComponent from "@Components/ThemedComponent";
 
 const IoniconsHeaderButton = passMeFurther => (
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
@@ -13,7 +14,7 @@ const IoniconsHeaderButton = passMeFurther => (
   <HeaderButton {...passMeFurther} IconComponent={Icon} iconSize={30} color={StyleKit.variable("stylekitInfoColor")} />
 );
 
-export default class Abstract extends Component {
+export default class Abstract extends ThemedComponent {
 
   static getDefaultNavigationOptions = ({ navigation, navigationOptions, templateOptions }) => {
     // templateOptions allow subclasses to specifiy things they want to display in nav bar before it actually loads.
@@ -22,7 +23,9 @@ export default class Abstract extends Component {
     let options = {
       headerTitle:<HeaderTitleView title={navigation.getParam("title") || templateOptions.title} subtitle={navigation.getParam("subtitle") || templateOptions.subtitle}/>,
       headerStyle: {
-        backgroundColor: StyleKit.variable("stylekitBackgroundColor")
+        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
+        borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
+        borderBottomWidth: 1
       },
       headerTintColor: StyleKit.variable("stylekitInfoColor")
     }
@@ -82,10 +85,17 @@ export default class Abstract extends Component {
         this.lockContent();
       }
     })
+  }
 
-    this.themeChangeObserver = StyleKit.get().addThemeChangeObserver(() => {
-      this.forceUpdate();
-    });
+  onThemeChange() {
+    super.onThemeChange();
+    try {
+      // Navigator doesnt really use activeTheme. We pass it here just as a way to trigger
+      // navigationOptions to reload.
+      this.props.navigation.setParams({activeTheme: StyleKit.get().activeTheme});
+    } catch {
+
+    }
   }
 
   componentWillUnmount() {
@@ -94,7 +104,6 @@ export default class Abstract extends Component {
     for(var listener of this.listeners) {
       listener.remove();
     }
-    StyleKit.get().removeThemeChangeObserver(this.themeChangeObserver);
     ApplicationState.get().removeStateObserver(this._stateObserver);
     this.componentDidBlur(); // This is not called automatically when the component unmounts. https://github.com/react-navigation/react-navigation/issues/4003
   }

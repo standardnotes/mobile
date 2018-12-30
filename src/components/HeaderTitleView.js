@@ -25,7 +25,7 @@ export default class HeaderTitleView extends Component {
   getStyles() {
     return new PlatformStyles({
       headerContainer: {
-        backgroundColor: StyleKit.variable("stylekitBackgroundColor"),
+        backgroundColor: StyleKit.variable("stylekitContrastBackgroundColor"),
         flex: 1,
         justifyContent: 'flex-start',
         flexDirection: "column"

@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
 import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import ThemedComponent from "@Components/ThemedComponent";
 
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import Circle from "@Components/Circle"
 
-export default class SideMenuCell extends Component {
-
-  constructor(props) {
-    super(props);
-    this.loadStyles();
-    this.updateStyles();
-  }
+export default class SideMenuCell extends ThemedComponent {
 
   componentDidUpdate() {
     this.updateStyles();

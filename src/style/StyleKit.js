@@ -2,6 +2,7 @@ import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native
 import ModelManager from "../lib/sfjs/modelManager"
 import Server from "../lib/sfjs/httpManager"
 import Sync from '../lib/sfjs/syncManager'
+import { SFItemParams } from 'standard-file-js';
 import Storage from "../lib/sfjs/storageManager"
 import Auth from "../lib/sfjs/authManager"
 import KeysManager from '../lib/keysManager'
@@ -61,9 +62,9 @@ export default class StyleKit {
 
   // When downloading an external theme, we can't depend on it having all the variables present.
   // So we will merge them with this template variable list to make sure the end result has all
-  // variables the app expects.
+  // variables the app expects. Return a copy as the result may be modified before use.
   templateVariables() {
-    return redJSON;
+    return _.clone(redJSON);
   }
 
   createDefaultThemes() {
@@ -81,93 +82,88 @@ export default class StyleKit {
 
     for(var option of options) {
       let variables = option.variables;
+      variables.statusBar = Platform.OS == "android" ? "light-content" : "dark-content";
 
       let theme = new SNTheme({
         uuid: option.name,
         content: {
           isSystemTheme: true,
           name: option.name,
+          variables: variables,
+          package_info: {
+            dock_icon: {
+              type: "circle",
+              background_color: variables.stylekitInfoColor,
+              border_color: variables.stylekitInfoColor
+            }
+          }
         }
       });
-
-      theme.setMobileRules({
-        name: option.name,
-        rules: this.defaultRules(variables),
-        variables: variables,
-        statusBar: Platform.OS == "android" ? "light-content" : "dark-content"
-      })
 
       this.systemThemes.push(theme);
     }
   }
 
   async resolveInitialTheme() {
-    let runDefaultTheme = () => {
-      var theme = this.systemThemes[0];
+    let runDefaultTheme = async () => {
+      let theme;
+      let savedSystemThemeId = await Storage.get().getItem("savedSystemThemeId");
+      if(savedSystemThemeId) {
+        theme = this.systemThemes.find((candidate) => candidate.uuid == savedSystemThemeId);
+      } else {
+        theme = this.systemThemes[0];
+      }
       theme.setMobileActive(true);
       this.setActiveTheme(theme);
     }
 
     // Get the active theme from storage rather than waiting for local database to load
-    var themeResult = await Storage.get().getItem("activeTheme");
+    var themeResult = await Storage.get().getItem("savedTheme");
     if(!themeResult) {
-      runDefaultTheme();
-      return;
+      return runDefaultTheme();
     }
 
     // JSON stringified content is generic and includes all items property at time of stringification
     // So we parse it, then set content to itself, so that the mapping can be handled correctly.
     try {
       var parsedTheme = JSON.parse(themeResult);
-      var needsMigration = false;
-      if(parsedTheme.mobileRules) {
-        // Newer versions of the app persist a Theme object where mobileRules are nested in AppData.
-        // We want to check if the currently saved data is of the old format, which uses theme.mobileRules
-        // instead of theme.getMobileRules(). If so, we want to prepare it for the new format.
-        needsMigration = true;
-      }
-      let content = Object.assign({}, parsedTheme);
-      parsedTheme.content = content;
-
       var theme = new SNTheme(parsedTheme);
-      if(needsMigration) {
-        theme.setMobileRules(parsedTheme.mobileRules);
-        theme.mobileRules = null;
-      }
-
       theme.isSwapIn = true;
       this.setActiveTheme(theme);
     } catch (e) {
       console.error("Error parsing initial theme", e);
-      runDefaultTheme();
+      return runDefaultTheme();
     }
   }
 
   static variable(name) {
-    return this.get().activeTheme.getMobileRules().variables[name];
+    return this.get().activeTheme.content.variables[name];
   }
 
   static get variables() {
-    return this.get().activeTheme.getMobileRules().variables;
+    return this.get().activeTheme.content.variables;
   }
 
   static styles() {
-    return this.get().activeTheme.getMobileRules();
+    return this.get().styles;
   }
 
   static stylesForKey(key) {
-    var rules = this.styles();
-    var styles = [rules[key]];
+    var allStyles = this.styles();
+    var styles = [allStyles[key]];
     var platform = Platform.OS == "android" ? "Android" : "IOS";
-    var platformRules = rules[key+platform];
-    if(platformRules) {
-      styles.push(platformRules);
+    var platformStyles = allStyles[key+platform];
+    if(platformStyles) {
+      styles.push(platformStyles);
     }
     return styles;
   }
 
   themes() {
-    return this.systemThemes.concat(ModelManager.get().themes);
+    let themes = ModelManager.get().themes.sort((a, b) => {
+      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+    });
+    return this.systemThemes.concat(themes);
   }
 
   isThemeActive(theme) {
@@ -179,11 +175,12 @@ export default class StyleKit {
 
   setActiveTheme(theme) {
     // merge default variables in case these theme has variables that are missing
-    let mobileRules = theme.getMobileRules();
-    mobileRules.variables = _.merge(this.templateVariables(), mobileRules.variables);
-    theme.setMobileRules(mobileRules);
+    let variables = theme.content.variables;
+    theme.content.variables = _.merge(this.templateVariables(), variables);
 
     this.activeTheme = theme;
+
+    this.reloadStyles();
 
     Icons.get().loadIcons();
 
@@ -195,28 +192,43 @@ export default class StyleKit {
       this.activeTheme.setMobileActive(false);
     }
 
-    var performActivation = () => {
+    var performActivation = async () => {
       this.setActiveTheme(theme);
       theme.setMobileActive(true);
 
       if(theme.content.isSystemTheme) {
-        Storage.get().setItem("activeSystemTheme", theme.name);
-        Storage.get().removeItem("activeTheme");
+        Storage.get().setItem("savedSystemThemeId", theme.uuid);
+        Storage.get().removeItem("savedTheme");
       } else if(writeToStorage) {
-        Storage.get().setItem("activeTheme", JSON.stringify(theme));
+        let transformer = new SFItemParams(theme);
+        let params = await transformer.paramsForLocalStorage();
+        Storage.get().setItem("savedTheme", JSON.stringify(params));
+        Storage.get().removeItem("savedSystemThemeId");
       }
-
-      // App.get().reload();
     }
 
-    if(!theme.hasMobileRules()) {
-      ThemeDownloader.get().downloadTheme(theme).then(() => {
-        if(theme.getNotAvailOnMobile()) {
+    // Theme may have been downloaded before stylekit changes. So if it doesn't have the info color,
+    // it needs to be refreshed
+    let hasValidInfoColor = theme.content.variables && theme.content.variables.stylekitInfoColor;
+    if(!hasValidInfoColor) {
+      ThemeDownloader.get().downloadTheme(theme).then((variables) => {
+        if(!variables) {
           Alert.alert("Not Available", "This theme is not available on mobile.");
-        } else {
-          Sync.get().sync();
-          performActivation();
+          return;
         }
+
+        if(variables !== theme.content.variables) {
+          theme.content.variables = variables;
+          theme.setDirty(true);
+        }
+
+        if(theme.getNotAvailOnMobile()) {
+          theme.setNotAvailOnMobile(false);
+          theme.setDirty(true);
+        }
+
+        Sync.get().sync();
+        performActivation();
       });
     } else {
       performActivation();
@@ -239,10 +251,11 @@ export default class StyleKit {
         (D_HEIGHT === X_WIDTH && D_WIDTH === X_HEIGHT));
   }
 
-  defaultRules(variables) {
+  reloadStyles() {
+    let variables = this.activeTheme.content.variables;
     let mainTextFontSize = 16;
     let paddingLeft = 14;
-    return {
+    this.styles = {
       container: {
         height: "100%",
       },

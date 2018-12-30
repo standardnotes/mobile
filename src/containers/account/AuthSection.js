@@ -7,12 +7,11 @@ import ButtonCell from "../../components/ButtonCell";
 import TableSection from "../../components/TableSection";
 import SectionedTableCell from "../../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../../components/SectionedAccessoryTableCell";
-import AbstractComponent from "../../components/AbstractComponent"
 
 const DEFAULT_SIGN_IN_TEXT = "Sign In";
 const DEFAULT_REGISTER_TEXT = "Register";
 
-export default class AuthSection extends AbstractComponent {
+export default class AuthSection extends Component {
   constructor(props) {
     super(props);
     this.state = _.merge(props.params, {
@@ -25,23 +24,23 @@ export default class AuthSection extends AbstractComponent {
   }
 
   showAdvanced = () => {
-    this.mergeState({showAdvanced: true});
+    this.setState({showAdvanced: true});
   }
 
   onSignInPress = () => {
-    this.mergeState({signingIn: true, signInButtonText: "Generating Keys..."});
+    this.setState({signingIn: true, signInButtonText: "Generating Keys..."});
     this.props.onSignInPress(this.state, (success) => {
       if(!success) {
-        this.mergeState({signingIn: false, signInButtonText: DEFAULT_SIGN_IN_TEXT});
+        this.setState({signingIn: false, signInButtonText: DEFAULT_SIGN_IN_TEXT});
       }
     })
   }
 
   onRegisterPress = () => {
-    this.mergeState({registering: true, registerButtonText: "Generating Keys..."});
+    this.setState({registering: true, registerButtonText: "Generating Keys..."});
     this.props.onRegisterPress(this.state, (success) => {
       if(!success) {
-        this.mergeState({registering: false, registerButtonText: DEFAULT_REGISTER_TEXT});
+        this.setState({registering: false, registerButtonText: DEFAULT_REGISTER_TEXT});
       }
     })
   }

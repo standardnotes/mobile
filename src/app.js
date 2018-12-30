@@ -161,19 +161,4 @@ export default class App extends Component {
 
     return <AppContainer /* persistenceKey="if-you-want-it" */ />;
   }
-
-  // reloadAfterThemeChange() {
-  //   ApplicationState.get().setThemeChangeBegan();
-  //
-  //   Icons.get().loadIcons();
-  //
-  //   // reset search box
-  //   this.optionsState.setSearchTerm(null);
-  //
-  //   this.startApp();
-  //
-  //   setTimeout(function () {
-  //     ApplicationState.get().setThemeChangeEnded();
-  //   }, 100);
-  // }
 }

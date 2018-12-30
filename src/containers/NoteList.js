@@ -45,9 +45,9 @@ export default class NoteList extends Component {
           keyboardDismissMode={'interactive'}
           inputStyle={
             {
-              backgroundColor: StyleKit.variable("stylekitContrastBackgroundColor"),
-              color: StyleKit.variable("stylekitForegroundColor"),
-              height: 35
+              backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
+              color: StyleKit.variables.stylekitForegroundColor,
+              height: 31
             }
           }
         />

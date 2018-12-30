@@ -5,8 +5,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import SideMenuCell from "@SideMenu/SideMenuCell"
+import ThemedComponent from "@Components/ThemedComponent";
 
-export default class SideMenuSection extends Component {
+export default class SideMenuSection extends ThemedComponent {
 
   static BuildOption({text, key, iconDesc, dimmed, selected, onSelect, onLongPress}) {
     return { text, key, iconDesc, dimmed, selected, onSelect, onLongPress };
@@ -14,7 +15,6 @@ export default class SideMenuSection extends Component {
 
   constructor(props) {
     super(props);
-    this.loadStyles();
     this.state = {collapsed: props.collapsed};
   }
 

@@ -28,7 +28,6 @@ export default class SideMenu extends Abstract {
 
   constructor(props) {
     super(props);
-    this.loadStyles();
     this.constructState({});
     this.state = {};
   }
@@ -137,7 +136,7 @@ export default class SideMenu extends Abstract {
 
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
 
-            <SideMenuSection title="Themes" options={themeOptions} collapsed={true} />
+            <SideMenuSection title="Themes" options={themeOptions} collapsed={false} />
 
             <SideMenuSection title="Tags">
               <TagSelectionList onTagSelect={this.onTagSelect} selectedTags={selectedTags} />

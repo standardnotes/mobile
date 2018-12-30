@@ -4,104 +4,13 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import StyleKit from "../style/StyleKit"
 import ActionSheet from 'react-native-actionsheet'
 import ItemActionManager from '../lib/itemActionManager'
+import ThemedPureComponent from "@Components/ThemedPureComponent";
 
-export default class NoteCell extends React.PureComponent {
-
+export default class NoteCell extends ThemedPureComponent {
 
   constructor(props) {
     super(props);
     this.state = {selected: false, options: props.options || {}};
-
-    let padding = 14;
-
-    this.styles = StyleSheet.create({
-
-      noteCell: {
-        padding: padding,
-        paddingRight: padding * 2,
-        borderBottomColor: StyleKit.variable("stylekitBorderColor"),
-        borderBottomWidth: 1,
-        backgroundColor: StyleKit.variable("stylekitBackgroundColor"),
-      },
-
-      noteCellSelected: {
-        backgroundColor: StyleKit.variable("stylekitInfoColor"),
-      },
-
-      noteTagsContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        marginBottom: 5,
-      },
-
-      pinnedView: {
-        flex: 1,
-        flexDirection: 'row',
-        marginBottom: 5,
-      },
-
-      pinnedText: {
-        color: StyleKit.variable("stylekitInfoColor"),
-        marginLeft: 8,
-        fontWeight: "bold",
-        fontSize: 12
-      },
-
-      pinnedTextSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor"),
-      },
-
-      noteTag: {
-        marginRight: 2,
-        fontSize: 12,
-        color: StyleKit.variable("stylekitForegroundColor"),
-        opacity: 0.5,
-      },
-
-      noteTagSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor"),
-        opacity: 0.8
-      },
-
-      noteTitle: {
-        fontWeight: "bold",
-        fontSize: 16,
-        color: StyleKit.variable("stylekitForegroundColor")
-      },
-
-      noteTitleSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor")
-      },
-
-      noteText: {
-        fontSize: 15,
-        marginTop: 4,
-        color: StyleKit.variable("stylekitForegroundColor"),
-        opacity: 0.8,
-        lineHeight: 21
-      },
-
-      noteTextSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor")
-      },
-
-      noteDate: {
-        marginTop: 5,
-        fontSize: 12,
-        color: StyleKit.variable("stylekitForegroundColor"),
-        opacity: 0.5
-      },
-
-      noteDateSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor"),
-        opacity: 0.8
-      },
-
-      deleting: {
-        color: StyleKit.variable("stylekitInfoColor"),
-        marginBottom: 5,
-      }
-    });
   }
 
   componentWillReceiveProps(props) {
@@ -253,5 +162,97 @@ export default class NoteCell extends React.PureComponent {
         </View>
       </TouchableWithoutFeedback>
     )
+  }
+
+  loadStyles() {
+    let padding = 14;
+    this.styles = StyleSheet.create({
+
+      noteCell: {
+        padding: padding,
+        paddingRight: padding * 2,
+        borderBottomColor: StyleKit.variable("stylekitBorderColor"),
+        borderBottomWidth: 1,
+        backgroundColor: StyleKit.variable("stylekitBackgroundColor"),
+      },
+
+      noteCellSelected: {
+        backgroundColor: StyleKit.variable("stylekitInfoColor"),
+      },
+
+      noteTagsContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        marginBottom: 5,
+      },
+
+      pinnedView: {
+        flex: 1,
+        flexDirection: 'row',
+        marginBottom: 5,
+      },
+
+      pinnedText: {
+        color: StyleKit.variable("stylekitInfoColor"),
+        marginLeft: 8,
+        fontWeight: "bold",
+        fontSize: 12
+      },
+
+      pinnedTextSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor"),
+      },
+
+      noteTag: {
+        marginRight: 2,
+        fontSize: 12,
+        color: StyleKit.variable("stylekitForegroundColor"),
+        opacity: 0.5,
+      },
+
+      noteTagSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor"),
+        opacity: 0.8
+      },
+
+      noteTitle: {
+        fontWeight: "bold",
+        fontSize: 16,
+        color: StyleKit.variable("stylekitForegroundColor")
+      },
+
+      noteTitleSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor")
+      },
+
+      noteText: {
+        fontSize: 15,
+        marginTop: 4,
+        color: StyleKit.variable("stylekitForegroundColor"),
+        opacity: 0.8,
+        lineHeight: 21
+      },
+
+      noteTextSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor")
+      },
+
+      noteDate: {
+        marginTop: 5,
+        fontSize: 12,
+        color: StyleKit.variable("stylekitForegroundColor"),
+        opacity: 0.5
+      },
+
+      noteDateSelected: {
+        color: StyleKit.variable("stylekitInfoContrastColor"),
+        opacity: 0.8
+      },
+
+      deleting: {
+        color: StyleKit.variable("stylekitInfoColor"),
+        marginBottom: 5,
+      }
+    });
   }
 }

@@ -31,8 +31,6 @@ export default class Notes extends Abstract {
   constructor(props) {
     super(props);
 
-    this.loadStyles();
-
     this.rendersLockscreen = true;
 
     props.navigation.setParams({

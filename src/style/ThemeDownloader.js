@@ -33,31 +33,18 @@ export default class ThemeDownloader {
       return;
     }
 
-    if(url.includes("?")) {
-      url = url.replace("?", ".json?");
-    } else if(url.includes(".css?")) {
-      url = url.replace(".css?", ".json?");
-    } else {
-      url = url + ".json";
-    }
-
     if(ApplicationState.isAndroid && url.includes("localhost")) {
       url = url.replace("localhost", "10.0.2.2");
     }
 
-    return Server.get().getAbsolute(url, {}, function(response){
-      // success
-      if(response !== theme.getMobileRules()) {
-        theme.setMobileRules(response);
-        theme.setDirty(true);
-      }
-
-      if(theme.getNotAvailOnMobile()) {
-        theme.setNotAvailOnMobile(false);
-        theme.setDirty(true);
-      }
-    }, function(response) {
-      errorBlock(response);
+    return new Promise((resolve, reject) => {
+      Server.get().getAbsolute(url, {}, (response) => {
+        let variables = CSSParser.cssToObject(response);
+        resolve(variables);
+      }, (response) => {
+        resolve(null);
+      })
     })
+
   }
 }

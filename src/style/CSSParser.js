@@ -1,7 +1,8 @@
+const GenericVarPrefix = "--";
 const StylekitPrefix = "--sn-stylekit";
 const StylekitPrefixToBurn = "--sn-";
 
-class CSSParser {
+export default class CSSParser {
   /*
     @param css: CSS file contents in string format
   */
@@ -11,9 +12,14 @@ class CSSParser {
 
     for(var line of lines) {
       line = line.trim();
-      if(line.startsWith(StylekitPrefix)) {
+      if(line.startsWith(GenericVarPrefix)) {
         // Remove initial "--"
-        line = line.slice(StylekitPrefixToBurn.length, line.length);
+        if(line.startsWith(StylekitPrefix)) {
+          line = line.slice(StylekitPrefixToBurn.length, line.length);
+        } else {
+          // Not all vars start with --sn-stylekit. e.g --background-color
+          line = line.slice(GenericVarPrefix.length, line.length);
+        }
         let parts = line.split(":");
         let key = parts[0].trim();
         let value = parts[1].trim();;
@@ -38,7 +44,12 @@ class CSSParser {
         let from = stripValue.length;
         let to = value.indexOf(")");
         let varName = value.slice(from, to);
-        varName = varName.slice(StylekitPrefixToBurn.length, varName.length);
+        if(varName.startsWith(StylekitPrefix)) {
+          varName = varName.slice(StylekitPrefixToBurn.length, varName.length);
+        } else {
+          // Not all vars start with --sn-stylekit. e.g --background-color
+          varName = varName.slice(GenericVarPrefix.length, varName.length);
+        }
         varName = this.hyphenatedStringToCamelCase(varName);
         object[key] = object[varName];
       }

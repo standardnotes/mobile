@@ -4,13 +4,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
+import ThemedComponent from "@Components/ThemedComponent";
 
-export default class SideMenuHero extends Component {
 
-  constructor(props) {
-    super(props);
-    this.loadStyles();
-  }
+export default class SideMenuHero extends ThemedComponent {
 
   render() {
     return (
