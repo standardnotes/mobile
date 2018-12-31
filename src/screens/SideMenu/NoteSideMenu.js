@@ -142,7 +142,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         <SafeAreaView style={[viewStyles, this.styles.safeArea]}>
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
 
-            <SideMenuSection title="Editors" options={editorOptions} collapsed={false} />
+            <SideMenuSection title="Editors" options={editorOptions} collapsed={true} />
 
             <SideMenuSection title="Tags">
               <TagSelectionList onTagSelect={this.onTagSelect} selectedTags={selectedTags} />

@@ -99,7 +99,6 @@ export default class OptionsState {
 
   rebuildOptions() {
     this.displayOptions = {
-      archivedOnly: this.getDisplayOptionValue("archivedOnly"),
       hidePreviews: this.getDisplayOptionValue("hidePreviews"),
       hideTags:     this.getDisplayOptionValue("hideTags"),
       hideDates:    this.getDisplayOptionValue("hideDates")
@@ -107,9 +106,7 @@ export default class OptionsState {
   }
 
   getDisplayOptionValue(key) {
-    if(key == "archivedOnly") {
-      return this.archivedOnly;
-    } else if(key == "hidePreviews") {
+    if(key == "hidePreviews") {
       return this.hidePreviews;
     } else if(key == "hideDates") {
       return this.hideDates;
@@ -119,9 +116,7 @@ export default class OptionsState {
   }
 
   setDisplayOptionKeyValue(key, value) {
-    if(key == "archivedOnly") {
-      this.archivedOnly = value;
-    } else if(key == "hidePreviews") {
+    if(key == "hidePreviews") {
       this.hidePreviews = value;
     } else if(key == "hideDates") {
       this.hideDates = value;

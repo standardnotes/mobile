@@ -44,7 +44,7 @@ export default class TagSelectionList extends Component {
       }
 
       else if(event == "sync:completed") {
-        if(data.retrievedItems && _.find(data.retrievedItems, {content_type: "Tag"})) {
+        if(data.retrievedItems && _.find(data.retrievedItems, {content_type: this.props.contentType})) {
           this.reloadTags();
         }
       }
@@ -56,8 +56,12 @@ export default class TagSelectionList extends Component {
   }
 
   reloadTags() {
-    var tags = ModelManager.get().tags.slice();
-    tags.unshift({title: "All notes", key: "all", uuid: 100})
+    let tags;
+    if(this.props.contentType == "Tag") {
+      tags = ModelManager.get().tags.slice();
+    } else {
+      tags = ModelManager.get().getSmartTags();
+    }
     this.setState({tags: tags});
   }
 

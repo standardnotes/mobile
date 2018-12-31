@@ -413,9 +413,10 @@ export default class Compose extends Abstract {
       noteTitle: {
         fontWeight: "600",
         fontSize: 16,
-        color: StyleKit.variable("stylekitForegroundColor"),
+        color: StyleKit.variables.stylekitForegroundColor,
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
         height: 50,
-        borderBottomColor: StyleKit.variable("stylekitBorderColor"),
+        borderBottomColor: StyleKit.variables.stylekitBorderColor,
         borderBottomWidth: 1,
         paddingTop: Platform.OS === "ios" ? 5 : 12,
         paddingLeft: padding,

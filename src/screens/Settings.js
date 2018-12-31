@@ -529,13 +529,6 @@ export default class Settings extends Abstract {
             <SectionHeader title={"Options"} />
 
             <SectionedAccessoryTableCell
-              onPress={() => {this.onOptionSelect('archivedOnly')}}
-              text={"Show only archived notes"}
-              first={true}
-              selected={() => {return this.options.archivedOnly}}
-            />
-
-            <SectionedAccessoryTableCell
               onPress={() => {this.onOptionSelect('hidePreviews')}}
               text={"Hide note previews"}
               selected={() => {return this.options.hidePreviews}}

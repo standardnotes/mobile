@@ -42,6 +42,7 @@ export default class SideMenu extends AbstractSideMenu {
 
   onTagSelect = (tag) => {
     this.handler.onTagSelect(tag);
+    this.forceUpdate();
   }
 
   onThemeSelect = (theme) => {
@@ -136,16 +137,14 @@ export default class SideMenu extends AbstractSideMenu {
 
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
 
-            <SideMenuSection title="Themes" options={themeOptions} collapsed={false} />
+            <SideMenuSection title="Themes" options={themeOptions} collapsed={true} />
+
+            <SideMenuSection title="Views">
+              <TagSelectionList contentType="SN|SmartTag" onTagSelect={this.onTagSelect} selectedTags={selectedTags} />
+            </SideMenuSection>
 
             <SideMenuSection title="Tags">
-              <TagSelectionList onTagSelect={this.onTagSelect} selectedTags={selectedTags} />
-            </SideMenuSection>
-
-            <SideMenuSection title="Sort By">
-            </SideMenuSection>
-
-            <SideMenuSection title="Display Options">
+              <TagSelectionList contentType="Tag" onTagSelect={this.onTagSelect} selectedTags={selectedTags} />
             </SideMenuSection>
           </ScrollView>
 

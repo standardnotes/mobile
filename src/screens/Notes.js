@@ -259,17 +259,13 @@ export default class Notes extends Abstract {
     var numTags = options.selectedTagIds.length;
 
     if(numTags > 0) {
-      var tags = ModelManager.get().findItems(options.selectedTagIds);
+      var tags = ModelManager.get().getTagsWithIds(options.selectedTagIds);
       if(tags.length > 0) {
         var tag = tags[0];
-        notesTitle = tag.title + " notes";
+        notesTitle = tag.title;
       } else {
         notesTitle = "Notes";
       }
-    }
-
-    if(options.archivedOnly) {
-      notesTitle = "Archived Notes";
     }
 
     this.setTitle(notesTitle, null);
@@ -293,7 +289,7 @@ export default class Notes extends Abstract {
       },
       getSelectedTags: () => {
         let ids = this.options.getSelectedTagIds();
-        return ModelManager.get().findItems(ids);
+        return ModelManager.get().getTagsWithIds(ids);
       }
     })
   }

@@ -1,12 +1,17 @@
 import Storage from "./storageManager"
 import "../../models/extend/item.js";
+import { SFPredicate } from "standard-file-js";
 
 SFModelManager.ContentTypeClassMapping = {
   "Note" : SNNote,
   "Tag" : SNTag,
+  "SN|SmartTag": SNSmartTag,
   "SN|Theme" : SNTheme,
   "SN|Component" : SNComponent
 };
+
+const SystemSmartTagIdAllNotes = "all-notes";
+const SystemSmartTagIdArchivedNotes = "archived-notes";
 
 export default class ModelManager extends SFModelManager {
 
@@ -27,7 +32,9 @@ export default class ModelManager extends SFModelManager {
     this.tags = [];
     this.themes = [];
 
-    this.acceptableContentTypes = ["Note", "Tag", "SN|Theme", "SN|Component"];
+    this.acceptableContentTypes = ["Note", "Tag", "SN|SmartTag", "SN|Theme", "SN|Component"];
+
+    this.buildSystemSmartTags();
   }
 
   handleSignout() {
@@ -78,18 +85,77 @@ export default class ModelManager extends SFModelManager {
     return Storage.get().deleteModel(item);
   }
 
-  getNotes(options = {}) {
-    var notes;
-    var tags = [];
-    // if(options.selectedTagIds && options.selectedTagIds.length > 0 && options.selectedTagIds[0].key !== "all") {
-    if(options.selectedTagIds && options.selectedTagIds.length > 0) {
-      tags = ModelManager.get().findItems(options.selectedTagIds);
-      if(tags.length > 0) {
-        var taggedNotes = new Set();
-        for(var tag of tags) {
-          taggedNotes = new Set([...taggedNotes, ...new Set(tag.notes)])
+  /* Be sure not to use just findItems in your views, because those won't find system smart tags */
+  getTagsWithIds(ids) {
+    let tagMatches = ModelManager.get().findItems(ids);
+    let smartMatches = this.getSmartTagsWithIds(ids);
+    return tagMatches.concat(smartMatches);
+  }
+
+  buildSystemSmartTags() {
+    this.systemSmartTags = [
+      new SNSmartTag({
+        uuid: SystemSmartTagIdAllNotes,
+        content: {
+          title: "All notes",
+          isAllTag: true,
+          predicate: new SFPredicate.fromArray(["content_type", "=", "Note"])
         }
-        notes = Array.from(taggedNotes);
+      }),
+      new SNSmartTag({
+        uuid: SystemSmartTagIdArchivedNotes,
+        content: {
+          title: "Archived",
+          isArchiveTag: true,
+          predicate: new SFPredicate.fromArray(["archived", "=", true])
+        }
+      })
+    ]
+  }
+
+  systemSmartTagIds() {
+    return [
+      SystemSmartTagIdAllNotes,
+      SystemSmartTagIdArchivedNotes
+    ]
+  }
+
+  getSmartTagWithId(id) {
+    return this.getSmartTags().find((candidate) => candidate.uuid == id);
+  }
+
+  getSmartTagsWithIds(ids) {
+    return this.getSmartTags().filter((candidate) => ids.includes(candidate.uuid));
+  }
+
+  getSmartTags() {
+    let userTags = this.validItemsForContentType("SN|SmartTag");
+    return this.systemSmartTags.concat(userTags);
+  }
+
+  notesMatchingPredicate(predicate) {
+    let notePredicate = ["content_type", "=", "Note"];
+    // itemsMatchingPredicate can return non-note types
+    return this.itemsMatchingPredicates([notePredicate, predicate]);
+  }
+
+  getNotes(options = {}) {
+    let notes, tags = [], selectedSmartTag;
+    // if(options.selectedTagIds && options.selectedTagIds.length > 0 && options.selectedTagIds[0].key !== "all") {
+    let selectedTagIds = options.selectedTagIds;
+    if(selectedTagIds && selectedTagIds.length > 0) {
+      selectedSmartTag = selectedTagIds.length == 1 && this.getSmartTagWithId(selectedTagIds[0]);
+      if(selectedSmartTag) {
+        notes = this.notesMatchingPredicate(selectedSmartTag.content.predicate);
+      } else {
+        tags = ModelManager.get().findItems(options.selectedTagIds);
+        if(tags.length > 0) {
+          var taggedNotes = new Set();
+          for(var tag of tags) {
+            taggedNotes = new Set([...taggedNotes, ...new Set(tag.notes)])
+          }
+          notes = Array.from(taggedNotes);
+        }
       }
     }
 
@@ -107,14 +173,18 @@ export default class ModelManager extends SFModelManager {
 
     var sortBy = options.sortBy;
 
-    notes = notes.filter(function(note){
+    notes = notes.filter((note) => {
       if(note.deleted) {
         return false;
       }
-      if(options.archivedOnly) {
-        return note.archived;
-      } else {
+
+      // If we're not dealing with the system archived tag, then we only want to
+      // filter for this note if it's not archived. (Hide archived if not archive tag)
+      let isExplicitlyArchiveTag = selectedSmartTag && selectedSmartTag.content.isArchiveTag;
+      if(!isExplicitlyArchiveTag) {
         return !note.archived;
+      } else {
+        return note.archived;
       }
     })
 

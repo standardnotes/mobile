@@ -27,7 +27,7 @@ export default class SideMenuSection extends ThemedComponent {
   render() {
     let options = this.props.options || [];
     return (
-      <View>
+      <View style={this.styles.root}>
         <TouchableHighlight
           style={[this.styles.header, this.state.collapsed ? this.styles.collapsedHeader : null]}
           underlayColor={StyleKit.variable("stylekitBorderColor")}
@@ -64,6 +64,9 @@ export default class SideMenuSection extends ThemedComponent {
 
   loadStyles() {
     this.styles = {
+      root: {
+        paddingBottom: 6
+      },
       header: {
         height: 22
       },
@@ -79,7 +82,8 @@ export default class SideMenuSection extends ThemedComponent {
       collapsedLabel: {
         fontSize: 12,
         opacity: 0.7,
-        marginTop: 3
+        marginTop: 3,
+        color: StyleKit.variables.stylekitContrastForegroundColor
       }
     }
   }
