@@ -215,4 +215,13 @@ export default class Abstract extends ThemedComponent {
     */
     this.props.navigation.goBack(null);
   }
+
+  static IsShallowEqual = (newObj, prevObj, keys) => {
+    for(var key of keys) {
+      if(newObj[key] !== prevObj[key]) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

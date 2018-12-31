@@ -23,13 +23,13 @@ import TagSelectionList from "@SideMenu/TagSelectionList"
 
 import ApplicationState from "@Root/ApplicationState";
 import OptionsState from "@Root/OptionsState"
+import AbstractSideMenu from "@SideMenu/AbstractSideMenu"
 
-export default class SideMenu extends Abstract {
+export default class SideMenu extends AbstractSideMenu {
 
   constructor(props) {
     super(props);
     this.constructState({});
-    this.state = {};
   }
 
   presentSettings() {

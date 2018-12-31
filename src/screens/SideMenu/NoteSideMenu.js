@@ -23,12 +23,12 @@ import SideMenuSection from "@SideMenu/SideMenuSection"
 import TagSelectionList from "@SideMenu/TagSelectionList"
 
 import ApplicationState from "@Root/ApplicationState";
+import AbstractSideMenu from "@SideMenu/AbstractSideMenu"
 
-export default class NoteSideMenu extends Abstract {
+export default class NoteSideMenu extends AbstractSideMenu {
 
   constructor(props) {
     super(props);
-    this.loadStyles();
     this.constructState({});
   }
 
