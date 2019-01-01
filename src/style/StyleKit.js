@@ -29,6 +29,8 @@ export default class StyleKit {
   constructor() {
     this.themeChangeObservers = [];
 
+    this.buildConstants();
+
     this.createDefaultThemes();
 
     KeysManager.get().registerAccountRelatedStorageKeys(["activeTheme"]);
@@ -142,6 +144,10 @@ export default class StyleKit {
 
   static get variables() {
     return this.get().activeTheme.content.variables;
+  }
+
+  static get constants() {
+    return this.get().constants;
   }
 
   static styles() {
@@ -270,8 +276,8 @@ export default class StyleKit {
 
   reloadStyles() {
     let variables = this.activeTheme.content.variables;
-    let mainTextFontSize = 16;
-    let paddingLeft = 14;
+    let mainTextFontSize = this.constants.mainTextFontSize;
+    let paddingLeft = this.constants.paddingLeft;
     this.styles = {
       container: {
         height: "100%",
@@ -310,34 +316,6 @@ export default class StyleKit {
         marginTop: 10,
         marginBottom: 10,
         backgroundColor: variables.stylekitBackgroundColor
-      },
-
-      sectionHeaderContainer: {
-        flex: 1,
-        flexGrow: 0,
-        justifyContent: "space-between",
-        flexDirection: 'row',
-        paddingRight: paddingLeft,
-        paddingBottom: 10,
-        paddingTop: 10,
-        backgroundColor: 'rgba(52, 52, 52, 0.0)'
-      },
-
-      sectionHeader: {
-        backgroundColor: "transparent",
-        fontSize: mainTextFontSize - 4,
-        paddingLeft: paddingLeft,
-        color: variables.stylekitNeutralColor,
-        fontWeight: Platform.OS == "android" ? "bold" : "normal"
-      },
-
-      sectionHeaderButton: {
-        color: variables.stylekitInfoColor
-      },
-
-      sectionHeaderAndroid: {
-        fontSize: mainTextFontSize - 2,
-        color: variables.stylekitInfoColor
       },
 
       sectionedTableCell: {
@@ -470,6 +448,13 @@ export default class StyleKit {
       bold: {
         fontWeight: "bold"
       },
+    }
+  }
+
+  buildConstants() {
+    this.constants = {
+      mainTextFontSize: 16,
+      paddingLeft: 14
     }
   }
 

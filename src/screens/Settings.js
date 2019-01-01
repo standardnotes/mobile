@@ -466,6 +466,11 @@ export default class Settings extends Abstract {
     this.forceUpdate();
   }
 
+  toggleSortReverse = () => {
+    this.options.setSortReverse(!this.options.sortReverse);
+    this.forceUpdate();
+  }
+
   render() {
     if(this.state.lockContent) {
       return (<LockedView />);
@@ -510,7 +515,7 @@ export default class Settings extends Abstract {
 
 
           <TableSection>
-            <SectionHeader title={"Sort By"} />
+            <SectionHeader title={"Sort Notes By"} buttonText={this.options.sortReverse ? "Disable Reverse Sort" : "Enable Reverse Sort"} buttonAction={this.toggleSortReverse} />
             {this.sortOptions.map((option, i) => {
               return (
                 <SectionedAccessoryTableCell
@@ -526,11 +531,12 @@ export default class Settings extends Abstract {
           </TableSection>
 
           <TableSection>
-            <SectionHeader title={"Options"} />
+            <SectionHeader title={"Note List Options"} />
 
             <SectionedAccessoryTableCell
               onPress={() => {this.onOptionSelect('hidePreviews')}}
               text={"Hide note previews"}
+              first={true}
               selected={() => {return this.options.hidePreviews}}
             />
 

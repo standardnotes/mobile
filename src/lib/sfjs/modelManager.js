@@ -174,6 +174,7 @@ export default class ModelManager extends SFModelManager {
     }
 
     var sortBy = options.sortBy;
+    let sortReverse = options.sortReverse;
 
     notes = notes.filter((note) => {
       if(note.deleted) {
@@ -203,6 +204,11 @@ export default class ModelManager extends SFModelManager {
       var bValue = b[sortBy] || "";
 
       let vector = 1;
+
+      if(sortReverse) {
+        vector *= -1;
+      }
+
       if(sortBy == "title") {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
@@ -210,11 +216,11 @@ export default class ModelManager extends SFModelManager {
         if(aValue.length == 0 && bValue.length == 0) {
           return 0;
         } else if(aValue.length == 0 && bValue.length != 0) {
-          return 1;
+          return 1 * vector;
         } else if(aValue.length != 0 && bValue.length == 0) {
-          return -1;
+          return -1 * vector;
         } else  {
-          vector = -1;
+          vector *= -1;
         }
       }
 

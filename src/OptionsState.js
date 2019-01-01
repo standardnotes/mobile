@@ -22,6 +22,7 @@ export default class OptionsState {
   init() {
     this.selectedTagIds = [];
     this.sortBy = "created_at";
+    this.sortReverse = false;
   }
 
   reset() {
@@ -30,11 +31,11 @@ export default class OptionsState {
   }
 
   async loadSaved() {
-    return Storage.get().getItem("options").then(function(result){
+    return Storage.get().getItem("options").then((result) => {
       _.merge(this, _.omit(JSON.parse(result), ["changeObservers"]));
       this.rebuildOptions();
       this.notifyObservers();
-    }.bind(this))
+    })
   }
 
   persist() {
@@ -44,6 +45,7 @@ export default class OptionsState {
   toJSON() {
     return _.merge({
       sortBy: this.sortBy,
+      sortReverse: this.sortReverse,
       selectedTagIds: this.selectedTagIds
     }, this.getDisplayOptionValues());
   }
@@ -74,6 +76,11 @@ export default class OptionsState {
   setSearchTerm(term) {
     this.searchTerm = term;
     this.notifyObservers(OptionsState.OptionsStateChangeEventSearch);
+  }
+
+  setSortReverse(reverse) {
+    this.sortReverse = reverse;
+    this.notifyObservers(OptionsState.OptionsStateChangeEventSort);
   }
 
   setSortBy(sortBy) {
