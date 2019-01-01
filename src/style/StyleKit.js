@@ -11,8 +11,8 @@ import CSSParser from "./CSSParser";
 import ThemeDownloader from "@Style/ThemeDownloader"
 import Icons from '@Style/Icons';
 
-import redJSON from './red.json';
-import blueJSON from './blue.json';
+import redJSON from './Themes/red.json';
+import blueJSON from './Themes/blue.json';
 
 export default class StyleKit {
 

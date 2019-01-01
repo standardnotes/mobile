@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { ScrollView, View, Text, TouchableHighlight } from 'react-native';
+import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Icons from '@Style/Icons';
@@ -26,9 +26,10 @@ export default class SideMenuSection extends ThemedComponent {
 
   render() {
     let options = this.props.options || [];
+    let collapsedLabel = options.length > 0 ? options.length + " Options" : "Hidden";
     return (
       <View style={this.styles.root}>
-        <TouchableHighlight
+        <TouchableOpacity
           style={[this.styles.header, this.state.collapsed ? this.styles.collapsedHeader : null]}
           underlayColor={StyleKit.variable("stylekitBorderColor")}
           onPress={this.toggleCollapse}
@@ -36,10 +37,10 @@ export default class SideMenuSection extends ThemedComponent {
           <Fragment>
             <Text style={this.styles.title}>{this.props.title}</Text>
             {this.state.collapsed &&
-              <Text style={this.styles.collapsedLabel}>{options.length + " Options"}</Text>
+              <Text style={this.styles.collapsedLabel}>{collapsedLabel}</Text>
             }
           </Fragment>
-        </TouchableHighlight>
+        </TouchableOpacity>
 
         {!this.state.collapsed &&
           <Fragment>

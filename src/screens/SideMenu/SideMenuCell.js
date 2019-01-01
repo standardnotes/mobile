@@ -39,7 +39,9 @@ export default class SideMenuCell extends ThemedComponent {
 
     if(desc.type == "icon") {
       return (
-        <Icon name={desc.name} size={14} color={this.styles.iconColor} />
+        <View style={this.styles.iconGraphic}>
+          <Icon name={desc.name} size={20} color={this.styles.iconColor} />
+        </View>
       )
     } else if(desc.type == "ascii") {
         return (
@@ -47,7 +49,9 @@ export default class SideMenuCell extends ThemedComponent {
         )
     } else if(desc.type == "circle") {
       return (
-        <Circle backgroundColor={desc.backgroundColor} borderColor={desc.borderColor} />
+        <View style={this.styles.iconCircle}>
+          <Circle backgroundColor={desc.backgroundColor} borderColor={desc.borderColor} />
+        </View>
       )
     } else {
       return (
@@ -65,15 +69,12 @@ export default class SideMenuCell extends ThemedComponent {
   }
 
   render() {
-    let iconSide = (this.props.iconDesc && this.props.iconDesc.side) ? this.props.iconDesc.side : "left";
+    let hasIcon = this.props.iconDesc;
+    let iconSide = (hasIcon && this.props.iconDesc.side) ? this.props.iconDesc.side : (hasIcon ? "left" : null);
     return (
-      <TouchableOpacity
-        style={this.styles.cell}
-
-        onPress={this.onPress}
-        onLongPress={this.onLongPress}
-      >
+      <TouchableOpacity style={this.styles.cell} onPress={this.onPress} onLongPress={this.onLongPress}>
         <View style={this.styles.cellContent}>
+
           {iconSide == "left" &&
             <View style={[this.styles.iconContainer, this.styles.iconContainerLeft]}>
               {this.getIconElement()}
@@ -98,7 +99,7 @@ export default class SideMenuCell extends ThemedComponent {
 
   loadStyles() {
     this.styles = {
-      iconColor: StyleKit.variable("stylekitContrastInfoColor"),
+      iconColor: StyleKit.variables.stylekitInfoColor,
       selectionBgColor: StyleKit.hexToRGBA(StyleKit.variable("stylekitInfoColor"), 0.1),
 
       cell: {
@@ -124,12 +125,13 @@ export default class SideMenuCell extends ThemedComponent {
 
       iconContainerRight: {
         marginLeft: 6,
-        marginRight: 3,
+        marginRight: 6,
         height: "100%",
       },
 
       textContainer: {
-        height: 24
+        height: 24,
+        marginLeft: 6
       },
 
       textContainerSelected: {
@@ -139,9 +141,17 @@ export default class SideMenuCell extends ThemedComponent {
 
       text: {
         height: "100%",
-        color: StyleKit.variable("stylekitContrastForegroundColor"),
+        color: StyleKit.variables.stylekitContrastForegroundColor,
         fontWeight: 'bold',
         fontSize: 15,
+      },
+
+      iconGraphic: {
+        marginTop: -3
+      },
+
+      iconCircle: {
+        marginTop: -5
       },
 
       iconAscii: {

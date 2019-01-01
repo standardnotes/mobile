@@ -18,7 +18,6 @@ import Notes from "./screens/Notes"
 import MainSideMenu from "@SideMenu/MainSideMenu"
 import NoteSideMenu from "@SideMenu/NoteSideMenu"
 import Settings from "./screens/Settings"
-import NoteOptions from "./screens/NoteOptions"
 import InputModal from "./screens/InputModal"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
@@ -32,8 +31,7 @@ if(__DEV__ === false) {
 
 const AppStack = createStackNavigator({
   Notes: {screen: Notes},
-  Compose: {screen: Compose},
-  NoteOptions: {screen : NoteOptions},
+  Compose: {screen: Compose}
 }, {
   initialRouteName: 'Notes',
 })

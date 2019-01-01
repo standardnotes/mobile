@@ -11,6 +11,7 @@ import Abstract from "@Screens/Abstract"
 import SectionHeader from "@Components/SectionHeader";
 import TableSection from "@Components/TableSection";
 import LockedView from "@Containers/LockedView";
+import ItemActionManager from "@Lib/itemActionManager"
 
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
@@ -116,6 +117,46 @@ export default class NoteSideMenu extends AbstractSideMenu {
   Render
   */
 
+  buildOptionsForNoteManagement() {
+    var pinOption = this.note.pinned ? "Unpin" : "Pin";
+    let pinEvent = pinOption == "Pin" ? ItemActionManager.PinEvent : ItemActionManager.UnpinEvent;
+
+    var archiveOption = this.note.archived ? "Unarchive" : "Archive";
+    let archiveEvent = archiveOption == "Archive" ? ItemActionManager.ArchiveEvent : ItemActionManager.UnarchiveEvent;
+
+    var lockOption = this.note.locked ? "Unlock" : "Lock";
+    let lockEvent = lockOption == "Lock" ? ItemActionManager.LockEvent : ItemActionManager.UnlockEvent;
+
+    let rawOptions = [
+      { text: pinOption, key: pinEvent, icon: "bookmark" },
+      { text: archiveOption, key: archiveEvent, icon: "archive" },
+      { text: lockOption, key: lockEvent, icon: "lock" },
+      { text: "Share", key: ItemActionManager.ShareEvent, icon: "share" },
+      { text: "Delete", key: ItemActionManager.DeleteEvent, icon: "trash" },
+    ];
+
+    let options = [];
+    for(let rawOption of rawOptions) {
+      let option = SideMenuSection.BuildOption({
+        text: rawOption.text,
+        key: rawOption.key,
+        iconDesc: { type: "icon", side: "right", name: Icons.nameForIcon(rawOption.icon) },
+        onSelect: () => {
+          ItemActionManager.handleEvent(rawOption.key, this.note, () => {
+            if(rawOption.key == ItemActionManager.DeleteEvent) {
+              this.popToRoot();
+            } else {
+              this.forceUpdate();
+            }
+          });
+        },
+      })
+      options.push(option);
+    }
+
+    return options;
+  }
+
   buildOptionsForEditors() {
     let editors = ComponentManager.get().getEditors();
     let selectedEditor = ComponentManager.get().editorForNote(this.note);
@@ -163,12 +204,15 @@ export default class NoteSideMenu extends AbstractSideMenu {
     }
 
     let editorOptions = this.buildOptionsForEditors();
+    let noteOptions = this.buildOptionsForNoteManagement();
     let selectedTags = this.handler.getSelectedTags();
 
     return (
       <Fragment>
         <SafeAreaView style={[viewStyles, this.styles.safeArea]}>
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
+
+            <SideMenuSection title="Options" options={noteOptions} />
 
             <SideMenuSection title="Editors" options={editorOptions} collapsed={true} />
 
