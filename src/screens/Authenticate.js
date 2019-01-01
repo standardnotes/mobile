@@ -146,7 +146,7 @@ export default class Authenticate extends Abstract {
     var paddingTop = (ApplicationState.isIOS && StyleKit.isIPhoneX()) ? 30 : 15;
 
     return (
-      <View style={StyleKit.styles().flexContainer}>
+      <View style={StyleKit.styles.flexContainer}>
         <ScrollView style={{paddingTop: this.props.mode == 'authenticate' ? paddingTop : 0}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
           <TableSection>
 
@@ -312,7 +312,7 @@ class PasscodeSection extends Abstract {
           <SectionedTableCell textInputCell={true} first={this.props.first}>
             <TextInput
               ref={'input'}
-              style={StyleKit.styles().sectionedTableCellTextInput}
+              style={StyleKit.styles.sectionedTableCellTextInput}
               placeholder={"Local passcode"}
               onChangeText={(text) => this.setState({passcode: text})}
               value={this.state.passcode}

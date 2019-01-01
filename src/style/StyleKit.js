@@ -150,12 +150,12 @@ export default class StyleKit {
     return this.get().constants;
   }
 
-  static styles() {
+  static get styles() {
     return this.get().styles;
   }
 
   static stylesForKey(key) {
-    var allStyles = this.styles();
+    var allStyles = this.styles;
     var styles = [allStyles[key]];
     var platform = Platform.OS == "android" ? "Android" : "IOS";
     var platformStyles = allStyles[key+platform];
@@ -279,6 +279,12 @@ export default class StyleKit {
     let mainTextFontSize = this.constants.mainTextFontSize;
     let paddingLeft = this.constants.paddingLeft;
     this.styles = {
+      baseBackground: {
+        backgroundColor: variables.stylekitBackgroundColor
+      },
+      contrastBackground: {
+        backgroundColor: variables.stylekitContrastBackgroundColor
+      },
       container: {
         height: "100%",
       },
@@ -460,21 +466,21 @@ export default class StyleKit {
 
   static actionSheetStyles() {
     return {
-      wrapperStyle: StyleKit.styles().actionSheetWrapper,
-      overlayStyle: StyleKit.styles().actionSheetOverlay,
-      bodyStyle : StyleKit.styles().actionSheetBody,
+      wrapperStyle: StyleKit.styles.actionSheetWrapper,
+      overlayStyle: StyleKit.styles.actionSheetOverlay,
+      bodyStyle : StyleKit.styles.actionSheetBody,
 
-      buttonWrapperStyle: StyleKit.styles().actionSheetButtonWrapper,
-      buttonTitleStyle: StyleKit.styles().actionSheetButtonTitle,
+      buttonWrapperStyle: StyleKit.styles.actionSheetButtonWrapper,
+      buttonTitleStyle: StyleKit.styles.actionSheetButtonTitle,
 
-      titleWrapperStyle: StyleKit.styles().actionSheetTitleWrapper,
-      titleTextStyle: StyleKit.styles().actionSheetTitleText,
+      titleWrapperStyle: StyleKit.styles.actionSheetTitleWrapper,
+      titleTextStyle: StyleKit.styles.actionSheetTitleText,
       tintColor: ApplicationState.isIOS ? undefined : StyleKit.variable("stylekitInfoColor"),
 
       buttonUnderlayColor: StyleKit.variable("stylekitBorderColor"),
 
-      cancelButtonWrapperStyle: StyleKit.styles().actionSheetCancelButtonWrapper,
-      cancelButtonTitleStyle: StyleKit.styles().actionSheetCancelButtonTitle,
+      cancelButtonWrapperStyle: StyleKit.styles.actionSheetCancelButtonWrapper,
+      cancelButtonTitleStyle: StyleKit.styles.actionSheetCancelButtonTitle,
       cancelMargin: StyleSheet.hairlineWidth
     }
   }

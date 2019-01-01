@@ -31,7 +31,7 @@ export default class InputModal extends Abstract {
       }
     })
 
-    this.constructState({text: ""});
+    this.constructState({text: this.getProp("initialValue") || ""});
   }
 
   dismiss() {
@@ -50,6 +50,7 @@ export default class InputModal extends Abstract {
   }
 
   onTextChange = (text) => {
+    console.log("Setting state text", text);
     this.setState({text: text})
   }
 
@@ -59,12 +60,11 @@ export default class InputModal extends Abstract {
     }
 
     return (
-      <View style={StyleKit.styles().container}>
-        <TableSection extraStyles={[StyleKit.styles().container]}>
-          <SectionHeader title={this.getProp("title")} />
+      <View style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+        <TableSection extraStyles={[StyleKit.styles.container]}>
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
-              style={[StyleKit.styles().sectionedTableCellTextInput]}
+              style={[StyleKit.styles.sectionedTableCellTextInput]}
               placeholder={this.getProp("placeholder")}
               onChangeText={this.onTextChange}
               value={this.state.text}

@@ -123,7 +123,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
   }
 
   render() {
-    var viewStyles = [StyleKit.styles().container, this.styles.sideMenu];
+    var viewStyles = [StyleKit.styles.container, this.styles.sideMenu];
 
     if(this.state.lockContent) {
       return (<LockedView style={viewStyles} />);

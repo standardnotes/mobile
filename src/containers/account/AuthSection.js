@@ -61,7 +61,7 @@ export default class AuthSection extends Component {
           <View>
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
-                style={StyleKit.styles().sectionedTableCellTextInput}
+                style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={"Email"}
                 onChangeText={(text) => this.setState({email: text})}
                 value={this.state.email}
@@ -75,7 +75,7 @@ export default class AuthSection extends Component {
 
             <SectionedTableCell textInputCell={true}>
               <TextInput
-                style={StyleKit.styles().sectionedTableCellTextInput}
+                style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={"Password"}
                 onChangeText={(text) => this.setState({password: text})}
                 value={this.state.password}
@@ -89,12 +89,12 @@ export default class AuthSection extends Component {
 
         {this.props.mfa &&
           <View>
-            <Text style={[StyleKit.styles().uiText, {paddingLeft: textPadding, paddingRight: textPadding, marginBottom: textPadding}]}>
+            <Text style={[StyleKit.styles.uiText, {paddingLeft: textPadding, paddingRight: textPadding, marginBottom: textPadding}]}>
               {this.props.mfa.message}
             </Text>
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
-                style={StyleKit.styles().sectionedTableCellTextInput}
+                style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder=""
                 onChangeText={(text) => this.setState({mfa_token: text})}
                 value={this.state.mfa_token}
@@ -113,7 +113,7 @@ export default class AuthSection extends Component {
             <SectionHeader title={"Advanced"} />
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
-                style={StyleKit.styles().sectionedTableCellTextInput}
+                style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={"Sync Server"}
                 onChangeText={(text) => this.setState({server: text})}
                 value={this.state.server}

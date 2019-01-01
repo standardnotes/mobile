@@ -10,8 +10,8 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
   rules() {
     var rules = super.rules().concat([
-      StyleKit.styles().view,
-      StyleKit.styles().flexContainer,
+      StyleKit.styles.view,
+      StyleKit.styles.flexContainer,
       ...StyleKit.stylesForKey("sectionedAccessoryTableCell")
     ]);
     return rules;
@@ -58,10 +58,10 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
       icon = null;
     }
 
-    var textStyles = [StyleKit.styles().sectionedAccessoryTableCellLabel];
+    var textStyles = [StyleKit.styles.sectionedAccessoryTableCellLabel];
 
     if(this.props.bold || (this.props.selected && this.props.selected())) {
-      textStyles.push(StyleKit.styles().bold)
+      textStyles.push(StyleKit.styles.bold)
     }
     if(this.props.tinted) {
       textStyles.push({color: StyleKit.variable("stylekitInfoColor")})

@@ -11,7 +11,7 @@ export default class LockedView extends Component {
 
   render() {
     let color = StyleKit.variable("stylekitInfoColor");
-    var styles = [StyleKit.styles().centeredContainer];
+    var styles = [StyleKit.styles.centeredContainer];
     if(this.props.style) {
       styles.push(this.props.style);
     }

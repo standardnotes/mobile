@@ -13,15 +13,15 @@ export default class ButtonCell extends SectionedTableCell {
 
   buttonRules() {
     var rules = [StyleKit.stylesForKey("buttonCellButton")];
-    if(this.props.leftAligned) { rules.push(StyleKit.styles().buttonCellButtonLeft) }
-    if(this.props.bold) { rules.push(StyleKit.styles().bold) }
+    if(this.props.leftAligned) { rules.push(StyleKit.styles.buttonCellButtonLeft) }
+    if(this.props.bold) { rules.push(StyleKit.styles.bold) }
     if(this.props.disabled) { rules.push({color: "gray", opacity: 0.6}) }
     return rules;
   }
 
   render() {
     return (
-        <TouchableHighlight underlayColor={StyleKit.variable("stylekitBorderColor")} style={[StyleKit.styles().flexContainer, StyleKit.styles().buttonCell, ...this.rules()]} disabled={this.props.disabled} onPress={this.props.onPress}>
+        <TouchableHighlight underlayColor={StyleKit.variable("stylekitBorderColor")} style={[StyleKit.styles.flexContainer, StyleKit.styles.buttonCell, ...this.rules()]} disabled={this.props.disabled} onPress={this.props.onPress}>
           <View>
             <Text style={this.buttonRules()}>{this.props.title}</Text>
             {this.props.children &&

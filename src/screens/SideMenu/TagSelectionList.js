@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { ScrollView, View, Text, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -6,15 +6,17 @@ import Sync from '@SFJS/syncManager'
 import ItemActionManager from '@Lib/itemActionManager'
 import ModelManager from '@SFJS/modelManager'
 
-import ActionSheet from 'react-native-actionsheet'
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import SideMenuCell from "@SideMenu/SideMenuCell"
 
 import ApplicationState from "@Root/ApplicationState";
 import OptionsState from "@Root/OptionsState"
+import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 
-export default class TagSelectionList extends Component {
+import { withNavigation } from 'react-navigation';
+
+class TagSelectionList extends Component {
 
   /*
     @param props.selectedTags
@@ -24,7 +26,6 @@ export default class TagSelectionList extends Component {
   constructor(props) {
     super(props);
     this.state = {tags: []};
-    this.loadStyles();
   }
 
   componentDidMount() {
@@ -70,7 +71,7 @@ export default class TagSelectionList extends Component {
   */
 
   presentNewTag() {
-    this.props.navigation.navigate("NewTag", {
+    this.props.navigation.navigate("InputModal", {
       title: 'New Tag',
       placeholder: "New tag name",
       onSave: (text) => {
@@ -99,48 +100,37 @@ export default class TagSelectionList extends Component {
     this.props.onTagSelect(tag);
   }
 
-  onManageTagEvent = (event, tag, renderBlock) => {
-    ItemActionManager.handleEvent(event, tag, () => {
-        if(event == ItemActionManager.DeleteEvent) {
-          this.reloadTags();
-        }
-    }, () => {
-      // afterConfirmCallback
-      // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
-      renderBlock();
-    })
-  }
-
-  static ActionSheetCancelIndex = 0;
-  static ActionSheetDestructiveIndex = 1;
-
-  actionSheetActions() {
-    return [
-      ['Cancel', ""],
-      ['Delete', ItemActionManager.DeleteEvent]
-    ];
-  }
-
-  showActionSheet = (item) => {
-    // Dont show actionsheet for "All notes" tag
-    if(item.key !== "all") {
-      this.actionSheetItem = item;
-      this.setState((prevState) => {
-        return _.merge(prevState, {actionSheetTitle: item.title})
-      })
-      this.actionSheet.show();
-    }
-  }
-
-  handleActionSheetPress = (index) => {
-    if(index == 0) {
-      return;
-    }
-
-    this.onManageTagEvent(this.actionSheetActions()[index][1], this.actionSheetItem, () => {
-      this.forceUpdate();
+  showActionSheet = (tag) => {
+    let sheet = new ActionSheetWrapper({
+      title: tag.title,
+      options: [
+        ActionSheetWrapper.BuildOption({text: "Rename", callback: () => {
+          this.props.navigation.navigate("InputModal", {
+            title: 'Rename Tag',
+            placeholder: "Tag name",
+            initialValue: tag.title,
+            onSave: (text) => {
+              if(tag) {
+                tag.title = text; // Update the text on the tag to the input text
+                tag.setDirty(true);
+                Sync.get().sync();
+                this.forceUpdate();
+              }
+            }
+          })
+        }}),
+        ActionSheetWrapper.BuildOption({text: "Delete", destructive: true, callback: () => {
+          ItemActionManager.handleEvent(ItemActionManager.DeleteEvent, tag, () => {
+            this.reloadTags();
+          });
+        }})
+      ], onCancel: () => {
+        this.setState({actionSheet: null});
+      }
     });
-    this.actionSheetItem = null;
+
+    this.setState({actionSheet: sheet.actionSheetElement()});
+    sheet.show();
   }
 
   iconDescriptorForTag = (tag) => {
@@ -149,7 +139,6 @@ export default class TagSelectionList extends Component {
       value: "#"
     };
   }
-
 
   // must pass title, text, and tags as props so that it re-renders when either of those change
   renderTagCell = ({item}) => {
@@ -163,36 +152,25 @@ export default class TagSelectionList extends Component {
           key={item.uuid}
           selected={this.props.selectedTags.includes(item)}
         />
-
-        <ActionSheet
-          title={this.state.actionSheetTitle}
-          ref={o => this.actionSheet = o}
-          options={this.actionSheetActions().map((action) => {return action[0]})}
-          cancelButtonIndex={TagSelectionList.ActionSheetCancelIndex}
-          destructiveButtonIndex={TagSelectionList.ActionSheetDestructiveIndex}
-          onPress={this.handleActionSheetPress}
-          {...StyleKit.actionSheetStyles()}
-        />
       </View>
     )
   }
 
   render() {
     return (
-      <FlatList
-        initialNumToRender={10}
-        windowSize={10}
-        maxToRenderPerBatch={10}
-        data={this.state.tags}
-        renderItem={this.renderTagCell}
-        extraData={this.props.selectedTags /* Required to force list cells to update on selection change */}
-      />
+      <Fragment>
+        <FlatList
+          initialNumToRender={10}
+          windowSize={10}
+          maxToRenderPerBatch={10}
+          data={this.state.tags}
+          renderItem={this.renderTagCell}
+          extraData={this.props.selectedTags /* Required to force list cells to update on selection change */}
+        />
+        {this.state.actionSheet && this.state.actionSheet}
+      </Fragment>
     )
   }
-
-  loadStyles() {
-    this.styles = {
-
-    }
-  }
 }
+
+export default withNavigation(TagSelectionList);

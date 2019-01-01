@@ -86,9 +86,9 @@ export default class Webview extends Component {
     let bottomPadding = -34; // For some reason iOS inserts padding on bottom
 
     return (
-      <View style={[StyleKit.styles().flexContainer, this.props.style]}>
+      <View style={[StyleKit.styles.flexContainer, this.props.style]}>
         <WebView
-           style={StyleKit.styles().flexContainer, {backgroundColor: "transparent"}}
+           style={StyleKit.styles.flexContainer, {backgroundColor: "transparent"}}
            source={{uri: url}}
            key={this.editor.uuid}
            ref={(webView) => this.webView = webView}

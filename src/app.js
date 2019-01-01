@@ -15,7 +15,7 @@ import ReviewManager from './lib/reviewManager';
 
 import Compose from "./screens/Compose"
 import Notes from "./screens/Notes"
-import SideMenu from "@SideMenu/SideMenu"
+import MainSideMenu from "@SideMenu/MainSideMenu"
 import NoteSideMenu from "@SideMenu/NoteSideMenu"
 import Settings from "./screens/Settings"
 import NoteOptions from "./screens/NoteOptions"
@@ -75,7 +75,7 @@ const InputModalStack = createStackNavigator({
 const AppDrawer = createStackNavigator({
   Home: AppDrawerStack,
   Settings: SettingsStack,
-  NewTag: InputModalStack
+  InputModal: InputModalStack
 }, {
   mode: "modal",
   headerMode: 'none',
@@ -89,7 +89,7 @@ const DrawerStack = createDrawerNavigator({
   Main: AppDrawer,
 }, {
   contentComponent: ({ navigation }) => (
-    <SideMenu ref={(ref) => {SideMenuManager.get().setLeftSideMenuReference(ref)}} navigation={navigation} />
+    <MainSideMenu ref={(ref) => {SideMenuManager.get().setLeftSideMenuReference(ref)}} navigation={navigation} />
   ),
   drawerPosition: "left",
   drawerType: 'slide',

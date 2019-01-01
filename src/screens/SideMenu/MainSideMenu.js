@@ -25,7 +25,7 @@ import ApplicationState from "@Root/ApplicationState";
 import OptionsState from "@Root/OptionsState"
 import AbstractSideMenu from "@SideMenu/AbstractSideMenu"
 
-export default class SideMenu extends AbstractSideMenu {
+export default class MainSideMenu extends AbstractSideMenu {
 
   constructor(props) {
     super(props);
@@ -114,7 +114,7 @@ export default class SideMenu extends AbstractSideMenu {
   }
 
   render() {
-    var viewStyles = [StyleKit.styles().container, this.styles.sideMenu];
+    var viewStyles = [StyleKit.styles.container, this.styles.sideMenu];
 
     if(this.state.lockContent) {
       return (<LockedView style={viewStyles} />);

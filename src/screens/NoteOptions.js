@@ -12,7 +12,6 @@ import ButtonCell from "../components/ButtonCell";
 import TableSection from "../components/TableSection";
 import LockedView from "../containers/LockedView";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
-import TagList from "../containers/TagList";
 
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
@@ -100,7 +99,7 @@ export default class NoteOptions extends Abstract {
   }
 
   presentNewTag() {
-    this.props.navigation.navigate("NewTag", {
+    this.props.navigation.navigate("InputModal", {
       title: 'New Tag',
       placeholder: "New tag name",
       onSave: (text) => {
@@ -179,7 +178,7 @@ export default class NoteOptions extends Abstract {
   }
 
   render() {
-    var viewStyles = [StyleKit.styles().container];
+    var viewStyles = [StyleKit.styles.container];
 
     if(this.state.lockContent) {
       return (<LockedView style={viewStyles} />);
@@ -202,7 +201,7 @@ export default class NoteOptions extends Abstract {
 
     return (
       <View style={viewStyles}>
-        <ScrollView style={StyleKit.styles().view}>
+        <ScrollView style={StyleKit.styles.view}>
 
           <TableSection>
             <SectionHeader title={"Manage Note"} />

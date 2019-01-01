@@ -479,7 +479,7 @@ export default class Settings extends Abstract {
     let signedIn = !Auth.get().offline();
 
     return (
-      <View style={StyleKit.styles().container}>
+      <View style={StyleKit.styles.container}>
         <ScrollView style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
 
           {!signedIn && !this.state.confirmRegistration &&

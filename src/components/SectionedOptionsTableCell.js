@@ -6,8 +6,8 @@ import StyleKit from "../style/StyleKit"
 export default class SectionedOptionsTableCell extends Component {
 
   rules() {
-    var rules = [StyleKit.styles().sectionedTableCell];
-    if(this.props.first) { rules.push(StyleKit.styles().sectionedTableCellFirst); }
+    var rules = [StyleKit.styles.sectionedTableCell];
+    if(this.props.first) { rules.push(StyleKit.styles.sectionedTableCellFirst); }
     if(this.props.height) {rules.push({height: this.props.height})};
     if(this.props.extraStyles) {
       rules = rules.concat(this.props.extraStyles);
@@ -67,7 +67,7 @@ export default class SectionedOptionsTableCell extends Component {
   render() {
     return (
       <View style={this.rules()}>
-        <Text style={[StyleKit.styles().sectionedAccessoryTableCellLabel, this.titleStyles]}>{this.props.title}</Text>
+        <Text style={[StyleKit.styles.sectionedAccessoryTableCellLabel, this.titleStyles]}>{this.props.title}</Text>
         <View style={this.optionsContainerStyle}>
           {this.props.options.map((option) => {
             var buttonStyles = [this.buttonStyles];
@@ -75,7 +75,7 @@ export default class SectionedOptionsTableCell extends Component {
               buttonStyles.push(this.selectedButtonStyles);
             }
             return (
-              <TouchableHighlight underlayColor={StyleKit.variable("stylekitBorderColor")} key={option.title} style={[StyleKit.styles().view, this.buttonContainerStyles]} onPress={() => {this.props.onPress(option)}}>
+              <TouchableHighlight underlayColor={StyleKit.variable("stylekitBorderColor")} key={option.title} style={[StyleKit.styles.view, this.buttonContainerStyles]} onPress={() => {this.props.onPress(option)}}>
                 <Text style={buttonStyles}>{option.title}</Text>
               </TouchableHighlight>
             )

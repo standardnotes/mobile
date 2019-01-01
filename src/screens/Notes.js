@@ -413,7 +413,7 @@ export default class Notes extends Abstract {
     var syncStatus = Sync.get().syncStatus;
 
     return (
-      <View style={StyleKit.styles().container}>
+      <View style={StyleKit.styles.container}>
         {notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}

@@ -332,7 +332,7 @@ export default class Compose extends Abstract {
     var shouldDisplayEditor = noteEditor != null && this.note.uuid;
 
     return (
-      <View style={[this.styles.container, StyleKit.styles().container]}>
+      <View style={[this.styles.container, StyleKit.styles.container]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
             <Icon name={Icons.nameForIcon("lock")} size={20} color={StyleKit.variable("stylekitBackgroundColor")} />

@@ -135,7 +135,7 @@ export default class AuthModal extends Component {
 
     let authProps = this.state.authProps;
     return (
-      <View style={[StyleKit.styles().container]}>
+      <View style={[StyleKit.styles.container]}>
         <Modal
          animationType={"slide"}
          transparent={true}
