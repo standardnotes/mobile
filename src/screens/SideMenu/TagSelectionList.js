@@ -45,7 +45,9 @@ class TagSelectionList extends Component {
       }
 
       else if(event == "sync:completed") {
-        if(data.retrievedItems && _.find(data.retrievedItems, {content_type: this.props.contentType})) {
+        let inRetrieved = data.retrievedItems && _.find(data.retrievedItems, {content_type: this.props.contentType});
+        let inSaved = data.savedItems && _.find(data.savedItems, {content_type: this.props.contentType});
+        if(inRetrieved || inSaved) {
           this.reloadTags();
         }
       }
@@ -69,32 +71,6 @@ class TagSelectionList extends Component {
   /*
   Tag Options
   */
-
-  presentNewTag() {
-    this.props.navigation.navigate("InputModal", {
-      title: 'New Tag',
-      placeholder: "New tag name",
-      onSave: (text) => {
-        this.createTag(text, (tag) => {
-          if(this.note) {
-            // select this tag
-            this.onTagSelect(tag)
-          }
-        });
-      }
-    })
-  }
-
-  createTag(text, callback) {
-    var tag = new SNTag({content: {title: text}});
-    tag.initUUID().then(() => {
-      tag.setDirty(true);
-      ModelManager.get().addItem(tag);
-      Sync.get().sync();
-      callback(tag);
-      this.forceUpdate();
-    })
-  }
 
   onTagSelect = (tag) => {
     this.props.onTagSelect(tag);

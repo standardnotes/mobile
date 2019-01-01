@@ -149,11 +149,11 @@ export default class MainSideMenu extends AbstractSideMenu {
           </ScrollView>
 
           <FAB
-            buttonColor={StyleKit.variable("stylekitInfoColor")}
-            iconTextColor={StyleKit.variable("stylekitInfoContrastColor")}
-            onClickAction={() => {this.note ? this.presentNewTag() : this.presentSettings()}}
+            buttonColor={StyleKit.variables.stylekitInfoColor}
+            iconTextColor={StyleKit.variables.stylekitInfoContrastColor}
+            onClickAction={() => {this.presentSettings()}}
             visible={true}
-            iconTextComponent={<Icon name={this.note ? "md-pricetag" : "md-settings"}/>}
+            iconTextComponent={<Icon name={"md-settings"}/>}
           />
 
         </SafeAreaView>

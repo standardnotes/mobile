@@ -50,7 +50,6 @@ export default class InputModal extends Abstract {
   }
 
   onTextChange = (text) => {
-    console.log("Setting state text", text);
     this.setState({text: text})
   }
 

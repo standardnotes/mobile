@@ -114,6 +114,14 @@ export default class Compose extends Abstract {
 
   componentWillUnmount() {
     super.componentWillUnmount();
+
+    // We don't want to do this in componentDid/WillBlur because when presenting new tag input modal,
+    // the component will blur, and this will be called. Then, because the right drawer is now locked,
+    // we ignore render events. This will cause the screen to be white when you save the new tag.
+    SideMenuManager.get().removeHandlerForRightSideMenu();
+    this.props.navigation.lockLeftDrawer(false);
+    this.props.navigation.lockRightDrawer(true);
+
     Sync.get().removeEventHandler(this.syncObserver);
     ComponentManager.get().deregisterHandler(this.componentHandler);
   }
@@ -147,9 +155,10 @@ export default class Compose extends Abstract {
       }
     }
 
+
     SideMenuManager.get().setHandlerForRightSideMenu({
       getCurrentNote: () => {
-        return this.note
+        return this.note;
       },
       onEditorSelect: (editor) => {
         if(editor) {
@@ -186,14 +195,6 @@ export default class Compose extends Abstract {
       // A dummy note created to work with default external editor. Safe to delete.
       ModelManager.get().removeItemLocally(this.note);
     }
-  }
-
-  componentDidBlur() {
-    super.componentDidBlur();
-
-    SideMenuManager.get().removeHandlerForRightSideMenu();
-    this.props.navigation.lockLeftDrawer(false);
-    this.props.navigation.lockRightDrawer(true);
   }
 
   replaceTagsForNote(newTags) {

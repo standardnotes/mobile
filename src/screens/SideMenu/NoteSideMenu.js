@@ -15,6 +15,8 @@ import LockedView from "@Containers/LockedView";
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import ActionSheetWrapper from "@Style/ActionSheetWrapper"
+import ModelManager from '@SFJS/modelManager'
+import Sync from '@SFJS/syncManager'
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 import SideMenuCell from "@SideMenu/SideMenuCell"
@@ -83,6 +85,33 @@ export default class NoteSideMenu extends AbstractSideMenu {
     sheet.show();
   }
 
+  presentNewTag = () => {
+    this.props.navigation.navigate("InputModal", {
+      title: 'New Tag',
+      placeholder: "New tag name",
+      onSave: (text) => {
+        this.createTag(text, (tag) => {
+          if(this.note) {
+            // select this tag
+            this.onTagSelect(tag)
+          }
+        });
+      }
+    })
+  }
+
+  createTag(text, callback) {
+    var tag = new SNTag({content: {title: text}});
+    tag.initUUID().then(() => {
+      tag.setDirty(true);
+      ModelManager.get().addItem(tag);
+      Sync.get().sync();
+      callback(tag);
+      this.forceUpdate();
+    })
+  }
+
+
   /*
   Render
   */
@@ -130,9 +159,8 @@ export default class NoteSideMenu extends AbstractSideMenu {
     }
 
     if(!this.handler || SideMenuManager.get().isRightSideMenuLocked()) {
-      return null
+      return null;
     }
-
 
     let editorOptions = this.buildOptionsForEditors();
     let selectedTags = this.handler.getSelectedTags();
@@ -149,6 +177,14 @@ export default class NoteSideMenu extends AbstractSideMenu {
             </SideMenuSection>
 
           </ScrollView>
+
+          <FAB
+            buttonColor={StyleKit.variables.stylekitInfoColor}
+            iconTextColor={StyleKit.variables.stylekitInfoContrastColor}
+            onClickAction={() => {this.presentNewTag()}}
+            visible={true}
+            iconTextComponent={<Icon name={"md-add"}/>}
+          />
         </SafeAreaView>
         {this.state.actionSheet && this.state.actionSheet}
       </Fragment>
