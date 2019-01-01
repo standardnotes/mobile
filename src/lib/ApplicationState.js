@@ -1,5 +1,5 @@
 import {AppState, Platform} from 'react-native'
-import KeysManager from "./lib/keysManager"
+import KeysManager from "@Lib/keysManager"
 import OptionsState from "@Lib/OptionsState"
 var pjson = require('../package.json')
 

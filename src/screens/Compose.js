@@ -91,8 +91,6 @@ export default class Compose extends Abstract {
         }
       }
     });
-
-    this.configureHeaderBar();
   }
 
   configureHeaderBar() {
@@ -263,23 +261,22 @@ export default class Compose extends Abstract {
   changesMade() {
     this.note.hasChanges = true;
 
+    // capture dummy status before timeout
+    let isDummy = this.note.dummy;
+
     if(this.saveTimeout) clearTimeout(this.saveTimeout);
     if(this.statusTimeout) clearTimeout(this.statusTimeout);
     this.saveTimeout = setTimeout(() => {
       this.showSavingStatus();
-      if(!this.note.uuid) {
-        this.note.initUUID().then(() => {
-          if(this.getProp("selectedTagId")) {
-            var tag = ModelManager.get().findItem(this.getProp("selectedTagId"));
-            tag.addItemAsRelationship(this.note);
-            tag.setDirty(true);
-          }
-          this.save();
-          this.configureHeaderBar();
-        });
-      } else {
-        this.save();
+      if(isDummy && this.getProp("selectedTagId")) {
+        var tag = ModelManager.get().findItem(this.getProp("selectedTagId"));
+        // Could be system tag, so wouldn't exist
+        if(tag && !tag.isSmartTag()) {
+          tag.addItemAsRelationship(this.note);
+          tag.setDirty(true);
+        }
       }
+      this.save();
     }, 275)
   }
 

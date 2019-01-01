@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Platform, Text, StatusBar, Modal, Alert, Button } from 'react-native';
+import { View, Text, Alert } from 'react-native';
 
 import ModelManager from '../lib/sfjs/modelManager'
 import Storage from '../lib/sfjs/storageManager'
@@ -14,17 +14,14 @@ import SideMenuManager from "@SideMenu/SideMenuManager"
 
 import Abstract from "./Abstract"
 import StyleKit from "../style/StyleKit"
-import Icons from '@Style/Icons';
 import NoteList from "../containers/NoteList"
 import OptionsState from "@Lib/OptionsState"
 import AuthModal from "../containers/AuthModal"
 import LockedView from "../containers/LockedView"
 import ApplicationState from "@Lib/ApplicationState"
 
-import { DrawerActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
-import HeaderButtons, { HeaderButton, Item } from 'react-navigation-header-buttons';
 
 export default class Notes extends Abstract {
 
@@ -315,38 +312,6 @@ export default class Notes extends Abstract {
     this.props.navigation.navigate("Compose", {
       noteId: item && item.uuid,
       selectedTagId: this.options.selectedTagIds.length && this.options.selectedTagIds[0],
-    });
-  }
-
-  presentFilterScreen() {
-    Navigation.showModal({
-      stack: {
-        children: [{
-          component: {
-            name: 'sn.Filter',
-            passProps: {
-              options: JSON.stringify(this.options),
-              onOptionsChange: (options) => {
-                this.options.mergeWith(options);
-              }
-            }
-          }
-        }]
-      }
-    });
-  }
-
-  presentSettingsScreen() {
-    Navigation.showModal({
-      stack: {
-        children: [{
-          component: {
-            name: 'sn.Account',
-            title: 'Account',
-            animationType: 'slide-up'
-          }
-        }]
-      }
     });
   }
 
