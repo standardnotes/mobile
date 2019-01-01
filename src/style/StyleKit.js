@@ -159,6 +159,17 @@ export default class StyleKit {
     return styles;
   }
 
+  statusBarColorForTheme(theme) {
+    // The main nav bar uses contrast background color
+    let luminosity = StyleKit.getColorLuminosity(theme.content.variables.stylekitContrastBackgroundColor);
+    if(luminosity < 130) {
+      // is dark color, return white status bar
+      return "light-content";
+    } else {
+      return "dark-content";
+    }
+  }
+
   themes() {
     let themes = ModelManager.get().themes.sort((a, b) => {
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
@@ -179,6 +190,12 @@ export default class StyleKit {
     theme.content.variables = _.merge(this.templateVariables(), variables);
 
     this.activeTheme = theme;
+
+    // On Android, a time out is required, especially during app startup
+    setTimeout(() => {
+      let statusBarColor = this.statusBarColorForTheme(theme);
+      StatusBar.setBarStyle(statusBarColor, true);
+    }, Platform.OS == "android" ? 100 : 0);
 
     this.reloadStyles();
 
@@ -475,6 +492,17 @@ export default class StyleKit {
       cancelButtonTitleStyle: StyleKit.styles().actionSheetCancelButtonTitle,
       cancelMargin: StyleSheet.hairlineWidth
     }
+  }
+
+  static getColorLuminosity(hexCode) {
+    var c = hexCode;
+    c = c.substring(1);      // strip #
+    var rgb = parseInt(c, 16);   // convert rrggbb to decimal
+    var r = (rgb >> 16) & 0xff;  // extract red
+    var g = (rgb >>  8) & 0xff;  // extract green
+    var b = (rgb >>  0) & 0xff;  // extract blue
+
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
   }
 
   static shadeBlend(p,c0,c1) {

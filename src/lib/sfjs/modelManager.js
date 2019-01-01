@@ -129,7 +129,9 @@ export default class ModelManager extends SFModelManager {
   }
 
   getSmartTags() {
-    let userTags = this.validItemsForContentType("SN|SmartTag");
+    let userTags = this.validItemsForContentType("SN|SmartTag").sort((a, b) => {
+      return a.content.title < b.content.title ? -1 : 1;
+    });;
     return this.systemSmartTags.concat(userTags);
   }
 

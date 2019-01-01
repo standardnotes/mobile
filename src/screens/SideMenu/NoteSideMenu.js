@@ -145,7 +145,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
             <SideMenuSection title="Editors" options={editorOptions} collapsed={true} />
 
             <SideMenuSection title="Tags">
-              <TagSelectionList onTagSelect={this.onTagSelect} selectedTags={selectedTags} />
+              <TagSelectionList contentType="Tag" onTagSelect={this.onTagSelect} selectedTags={selectedTags} />
             </SideMenuSection>
 
           </ScrollView>
