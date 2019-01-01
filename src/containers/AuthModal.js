@@ -4,7 +4,7 @@ import NoteCell from "./NoteCell"
 import Search from 'react-native-search-box'
 import StyleKit from "../style/StyleKit"
 import Authenticate from "../screens/Authenticate"
-import ApplicationState from "../ApplicationState";
+import ApplicationState from "@Lib/ApplicationState"
 
 /*
 

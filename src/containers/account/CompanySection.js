@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import StyleKit from "../../style/StyleKit"
-import ApplicationState from "../../ApplicationState"
+import ApplicationState from "@Lib/ApplicationState"
 import {TextInput, View, Text, Platform} from 'react-native';
 
 import SectionHeader from "../../components/SectionHeader";

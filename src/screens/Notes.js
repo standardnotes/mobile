@@ -16,10 +16,10 @@ import Abstract from "./Abstract"
 import StyleKit from "../style/StyleKit"
 import Icons from '@Style/Icons';
 import NoteList from "../containers/NoteList"
-import OptionsState from "../OptionsState"
+import OptionsState from "@Lib/OptionsState"
 import AuthModal from "../containers/AuthModal"
 import LockedView from "../containers/LockedView"
-import ApplicationState from "../ApplicationState";
+import ApplicationState from "@Lib/ApplicationState"
 
 import { DrawerActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';

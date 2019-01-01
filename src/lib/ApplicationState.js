@@ -1,6 +1,6 @@
 import {AppState, Platform} from 'react-native'
 import KeysManager from "./lib/keysManager"
-import OptionsState from "./OptionsState"
+import OptionsState from "@Lib/OptionsState"
 var pjson = require('../package.json')
 
 export default class ApplicationState {

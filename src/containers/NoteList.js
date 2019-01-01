@@ -3,7 +3,7 @@ import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text } from 're
 import NoteCell from "./NoteCell"
 import Search from 'react-native-search-box'
 import StyleKit from "../style/StyleKit"
-import ApplicationState from "../ApplicationState"
+import ApplicationState from "@Lib/ApplicationState"
 
 export default class NoteList extends Component {
 

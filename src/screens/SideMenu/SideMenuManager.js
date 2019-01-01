@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { ScrollView, View, Text, FlatList } from 'react-native';
 
-import ApplicationState from "@Root/ApplicationState";
+import ApplicationState from "@Lib/ApplicationState"
 
 /*
   Because SideMenus (SideMenu and NoteSideMenu) are rendering by React Navigation as drawer components

@@ -6,9 +6,9 @@ import { SFItemParams } from 'standard-file-js';
 import Storage from "../lib/sfjs/storageManager"
 import Auth from "../lib/sfjs/authManager"
 import KeysManager from '../lib/keysManager'
-import ApplicationState from '../ApplicationState'
-import CSSParser from "./CSSParser";
-import ThemeDownloader from "@Style/ThemeDownloader"
+import ApplicationState from "@Lib/ApplicationState"
+import CSSParser from "@Style/Util/CSSParser";
+import ThemeDownloader from "@Style/Util/ThemeDownloader"
 import Icons from '@Style/Icons';
 
 import redJSON from './Themes/red.json';

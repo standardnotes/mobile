@@ -5,7 +5,7 @@ import ComponentManager from '../lib/componentManager'
 import ModelManager from '../lib/sfjs/modelManager'
 
 import StyleKit from "../style/StyleKit"
-import ApplicationState from "../ApplicationState"
+import ApplicationState from "@Lib/ApplicationState"
 
 
 export default class Webview extends Component {

@@ -15,7 +15,7 @@ import StyleKit from "../style/StyleKit"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import ApplicationState from "../ApplicationState"
+import ApplicationState from "@Lib/ApplicationState"
 
 import {
   TextInput,

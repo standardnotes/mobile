@@ -5,7 +5,7 @@ import StyleKit from '../style/StyleKit'
 import ModelManager from './sfjs/modelManager'
 import Sync from './sfjs/syncManager'
 import SF from "./sfjs/sfjs"
-import ApplicationState from "../ApplicationState"
+import ApplicationState from "@Lib/ApplicationState"
 
 export default class ComponentManager {
 

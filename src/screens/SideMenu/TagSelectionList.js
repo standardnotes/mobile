@@ -10,8 +10,8 @@ import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import SideMenuCell from "@SideMenu/SideMenuCell"
 
-import ApplicationState from "@Root/ApplicationState";
-import OptionsState from "@Root/OptionsState"
+import ApplicationState from "@Lib/ApplicationState"
+import OptionsState from "@Lib/OptionsState"
 import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 
 import { withNavigation } from 'react-navigation';

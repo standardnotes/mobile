@@ -6,7 +6,7 @@ import { createStackNavigator, createAppContainer, createDrawerNavigator, Drawer
 import KeysManager from './lib/keysManager'
 import StyleKit from "./style/StyleKit"
 import Icons from '@Style/Icons';
-import ApplicationState from "./ApplicationState"
+import ApplicationState from "@Lib/ApplicationState"
 import Auth from './lib/sfjs/authManager'
 import ModelManager from './lib/sfjs/modelManager'
 import Sync from './lib/sfjs/syncManager'

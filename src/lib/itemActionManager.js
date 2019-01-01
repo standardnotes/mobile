@@ -1,5 +1,5 @@
 import {Platform, Share} from 'react-native';
-import ApplicationState from '../ApplicationState'
+import ApplicationState from "@Lib/ApplicationState"
 import AlertManager from './sfjs/alertManager'
 import ModelManager from './sfjs/modelManager'
 import Sync from './sfjs/syncManager'

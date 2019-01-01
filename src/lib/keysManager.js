@@ -1,6 +1,6 @@
 import {Platform} from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
-import ApplicationState from "../ApplicationState"
+import ApplicationState from "@Lib/ApplicationState"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 import SF from './sfjs/sfjs'

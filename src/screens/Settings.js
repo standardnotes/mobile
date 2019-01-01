@@ -8,7 +8,7 @@ import AlertManager from '../lib/sfjs/alertManager'
 import Auth from '../lib/sfjs/authManager'
 import KeysManager from '../lib/keysManager'
 import UserPrefsManager from '../lib/userPrefsManager'
-import OptionsState from "../OptionsState";
+import OptionsState from "@Lib/OptionsState"
 
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
@@ -25,7 +25,7 @@ import PasscodeSection from "../containers/account/PasscodeSection"
 import EncryptionSection from "../containers/account/EncryptionSection"
 import CompanySection from "../containers/account/CompanySection"
 import LockedView from "../containers/LockedView";
-import ApplicationState from "../ApplicationState";
+import ApplicationState from "@Lib/ApplicationState"
 import StyleKit from "../style/StyleKit"
 
 var base64 = require('base-64');

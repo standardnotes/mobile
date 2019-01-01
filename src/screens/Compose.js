@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Sync from '../lib/sfjs/syncManager'
 import ModelManager from '../lib/sfjs/modelManager'
 import Auth from '../lib/sfjs/authManager'
-import OptionsState from "@Root/OptionsState"
+import OptionsState from "@Lib/OptionsState"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 
@@ -10,7 +10,7 @@ import Abstract from "./Abstract"
 import Webview from "./Webview"
 import ComponentManager from '../lib/componentManager'
 import Icons from '@Style/Icons';
-import ApplicationState from '../ApplicationState';
+import ApplicationState from "@Lib/ApplicationState"
 import LockedView from "../containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
 

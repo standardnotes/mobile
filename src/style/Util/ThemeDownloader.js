@@ -1,8 +1,7 @@
 import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
 
-import Server from "../lib/sfjs/httpManager"
-import ApplicationState from '../ApplicationState'
-import CSSParser from "./CSSParser";
+import Server from "@SFJS/httpManager"
+import CSSParser from "@Style/Util/CSSParser";
 
 export default class ThemeDownloader {
 
@@ -33,7 +32,7 @@ export default class ThemeDownloader {
       return;
     }
 
-    if(ApplicationState.isAndroid && url.includes("localhost")) {
+    if(Platform.OS === "android" && url.includes("localhost")) {
       url = url.replace("localhost", "10.0.2.2");
     }
 

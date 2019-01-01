@@ -21,8 +21,8 @@ import SideMenuHero from "@SideMenu/SideMenuHero"
 import SideMenuSection from "@SideMenu/SideMenuSection"
 import TagSelectionList from "@SideMenu/TagSelectionList"
 
-import ApplicationState from "@Root/ApplicationState";
-import OptionsState from "@Root/OptionsState"
+import ApplicationState from "@Lib/ApplicationState"
+import OptionsState from "@Lib/OptionsState"
 import AbstractSideMenu from "@SideMenu/AbstractSideMenu"
 
 export default class MainSideMenu extends AbstractSideMenu {
