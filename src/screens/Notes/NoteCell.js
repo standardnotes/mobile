@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import StyleKit from "../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 import ActionSheet from 'react-native-actionsheet'
 import ActionSheetWrapper from "@Style/ActionSheetWrapper"
-import ItemActionManager from '../lib/itemActionManager'
+import ItemActionManager from '@Lib/itemActionManager'
 import ThemedPureComponent from "@Components/ThemedPureComponent";
 
 export default class NoteCell extends ThemedPureComponent {
@@ -160,7 +160,7 @@ export default class NoteCell extends ThemedPureComponent {
       noteCell: {
         padding: padding,
         paddingRight: padding * 2,
-        borderBottomColor: StyleKit.variable("stylekitBorderColor"),
+        borderBottomColor: StyleKit.hexToRGBA(StyleKit.variables.stylekitBorderColor, 0.7),
         borderBottomWidth: 1,
         backgroundColor: StyleKit.variable("stylekitBackgroundColor"),
       },

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text, Modal, AppState } from 'react-native';
-import NoteCell from "./NoteCell"
+import NoteCell from "@Screens/Notes/NoteCell"
 import Search from 'react-native-search-box'
 import StyleKit from "../style/StyleKit"
 import Authenticate from "../screens/Authenticate"

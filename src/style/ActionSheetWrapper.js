@@ -3,6 +3,7 @@ import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import ActionSheet from 'react-native-actionsheet'
+import ApplicationState from "@Lib/ApplicationState"
 
 export default class ActionSheetWrapper {
 
@@ -46,9 +47,30 @@ export default class ActionSheetWrapper {
         cancelButtonIndex={this.cancelIndex}
         destructiveButtonIndex={this.destructiveIndex}
         onPress={this.handleActionSheetPress}
-        {...StyleKit.actionSheetStyles()}
+        {...ActionSheetWrapper.actionSheetStyles()}
       />
     )
+  }
+
+  static actionSheetStyles() {
+    return {
+      wrapperStyle: StyleKit.styles.actionSheetWrapper,
+      overlayStyle: StyleKit.styles.actionSheetOverlay,
+      bodyStyle : StyleKit.styles.actionSheetBody,
+
+      buttonWrapperStyle: StyleKit.styles.actionSheetButtonWrapper,
+      buttonTitleStyle: StyleKit.styles.actionSheetButtonTitle,
+
+      titleWrapperStyle: StyleKit.styles.actionSheetTitleWrapper,
+      titleTextStyle: StyleKit.styles.actionSheetTitleText,
+      tintColor: ApplicationState.isIOS ? undefined : StyleKit.variable("stylekitInfoColor"),
+
+      buttonUnderlayColor: StyleKit.variable("stylekitBorderColor"),
+
+      cancelButtonWrapperStyle: StyleKit.styles.actionSheetCancelButtonWrapper,
+      cancelButtonTitleStyle: StyleKit.styles.actionSheetCancelButtonTitle,
+      cancelMargin: StyleSheet.hairlineWidth
+    }
   }
 
 }

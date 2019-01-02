@@ -6,7 +6,6 @@ import { SFItemParams } from 'standard-file-js';
 import Storage from "../lib/sfjs/storageManager"
 import Auth from "../lib/sfjs/authManager"
 import KeysManager from '../lib/keysManager'
-import ApplicationState from "@Lib/ApplicationState"
 import CSSParser from "@Style/Util/CSSParser";
 import ThemeDownloader from "@Style/Util/ThemeDownloader"
 import Icons from '@Style/Icons';
@@ -464,27 +463,6 @@ export default class StyleKit {
     }
   }
 
-  static actionSheetStyles() {
-    return {
-      wrapperStyle: StyleKit.styles.actionSheetWrapper,
-      overlayStyle: StyleKit.styles.actionSheetOverlay,
-      bodyStyle : StyleKit.styles.actionSheetBody,
-
-      buttonWrapperStyle: StyleKit.styles.actionSheetButtonWrapper,
-      buttonTitleStyle: StyleKit.styles.actionSheetButtonTitle,
-
-      titleWrapperStyle: StyleKit.styles.actionSheetTitleWrapper,
-      titleTextStyle: StyleKit.styles.actionSheetTitleText,
-      tintColor: ApplicationState.isIOS ? undefined : StyleKit.variable("stylekitInfoColor"),
-
-      buttonUnderlayColor: StyleKit.variable("stylekitBorderColor"),
-
-      cancelButtonWrapperStyle: StyleKit.styles.actionSheetCancelButtonWrapper,
-      cancelButtonTitleStyle: StyleKit.styles.actionSheetCancelButtonTitle,
-      cancelMargin: StyleSheet.hairlineWidth
-    }
-  }
-
   static getColorLuminosity(hexCode) {
     var c = hexCode;
     c = c.substring(1);      // strip #
@@ -516,7 +494,7 @@ export default class StyleKit {
   }
 
   static hexToRGBA(hex, alpha) {
-    if(!hex) {
+    if(!hex || !hex.startsWith("#")) {
       return null;
     }
     var c;

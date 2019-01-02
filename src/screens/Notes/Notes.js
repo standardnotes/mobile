@@ -1,23 +1,23 @@
 import React, { Component } from 'react';
 import { View, Text, Alert } from 'react-native';
 
-import ModelManager from '../lib/sfjs/modelManager'
-import Storage from '../lib/sfjs/storageManager'
-import Sync from '../lib/sfjs/syncManager'
-import AlertManager from '../lib/sfjs/alertManager'
+import ModelManager from '@SFJS/modelManager'
+import Storage from '@SFJS/storageManager'
+import Sync from '@SFJS/syncManager'
+import AlertManager from '@SFJS/alertManager'
 
-import Auth from '../lib/sfjs/authManager'
-import KeysManager from '../lib/keysManager'
-import Keychain from "../lib/keychain"
+import Auth from '@SFJS/authManager'
+import KeysManager from '@Lib/keysManager'
+import Keychain from "@Lib/keychain"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 
-import Abstract from "./Abstract"
-import StyleKit from "../style/StyleKit"
-import NoteList from "../containers/NoteList"
+import Abstract from "@Screens/Abstract"
+import StyleKit from "@Style/StyleKit"
+import NoteList from "@Screens/Notes/NoteList"
 import OptionsState from "@Lib/OptionsState"
-import AuthModal from "../containers/AuthModal"
-import LockedView from "../containers/LockedView"
+import AuthModal from "@Containers/AuthModal"
+import LockedView from "@Containers/LockedView"
 import ApplicationState from "@Lib/ApplicationState"
 
 import Icon from 'react-native-vector-icons/Ionicons';

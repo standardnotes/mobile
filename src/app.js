@@ -13,12 +13,12 @@ import Sync from './lib/sfjs/syncManager'
 import Storage from './lib/sfjs/storageManager'
 import ReviewManager from './lib/reviewManager';
 
-import Compose from "./screens/Compose"
-import Notes from "./screens/Notes"
+import Compose from "@Screens/Compose"
+import Notes from "@Screens/Notes/Notes"
 import MainSideMenu from "@SideMenu/MainSideMenu"
 import NoteSideMenu from "@SideMenu/NoteSideMenu"
-import Settings from "./screens/Settings"
-import InputModal from "./screens/InputModal"
+import Settings from "@Screens/Settings"
+import InputModal from "@Screens/InputModal"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 

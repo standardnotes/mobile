@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text } from 'react-native';
-import NoteCell from "./NoteCell"
+import NoteCell from "@Screens/Notes/NoteCell"
 import Search from 'react-native-search-box'
-import StyleKit from "../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 import ApplicationState from "@Lib/ApplicationState"
 
 export default class NoteList extends Component {
