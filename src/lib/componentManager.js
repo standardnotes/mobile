@@ -1,6 +1,8 @@
 /* This domain will be used to save context item client data */
 let ClientDataDomain = "org.standardnotes.sn.components";
 
+import { Platform } from 'react-native';
+
 import StyleKit from '../style/StyleKit'
 import ModelManager from './sfjs/modelManager'
 import Sync from './sfjs/syncManager'
@@ -332,10 +334,13 @@ export default class ComponentManager {
       componentData: component.componentData,
       data: {
         uuid: component.uuid,
-        environment: "mobile"
+        environment: "mobile",
+        platform: Platform.OS,
+        activeThemeUrls: [this.getActiveThemeUrl()]
       }
     });
 
+    // Some editors may not yet accept initial activeThemeUrls in component-registerd event
     this.postActiveThemeToComponent(component);
   }
 
@@ -352,16 +357,21 @@ export default class ComponentManager {
     })
   }
 
-  getActiveTheme() {
-    return this.componentsForArea("themes").find((theme) => {return theme.active});
+  getActiveThemeUrl() {
+    let theme = StyleKit.get().activeTheme;
+    if(theme) {
+      let url = this.urlForComponent(theme);
+      return url;
+    }
   }
 
   postActiveThemeToComponent(component) {
-    var activeTheme = StyleKit.get().activeTheme;
-
-    var data = {
-      themes: [(activeTheme && !activeTheme.default) ? this.urlForComponent(activeTheme) : null]
+    let url = this.getActiveThemeUrl();
+    if(!url) {
+      return;
     }
+
+    var data = { themes: [url] }
 
     this.sendMessageToComponent(component, {action: "themes", data: data})
   }

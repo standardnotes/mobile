@@ -353,8 +353,11 @@ export default class Compose extends Abstract {
 
         {(this.state.loadingWebView || this.state.webViewError) &&
           <View style={[this.styles.loadingWebViewContainer]}>
-            <Text style={[this.styles.loadingWebViewText, {fontWeight: 'bold'}]}>
-              {this.state.webViewError ? "Unable to Load Editor" : "Loading Editor..."}
+            <Text style={[this.styles.loadingWebViewText]}>
+              {this.state.webViewError ? "Unable to Load" : "LOADING"}
+            </Text>
+            <Text style={[this.styles.loadingWebViewSubtitle]}>
+              {noteEditor.content.name}
             </Text>
           </View>
         }
@@ -443,12 +446,22 @@ export default class Compose extends Abstract {
         display: "flex",
         alignItems: "center",
         justifyContent: 'center',
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
       },
 
       loadingWebViewText: {
         paddingLeft: 0,
         color: StyleKit.variable("stylekitForegroundColor"),
-        opacity: 0.7
+        opacity: 0.7,
+        fontSize: 22,
+        fontWeight: 'bold'
+      },
+
+      loadingWebViewSubtitle: {
+        paddingLeft: 0,
+        color: StyleKit.variable("stylekitForegroundColor"),
+        opacity: 0.7,
+        marginTop: 5
       },
 
       lockedText: {

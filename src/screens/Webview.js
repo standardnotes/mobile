@@ -62,7 +62,13 @@ export default class Webview extends Component {
 
   onFrameLoad = (event) => {
     ComponentManager.get().registerComponentWindow(this.editor, this.webView);
-    this.props.onLoadEnd();
+
+    // The parent will remove their loading screen on load end. We want to delay this by 100
+    // to avoid flicker that may result if using a dark theme. This delay will allow editor
+    // to load its theme
+    setTimeout(() => {
+      this.props.onLoadEnd();
+    }, 100);
   }
 
   onLoadStart = () => {
@@ -86,7 +92,7 @@ export default class Webview extends Component {
     let bottomPadding = -34; // For some reason iOS inserts padding on bottom
 
     return (
-      <View style={[StyleKit.styles.flexContainer, this.props.style]}>
+      <View style={[StyleKit.styles.flexContainer, {backgroundColor: StyleKit.variables.stylekitBackgroundColor}]}>
         <WebView
            style={StyleKit.styles.flexContainer, {backgroundColor: "transparent"}}
            source={{uri: url}}

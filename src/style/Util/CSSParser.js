@@ -36,11 +36,11 @@ export default class CSSParser {
     return object;
   }
 
-  static resolveVariablesThatReferenceOtherVariables(object) {
+  static resolveVariablesThatReferenceOtherVariables(object, round = 0) {
     for(const key of Object.keys(object)) {
       let value = object[key];
       let stripValue = "var(";
-      if(value.startsWith(stripValue)) {
+      if(typeof value == "string" && value.startsWith(stripValue)) {
         let from = stripValue.length;
         let to = value.indexOf(")");
         let varName = value.slice(from, to);
@@ -53,6 +53,14 @@ export default class CSSParser {
         varName = this.hyphenatedStringToCamelCase(varName);
         object[key] = object[varName];
       }
+    }
+
+    // Two rounds are required. The first will replace all right hand side variables with
+    // the left hand counterparts. In the first round, variables on rhs mentioned before
+    // its value has been gotten to in the loop will be missed. The second round takes care of this
+    // and makes sure that all values will resolve.
+    if(round == 0) {
+      this.resolveVariablesThatReferenceOtherVariables(object, ++round);
     }
   }
 
