@@ -160,7 +160,7 @@ export default class NoteCell extends ThemedPureComponent {
       noteCell: {
         padding: padding,
         paddingRight: padding * 2,
-        borderBottomColor: StyleKit.hexToRGBA(StyleKit.variables.stylekitBorderColor, 0.7),
+        borderBottomColor: StyleKit.hexToRGBA(StyleKit.variables.stylekitBorderColor, 0.75),
         borderBottomWidth: 1,
         backgroundColor: StyleKit.variable("stylekitBackgroundColor"),
       },

@@ -121,7 +121,8 @@ export default class MainSideMenu extends AbstractSideMenu {
     }
 
     if(!this.handler || SideMenuManager.get().isLeftSideMenuLocked()) {
-      return null
+      // Return empty, but colored view
+      return <View style={viewStyles} />;
     }
 
     let themeOptions = this.buildOptionsForThemes();
@@ -182,9 +183,8 @@ export default class MainSideMenu extends AbstractSideMenu {
         flexDirection: "column"
       },
       hero: {
-        height: 75,
+        height: 65,
         padding: 15,
-        paddingTop: 25,
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
         borderBottomWidth: 1

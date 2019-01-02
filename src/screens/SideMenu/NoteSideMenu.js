@@ -200,7 +200,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
     }
 
     if(!this.handler || SideMenuManager.get().isRightSideMenuLocked()) {
-      return null;
+      return <View style={viewStyles} />;
     }
 
     let editorOptions = this.buildOptionsForEditors();
