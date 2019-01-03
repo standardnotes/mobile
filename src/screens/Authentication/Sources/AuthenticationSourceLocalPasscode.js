@@ -23,9 +23,10 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
 
   get label() {
     switch (this.status) {
-      case "waiting":
+      case "waiting-turn":
+      case "waiting-input":
         return "Enter your local passcode"
-      case "did-begin":
+      case "processing":
         return "Verifying keys...";
       case "did-fail":
        return "Invalid local passcode. Please try again."

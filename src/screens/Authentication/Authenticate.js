@@ -16,7 +16,7 @@ export default class Authenticate extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
     let templateOptions = {
-      title: "Authentication Required",
+      title: "Authenticate",
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
   };
@@ -32,7 +32,7 @@ export default class Authenticate extends Abstract {
 
     if(__DEV__) {
       props.navigation.setParams({
-        rightButton: {
+        leftButton: {
           title: "Clear",
           onPress: () => {
             KeysManager.get().clearAccountKeysAndData();
@@ -44,6 +44,26 @@ export default class Authenticate extends Abstract {
 
     this.pendingSources = this.sources.slice();
     this.successfulSources = [];
+    this.updateHeaderBar();
+  }
+
+  updateHeaderBar() {
+    if(this.pendingSources.length > 1) {
+      buttonText = "Next";
+    } else {
+      buttonText = "Submit";
+    }
+
+    this.props.navigation.setParams({
+      rightButton: {
+        title: buttonText,
+        onPress: () => {
+          if(this.state.activeSource) {
+            this.validateAuthentication(this.state.activeSource);
+          }
+        }
+      }
+    })
   }
 
   componentDidMount() {
@@ -68,6 +88,7 @@ export default class Authenticate extends Abstract {
         source.inputRef.focus();
       }
     }
+    source.setWaitingForInput();
     this.setState({activeSource: source});
     this.forceUpdate();
   }
@@ -77,6 +98,7 @@ export default class Authenticate extends Abstract {
     if(source.isInSuccessState()) {
       this.successfulSources.push(source);
       _.remove(this.pendingSources, source);
+      this.updateHeaderBar();
     } else {
       if(result.error && result.error.message) {
         Alert.alert("Unsuccessful", result.error.message);
@@ -103,8 +125,7 @@ export default class Authenticate extends Abstract {
   _renderAuthenticationSoure = (source) => {
 
     const inputAuthenticationSource = (source) => (
-      <View>
-        <SectionHeader title={source.title} subtitle={source.label} tinted={source == this.state.activeSource} />
+      <View style={{marginBottom: 10}}>
         <SectionedTableCell textInputCell={true} first={true} onPress={() => {}}>
           <TextInput
             ref={(ref) => {source.inputRef = ref}}
@@ -126,15 +147,26 @@ export default class Authenticate extends Abstract {
     )
 
     const biometricAuthenticationSource = (source) => (
-      <View>
-        <SectionHeader title={source.title} tinted={source == this.state.activeSource} />
-        <SectionedAccessoryTableCell first={true} text={source.label} onPress={() => {}}>
+      <View style={{marginBottom: 10}}>
+        <SectionedAccessoryTableCell
+          first={true}
+          dimmed={true}
+          text={source.label}
+          onPress={() => {this.beginAuthenticationForSource(source)}}
+        >
         </SectionedAccessoryTableCell>
       </View>
     )
 
+    let hasHeaderSubtitle = source.type == "input";
+
     return (
       <View key={source.identifier}>
+        <SectionHeader
+          title={source.title + (source.status == "waiting-turn" ? " — Waiting" : "")}
+          subtitle={hasHeaderSubtitle && source.label} 
+          tinted={source == this.state.activeSource}
+        />
         {source.type == "input" &&
           inputAuthenticationSource(source)
         }

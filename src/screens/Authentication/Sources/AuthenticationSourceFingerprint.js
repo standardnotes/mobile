@@ -21,10 +21,11 @@ export default class AuthenticationSourceFingerprint extends AuthenticationSourc
 
   get label() {
     switch (this.status) {
-      case "did-begin":
-        return "Waiting for Fingerprint";
-      case "waiting":
+      case "waiting-turn":
+      case "waiting-input":
         return "Please scan your fingerprint"
+      case "processing":
+        return "Waiting for Fingerprint";
       case "did-succeed":
        return "Success | Fingerprint"
       default:

@@ -18,9 +18,10 @@ export default class AuthenticationSourceAccountPassword extends AuthenticationS
 
   get label() {
     switch (this.status) {
-      case "waiting":
+      case "waiting-turn":
+      case "waiting-input":
         return "Enter your account password"
-      case "did-begin":
+      case "processing":
         return "Verifying keys...";
         case "did-succeed":
          return "Success | Account Password"

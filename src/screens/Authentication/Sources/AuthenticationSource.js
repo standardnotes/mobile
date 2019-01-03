@@ -1,6 +1,6 @@
 export default class AuthenticationSource {
   constructor() {
-    this.status = "waiting";
+    this.status = "waiting-turn";
   }
 
   get identifier() {
@@ -11,8 +11,12 @@ export default class AuthenticationSource {
     return "Not Configured";
   }
 
+  setWaitingForInput() {
+    this.status = "waiting-input";
+  }
+
   didBegin() {
-    this.status = "did-begin";
+    this.status = "processing";
   }
 
   didSucceed() {
