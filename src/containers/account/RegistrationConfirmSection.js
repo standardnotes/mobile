@@ -45,6 +45,7 @@ export default class RegistrationConfirmSection extends Component {
             value={this.state.passwordConfirmation}
             secureTextEntry={true}
             autoFocus={true}
+            keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
           />
         </SectionedTableCell>

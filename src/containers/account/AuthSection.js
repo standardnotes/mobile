@@ -68,6 +68,7 @@ export default class AuthSection extends Component {
                 autoCorrect={false}
                 autoCapitalize={'none'}
                 keyboardType={'email-address'}
+                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               />
@@ -80,6 +81,7 @@ export default class AuthSection extends Component {
                 onChangeText={(text) => this.setState({password: text})}
                 value={this.state.password}
                 secureTextEntry={true}
+                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               />
@@ -99,6 +101,7 @@ export default class AuthSection extends Component {
                 onChangeText={(text) => this.setState({mfa_token: text})}
                 value={this.state.mfa_token}
                 keyboardType={'numeric'}
+                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 autoFocus={true}
                 underlineColorAndroid={'transparent'}
                 placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
@@ -120,6 +123,7 @@ export default class AuthSection extends Component {
                 autoCorrect={false}
                 autoCapitalize={'none'}
                 keyboardType={'url'}
+                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               />

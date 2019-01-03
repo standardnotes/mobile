@@ -121,6 +121,7 @@ export default class InputModal extends Abstract {
               value={this.state.text}
               autoCorrect={false}
               autoCapitalize={'none'}
+              keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
               autoFocus={true}
               placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               underlineColorAndroid={'transparent'}
@@ -138,6 +139,7 @@ export default class InputModal extends Abstract {
                 value={this.state.confirmText}
                 autoCorrect={false}
                 autoCapitalize={'none'}
+                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
                 underlineColorAndroid={'transparent'}
                 onSubmitEditing={this.onConfirmSubmit.bind(this)}
@@ -154,7 +156,7 @@ export default class InputModal extends Abstract {
             disabled={this.state.text.length == 0}
             title={"Save"}
             bold={true}
-            onPress={() => this.submit()} 
+            onPress={() => this.submit()}
           />
 
         </TableSection>

@@ -166,13 +166,33 @@ export default class StyleKit {
 
   statusBarColorForTheme(theme) {
     // The main nav bar uses contrast background color
-    let luminosity = StyleKit.getColorLuminosity(theme.content.variables.stylekitContrastBackgroundColor);
-    if(luminosity < 130) {
+    if(!theme.luminosity) {
+      theme.luminosity = StyleKit.getColorLuminosity(theme.content.variables.stylekitContrastBackgroundColor);
+    }
+
+    if(theme.luminosity < 130) {
       // is dark color, return white status bar
       return "light-content";
     } else {
       return "dark-content";
     }
+  }
+
+  keyboardColorForTheme(theme) {
+    if(!theme.luminosity) {
+      theme.luminosity = StyleKit.getColorLuminosity(theme.content.variables.stylekitContrastBackgroundColor);
+    }
+
+    if(theme.luminosity < 130) {
+      // is dark color, return dark keyboard
+      return "dark";
+    } else {
+      return "light";
+    }
+  }
+
+  keyboardColorForActiveTheme() {
+    return this.keyboardColorForTheme(this.activeTheme);
   }
 
   themes() {

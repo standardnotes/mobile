@@ -349,6 +349,7 @@ export default class Compose extends Abstract {
           selectionColor={StyleKit.variable("stylekitInfoColor")}
           underlineColorAndroid={'transparent'}
           placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
+          keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
           autoCorrect={true}
           autoCapitalize={'sentences'}
           editable={!this.note.locked}
@@ -396,6 +397,7 @@ export default class Compose extends Abstract {
             autoFocus={false}
             value={this.note.text}
             keyboardDismissMode={'interactive'}
+            keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
             selectionColor={StyleKit.lighten(StyleKit.variable("stylekitInfoColor"))}
             onChangeText={this.onTextChange}
             editable={!this.note.locked}

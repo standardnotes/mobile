@@ -166,6 +166,7 @@ export default class Authenticate extends Abstract {
             autoCapitalize={'none'}
             secureTextEntry={true}
             keyboardType={source.keyboardType || "default"}
+            keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
             placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
             onSubmitEditing={() => {this.validateAuthentication(source)}}

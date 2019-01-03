@@ -43,6 +43,7 @@ export default class NoteList extends Component {
           backgroundColor={StyleKit.variable("stylekitBackgroundColor")}
           titleCancelColor={StyleKit.variable("stylekitInfoColor")}
           keyboardDismissMode={'interactive'}
+          keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
           inputStyle={
             {
               backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,

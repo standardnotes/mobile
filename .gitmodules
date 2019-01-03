@@ -19,3 +19,6 @@
 [submodule "vendor/react-native-fab"]
 	path = vendor/react-native-fab
 	url = git@github.com:mobitar/React-Native-FAB.git
+[submodule "vendor/react-native-search-box"]
+	path = vendor/react-native-search-box
+	url = git@github.com:mobitar/react-native-search-box.git
