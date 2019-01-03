@@ -7,6 +7,7 @@ import FAB from 'react-native-fab';
 import ActionSheet from 'react-native-actionsheet'
 
 import Abstract from "@Screens/Abstract"
+import AlertManager from "@SFJS/alertManager"
 
 import SectionHeader from "@Components/SectionHeader";
 import TableSection from "@Components/TableSection";

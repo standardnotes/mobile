@@ -65,6 +65,12 @@ export default class NoteCell extends ThemedPureComponent {
     var archiveLabel = this.props.item.archived ? "Unarchive" : "Archive";
     let archiveEvent = archiveLabel == "Archive" ? ItemActionManager.ArchiveEvent : ItemActionManager.UnarchiveEvent;
 
+    var lockLabel = this.props.item.locked ? "Unlock" : "Lock";
+    let lockEvent = lockLabel == "Lock" ? ItemActionManager.LockEvent : ItemActionManager.UnlockEvent;
+
+    var protectLabel = this.props.item.content.protected ? "Unprotect" : "Protect";
+    let protectEvent = protectLabel == "Protect" ? ItemActionManager.ProtectEvent : ItemActionManager.UnprotectEvent;
+
     let sheet;
     if(this.props.item.content.protected) {
       sheet = new ActionSheetWrapper({
@@ -80,6 +86,8 @@ export default class NoteCell extends ThemedPureComponent {
         options: [
           ActionSheetWrapper.BuildOption({text: pinLabel, key: pinEvent, callback: callbackForOption}),
           ActionSheetWrapper.BuildOption({text: archiveLabel, key: archiveEvent, callback: callbackForOption}),
+          ActionSheetWrapper.BuildOption({text: lockLabel, key: lockEvent, callback: callbackForOption}),
+          ActionSheetWrapper.BuildOption({text: protectLabel, key: protectEvent, callback: callbackForOption}),
           ActionSheetWrapper.BuildOption({text: "Share", key: ItemActionManager.ShareEvent, callback: callbackForOption}),
           ActionSheetWrapper.BuildOption({text: "Delete", key: ItemActionManager.DeleteEvent, destructive: true, callback: callbackForOption}),
         ], onCancel: () => {
@@ -92,8 +100,73 @@ export default class NoteCell extends ThemedPureComponent {
     sheet.show();
   }
 
+  getFlags(note) {
+    let flags = [];
+
+    if(note.pinned) {
+      flags.push({
+        text: "Pinned",
+        color: StyleKit.variables.stylekitInfoColor
+      })
+    }
+
+    if(note.archived) {
+      flags.push({
+        text: "Archived",
+        color: StyleKit.variables.stylekitWarningColor
+      })
+    }
+
+    if(note.content.protected) {
+      flags.push({
+        text: "Protected",
+        color: StyleKit.variables.stylekitSuccessColor
+      })
+    }
+
+    if(note.locked) {
+      flags.push({
+        text: "Locked",
+        color: StyleKit.variables.stylekitNeutralColor
+      })
+    }
+
+    return flags;
+  }
+
+  flagElement = (flag) => {
+    let bgColor = flag.color;
+    let textColor = StyleKit.variables.stylekitInfoContrastColor;
+    if(this.state.selected) {
+      bgColor = StyleKit.variables.stylekitInfoContrastColor;
+      textColor = flag.color
+    }
+    const styles = {
+      background: {
+        backgroundColor: bgColor,
+        padding: 4,
+        paddingLeft: 6,
+        paddingRight: 6,
+        borderRadius: 3,
+        marginRight: 4
+      },
+      text: {
+        color: textColor,
+        fontSize: 10,
+        fontWeight: "bold"
+      }
+    }
+    return (
+      <View key={flag.text} style={styles.background}>
+        <Text style={styles.text}>{flag.text}</Text>
+      </View>
+    )
+  }
+
   render() {
     var note = this.props.item;
+    let showPreview = !this.state.options.hidePreviews && !note.content.protected;
+    let flags = this.getFlags(note);
     return (
        <TouchableWithoutFeedback onPress={this._onPress} onPressIn={this._onPressIn} onPressOut={this._onPressOut} onLongPress={this.showActionSheet}>
           <View style={this.aggregateStyles(this.styles.noteCell, this.styles.noteCellSelected, this.state.selected)} onPress={this._onPress}>
@@ -106,20 +179,11 @@ export default class NoteCell extends ThemedPureComponent {
               <Text style={this.styles.deleting}>Conflicted Copy</Text>
             }
 
-            {note.pinned &&
-              <View style={this.styles.pinnedView}>
-                <Icon name={"ios-bookmark"} size={14} color={this.state.selected ? StyleKit.variable("stylekitInfoContrastColor") : StyleKit.variable("stylekitInfoColor")} />
-                <Text style={this.aggregateStyles(this.styles.pinnedText, this.styles.pinnedTextSelected, this.state.selected)}>Pinned</Text>
-              </View>
-            }
-
-            {this.props.renderTags && !this.state.options.hideTags && note.tags.length > 0 &&
-              <View style={this.styles.noteTagsContainer}>
-                <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag, this.styles.noteTagSelected, this.state.selected)}>
-                  {this.props.tagsString}
-                </Text>
-              </View>
-            }
+            <View style={this.styles.flagsContainer}>
+              {flags.map((flag) =>
+                this.flagElement(flag)
+              )}
+            </View>
 
             {note.errorDecrypting &&
               <View>
@@ -138,13 +202,13 @@ export default class NoteCell extends ThemedPureComponent {
               </Text>
             }
 
-            {(note.content.preview_plain != null && !this.state.options.hidePreviews) &&
+            {(note.content.preview_plain != null && showPreview) &&
               <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>
                 {note.content.preview_plain}
               </Text>
             }
 
-            {(!note.content.preview_plain && !this.state.options.hidePreviews && note.safeText().length > 0) &&
+            {(!note.content.preview_plain && showPreview && note.safeText().length > 0) &&
               <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>
                 {note.text}
               </Text>
@@ -156,6 +220,14 @@ export default class NoteCell extends ThemedPureComponent {
                 style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>
                 {this.props.sortType == "client_updated_at" ? "Modified " + note.updatedAtString() : note.createdAtString()}
               </Text>
+            }
+
+            {this.props.renderTags && !this.state.options.hideTags && note.tags.length > 0 &&
+              <View style={this.styles.noteTagsContainer}>
+                <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag, this.styles.noteTagSelected, this.state.selected)}>
+                  {this.props.tagsString}
+                </Text>
+              </View>
             }
 
             {this.state.actionSheet && this.state.actionSheet}
@@ -183,7 +255,7 @@ export default class NoteCell extends ThemedPureComponent {
       noteTagsContainer: {
         flex: 1,
         flexDirection: 'row',
-        marginBottom: 5,
+        marginTop: 7,
       },
 
       pinnedView: {
@@ -192,15 +264,10 @@ export default class NoteCell extends ThemedPureComponent {
         marginBottom: 5,
       },
 
-      pinnedText: {
-        color: StyleKit.variable("stylekitInfoColor"),
-        marginLeft: 8,
-        fontWeight: "bold",
-        fontSize: 12
-      },
-
-      pinnedTextSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor"),
+      flagsContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        marginBottom: 8
       },
 
       noteTag: {
