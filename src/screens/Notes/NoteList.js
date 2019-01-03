@@ -70,12 +70,15 @@ export default class NoteList extends Component {
         text={item.text}
         tags={item.tags}
         tagsString={item.tagsString()}
-        pinned={item.pinned}
-        deleted={item.deleted}
-        archived={item.archived}
         sortType={this.props.sortType}
         renderTags={renderTags}
         options={this.props.options}
+
+        pinned={item.pinned /* extraData */}
+        deleted={item.deleted /* extraData */}
+        archived={item.archived /* extraData */}
+        locked={item.locked /* extraData */}
+        protected={item.content.protected /* extraData */}
       />
     )
   }

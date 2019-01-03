@@ -167,6 +167,9 @@ export default class Compose extends Abstract {
         this.forceUpdate();
         this.props.navigation.closeRightDrawer();
       },
+      onPropertyChange: () => {
+        this.forceUpdate();
+      },
       onTagSelect: (tag) => {
         let selectedTags = this.note.tags;
         var selected = selectedTags.includes(tag);
@@ -333,7 +336,7 @@ export default class Compose extends Abstract {
       <View style={[this.styles.container, StyleKit.styles.container]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
-            <Icon name={Icons.nameForIcon("lock")} size={20} color={StyleKit.variable("stylekitBackgroundColor")} />
+            <Icon name={Icons.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
             <Text style={this.styles.lockedText}>Note Locked</Text>
           </View>
         }
@@ -429,12 +432,19 @@ export default class Compose extends Abstract {
         justifyContent: 'flex-start',
         flexDirection: 'row',
         alignItems: "center",
-        height: 30,
-        maxHeight: 30,
+        height: 26,
+        maxHeight: 26,
         paddingLeft: padding,
-        backgroundColor: StyleKit.variable("stylekitInfoColor"),
-        borderBottomColor: StyleKit.variable("stylekitBorderColor"),
+        backgroundColor: StyleKit.variables.stylekitNeutralColor,
+        borderBottomColor: StyleKit.variables.stylekitBorderColor,
         borderBottomWidth: 1
+      },
+
+      lockedText: {
+        fontWeight: "bold",
+        fontSize: 12,
+        color: StyleKit.variables.stylekitBackgroundColor,
+        paddingLeft: 10
       },
 
       loadingWebViewContainer: {
@@ -462,12 +472,6 @@ export default class Compose extends Abstract {
         color: StyleKit.variable("stylekitForegroundColor"),
         opacity: 0.7,
         marginTop: 5
-      },
-
-      lockedText: {
-        fontWeight: "bold",
-        color: StyleKit.variable("stylekitBackgroundColor"),
-        paddingLeft: 10
       },
 
       textContentAndroid: {

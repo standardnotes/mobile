@@ -152,6 +152,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
                 this.popToRoot();
               } else {
                 this.forceUpdate();
+                this.handler.onPropertyChange();
               }
             });
           }
