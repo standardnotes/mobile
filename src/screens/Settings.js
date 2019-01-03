@@ -269,66 +269,68 @@ export default class Settings extends Abstract {
   }
 
   onExportPress = async (encrypted, callback) => {
-    let customCallback = (success) => {
-      if(success) {
-        // UserPrefsManager.get().clearLastExportDate();
-        var date = new Date();
-        this.setState({lastExportDate: date});
-        UserPrefsManager.get().setLastExportDate(date);
+    this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManageBackups, async () => {
+      let customCallback = (success) => {
+        if(success) {
+          // UserPrefsManager.get().clearLastExportDate();
+          var date = new Date();
+          this.setState({lastExportDate: date});
+          UserPrefsManager.get().setLastExportDate(date);
+        }
+        callback();
       }
-      callback();
-    }
-    var auth_params = await Auth.get().getAuthParams();
-    var keys = encrypted ? KeysManager.get().activeKeys() : null;
+      var auth_params = await Auth.get().getAuthParams();
+      var keys = encrypted ? KeysManager.get().activeKeys() : null;
 
-    var items = [];
+      var items = [];
 
-    for(var item of ModelManager.get().allItems) {
-      var itemParams = new SFItemParams(item, keys, auth_params);
-      var params = await itemParams.paramsForExportFile();
-      items.push(params);
-    }
-
-    if(items.length == 0) {
-      Alert.alert('No Data', "You don't have any notes yet.");
-      customCallback();
-      return;
-    }
-
-    var data = {items: items}
-
-    if(keys) {
-      var authParams = KeysManager.get().activeAuthParams();
-      // auth params are only needed when encrypted with a standard file key
-      data["auth_params"] = authParams;
-    }
-
-    var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
-    var stringData = ApplicationState.isIOS ? jsonString : base64.encode(unescape(encodeURIComponent(jsonString)))
-    var fileType = ApplicationState.isAndroid ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
-
-    var calledCallback = false;
-
-    Mailer.mail({
-      subject: 'Standard Notes Backup',
-      recipients: [''],
-      body: '',
-      isHTML: true,
-      attachment: { data: stringData, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
-    }, (error, event) => {
-      customCallback(false);
-      calledCallback = true;
-      if(error) {
-        Alert.alert('Error', 'Unable to send email.');
+      for(var item of ModelManager.get().allItems) {
+        var itemParams = new SFItemParams(item, keys, auth_params);
+        var params = await itemParams.paramsForExportFile();
+        items.push(params);
       }
+
+      if(items.length == 0) {
+        Alert.alert('No Data', "You don't have any notes yet.");
+        customCallback();
+        return;
+      }
+
+      var data = {items: items}
+
+      if(keys) {
+        var authParams = KeysManager.get().activeAuthParams();
+        // auth params are only needed when encrypted with a standard file key
+        data["auth_params"] = authParams;
+      }
+
+      var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
+      var stringData = ApplicationState.isIOS ? jsonString : base64.encode(unescape(encodeURIComponent(jsonString)))
+      var fileType = ApplicationState.isAndroid ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
+
+      var calledCallback = false;
+
+      Mailer.mail({
+        subject: 'Standard Notes Backup',
+        recipients: [''],
+        body: '',
+        isHTML: true,
+        attachment: { data: stringData, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
+      }, (error, event) => {
+        customCallback(false);
+        calledCallback = true;
+        if(error) {
+          Alert.alert('Error', 'Unable to send email.');
+        }
+      });
+
+      // On Android the Mailer callback event isn't always triggered.
+      setTimeout(function () {
+        if(!calledCallback) {
+          customCallback(true);
+        }
+      }, 2500);
     });
-
-    // On Android the Mailer callback event isn't always triggered.
-    setTimeout(function () {
-      if(!calledCallback) {
-        customCallback(true);
-      }
-    }, 2500);
   }
 
   onStorageEncryptionEnable = () => {
@@ -396,28 +398,30 @@ export default class Settings extends Abstract {
   }
 
   onPasscodeDisable = () => {
-    var encryptionSource = KeysManager.get().encryptionSource();
-    var message;
-    if(encryptionSource == "account") {
-      message = "Are you sure you want to disable your local passcode? This will not affect your encryption status, as your data is currently being encrypted through your sync account keys.";
-    } else if(encryptionSource == "offline") {
-      message = "Are you sure you want to disable your local passcode? This will disable encryption on your data.";
-    }
-
-    AlertManager.get().confirm({
-      title: "Disable Passcode",
-      text: message,
-      confirmButtonText: "Disable Passcode",
-      onConfirm: async () => {
-        var result = await KeysManager.get().clearOfflineKeysAndData();
-        if(encryptionSource == "offline") {
-          // remove encryption from all items
-          this.resaveOfflineData(null, true);
-        }
-
-        this.mergeState({hasPasscode: false});
-        this.forceUpdate();
+    this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManagePasscode, () => {
+      var encryptionSource = KeysManager.get().encryptionSource();
+      var message;
+      if(encryptionSource == "account") {
+        message = "Are you sure you want to disable your local passcode? This will not affect your encryption status, as your data is currently being encrypted through your sync account keys.";
+      } else if(encryptionSource == "offline") {
+        message = "Are you sure you want to disable your local passcode? This will disable encryption on your data.";
       }
+
+      AlertManager.get().confirm({
+        title: "Disable Passcode",
+        text: message,
+        confirmButtonText: "Disable Passcode",
+        onConfirm: async () => {
+          var result = await KeysManager.get().clearOfflineKeysAndData();
+          if(encryptionSource == "offline") {
+            // remove encryption from all items
+            this.resaveOfflineData(null, true);
+          }
+
+          this.mergeState({hasPasscode: false});
+          this.forceUpdate();
+        }
+      })
     })
   }
 
@@ -427,8 +431,10 @@ export default class Settings extends Abstract {
   }
 
   onFingerprintDisable = () => {
-    KeysManager.get().disableFingerprint();
-    this.loadSecurityStatus();
+    this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManagePasscode, () => {
+      KeysManager.get().disableFingerprint();
+      this.loadSecurityStatus();
+    });
   }
 
   onCompanyAction = (action) => {

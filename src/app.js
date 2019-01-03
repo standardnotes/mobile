@@ -9,6 +9,7 @@ import Icons from '@Style/Icons';
 import ApplicationState from "@Lib/ApplicationState"
 import Auth from './lib/sfjs/authManager'
 import ModelManager from './lib/sfjs/modelManager'
+import PrivilegesManager from '@SFJS/privilegesManager'
 import Sync from './lib/sfjs/syncManager'
 import Storage from './lib/sfjs/storageManager'
 import ReviewManager from './lib/reviewManager';
@@ -122,6 +123,8 @@ export default class App extends Component {
 
     // Initialize iOS review manager. Will automatically handle requesting review logic.
     ReviewManager.initialize();
+
+    PrivilegesManager.get().loadPrivileges();
 
     // Listen to sign out event
     Auth.get().addEventHandler((event) => {

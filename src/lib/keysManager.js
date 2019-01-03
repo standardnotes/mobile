@@ -295,9 +295,9 @@ export default class KeysManager {
 
   // Local Security
 
-  async clearOfflineKeysAndData() {
+  async clearOfflineKeysAndData(force = false) {
     // make sure user is authenticated before performing this step
-    if(!this.offlineKeys.mk) {
+    if(!this.offlineKeys.mk && !force) {
       alert("Unable to remove passcode. Make sure you are properly authenticated and try again.");
       return false;
     }

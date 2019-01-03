@@ -65,17 +65,28 @@ export default class NoteCell extends ThemedPureComponent {
     var archiveLabel = this.props.item.archived ? "Unarchive" : "Archive";
     let archiveEvent = archiveLabel == "Archive" ? ItemActionManager.ArchiveEvent : ItemActionManager.UnarchiveEvent;
 
-    let sheet = new ActionSheetWrapper({
-      title: this.props.item.safeTitle(),
-      options: [
-        ActionSheetWrapper.BuildOption({text: pinLabel, key: pinEvent, callback: callbackForOption}),
-        ActionSheetWrapper.BuildOption({text: archiveLabel, key: archiveEvent, callback: callbackForOption}),
-        ActionSheetWrapper.BuildOption({text: "Share", key: ItemActionManager.ShareEvent, callback: callbackForOption}),
-        ActionSheetWrapper.BuildOption({text: "Delete", key: ItemActionManager.DeleteEvent, destructive: true, callback: callbackForOption}),
-      ], onCancel: () => {
-        this.setState({actionSheet: null});
-      }
-    });
+    let sheet;
+    if(this.props.item.content.protected) {
+      sheet = new ActionSheetWrapper({
+        title: "Note Protected",
+        options: [],
+        onCancel: () => {
+          this.setState({actionSheet: null});
+        }
+      });
+    } else {
+      sheet = new ActionSheetWrapper({
+        title: this.props.item.safeTitle(),
+        options: [
+          ActionSheetWrapper.BuildOption({text: pinLabel, key: pinEvent, callback: callbackForOption}),
+          ActionSheetWrapper.BuildOption({text: archiveLabel, key: archiveEvent, callback: callbackForOption}),
+          ActionSheetWrapper.BuildOption({text: "Share", key: ItemActionManager.ShareEvent, callback: callbackForOption}),
+          ActionSheetWrapper.BuildOption({text: "Delete", key: ItemActionManager.DeleteEvent, destructive: true, callback: callbackForOption}),
+        ], onCancel: () => {
+          this.setState({actionSheet: null});
+        }
+      });
+    }
 
     this.setState({actionSheet: sheet.actionSheetElement()});
     sheet.show();

@@ -1,13 +1,14 @@
 import Storage from "./storageManager"
 import "../../models/extend/item.js";
-import { SFPredicate } from "standard-file-js";
+import { SFPredicate, SFPrivileges } from "standard-file-js";
 
 SFModelManager.ContentTypeClassMapping = {
   "Note" : SNNote,
   "Tag" : SNTag,
   "SN|SmartTag": SNSmartTag,
   "SN|Theme" : SNTheme,
-  "SN|Component" : SNComponent
+  "SN|Component" : SNComponent,
+  "SN|Privileges" : SFPrivileges
 };
 
 const SystemSmartTagIdAllNotes = "all-notes";
@@ -31,8 +32,6 @@ export default class ModelManager extends SFModelManager {
     this.notes = [];
     this.tags = [];
     this.themes = [];
-
-    this.acceptableContentTypes = ["Note", "Tag", "SN|SmartTag", "SN|Theme", "SN|Component"];
 
     this.buildSystemSmartTags();
   }

@@ -22,7 +22,8 @@ import {
   SFAlertManager,
   SFStorageManager,
   SFHttpManager,
-  SFAuthManager
+  SFAuthManager,
+  SFPrivilegesManager
 } from 'standard-file-js';
 
 SFItem.AppDomain = "org.standardnotes.sn";
@@ -35,6 +36,7 @@ global.SFAlertManager = SFAlertManager;
 global.SFStorageManager = SFStorageManager;
 global.SFHttpManager = SFHttpManager;
 global.SFAuthManager = SFAuthManager;
+global.SFPrivilegesManager = SFPrivilegesManager;
 
 import SF from "./lib/sfjs/sfjs"
 global.SFJS = SF.get();

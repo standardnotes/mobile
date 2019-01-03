@@ -21,16 +21,6 @@ SFItem.prototype.dateToLocalizedString = function(date) {
   return moment(date).format('llll');
 }
 
-// Define these new methods
-
-SFItem.prototype.initUUID = async function() {
-  if(!this.uuid) {
-    return SFJS.crypto.generateUUID().then((uuid) => {
-      this.uuid = uuid;
-    })
-  }
-}
-
 // Define these getters
 
 Object.defineProperty(SFItem.prototype, "key", {

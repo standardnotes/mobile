@@ -1,5 +1,6 @@
 import SF from '@SFJS/sfjs'
 import Storage from '@SFJS/storageManager'
+import Auth from '@SFJS/authManager'
 import KeysManager from '@Lib/keysManager'
 import AuthenticationSource from "./AuthenticationSource"
 
@@ -41,8 +42,12 @@ export default class AuthenticationSourceAccountPassword extends AuthenticationS
   async authenticate() {
     this.didBegin();
 
-    // TODO
-    return this._success();
+    let success = await Auth.get().verifyAccountPassword(this.authenticationValue);
+    if(success) {
+      return this._success();
+    } else {
+      return this._fail("Invalid account password. Please try again.");
+    }
   }
 
   _success() {

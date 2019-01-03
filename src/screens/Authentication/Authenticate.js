@@ -10,13 +10,19 @@ import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell
 import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
 import StyleKit from "@Style/StyleKit"
 import Icon from 'react-native-vector-icons/Ionicons';
-import KeysManager from "@Lib/keysManager";
+
+// Dev mode only. Used to destroy data
+// import KeysManager from "@Lib/keysManager";
+// import Auth from "@SFJS/authManager"
 
 export default class Authenticate extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
     let templateOptions = {
       title: "Authenticate",
+      rightButton: {
+        title: "Submit",
+      }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
   };
@@ -30,13 +36,25 @@ export default class Authenticate extends Abstract {
       }
     }
 
-    if(__DEV__) {
+    // if(__DEV__) {
+      // props.navigation.setParams({
+      //   leftButton: {
+      //     title: "Destroy Data",
+      //     onPress: () => {
+      //       Auth.get().signout();
+      //       KeysManager.get().clearOfflineKeysAndData(true);
+      //     }
+      //   }
+      // })
+    // }
+
+    if(this.getProp("hasCancelOption")) {
       props.navigation.setParams({
         leftButton: {
-          title: "Clear",
+          title: "Cancel",
           onPress: () => {
-            KeysManager.get().clearAccountKeysAndData();
-            KeysManager.get().clearOfflineKeysAndData();
+            this.getProp("onCancel")();
+            this.dismiss();
           }
         }
       })
@@ -113,8 +131,18 @@ export default class Authenticate extends Abstract {
   }
 
   onSuccess() {
-    this.getProp("onSuccess")();
+    // Wait for componentWillBlur to call onSuccess callback.
+    // This way, if the callback has another route change, the dismissal
+    // of this one won't affect it.
+    this.successful = true;
     this.dismiss();
+  }
+
+  componentWillBlur() {
+    super.componentWillBlur();
+    if(this.successful) {
+      this.getProp("onSuccess")();
+    }
   }
 
   inputTextChanged(text, source) {
@@ -164,7 +192,7 @@ export default class Authenticate extends Abstract {
       <View key={source.identifier}>
         <SectionHeader
           title={source.title + (source.status == "waiting-turn" ? " — Waiting" : "")}
-          subtitle={hasHeaderSubtitle && source.label} 
+          subtitle={hasHeaderSubtitle && source.label}
           tinted={source == this.state.activeSource}
         />
         {source.type == "input" &&

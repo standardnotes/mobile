@@ -17,6 +17,9 @@ export default class ItemActionManager {
   static LockEvent = "LockEvent";
   static UnlockEvent = "UnlockEvent";
 
+  static ProtectEvent = "ProtectEvent";
+  static UnprotectEvent = "UnprotectEvent";
+
   static ShareEvent = "ShareEvent";
 
   /* The afterConfirmCallback is called after user confirms deletion pop up */
@@ -65,6 +68,13 @@ export default class ItemActionManager {
       Sync.get().sync();
       callback && callback();
     }
+
+    else if(event == this.ProtectEvent || event == this.UnprotectEvent) {
+     item.content.protected = !item.content.protected;
+     item.setDirty(true);
+     Sync.get().sync();
+     callback && callback();
+   }
 
     else if(event == this.ShareEvent) {
       ApplicationState.get().performActionWithoutStateChangeImpact(() => {

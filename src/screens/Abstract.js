@@ -6,6 +6,7 @@ import HeaderTitleView from "../components/HeaderTitleView"
 import HeaderButtons, { HeaderButton, Item } from 'react-navigation-header-buttons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ThemedComponent from "@Components/ThemedComponent";
+import PrivilegesManager from "@SFJS/privilegesManager"
 
 const IoniconsHeaderButton = passMeFurther => (
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
@@ -212,6 +213,21 @@ export default class Abstract extends ThemedComponent {
       the `null` parameter is actually very important: https://reactnavigation.org/docs/en/navigation-prop.html#goback-close-the-active-screen-and-move-back
     */
     this.props.navigation.goBack(null);
+  }
+
+  async handlePrivilegedAction(isProtected, action, run) {
+    if(isProtected) {
+      let actionRequiresPrivs = await PrivilegesManager.get().actionRequiresPrivilege(action);
+      if(actionRequiresPrivs) {
+        PrivilegesManager.get().presentPrivilegesModal(action, this.props.navigation, () => {
+          run();
+        });
+      } else {
+        run();
+      }
+    } else {
+      run();
+    }
   }
 
   static IsShallowEqual = (newObj, prevObj, keys) => {

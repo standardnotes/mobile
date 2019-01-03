@@ -66,4 +66,11 @@ export default class Auth extends SFAuthManager {
       return null;
     }
   }
+
+  async verifyAccountPassword(password) {
+    let authParams = await this.getAuthParams();
+    let keys = await SFJS.crypto.computeEncryptionKeysForUser(password, authParams);
+    let success = keys.mk === (await this.keys()).mk;
+    return success;
+  }
 }

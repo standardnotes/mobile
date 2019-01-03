@@ -127,10 +127,14 @@ export default class NoteSideMenu extends AbstractSideMenu {
     var lockOption = this.note.locked ? "Unlock" : "Lock";
     let lockEvent = lockOption == "Lock" ? ItemActionManager.LockEvent : ItemActionManager.UnlockEvent;
 
+    var protectOption = this.note.content.protected ? "Unprotect" : "Protect";
+    let protectEvent = protectOption == "Protect" ? ItemActionManager.ProtectEvent : ItemActionManager.UnprotectEvent;
+
     let rawOptions = [
       { text: pinOption, key: pinEvent, icon: "bookmark" },
       { text: archiveOption, key: archiveEvent, icon: "archive" },
       { text: lockOption, key: lockEvent, icon: "lock" },
+      { text: protectOption, key: protectEvent, icon: "finger-print" },
       { text: "Share", key: ItemActionManager.ShareEvent, icon: "share" },
       { text: "Delete", key: ItemActionManager.DeleteEvent, icon: "trash" },
     ];
@@ -142,13 +146,23 @@ export default class NoteSideMenu extends AbstractSideMenu {
         key: rawOption.key,
         iconDesc: { type: "icon", side: "right", name: Icons.nameForIcon(rawOption.icon) },
         onSelect: () => {
-          ItemActionManager.handleEvent(rawOption.key, this.note, () => {
-            if(rawOption.key == ItemActionManager.DeleteEvent) {
-              this.popToRoot();
-            } else {
-              this.forceUpdate();
-            }
-          });
+          let run = () => {
+            ItemActionManager.handleEvent(rawOption.key, this.note, () => {
+              if(rawOption.key == ItemActionManager.DeleteEvent) {
+                this.popToRoot();
+              } else {
+                this.forceUpdate();
+              }
+            });
+          }
+          if(rawOption.key == ItemActionManager.DeleteEvent && this.note.content.protected) {
+            this.handlePrivilegedAction(this.note.content.protected, SFPrivilegesManager.ActionDeleteNote, () => {
+              run();
+            })
+          } else {
+            run();
+          }
+
         },
       })
       options.push(option);

@@ -337,11 +337,13 @@ export default class Notes extends Abstract {
     }
   }
 
-  presentComposer(item) {
-    this.props.navigation.navigate("Compose", {
-      noteId: item && item.uuid,
-      selectedTagId: this.options.selectedTagIds.length && this.options.selectedTagIds[0],
-    });
+  async presentComposer(note) {
+    this.handlePrivilegedAction(note && note.content.protected, SFPrivilegesManager.ActionViewProtectedNotes, () => {
+      this.props.navigation.navigate("Compose", {
+        noteId: note && note.uuid,
+        selectedTagId: this.options.selectedTagIds.length && this.options.selectedTagIds[0],
+      });
+    })
   }
 
   reloadList(force) {
