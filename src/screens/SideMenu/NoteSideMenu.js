@@ -90,7 +90,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
     this.props.navigation.navigate("InputModal", {
       title: 'New Tag',
       placeholder: "New tag name",
-      onSave: (text) => {
+      onSubmit: (text) => {
         this.createTag(text, (tag) => {
           if(this.note) {
             // select this tag

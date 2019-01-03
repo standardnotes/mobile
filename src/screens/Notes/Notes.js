@@ -16,9 +16,12 @@ import Abstract from "@Screens/Abstract"
 import StyleKit from "@Style/StyleKit"
 import NoteList from "@Screens/Notes/NoteList"
 import OptionsState from "@Lib/OptionsState"
-import AuthModal from "@Containers/AuthModal"
 import LockedView from "@Containers/LockedView"
 import ApplicationState from "@Lib/ApplicationState"
+
+import AuthenticationSourceAccountPassword from "@Screens/Authentication/Sources/AuthenticationSourceAccountPassword";
+import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
+import AuthenticationSourceFingerprint from "@Screens/Authentication/Sources/AuthenticationSourceFingerprint";
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
@@ -27,8 +30,6 @@ export default class Notes extends Abstract {
 
   constructor(props) {
     super(props);
-
-    this.rendersLockscreen = true;
 
     props.navigation.setParams({
       title: "Notes",
@@ -42,22 +43,54 @@ export default class Notes extends Abstract {
     })
 
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      if(state == ApplicationState.Resuming) {
+      let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
+      if(authProps.sources.length > 0) {
+        this.presentAuthenticationModal(authProps);
+      }
+
+      else if(state == ApplicationState.Resuming) {
         // we only want to perform sync here if the app is resuming, not if it's a fresh start
         if(this.dataLoaded) {
           Sync.get().sync();
         }
-
-        var authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
-        if((authProps.passcode || authProps.fingerprint)) {
-          // Android can handle presenting modals no matter which screen you're on
-          if(ApplicationState.isIOS) {
-            // The auth modal is only presented if the Notes screen is visible.
-            this.props.navigation.popToTop();
-          }
-        }
       }
     })
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    if(this.authOnMount) {
+      // Perform in timeout to avoid stutter when presenting modal on initial app start.
+      setTimeout(() => {
+        this.presentAuthenticationModal(this.authOnMount);
+        this.authOnMount = null;
+      }, 20);
+    }
+  }
+
+  presentAuthenticationModal(authProps) {
+    if(!this.isMounted()) {
+      console.log("Not yet mounted, not authing.");
+      this.authOnMount = authProps;
+      return;
+    }
+
+
+    if(this.authenticationInProgress) {
+      console.log('Not presenting auth modal because one is already presented.');
+      return;
+    }
+
+    this.authenticationInProgress = true;
+
+    this.props.navigation.navigate("Authenticate", {
+      authenticationSources: authProps.sources,
+      onSuccess: () => {
+        console.log("Authentication Success.");
+        authProps.onAuthenticate();
+        this.authenticationInProgress = false;
+      }
+    });
   }
 
   unlockContent() {
@@ -79,10 +112,6 @@ export default class Notes extends Abstract {
     this.beginSyncTimer();
 
     super.loadInitialState();
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
   }
 
   componentWillUnmount() {
@@ -368,7 +397,7 @@ export default class Notes extends Abstract {
 
   render() {
     if(this.state.lockContent) {
-      return <AuthModal />;
+      return <LockedView />;
     }
 
     var result = ModelManager.get().getNotes(this.options);

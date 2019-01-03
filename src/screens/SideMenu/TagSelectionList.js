@@ -85,7 +85,7 @@ class TagSelectionList extends Component {
             title: 'Rename Tag',
             placeholder: "Tag name",
             initialValue: tag.title,
-            onSave: (text) => {
+            onSubmit: (text) => {
               if(tag) {
                 tag.title = text; // Update the text on the tag to the input text
                 tag.setDirty(true);

@@ -1,6 +1,8 @@
 import {AppState, Platform} from 'react-native'
 import KeysManager from "@Lib/keysManager"
 import OptionsState from "@Lib/OptionsState"
+import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
+import AuthenticationSourceFingerprint from "@Screens/Authentication/Sources/AuthenticationSourceFingerprint";
 var pjson = require('../package.json')
 
 export default class ApplicationState {
@@ -87,7 +89,7 @@ export default class ApplicationState {
   // Sent from App.js
   receiveApplicationStartEvent() {
     var authProps = this.getAuthenticationPropsForAppState(ApplicationState.Launching);
-    if(!authProps.passcode && !authProps.fingerprint) {
+    if(authProps.sources.length == 0) {
       this.unlockApplication();
     }
   }
@@ -98,11 +100,12 @@ export default class ApplicationState {
       return;
     }
 
-    var isResuming = nextAppState === "active";
+    // if the most recent state is not 'background' ('inactive'), then we're going
+    // from inactive to active, which doesn't really happen unless you, say, swipe
+    // notification center in iOS down then back up. We don't want to lock on this state change.
+    var isResuming = nextAppState === "active" && this.mostRecentState == "background";
     var isEnteringBackground = nextAppState == 'background';
     var isLosingFocus = nextAppState == 'inactive';
-
-    // console.log("APP STATE CHANGE FROM", this.mostRecentState, "TO STATE", this.applicationStateForNativeState(nextAppState));
 
     if(isEnteringBackground) {
       this.didEnterBackground();
@@ -114,20 +117,6 @@ export default class ApplicationState {
 
     if(isLosingFocus) {
       this.didLoseFocus();
-    }
-  }
-
-  applicationStateForNativeState(nativeState) {
-    if(nativeState == 'active') {
-      return ApplicationState.Resuming;
-    }
-
-    if(nativeState == 'background') {
-      return ApplicationState.Backgrounding;
-    }
-
-    if(nativeState == 'inactive') {
-      return ApplicationState.LosingFocus;
     }
   }
 
@@ -263,7 +252,7 @@ export default class ApplicationState {
 
   getAuthenticationPropsForAppState(state) {
     if(state == ApplicationState.Unlocking || state == ApplicationState.Locking) {
-      return {};
+      return {sources: []};
     }
 
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
@@ -278,10 +267,13 @@ export default class ApplicationState {
 
     var title = showPasscode && showFingerprint ? "Authentication Required" : (showPasscode ? "Passcode Required" : "Fingerprint Required");
 
+    let sources = [];
+    if(showPasscode) { sources.push(new AuthenticationSourceLocalPasscode()); }
+    if(showFingerprint) { sources.push(new AuthenticationSourceFingerprint()); }
+
     return {
       title: title,
-      passcode: showPasscode || false,
-      fingerprint: showFingerprint || false,
+      sources: sources,
       onAuthenticate: this.unlockApplication.bind(this)
     }
   }

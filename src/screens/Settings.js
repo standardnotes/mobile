@@ -4,9 +4,10 @@ import {ScrollView, View, Alert, Keyboard, Linking, Platform, Share, NativeModul
 import Sync from '../lib/sfjs/syncManager'
 import ModelManager from '../lib/sfjs/modelManager'
 import AlertManager from '../lib/sfjs/alertManager'
+import SF from '@SFJS/sfjs'
 
 import Auth from '../lib/sfjs/authManager'
-import KeysManager from '../lib/keysManager'
+import KeysManager from '@Lib/keysManager'
 import UserPrefsManager from '../lib/userPrefsManager'
 import OptionsState from "@Lib/OptionsState"
 
@@ -16,8 +17,7 @@ import TableSection from "../components/TableSection";
 import SectionedTableCell from "../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
 import Abstract from "./Abstract"
-import Authenticate from "./Authenticate"
-import AuthModal from "../containers/AuthModal"
+import Authenticate from "@Screens/Authentication/Authenticate"
 import AuthSection from "../containers/account/AuthSection"
 import RegistrationConfirmSection from "../containers/account/RegistrationConfirmSection"
 import OptionsSection from "../containers/account/OptionsSection"
@@ -362,29 +362,35 @@ export default class Settings extends Abstract {
   }
 
   onPasscodeEnable = () => {
-    Navigation.showModal({
-      stack: {
-        children: [{
-          component: {
-            name: 'sn.Authenticate',
-            passProps: {
-              mode: "setup",
-              onSetupSuccess: () => {
-                var encryptionSource = KeysManager.get().encryptionSource();
-                if(encryptionSource == "offline") {
-                  this.resaveOfflineData(null, true);
-                }
-              }
-            },
-            options: {
-              topBar: {
-                title: {
-                  text: 'Setup Passcode',
-                }
-              }
+    this.props.navigation.navigate("InputModal", {
+      placeholder: "Enter a passcode",
+      confirmPlaceholder: "Confirm your passcode",
+      requireConfirm: true,
+      showKeyboardChooser: true,
+      onSubmit: async (value) => {
+        console.log("Setting up local passcode", value);
+        let identifier = await SF.get().crypto.generateUUID();
+
+        SF.get().crypto.generateInitialKeysAndAuthParamsForUser(identifier, value).then((results) => {
+          let keys = results.keys;
+          let authParams = results.authParams;
+
+          // make sure it has valid items
+          if(_.keys(keys).length > 0) {
+            KeysManager.get().persistOfflineKeys(keys);
+            KeysManager.get().setOfflineAuthParams(authParams);
+            var encryptionSource = KeysManager.get().encryptionSource();
+            if(encryptionSource == "offline") {
+              this.resaveOfflineData(null, true);
             }
+          } else {
+            this.mergeState({setupButtonText: SAVE_BUTTON_DEFAULT_TEXT, setupButtonEnabled: true});
+            Alert.alert("Passcode Error", "There was an error setting up your passcode. Please try again.");
           }
-        }]
+        });
+      },
+      onKeyboardTypeChange: (type) => {
+        Storage.get().setItem("passcodeKeyboardType", type);
       }
     });
   }

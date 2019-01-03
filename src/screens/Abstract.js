@@ -131,8 +131,6 @@ export default class Abstract extends ThemedComponent {
   }
 
   componentWillFocus() {
-    this.willUnmount = false;
-    this.mounted = false;
     if(ApplicationState.get().isUnlocked() && this.state.lockContent) {
       this.unlockContent();
     }

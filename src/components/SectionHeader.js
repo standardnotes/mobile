@@ -9,11 +9,16 @@ export default class SectionHeader extends ThemedComponent {
     var title = this.props.title;
     if(Platform.OS == "ios") { title = title.toUpperCase(); }
     return (
-      <View style={[this.styles.sectionHeaderContainer, {backgroundColor: this.props.backgroundColor, color: this.props.foregroundColor}]}>
-        <Text style={this.styles.sectionHeader}>{title}</Text>
+      <View style={[this.styles.container, {backgroundColor: this.props.backgroundColor, color: this.props.foregroundColor}]}>
+        <View>
+          <Text style={[this.styles.title, this.props.tinted ? {color: StyleKit.variables.stylekitInfoColor} : null]}>{title}</Text>
+          {this.props.subtitle &&
+            <Text style={this.styles.subtitle}>{this.props.subtitle}</Text>
+          }
+        </View>
         {this.props.buttonText &&
           <TouchableOpacity onPress={this.props.buttonAction}>
-            <Text style={this.styles.sectionHeaderButton}>{this.props.buttonText}</Text>
+            <Text style={this.styles.button}>{this.props.buttonText}</Text>
           </TouchableOpacity>
         }
       </View>
@@ -22,7 +27,7 @@ export default class SectionHeader extends ThemedComponent {
 
   loadStyles() {
     this.styles = {
-      sectionHeaderContainer: {
+      container: {
         flex: 1,
         flexGrow: 0,
         justifyContent: "space-between",
@@ -33,7 +38,7 @@ export default class SectionHeader extends ThemedComponent {
         backgroundColor: StyleKit.variables.stylekitBackgroundColor
       },
 
-      sectionHeader: {
+      title: {
         backgroundColor: StyleKit.variables.stylekitBackgroundColor,
         fontSize: StyleKit.constants.mainTextFontSize - 4,
         paddingLeft: StyleKit.constants.paddingLeft,
@@ -41,11 +46,19 @@ export default class SectionHeader extends ThemedComponent {
         fontWeight: Platform.OS == "android" ? "bold" : "normal"
       },
 
-      sectionHeaderButton: {
+      subtitle: {
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        fontSize: StyleKit.constants.mainTextFontSize - 5,
+        marginTop: 4,
+        paddingLeft: StyleKit.constants.paddingLeft,
+        color: StyleKit.variables.stylekitNeutralColor,
+      },
+
+      button: {
         color: StyleKit.variables.stylekitInfoColor
       },
 
-      sectionHeaderAndroid: {
+      titleAndroid: {
         fontSize: StyleKit.constants.mainTextFontSize - 2,
         color: StyleKit.variables.stylekitInfoColor
       },
