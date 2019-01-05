@@ -220,7 +220,16 @@ export default class StyleKit {
     setTimeout(() => {
       let statusBarColor = this.statusBarColorForTheme(theme);
       StatusBar.setBarStyle(statusBarColor, true);
-      StatusBar.setBackgroundColor(StyleKit.darken(theme.content.variables.stylekitContrastBackgroundColor));
+      // setBackgroundColor is only for Android
+      if(Platform.OS == "android") {
+        // Android <= v22 does not support changing status bar text color. It will always be white
+        // So we have to make sure background color has proper contrast
+        if(Platform.Version <= 22) {
+          StatusBar.setBackgroundColor("#000000");
+        } else {
+          StatusBar.setBackgroundColor(theme.content.variables.stylekitContrastBackgroundColor);
+        }
+      }
     }, Platform.OS == "android" ? 100 : 0);
 
     this.reloadStyles();
