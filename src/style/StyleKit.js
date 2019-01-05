@@ -220,6 +220,7 @@ export default class StyleKit {
     setTimeout(() => {
       let statusBarColor = this.statusBarColorForTheme(theme);
       StatusBar.setBarStyle(statusBarColor, true);
+      StatusBar.setBackgroundColor(StyleKit.darken(theme.content.variables.stylekitContrastBackgroundColor));
     }, Platform.OS == "android" ? 100 : 0);
 
     this.reloadStyles();
