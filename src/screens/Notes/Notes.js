@@ -202,7 +202,8 @@ export default class Notes extends Abstract {
   }
 
   setStatusBarText(text) {
-    this.mergeState({showSyncBar: text != null, syncBarText: text});
+    // this.mergeState({showSyncBar: text != null, syncBarText: text});
+    this.setSubTitle(text);
   }
 
   initializeNotes() {

@@ -164,6 +164,12 @@ export default class Abstract extends ThemedComponent {
     this.props.navigation.setParams(options);
   }
 
+  setSubTitle(subtitle) {
+    let options = {};
+    options.subtitle = subtitle;
+    this.props.navigation.setParams(options);
+  }
+
   lockContent() {
     this.mergeState({lockContent: true});
     this.configureNavBar();
