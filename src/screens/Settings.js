@@ -29,7 +29,6 @@ import ApplicationState from "@Lib/ApplicationState"
 import StyleKit from "../style/StyleKit"
 
 var base64 = require('base-64');
-var Mailer = require('NativeModules').RNMail;
 
 export default class Settings extends Abstract {
 
@@ -272,7 +271,6 @@ export default class Settings extends Abstract {
     this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManageBackups, async () => {
       let customCallback = (success) => {
         if(success) {
-          // UserPrefsManager.get().clearLastExportDate();
           var date = new Date();
           this.setState({lastExportDate: date});
           UserPrefsManager.get().setLastExportDate(date);
@@ -305,31 +303,18 @@ export default class Settings extends Abstract {
       }
 
       var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
-      var stringData = ApplicationState.isIOS ? jsonString : base64.encode(unescape(encodeURIComponent(jsonString)))
-      var fileType = ApplicationState.isAndroid ? ".json" : "json"; // Android creates a tmp file and expects dot with extension
 
       var calledCallback = false;
 
-      Mailer.mail({
-        subject: 'Standard Notes Backup',
-        recipients: [''],
-        body: '',
-        isHTML: true,
-        attachment: { data: stringData, type: fileType, name: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup' }
-      }, (error, event) => {
-        customCallback(false);
-        calledCallback = true;
-        if(error) {
-          Alert.alert('Error', 'Unable to send email.');
-        }
-      });
-
-      // On Android the Mailer callback event isn't always triggered.
-      setTimeout(function () {
-        if(!calledCallback) {
-          customCallback(true);
-        }
-      }, 2500);
+      ApplicationState.get().performActionWithoutStateChangeImpact(() => {
+        Share.share({
+          title: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup',
+          message: jsonString,
+        }).then((event) => {
+          console.log("Result", event);
+          customCallback(event != Share.dismissedAction);
+        })
+      })
     });
   }
 
