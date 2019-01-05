@@ -75,7 +75,7 @@ export default class OptionsSection extends Component {
           disabled={this.state.loadingExport}
           leftAligned={true}
           options={this.exportOptions()}
-          title={this.state.loadingExport ? "Preparing Data..." : "Export Data"}
+          title={this.state.loadingExport ? "Processing..." : "Export Data"}
           onPress={this.onExportPress}
         />
 
