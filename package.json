@@ -19,6 +19,8 @@
     "moment": "^2.23.0",
     "react": "16.6.3",
     "react-native": "0.57.8",
+    "react-native-file-viewer": "^1.0.10",
+    "react-native-fs": "^2.13.3",
     "react-native-gesture-handler": "^1.0.12",
     "react-native-keychain": "^1.2.1",
     "react-native-store-review": "^0.1.3",

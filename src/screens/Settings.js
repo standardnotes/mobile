@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {ScrollView, View, Alert, Keyboard, Linking, Platform, Share, NativeModules} from 'react-native';
 
 import Sync from '../lib/sfjs/syncManager'
-import ModelManager from '../lib/sfjs/modelManager'
+import ModelManager from '@SFJS/modelManager'
 import AlertManager from '../lib/sfjs/alertManager'
 import SF from '@SFJS/sfjs'
 
@@ -10,6 +10,9 @@ import Auth from '../lib/sfjs/authManager'
 import KeysManager from '@Lib/keysManager'
 import UserPrefsManager from '../lib/userPrefsManager'
 import OptionsState from "@Lib/OptionsState"
+import ApplicationState from "@Lib/ApplicationState"
+import StyleKit from "@Style/StyleKit"
+import BackupsManager from "@Lib/BackupsManager"
 
 import SectionHeader from "../components/SectionHeader";
 import ButtonCell from "../components/ButtonCell";
@@ -25,10 +28,6 @@ import PasscodeSection from "../containers/account/PasscodeSection"
 import EncryptionSection from "../containers/account/EncryptionSection"
 import CompanySection from "../containers/account/CompanySection"
 import LockedView from "../containers/LockedView";
-import ApplicationState from "@Lib/ApplicationState"
-import StyleKit from "../style/StyleKit"
-
-var base64 = require('base-64');
 
 export default class Settings extends Abstract {
 
@@ -269,51 +268,13 @@ export default class Settings extends Abstract {
 
   onExportPress = async (encrypted, callback) => {
     this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManageBackups, async () => {
-      let customCallback = (success) => {
+      BackupsManager.get().export(encrypted, callback).then((success) => {
         if(success) {
           var date = new Date();
           this.setState({lastExportDate: date});
           UserPrefsManager.get().setLastExportDate(date);
         }
         callback();
-      }
-      var auth_params = await Auth.get().getAuthParams();
-      var keys = encrypted ? KeysManager.get().activeKeys() : null;
-
-      var items = [];
-
-      for(var item of ModelManager.get().allItems) {
-        var itemParams = new SFItemParams(item, keys, auth_params);
-        var params = await itemParams.paramsForExportFile();
-        items.push(params);
-      }
-
-      if(items.length == 0) {
-        Alert.alert('No Data', "You don't have any notes yet.");
-        customCallback();
-        return;
-      }
-
-      var data = {items: items}
-
-      if(keys) {
-        var authParams = KeysManager.get().activeAuthParams();
-        // auth params are only needed when encrypted with a standard file key
-        data["auth_params"] = authParams;
-      }
-
-      var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
-
-      var calledCallback = false;
-
-      ApplicationState.get().performActionWithoutStateChangeImpact(() => {
-        Share.share({
-          title: encrypted ? "SN-Encrypted-Backup" : 'SN-Decrypted-Backup',
-          message: jsonString,
-        }).then((event) => {
-          console.log("Result", event);
-          customCallback(event != Share.dismissedAction);
-        })
       })
     });
   }
