@@ -16,6 +16,7 @@ import ReviewManager from './lib/reviewManager';
 
 import Compose from "@Screens/Compose"
 import Notes from "@Screens/Notes/Notes"
+import NotesTablet from "@Screens/Notes/NotesTablet"
 import MainSideMenu from "@SideMenu/MainSideMenu"
 import NoteSideMenu from "@SideMenu/NoteSideMenu"
 import Settings from "@Screens/Settings"
@@ -32,10 +33,11 @@ if(__DEV__ === false) {
 }
 
 const AppStack = createStackNavigator({
-  Notes: {screen: Notes},
-  Compose: {screen: Compose}
+  Notes: {screen: ApplicationState.get().isTablet ? NotesTablet : Notes},
+  Compose: {screen: Compose},
+
 }, {
-  initialRouteName: 'Notes',
+  initialRouteName: 'Notes'
 })
 
 AppStack.navigationOptions = ({ navigation }) => {
@@ -80,7 +82,8 @@ const AppDrawer = createStackNavigator({
   Home: AppDrawerStack,
   Settings: SettingsStack,
   InputModal: InputModalStack,
-  Authenticate: AuthenticateModalStack
+  Authenticate: AuthenticateModalStack,
+
 }, {
   mode: "modal",
   headerMode: 'none',

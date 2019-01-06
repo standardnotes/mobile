@@ -237,6 +237,7 @@ export default class Abstract extends ThemedComponent {
   }
 
   static IsShallowEqual = (newObj, prevObj, keys) => {
+    if(!keys) {keys = Object.keys(newObj)};
     for(var key of keys) {
       if(newObj[key] !== prevObj[key]) {
         return false;

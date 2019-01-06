@@ -48,22 +48,9 @@ export default class Compose extends Abstract {
 
     let note, noteId = this.getProp("noteId");
     if(noteId) { note = ModelManager.get().findItem(noteId);}
-    if(!note) {
-      note = ModelManager.get().createItem({content_type: "Note", dummy: true, text: ""});
-      note.dummy = true;
-      // Editors need a valid note with uuid and modelmanager mapped in order to interact with it
-      // Note that this can create dummy notes that aren't deleted automatically.
-      // Also useful to keep right menu enabled at all times. If the note has a uuid and is a dummy,
-      // it will be removed locally on blur
-      note.initUUID().then(() => {
-        ModelManager.get().addItem(note);
-        this.forceUpdate();
-      })
-    }
+    this.setNote(note, true);
 
-    this.note = note;
-
-    this.constructState({title: note.title, text: note.text});
+    this.constructState({title: this.note.title});
 
     this.configureHeaderBar();
 
@@ -71,7 +58,9 @@ export default class Compose extends Abstract {
 
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
       if(event == "sync:completed") {
-        if(data.retrievedItems && this.note.uuid && data.retrievedItems.map((i) => i.uuid).includes(this.note.uuid)) {
+        if(this.note.deleted) {
+          this.setNote(null);
+        } else if(data.retrievedItems && this.note.uuid && data.retrievedItems.concat(data.savedItems).map((i) => i.uuid).includes(this.note.uuid)) {
           this.refreshContent();
         }
       }
@@ -93,6 +82,28 @@ export default class Compose extends Abstract {
     });
   }
 
+  setNote(note, isConstructor = false) {
+    if(!note) {
+      note = ModelManager.get().createItem({content_type: "Note", dummy: true, text: ""});
+      note.dummy = true;
+      // Editors need a valid note with uuid and modelmanager mapped in order to interact with it
+      // Note that this can create dummy notes that aren't deleted automatically.
+      // Also useful to keep right menu enabled at all times. If the note has a uuid and is a dummy,
+      // it will be removed locally on blur
+      note.initUUID().then(() => {
+        ModelManager.get().addItem(note);
+        this.forceUpdate();
+      })
+    }
+
+    this.note = note;
+
+    if(!isConstructor) {
+      this.setState({title: note.title});
+      this.forceUpdate();
+    }
+  }
+
   configureHeaderBar() {
     this.props.navigation.setParams({
       title: 'Compose',
@@ -107,7 +118,7 @@ export default class Compose extends Abstract {
   }
 
   refreshContent() {
-    this.mergeState({title: this.note.title, text: this.note.text});
+    this.mergeState({title: this.note.title});
   }
 
   componentWillUnmount() {
@@ -138,8 +149,10 @@ export default class Compose extends Abstract {
   componentDidFocus() {
     super.componentDidFocus();
 
-    this.props.navigation.lockLeftDrawer(true);
-    this.props.navigation.lockRightDrawer(false);
+    if(!ApplicationState.get().isTablet) {
+      this.props.navigation.lockLeftDrawer(true);
+      this.props.navigation.lockRightDrawer(false);
+    }
 
     if(this.note.dummy) {
       if(this.refs.input) {
@@ -236,7 +249,7 @@ export default class Compose extends Abstract {
   }
 
   showSavingStatus() {
-    this.setTitle(null, "Saving...");
+    this.setSubTitle("Saving...");
   }
 
   showSavedStatus(success) {
@@ -249,16 +262,21 @@ export default class Compose extends Abstract {
         }
         this.saveError = false;
         this.syncTakingTooLong = false;
-        this.setTitle(null, status);
+        this.setSubTitle(status);
       }, 200)
     } else {
       if(this.statusTimeout) clearTimeout(this.statusTimeout);
       this.statusTimeout = setTimeout(function(){
         this.saveError = true;
         this.syncTakingTooLong = false;
-        this.setTitle(null, "Error syncing (changes saved offline)");
+        this.setSubTitle("Error syncing (changes saved offline)");
       }.bind(this), 200)
     }
+  }
+
+  getSelectedTagId() {
+    // On tablet, we use props.selectedTagId
+    return this.getProp("selectedTagId") || this.props.selectedTagId;
   }
 
   changesMade() {
@@ -271,8 +289,8 @@ export default class Compose extends Abstract {
     if(this.statusTimeout) clearTimeout(this.statusTimeout);
     this.saveTimeout = setTimeout(() => {
       this.showSavingStatus();
-      if(isDummy && this.getProp("selectedTagId")) {
-        var tag = ModelManager.get().findItem(this.getProp("selectedTagId"));
+      if(isDummy && this.getSelectedTagId()) {
+        var tag = ModelManager.get().findItem(this.getSelectedTagId());
         // Could be system tag, so wouldn't exist
         if(tag && !tag.isSmartTag()) {
           tag.addItemAsRelationship(this.note);

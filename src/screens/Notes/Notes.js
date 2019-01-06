@@ -145,16 +145,19 @@ export default class Notes extends Abstract {
       }
       this.reloadList(true);
       this.configureNavBar();
+      if(ApplicationState.get().isTablet) {
+        this.selectFirstNote();
+      }
     })
 
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
       if(event == "sync:completed") {
         // We want to reload the list of the retrieved items contains notes or tags.
         // Since Notes no longer have relationships on tags, if a note's tags change, only the tag will be synced.
-        var retrievedHasNoteOrTag = data.retrievedItems && data.retrievedItems.find((item) => {
+        var retrievedSavedHasNoteOrTag = data.retrievedItems && data.retrievedItems.concat(data.savedItems).find((item) => {
           return ["Note", "Tag"].includes(item.content_type);
         })
-        if(retrievedHasNoteOrTag || _.find(data.unsavedItems, {content_type: "Note"})) {
+        if(retrievedSavedHasNoteOrTag || _.find(data.unsavedItems, {content_type: "Note"})) {
           this.reloadList();
         }
         this.mergeState({refreshing: false, loading: false});
@@ -356,8 +359,24 @@ export default class Notes extends Abstract {
 
     console.log("===Reload Notes List===");
 
+    var result = ModelManager.get().getNotes(this.options);
+    var notes = result.notes;
+    var tags = result.tags;
+
+    this.setState({notes: notes, tags: tags, refreshing: false});
+
+    // setState is async, but we need this value right away sometimes to select the first note of new set of notes
+    this.stateNotes = notes;
+
     this.forceUpdate();
-    this.mergeState({refreshing: false})
+  }
+
+  selectFirstNote() {
+    if(this.stateNotes && this.stateNotes.length > 0) {
+      this.handleSelection(this.stateNotes[0]);
+    } else {
+      this.handleSelection(null);
+    }
   }
 
   _onRefresh() {
@@ -370,13 +389,21 @@ export default class Notes extends Abstract {
     })
   }
 
+  handleSelection = (note) => {
+    if(this.props.onNoteSelect) {
+      this.props.onNoteSelect(note);
+    } else {
+      this.presentComposer(note);
+    }
+  }
+
   _onPressItem = (item: hash) => {
     var run = () => {
       if(item.conflict_of) {
         item.conflict_of = null;
       }
 
-      this.presentComposer(item);
+      this.handleSelection(item);
     }
 
     if(item.errorDecrypting) {
@@ -403,15 +430,11 @@ export default class Notes extends Abstract {
       return <LockedView />;
     }
 
-    var result = ModelManager.get().getNotes(this.options);
-    var notes = result.notes;
-    var tags = result.tags;
-
     var syncStatus = Sync.get().syncStatus;
 
     return (
       <View style={StyleKit.styles.container}>
-        {notes &&
+        {this.state.notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}
             hasRefreshControl={!Auth.get().offline()}
@@ -419,11 +442,11 @@ export default class Notes extends Abstract {
             refreshing={this.state.refreshing}
             onSearchChange={this.onSearchTextChange}
             onSearchCancel={this.onSearchCancel}
-            notes={notes}
+            notes={this.state.notes}
             sortType={this.options.sortBy}
             decrypting={this.state.decrypting}
             loading={this.state.loading}
-            selectedTags={tags}
+            selectedTags={this.state.tags}
             options={this.options.displayOptions}
           />
         }
@@ -437,7 +460,7 @@ export default class Notes extends Abstract {
         <FAB
           buttonColor={StyleKit.variable("stylekitInfoColor")}
           iconTextColor={StyleKit.variable("stylekitInfoContrastColor")}
-          onClickAction={() => {this.presentComposer()}}
+          onClickAction={() => {this.handleSelection()}}
           visible={true}
           iconTextComponent={<Icon name="md-add"/>}
         />

@@ -1,4 +1,5 @@
-import {AppState, Platform} from 'react-native'
+import {AppState, Platform, NativeModules} from 'react-native'
+const { PlatformConstants } = NativeModules;
 import KeysManager from "@Lib/keysManager"
 import OptionsState from "@Lib/OptionsState"
 import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
@@ -84,6 +85,11 @@ export default class ApplicationState {
 
   get isIOS() {
     return !this._isAndroid;
+  }
+
+  get isTablet() {
+    const deviceType = PlatformConstants.interfaceIdiom;
+    return deviceType == "pad";
   }
 
   // Sent from App.js
