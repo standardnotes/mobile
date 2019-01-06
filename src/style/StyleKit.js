@@ -9,6 +9,7 @@ import KeysManager from '../lib/keysManager'
 import CSSParser from "@Style/Util/CSSParser";
 import ThemeDownloader from "@Style/Util/ThemeDownloader"
 import Icons from '@Style/Icons';
+import IconChanger from 'react-native-alternate-icons';
 
 import redJSON from './Themes/red.json';
 import blueJSON from './Themes/blue.json';
@@ -72,12 +73,13 @@ export default class StyleKit {
     this.systemThemes = [];
     let options = [
       {
-        variables: redJSON,
-        name: "Red"
+        variables: blueJSON,
+        name: "Blue",
+        isInitial: true
       },
       {
-        variables: blueJSON,
-        name: "Blue"
+        variables: redJSON,
+        name: "Red",
       }
     ];
 
@@ -89,6 +91,7 @@ export default class StyleKit {
         uuid: option.name,
         content: {
           isSystemTheme: true,
+          isInitial: option.isInitial,
           name: option.name,
           variables: variables,
           package_info: {
@@ -231,6 +234,24 @@ export default class StyleKit {
         }
       }
     }, Platform.OS == "android" ? 100 : 0);
+
+    if(theme.content.isSystemTheme) {
+      IconChanger.supportDevice((supported) => {
+        if(supported) {
+          IconChanger.getIconName((currentName) => {
+            if(theme.content.isInitial && currentName != "default") {
+              // Clear the icon to default
+              IconChanger.setIconName(null);
+            } else {
+              let newName = theme.content.name;
+              if(newName != currentName) {
+                IconChanger.setIconName(newName);
+              }
+            }
+          })
+        }
+      })
+    }
 
     this.reloadStyles();
 
