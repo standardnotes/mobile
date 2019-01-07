@@ -1,8 +1,8 @@
 import {Platform} from 'react-native';
-import KeysManager from "../keysManager"
-import Storage from './storageManager'
-import Server from './httpManager'
-import AlertManager from './alertManager'
+import KeysManager from "@Lib/keysManager"
+import Storage from '@SFJS/storageManager'
+import Server from '@SFJS/httpManager'
+import AlertManager from '@SFJS/alertManager'
 
 export default class Auth extends SFAuthManager {
 

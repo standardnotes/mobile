@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {View} from 'react-native';
 
-import StyleKit from "../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 
 export default class TableSection extends Component {
 

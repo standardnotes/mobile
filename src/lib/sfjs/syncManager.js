@@ -4,8 +4,8 @@ import ModelManager from './modelManager'
 import Storage from './storageManager'
 import AlertManager from './alertManager'
 
-import Auth from '../sfjs/authManager'
-import KeysManager from '../keysManager'
+import Auth from '@SFJS/authManager'
+import KeysManager from '@Lib/keysManager'
 
 export default class Sync extends SFSyncManager {
 

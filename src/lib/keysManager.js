@@ -371,8 +371,8 @@ export default class KeysManager {
 
   static getDeviceBiometricsAvailability(callback) {
     let isAndroid = Platform.OS == "android";
-    if(__DEV__ && isAndroid) {
-      callback(true, "touch", "Fingerprint");
+    if(__DEV__) {
+      callback(true, "touch", "Fingerprint (Dev)");
       return;
     }
     FingerprintScanner.isSensorAvailable().then((type) => {

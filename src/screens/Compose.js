@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import Sync from '../lib/sfjs/syncManager'
-import ModelManager from '../lib/sfjs/modelManager'
-import Auth from '../lib/sfjs/authManager'
+import Sync from '@Lib/sfjs/syncManager'
+import ModelManager from '@Lib/sfjs/modelManager'
+import Auth from '@Lib/sfjs/authManager'
 import OptionsState from "@Lib/OptionsState"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 
 import Abstract from "./Abstract"
 import Webview from "./Webview"
-import ComponentManager from '../lib/componentManager'
+import ComponentManager from '@Lib/componentManager'
 import Icons from '@Style/Icons';
 import ApplicationState from "@Lib/ApplicationState"
-import LockedView from "../containers/LockedView";
+import LockedView from "@Containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import TextView from "sn-textview";
@@ -28,7 +28,7 @@ import {
   Dimensions
 } from 'react-native';
 
-import StyleKit from "../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 
 export default class Compose extends Abstract {
 

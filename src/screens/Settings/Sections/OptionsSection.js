@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import {Alert} from 'react-native';
-import StyleKit from "../../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 import {TextInput, View, Text} from 'react-native';
-import SectionHeader from "../../components/SectionHeader";
-import ButtonCell from "../../components/ButtonCell";
-import TableSection from "../../components/TableSection";
-import SectionedTableCell from "../../components/SectionedTableCell";
-import SectionedAccessoryTableCell from "../../components/SectionedAccessoryTableCell";
-import SectionedOptionsTableCell from "../../components/SectionedOptionsTableCell";
+import SectionHeader from "@Components/SectionHeader";
+import ButtonCell from "@Components/ButtonCell";
+import TableSection from "@Components/TableSection";
+import SectionedTableCell from "@Components/SectionedTableCell";
+import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
+import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
 
 import moment from "@Lib/moment"
 

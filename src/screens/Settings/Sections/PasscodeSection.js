@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import StyleKit from "../../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 import {TextInput, View, Alert, Text} from 'react-native';
 
-import SectionHeader from "../../components/SectionHeader";
-import ButtonCell from "../../components/ButtonCell";
-import TableSection from "../../components/TableSection";
-import SectionedTableCell from "../../components/SectionedTableCell";
-import SectionedAccessoryTableCell from "../../components/SectionedAccessoryTableCell";
-import SectionedOptionsTableCell from "../../components/SectionedOptionsTableCell";
+import SectionHeader from "@Components/SectionHeader";
+import ButtonCell from "@Components/ButtonCell";
+import TableSection from "@Components/TableSection";
+import SectionedTableCell from "@Components/SectionedTableCell";
+import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
+import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
 
 import ApplicationState from "@Lib/ApplicationState"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import KeysManager from "../../lib/keysManager"
+import KeysManager from "@Lib/keysManager"
 
 export default class PasscodeSection extends Component {
 

@@ -19,7 +19,7 @@ import Notes from "@Screens/Notes/Notes"
 import NotesTablet from "@Screens/Notes/NotesTablet"
 import MainSideMenu from "@SideMenu/MainSideMenu"
 import NoteSideMenu from "@SideMenu/NoteSideMenu"
-import Settings from "@Screens/Settings"
+import Settings from "@Screens/Settings/Settings"
 import InputModal from "@Screens/InputModal"
 import Authenticate from "@Screens/Authentication/Authenticate"
 

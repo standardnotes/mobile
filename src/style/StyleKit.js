@@ -1,11 +1,11 @@
 import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
-import ModelManager from "../lib/sfjs/modelManager"
-import Server from "../lib/sfjs/httpManager"
-import Sync from '../lib/sfjs/syncManager'
+import ModelManager from "@Lib/sfjs/modelManager"
+import Server from "@Lib/sfjs/httpManager"
+import Sync from '@Lib/sfjs/syncManager'
 import { SFItemParams } from 'standard-file-js';
-import Storage from "../lib/sfjs/storageManager"
-import Auth from "../lib/sfjs/authManager"
-import KeysManager from '../lib/keysManager'
+import Storage from "@Lib/sfjs/storageManager"
+import Auth from "@Lib/sfjs/authManager"
+import KeysManager from '@Lib/keysManager'
 import CSSParser from "@Style/Util/CSSParser";
 import ThemeDownloader from "@Style/Util/ThemeDownloader"
 import Icons from '@Style/Icons';

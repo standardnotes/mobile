@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {DeviceEventEmitter, Modal, View, Text} from 'react-native';
-import StyleKit from "../style/StyleKit";
+import StyleKit from "@Style/StyleKit";
 import ApplicationState from "@Lib/ApplicationState"
-import HeaderTitleView from "../components/HeaderTitleView"
+import HeaderTitleView from "@Components/HeaderTitleView"
 import HeaderButtons, { HeaderButton, Item } from 'react-navigation-header-buttons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ThemedComponent from "@Components/ThemedComponent";

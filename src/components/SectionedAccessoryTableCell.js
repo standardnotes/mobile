@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {View, Image, Text, TouchableHighlight, Platform} from 'react-native';
 
-import StyleKit from "../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 import SectionedTableCell from "./SectionedTableCell"
 
 import Icon from 'react-native-vector-icons/Ionicons';

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {TouchableHighlight, Text, View} from 'react-native';
 import SectionedTableCell from './SectionedTableCell'
-import StyleKit from "../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 
 export default class ButtonCell extends SectionedTableCell {
 

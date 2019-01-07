@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {DeviceEventEmitter, Modal, View, Text} from 'react-native';
-import StyleKit from "../style/StyleKit";
+import StyleKit from "@Style/StyleKit";
 import PlatformStyles from "../models/PlatformStyles";
 
 export default class HeaderTitleView extends Component {

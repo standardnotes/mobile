@@ -1,34 +1,35 @@
 import React, { Component } from 'react';
 import {ScrollView, View, Alert, Keyboard, Linking, Platform, Share, NativeModules} from 'react-native';
 
-import Sync from '../lib/sfjs/syncManager'
+import Sync from '@SFJS/syncManager'
 import ModelManager from '@SFJS/modelManager'
-import AlertManager from '../lib/sfjs/alertManager'
+import AlertManager from '@SFJS/alertManager'
 import SF from '@SFJS/sfjs'
 import Storage from "@SFJS/storageManager"
 
-import Auth from '../lib/sfjs/authManager'
+import Auth from '@SFJS/authManager'
 import KeysManager from '@Lib/keysManager'
-import UserPrefsManager from '../lib/userPrefsManager'
+import UserPrefsManager from '@Lib/userPrefsManager'
 import OptionsState from "@Lib/OptionsState"
 import ApplicationState from "@Lib/ApplicationState"
 import StyleKit from "@Style/StyleKit"
 import BackupsManager from "@Lib/BackupsManager"
 
-import SectionHeader from "../components/SectionHeader";
-import ButtonCell from "../components/ButtonCell";
-import TableSection from "../components/TableSection";
-import SectionedTableCell from "../components/SectionedTableCell";
-import SectionedAccessoryTableCell from "../components/SectionedAccessoryTableCell";
-import Abstract from "./Abstract"
+import SectionHeader from "@Components/SectionHeader";
+import ButtonCell from "@Components/ButtonCell";
+import TableSection from "@Components/TableSection";
+import SectionedTableCell from "@Components/SectionedTableCell";
+import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
+import Abstract from "@Screens/Abstract"
 import Authenticate from "@Screens/Authentication/Authenticate"
-import AuthSection from "../containers/account/AuthSection"
-import RegistrationConfirmSection from "../containers/account/RegistrationConfirmSection"
-import OptionsSection from "../containers/account/OptionsSection"
-import PasscodeSection from "../containers/account/PasscodeSection"
-import EncryptionSection from "../containers/account/EncryptionSection"
-import CompanySection from "../containers/account/CompanySection"
-import LockedView from "../containers/LockedView";
+import LockedView from "@Containers/LockedView";
+
+import AuthSection from "@Screens/Settings/Sections/AuthSection"
+import RegistrationConfirmSection from "@Screens/Settings/Sections/RegistrationConfirmSection"
+import OptionsSection from "@Screens/Settings/Sections/OptionsSection"
+import PasscodeSection from "@Screens/Settings/Sections/PasscodeSection"
+import EncryptionSection from "@Screens/Settings/Sections/EncryptionSection"
+import CompanySection from "@Screens/Settings/Sections/CompanySection"
 
 export default class Settings extends Abstract {
 
@@ -386,37 +387,6 @@ export default class Settings extends Abstract {
     });
   }
 
-  onCompanyAction = (action) => {
-    if(action == "feedback") {
-      var platformString = Platform.OS == "android" ? "Android" : "iOS";
-      Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} app feedback (v${ApplicationState.version})`);
-    } else if(action == "learn_more") {
-      Linking.openURL("https://standardnotes.org");
-    } else if(action == "privacy") {
-      Linking.openURL("https://standardnotes.org/privacy");
-    } else if(action == "help") {
-      Linking.openURL("https://standardnotes.org/help");
-    } else if(action == "rate") {
-      if(ApplicationState.isIOS) {
-        Linking.openURL("https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8");
-      } else {
-        Linking.openURL("market://details?id=com.standardnotes");
-      }
-    } else if(action == "friend") {
-      let title = "Standard Notes";
-      var message = "Check out Standard Notes, a free, open-source, and completely encrypted notes app.";
-      let url = "https://standardnotes.org";
-      // Android ignores url. iOS ignores title.
-      if(ApplicationState.isAndroid) {
-        message += "\n\nhttps://standardnotes.org";
-      }
-
-      ApplicationState.get().performActionWithoutStateChangeImpact(() => {
-        Share.share({title: title, message: message, url: url})
-      })
-    }
-  }
-
   onSortChange = (key) => {
     this.options.setSortBy(key);
     this.forceUpdate();
@@ -534,10 +504,7 @@ export default class Settings extends Abstract {
             title={"Encryption Status"}
           />
 
-          <CompanySection
-            title={"Standard Notes"}
-            onAction={this.onCompanyAction}
-          />
+          <CompanySection title={"Standard Notes"}/>
 
         </ScrollView>
       </View>

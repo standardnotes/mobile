@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Alert, View, WebView, Linking, Platform } from 'react-native';
 
-import ComponentManager from '../lib/componentManager'
-import ModelManager from '../lib/sfjs/modelManager'
+import ComponentManager from '@Lib/componentManager'
+import ModelManager from '@Lib/sfjs/modelManager'
 
-import StyleKit from "../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 import ApplicationState from "@Lib/ApplicationState"
 
 

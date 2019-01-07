@@ -3,7 +3,7 @@ let ClientDataDomain = "org.standardnotes.sn.components";
 
 import { Platform } from 'react-native';
 
-import StyleKit from '../style/StyleKit'
+import StyleKit from '@Style/StyleKit'
 import ModelManager from './sfjs/modelManager'
 import Sync from './sfjs/syncManager'
 import SF from "./sfjs/sfjs"

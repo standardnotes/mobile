@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import {TextInput, View, Text} from 'react-native';
-import StyleKit from "../../style/StyleKit"
+import StyleKit from "@Style/StyleKit"
 
-import SectionHeader from "../../components/SectionHeader";
-import ButtonCell from "../../components/ButtonCell";
-import TableSection from "../../components/TableSection";
-import SectionedTableCell from "../../components/SectionedTableCell";
-import SectionedAccessoryTableCell from "../../components/SectionedAccessoryTableCell";
+import SectionHeader from "@Components/SectionHeader";
+import ButtonCell from "@Components/ButtonCell";
+import TableSection from "@Components/TableSection";
+import SectionedTableCell from "@Components/SectionedTableCell";
+import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
 
 const DEFAULT_SIGN_IN_TEXT = "Sign In";
 const DEFAULT_REGISTER_TEXT = "Register";
