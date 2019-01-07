@@ -57,6 +57,23 @@ export default class Notes extends Abstract {
     })
   }
 
+  loadInitialState() {
+    this.options = ApplicationState.getOptions();
+
+    this.mergeState({
+      refreshing: false,
+      decrypting: false,
+      loading: true,
+      notes: []
+    });
+
+    this.registerObservers();
+    this.initializeNotes();
+    this.beginSyncTimer();
+
+    super.loadInitialState();
+  }
+
   componentDidMount() {
     super.componentDidMount();
     if(this.authOnMount) {
@@ -96,22 +113,6 @@ export default class Notes extends Abstract {
   unlockContent() {
     super.unlockContent();
     this.configureNavBar(true);
-  }
-
-  loadInitialState() {
-    this.options = ApplicationState.getOptions();
-
-    this.mergeState({
-      refreshing: false,
-      decrypting: false,
-      loading: true,
-    });
-
-    this.registerObservers();
-    this.initializeNotes();
-    this.beginSyncTimer();
-
-    super.loadInitialState();
   }
 
   componentWillUnmount() {
@@ -275,7 +276,7 @@ export default class Notes extends Abstract {
 
   configureNavBar(initial = false) {
     // If you change anything here, be sure to test how it interacts with filtering, when you change which tags to show.
-    if(this.state.lockContent ) {
+    if(this.state.lockContent) {
       this.needsConfigureNavBar = true;
       return;
     }
@@ -334,6 +335,10 @@ export default class Notes extends Abstract {
     if(this.needsConfigureNavBar) {
       this.configureNavBar(false);
     }
+  }
+
+  componentWillFocus() {
+    super.componentWillFocus();
 
     if(this.loadNotesOnVisible) {
       this.loadNotesOnVisible = false;

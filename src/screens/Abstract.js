@@ -88,6 +88,11 @@ export default class Abstract extends ThemedComponent {
     })
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    let isSame = Abstract.IsShallowEqual(nextProps, this.props) && Abstract.IsShallowEqual(nextState, this.state);
+    return !isSame;
+  }
+
   onThemeChange() {
     super.onThemeChange();
     try {
@@ -132,6 +137,8 @@ export default class Abstract extends ThemedComponent {
   }
 
   componentWillFocus() {
+    this.willBeVisible = true
+
     if(ApplicationState.get().isUnlocked() && this.state.lockContent) {
       this.unlockContent();
     }
@@ -139,16 +146,14 @@ export default class Abstract extends ThemedComponent {
 
   componentDidFocus() {
     this.visible = true;
-    this.willBeVisible = true; // Just in case willAppear isn't called for whatever reason
     this.configureNavBar(false);
   }
 
   componentWillBlur() {
-
+    this.willBeVisible = false;
   }
 
   componentDidBlur() {
-    this.willBeVisible = false;
     this.visible = false;
   }
 

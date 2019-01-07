@@ -184,7 +184,7 @@ export default class Compose extends Abstract {
         this.forceUpdate();
       },
       onTagSelect: (tag) => {
-        let selectedTags = this.note.tags;
+        let selectedTags = this.note.tags.slice();
         var selected = selectedTags.includes(tag);
         if(selected) {
           // deselect
@@ -213,6 +213,7 @@ export default class Compose extends Abstract {
 
   replaceTagsForNote(newTags) {
     let note = this.note;
+
 
     var oldTags = note.tags.slice(); // original array will be modified in the for loop so we make a copy
     for(var oldTag of oldTags) {
