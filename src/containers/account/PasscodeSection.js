@@ -9,6 +9,7 @@ import SectionedTableCell from "../../components/SectionedTableCell";
 import SectionedAccessoryTableCell from "../../components/SectionedAccessoryTableCell";
 import SectionedOptionsTableCell from "../../components/SectionedOptionsTableCell";
 
+import ApplicationState from "@Lib/ApplicationState"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import KeysManager from "../../lib/keysManager"
 
@@ -18,8 +19,8 @@ export default class PasscodeSection extends Component {
     super(props);
     var state = { fingerprintAvailable: false || __DEV__};
     if(__DEV__) {
-      state.biometricsType = "touch";
-      state.biometricsNoun = "Fingerprint";
+      state.biometricsType = ApplicationState.isAndroid ? "touch" : "face";
+      state.biometricsNoun = ApplicationState.isAndroid ? "Fingerprint" : "Face ID";
     }
 
     this.state = state;

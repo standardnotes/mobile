@@ -31,6 +31,7 @@ export default class Authenticate extends Abstract {
       source.onRequiresInterfaceReload = () => {
         this.forceUpdate();
       }
+      source.initializeForInterface();
     }
 
     // if(__DEV__) {

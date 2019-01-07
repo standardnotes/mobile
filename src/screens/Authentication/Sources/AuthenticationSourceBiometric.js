@@ -1,14 +1,25 @@
 import FingerprintScanner from 'react-native-fingerprint-scanner'
 import ApplicationState from "@Lib/ApplicationState"
 import AuthenticationSource from "./AuthenticationSource"
+import KeysManager from "@Lib/keysManager"
 
-export default class AuthenticationSourceFingerprint extends AuthenticationSource {
+export default class AuthenticationSourceBiometric extends AuthenticationSource {
   constructor() {
     super();
   }
 
+  initializeForInterface() {
+    super.initializeForInterface();
+
+    KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
+      this.biometricsType = type;
+      this.biometricsNoun = noun;
+      this.requiresInterfaceReload();
+    })
+  }
+
   get identifier() {
-    return "fingerprint-auth-source";
+    return "biometric-auth-source";
   }
 
   get type() {
@@ -16,18 +27,22 @@ export default class AuthenticationSourceFingerprint extends AuthenticationSourc
   }
 
   get title() {
-    return "Fingerprint";
+    return this.isFace ? "Face ID" : "Fingerprint";
+  }
+
+  get isFace() {
+    return this.biometricsType == "face";
   }
 
   get label() {
     switch (this.status) {
       case "waiting-turn":
       case "waiting-input":
-        return "Please scan your fingerprint"
+        return `Please scan your ${this.isFace ? "face" : "fingerprint"}`
       case "processing":
-        return "Waiting for Fingerprint";
+        return `Waiting for ${this.isFace ? "Face ID" : "Fingerprint"}`;
       case "did-succeed":
-       return "Success | Fingerprint"
+       return `Success | ${this.isFace ? "Face ID" : "Fingerprint"}`
       default:
         return "Status not accounted for"
     }

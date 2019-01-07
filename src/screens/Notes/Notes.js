@@ -21,7 +21,7 @@ import ApplicationState from "@Lib/ApplicationState"
 
 import AuthenticationSourceAccountPassword from "@Screens/Authentication/Sources/AuthenticationSourceAccountPassword";
 import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
-import AuthenticationSourceFingerprint from "@Screens/Authentication/Sources/AuthenticationSourceFingerprint";
+import AuthenticationSourceBiometric from "@Screens/Authentication/Sources/AuthenticationSourceBiometric";
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';

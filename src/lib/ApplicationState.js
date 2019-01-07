@@ -3,7 +3,7 @@ const { PlatformConstants } = NativeModules;
 import KeysManager from "@Lib/keysManager"
 import OptionsState from "@Lib/OptionsState"
 import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
-import AuthenticationSourceFingerprint from "@Screens/Authentication/Sources/AuthenticationSourceFingerprint";
+import AuthenticationSourceBiometric from "@Screens/Authentication/Sources/AuthenticationSourceBiometric";
 var pjson = require('../package.json')
 
 export default class ApplicationState {
@@ -95,14 +95,6 @@ export default class ApplicationState {
     return deviceType == "pad";
   }
 
-  // Sent from App.js
-  receiveApplicationStartEvent() {
-    var authProps = this.getAuthenticationPropsForAppState(ApplicationState.Launching);
-    if(authProps.sources.length == 0) {
-      this.unlockApplication();
-    }
-  }
-
   handleAppStateChange = (nextAppState) => {
 
     if(this.ignoreStateChanges) {
@@ -164,6 +156,14 @@ export default class ApplicationState {
 
   /* State Changes */
 
+  // Sent from App.js
+  receiveApplicationStartEvent() {
+    var authProps = this.getAuthenticationPropsForAppState(ApplicationState.Launching);
+    if(authProps.sources.length == 0) {
+      this.unlockApplication();
+    }
+  }
+
   didLaunch() {
     this.notifyOfState(ApplicationState.Launching);
     this.mostRecentState = ApplicationState.Launching;
@@ -176,10 +176,6 @@ export default class ApplicationState {
     }
 
     this.previousEvents.push(state);
-  }
-
-  clearEventHistory() {
-    this.previousEvents = [];
   }
 
   /* End State */
@@ -280,7 +276,7 @@ export default class ApplicationState {
 
     let sources = [];
     if(showPasscode) { sources.push(new AuthenticationSourceLocalPasscode()); }
-    if(showFingerprint) { sources.push(new AuthenticationSourceFingerprint()); }
+    if(showFingerprint) { sources.push(new AuthenticationSourceBiometric()); }
 
     return {
       title: title,

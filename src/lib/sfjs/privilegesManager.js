@@ -3,7 +3,7 @@ import Sync from "./syncManager";
 import { SFPrivilegesManager, SFSingletonManager } from "standard-file-js";
 import AuthenticationSourceAccountPassword from "@Screens/Authentication/Sources/AuthenticationSourceAccountPassword";
 import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
-import AuthenticationSourceFingerprint from "@Screens/Authentication/Sources/AuthenticationSourceFingerprint";
+import AuthenticationSourceBiometric from "@Screens/Authentication/Sources/AuthenticationSourceBiometric";
 import KeysManager from "@Lib/keysManager"
 import Storage from "@SFJS/storageManager"
 import Auth from "@SFJS/authManager"
@@ -85,7 +85,7 @@ export default class PrivilegesManager extends SFPrivilegesManager {
         var hasFingerprint = KeysManager.get().hasFingerprint();
         let sources = [];
         if(hasPasscode) {sources.push(new AuthenticationSourceLocalPasscode());}
-        if(hasFingerprint) {sources.push(new AuthenticationSourceFingerprint());}
+        if(hasFingerprint) {sources.push(new AuthenticationSourceBiometric());}
         return sources;
       }
     }
