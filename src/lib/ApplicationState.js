@@ -17,8 +17,11 @@ export default class ApplicationState {
   // When the app enters the background completely
   static Backgrounding = "Backgrounding";
 
+  // When the app resumes from either the background or from multitasking switcher or notification center
+  static GainingFocus = "GainingFocus";
+
   // When the app resumes from the background
-  static Resuming = "Resuming";
+  static ResumingFromBackground = "ResumingFromBackground";
 
   // When the user enters their local passcode and/or fingerprint
   static Locking = "Locking";
@@ -109,20 +112,38 @@ export default class ApplicationState {
     // if the most recent state is not 'background' ('inactive'), then we're going
     // from inactive to active, which doesn't really happen unless you, say, swipe
     // notification center in iOS down then back up. We don't want to lock on this state change.
-    var isResuming = nextAppState === "active" && this.mostRecentState == "background";
+    var isResuming = nextAppState === "active";
+    var isResumingFromBackground = isResuming && this.mostRecentState == ApplicationState.Backgrounding;
     var isEnteringBackground = nextAppState == 'background';
     var isLosingFocus = nextAppState == 'inactive';
 
     if(isEnteringBackground) {
-      this.didEnterBackground();
+      this.notifyOfState(ApplicationState.Backgrounding);
+      this.mostRecentState = ApplicationState.Backgrounding;
+
+      if(this.shouldLockApplication()) {
+        this.lockApplication();
+      }
     }
 
-    if(isResuming) {
-      this.didResume();
+    if(isResumingFromBackground || isResuming) {
+      if(isResumingFromBackground) {
+        this.notifyOfState(ApplicationState.ResumingFromBackground);
+        this.mostRecentState = ApplicationState.ResumingFromBackground;
+      }
+
+      // Notify of GainingFocus even if resuming from background
+      this.notifyOfState(ApplicationState.GainingFocus);
+      this.mostRecentState = ApplicationState.GainingFocus;
     }
 
     if(isLosingFocus) {
-      this.didLoseFocus();
+      this.notifyOfState(ApplicationState.LosingFocus);
+      this.mostRecentState = ApplicationState.LosingFocus;
+
+      if(this.shouldLockApplication()) {
+        this.lockApplication();
+      }
     }
   }
 
@@ -134,7 +155,8 @@ export default class ApplicationState {
       ApplicationState.Launching,
       ApplicationState.LosingFocus,
       ApplicationState.Backgrounding,
-      ApplicationState.Resuming
+      ApplicationState.GainingFocus,
+      ApplicationState.ResumingFromBackground
     ].includes(state);
   }
 
@@ -147,32 +169,8 @@ export default class ApplicationState {
     this.mostRecentState = ApplicationState.Launching;
   }
 
-  didLoseFocus() {
-    this.notifyOfState(ApplicationState.LosingFocus);
-    this.mostRecentState = ApplicationState.LosingFocus;
-
-    if(this.shouldLockApplication()) {
-      this.lockApplication();
-    }
-  }
-
-  didEnterBackground() {
-    this.notifyOfState(ApplicationState.Backgrounding);
-    this.mostRecentState = ApplicationState.Backgrounding;
-
-    if(this.shouldLockApplication()) {
-      this.lockApplication();
-    }
-  }
-
-  didResume() {
-    this.notifyOfState(ApplicationState.Resuming);
-    this.mostRecentState = ApplicationState.Resuming;
-  }
-
   notifyOfState(state) {
     if(this.ignoreStateChanges) {return;}
-    // console.log("ApplicationState notifying of state:", state);
     for(var observer of this.observers) {
       observer.callback(state);
     }
@@ -266,7 +264,8 @@ export default class ApplicationState {
 
     var showPasscode = hasPasscode, showFingerprint = hasFingerprint;
 
-    if(state == ApplicationState.Backgrounding || state == ApplicationState.Resuming || state == ApplicationState.LosingFocus) {
+    // We don't need to account for ApplicationState.GainingFocus, since LosingFocus will lock the application
+    if(state == ApplicationState.Backgrounding || state == ApplicationState.ResumingFromBackground || state == ApplicationState.LosingFocus) {
       showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
       showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
     }

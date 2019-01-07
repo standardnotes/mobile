@@ -47,8 +47,7 @@ export default class Notes extends Abstract {
       if(authProps.sources.length > 0) {
         this.presentAuthenticationModal(authProps);
       }
-
-      else if(state == ApplicationState.Resuming) {
+      else if(state == ApplicationState.GainingFocus) {
         // we only want to perform sync here if the app is resuming, not if it's a fresh start
         if(this.dataLoaded) {
           Sync.get().sync();
@@ -103,9 +102,12 @@ export default class Notes extends Abstract {
     this.props.navigation.navigate("Authenticate", {
       authenticationSources: authProps.sources,
       onSuccess: () => {
-        console.log("Authentication Success.");
         authProps.onAuthenticate();
         this.authenticationInProgress = false;
+
+        if(this.dataLoaded) {
+          Sync.get().sync();
+        }
       }
     });
   }
@@ -151,16 +153,12 @@ export default class Notes extends Abstract {
       }
     })
 
+    this.mappingObserver = ModelManager.get().addItemSyncObserver("notes-screen", ["Tag", "Note"], () => {
+      this.reloadList();
+    })
+
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
       if(event == "sync:completed") {
-        // We want to reload the list of the retrieved items contains notes or tags.
-        // Since Notes no longer have relationships on tags, if a note's tags change, only the tag will be synced.
-        var retrievedSavedHasNoteOrTag = data.retrievedItems && data.retrievedItems.concat(data.savedItems).find((item) => {
-          return ["Note", "Tag"].includes(item.content_type);
-        })
-        if(retrievedSavedHasNoteOrTag || _.find(data.unsavedItems, {content_type: "Note"})) {
-          this.reloadList();
-        }
         this.mergeState({refreshing: false, loading: false});
       } else if(event == "sync-exception") {
         Alert.alert("Issue Syncing", `There was an error while trying to save your items. Please contact support and share this message: ${data}`);
