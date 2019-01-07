@@ -147,10 +147,10 @@ export default class ApplicationState {
     }
   }
 
-  // An app cycle change are natural events like active, inactive, background,
+  // Visibility change events are like active, inactive, background,
   // while non-app cycle events are custom events like locking and unlocking
 
-  isStateAppCycleChange(state) {
+  isAppVisibilityChange(state) {
     return [
       ApplicationState.Launching,
       ApplicationState.LosingFocus,
@@ -255,7 +255,10 @@ export default class ApplicationState {
   }
 
   getAuthenticationPropsForAppState(state) {
-    if(state == ApplicationState.Unlocking || state == ApplicationState.Locking) {
+    // We don't want to do anything on gaining focus, since that may be called extraenously,
+    // when you come back from notification center, etc. Any immediate locking should be handled
+    // LosingFocus anyway.
+    if(!this.isAppVisibilityChange(state) || state == ApplicationState.GainingFocus) {
       return {sources: []};
     }
 
@@ -264,8 +267,11 @@ export default class ApplicationState {
 
     var showPasscode = hasPasscode, showFingerprint = hasFingerprint;
 
-    // We don't need to account for ApplicationState.GainingFocus, since LosingFocus will lock the application
-    if(state == ApplicationState.Backgrounding || state == ApplicationState.ResumingFromBackground || state == ApplicationState.LosingFocus) {
+    if(
+      state == ApplicationState.Backgrounding ||
+      state == ApplicationState.ResumingFromBackground ||
+      state == ApplicationState.LosingFocus
+    ) {
       showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
       showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
     }

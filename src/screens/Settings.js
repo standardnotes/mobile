@@ -5,6 +5,7 @@ import Sync from '../lib/sfjs/syncManager'
 import ModelManager from '@SFJS/modelManager'
 import AlertManager from '../lib/sfjs/alertManager'
 import SF from '@SFJS/sfjs'
+import Storage from "@SFJS/storageManager"
 
 import Auth from '../lib/sfjs/authManager'
 import KeysManager from '@Lib/keysManager'
@@ -311,8 +312,10 @@ export default class Settings extends Abstract {
 
   onPasscodeEnable = () => {
     this.props.navigation.navigate("InputModal", {
+      title: "Setup Passcode",
       placeholder: "Enter a passcode",
-      confirmPlaceholder: "Confirm your passcode",
+      confirmPlaceholder: "Confirm passcode",
+      secureTextEntry: true,
       requireConfirm: true,
       showKeyboardChooser: true,
       onSubmit: async (value) => {

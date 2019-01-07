@@ -8,6 +8,7 @@ import SectionHeader from "@Components/SectionHeader";
 import ButtonCell from "@Components/ButtonCell";
 import Abstract from "@Screens/Abstract"
 import LockedView from "@Containers/LockedView";
+import ApplicationState from "@Lib/ApplicationState"
 
 export default class InputModal extends Abstract {
 
@@ -34,6 +35,7 @@ export default class InputModal extends Abstract {
 
     this.requireConfirm = this.getProp("requireConfirm");
     this.showKeyboardChooser = this.getProp("showKeyboardChooser");
+    this.keyboardType = "default";
 
     this.constructState({text: this.getProp("initialValue") || ""});
   }
@@ -84,13 +86,14 @@ export default class InputModal extends Abstract {
       // on Android, keyboard will update right away
       Keyboard.dismiss();
       setTimeout(() => {
-        this.refs.input.focus();
+        this.inputRef && this.inputRef.focus();
       }, 100);
     }
   }
 
-  onKeyboardOptionsSelect(option) {
+  onKeyboardOptionsSelect = (option) => {
     this.keyboardType = option.key;
+    this.forceUpdate();
     this.refreshKeyboard();
     this.getProp("onKeyboardTypeChange")(option.key);
   }
@@ -119,8 +122,10 @@ export default class InputModal extends Abstract {
               placeholder={this.getProp("placeholder")}
               onChangeText={this.onTextChange}
               value={this.state.text}
+              secureTextEntry={this.getProp("secureTextEntry")}
               autoCorrect={false}
               autoCapitalize={'none'}
+              keyboardType={this.keyboardType}
               keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
               autoFocus={true}
               placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
@@ -137,8 +142,10 @@ export default class InputModal extends Abstract {
                 placeholder={this.getProp("confirmPlaceholder")}
                 onChangeText={this.onConfirmTextChange}
                 value={this.state.confirmText}
+                secureTextEntry={this.getProp("secureTextEntry")}
                 autoCorrect={false}
                 autoCapitalize={'none'}
+                keyboardType={this.keyboardType}
                 keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
                 underlineColorAndroid={'transparent'}

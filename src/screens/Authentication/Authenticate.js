@@ -19,10 +19,7 @@ export default class Authenticate extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
     let templateOptions = {
-      title: "Authenticate",
-      rightButton: {
-        title: "Submit",
-      }
+      title: "Authenticate"
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
   };
@@ -62,26 +59,12 @@ export default class Authenticate extends Abstract {
 
     this.pendingSources = this.sources.slice();
     this.successfulSources = [];
-    this.updateHeaderBar();
   }
 
-  updateHeaderBar() {
-    if(this.pendingSources.length > 1) {
-      buttonText = "Next";
-    } else {
-      buttonText = "Submit";
+  submitPressed() {
+    if(this.state.activeSource) {
+      this.validateAuthentication(this.state.activeSource);
     }
-
-    this.props.navigation.setParams({
-      rightButton: {
-        title: buttonText,
-        onPress: () => {
-          if(this.state.activeSource) {
-            this.validateAuthentication(this.state.activeSource);
-          }
-        }
-      }
-    })
   }
 
   componentDidMount() {
@@ -116,7 +99,6 @@ export default class Authenticate extends Abstract {
     if(source.isInSuccessState()) {
       this.successfulSources.push(source);
       _.remove(this.pendingSources, source);
-      this.updateHeaderBar();
     } else {
       if(result.error && result.error.message) {
         Alert.alert("Unsuccessful", result.error.message);
@@ -150,10 +132,12 @@ export default class Authenticate extends Abstract {
     this.forceUpdate();
   }
 
-  _renderAuthenticationSoure = (source) => {
+  _renderAuthenticationSoure = (source, index) => {
+
+    let isLast = index == this.sources.length - 1;
 
     const inputAuthenticationSource = (source) => (
-      <View style={{marginBottom: 10}}>
+      <View style={[this.styles.authSourceSection, !isLast ? this.styles.authSourceSectionNotLast : undefined]}>
         <SectionedTableCell textInputCell={true} first={true} onPress={() => {}}>
           <TextInput
             ref={(ref) => {source.inputRef = ref}}
@@ -176,7 +160,7 @@ export default class Authenticate extends Abstract {
     )
 
     const biometricAuthenticationSource = (source) => (
-      <View style={{marginBottom: 10}}>
+      <View style={[this.styles.authSourceSection, !isLast ? this.styles.authSourceSectionNotLast : undefined]}>
         <SectionedAccessoryTableCell
           first={true}
           dimmed={true}
@@ -210,12 +194,33 @@ export default class Authenticate extends Abstract {
     return (
       <View style={StyleKit.styles.container}>
         <ScrollView style={{backgroundColor: StyleKit.variables.stylekitBackgroundColor}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
-          {this.sources.map((source) => {
-            return this._renderAuthenticationSoure(source)
+          {this.sources.map((source, index) => {
+            return this._renderAuthenticationSoure(source, index)
           })}
+
+          <ButtonCell
+            style={this.styles.submitButtonCell}
+            maxHeight={45}
+            title={this.pendingSources.length > 1 ? "Next" : "Submit"}
+            bold={true}
+            onPress={() => this.submitPressed()}
+          />
+
         </ScrollView>
       </View>
     )
+  }
+
+  loadStyles() {
+    this.styles = {
+      authSourceSection: {
+      },
+      authSourceSectionNotLast: {
+        marginBottom: 10
+      },
+      submitButtonCell: {
+      }
+    }
   }
 
 }
