@@ -199,12 +199,19 @@ export default class Compose extends Abstract {
       getSelectedTags: () => {
         // Return copy so that list re-renders every time if they change
         return this.note.tags.slice();
+      },
+      onKeyboardDismiss: () => {
+        // Keyboard.dismiss() does not work for native views, which our tet input is
+        this.input && this.input.blur();
       }
     })
   }
 
   componentWillBlur() {
     super.componentWillBlur();
+
+    this.input && this.input.blur();
+    
     if(this.note.uuid && this.note.dummy) {
       // A dummy note created to work with default external editor. Safe to delete.
       ModelManager.get().removeItemLocally(this.note);

@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import {Keyboard} from 'react-native';
 import Abstract from "@Screens/Abstract"
 
 export default class AbstractSideMenu extends Abstract {
@@ -19,8 +20,20 @@ export default class AbstractSideMenu extends Abstract {
       return false;
     }
     let isSame = Abstract.IsShallowEqual(newNavigationState, currentNavigationState, ["isDrawerIdle", "isDrawerOpen", "isTransitioning"])
+    if(!isSame) {
+      this.psuedo_willFocus();
+    }
     return !isSame;
   }
 
+  psuedo_willFocus() {
+    // componentWillFocus is not called for drawer components when they are about to appear
+    // instead, we piggyback on the logic in shouldComponentUpdate above to determine
+    // if navigation state is about to change, and if so, we call this.
+
+    Keyboard.dismiss();
+
+    this.handler.onKeyboardDismiss && this.handler.onKeyboardDismiss();
+  }
 
 }

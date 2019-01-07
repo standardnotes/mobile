@@ -11,6 +11,9 @@
 #import <React/RCTFont.h>
 
 @implementation SNTextViewManager
+{
+    SNTextView *_textView;
+}
 
 RCT_EXPORT_MODULE()
 RCT_EXPORT_VIEW_PROPERTY(text, NSString)
@@ -27,9 +30,18 @@ RCT_EXPORT_VIEW_PROPERTY(paddingLeft, CGFloat)
 
 - (UIView *)view
 {
-    SNTextView *textView = [[SNTextView alloc] init];
-    textView.delegate = self;
-    return textView;
+    if(!_textView) {
+        _textView = [[SNTextView alloc] init];
+        _textView.delegate = self;
+    }
+    return _textView;
+}
+
+RCT_EXPORT_METHOD(blur:(nonnull NSNumber *)node)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_textView resignFirstResponder];
+    });
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(fontSize, NSNumber, SNTextView)
