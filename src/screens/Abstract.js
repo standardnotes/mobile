@@ -89,7 +89,8 @@ export default class Abstract extends ThemedComponent {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    let isSame = Abstract.IsShallowEqual(nextProps, this.props) && Abstract.IsShallowEqual(nextState, this.state);
+    let isSame = Abstract.IsDeepEqual(nextProps, this.props, null, ["navigation"])
+        && Abstract.IsDeepEqual(nextState, this.state);
     return !isSame;
   }
 
@@ -192,9 +193,16 @@ export default class Abstract extends ThemedComponent {
   }
 
   mergeState(state) {
-    this.setState(function(prevState){
-      return _.merge(prevState, state);
-    })
+    /*
+      We're getting rid of the original implementation of this, which was to pass a function into set state.
+      The reason was, when compared new and previous values in componentShouldUpdate, if we used the function approach,
+      it would always have the new values for both. Doing a normal setState({}) did not have this issue,
+    */
+    // this.setState((prevState) => {
+    //   return _.merge(prevState, state);
+    // })
+
+    this.setState(state);
   }
 
   renderOnMount(callback) {
@@ -249,5 +257,13 @@ export default class Abstract extends ThemedComponent {
       }
     }
     return true;
+  }
+
+  static IsDeepEqual = (newObj, prevObj, keys, omitKeys = []) => {
+    if(!keys) {keys = Object.keys(newObj)};
+    for(var omitKey of omitKeys) {
+      _.pull(keys, omitKey);
+    }
+    return _.isEqual(_.pick(newObj, keys), _.pick(prevObj, keys));
   }
 }

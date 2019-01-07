@@ -50,7 +50,7 @@ export default class Compose extends Abstract {
     if(noteId) { note = ModelManager.get().findItem(noteId);}
     this.setNote(note, true);
 
-    this.constructState({title: this.note.title});
+    this.constructState({title: this.note.title, noteLocked: this.note.locked});
 
     this.configureHeaderBar();
 
@@ -61,7 +61,19 @@ export default class Compose extends Abstract {
         if(this.note.deleted) {
           this.setNote(null);
         } else if(data.retrievedItems && this.note.uuid && data.retrievedItems.concat(data.savedItems).map((i) => i.uuid).includes(this.note.uuid)) {
-          this.refreshContent();
+          /*
+          You have to be careful about when you render inside this component. Rendering with the native SNTextView component
+          can cause the cursor to go to the end of the input, both on iOS and Android. We want to force an update only if retrievedItems includes this item
+
+          However, if we make a change to a note from the side menu (such as pin, lock, etc), then we also want
+          to update ourselves. This would only be found in data.savedItems.
+
+          Actually, we only care about lock changes, because we display a banner if a note is locked. So we'll just
+          make that a part of the state then. Abstract does a deep compare on state before deciding if to render.
+
+          Do not make text part of the state, otherwise that would cause a re-render on every keystroke.
+          */
+          this.setState({title: this.note.title, noteLocked: this.note.locked});
         }
       }
     });
@@ -115,10 +127,6 @@ export default class Compose extends Abstract {
         }
       }
     })
-  }
-
-  refreshContent() {
-    this.mergeState({title: this.note.title});
   }
 
   componentWillUnmount() {
@@ -211,7 +219,7 @@ export default class Compose extends Abstract {
     super.componentWillBlur();
 
     this.input && this.input.blur();
-    
+
     if(this.note.uuid && this.note.dummy) {
       // A dummy note created to work with default external editor. Safe to delete.
       ModelManager.get().removeItemLocally(this.note);
@@ -241,7 +249,7 @@ export default class Compose extends Abstract {
   }
 
   onTitleChange = (text) => {
-    this.mergeState({title: text})
+    this.setState({title: text})
     this.note.title = text;
     this.changesMade();
   }

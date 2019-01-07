@@ -219,12 +219,14 @@ export default class StyleKit {
 
     this.activeTheme = theme;
 
+    const isAndroid = Platform.OS == "android";
+
     // On Android, a time out is required, especially during app startup
     setTimeout(() => {
       let statusBarColor = this.statusBarColorForTheme(theme);
       StatusBar.setBarStyle(statusBarColor, true);
       // setBackgroundColor is only for Android
-      if(Platform.OS == "android") {
+      if(isAndroid) {
         // Android <= v22 does not support changing status bar text color. It will always be white
         // So we have to make sure background color has proper contrast
         if(Platform.Version <= 22) {
@@ -233,9 +235,9 @@ export default class StyleKit {
           StatusBar.setBackgroundColor(theme.content.variables.stylekitContrastBackgroundColor);
         }
       }
-    }, Platform.OS == "android" ? 100 : 0);
+    }, isAndroid ? 100 : 0);
 
-    if(theme.content.isSystemTheme) {
+    if(theme.content.isSystemTheme && !isAndroid) {
       IconChanger.supportDevice((supported) => {
         if(supported) {
           IconChanger.getIconName((currentName) => {
