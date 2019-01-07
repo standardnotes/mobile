@@ -2,37 +2,65 @@ import React, { Component } from 'react';
 import {Alert} from 'react-native';
 import StyleKit from "@Style/StyleKit"
 import {TextInput, View, Text} from 'react-native';
+import UserPrefsManager from "@Lib/userPrefsManager"
+import KeysManager from "@Lib/keysManager"
+import Auth from '@SFJS/authManager'
 import SectionHeader from "@Components/SectionHeader";
 import ButtonCell from "@Components/ButtonCell";
 import TableSection from "@Components/TableSection";
 import SectionedTableCell from "@Components/SectionedTableCell";
 import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
 import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
+import { withNavigation } from 'react-navigation';
+import Abstract from "@Screens/Abstract";
+import BackupsManager from "@Lib/BackupsManager"
 
 import moment from "@Lib/moment"
 
-export default class OptionsSection extends Component {
+class OptionsSection extends Abstract {
 
   constructor(props) {
     super(props);
-    this.state = {loadingExport: false};
+    let encryptionAvailable = KeysManager.get().activeKeys() != null;
+    let email = KeysManager.get().getUserEmail();
+    this.state = {
+      loadingExport: false,
+      encryptionAvailable: encryptionAvailable,
+      email: email
+    };
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    UserPrefsManager.get().getLastExportDate().then((date) => {
+      this.setState({lastExportDate: date});
+    })
   }
 
   onExportPress = (option) => {
     let encrypted = option.key == "encrypted";
-    if(encrypted && !this.props.encryptionAvailable) {
+    if(encrypted && !this.state.encryptionAvailable) {
       Alert.alert('Not Available', "You must be signed in, or have a local passcode set, to generate an encrypted export file.", [{text: 'OK'}])
       return;
     }
+
     this.setState({loadingExport: true});
-    this.props.onExportPress(encrypted, () => {
-      this.setState({loadingExport: false});
-    })
+
+    this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManageBackups, async () => {
+      BackupsManager.get().export(encrypted).then((success) => {
+        if(success) {
+          var date = new Date();
+          this.setState({lastExportDate: date});
+          UserPrefsManager.get().setLastExportDate(date);
+        }
+        this.setState({loadingExport: false});
+      })
+    });
   }
 
   exportOptions = () => {
     return [
-      {title: "Encrypted", key: "encrypted", selected: this.props.encryptionAvailable},
+      {title: "Encrypted", key: "encrypted", selected: this.state.encryptionAvailable},
       {title: "Decrypted", key: "decrypted", selected: true}
     ];
   }
@@ -58,20 +86,22 @@ export default class OptionsSection extends Component {
       lastExportString = "Your data has not yet been backed up.";
     }
 
-    var hasLastExportSection = !this.props.signedIn;
+    let signedIn = !Auth.get().offline();
+
+    var hasLastExportSection = !signedIn;
 
     return (
       <TableSection>
 
         <SectionHeader title={this.props.title} />
 
-        {this.props.signedIn &&
-          <ButtonCell first={true} leftAligned={true} title={`Sign out (${this.props.email})`} onPress={this.props.onSignOutPress} />
+        {signedIn &&
+          <ButtonCell first={true} leftAligned={true} title={`Sign out (${this.state.email})`} onPress={this.props.onSignOutPress} />
         }
 
         <SectionedOptionsTableCell
           last={!hasLastExportSection}
-          first={!this.props.signedIn}
+          first={!signedIn}
           disabled={this.state.loadingExport}
           leftAligned={true}
           options={this.exportOptions()}
@@ -93,3 +123,5 @@ export default class OptionsSection extends Component {
     );
   }
 }
+
+export default withNavigation(OptionsSection);

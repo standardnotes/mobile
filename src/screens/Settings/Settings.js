@@ -107,17 +107,6 @@ export default class Settings extends Abstract {
     Sync.get().removeEventHandler(this.syncEventHandler);
   }
 
-  componentWillFocus() {
-    super.componentWillFocus();
-    this.loadLastExportDate();
-  }
-
-  async loadLastExportDate() {
-    UserPrefsManager.get().getLastExportDate().then((date) => {
-      this.setState({lastExportDate: date});
-    })
-  }
-
   componentDidFocus() {
     super.componentDidFocus();
     this.loadSecurityStatus();
@@ -266,19 +255,6 @@ export default class Settings extends Abstract {
         })
       }
     })
-  }
-
-  onExportPress = async (encrypted, callback) => {
-    this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManageBackups, async () => {
-      BackupsManager.get().export(encrypted, callback).then((success) => {
-        if(success) {
-          var date = new Date();
-          this.setState({lastExportDate: date});
-          UserPrefsManager.get().setLastExportDate(date);
-        }
-        callback();
-      })
-    });
   }
 
   onStorageEncryptionEnable = () => {
@@ -435,15 +411,9 @@ export default class Settings extends Abstract {
           }
 
           <OptionsSection
-            signedIn={signedIn}
-            lastExportDate={this.state.lastExportDate}
             title={"Options"}
-            encryptionAvailable={KeysManager.get().activeKeys()}
             onSignOutPress={this.onSignOutPress}
-            onExportPress={this.onExportPress}
-            email={KeysManager.get().getUserEmail()}
           />
-
 
           <TableSection>
             <SectionHeader title={"Sort Notes By"} buttonText={this.options.sortReverse ? "Disable Reverse Sort" : "Enable Reverse Sort"} buttonAction={this.toggleSortReverse} />
@@ -500,9 +470,7 @@ export default class Settings extends Abstract {
             title={"Security"}
           />
 
-          <EncryptionSection
-            title={"Encryption Status"}
-          />
+          <EncryptionSection title={"Encryption Status"}/>
 
           <CompanySection title={"Standard Notes"}/>
 
