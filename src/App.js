@@ -15,8 +15,7 @@ import Storage from './lib/sfjs/storageManager'
 import ReviewManager from './lib/reviewManager';
 
 import Compose from "@Screens/Compose"
-import Notes from "@Screens/Notes/Notes"
-import NotesTablet from "@Screens/Notes/NotesTablet"
+import Root from "@Screens/Root"
 import MainSideMenu from "@SideMenu/MainSideMenu"
 import NoteSideMenu from "@SideMenu/NoteSideMenu"
 import Settings from "@Screens/Settings/Settings"
@@ -33,7 +32,7 @@ if(__DEV__ === false) {
 }
 
 const AppStack = createStackNavigator({
-  Notes: {screen: ApplicationState.get().isTablet ? NotesTablet : Notes},
+  Notes: {screen: Root},
   Compose: {screen: Compose},
 
 }, {

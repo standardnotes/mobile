@@ -19,10 +19,6 @@ import OptionsState from "@Lib/OptionsState"
 import LockedView from "@Containers/LockedView"
 import ApplicationState from "@Lib/ApplicationState"
 
-import AuthenticationSourceAccountPassword from "@Screens/Authentication/Sources/AuthenticationSourceAccountPassword";
-import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
-import AuthenticationSourceBiometric from "@Screens/Authentication/Sources/AuthenticationSourceBiometric";
-
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
 
@@ -30,6 +26,9 @@ export default class Notes extends Abstract {
 
   constructor(props) {
     super(props);
+
+    this.options = ApplicationState.getOptions();
+    this.registerObservers();
 
     props.navigation.setParams({
       title: "Notes",
@@ -41,75 +40,18 @@ export default class Notes extends Abstract {
         }
       }
     })
-
-    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
-      if(authProps.sources.length > 0) {
-        this.presentAuthenticationModal(authProps);
-      }
-      else if(state == ApplicationState.GainingFocus) {
-        // we only want to perform sync here if the app is resuming, not if it's a fresh start
-        if(this.dataLoaded) {
-          Sync.get().sync();
-        }
-      }
-    })
   }
 
   loadInitialState() {
-    this.options = ApplicationState.getOptions();
-
+    let encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.mergeState({
       refreshing: false,
-      decrypting: false,
-      loading: true,
+      decrypting: encryptionEnabled,
+      loading: !encryptionEnabled,
       notes: []
     });
 
-    this.registerObservers();
-    this.initializeNotes();
-    this.beginSyncTimer();
-
     super.loadInitialState();
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    if(this.authOnMount) {
-      // Perform in timeout to avoid stutter when presenting modal on initial app start.
-      setTimeout(() => {
-        this.presentAuthenticationModal(this.authOnMount);
-        this.authOnMount = null;
-      }, 20);
-    }
-  }
-
-  presentAuthenticationModal(authProps) {
-    if(!this.isMounted()) {
-      console.log("Not yet mounted, not authing.");
-      this.authOnMount = authProps;
-      return;
-    }
-
-
-    if(this.authenticationInProgress) {
-      console.log('Not presenting auth modal because one is already presented.');
-      return;
-    }
-
-    this.authenticationInProgress = true;
-
-    this.props.navigation.navigate("Authenticate", {
-      authenticationSources: authProps.sources,
-      onSuccess: () => {
-        authProps.onAuthenticate();
-        this.authenticationInProgress = false;
-
-        if(this.dataLoaded) {
-          Sync.get().sync();
-        }
-      }
-    });
   }
 
   unlockContent() {
@@ -117,25 +59,36 @@ export default class Notes extends Abstract {
     this.configureNavBar(true);
   }
 
+  componentWillFocus() {
+    super.componentWillFocus();
+
+    if(this.loadNotesOnVisible) {
+      this.loadNotesOnVisible = false;
+      this.reloadList();
+    }
+  }
+
+  componentDidFocus() {
+    super.componentDidFocus();
+
+    this.setSideMenuHandler();
+
+    this.forceUpdate();
+
+    if(this.needsConfigureNavBar) {
+      this.configureNavBar(false);
+    }
+  }
+
   componentWillUnmount() {
     super.componentWillUnmount();
-    ApplicationState.get().removeStateObserver(this.stateObserver);
 
     Sync.get().removeEventHandler(this.syncObserver);
-    Sync.get().removeSyncStatusObserver(this.syncStatusObserver);
 
     Auth.get().removeEventHandler(this.signoutObserver);
     if(this.options) {
       this.options.removeChangeObserver(this.optionsObserver);
     }
-    clearInterval(this.syncTimer);
-  }
-
-  beginSyncTimer() {
-    // Refresh every 30s
-    this.syncTimer = setInterval(function () {
-      Sync.get().sync(null);
-    }, 30000);
   }
 
   registerObservers() {
@@ -143,8 +96,7 @@ export default class Notes extends Abstract {
       // this.props.navigation.closeLeftDrawer();
       // should only show for non-search term change
       if(eventType !== OptionsState.OptionsStateChangeEventSearch) {
-        this.setTitle(null, "Loading...");
-        this.showingNavBarLoadingStatus = true;
+        this.setSubTitle("Loading...");
       }
       this.reloadList(true);
       this.configureNavBar();
@@ -160,32 +112,13 @@ export default class Notes extends Abstract {
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
       if(event == "sync:completed") {
         this.mergeState({refreshing: false, loading: false});
+      } else if(event == "local-data-loaded") {
+        this.displayNeedSignInAlertForLocalItemsIfApplicable(ModelManager.get().allItems);
+        this.reloadList();
+        this.configureNavBar(true);
+        this.mergeState({decrypting: false, loading: false});
       } else if(event == "sync-exception") {
         Alert.alert("Issue Syncing", `There was an error while trying to save your items. Please contact support and share this message: ${data}`);
-      }
-    })
-
-    this.syncStatusObserver = Sync.get().registerSyncStatusObserver((status) => {
-      if(status.error) {
-        var text = `Unable to connect to sync server.`
-        this.showingErrorStatus = true;
-        setTimeout( () => {
-          // need timeout for syncing on app launch
-          this.setStatusBarText(text);
-        }, 250);
-      } else if(status.retrievedCount > 20) {
-        var text = `Downloading ${status.retrievedCount} items. Keep app opened.`
-        this.setStatusBarText(text);
-        this.showingDownloadStatus = true;
-      } else if(this.showingDownloadStatus) {
-        this.showingDownloadStatus = false;
-        var text = "Download Complete.";
-        this.setStatusBarText(text);
-        setTimeout(() => {
-          this.setStatusBarText(null);
-        }, 2000);
-      } else if(this.showingErrorStatus) {
-        this.setStatusBarText(null);
       }
     })
 
@@ -197,58 +130,14 @@ export default class Notes extends Abstract {
         Sync.get().refreshErroredItems().then(() => {
           this.reloadList();
         })
-      } else if(event == SFAuthManager.DidSignOutEvent) {
-        this.setStatusBarText(null);
       }
     });
   }
 
-  setStatusBarText(text) {
-    // this.mergeState({showSyncBar: text != null, syncBarText: text});
-    this.setSubTitle(text);
-  }
-
-  initializeNotes() {
-    var encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
-    this.mergeState({decrypting: encryptionEnabled, loading: !encryptionEnabled})
-
-    this.setStatusBarText(encryptionEnabled ? "Decrypting notes..." : "Loading notes...");
-    let incrementalCallback = (current, total) => {
-      let notesString = `${current}/${total} items...`
-      this.setStatusBarText(encryptionEnabled ? `Decrypting ${notesString}` : `Loading ${notesString}`);
-      // Incremental Callback
-      if(!this.dataLoaded) {
-        this.dataLoaded = true;
-        this.configureNavBar(true);
-      }
-      this.reloadList();
-    }
-
-    let loadLocalCompletion = (items) => {
-      this.setStatusBarText("Syncing...");
-      this.displayNeedSignInAlertForLocalItemsIfApplicable(items);
-      this.dataLoaded = true;
-      this.reloadList();
-      this.configureNavBar(true);
-      this.mergeState({decrypting: false, loading: false});
-      // perform initial sync
-      Sync.get().sync().then(() => {
-        this.setStatusBarText(null);
-      });
-    }
-
-    if(Sync.get().initialDataLoaded()) {
-      // Data can be already loaded in the case of a theme change
-      loadLocalCompletion();
-    } else {
-      let batchSize = 100;
-      Sync.get().loadLocalItems(incrementalCallback, batchSize).then((items) => {
-        setTimeout(() => {
-          loadLocalCompletion(items);
-        });
-      });
-    }
-
+  // Called by Root.js
+  root_onIncrementalSync() {
+    this.reloadList();
+    this.configureNavBar(true);
   }
 
   /* If there is at least one item that has an error decrypting, and there are no account keys saved,
@@ -300,15 +189,6 @@ export default class Notes extends Abstract {
     this.setTitle(notesTitle, null);
   }
 
-  componentDidUpdate() {
-    // Called when render is complete
-    if(this.showingNavBarLoadingStatus) {
-      setTimeout(() => {
-        this.showingNavBarLoadingStatus = false;
-      }, 50);
-    }
-  }
-
   setSideMenuHandler() {
     SideMenuManager.get().setHandlerForLeftSideMenu({
       onTagSelect: (tag) => {
@@ -321,27 +201,6 @@ export default class Notes extends Abstract {
         return ModelManager.get().getTagsWithIds(ids);
       }
     })
-  }
-
-  componentDidFocus() {
-    super.componentDidFocus();
-
-    this.setSideMenuHandler();
-
-    this.forceUpdate();
-
-    if(this.needsConfigureNavBar) {
-      this.configureNavBar(false);
-    }
-  }
-
-  componentWillFocus() {
-    super.componentWillFocus();
-
-    if(this.loadNotesOnVisible) {
-      this.loadNotesOnVisible = false;
-      this.reloadList();
-    }
   }
 
   async presentComposer(note) {
@@ -383,11 +242,11 @@ export default class Notes extends Abstract {
   }
 
   _onRefresh() {
-    this.setStatusBarText("Syncing...");
+    this.setSubTitle("Syncing...");
     this.setState({refreshing: true});
     Sync.get().sync().then(() => {
       setTimeout(() => {
-        this.setStatusBarText(null);
+        this.setSubTitle(null);
       }, 100);
     })
   }
@@ -433,8 +292,6 @@ export default class Notes extends Abstract {
       return <LockedView />;
     }
 
-    var syncStatus = Sync.get().syncStatus;
-
     return (
       <View style={StyleKit.styles.container}>
         {this.state.notes &&
@@ -454,12 +311,6 @@ export default class Notes extends Abstract {
           />
         }
 
-        {this.state.showSyncBar &&
-          <View style={this.styles.syncBar}>
-            <Text style={this.styles.syncBarText}>{this.state.syncBarText}</Text>
-          </View>
-        }
-
         <FAB
           buttonColor={StyleKit.variable("stylekitInfoColor")}
           iconTextColor={StyleKit.variable("stylekitInfoContrastColor")}
@@ -473,18 +324,7 @@ export default class Notes extends Abstract {
 
   loadStyles() {
     this.styles = {
-      syncBar: {
-        position: "absolute",
-        bottom: 0,
-        width: "100%",
-        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
-        padding: 5
-      },
 
-      syncBarText: {
-        textAlign: "center",
-        color: StyleKit.variables.stylekitContrastForegroundColor
-      },
     }
   }
 }
