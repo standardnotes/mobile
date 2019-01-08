@@ -59,6 +59,9 @@ export default class PrivilegesManager extends SFPrivilegesManager {
     let sources = await this.sourcesForAction(action);
 
     navigation.navigate("Authenticate", {
+      leftButton: {
+        title: "Cancel",
+      },
       authenticationSources: sources,
       hasCancelOption: true,
       onSuccess: () => {
