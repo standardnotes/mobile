@@ -368,7 +368,7 @@ export default class Compose extends Abstract {
     var shouldDisplayEditor = noteEditor != null && this.note.uuid;
 
     return (
-      <SafeAreaView style={[this.styles.container, StyleKit.styles.container]}>
+      <View style={[this.styles.container, StyleKit.styles.container]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
             <Icon name={Icons.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
@@ -438,7 +438,7 @@ export default class Compose extends Abstract {
             editable={!this.note.locked}
           />
         }
-      </SafeAreaView>
+      </View>
     );
   }
 

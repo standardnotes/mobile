@@ -300,7 +300,7 @@ export default class Notes extends Abstract {
     }
 
     return (
-      <SafeAreaView style={StyleKit.styles.container}>
+      <View style={StyleKit.styles.container}>
         {this.state.notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}
@@ -325,7 +325,7 @@ export default class Notes extends Abstract {
           visible={true}
           iconTextComponent={<Icon name="md-add"/>}
         />
-      </SafeAreaView>
+      </View>
     );
   }
 
