@@ -95,11 +95,16 @@ export default class Notes extends Abstract {
     this.optionsObserver = this.options.addChangeObserver((options, eventType) => {
       // this.props.navigation.closeLeftDrawer();
       // should only show for non-search term change
+      let setSubtitle = false;
       if(eventType !== OptionsState.OptionsStateChangeEventSearch) {
+        setSubTitle = true;
         this.setSubTitle("Loading...");
       }
       this.reloadList(true);
       this.configureNavBar();
+      if(setSubTitle) {
+        this.setSubTitle(null);
+      }
       if(ApplicationState.get().isTablet) {
         this.selectFirstNote();
       }

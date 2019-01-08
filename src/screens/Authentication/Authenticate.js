@@ -63,6 +63,10 @@ export default class Authenticate extends Abstract {
   }
 
   submitPressed() {
+    if(this.pendingSources.length == 1) {
+      this.setState({submitDisabled: true});
+    }
+
     if(this.state.activeSource) {
       this.validateAuthentication(this.state.activeSource);
     }
@@ -109,6 +113,7 @@ export default class Authenticate extends Abstract {
     if(this.successfulSources.length == this.sources.length) {
       this.onSuccess();
     } else {
+      this.setState({submitDisabled: false});
       this.beginNextAuthentication();
     }
   }
@@ -202,6 +207,7 @@ export default class Authenticate extends Abstract {
           <ButtonCell
             style={this.styles.submitButtonCell}
             maxHeight={45}
+            disabled={this.state.submitDisabled}
             title={this.pendingSources.length > 1 ? "Next" : "Submit"}
             bold={true}
             onPress={() => this.submitPressed()}
