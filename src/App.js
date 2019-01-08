@@ -19,6 +19,7 @@ import MainSideMenu from "@SideMenu/MainSideMenu"
 import NoteSideMenu from "@SideMenu/NoteSideMenu"
 import Settings from "@Screens/Settings/Settings"
 import InputModal from "@Screens/InputModal"
+import ManagePrivileges from "@Screens/ManagePrivileges"
 import Authenticate from "@Screens/Authentication/Authenticate"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
@@ -76,12 +77,16 @@ const AuthenticateModalStack = createStackNavigator({
   Screen1: Authenticate
 })
 
+const ManagePrivilegesStack = createStackNavigator({
+  Screen1: ManagePrivileges
+})
+
 const AppDrawer = createStackNavigator({
   Home: AppDrawerStack,
   Settings: SettingsStack,
   InputModal: InputModalStack,
   Authenticate: AuthenticateModalStack,
-
+  ManagePrivileges: ManagePrivilegesStack
 }, {
   mode: "modal",
   headerMode: 'none',

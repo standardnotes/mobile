@@ -59,6 +59,9 @@ export default class PrivilegesManager extends SFPrivilegesManager {
 
     let sources = await this.sourcesForAction(action);
 
+    let sessionLengthOptions = await this.getSessionLengthOptions();
+    let selectedSessionLength = await this.getSelectedSessionLength();
+
     navigation.navigate("Authenticate", {
       leftButton: {
         title: ApplicationState.isIOS ? "Cancel" : null,
@@ -66,7 +69,10 @@ export default class PrivilegesManager extends SFPrivilegesManager {
       },
       authenticationSources: sources,
       hasCancelOption: true,
-      onSuccess: () => {
+      sessionLengthOptions: sessionLengthOptions,
+      selectedSessionLength: selectedSessionLength,
+      onSuccess: (selectedSessionLength) => {
+        this.setSessionLength(selectedSessionLength);
         customSuccess();
       },
       onCancel: () => {

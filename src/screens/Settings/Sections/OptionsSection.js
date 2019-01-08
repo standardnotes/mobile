@@ -95,13 +95,15 @@ class OptionsSection extends Abstract {
 
         <SectionHeader title={this.props.title} />
 
+        <ButtonCell first={true} leftAligned={true} title={`Manage Privileges`} onPress={this.props.onManagePrivileges} />
+
         {signedIn &&
-          <ButtonCell first={true} leftAligned={true} title={`Sign out (${this.state.email})`} onPress={this.props.onSignOutPress} />
+          <ButtonCell leftAligned={true} title={`Sign out (${this.state.email})`} onPress={this.props.onSignOutPress} />
         }
 
         <SectionedOptionsTableCell
           last={!hasLastExportSection}
-          first={!signedIn}
+          first={false}
           disabled={this.state.loadingExport}
           leftAligned={true}
           options={this.exportOptions()}

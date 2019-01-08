@@ -35,6 +35,8 @@ export default class Authenticate extends Abstract {
       source.initializeForInterface();
     }
 
+    this._sessionLength = this.getProp("selectedSessionLength");
+
     // if(__DEV__) {
       // props.navigation.setParams({
       //   leftButton: {
@@ -131,12 +133,21 @@ export default class Authenticate extends Abstract {
   componentWillBlur() {
     super.componentWillBlur();
     if(this.successful) {
-      this.getProp("onSuccess")();
+      this.getProp("onSuccess")(this._sessionLength);
     }
   }
 
   inputTextChanged(text, source) {
     source.setAuthenticationValue(text);
+    this.forceUpdate();
+  }
+
+  get sessionLengthOptions() {
+    return this.getProp("sessionLengthOptions");
+  }
+
+  setSessionLength(length) {
+    this._sessionLength = length;
     this.forceUpdate();
   }
 
@@ -215,6 +226,22 @@ export default class Authenticate extends Abstract {
             onPress={() => this.submitPressed()}
           />
 
+          {this.sessionLengthOptions && this.sessionLengthOptions.length > 0 &&
+            <View style={this.styles.rememberForSection}>
+              <SectionHeader title={"Remember For"} />
+              {this.sessionLengthOptions.map((option, index) =>
+                <SectionedAccessoryTableCell
+                  text={option.label}
+                  key={`${index}`}
+                  first={index == 0}
+                  last={index == this.sessionLengthOptions.length - 1}
+                  selected={() => {return option.value == this._sessionLength}}
+                  onPress={() => {this.setSessionLength(option.value)}}
+                />
+              )}
+            </View>
+          }
+
         </ScrollView>
       </View>
     )
@@ -222,12 +249,11 @@ export default class Authenticate extends Abstract {
 
   loadStyles() {
     this.styles = {
-      authSourceSection: {
-      },
       authSourceSectionNotLast: {
         marginBottom: 10
       },
-      submitButtonCell: {
+      rememberForSection: {
+        marginTop: 10
       }
     }
   }

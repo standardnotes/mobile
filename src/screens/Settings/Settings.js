@@ -250,6 +250,7 @@ export default class Settings extends Abstract {
           <OptionsSection
             title={"Options"}
             onSignOutPress={this.onSignOutPress}
+            onManagePrivileges={() => {this.props.navigation.navigate("ManagePrivileges")}}
           />
 
           <TableSection>
