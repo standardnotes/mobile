@@ -154,8 +154,8 @@ export default class Settings extends Abstract {
 
           // make sure it has valid items
           if(_.keys(keys).length > 0) {
-            KeysManager.get().persistOfflineKeys(keys);
             KeysManager.get().setOfflineAuthParams(authParams);
+            KeysManager.get().persistOfflineKeys(keys);
             var encryptionSource = KeysManager.get().encryptionSource();
             if(encryptionSource == "offline") {
               this.resaveOfflineData(null, true);

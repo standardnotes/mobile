@@ -50,7 +50,7 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
     var authParams = KeysManager.get().offlineAuthParams;
     let keys = await SF.get().crypto.computeEncryptionKeysForUser(this.authenticationValue, authParams);
     if(keys.pw === KeysManager.get().offlinePasscodeHash()) {
-      KeysManager.get().setOfflineKeys(keys);
+      await KeysManager.get().setOfflineKeys(keys);
       return this._success();
     } else {
       return this._fail("Invalid local passcode. Please try again.");
