@@ -153,6 +153,10 @@ export default class AuthSection extends Component {
     }
   }
 
+  cancelMfa = () => {
+    this.setState({mfa: null});
+  }
+
   _renderRegistrationConfirm() {
     var padding = 14;
     return (
@@ -190,11 +194,36 @@ export default class AuthSection extends Component {
   }
 
   _renderDefaultContent() {
+
     let textPadding = 14;
-    return (
-      <TableSection>
-        <SectionHeader title={this.props.title} />
-        {!this.state.mfa &&
+
+    const renderMfaSubcontent = () => {
+      return (
+        <View>
+          <Text style={[StyleKit.styles.uiText, {paddingLeft: textPadding, paddingRight: textPadding, marginBottom: textPadding}]}>
+            {this.state.mfa.message}
+          </Text>
+          <SectionedTableCell textInputCell={true} first={true}>
+            <TextInput
+              style={StyleKit.styles.sectionedTableCellTextInput}
+              placeholder=""
+              onChangeText={(text) => this.setState({mfa_token: text})}
+              value={this.state.mfa_token}
+              keyboardType={'numeric'}
+              keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+              autoFocus={true}
+              underlineColorAndroid={'transparent'}
+              placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
+              onSubmitEditing={this.onSignInPress}
+            />
+          </SectionedTableCell>
+        </View>
+      )
+    }
+
+    const renderNonMfaSubcontent = () => {
+      return (
+        <Fragment>
           <View>
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
@@ -224,59 +253,54 @@ export default class AuthSection extends Component {
               />
             </SectionedTableCell>
           </View>
-        }
 
+          {(this.state.showAdvanced || !this.state.server) &&
+            <View>
+              <SectionHeader title={"Advanced"} />
+              <SectionedTableCell textInputCell={true} first={true}>
+                <TextInput
+                  style={StyleKit.styles.sectionedTableCellTextInput}
+                  placeholder={"Sync Server"}
+                  onChangeText={(text) => this.setState({server: text})}
+                  value={this.state.server}
+                  autoCorrect={false}
+                  autoCapitalize={'none'}
+                  keyboardType={'url'}
+                  keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+                  underlineColorAndroid={'transparent'}
+                  placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
+                />
+              </SectionedTableCell>
+
+              <SectionedAccessoryTableCell
+                onPress={() => this.toggleStrictMode()}
+                text={"Use strict sign in"}
+                selected={() => {return this.state.strictSignIn}}
+                first={false}
+                last={true}
+              />
+            </View>
+          }
+        </Fragment>
+      )
+    }
+
+    return (
+      <TableSection>
+        <SectionHeader title={this.props.title} />
         {this.state.mfa &&
-          <View>
-            <Text style={[StyleKit.styles.uiText, {paddingLeft: textPadding, paddingRight: textPadding, marginBottom: textPadding}]}>
-              {this.state.mfa.message}
-            </Text>
-            <SectionedTableCell textInputCell={true} first={true}>
-              <TextInput
-                style={StyleKit.styles.sectionedTableCellTextInput}
-                placeholder=""
-                onChangeText={(text) => this.setState({mfa_token: text})}
-                value={this.state.mfa_token}
-                keyboardType={'numeric'}
-                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
-                autoFocus={true}
-                underlineColorAndroid={'transparent'}
-                placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
-                onSubmitEditing={this.onSignInPress}
-              />
-            </SectionedTableCell>
-          </View>
+          renderMfaSubcontent()
         }
 
-        {(this.state.showAdvanced || !this.state.server) && !this.state.mfa &&
-          <View>
-            <SectionHeader title={"Advanced"} />
-            <SectionedTableCell textInputCell={true} first={true}>
-              <TextInput
-                style={StyleKit.styles.sectionedTableCellTextInput}
-                placeholder={"Sync Server"}
-                onChangeText={(text) => this.setState({server: text})}
-                value={this.state.server}
-                autoCorrect={false}
-                autoCapitalize={'none'}
-                keyboardType={'url'}
-                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
-                underlineColorAndroid={'transparent'}
-                placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
-              />
-            </SectionedTableCell>
-
-            <SectionedAccessoryTableCell
-              onPress={() => this.toggleStrictMode()}
-              text={"Use strict sign in"}
-              selected={() => {return this.state.strictSignIn}}
-              first={false}
-              last={true}
-            />
-          </View>
+        {!this.state.mfa &&
+          renderNonMfaSubcontent()
         }
 
         <ButtonCell title={this.state.signInButtonText} disabled={this.state.signingIn} bold={true} onPress={() => this.onSignInPress()} />
+
+        {this.state.mfa &&
+          <ButtonCell last={this.state.showAdvanced} title={"Cancel"} disabled={this.state.signingIn} onPress={() => this.cancelMfa()} />
+        }
 
         {!this.state.mfa &&
           <ButtonCell last={this.state.showAdvanced} title={this.state.registerButtonText} disabled={this.state.registering} bold={true} onPress={() => this.onRegisterPress()} />

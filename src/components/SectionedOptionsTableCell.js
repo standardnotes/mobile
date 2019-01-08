@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import {View, Text, TouchableHighlight} from 'react-native';
+import ThemedComponent from "@Components/ThemedComponent";
 
 import StyleKit from "@Style/StyleKit"
 
-export default class SectionedOptionsTableCell extends Component {
+export default class SectionedOptionsTableCell extends ThemedComponent {
 
   rules() {
     var rules = [StyleKit.styles.sectionedTableCell];
@@ -26,62 +27,66 @@ export default class SectionedOptionsTableCell extends Component {
     return rules;
   }
 
-  constructor(props) {
-    super(props);
-
-    this.titleStyles = {
-      width: "42%",
-      minWidth: 0
-    }
-
-    this.optionsContainerStyle = {
-      width: "58%",
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: StyleKit.variable("stylekitBackgroundColor")
-    }
-
-    this.buttonContainerStyles = {
-      borderLeftColor: StyleKit.variable("stylekitBorderColor"),
-      borderLeftWidth: 1,
-      height: "100%",
-      flexGrow: 1,
-      padding: 10,
-      paddingTop: 12
-    };
-
-    this.buttonStyles = {
-      color: StyleKit.variable("stylekitNeutralColor"),
-      fontSize: 16,
-      textAlign: "center",
-      width: "100%",
-    }
-
-    this.selectedButtonStyles = {
-      color: StyleKit.variable("stylekitInfoColor"),
-    }
-  }
-
   render() {
     return (
       <View style={this.rules()}>
-        <Text style={[StyleKit.styles.sectionedAccessoryTableCellLabel, this.titleStyles]}>{this.props.title}</Text>
-        <View style={this.optionsContainerStyle}>
+        <Text style={[StyleKit.styles.sectionedAccessoryTableCellLabel, this.styles.titleStyles]}>{this.props.title}</Text>
+        <View style={this.styles.optionsContainerStyle}>
           {this.props.options.map((option) => {
-            var buttonStyles = [this.buttonStyles];
+            var buttonStyles = [this.styles.buttonStyles];
             if(option.selected) {
-              buttonStyles.push(this.selectedButtonStyles);
+              buttonStyles.push(this.styles.selectedButtonStyles);
             }
             return (
-              <TouchableHighlight underlayColor={StyleKit.variable("stylekitBorderColor")} key={option.title} style={[StyleKit.styles.view, this.buttonContainerStyles]} onPress={() => {this.props.onPress(option)}}>
-                <Text style={buttonStyles}>{option.title}</Text>
+              <TouchableHighlight
+                underlayColor={StyleKit.variable("stylekitBorderColor")}
+                key={option.title}
+                style={[StyleKit.styles.view, this.styles.buttonContainerStyles]}
+                onPress={() => {this.props.onPress(option)}}>
+                  <Text style={buttonStyles}>{option.title}</Text>
               </TouchableHighlight>
             )
           })}
         </View>
       </View>
     )
+  }
+
+  loadStyles() {
+    this.styles = {
+      titleStyles: {
+        width: "42%",
+        minWidth: 0
+      },
+
+      optionsContainerStyle: {
+        width: "58%",
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: StyleKit.variable("stylekitBackgroundColor")
+      },
+
+      buttonContainerStyles: {
+        borderLeftColor: StyleKit.variable("stylekitBorderColor"),
+        borderLeftWidth: 1,
+        height: "100%",
+        flexGrow: 1,
+        padding: 10,
+        paddingTop: 12
+      },
+
+      buttonStyles: {
+        color: StyleKit.variable("stylekitNeutralColor"),
+        fontSize: 16,
+        textAlign: "center",
+        width: "100%",
+      },
+
+      selectedButtonStyles: {
+        color: StyleKit.variable("stylekitInfoColor"),
+      }
+    }
   }
 }

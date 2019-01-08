@@ -8,6 +8,7 @@ import ActionSheet from 'react-native-actionsheet'
 
 import Abstract from "@Screens/Abstract"
 import AlertManager from "@SFJS/alertManager"
+import Auth from "@SFJS/authManager"
 
 import SectionHeader from "@Components/SectionHeader";
 import TableSection from "@Components/TableSection";
@@ -31,6 +32,17 @@ export default class MainSideMenu extends AbstractSideMenu {
   constructor(props) {
     super(props);
     this.constructState({});
+
+    this.signoutObserver = Auth.get().addEventHandler((event) => {
+      if(event == SFAuthManager.DidSignOutEvent) {
+        this.forceUpdate();
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    Auth.get().removeEventHandler(this.signoutObserver);
   }
 
   presentSettings() {

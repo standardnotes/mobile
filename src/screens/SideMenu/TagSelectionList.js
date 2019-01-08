@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Sync from '@SFJS/syncManager'
 import ItemActionManager from '@Lib/itemActionManager'
 import ModelManager from '@SFJS/modelManager'
+import Auth from "@SFJS/authManager"
 
 import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
@@ -32,12 +33,18 @@ class TagSelectionList extends Component {
     let handleInitialDataLoad = () => {
       if(this.handledDataLoad) { return; }
       this.handledDataLoad = true;
-      this.reloadTags();
+      this.reload();
     }
 
     if(Sync.get().initialDataLoaded()) {
       handleInitialDataLoad();
     }
+
+    this.signoutObserver = Auth.get().addEventHandler((event) => {
+      if(event == SFAuthManager.DidSignOutEvent) {
+        this.reload();
+      }
+    });
 
     this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
       if(event == "local-data-loaded") {
@@ -48,7 +55,7 @@ class TagSelectionList extends Component {
         let inRetrieved = data.retrievedItems && _.find(data.retrievedItems, {content_type: this.props.contentType});
         let inSaved = data.savedItems && _.find(data.savedItems, {content_type: this.props.contentType});
         if(inRetrieved || inSaved) {
-          this.reloadTags();
+          this.reload();
         }
       }
     })
@@ -56,9 +63,10 @@ class TagSelectionList extends Component {
 
   componentWillUnmount() {
     Sync.get().removeEventHandler(this.syncEventHandler);
+    Auth.get().removeEventHandler(this.signoutObserver);
   }
 
-  reloadTags() {
+  reload = () => {
     let tags;
     if(this.props.contentType == "Tag") {
       tags = ModelManager.get().tags.slice();
@@ -97,7 +105,7 @@ class TagSelectionList extends Component {
         }}),
         ActionSheetWrapper.BuildOption({text: "Delete", destructive: true, callback: () => {
           ItemActionManager.handleEvent(ItemActionManager.DeleteEvent, tag, () => {
-            this.reloadTags();
+            this.reload();
           });
         }})
       ], onCancel: () => {

@@ -33,9 +33,9 @@ export default class StyleKit {
 
     this.createDefaultThemes();
 
-    KeysManager.get().registerAccountRelatedStorageKeys(["activeTheme"]);
+    KeysManager.get().registerAccountRelatedStorageKeys(["savedTheme"]);
 
-    ModelManager.get().addItemSyncObserver("themes", "SN|Theme", function(allItems, validItems, deletedItems, source){
+    ModelManager.get().addItemSyncObserver("themes", "SN|Theme", (allItems, validItems, deletedItems, source) => {
       if(this.activeTheme && this.activeTheme.isSwapIn) {
         var matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
         if(matchingTheme) {
@@ -44,7 +44,13 @@ export default class StyleKit {
           this.activeTheme.setMobileActive(true);
         }
       }
-    }.bind(this));
+    });
+
+    this.signoutObserver = Auth.get().addEventHandler((event) => {
+      if(event == SFAuthManager.DidSignOutEvent) {
+        this.activateTheme(this.systemThemes[0]);
+      }
+    });
   }
 
   addThemeChangeObserver(observer) {

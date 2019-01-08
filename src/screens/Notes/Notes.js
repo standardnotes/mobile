@@ -123,7 +123,9 @@ export default class Notes extends Abstract {
     })
 
     this.signoutObserver = Auth.get().addEventHandler((event) => {
-      if(event == SFAuthManager.WillSignInEvent) {
+      if(event == SFAuthManager.DidSignOutEvent) {
+        this.reloadList();
+      } else if(event == SFAuthManager.WillSignInEvent) {
         this.mergeState({loading: true})
       } else if(event == SFAuthManager.DidSignInEvent) {
         // Check if there are items that are errorDecrypting and try decrypting with new keys
