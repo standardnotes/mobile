@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
-import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import ActionSheet from 'react-native-actionsheet'
 import ApplicationState from "@Lib/ApplicationState"

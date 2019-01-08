@@ -7,7 +7,6 @@ import ItemActionManager from '@Lib/itemActionManager'
 import ModelManager from '@SFJS/modelManager'
 import Auth from "@SFJS/authManager"
 
-import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import SideMenuCell from "@SideMenu/SideMenuCell"
 
@@ -166,7 +165,7 @@ class TagSelectionList extends ThemedComponent {
       emptyPlaceholderText: {
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.6,
-        paddingRight: 40,
+        paddingRight: 30,
         lineHeight: 18
       }
     }

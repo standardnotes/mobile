@@ -14,7 +14,6 @@ import SectionHeader from "@Components/SectionHeader";
 import TableSection from "@Components/TableSection";
 import LockedView from "@Containers/LockedView";
 
-import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
@@ -117,8 +116,14 @@ export default class MainSideMenu extends AbstractSideMenu {
     // Red and Blue default
     if(themes.length == 2) {
       options.push(SideMenuSection.BuildOption({
-        text: "Get Themes",
+        text: "Get More Themes",
         key: "get-theme",
+        iconDesc: {
+          type: "icon",
+          name: StyleKit.nameForIcon("brush"),
+          side: "right",
+          size: 17
+        },
         onSelect: () => { Linking.openURL("https://standardnotes.org/extensions")},
       }));
     }
@@ -171,7 +176,9 @@ export default class MainSideMenu extends AbstractSideMenu {
             iconTextColor={StyleKit.variables.stylekitInfoContrastColor}
             onClickAction={() => {this.presentSettings()}}
             visible={true}
-            iconTextComponent={<Icon name={"md-settings"}/>}
+            size={29}
+            paddingTop={2}
+            iconTextComponent={<Icon name={StyleKit.nameForIcon("settings")}/>}
           />
 
         </SafeAreaView>

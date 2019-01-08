@@ -52,30 +52,30 @@
 			</dict>
 		</dict>
 	</dict>
-  <key>CFBundleIcons~ipad</key>
-  <dict>
-    <key>CFBundlePrimaryIcon</key>
-    <dict>
-      <key>CFBundleIconFiles</key>
-      <array>
-        <string>Blue</string>
-      </array>
-      <key>UIPrerenderedIcon</key>
-      <false/>
-    </dict>
-    <key>CFBundleAlternateIcons</key>
-    <dict>
-      <key>Red</key>
-      <dict>
-        <key>CFBundleIconFiles</key>
-        <array>
-          <string>Red</string>
-        </array>
-        <key>UIPrerenderedIcon</key>
-        <true/>
-      </dict>
-    </dict>
-  </dict>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>Blue</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<false/>
+		</dict>
+		<key>CFBundleAlternateIcons</key>
+		<dict>
+			<key>Red</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>Red</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -90,7 +90,7 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Face ID is required to unlock your notes.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Entypo.ttf</string>
@@ -104,6 +104,10 @@
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
 		<string>Feather.ttf</string>
+		<string>AntDesign.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

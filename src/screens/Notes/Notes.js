@@ -18,7 +18,6 @@ import NoteList from "@Screens/Notes/NoteList"
 import OptionsState from "@Lib/OptionsState"
 import LockedView from "@Containers/LockedView"
 import ApplicationState from "@Lib/ApplicationState"
-
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
 
@@ -34,7 +33,7 @@ export default class Notes extends Abstract {
       title: "Notes",
       leftButton: {
         title: null,
-        iconName: "ios-menu-outline",
+        iconName: StyleKit.nameForIcon("menu"),
         onPress: () => {
           this.props.navigation.openLeftDrawer();
         }
@@ -323,7 +322,9 @@ export default class Notes extends Abstract {
           iconTextColor={StyleKit.variable("stylekitInfoContrastColor")}
           onClickAction={() => {this.handleSelection()}}
           visible={true}
-          iconTextComponent={<Icon name="md-add"/>}
+          size={30}
+          paddingTop={1}
+          iconTextComponent={<Icon style={{textAlignVertical: "center"}} name={StyleKit.nameForIcon("add")}/>}
         />
       </View>
     );

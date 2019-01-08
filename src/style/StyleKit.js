@@ -8,7 +8,6 @@ import Auth from "@Lib/sfjs/authManager"
 import KeysManager from '@Lib/keysManager'
 import CSSParser from "@Style/Util/CSSParser";
 import ThemeDownloader from "@Style/Util/ThemeDownloader"
-import Icons from '@Style/Icons';
 import IconChanger from 'react-native-alternate-icons';
 
 import redJSON from './Themes/red.json';
@@ -262,8 +261,6 @@ export default class StyleKit {
     }
 
     this.reloadStyles();
-
-    Icons.get().loadIcons();
 
     this.notifyObserversOfThemeChange();
   }
@@ -520,6 +517,11 @@ export default class StyleKit {
       mainTextFontSize: 16,
       paddingLeft: 14
     }
+  }
+
+  static nameForIcon(iconName) {
+    const iconPrefix = Platform.OS == "android" ? "md" : "ios";
+    return iconPrefix + "-" + iconName;
   }
 
   static getColorLuminosity(hexCode) {

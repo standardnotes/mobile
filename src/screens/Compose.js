@@ -9,7 +9,6 @@ import SideMenuManager from "@SideMenu/SideMenuManager"
 import Abstract from "./Abstract"
 import Webview from "./Webview"
 import ComponentManager from '@Lib/componentManager'
-import Icons from '@Style/Icons';
 import ApplicationState from "@Lib/ApplicationState"
 import LockedView from "@Containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -38,7 +37,7 @@ export default class Compose extends Abstract {
       title: "Compose",
       rightButton: {
         title: null,
-        iconName: "ios-menu-outline",
+        iconName: StyleKit.nameForIcon("menu"),
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -122,7 +121,7 @@ export default class Compose extends Abstract {
       title: 'Compose',
       rightButton: {
         title: null,
-        iconName: "ios-menu-outline",
+        iconName: StyleKit.nameForIcon("menu"),
         onPress: () => {
           this.props.navigation.openRightDrawer();
         }
@@ -371,7 +370,7 @@ export default class Compose extends Abstract {
       <View style={[this.styles.container, StyleKit.styles.container]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
-            <Icon name={Icons.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
+            <Icon name={StyleKit.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
             <Text style={this.styles.lockedText}>Note Locked</Text>
           </View>
         }

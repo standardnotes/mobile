@@ -5,7 +5,6 @@ import Auth from "@SFJS/authManager"
 import KeysManager from "@Lib/keysManager"
 import ModelManager from "@SFJS/modelManager"
 
-import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import ThemedComponent from "@Components/ThemedComponent";
 

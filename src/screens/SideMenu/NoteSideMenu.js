@@ -13,7 +13,6 @@ import TableSection from "@Components/TableSection";
 import LockedView from "@Containers/LockedView";
 import ItemActionManager from "@Lib/itemActionManager"
 
-import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 import ModelManager from '@SFJS/modelManager'
@@ -144,7 +143,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
       let option = SideMenuSection.BuildOption({
         text: rawOption.text,
         key: rawOption.key,
-        iconDesc: { type: "icon", side: "right", name: Icons.nameForIcon(rawOption.icon) },
+        iconDesc: { type: "icon", side: "right", name: StyleKit.nameForIcon(rawOption.icon) },
         onSelect: () => {
           let run = () => {
             ItemActionManager.handleEvent(rawOption.key, this.note, () => {
@@ -195,11 +194,19 @@ export default class NoteSideMenu extends AbstractSideMenu {
       options.push(option);
     }
 
+
+    console.log("Editor options", editors);
     // Default
-    if(editors.length == 1) {
+    if(options.length == 1) {
       options.push(SideMenuSection.BuildOption({
-        text: "Get Editors",
+        text: "Get More Editors",
         key: "get-editors",
+        iconDesc: {
+          type: "icon",
+          name: StyleKit.nameForIcon("medical"),
+          side: "right",
+          size: 17
+        },
         onSelect: () => { Linking.openURL("https://standardnotes.org/extensions")},
       }));
     }
@@ -232,7 +239,12 @@ export default class NoteSideMenu extends AbstractSideMenu {
             <SideMenuSection title="Editors" options={editorOptions} collapsed={true} />
 
             <SideMenuSection title="Tags">
-              <TagSelectionList contentType="Tag" onTagSelect={this.onTagSelect} selectedTags={selectedTags} />
+              <TagSelectionList
+                contentType="Tag"
+                onTagSelect={this.onTagSelect}
+                selectedTags={selectedTags}
+                emptyPlaceholder={"Create a new tag using the tag button in the bottom right corner."}
+              />
             </SideMenuSection>
 
           </ScrollView>
@@ -242,7 +254,9 @@ export default class NoteSideMenu extends AbstractSideMenu {
             iconTextColor={StyleKit.variables.stylekitInfoContrastColor}
             onClickAction={() => {this.presentNewTag()}}
             visible={true}
-            iconTextComponent={<Icon name={"md-add"}/>}
+            size={30}
+            paddingTop={1}
+            iconTextComponent={<Icon name={StyleKit.nameForIcon("pricetag")}/>}
           />
         </SafeAreaView>
         {this.state.actionSheet && this.state.actionSheet}

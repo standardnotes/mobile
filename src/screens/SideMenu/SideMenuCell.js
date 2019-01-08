@@ -3,7 +3,6 @@ import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ThemedComponent from "@Components/ThemedComponent";
 
-import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import Circle from "@Components/Circle"
 
@@ -40,7 +39,7 @@ export default class SideMenuCell extends ThemedComponent {
     if(desc.type == "icon") {
       return (
         <View style={this.styles.iconGraphic}>
-          <Icon name={desc.name} size={20} color={this.styles.iconColor} />
+          <Icon name={desc.name} size={desc.size || 20} color={this.styles.iconColor} />
         </View>
       )
     } else if(desc.type == "ascii") {
@@ -125,7 +124,7 @@ export default class SideMenuCell extends ThemedComponent {
 
       iconContainerRight: {
         marginLeft: 6,
-        marginRight: 6,
+        marginRight: 4,
         height: "100%",
       },
 
@@ -147,11 +146,19 @@ export default class SideMenuCell extends ThemedComponent {
       },
 
       iconGraphic: {
-        marginTop: -3
+        marginTop: -3,
+        width: 20,
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
       },
 
       iconCircle: {
-        marginTop: -5
+        marginTop: -5,
+        width: 20,
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
       },
 
       iconAscii: {

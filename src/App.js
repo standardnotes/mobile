@@ -5,7 +5,6 @@ import { createStackNavigator, createAppContainer, createDrawerNavigator, Drawer
 
 import KeysManager from './lib/keysManager'
 import StyleKit from "./style/StyleKit"
-import Icons from '@Style/Icons';
 import ApplicationState from "@Lib/ApplicationState"
 import Auth from './lib/sfjs/authManager'
 import ModelManager from './lib/sfjs/modelManager'
@@ -146,10 +145,7 @@ export default class App extends Component {
 
   async loadInitialData() {
     await StyleKit.get().resolveInitialTheme();
-    await Promise.all([
-      Icons.get().loadIcons(),
-      KeysManager.get().loadInitialData(),
-    ])
+    await KeysManager.get().loadInitialData();
 
     let ready = () => {
       ApplicationState.get().receiveApplicationStartEvent();
