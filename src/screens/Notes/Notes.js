@@ -188,7 +188,7 @@ export default class Notes extends Abstract {
       }
     }
 
-    this.setTitle(notesTitle, null);
+    this.setTitle(notesTitle);
   }
 
   setSideMenuHandler() {

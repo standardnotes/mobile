@@ -157,7 +157,12 @@ export default class MainSideMenu extends AbstractSideMenu {
             </SideMenuSection>
 
             <SideMenuSection title="Tags">
-              <TagSelectionList contentType="Tag" onTagSelect={this.onTagSelect} selectedTags={selectedTags} />
+              <TagSelectionList
+                emptyPlaceholder={"No tags. Create one from the note composer."}
+                contentType="Tag"
+                onTagSelect={this.onTagSelect}
+                selectedTags={selectedTags}
+              />
             </SideMenuSection>
           </ScrollView>
 

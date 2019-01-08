@@ -87,10 +87,15 @@ export default class KeysManager {
 
         // storage encryption
         if(items[StorageEncryptionKey] == null) {
-          // default is false
-          this.storageEncryptionEnabled = false;
+          // default is true
+          // Note that this defaults to true, but doesn't dictate if it's actually applied.
+          // For example, when you first install the app and have no account and no passcode,
+          // There will be no encryption source available. In the syncManager key request handler,
+          // we check if this flag is true and if there are active keys. We use this to indicate that
+          // when keys become available, we want storage encryption to be enabled by default.
+          this._storageEncryptionEnabled = true;
         } else {
-          this.storageEncryptionEnabled = JSON.parse(items[StorageEncryptionKey]) == true;
+          this._storageEncryptionEnabled = JSON.parse(items[StorageEncryptionKey]) == true;
         }
 
         // user
@@ -231,17 +236,19 @@ export default class KeysManager {
   // Storage Encryption
 
   async enableStorageEncryption() {
-    this.storageEncryptionEnabled = true;
-    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
+    this._storageEncryptionEnabled = true;
+    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this._storageEncryptionEnabled));
   }
 
   async disableStorageEncryption() {
-    this.storageEncryptionEnabled = false;
-    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
+    this._storageEncryptionEnabled = false;
+    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this._storageEncryptionEnabled));
   }
 
   isStorageEncryptionEnabled() {
-    return this.storageEncryptionEnabled;
+    // See comment in loadInitialData regarding why the value of this._storageEncryptionEnabled is not sufficient
+    // to determine whether it's actually enabled
+    return this._storageEncryptionEnabled && this.activeKeys();
   }
 
 

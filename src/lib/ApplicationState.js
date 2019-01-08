@@ -4,7 +4,7 @@ import KeysManager from "@Lib/keysManager"
 import OptionsState from "@Lib/OptionsState"
 import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
 import AuthenticationSourceBiometric from "@Screens/Authentication/Sources/AuthenticationSourceBiometric";
-var pjson = require('../package.json')
+var pjson = require('../../package.json')
 
 export default class ApplicationState {
 

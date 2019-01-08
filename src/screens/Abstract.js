@@ -163,10 +163,9 @@ export default class Abstract extends ThemedComponent {
     return this.props.navigation.getParam && this.props.navigation.getParam(prop);
   }
 
-  setTitle(title, subtitle) {
+  setTitle(title) {
     let options = {};
     options.title = title;
-    options.subtitle = subtitle;
     this.props.navigation.setParams(options);
   }
 

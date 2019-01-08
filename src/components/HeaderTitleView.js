@@ -16,7 +16,13 @@ export default class HeaderTitleView extends Component {
       <View style={styles.get('headerContainer')}>
         <Text style={styles.get('headerTitle')}>{this.props.title}</Text>
         {this.props.subtitle &&
-          <Text style={styles.get('headerSubtitle')}>{this.props.subtitle}</Text>
+          <Text
+            numberOfLines={1}
+            style={styles.get('headerSubtitle')}
+            adjustsFontSizeToFit={true}
+          >
+            {this.props.subtitle}
+          </Text>
         }
       </View>
     )

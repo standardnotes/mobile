@@ -4,33 +4,9 @@ import NoteCell from "@Screens/Notes/NoteCell"
 import Search from 'react-native-search-box'
 import StyleKit from "@Style/StyleKit"
 import ApplicationState from "@Lib/ApplicationState"
+import ThemedComponent from "@Components/ThemedComponent"
 
-export default class NoteList extends Component {
-
-  constructor(props) {
-    super(props);
-    this.styles = StyleSheet.create({
-      container: {
-        flex: 1,
-      },
-
-      decryptNoticeContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: -1,
-        position: "absolute",
-        height: "100%",
-        width: "100%"
-      },
-
-      decryptNotice: {
-        position: "absolute",
-        opacity: 0.5,
-        color: StyleKit.variable("stylekitForegroundColor")
-      }
-    });
-  }
+export default class NoteList extends ThemedComponent {
 
   renderHeader = () => {
     return (
@@ -98,8 +74,8 @@ export default class NoteList extends Component {
       <View style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}}>
 
         {placeholderText.length > 0 &&
-          <View style={this.styles.decryptNoticeContainer}>
-            <Text style={this.styles.decryptNotice}>
+          <View style={this.styles.loadingTextContainer}>
+            <Text style={this.styles.loadingText}>
               {placeholderText}
             </Text>
           </View>
@@ -125,5 +101,29 @@ export default class NoteList extends Component {
 
       </View>
     )
+  }
+
+  loadStyles() {
+    this.styles = StyleSheet.create({
+      container: {
+        flex: 1,
+      },
+
+      loadingTextContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: -1,
+        position: "absolute",
+        height: "100%",
+        width: "100%"
+      },
+
+      loadingText: {
+        position: "absolute",
+        opacity: 0.5,
+        color: StyleKit.variables.stylekitForegroundColor
+      }
+    });
   }
 }

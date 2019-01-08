@@ -63,7 +63,7 @@ export default class Root extends Abstract {
           this.setStatusBarText(text);
         }, 250);
       } else if(status.retrievedCount > 20) {
-        var text = `Downloading ${status.retrievedCount} items. Keep app opened.`
+        var text = `Downloading ${status.retrievedCount} items. Keep app open.`
         this.setStatusBarText(text);
         this.showingDownloadStatus = true;
       } else if(this.showingDownloadStatus) {

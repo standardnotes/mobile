@@ -11,13 +11,15 @@ import Icons from '@Style/Icons';
 import StyleKit from "@Style/StyleKit"
 import SideMenuCell from "@SideMenu/SideMenuCell"
 
+import ThemedComponent from "@Components/ThemedComponent";
+
 import ApplicationState from "@Lib/ApplicationState"
 import OptionsState from "@Lib/OptionsState"
 import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 
 import { withNavigation } from 'react-navigation';
 
-class TagSelectionList extends Component {
+class TagSelectionList extends ThemedComponent {
 
   /*
     @param props.selectedTags
@@ -36,9 +38,7 @@ class TagSelectionList extends Component {
       this.reload();
     }
 
-    if(Sync.get().initialDataLoaded()) {
-      handleInitialDataLoad();
-    }
+    this.reload();
 
     this.signoutObserver = Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
@@ -151,9 +151,25 @@ class TagSelectionList extends Component {
           renderItem={this.renderTagCell}
           extraData={this.props.selectedTags /* Required to force list cells to update on selection change */}
         />
+
+        {this.state.tags.length == 0 &&
+          <Text style={this.styles.emptyPlaceholderText}>{this.props.emptyPlaceholder}</Text>
+        }
+
         {this.state.actionSheet && this.state.actionSheet}
       </Fragment>
     )
+  }
+
+  loadStyles() {
+    this.styles = {
+      emptyPlaceholderText: {
+        color: StyleKit.variables.stylekitForegroundColor,
+        opacity: 0.6,
+        paddingRight: 40,
+        lineHeight: 18
+      }
+    }
   }
 }
 
