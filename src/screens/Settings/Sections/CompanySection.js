@@ -39,7 +39,19 @@ export default class CompanySection extends Component {
       ApplicationState.get().performActionWithoutStateChangeImpact(() => {
         Share.share({title: title, message: message, url: url})
       })
-    }
+    } else if(action == "spread-encryption") {
+     let title = "The Unexpected Benefits of Encrypted Writing";
+     var message = ApplicationState.isIOS ? title : "";
+     let url = "https://standardnotes.org/why-encrypted";
+     // Android ignores url. iOS ignores title.
+     if(ApplicationState.isAndroid) {
+       message += "\n\nhttps://standardnotes.org/why-encrypted";
+     }
+
+     ApplicationState.get().performActionWithoutStateChangeImpact(() => {
+       Share.share({title: title, message: message, url: url})
+     })
+   }
   }
 
   render() {
@@ -49,15 +61,31 @@ export default class CompanySection extends Component {
 
         <SectionHeader title={this.props.title} />
 
-        <ButtonCell first={true} leftAligned={true} title="Help" onPress={() => this.onAction("help")} />
+        <ButtonCell first={true} leftAligned={true} title="Help" onPress={() => this.onAction("help")}>
+          <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 3}}>https://standardnotes.org/help</Text>
+        </ButtonCell>
 
-        <ButtonCell leftAligned={true} title="Send Feedback" onPress={() => this.onAction("feedback")} />
+        <ButtonCell leftAligned={true} title="Contact Support" onPress={() => this.onAction("feedback")}>
+          <View style={{display: "flex", flexDirection: "column"}}>
+            <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 3}}>hello@standardnotes.org</Text>
+          </View>
+        </ButtonCell>
 
-        <ButtonCell leftAligned={true} title="Tell a Friend" onPress={() => this.onAction("friend")} />
+        <ButtonCell leftAligned={true} title="Spread Encryption" onPress={() => this.onAction("spread-encryption")}>
+          <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 3}}>Share the unexpected benefits of encrypted writing.</Text>
+        </ButtonCell>
 
-        <ButtonCell leftAligned={true} title="Learn more about Standard Notes" onPress={() => this.onAction("learn_more")} />
+        <ButtonCell leftAligned={true} title="Tell a Friend" onPress={() => this.onAction("friend")}>
+          <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 3}}>Share Standard Notes with a friend.</Text>
+        </ButtonCell>
 
-        <ButtonCell leftAligned={true} title="Our Privacy Manifesto" onPress={() => this.onAction("privacy")} />
+        <ButtonCell leftAligned={true} title="Learn About Standard Notes" onPress={() => this.onAction("learn_more")}>
+          <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 3}}>https://standardnotes.org</Text>
+        </ButtonCell>
+
+        <ButtonCell leftAligned={true} title="Our Privacy Manifesto" onPress={() => this.onAction("privacy")}>
+          <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 3}}>https://standardnotes.org/privacy</Text>
+        </ButtonCell>
 
         <ButtonCell last={true} leftAligned={true} title="Rate Standard Notes" onPress={() => this.onAction("rate")} >
           <View style={{display: "flex", flexDirection: "column"}}>
