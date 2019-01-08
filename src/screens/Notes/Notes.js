@@ -323,7 +323,7 @@ export default class Notes extends Abstract {
           onClickAction={() => {this.handleSelection()}}
           visible={true}
           size={30}
-          paddingTop={1}
+          paddingTop={ApplicationState.isIOS ? 1 : 0}
           iconTextComponent={<Icon style={{textAlignVertical: "center"}} name={StyleKit.nameForIcon("add")}/>}
         />
       </View>

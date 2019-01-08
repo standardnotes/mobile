@@ -10,6 +10,7 @@ import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell
 import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
 import StyleKit from "@Style/StyleKit"
 import Icon from 'react-native-vector-icons/Ionicons';
+import ApplicationState from "@Lib/ApplicationState"
 
 // Dev mode only. Used to destroy data
 // import KeysManager from "@Lib/keysManager";
@@ -49,7 +50,8 @@ export default class Authenticate extends Abstract {
     if(this.getProp("hasCancelOption")) {
       props.navigation.setParams({
         leftButton: {
-          title: "Cancel",
+          title: ApplicationState.isIOS ? "Cancel" : null,
+          iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
           onPress: () => {
             this.getProp("onCancel")();
             this.dismiss();

@@ -7,6 +7,7 @@ import AuthenticationSourceBiometric from "@Screens/Authentication/Sources/Authe
 import KeysManager from "@Lib/keysManager"
 import Storage from "@SFJS/storageManager"
 import Auth from "@SFJS/authManager"
+import ApplicationState from "@Lib/ApplicationState"
 
 export default class PrivilegesManager extends SFPrivilegesManager {
 
@@ -60,7 +61,8 @@ export default class PrivilegesManager extends SFPrivilegesManager {
 
     navigation.navigate("Authenticate", {
       leftButton: {
-        title: "Cancel",
+        title: ApplicationState.isIOS ? "Cancel" : null,
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
       },
       authenticationSources: sources,
       hasCancelOption: true,

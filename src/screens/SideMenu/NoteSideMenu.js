@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { ScrollView, View, Text, FlatList } from 'react-native';
+import { ScrollView, View, Text, FlatList, Linking } from 'react-native';
 
 import { SafeAreaView } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -255,7 +255,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
             onClickAction={() => {this.presentNewTag()}}
             visible={true}
             size={30}
-            paddingTop={1}
+            paddingTop={ApplicationState.isIOS ? 1 : 0}
             iconTextComponent={<Icon name={StyleKit.nameForIcon("pricetag")}/>}
           />
         </SafeAreaView>

@@ -15,7 +15,8 @@ export default class InputModal extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {
     let templateOptions = {
       leftButton: {
-        title: "Cancel"
+        title: ApplicationState.isIOS ? "Cancel" : null,
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -26,7 +27,8 @@ export default class InputModal extends Abstract {
 
     props.navigation.setParams({
       leftButton: {
-        title: "Cancel",
+        title: ApplicationState.isIOS ? "Cancel" : null,
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
         onPress: () => {
           this.dismiss();
         }

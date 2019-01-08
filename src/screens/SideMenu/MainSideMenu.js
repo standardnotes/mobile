@@ -177,7 +177,7 @@ export default class MainSideMenu extends AbstractSideMenu {
             onClickAction={() => {this.presentSettings()}}
             visible={true}
             size={29}
-            paddingTop={2}
+            paddingTop={ApplicationState.isIOS ? 2 : 0}
             iconTextComponent={<Icon name={StyleKit.nameForIcon("settings")}/>}
           />
 

@@ -31,7 +31,8 @@ export default class Settings extends Abstract {
     let templateOptions = {
       title: "Settings",
       leftButton: {
-        title: "Done"
+        title: ApplicationState.isIOS ? "Done" : null,
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("checkmark"),
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -42,7 +43,8 @@ export default class Settings extends Abstract {
 
     props.navigation.setParams({
       leftButton: {
-        title: "Done",
+        title: ApplicationState.isIOS ? "Done" : null,
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("checkmark"),
         onPress: () => {
           this.dismiss();
         }
