@@ -194,8 +194,6 @@ export default class NoteSideMenu extends AbstractSideMenu {
       options.push(option);
     }
 
-
-    console.log("Editor options", editors);
     // Default
     if(options.length == 1) {
       options.push(SideMenuSection.BuildOption({
