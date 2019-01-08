@@ -4,6 +4,7 @@ import StyleKit from "@Style/StyleKit"
 import Sync from '@SFJS/syncManager'
 import Auth from '@SFJS/authManager'
 import KeysManager from '@Lib/keysManager'
+import AlertManager from '@SFJS/alertManager'
 
 import Abstract from "@Screens/Abstract"
 import LockedView from "@Containers/LockedView";
@@ -29,6 +30,26 @@ export default class Root extends Abstract {
         // we only want to perform sync here if the app is resuming, not if it's a fresh start
         if(this.dataLoaded) {
           Sync.get().sync();
+        }
+      }
+    })
+
+    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+     if(event == "sync-session-invalid") {
+        if(!this.didShowSessionInvalidAlert) {
+          this.didShowSessionInvalidAlert = true;
+          AlertManager.get().confirm({
+            title: "Session Expired",
+            text: "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.",
+            confirmButtonText: "Sign Out",
+            onConfirm: () => {
+              this.didShowSessionInvalidAlert = false;
+              Auth.get().signout();
+            },
+            onCancel: () => {
+              this.didShowSessionInvalidAlert = false;
+            }
+          })
         }
       }
     })

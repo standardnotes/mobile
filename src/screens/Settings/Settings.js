@@ -1,31 +1,25 @@
 import React, { Component } from 'react';
-import {ScrollView, View, Alert, Keyboard, Linking, Platform, Share, NativeModules} from 'react-native';
+import {ScrollView, View, Alert, Keyboard, Platform} from 'react-native';
 
 import Sync from '@SFJS/syncManager'
 import ModelManager from '@SFJS/modelManager'
 import AlertManager from '@SFJS/alertManager'
 import SF from '@SFJS/sfjs'
+import Auth from '@SFJS/authManager'
 import Storage from "@SFJS/storageManager"
 
-import Auth from '@SFJS/authManager'
 import KeysManager from '@Lib/keysManager'
-import UserPrefsManager from '@Lib/userPrefsManager'
 import OptionsState from "@Lib/OptionsState"
 import ApplicationState from "@Lib/ApplicationState"
 import StyleKit from "@Style/StyleKit"
-import BackupsManager from "@Lib/BackupsManager"
 
 import SectionHeader from "@Components/SectionHeader";
-import ButtonCell from "@Components/ButtonCell";
 import TableSection from "@Components/TableSection";
-import SectionedTableCell from "@Components/SectionedTableCell";
 import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
 import Abstract from "@Screens/Abstract"
-import Authenticate from "@Screens/Authentication/Authenticate"
 import LockedView from "@Containers/LockedView";
 
 import AuthSection from "@Screens/Settings/Sections/AuthSection"
-import RegistrationConfirmSection from "@Screens/Settings/Sections/RegistrationConfirmSection"
 import OptionsSection from "@Screens/Settings/Sections/OptionsSection"
 import PasscodeSection from "@Screens/Settings/Sections/PasscodeSection"
 import EncryptionSection from "@Screens/Settings/Sections/EncryptionSection"
@@ -62,35 +56,11 @@ export default class Settings extends Abstract {
     ];
 
     this.options = ApplicationState.getOptions();
-    this.constructState({params: {}});
+    this.constructState({});
   }
 
   loadInitialState() {
     super.loadInitialState();
-
-    this.mergeState({params: {server: Auth.get().serverUrl()}})
-
-    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
-      if(event == "local-data-loaded") {
-        this.forceUpdate();
-      } else if(event == "sync-session-invalid") {
-        if(!this.didShowSessionInvalidAlert) {
-          this.didShowSessionInvalidAlert = true;
-          AlertManager.get().confirm({
-            title: "Session Expired",
-            text: "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.",
-            confirmButtonText: "Sign Out",
-            onConfirm: () => {
-              this.didShowSessionInvalidAlert = false;
-              Auth.get().signout();
-            },
-            onCancel: () => {
-              this.didShowSessionInvalidAlert = false;
-            }
-          })
-        }
-      }
-    })
 
     this.loadSecurityStatus();
   }
@@ -113,133 +83,12 @@ export default class Settings extends Abstract {
     this.forceUpdate();
   }
 
-  validate(email, password) {
-    if(!email) {
-      Alert.alert('Missing Email', "Please enter a valid email address.", [{text: 'OK'}])
-      return false;
-    }
-
-    if(!password) {
-      Alert.alert('Missing Password', "Please enter your password.", [{text: 'OK'}])
-      return false;
-    }
-
-    return true;
-  }
-
-  onSignInPress = (params, callback) => {
-    Keyboard.dismiss();
-
-    // Merge params back into our own state.params. The reason is, if you have immediate passcode enabled, and 2FA enabled
-    // When you press sign in, see your 2fa prompt, exit the app to get your code and come back, the AuthSection component is destroyed.
-    // Its data will need to be repopulated, and will use this.state.params
-    this.mergeState({params: params});
-
-    var email = params.email;
-    var password = params.password;
-
-    if(!this.validate(email, password)) {
-      if(callback) {callback(false);}
-      return;
-    }
-
-    var extraParams = {};
-    if(this.state.mfa) {
-      extraParams[this.state.mfa.payload.mfa_key] = params.mfa_token;
-    }
-
-    var strict = params.strictSignIn;
-
-    // Prevent a timed sync from occuring while signing in. There may be a race condition where when
-    // calling `markAllItemsDirtyAndSaveOffline` during sign in, if an authenticated sync happens to occur
-    // right before that's called, items retreived from that sync will be marked as dirty, then resynced, causing mass duplication.
-    // Unlock sync after all sign in processes are complete.
-    Sync.get().lockSyncing();
-
-    Auth.get().login(params.server, email, password, strict, extraParams).then((response) => {
-
-      if(!response || response.error) {
-        var error = response ? response.error : {message: "An unknown error occured."}
-
-        Sync.get().unlockSyncing();
-
-        if(error.tag == "mfa-required" || error.tag == "mfa-invalid") {
-          this.mergeState({mfa: error});
-        } else if(error.message) {
-          Alert.alert('Oops', error.message, [{text: 'OK'}])
-        }
-        if(callback) {callback(false);}
-        return;
-      }
-
-      params.email = null;
-      params.password = null;
-      this.setState({params: params});
-
-      if(this.state.mfa) {
-        this.mergeState({mfa: null});
-      }
-
-      this.onAuthSuccess(() => {
-        Sync.get().unlockSyncing();
-        Sync.get().sync();
-      });
-
-      callback && callback(true);
-    });
-  }
-
-  onRegisterPress = (params, callback) => {
-    Keyboard.dismiss();
-
-    var email = params.email;
-    var password = params.password;
-
-    if(!this.validate(email, password)) {
-      if(callback) {callback(false);}
-      return;
-    }
-
-    this.mergeState({params: params, confirmRegistration: true});
-  }
-
-  onRegisterConfirmSuccess = () => {
-    this.mergeState({registering: true});
-
-    var params = this.state.params;
-
-    Auth.get().register( params.server, params.email, params.password).then((response) => {
-      this.mergeState({registering: false, confirmRegistration: false});
-
-      if(!response || response.error) {
-        var error = response ? response.error : {message: "An unknown error occured."}
-        Alert.alert('Oops', error.message, [{text: 'OK'}])
-        return;
-      }
-
-      this.onAuthSuccess(() => {
-        Sync.get().sync();
-      });
-    });
-  }
-
-  onRegisterConfirmCancel = () => {
-    this.mergeState({confirmRegistration: false});
-  }
-
   resaveOfflineData(callback, updateAfter = false) {
     Sync.get().resaveOfflineData().then(() => {
       if(updateAfter) {
         this.forceUpdate();
       }
       callback && callback();
-    });
-  }
-
-  onAuthSuccess = (callback) => {
-    Sync.get().markAllItemsDirtyAndSaveOffline(false).then(() => {
-      callback && callback();
-      this.dismiss();
     });
   }
 
@@ -391,22 +240,8 @@ export default class Settings extends Abstract {
 
           {!signedIn && !this.state.confirmRegistration &&
             <AuthSection
-              params={this.state.params}
-              confirmRegistration={this.state.confirmRegistration}
               title={"Account"}
-              mfa={this.state.mfa}
-              onSignInPress={this.onSignInPress}
-              onRegisterPress={this.onRegisterPress}
-            />
-          }
-
-          {this.state.confirmRegistration &&
-            <RegistrationConfirmSection
-              title={"Confirm your password"}
-              password={this.state.params.password}
-              registering={this.state.registering}
-              onSuccess={this.onRegisterConfirmSuccess}
-              onCancel={this.onRegisterConfirmCancel}
+              onAuthSuccess = {() => {this.dismiss()}}
             />
           }
 

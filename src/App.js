@@ -85,7 +85,7 @@ const AppDrawer = createStackNavigator({
 
 }, {
   mode: "modal",
-  headerMode: 'none'
+  headerMode: 'none',
 })
 
 AppDrawer.navigationOptions = ({ navigation }) => {
