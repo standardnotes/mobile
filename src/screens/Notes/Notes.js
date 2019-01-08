@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Alert, SafeAreaView } from 'react-native';
 
 import ModelManager from '@SFJS/modelManager'
 import Storage from '@SFJS/storageManager'
@@ -300,7 +300,7 @@ export default class Notes extends Abstract {
     }
 
     return (
-      <View style={StyleKit.styles.container}>
+      <SafeAreaView style={StyleKit.styles.container}>
         {this.state.notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}
@@ -325,7 +325,7 @@ export default class Notes extends Abstract {
           visible={true}
           iconTextComponent={<Icon name="md-add"/>}
         />
-      </View>
+      </SafeAreaView>
     );
   }
 

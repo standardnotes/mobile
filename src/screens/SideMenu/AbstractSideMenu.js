@@ -33,7 +33,7 @@ export default class AbstractSideMenu extends Abstract {
 
     Keyboard.dismiss();
 
-    this.handler.onKeyboardDismiss && this.handler.onKeyboardDismiss();
+    this.handler && this.handler.onKeyboardDismiss && this.handler.onKeyboardDismiss();
   }
 
 }

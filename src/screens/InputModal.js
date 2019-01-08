@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, View, Keyboard, TouchableHighlight, Platform, Alert } from 'react-native';
+import { TextInput, View, Keyboard, TouchableHighlight, Platform, Alert, SafeAreaView } from 'react-native';
 import StyleKit from "@Style/StyleKit"
 import TableSection from "@Components/TableSection";
 import SectionedTableCell from "@Components/SectionedTableCell";
@@ -15,7 +15,7 @@ export default class InputModal extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {
     let templateOptions = {
       leftButton: {
-        title: "Done"
+        title: "Cancel"
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -26,7 +26,7 @@ export default class InputModal extends Abstract {
 
     props.navigation.setParams({
       leftButton: {
-        title: "Done",
+        title: "Cancel",
         onPress: () => {
           this.dismiss();
         }
@@ -113,7 +113,7 @@ export default class InputModal extends Abstract {
     )
 
     return (
-      <View style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         <TableSection extraStyles={[StyleKit.styles.container]}>
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
@@ -167,7 +167,7 @@ export default class InputModal extends Abstract {
           />
 
         </TableSection>
-      </View>
+      </SafeAreaView>
     );
   }
 

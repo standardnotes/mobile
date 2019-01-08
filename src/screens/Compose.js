@@ -13,6 +13,7 @@ import Icons from '@Style/Icons';
 import ApplicationState from "@Lib/ApplicationState"
 import LockedView from "@Containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
 
 import TextView from "sn-textview";
 
@@ -367,7 +368,7 @@ export default class Compose extends Abstract {
     var shouldDisplayEditor = noteEditor != null && this.note.uuid;
 
     return (
-      <View style={[this.styles.container, StyleKit.styles.container]}>
+      <SafeAreaView style={[this.styles.container, StyleKit.styles.container]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
             <Icon name={Icons.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
@@ -437,7 +438,7 @@ export default class Compose extends Abstract {
             editable={!this.note.locked}
           />
         }
-      </View>
+      </SafeAreaView>
     );
   }
 
