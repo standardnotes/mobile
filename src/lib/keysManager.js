@@ -87,8 +87,8 @@ export default class KeysManager {
 
         // storage encryption
         if(items[StorageEncryptionKey] == null) {
-          // default is true
-          this.storageEncryptionEnabled = true;
+          // default is false
+          this.storageEncryptionEnabled = false;
         } else {
           this.storageEncryptionEnabled = JSON.parse(items[StorageEncryptionKey]) == true;
         }

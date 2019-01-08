@@ -133,9 +133,8 @@ export default class MainSideMenu extends AbstractSideMenu {
       <Fragment>
         <SafeAreaView style={this.styles.firstSafeArea} />
         <SafeAreaView style={[viewStyles, this.styles.secondSafeArea]}>
-          <View style={this.styles.hero}>
-            <SideMenuHero />
-          </View>
+
+          <SideMenuHero onPress={() => {this.presentSettings()}}/>
 
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
 
@@ -182,13 +181,6 @@ export default class MainSideMenu extends AbstractSideMenu {
         color: StyleKit.variables.stylekitForegroundColor,
         flex: 1,
         flexDirection: "column"
-      },
-      hero: {
-        height: 65,
-        padding: 15,
-        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
-        borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
-        borderBottomWidth: 1
       },
       scrollView: {
         padding: 15,
