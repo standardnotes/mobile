@@ -30,7 +30,7 @@ export default class Notes extends Abstract {
     this.registerObservers();
 
     props.navigation.setParams({
-      title: "Notes",
+      title: "All notes",
       leftButton: {
         title: null,
         iconName: StyleKit.nameForIcon("menu"),
@@ -55,7 +55,7 @@ export default class Notes extends Abstract {
 
   unlockContent() {
     super.unlockContent();
-    this.configureNavBar(true);
+    this.reloadHeaderBar();
   }
 
   componentWillFocus() {
@@ -73,10 +73,6 @@ export default class Notes extends Abstract {
     this.setSideMenuHandler();
 
     this.forceUpdate();
-
-    if(this.needsConfigureNavBar) {
-      this.configureNavBar(false);
-    }
   }
 
   componentWillUnmount() {
@@ -92,18 +88,20 @@ export default class Notes extends Abstract {
 
   registerObservers() {
     this.optionsObserver = this.options.addChangeObserver((options, eventType) => {
-      // this.props.navigation.closeLeftDrawer();
       // should only show for non-search term change
-      let setSubtitle = false;
+      let shouldReloadSubtitleAfterNotesReload = false;
       if(eventType !== OptionsState.OptionsStateChangeEventSearch) {
-        setSubTitle = true;
+        shouldReloadSubtitleAfterNotesReload = true;
         this.setSubTitle("Loading...");
+        this.reloadHeaderBar();
       }
+
       this.reloadList(true);
-      this.configureNavBar();
-      if(setSubTitle) {
+
+      if(shouldReloadSubtitleAfterNotesReload) {
         this.setSubTitle(null);
       }
+
       if(ApplicationState.get().isTablet) {
         this.selectFirstNote();
       }
@@ -119,7 +117,7 @@ export default class Notes extends Abstract {
       } else if(event == "local-data-loaded") {
         this.displayNeedSignInAlertForLocalItemsIfApplicable(ModelManager.get().allItems);
         this.reloadList();
-        this.configureNavBar(true);
+        this.reloadHeaderBar();
         this.mergeState({decrypting: false, loading: false});
       } else if(event == "sync-exception") {
         Alert.alert("Issue Syncing", `There was an error while trying to save your items. Please contact support and share this message: ${data}`);
@@ -143,7 +141,7 @@ export default class Notes extends Abstract {
   // Called by Root.js
   root_onIncrementalSync() {
     this.reloadList();
-    this.configureNavBar(true);
+    this.reloadHeaderBar();
   }
 
   /* If there is at least one item that has an error decrypting, and there are no account keys saved,
@@ -167,24 +165,16 @@ export default class Notes extends Abstract {
     }
   }
 
-  configureNavBar(initial = false) {
+  reloadHeaderBar() {
     if(this.state.lockContent) {
-      this.needsConfigureNavBar = true;
       return;
     }
 
-    this.needsConfigureNavBar = false;
-
-    if(this.options.selectedTagIds.length > 0) {
-      var tags = ModelManager.get().getTagsWithIds(this.options.selectedTagIds);
-      if(tags.length > 0) {
-        var tag = tags[0];
-        notesTitle = tag.title;
-      } else {
-        notesTitle = "Notes";
-      }
-      this.setTitle(notesTitle);
-    }
+    var tags = ModelManager.get().getTagsWithIds(this.options.selectedTagIds);
+    // There always has to be a selected tag/view
+    var tag = tags[0];
+    notesTitle = tag.title;
+    this.setTitle(notesTitle);
   }
 
   setSideMenuHandler() {

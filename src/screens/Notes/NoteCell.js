@@ -179,11 +179,13 @@ export default class NoteCell extends ThemedPureComponent {
               <Text style={this.styles.deleting}>Conflicted Copy</Text>
             }
 
-            <View style={this.styles.flagsContainer}>
-              {flags.map((flag) =>
-                this.flagElement(flag)
-              )}
-            </View>
+            {flags.length > 0 &&
+              <View style={this.styles.flagsContainer}>
+                {flags.map((flag) =>
+                  this.flagElement(flag)
+                )}
+              </View>
+            }
 
             {note.errorDecrypting &&
               <View>
