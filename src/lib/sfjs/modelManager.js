@@ -112,6 +112,10 @@ export default class ModelManager extends SFModelManager {
     ]
   }
 
+  defaultSmartTag() {
+    return this.systemSmartTags[0];
+  }
+
   systemSmartTagIds() {
     return [
       SystemSmartTagIdAllNotes,

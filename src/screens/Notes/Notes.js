@@ -168,7 +168,6 @@ export default class Notes extends Abstract {
   }
 
   configureNavBar(initial = false) {
-    // If you change anything here, be sure to test how it interacts with filtering, when you change which tags to show.
     if(this.state.lockContent) {
       this.needsConfigureNavBar = true;
       return;
@@ -176,23 +175,16 @@ export default class Notes extends Abstract {
 
     this.needsConfigureNavBar = false;
 
-    super.configureNavBar();
-
-    var options = this.options;
-    var notesTitle = "Notes";
-    var numTags = options.selectedTagIds.length;
-
-    if(numTags > 0) {
-      var tags = ModelManager.get().getTagsWithIds(options.selectedTagIds);
+    if(this.options.selectedTagIds.length > 0) {
+      var tags = ModelManager.get().getTagsWithIds(this.options.selectedTagIds);
       if(tags.length > 0) {
         var tag = tags[0];
         notesTitle = tag.title;
       } else {
         notesTitle = "Notes";
       }
+      this.setTitle(notesTitle);
     }
-
-    this.setTitle(notesTitle);
   }
 
   setSideMenuHandler() {

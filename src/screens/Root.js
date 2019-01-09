@@ -4,6 +4,7 @@ import StyleKit from "@Style/StyleKit"
 import Sync from '@SFJS/syncManager'
 import Auth from '@SFJS/authManager'
 import KeysManager from '@Lib/keysManager'
+import ModelManager from "@SFJS/modelManager"
 import AlertManager from '@SFJS/alertManager'
 
 import Abstract from "@Screens/Abstract"
@@ -21,6 +22,13 @@ export default class Root extends Abstract {
   }
 
   registerObservers() {
+
+    let options = ApplicationState.getOptions();
+    if(options.selectedTagIds.length == 0) {
+      // select default All notes smart tag
+      options.setSelectedTagIds(ModelManager.get().defaultSmartTag().uuid);
+    }
+
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
       if(authProps.sources.length > 0) {
