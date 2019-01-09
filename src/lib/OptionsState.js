@@ -25,9 +25,11 @@ export default class OptionsState {
     this.sortReverse = false;
   }
 
-  reset() {
+  reset(notifyObservers = true) {
     this.init();
-    this.notifyObservers();
+    if(notifyObservers) {
+      this.notifyObservers();
+    }
   }
 
   async loadSaved() {

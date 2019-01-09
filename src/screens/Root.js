@@ -23,12 +23,6 @@ export default class Root extends Abstract {
 
   registerObservers() {
 
-    let options = ApplicationState.getOptions();
-    if(options.selectedTagIds.length == 0) {
-      // select default All notes smart tag
-      options.setSelectedTagIds(ModelManager.get().defaultSmartTag().uuid);
-    }
-
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       let authProps = ApplicationState.get().getAuthenticationPropsForAppState(state);
       if(authProps.sources.length > 0) {
@@ -89,8 +83,22 @@ export default class Root extends Abstract {
     this.signoutObserver = Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
         this.setStatusBarText(null);
+        let notifyObservers = false;
+        ApplicationState.getOptions().reset(notifyObservers);
+        this.reloadOptionsToDefault();
+        ApplicationState.getOptions().notifyObservers();
       }
     });
+
+    this.reloadOptionsToDefault();
+  }
+
+  reloadOptionsToDefault() {
+    let options = ApplicationState.getOptions();
+    if(options.selectedTagIds.length == 0) {
+      // select default All notes smart tag
+      options.setSelectedTagIds(ModelManager.get().defaultSmartTag().uuid);
+    }
   }
 
   componentDidMount() {

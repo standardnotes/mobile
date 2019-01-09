@@ -135,7 +135,6 @@ export default class App extends Component {
     // Listen to sign out event
     Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
-        ApplicationState.getOptions().reset();
         Storage.get().clearAllModels();
         KeysManager.get().clearAccountKeysAndData();
         ModelManager.get().handleSignout();

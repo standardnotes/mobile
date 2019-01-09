@@ -107,7 +107,7 @@ export default class Authenticate extends Abstract {
     let result = await source.authenticate();
     if(source.isInSuccessState()) {
       this.successfulSources.push(source);
-      _.remove(this.pendingSources, source);
+      _.pull(this.pendingSources, source);
     } else {
       if(result.error && result.error.message) {
         Alert.alert("Unsuccessful", result.error.message);

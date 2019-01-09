@@ -58,7 +58,7 @@ export default class StyleKit {
   }
 
   removeThemeChangeObserver(observer) {
-    _.remove(this.themeChangeObservers, observer);
+    _.pull(this.themeChangeObservers, observer);
   }
 
   notifyObserversOfThemeChange() {
