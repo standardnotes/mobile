@@ -136,8 +136,6 @@ export default class Compose extends Abstract {
     // the component will blur, and this will be called. Then, because the right drawer is now locked,
     // we ignore render events. This will cause the screen to be white when you save the new tag.
     SideMenuManager.get().removeHandlerForRightSideMenu();
-    this.props.navigation.lockLeftDrawer(false);
-    this.props.navigation.lockRightDrawer(true);
 
     Sync.get().removeEventHandler(this.syncObserver);
     ComponentManager.get().deregisterHandler(this.componentHandler);
@@ -157,11 +155,6 @@ export default class Compose extends Abstract {
   componentDidFocus() {
     super.componentDidFocus();
 
-    if(!ApplicationState.get().isTablet) {
-      this.props.navigation.lockLeftDrawer(true);
-      this.props.navigation.lockRightDrawer(false);
-    }
-
     if(this.note.dummy) {
       if(this.refs.input) {
         this.refs.input.focus();
@@ -173,7 +166,6 @@ export default class Compose extends Abstract {
         this.input.focus();
       }
     }
-
 
     SideMenuManager.get().setHandlerForRightSideMenu({
       getCurrentNote: () => {

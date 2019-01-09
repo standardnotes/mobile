@@ -61,9 +61,23 @@ export default class Notes extends Abstract {
   componentWillFocus() {
     super.componentWillFocus();
 
+    if(!ApplicationState.get().isTablet) {
+      this.props.navigation.lockLeftDrawer(false);
+      this.props.navigation.lockRightDrawer(true);
+    }
+
     if(this.loadNotesOnVisible) {
       this.loadNotesOnVisible = false;
       this.reloadList();
+    }
+  }
+
+  componentWillBlur() {
+    super.componentWillBlur();
+
+    if(!ApplicationState.get().isTablet) {
+      this.props.navigation.lockLeftDrawer(true);
+      this.props.navigation.lockRightDrawer(false);
     }
   }
 
