@@ -38,6 +38,7 @@ export default class Auth extends SFAuthManager {
   }
 
   async signout(clearAllData) {
+    this._keys = null;
     // DONT clear all data. We will do this ourselves manually, as we need to preserve certain data keys.
     super.signout(false);
   }
