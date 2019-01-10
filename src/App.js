@@ -9,9 +9,10 @@ import ApplicationState from "@Lib/ApplicationState"
 import Auth from './lib/sfjs/authManager'
 import ModelManager from './lib/sfjs/modelManager'
 import PrivilegesManager from '@SFJS/privilegesManager'
+import MigrationManager from "@SFJS/migrationManager"
 import Sync from './lib/sfjs/syncManager'
 import Storage from './lib/sfjs/storageManager'
-import ReviewManager from './lib/reviewManager';
+import ReviewManager from './lib/reviewManager'
 
 import Compose from "@Screens/Compose"
 import Root from "@Screens/Root"
@@ -131,6 +132,7 @@ export default class App extends Component {
     ReviewManager.initialize();
 
     PrivilegesManager.get().loadPrivileges();
+    MigrationManager.get().load();
 
     // Listen to sign out event
     Auth.get().addEventHandler((event) => {

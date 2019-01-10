@@ -165,7 +165,7 @@ export default class NoteCell extends ThemedPureComponent {
 
   render() {
     var note = this.props.item;
-    let showPreview = !this.state.options.hidePreviews && !note.content.protected;
+    let showPreview = !this.state.options.hidePreviews && !note.content.protected && !note.content.hidePreview;
     let flags = this.getFlags(note);
     return (
        <TouchableWithoutFeedback onPress={this._onPress} onPressIn={this._onPressIn} onPressOut={this._onPressOut} onLongPress={this.showActionSheet}>
