@@ -49,8 +49,12 @@ export default class MigrationManager extends SFMigrationManager {
           return;
         }
 
+        let options = {
+          contentType: contentType
+        }
+
         // The user is signed in
-        Sync.get().stateless_downloadAllItems().then((items) => {
+        Sync.get().stateless_downloadAllItems(options).then((items) => {
           let matchingPrivs = items.filter((candidate) => {
             return candidate.content_type == contentType;
           });
