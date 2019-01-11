@@ -54,6 +54,8 @@ export default class SideMenuHero extends ThemedComponent {
         borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
         borderBottomWidth: 1,
         padding: 15,
+        paddingTop: 10,
+        paddingBottom: 12,
         paddingRight: 25,
       },
 

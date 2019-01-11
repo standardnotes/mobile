@@ -116,6 +116,28 @@ export default class NoteSideMenu extends AbstractSideMenu {
   Render
   */
 
+  runAction(action) {
+    let run = () => {
+      ItemActionManager.handleEvent(action, this.note, () => {
+        if(action == ItemActionManager.TrashEvent
+          || action == ItemActionManager.DeleteEvent
+          || action == ItemActionManager.EmptyTrashEvent) {
+          this.popToRoot();
+        } else {
+          this.forceUpdate();
+          this.handler.onPropertyChange();
+        }
+      });
+    }
+    if((action == ItemActionManager.TrashEvent || action == ItemActionManager.DeleteEvent) && this.note.content.protected) {
+      this.handlePrivilegedAction(this.note.content.protected, SFPrivilegesManager.ActionDeleteNote, () => {
+        run();
+      })
+    } else {
+      run();
+    }
+  }
+
   buildOptionsForNoteManagement() {
     var pinOption = this.note.pinned ? "Unpin" : "Pin";
     let pinEvent = pinOption == "Pin" ? ItemActionManager.PinEvent : ItemActionManager.UnpinEvent;
@@ -135,8 +157,11 @@ export default class NoteSideMenu extends AbstractSideMenu {
       { text: lockOption, key: lockEvent, icon: "lock" },
       { text: protectOption, key: protectEvent, icon: "finger-print" },
       { text: "Share", key: ItemActionManager.ShareEvent, icon: "share" },
-      { text: "Delete", key: ItemActionManager.DeleteEvent, icon: "trash" },
     ];
+
+    if(!this.note.content.trashed) {
+      rawOptions.push({ text: "Move to Trash", key: ItemActionManager.TrashEvent, icon: "trash" });
+    }
 
     let options = [];
     for(let rawOption of rawOptions) {
@@ -145,28 +170,46 @@ export default class NoteSideMenu extends AbstractSideMenu {
         key: rawOption.key,
         iconDesc: { type: "icon", side: "right", name: StyleKit.nameForIcon(rawOption.icon) },
         onSelect: () => {
-          let run = () => {
-            ItemActionManager.handleEvent(rawOption.key, this.note, () => {
-              if(rawOption.key == ItemActionManager.DeleteEvent) {
-                this.popToRoot();
-              } else {
-                this.forceUpdate();
-                this.handler.onPropertyChange();
-              }
-            });
-          }
-          if(rawOption.key == ItemActionManager.DeleteEvent && this.note.content.protected) {
-            this.handlePrivilegedAction(this.note.content.protected, SFPrivilegesManager.ActionDeleteNote, () => {
-              run();
-            })
-          } else {
-            run();
-          }
-
+          this.runAction(rawOption.key);
         },
       })
       options.push(option);
     }
+
+    return options;
+  }
+
+  buildOptionsForTrash() {
+    if(!this.note.content.trashed) {
+      return [];
+    }
+
+    let options = [
+      {
+        text: "Restore Note",
+        key: "restore-note",
+        onSelect: () => {
+          this.note.content.trashed = false;
+          this.note.setDirty(true);
+          Sync.get().sync();
+          this.forceUpdate();
+        }
+      },
+      {
+        text: "Delete Forever",
+        key: "delete-forever",
+        onSelect: () => {
+          this.runAction(ItemActionManager.DeleteEvent);
+        }
+      },
+      {
+        text: "Empty Trash",
+        key: "empty trash",
+        onSelect: () => {
+          this.runAction(ItemActionManager.EmptyTrashEvent);
+        }
+      },
+    ]
 
     return options;
   }
@@ -223,8 +266,9 @@ export default class NoteSideMenu extends AbstractSideMenu {
       return <View style={viewStyles} />;
     }
 
-    let editorOptions = this.buildOptionsForEditors();
     let noteOptions = this.buildOptionsForNoteManagement();
+    let trashOptions = this.buildOptionsForTrash();
+    let editorOptions = this.buildOptionsForEditors();
     let selectedTags = this.handler.getSelectedTags();
 
     return (
@@ -233,6 +277,10 @@ export default class NoteSideMenu extends AbstractSideMenu {
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
 
             <SideMenuSection title="Options" options={noteOptions} />
+
+            {trashOptions.length > 0 &&
+              <SideMenuSection title="Trash" options={trashOptions} />
+            }
 
             <SideMenuSection title="Editors" options={editorOptions} collapsed={true} />
 

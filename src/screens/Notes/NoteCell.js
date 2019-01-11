@@ -81,16 +81,22 @@ export default class NoteCell extends ThemedPureComponent {
         }
       });
     } else {
+      let options = [
+        ActionSheetWrapper.BuildOption({text: pinLabel, key: pinEvent, callback: callbackForOption}),
+        ActionSheetWrapper.BuildOption({text: archiveLabel, key: archiveEvent, callback: callbackForOption}),
+        ActionSheetWrapper.BuildOption({text: lockLabel, key: lockEvent, callback: callbackForOption}),
+        ActionSheetWrapper.BuildOption({text: protectLabel, key: protectEvent, callback: callbackForOption}),
+        ActionSheetWrapper.BuildOption({text: "Share", key: ItemActionManager.ShareEvent, callback: callbackForOption}),
+      ]
+
+      if(!this.props.item.content.trashed) {
+        options.push(ActionSheetWrapper.BuildOption({text: "Move to Trash", key: ItemActionManager.TrashEvent, destructive: true, callback: callbackForOption}));
+      }
+
       sheet = new ActionSheetWrapper({
         title: this.props.item.safeTitle(),
-        options: [
-          ActionSheetWrapper.BuildOption({text: pinLabel, key: pinEvent, callback: callbackForOption}),
-          ActionSheetWrapper.BuildOption({text: archiveLabel, key: archiveEvent, callback: callbackForOption}),
-          ActionSheetWrapper.BuildOption({text: lockLabel, key: lockEvent, callback: callbackForOption}),
-          ActionSheetWrapper.BuildOption({text: protectLabel, key: protectEvent, callback: callbackForOption}),
-          ActionSheetWrapper.BuildOption({text: "Share", key: ItemActionManager.ShareEvent, callback: callbackForOption}),
-          ActionSheetWrapper.BuildOption({text: "Delete", key: ItemActionManager.DeleteEvent, destructive: true, callback: callbackForOption}),
-        ], onCancel: () => {
+        options: options,
+        onCancel: () => {
           this.setState({actionSheet: null});
         }
       });
@@ -128,6 +134,13 @@ export default class NoteCell extends ThemedPureComponent {
       flags.push({
         text: "Locked",
         color: StyleKit.variables.stylekitNeutralColor
+      })
+    }
+
+    if(note.content.trashed) {
+      flags.push({
+        text: "Deleted",
+        color: StyleKit.variables.stylekitDangerColor
       })
     }
 

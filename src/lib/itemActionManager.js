@@ -8,6 +8,10 @@ export default class ItemActionManager {
 
   static DeleteEvent = "DeleteEvent";
 
+  static TrashEvent = "TrashEvent";
+
+  static EmptyTrashEvent = "EmptyTrashEvent";
+
   static PinEvent = "PinEvent";
   static UnpinEvent = "UnpinEvent";
 
@@ -26,11 +30,40 @@ export default class ItemActionManager {
 
   static handleEvent(event, item, callback, afterConfirmCallback) {
 
-    console.log("Handling event", event);
+    if(event == this.TrashEvent) {
+      var title = `Move to Trash`;
+      var message = `Are you sure you want to move this ${item.displayName.toLowerCase()} to the trash?`;
 
-    if(event == this.DeleteEvent) {
+      AlertManager.get().confirm({
+        title: title,
+        text: message,
+        confirmButtonText: "Confirm",
+        onConfirm: () => {
+          item.content.trashed = true;
+          item.setDirty(true);
+          Sync.get().sync();
+          callback && callback();
+        }
+      })
+    }
+
+    else if(event == this.EmptyTrashEvent) {
+      let deletedCount = ModelManager.get().trashedItems().length;
+      AlertManager.get().confirm({
+        title: "Empty Trash",
+        text: `Are you sure you want to permanently delete ${deletedCount} notes?`,
+        confirmButtonText: "Delete",
+        onConfirm: () => {
+          ModelManager.get().emptyTrash();
+          Sync.get().sync();
+          callback && callback();
+        }
+      })
+    }
+
+    else if(event == this.DeleteEvent) {
       var title = `Delete ${item.displayName}`;
-      var message = `Are you sure you want to delete this ${item.displayName.toLowerCase()}?`;
+      var message = `Are you sure you want to permanently delete this ${item.displayName.toLowerCase()}?`;
 
       AlertManager.get().confirm({
         title: title,
@@ -48,7 +81,7 @@ export default class ItemActionManager {
       })
     }
 
-     else if(event == this.PinEvent || event == this.UnpinEvent) {
+    else if(event == this.PinEvent || event == this.UnpinEvent) {
       item.setAppDataItem("pinned", event == this.PinEvent);
       item.setDirty(true);
       Sync.get().sync();
@@ -56,13 +89,13 @@ export default class ItemActionManager {
     }
 
     else if(event == this.LockEvent || event == this.UnlockEvent) {
-     item.setAppDataItem("locked", event == this.LockEvent);
-     item.setDirty(true, true);
-     Sync.get().sync();
-     callback && callback();
-   }
+      item.setAppDataItem("locked", event == this.LockEvent);
+      item.setDirty(true, true);
+      Sync.get().sync();
+      callback && callback();
+    }
 
-     else if(event == this.ArchiveEvent || event == this.UnarchiveEvent) {
+    else if(event == this.ArchiveEvent || event == this.UnarchiveEvent) {
       item.setAppDataItem("archived", event == this.ArchiveEvent);
       item.setDirty(true);
       Sync.get().sync();
@@ -70,11 +103,11 @@ export default class ItemActionManager {
     }
 
     else if(event == this.ProtectEvent || event == this.UnprotectEvent) {
-     item.content.protected = !item.content.protected;
-     item.setDirty(true);
-     Sync.get().sync();
-     callback && callback();
-   }
+      item.content.protected = !item.content.protected;
+      item.setDirty(true);
+      Sync.get().sync();
+      callback && callback();
+    }
 
     else if(event == this.ShareEvent) {
       ApplicationState.get().performActionWithoutStateChangeImpact(() => {

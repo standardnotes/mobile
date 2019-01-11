@@ -11,9 +11,6 @@ SFModelManager.ContentTypeClassMapping = {
   "SN|Privileges" : SFPrivileges
 };
 
-const SystemSmartTagIdAllNotes = "all-notes";
-const SystemSmartTagIdArchivedNotes = "archived-notes";
-
 export default class ModelManager extends SFModelManager {
 
   static instance = null;
@@ -92,24 +89,7 @@ export default class ModelManager extends SFModelManager {
   }
 
   buildSystemSmartTags() {
-    this.systemSmartTags = [
-      new SNSmartTag({
-        uuid: SystemSmartTagIdAllNotes,
-        content: {
-          title: "All notes",
-          isAllTag: true,
-          predicate: new SFPredicate.fromArray(["content_type", "=", "Note"])
-        }
-      }),
-      new SNSmartTag({
-        uuid: SystemSmartTagIdArchivedNotes,
-        content: {
-          title: "Archived",
-          isArchiveTag: true,
-          predicate: new SFPredicate.fromArray(["archived", "=", true])
-        }
-      })
-    ]
+    this.systemSmartTags = SNSmartTag.systemSmartTags();
   }
 
   defaultSmartTag() {
@@ -117,10 +97,7 @@ export default class ModelManager extends SFModelManager {
   }
 
   systemSmartTagIds() {
-    return [
-      SystemSmartTagIdAllNotes,
-      SystemSmartTagIdArchivedNotes
-    ]
+    return this.systemSmartTags.map((tag) => {return tag.uuid});
   }
 
   getSmartTagWithId(id) {
@@ -134,14 +111,34 @@ export default class ModelManager extends SFModelManager {
   getSmartTags() {
     let userTags = this.validItemsForContentType("SN|SmartTag").sort((a, b) => {
       return a.content.title < b.content.title ? -1 : 1;
-    });;
+    });
     return this.systemSmartTags.concat(userTags);
   }
 
-  notesMatchingPredicate(predicate) {
-    let notePredicate = ["content_type", "=", "Note"];
-    // itemsMatchingPredicate can return non-note types
-    return this.itemsMatchingPredicates([notePredicate, predicate]);
+
+  trashSmartTag() {
+    return this.systemSmartTags.find((tag) => tag.content.isTrashTag);
+  }
+
+  trashedItems() {
+    return this.notesMatchingSmartTag(this.trashSmartTag());
+  }
+
+  emptyTrash() {
+    let notes = this.trashedItems();
+    for(let note of notes) {
+      this.setItemToBeDeleted(note);
+    }
+  }
+
+  notesMatchingSmartTag(tag) {
+    let contentTypePredicate = new SFPredicate("content_type", "=", "Note");
+    let predicates = [contentTypePredicate, tag.content.predicate];
+    if(!tag.content.isTrashTag) {
+      let notTrashedPredicate = new SFPredicate("content.trashed", "=", false);
+      predicates.push(notTrashedPredicate);
+    }
+    return this.itemsMatchingPredicates(predicates);
   }
 
   getNotes(options = {}) {
@@ -151,7 +148,7 @@ export default class ModelManager extends SFModelManager {
     if(selectedTagIds && selectedTagIds.length > 0) {
       selectedSmartTag = selectedTagIds.length == 1 && this.getSmartTagWithId(selectedTagIds[0]);
       if(selectedSmartTag) {
-        notes = this.notesMatchingPredicate(selectedSmartTag.content.predicate);
+        notes = this.notesMatchingSmartTag(selectedSmartTag);
       } else {
         tags = ModelManager.get().findItems(options.selectedTagIds);
         if(tags.length > 0) {
@@ -184,14 +181,18 @@ export default class ModelManager extends SFModelManager {
         return false;
       }
 
-      // If we're not dealing with the system archived tag, then we only want to
-      // filter for this note if it's not archived. (Hide archived if not archive tag)
-      let isExplicitlyArchiveTag = selectedSmartTag && selectedSmartTag.content.isArchiveTag;
-      if(!isExplicitlyArchiveTag) {
-        return !note.archived;
-      } else {
-        return note.archived;
+      let isTrash = selectedSmartTag && selectedSmartTag.content.isTrashTag;
+      let canShowArchived = (selectedSmartTag && selectedSmartTag.content.isArchiveTag) || isTrash;
+
+      if(!isTrash && note.content.trashed) {
+        return false;
       }
+
+      if(note.archived && !canShowArchived) {
+        return false;
+      }
+
+      return true;
     })
 
     let sortValueFn = (a, b, pinCheck = false) => {

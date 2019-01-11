@@ -28,7 +28,7 @@
     "react-navigation": "^3.0.9",
     "react-navigation-header-buttons": "^2.1.1",
     "regenerator": "^0.13.3",
-    "sn-models": "0.1.8",
+    "sn-models": "0.1.11",
     "standard-file-js": "0.3.31"
   },
   "devDependencies": {
