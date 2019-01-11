@@ -208,6 +208,7 @@ export default class Notes extends Abstract {
   async presentComposer(note) {
     this.handlePrivilegedAction(note && note.content.protected, SFPrivilegesManager.ActionViewProtectedNotes, () => {
       this.props.navigation.navigate("Compose", {
+        title: note ? "Editor" : "Compose",
         noteId: note && note.uuid,
         selectedTagId: this.options.selectedTagIds.length && this.options.selectedTagIds[0],
       });

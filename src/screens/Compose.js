@@ -34,7 +34,6 @@ export default class Compose extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
     let templateOptions = {
-      title: "Compose",
       rightButton: {
         title: null,
         iconName: StyleKit.nameForIcon("menu"),
@@ -118,7 +117,6 @@ export default class Compose extends Abstract {
 
   configureHeaderBar() {
     this.props.navigation.setParams({
-      title: 'Compose',
       rightButton: {
         title: null,
         iconName: StyleKit.nameForIcon("menu"),
