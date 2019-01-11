@@ -48,7 +48,7 @@ export default class AuthSection extends Component {
     var password = this.state.password;
 
     if(!this.validate(email, password)) {
-      if(callback) {callback(false);}
+      this.setState({signingIn: false, signInButtonText: DEFAULT_SIGN_IN_TEXT});
       return;
     }
 

@@ -14,6 +14,10 @@ export default class PasscodeSection extends Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      items: ModelManager.get().allItemsMatchingTypes(["Note", "Tag"])
+    }
   }
 
   render() {
@@ -22,60 +26,64 @@ export default class PasscodeSection extends Component {
     if(source == "offline") {
       enabled = KeysManager.get().isStorageEncryptionEnabled();
     }
+    var encryptionType = "AES-256";
     var storageEncryptionAvailable = source != null;
     var encryptionStatus = enabled ? "Enabled" : "Not Enabled";
+    if(enabled) {
+      encryptionStatus += ` | ${encryptionType}`
+    } else {
+      encryptionStatus += ". "; // to connect sentence
+      encryptionStatus += storageEncryptionAvailable
+        ? "To enable encryption, sign in, register, or enable storage encryption."
+        : "Sign in, register, or add a local passcode to enable encryption."
+    }
     var sourceString = source == "account" ? "Account Keys" : "Passcode";
-    var encryptionType = "AES-256";
 
-    var items = ModelManager.get().allItemsMatchingTypes(["Note", "Tag"]);
+    var items = this.state.items;
     var itemsStatus = items.length + "/" + items.length + " notes and tags encrypted";
 
-    var textStyles = {
+    let titleStyles = {
       color: StyleKit.variable("stylekitForegroundColor"),
       fontSize: 16,
-      lineHeight: 22
+      fontWeight: "bold"
     }
+
+    let subtitleStyles = {
+      color: StyleKit.variable("stylekitNeutralColor"),
+      fontSize: 14,
+      marginTop: 4,
+    }
+
+    let containerStyles = {}
 
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
 
         <SectionedTableCell last={!enabled} first={true}>
-          <Text style={textStyles}>
-            <Text style={{fontWeight: "bold"}}>Encryption: </Text>
-            <Text>{encryptionStatus}</Text>
-            {enabled &&
-              <Text> | {encryptionType}</Text>
-            }
-          </Text>
-          {!enabled &&
-            <Text style={[textStyles, {marginTop: 4, color: StyleKit.variable("stylekitNeutralColor")}]}>
-            {storageEncryptionAvailable
-              ? "To enable encryption, sign in, register, or enable storage encryption."
-              : "Sign in, register, or add a local passcode to enable encryption."
-            }
-            </Text>
-          }
+          <View style={containerStyles}>
+            <Text style={titleStyles}>Encryption</Text>
+            <Text style={subtitleStyles}>{encryptionStatus}</Text>
+          </View>
         </SectionedTableCell>
 
         {enabled &&
           <SectionedTableCell>
-            <Text style={textStyles}>
-              <Text style={{fontWeight: "bold"}}>Encryption Source: </Text>
-              <Text>{sourceString}</Text>
-            </Text>
+            <View style={containerStyles}>
+              <Text style={titleStyles}>Encryption Source</Text>
+              <Text style={subtitleStyles}>{sourceString}</Text>
+            </View>
           </SectionedTableCell>
         }
 
         {enabled &&
           <SectionedTableCell last={true}>
-            <Text style={textStyles}>
-              <Text style={{fontWeight: "bold"}}>Items Encrypted: </Text>
-              <Text>{itemsStatus}</Text>
-            </Text>
+            <View style={containerStyles}>
+              <Text style={titleStyles}>Items Encrypted</Text>
+              <Text style={subtitleStyles}>{itemsStatus}</Text>
+            </View>
           </SectionedTableCell>
         }
-
 
       </TableSection>
     );
