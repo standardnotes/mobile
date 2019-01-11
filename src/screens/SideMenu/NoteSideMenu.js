@@ -215,7 +215,9 @@ export default class NoteSideMenu extends AbstractSideMenu {
   }
 
   buildOptionsForEditors() {
-    let editors = ComponentManager.get().getEditors();
+    let editors = ComponentManager.get().getEditors().sort((a, b) => {
+      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+    });
     let selectedEditor = ComponentManager.get().editorForNote(this.note);
     let options = [{
       text: "Plain Editor",
