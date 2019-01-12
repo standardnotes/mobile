@@ -147,7 +147,6 @@ export default class Settings extends Abstract {
       requireConfirm: true,
       showKeyboardChooser: true,
       onSubmit: async (value) => {
-        console.log("Setting up local passcode", value);
         let identifier = await SF.get().crypto.generateUUID();
 
         SF.get().crypto.generateInitialKeysAndAuthParamsForUser(identifier, value).then((results) => {

@@ -49,6 +49,10 @@ export default class AuthenticationSource {
 
   }
 
+  cancel() {
+
+  }
+
   requiresInterfaceReload() {
     this.onRequiresInterfaceReload && this.onRequiresInterfaceReload();
   }

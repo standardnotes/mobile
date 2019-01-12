@@ -43,8 +43,16 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
         return `Waiting for ${this.isFace ? "Face ID" : "Fingerprint"}`;
       case "did-succeed":
        return `Success | ${this.isFace ? "Face ID" : "Fingerprint"}`
+      case "did-fail":
+        return "Fingerprint failed. Tap to try again.";
       default:
         return "Status not accounted for"
+    }
+  }
+
+  setWaitingForInput() {
+    if(this.status != "processing") {
+      this.authenticate();
     }
   }
 
@@ -58,6 +66,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
         return this._success();
       })
       .catch((error) => {
+        console.log("Fingerprint error", error);
         return this._fail("Authentication failed. Tap to try again.");
       });
     } else {
@@ -79,6 +88,11 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
     }
   }
 
+  cancel() {
+    FingerprintScanner.release();
+    this.status = "waiting-turn";
+  }
+
   _success() {
     this.didSucceed();
     FingerprintScanner.release();
@@ -87,7 +101,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
 
   _fail(message) {
     this.didFail();
+    // FingerprintScanner.release();
     return {success: false, error: {message: message}};
-    FingerprintScanner.release();
   }
 }

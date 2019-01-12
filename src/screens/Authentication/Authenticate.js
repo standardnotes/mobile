@@ -12,10 +12,6 @@ import StyleKit from "@Style/StyleKit"
 import Icon from 'react-native-vector-icons/Ionicons';
 import ApplicationState from "@Lib/ApplicationState"
 
-// Dev mode only. Used to destroy data
-// import KeysManager from "@Lib/keysManager";
-// import Auth from "@SFJS/authManager"
-
 export default class Authenticate extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -35,19 +31,15 @@ export default class Authenticate extends Abstract {
       source.initializeForInterface();
     }
 
-    this._sessionLength = this.getProp("selectedSessionLength");
+    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
+      if(state == ApplicationState.GainingFocus) {
+          this.begin();
+      } else if(state == ApplicationState.Backgrounding) {
+        this.cancel();
+      }
+    })
 
-    // if(__DEV__) {
-      // props.navigation.setParams({
-      //   leftButton: {
-      //     title: "Destroy Data",
-      //     onPress: () => {
-      //       Auth.get().signout();
-      //       KeysManager.get().clearOfflineKeysAndData(true);
-      //     }
-      //   }
-      // })
-    // }
+    this._sessionLength = this.getProp("selectedSessionLength");
 
     if(this.getProp("hasCancelOption")) {
       props.navigation.setParams({
@@ -66,6 +58,11 @@ export default class Authenticate extends Abstract {
     this.successfulSources = [];
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    ApplicationState.get().removeStateObserver(this.stateObserver);
+  }
+
   submitPressed() {
     if(this.pendingSources.length == 1) {
       this.setState({submitDisabled: true});
@@ -76,7 +73,18 @@ export default class Authenticate extends Abstract {
     }
   }
 
-  componentDidMount() {
+  componentWillFocus() {
+    super.componentWillFocus();
+    this.begin();
+  }
+
+  cancel() {
+    if(this.state.activeSource) {
+      this.state.activeSource.cancel();
+    }
+  }
+
+  begin() {
     this.beginNextAuthentication();
   }
 
@@ -85,8 +93,10 @@ export default class Authenticate extends Abstract {
   }
 
   beginNextAuthentication() {
-    let firstSource = this.pendingSources[0];
-    this.beginAuthenticationForSource(firstSource);
+    if(this.pendingSources && this.pendingSources.length) {
+      let firstSource = this.pendingSources[0];
+      this.beginAuthenticationForSource(firstSource);
+    }
   }
 
   async beginAuthenticationForSource(source) {
@@ -118,7 +128,9 @@ export default class Authenticate extends Abstract {
       this.onSuccess();
     } else {
       this.setState({submitDisabled: false});
-      this.beginNextAuthentication();
+      if(!result.error) {
+        this.beginNextAuthentication();
+      }
     }
   }
 
@@ -182,7 +194,8 @@ export default class Authenticate extends Abstract {
       <View style={[this.styles.authSourceSection, !isLast ? this.styles.authSourceSectionNotLast : undefined]}>
         <SectionedAccessoryTableCell
           first={true}
-          dimmed={true}
+          dimmed={source != this.state.activeSource}
+          tinted={source == this.state.activeSource}
           text={source.label}
           onPress={() => {this.beginAuthenticationForSource(source)}}
         >
