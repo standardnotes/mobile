@@ -1,5 +1,5 @@
+import { Platform } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner'
-import ApplicationState from "@Lib/ApplicationState"
 import AuthenticationSource from "./AuthenticationSource"
 import KeysManager from "@Lib/keysManager"
 
@@ -59,7 +59,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
   async authenticate() {
     this.didBegin();
 
-    if(ApplicationState.isAndroid) {
+    if(Platform.OS == "android") {
       return FingerprintScanner.authenticate({
         // onAttempt: this.handleInvalidAttempt
       }).then(() => {

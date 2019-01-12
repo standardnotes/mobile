@@ -239,6 +239,7 @@ export default class ApplicationState {
   unlockApplication() {
     this.notifyOfState(ApplicationState.Unlocking);
     this.setAuthenticationInProgress(false);
+    KeysManager.get().updateScreenshotPrivacy();
     this.locked = false;
   }
 

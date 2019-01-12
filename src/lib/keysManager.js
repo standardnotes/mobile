@@ -1,6 +1,5 @@
 import {Platform} from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
-import ApplicationState from "@Lib/ApplicationState"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 import SF from './sfjs/sfjs'
@@ -29,12 +28,6 @@ export default class KeysManager {
   }
 
   async loadInitialData() {
-    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      if(state == ApplicationState.Unlocking) {
-        this.updateScreenshotPrivacy();
-      }
-    })
-
     var storageKeys = ["auth_params", OfflineParamsKey, "user", FirstRunKey, StorageEncryptionKey];
 
     return Promise.all([
@@ -184,7 +177,7 @@ export default class KeysManager {
   }
 
   updateScreenshotPrivacy(enabled) {
-    if(ApplicationState.isIOS) {
+    if(Platform.OS == "ios") {
       return;
     }
 
