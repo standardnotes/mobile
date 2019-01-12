@@ -47,10 +47,10 @@ export default class Auth extends SFAuthManager {
     // AuthManager only handles account related keys. If we are requesting keys,
     // we are referring to account keys. KeysManager.activeKeys can return local passcode
     // keys.
-    
-    if(this.offline) {
+    if(this.offline()) {
       return null;
     }
+
     return KeysManager.get().activeKeys();
   }
 

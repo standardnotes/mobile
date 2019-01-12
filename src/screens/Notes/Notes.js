@@ -61,6 +61,13 @@ export default class Notes extends Abstract {
   componentWillFocus() {
     super.componentWillFocus();
 
+    /*
+      Note that (tested on Android) if you select a protected note then present Authenticate,
+      upon Authenticate completion, willBlur/didBlur on Notes will not be called.
+
+      We'll let Compose itself handle whether right drawer should be locked.
+    */
+
     if(!ApplicationState.get().isTablet) {
       this.props.navigation.lockLeftDrawer(false);
       this.props.navigation.lockRightDrawer(true);

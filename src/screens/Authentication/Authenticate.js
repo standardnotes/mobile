@@ -16,7 +16,9 @@ export default class Authenticate extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
     let templateOptions = {
-      title: "Authenticate"
+      // On Android, not having a left button will make the title appear all the way at the edge
+      // Below will add some padding
+      title: ApplicationState.isAndroid ? "  Authenticate" : "Authenticate"
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
   };

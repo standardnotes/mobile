@@ -142,6 +142,10 @@ export default class Compose extends Abstract {
   componentWillFocus() {
     super.componentWillFocus();
 
+    if(!ApplicationState.get().isTablet) {
+      this.props.navigation.lockRightDrawer(false);
+    }
+
     if(this.note.dirty) {
       // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
       setTimeout(() => {
@@ -165,6 +169,10 @@ export default class Compose extends Abstract {
       }
     }
 
+    this.setSideMenuHandler();
+  }
+
+  setSideMenuHandler() {
     SideMenuManager.get().setHandlerForRightSideMenu({
       getCurrentNote: () => {
         return this.note;
@@ -207,6 +215,10 @@ export default class Compose extends Abstract {
 
   componentWillBlur() {
     super.componentWillBlur();
+
+    if(!ApplicationState.get().isTablet) {
+      this.props.navigation.lockRightDrawer(true);
+    }
 
     this.input && this.input.blur();
 

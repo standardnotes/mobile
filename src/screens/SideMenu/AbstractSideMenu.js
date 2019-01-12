@@ -19,7 +19,13 @@ export default class AbstractSideMenu extends Abstract {
     if(newNavigationState.drawerMovementDirection == "closing" || currentNavigationState.drawerMovementDirection == "closing") {
       return false;
     }
-    let isSame = Abstract.IsShallowEqual(newNavigationState, currentNavigationState, ["isDrawerIdle", "isDrawerOpen", "isTransitioning"])
+
+    let isSame = Abstract.IsShallowEqual(
+      newNavigationState,
+      currentNavigationState,
+      ["isDrawerIdle", "isDrawerOpen", "isTransitioning"]
+    );
+    
     if(!isSame) {
       this.psuedo_willFocus();
     }

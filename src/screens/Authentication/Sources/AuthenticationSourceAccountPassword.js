@@ -24,8 +24,10 @@ export default class AuthenticationSourceAccountPassword extends AuthenticationS
         return "Enter your account password"
       case "processing":
         return "Verifying keys...";
-        case "did-succeed":
-         return "Success | Account Password"
+      case "did-succeed":
+       return "Success | Account Password"
+       case "did-fail":
+        return "Invalid account password. Please try again."
       default:
         return "Status not accounted for: " + this.status
     }
