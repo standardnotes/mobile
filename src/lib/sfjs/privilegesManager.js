@@ -8,6 +8,7 @@ import KeysManager from "@Lib/keysManager"
 import Storage from "@SFJS/storageManager"
 import Auth from "@SFJS/authManager"
 import ApplicationState from "@Lib/ApplicationState"
+import StyleKit from "@Style/StyleKit"
 
 export default class PrivilegesManager extends SFPrivilegesManager {
 
