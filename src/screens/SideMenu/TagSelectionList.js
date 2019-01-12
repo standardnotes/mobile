@@ -84,6 +84,10 @@ class TagSelectionList extends ThemedComponent {
   }
 
   showActionSheet = (tag) => {
+    if(tag.content.isSystemTag) {
+      return;
+    }
+    
     let sheet = new ActionSheetWrapper({
       title: tag.title,
       options: [
@@ -143,6 +147,7 @@ class TagSelectionList extends ThemedComponent {
     return (
       <Fragment>
         <FlatList
+          style={this.styles.list}
           initialNumToRender={10}
           windowSize={10}
           maxToRenderPerBatch={10}
@@ -162,6 +167,9 @@ class TagSelectionList extends ThemedComponent {
 
   loadStyles() {
     this.styles = {
+      list: {
+        paddingBottom: this.props.hasBottomPadding ? 30 : 0
+      },
       emptyPlaceholderText: {
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.6,

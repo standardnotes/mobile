@@ -163,6 +163,7 @@ export default class MainSideMenu extends AbstractSideMenu {
 
             <SideMenuSection title="Tags">
               <TagSelectionList
+                hasBottomPadding={ApplicationState.isAndroid}
                 emptyPlaceholder={"No tags. Create one from the note composer."}
                 contentType="Tag"
                 onTagSelect={this.onTagSelect}

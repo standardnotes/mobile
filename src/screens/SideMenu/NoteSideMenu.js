@@ -288,6 +288,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
 
             <SideMenuSection title="Tags">
               <TagSelectionList
+                hasBottomPadding={ApplicationState.isAndroid}
                 contentType="Tag"
                 onTagSelect={this.onTagSelect}
                 selectedTags={selectedTags}
