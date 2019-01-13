@@ -70,6 +70,7 @@ export default class Compose extends Abstract {
           }
 
           if(clearNote) {
+            this.props.navigation.closeRightDrawer();
             this.setNote(null);
           }
         } else if(data.retrievedItems && this.note.uuid && data.retrievedItems.concat(data.savedItems).map((i) => i.uuid).includes(this.note.uuid)) {
