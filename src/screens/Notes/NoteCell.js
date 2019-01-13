@@ -32,14 +32,6 @@ export default class NoteCell extends ThemedPureComponent {
     this.setState({selected: false});
   };
 
-  noteCellStyle = () => {
-    if(this.state.selected) {
-      return [styles.noteCell, styles.noteCellSelected];
-    } else {
-      return styles.noteCell;
-    }
-  }
-
   aggregateStyles(base, addition, condition) {
     if(condition) {
       return [base, addition];
@@ -150,7 +142,7 @@ export default class NoteCell extends ThemedPureComponent {
   flagElement = (flag) => {
     let bgColor = flag.color;
     let textColor = StyleKit.variables.stylekitInfoContrastColor;
-    if(this.state.selected) {
+    if(this.state.selected || this.props.highlighted) {
       bgColor = StyleKit.variables.stylekitInfoContrastColor;
       textColor = flag.color
     }
@@ -180,9 +172,12 @@ export default class NoteCell extends ThemedPureComponent {
     var note = this.props.item;
     let showPreview = !this.state.options.hidePreviews && !note.content.protected && !note.content.hidePreview;
     let flags = this.getFlags(note);
+
+    let highlight = this.state.selected || this.props.highlighted;
+
     return (
        <TouchableWithoutFeedback onPress={this._onPress} onPressIn={this._onPressIn} onPressOut={this._onPressOut} onLongPress={this.showActionSheet}>
-          <View style={this.aggregateStyles(this.styles.noteCell, this.styles.noteCellSelected, this.state.selected)} onPress={this._onPress}>
+          <View style={this.aggregateStyles(this.styles.noteCell, this.styles.noteCellSelected, highlight)} onPress={this._onPress}>
 
             {note.deleted &&
               <Text style={this.styles.deleting}>Deleting...</Text>
@@ -205,26 +200,26 @@ export default class NoteCell extends ThemedPureComponent {
                 <Text style={[this.styles.noteTitle, this.styles.deleting]}>
                   {"Password Required."}
                 </Text>
-                <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>
+                <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, highlight)}>
                   {"Please sign in to restore your decryption keys and notes."}
                 </Text>
               </View>
             }
 
             {note.safeTitle().length > 0 &&
-              <Text style={this.aggregateStyles(this.styles.noteTitle, this.styles.noteTitleSelected, this.state.selected)}>
+              <Text style={this.aggregateStyles(this.styles.noteTitle, this.styles.noteTitleSelected, highlight)}>
                 {note.title}
               </Text>
             }
 
             {(note.content.preview_plain != null && showPreview) &&
-              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>
+              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, highlight)}>
                 {note.content.preview_plain}
               </Text>
             }
 
             {(!note.content.preview_plain && showPreview && note.safeText().length > 0) &&
-              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, this.state.selected)}>
+              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, highlight)}>
                 {note.text}
               </Text>
             }
@@ -232,14 +227,14 @@ export default class NoteCell extends ThemedPureComponent {
             {!this.state.options.hideDates &&
               <Text
                 numberOfLines={1}
-                style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, this.state.selected)}>
+                style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, highlight)}>
                 {this.props.sortType == "client_updated_at" ? "Modified " + note.updatedAtString() : note.createdAtString()}
               </Text>
             }
 
             {this.props.renderTags && !this.state.options.hideTags && note.tags.length > 0 &&
               <View style={this.styles.noteTagsContainer}>
-                <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag, this.styles.noteTagSelected, this.state.selected)}>
+                <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag, this.styles.noteTagSelected, highlight)}>
                   {this.props.tagsString}
                 </Text>
               </View>

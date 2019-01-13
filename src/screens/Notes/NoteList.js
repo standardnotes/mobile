@@ -50,6 +50,7 @@ export default class NoteList extends ThemedComponent {
         sortType={this.props.sortType}
         renderTags={renderTags}
         options={this.props.options}
+        highlighted={item.uuid == this.props.selectedNoteId}
 
         pinned={item.pinned /* extraData */}
         deleted={item.deleted /* extraData */}

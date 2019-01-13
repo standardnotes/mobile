@@ -265,6 +265,10 @@ export default class Notes extends Abstract {
       } else {
         this.presentComposer(note);
       }
+
+      if(ApplicationState.get().isTablet) {
+        this.setState({selectedNoteId: note && note.uuid});
+      }
     });
   }
 
@@ -317,6 +321,7 @@ export default class Notes extends Abstract {
             loading={this.state.loading}
             selectedTags={this.state.tags}
             options={this.options.displayOptions}
+            selectedNoteId={this.state.selectedNoteId}
           />
         }
 
