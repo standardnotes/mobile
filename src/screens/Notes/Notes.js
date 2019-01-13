@@ -122,10 +122,6 @@ export default class Notes extends Abstract {
       if(shouldReloadSubtitleAfterNotesReload) {
         this.setSubTitle(null);
       }
-
-      if(ApplicationState.get().isTablet) {
-        this.selectFirstNote();
-      }
     })
 
     this.mappingObserver = ModelManager.get().addItemSyncObserver("notes-screen", ["Tag", "Note"], () => {
@@ -140,6 +136,9 @@ export default class Notes extends Abstract {
         this.reloadList();
         this.reloadHeaderBar();
         this.mergeState({decrypting: false, loading: false});
+        if(ApplicationState.get().isTablet) {
+          this.selectFirstNote();
+        }
       } else if(event == "sync-exception") {
         Alert.alert("Issue Syncing", `There was an error while trying to save your items. Please contact support and share this message: ${data}`);
       }
@@ -213,13 +212,11 @@ export default class Notes extends Abstract {
   }
 
   async presentComposer(note) {
-    this.handlePrivilegedAction(note && note.content.protected, SFPrivilegesManager.ActionViewProtectedNotes, () => {
-      this.props.navigation.navigate("Compose", {
-        title: note ? "Editor" : "Compose",
-        noteId: note && note.uuid,
-        selectedTagId: this.options.selectedTagIds.length && this.options.selectedTagIds[0],
-      });
-    })
+    this.props.navigation.navigate("Compose", {
+      title: note ? "Editor" : "Compose",
+      noteId: note && note.uuid,
+      selectedTagId: this.options.selectedTagIds.length && this.options.selectedTagIds[0],
+    });
   }
 
   reloadList(force) {
@@ -262,11 +259,13 @@ export default class Notes extends Abstract {
   }
 
   handleSelection = (note) => {
-    if(this.props.onNoteSelect) {
-      this.props.onNoteSelect(note);
-    } else {
-      this.presentComposer(note);
-    }
+    this.handlePrivilegedAction(note && note.content.protected, SFPrivilegesManager.ActionViewProtectedNotes, () => {
+      if(this.props.onNoteSelect) {
+        this.props.onNoteSelect(note);
+      } else {
+        this.presentComposer(note);
+      }
+    });
   }
 
   _onPressItem = (item: hash) => {

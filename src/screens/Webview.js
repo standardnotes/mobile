@@ -13,8 +13,15 @@ export default class Webview extends Component {
   constructor(props) {
     super(props);
 
-    this.editor = ModelManager.get().findItem(props.editorId);
-    this.note = ModelManager.get().findItem(props.noteId);
+    this.identifier = `${Math.random()}`
+
+    ComponentManager.get().registerHandler({identifier: this.identifier, areas: ["note-tags", "editor-stack", "editor-editor"],
+       contextRequestHandler: (component) => {
+        return this.note;
+      }
+    });
+
+    this.reloadData();
 
     if(!this.note) {
       console.log("Unable to find note with ID", props.noteId);
@@ -27,16 +34,22 @@ export default class Webview extends Component {
       Alert.alert('Re-install Extension', `This extension is not installed correctly. Please use the web or desktop application to reinstall ${this.editor.name}, then try again.`, [{text: 'OK'}])
       return;
     }
+  }
 
-    this.handler = ComponentManager.get().registerHandler({identifier: "editor", areas: ["note-tags", "editor-stack", "editor-editor"],
-       contextRequestHandler: (component) => {
-        return this.note;
-      }
-    });
+  componentDidUpdate(prevProps, prevState) {
+    if(prevProps.noteId != this.props.noteId || prevProps.editorId != this.props.editorId) {
+      this.reloadData();
+    }
+  }
+
+  reloadData() {
+    this.editor = ModelManager.get().findItem(this.props.editorId);
+    this.note = ModelManager.get().findItem(this.props.noteId);
+    ComponentManager.get().contextItemDidChangeInArea("editor-editor");
   }
 
   componentWillUnmount() {
-    ComponentManager.get().deregisterHandler(this.handler);
+    ComponentManager.get().deregisterHandler(this.identifier);
     ComponentManager.get().deactivateComponent(this.editor);
   }
 
