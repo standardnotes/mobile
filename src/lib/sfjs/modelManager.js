@@ -88,6 +88,13 @@ export default class ModelManager extends SFModelManager {
     return tagMatches.concat(smartMatches);
   }
 
+  getTagWithId(id) {
+    let tags = this.getTagsWithIds([id]);
+    if(tags.length > 0) {
+      return tags[0];
+    }
+  }
+
   buildSystemSmartTags() {
     this.systemSmartTags = SNSmartTag.systemSmartTags();
   }

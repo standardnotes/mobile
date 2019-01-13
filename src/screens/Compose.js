@@ -49,7 +49,7 @@ export default class Compose extends Abstract {
     if(noteId) { note = ModelManager.get().findItem(noteId);}
     this.setNote(note, true);
 
-    this.constructState({title: this.note.title, noteLocked: this.note.locked});
+    this.constructState({title: this.note.title, noteLocked: this.note.locked /* required to re-render on change */});
 
     this.configureHeaderBar();
 
@@ -57,8 +57,21 @@ export default class Compose extends Abstract {
 
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
       if(event == "sync:completed") {
-        if(this.note.deleted) {
-          this.setNote(null);
+        if(this.note.deleted || this.note.content.trashed) {
+          let clearNote = this.note.deleted == true;
+          // if Trashed, and we're in the Trash view, don't clear note.
+          if(!this.note.deleted) {
+            let selectedTag = this.getSelectedTag();
+            let isTrashTag = selectedTag != null && selectedTag.content.isTrashTag == true;
+            if(this.note.content.trashed) {
+              // clear the note if this is not the trash tag. Otherwise, keep it in view.
+              clearNote = !isTrashTag;
+            }
+          }
+
+          if(clearNote) {
+            this.setNote(null);
+          }
         } else if(data.retrievedItems && this.note.uuid && data.retrievedItems.concat(data.savedItems).map((i) => i.uuid).includes(this.note.uuid)) {
           /*
           You have to be careful about when you render inside this component. Rendering with the native SNTextView component
@@ -93,8 +106,28 @@ export default class Compose extends Abstract {
     });
   }
 
+  /*
+    In the Compose constructor, setNote is called with an empty value. This will create a new note.
+    This is fine for non-tablet, but on tablet, we select the first note of the current view options,
+    which initially is null, so setNote(null) will be called twice.
+
+    On tablet, in the options change observer, we select first note, which is null, will call setNote(null) again.
+    This is fine throughout normal lifecycle operation, but because the Compose constructor already calls setNote(null),
+    it will be called twice.
+
+    Two solutions can be:
+    1. In Compose constructor, check if tablet if note is null (hacky)
+    2. In setNote(null), if the current note is already a dummy, don't do anything.
+  */
+
   setNote(note, isConstructor = false) {
     if(!note) {
+      if(this.note && this.note.dummy) {
+        // This method can be called if the + button is pressed. On Tablet, it can be pressed even while we're
+        // already here. Just focus input if that's the case.
+        this.input && this.input.focus();
+        return;
+      }
       note = ModelManager.get().createItem({content_type: "Note", dummy: true, text: ""});
       note.dummy = true;
       // Editors need a valid note with uuid and modelmanager mapped in order to interact with it
@@ -231,7 +264,6 @@ export default class Compose extends Abstract {
   replaceTagsForNote(newTags) {
     let note = this.note;
 
-
     var oldTags = note.tags.slice(); // original array will be modified in the for loop so we make a copy
     for(var oldTag of oldTags) {
       if(!newTags.includes(oldTag)) {
@@ -297,6 +329,13 @@ export default class Compose extends Abstract {
     return this.getProp("selectedTagId") || this.props.selectedTagId;
   }
 
+  getSelectedTag() {
+    let id = this.getSelectedTagId();
+    if(id) {
+      return ModelManager.get().getTagWithId(id);
+    }
+  }
+
   changesMade() {
     this.note.hasChanges = true;
 
@@ -308,7 +347,7 @@ export default class Compose extends Abstract {
     this.saveTimeout = setTimeout(() => {
       this.showSavingStatus();
       if(isDummy && this.getSelectedTagId()) {
-        var tag = ModelManager.get().findItem(this.getSelectedTagId());
+        var tag = this.getSelectedTag();
         // Could be system tag, so wouldn't exist
         if(tag && !tag.isSmartTag()) {
           tag.addItemAsRelationship(this.note);
