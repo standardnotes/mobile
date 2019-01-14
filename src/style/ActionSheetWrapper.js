@@ -31,8 +31,6 @@ export default class ActionSheetWrapper {
   }
 
   handleActionSheetPress = (index) => {
-    console.log("handleActionSheetPress", index);
-
     let option = this.options[index];
     option.callback && option.callback(option);
   }
