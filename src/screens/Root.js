@@ -164,7 +164,7 @@ export default class Root extends Abstract {
       if(!this.dataLoaded) {
         this.dataLoaded = true;
       }
-      this.notesRef.root_onIncrementalSync();
+      this.notesRef && this.notesRef.root_onIncrementalSync();
     }
 
     let loadLocalCompletion = (items) => {

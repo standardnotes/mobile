@@ -205,6 +205,7 @@ export default class StyleKit {
 
   themes() {
     let themes = ModelManager.get().themes.sort((a, b) => {
+      if(!a.name || !b.name) { return -1; }
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
     });
     return this.systemThemes.concat(themes);

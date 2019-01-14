@@ -143,6 +143,7 @@ export default class SideMenuCell extends ThemedComponent {
         color: StyleKit.variables.stylekitContrastForegroundColor,
         fontWeight: 'bold',
         fontSize: 15,
+        fontFamily: "", // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       iconGraphic: {
