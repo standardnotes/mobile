@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ThemedComponent from "@Components/ThemedComponent";
+import ApplicationState from "@Lib/ApplicationState"
 
 import StyleKit from "@Style/StyleKit"
 import Circle from "@Components/Circle"
@@ -143,7 +144,7 @@ export default class SideMenuCell extends ThemedComponent {
         color: StyleKit.variables.stylekitContrastForegroundColor,
         fontWeight: 'bold',
         fontSize: 15,
-        fontFamily: "", // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+        fontFamily: ApplicationState.isAndroid ? 'Roboto' : null, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       iconGraphic: {

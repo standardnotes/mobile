@@ -191,10 +191,12 @@ export default class Notes extends Abstract {
     }
 
     var tags = ModelManager.get().getTagsWithIds(this.options.selectedTagIds);
-    // There always has to be a selected tag/view
-    var tag = tags[0];
-    notesTitle = tag.title;
-    this.setTitle(notesTitle);
+    // Tags might not be completely loaded yet, as reloadHeaderBar can be called from incrementalSync
+    if(tags.length > 0) {
+      var tag = tags[0];
+      notesTitle = tag.title;
+      this.setTitle(notesTitle);
+    }
   }
 
   setSideMenuHandler() {

@@ -45,22 +45,22 @@ class TagSelectionList extends ThemedComponent {
       }
     });
 
+    this.syncObserverId = `${Math.random()}`;
+
+    ModelManager.get().addItemSyncObserver(this.syncObserverId, this.props.contentType, () => {
+      console.log("Reloading tags list", this.props.contentType);
+      this.reload();
+    })
+
     this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
       if(event == "local-data-loaded") {
         handleInitialDataLoad();
-      }
-
-      else if(event == "sync:completed") {
-        let inRetrieved = data.retrievedItems && _.find(data.retrievedItems, {content_type: this.props.contentType});
-        let inSaved = data.savedItems && _.find(data.savedItems, {content_type: this.props.contentType});
-        if(inRetrieved || inSaved) {
-          this.reload();
-        }
       }
     })
   }
 
   componentWillUnmount() {
+    ModelManager.get().removeItemSyncObserver(this.syncObserverId);
     Sync.get().removeEventHandler(this.syncEventHandler);
     Auth.get().removeEventHandler(this.signoutObserver);
   }
@@ -87,7 +87,7 @@ class TagSelectionList extends ThemedComponent {
     if(tag.content.isSystemTag) {
       return;
     }
-    
+
     let sheet = new ActionSheetWrapper({
       title: tag.title,
       options: [

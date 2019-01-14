@@ -226,13 +226,35 @@ export default class Root extends Abstract {
     this.setState({selectedTagId: this.notesRef.options.selectedTagIds.length && this.notesRef.options.selectedTagIds[0]});
   }
 
+  onLayout = (e) => {
+    let width = e.nativeEvent.layout.width;
+    let shouldSplitLayout = ApplicationState.get().isTablet;
+
+    /*
+    If you're in tablet mode, but on an iPad where this app is running side by side by another app,
+    we only want to show the Compose window and not the list, because there isn't enough space.
+    */
+    const MinWidthToSplit = 450;
+    if(ApplicationState.get().isTablet && width < MinWidthToSplit) {
+      shouldSplitLayout = false;
+    }
+
+    this.setState({
+      width: width,
+      height: e.nativeEvent.layout.height,
+      x: e.nativeEvent.layout.x,
+      y: e.nativeEvent.layout.y,
+      shouldSplitLayout: shouldSplitLayout
+    });
+  }
+
   render() {
     /* Don't render LockedView here since we need this.notesRef as soon as we can (for componentWillFocus callback) */
 
     let isTablet = ApplicationState.get().isTablet;
 
     return (
-      <View style={[StyleKit.styles.container, this.styles.root]}>
+      <View onLayout={this.onLayout} style={[StyleKit.styles.container, this.styles.root]}>
         {!isTablet &&
           <Notes
             ref={(ref) => {this.notesRef = ref}}
@@ -242,7 +264,7 @@ export default class Root extends Abstract {
 
         {isTablet &&
           <Fragment>
-            <View style={this.styles.left}>
+            <View style={[this.styles.left, {width: this.state.shouldSplitLayout ? "34%" : 0}]}>
               <Notes
                 ref={(ref) => {this.notesRef = ref}}
                 navigation={this.props.navigation}
@@ -250,7 +272,7 @@ export default class Root extends Abstract {
               />
             </View>
 
-            <View style={this.styles.right}>
+            <View style={[this.styles.right, {width: this.state.shouldSplitLayout ? "66%" : "100%"}]}>
               <Compose
                 ref={(ref) => {this.composer = ref}}
                 selectedTagId={this.state.selectedTagId}
@@ -271,12 +293,11 @@ export default class Root extends Abstract {
         flexDirection: "row"
       },
       left: {
-        width: "34%",
         borderRightColor: StyleKit.variables.stylekitBorderColor,
         borderRightWidth: 1
       },
       right: {
-        width: "66%"
+
       }
     }
   }
