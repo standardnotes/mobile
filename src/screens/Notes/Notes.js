@@ -42,15 +42,23 @@ export default class Notes extends Abstract {
   }
 
   loadInitialState() {
+    // We may be here on non-launch state, where local data will already have been loaded.
+    let initialDataLoaded = Sync.get().initialDataLoaded();
     let encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.mergeState({
       refreshing: false,
-      decrypting: encryptionEnabled,
-      loading: !encryptionEnabled,
+      decrypting: !initialDataLoaded && encryptionEnabled,
+      loading: !initialDataLoaded && !encryptionEnabled,
       notes: []
     });
 
     super.loadInitialState();
+
+    // On Android, if you press physical back button, all components will be unmounted.
+    // When you reopen, they will be mounted again, but local-data-loaded event will rightfully
+    // not be sent again. So we want to make sure that we're able to reload state when component mounts,
+    // and loadInitialState is called on componentDidMount
+    this.reloadList();
   }
 
   unlockContent() {

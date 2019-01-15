@@ -244,7 +244,7 @@ export default class Compose extends Abstract {
         // Keyboard.dismiss() does not work for native views, which our tet input is
         this.input && this.input.blur();
       }
-    })
+    });
   }
 
   componentWillBlur() {
