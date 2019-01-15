@@ -48,7 +48,6 @@ class TagSelectionList extends ThemedComponent {
     this.syncObserverId = `${Math.random()}`;
 
     ModelManager.get().addItemSyncObserver(this.syncObserverId, this.props.contentType, () => {
-      console.log("Reloading tags list", this.props.contentType);
       this.reload();
     })
 
