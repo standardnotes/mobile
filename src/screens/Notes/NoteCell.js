@@ -41,12 +41,8 @@ export default class NoteCell extends ThemedPureComponent {
   }
 
   showActionSheet = () => {
-    let callbackForOption = (option) => {
-      ItemActionManager.handleEvent(option.key, this.props.item, () => {
-        this.forceUpdate();
-      }, () => {
-        // afterConfirmCallback
-        // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
+    let callbackForAction = (action) => {
+      this.props.handleAction(this.props.item, action.key, () => {
         this.forceUpdate();
       });
     }
@@ -74,15 +70,17 @@ export default class NoteCell extends ThemedPureComponent {
       });
     } else {
       let options = [
-        ActionSheetWrapper.BuildOption({text: pinLabel, key: pinEvent, callback: callbackForOption}),
-        ActionSheetWrapper.BuildOption({text: archiveLabel, key: archiveEvent, callback: callbackForOption}),
-        ActionSheetWrapper.BuildOption({text: lockLabel, key: lockEvent, callback: callbackForOption}),
-        ActionSheetWrapper.BuildOption({text: protectLabel, key: protectEvent, callback: callbackForOption}),
-        ActionSheetWrapper.BuildOption({text: "Share", key: ItemActionManager.ShareEvent, callback: callbackForOption}),
+        ActionSheetWrapper.BuildOption({text: pinLabel, key: pinEvent, callback: callbackForAction}),
+        ActionSheetWrapper.BuildOption({text: archiveLabel, key: archiveEvent, callback: callbackForAction}),
+        ActionSheetWrapper.BuildOption({text: lockLabel, key: lockEvent, callback: callbackForAction}),
+        ActionSheetWrapper.BuildOption({text: protectLabel, key: protectEvent, callback: callbackForAction}),
+        ActionSheetWrapper.BuildOption({text: "Share", key: ItemActionManager.ShareEvent, callback: callbackForAction}),
       ]
 
       if(!this.props.item.content.trashed) {
-        options.push(ActionSheetWrapper.BuildOption({text: "Move to Trash", key: ItemActionManager.TrashEvent, destructive: true, callback: callbackForOption}));
+        options.push(ActionSheetWrapper.BuildOption({text: "Move to Trash", key: ItemActionManager.TrashEvent, destructive: true, callback: callbackForAction}));
+      } else {
+        options.push(ActionSheetWrapper.BuildOption({text: "Delete Forever", key: ItemActionManager.DeleteEvent, destructive: true, callback: callbackForAction}));
       }
 
       sheet = new ActionSheetWrapper({

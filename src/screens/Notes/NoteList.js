@@ -51,6 +51,7 @@ export default class NoteList extends ThemedComponent {
         renderTags={renderTags}
         options={this.props.options}
         highlighted={item.uuid == this.props.selectedNoteId}
+        handleAction={this.props.handleAction}
 
         pinned={item.pinned /* extraData */}
         deleted={item.deleted /* extraData */}

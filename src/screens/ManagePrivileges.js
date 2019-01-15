@@ -103,7 +103,7 @@ export default class ManagePrivileges extends Abstract {
     }
 
     return (
-      <View style={StyleKit.styles.container}>
+      <View style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         <ScrollView>
 
           {this.state.sessionExpirey && !this.state.sessionExpired &&

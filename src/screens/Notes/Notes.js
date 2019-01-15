@@ -9,6 +9,7 @@ import AlertManager from '@SFJS/alertManager'
 import Auth from '@SFJS/authManager'
 import KeysManager from '@Lib/keysManager'
 import Keychain from "@Lib/keychain"
+import ItemActionManager from '@Lib/itemActionManager'
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 
@@ -310,6 +311,28 @@ export default class Notes extends Abstract {
     this.skipUpdatingNavBar = false;
   }
 
+  handleActionsheetAction = (item, action, callback) => {
+    console.log("handleActionsheetAction", item, action);
+    let run = () => {
+      ItemActionManager.handleEvent(action, item, () => {
+        callback();
+      }, () => {
+        // afterConfirmCallback
+        // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
+        callback();
+      });
+    }
+
+    if(action == ItemActionManager.TrashEvent || action == ItemActionManager.DeleteEvent) {
+      this.handlePrivilegedAction(true, SFPrivilegesManager.ActionDeleteNote, () => {
+        run();
+      })
+    } else {
+      run();
+    }
+  }
+
+
   render() {
     if(this.state.lockContent) {
       return <LockedView />;
@@ -332,6 +355,7 @@ export default class Notes extends Abstract {
             selectedTags={this.state.tags}
             options={this.options.displayOptions}
             selectedNoteId={this.state.selectedNoteId}
+            handleAction={this.handleActionsheetAction}
           />
         }
 

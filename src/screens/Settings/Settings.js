@@ -228,6 +228,12 @@ export default class Settings extends Abstract {
     this.forceUpdate();
   }
 
+  openManagePrivs = () => {
+    this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManagePrivileges, () => {
+      this.props.navigation.navigate("ManagePrivileges")
+    })
+  }
+
   render() {
     if(this.state.lockContent) {
       return (<LockedView />);
@@ -249,7 +255,7 @@ export default class Settings extends Abstract {
           <OptionsSection
             title={"Options"}
             onSignOutPress={this.onSignOutPress}
-            onManagePrivileges={() => {this.props.navigation.navigate("ManagePrivileges")}}
+            onManagePrivileges={this.openManagePrivs}
           />
 
           <TableSection>

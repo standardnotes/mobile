@@ -129,8 +129,8 @@ export default class NoteSideMenu extends AbstractSideMenu {
         }
       });
     }
-    if((action == ItemActionManager.TrashEvent || action == ItemActionManager.DeleteEvent) && this.note.content.protected) {
-      this.handlePrivilegedAction(this.note.content.protected, SFPrivilegesManager.ActionDeleteNote, () => {
+    if(action == ItemActionManager.TrashEvent || action == ItemActionManager.DeleteEvent) {
+      this.handlePrivilegedAction(true, SFPrivilegesManager.ActionDeleteNote, () => {
         run();
       })
     } else {
