@@ -55,6 +55,8 @@ class OptionsSection extends Abstract {
         }
         this.setState({loadingExport: false});
       })
+    }, () => {
+      this.setState({loadingExport: false});
     });
   }
 

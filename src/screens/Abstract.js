@@ -233,13 +233,13 @@ export default class Abstract extends ThemedComponent {
     this.props.navigation.goBack(null);
   }
 
-  async handlePrivilegedAction(isProtected, action, run) {
+  async handlePrivilegedAction(isProtected, action, run, onCancel) {
     if(isProtected) {
       let actionRequiresPrivs = await PrivilegesManager.get().actionRequiresPrivilege(action);
       if(actionRequiresPrivs) {
         PrivilegesManager.get().presentPrivilegesModal(action, this.props.navigation, () => {
           run();
-        });
+        }, onCancel);
       } else {
         run();
       }
