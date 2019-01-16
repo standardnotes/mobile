@@ -38,7 +38,7 @@ export default class KeysManager {
         }
       }),
 
-      Storage.get().getMultiItems(storageKeys).then(function(items){
+      Storage.get().getMultiItems(storageKeys).then((items) => {
         // first run
         this.firstRun = items[FirstRunKey] === null || items[FirstRunKey] === undefined;
 
@@ -74,7 +74,7 @@ export default class KeysManager {
         } else {
           this.user = {};
         }
-      }.bind(this))
+      })
     ])
   }
 
