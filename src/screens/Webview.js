@@ -102,8 +102,6 @@ export default class Webview extends Component {
     var editor = this.editor;
     var url = ComponentManager.get().urlForComponent(editor);
 
-    let bottomPadding = -34; // For some reason iOS inserts padding on bottom
-
     return (
       <View style={[StyleKit.styles.flexContainer, {backgroundColor: StyleKit.variables.stylekitBackgroundColor}]}>
         <WebView
@@ -115,7 +113,7 @@ export default class Webview extends Component {
            onLoadStart={this.onLoadStart}
            onError={this.onLoadError}
            onMessage={this.onMessage}
-           contentInset={{top: 0, left: 0, bottom: bottomPadding, right: 0}}
+           contentInset={{top: 0, left: 0, bottom: 0, right: 0}}
            scalesPageToFit={ApplicationState.isIOS ? false : true}
            injectedJavaScript = {
              `window.isNative = "true"`
