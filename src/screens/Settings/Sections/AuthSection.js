@@ -18,6 +18,8 @@ export default class AuthSection extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      email: AuthSection.emailInProgress,
+      password: AuthSection.passwordInProgress,
       signingIn: false,
       registering: false,
       strictSignIn: false,
@@ -120,6 +122,8 @@ export default class AuthSection extends Component {
   }
 
   onAuthSuccess = () => {
+    AuthSection.emailInProgress = null;
+    AuthSection.passwordInProgress = null;
     Sync.get().markAllItemsDirtyAndSaveOffline(false).then(() => {
       Sync.get().unlockSyncing();
       Sync.get().sync();
@@ -155,6 +159,19 @@ export default class AuthSection extends Component {
 
   cancelMfa = () => {
     this.setState({mfa: null});
+  }
+
+  emailInputChanged = (text) => {
+    this.setState({email: text});
+    // If you have a local passcode with immediate timing, and you're trying to sign in, and 2FA is prompted
+    // then by the time you come back from Auth, AuthSection will have unmounted and remounted (because Settings returns LockedView),
+    // clearing any values. So we'll hang on to them here.
+    AuthSection.emailInProgress = text;
+  }
+
+  passwordInputChanged = (text) => {
+    this.setState({password: text});
+    AuthSection.passwordInProgress = text;
   }
 
   _renderRegistrationConfirm() {
@@ -229,7 +246,7 @@ export default class AuthSection extends Component {
               <TextInput
                 style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={"Email"}
-                onChangeText={(text) => this.setState({email: text})}
+                onChangeText={(text) => this.emailInputChanged(text)}
                 value={this.state.email}
                 autoCorrect={false}
                 autoCapitalize={'none'}
@@ -244,7 +261,7 @@ export default class AuthSection extends Component {
               <TextInput
                 style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={"Password"}
-                onChangeText={(text) => this.setState({password: text})}
+                onChangeText={(text) => this.passwordInputChanged(text)}
                 value={this.state.password}
                 secureTextEntry={true}
                 keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
