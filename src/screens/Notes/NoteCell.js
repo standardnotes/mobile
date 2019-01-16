@@ -176,6 +176,7 @@ export default class NoteCell extends ThemedPureComponent {
     var note = this.props.item;
     let showPreview = !this.state.options.hidePreviews && !note.content.protected && !note.content.hidePreview;
     let flags = this.getFlags(note);
+    let showTagsString = this.props.renderTags && !this.state.options.hideTags && note.tags.length > 0 && !note.content.protected;
 
     let highlight = this.state.selected || this.props.highlighted;
 
@@ -236,7 +237,7 @@ export default class NoteCell extends ThemedPureComponent {
               </Text>
             }
 
-            {this.props.renderTags && !this.state.options.hideTags && note.tags.length > 0 &&
+            {showTagsString &&
               <View style={this.styles.noteTagsContainer}>
                 <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag, this.styles.noteTagSelected, highlight)}>
                   {this.props.tagsString}
