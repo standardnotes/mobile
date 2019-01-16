@@ -110,8 +110,9 @@ export default class ApplicationState {
     var isLosingFocus = nextAppState == 'inactive';
 
     if(isEnteringBackground) {
-      this.notifyOfState(ApplicationState.Backgrounding);
+      // Set most recent state before notifying observers, in case they need to query this value.
       this.mostRecentState = ApplicationState.Backgrounding;
+      this.notifyOfState(ApplicationState.Backgrounding);
 
       if(this.shouldLockApplication()) {
         this.lockApplication();
@@ -120,18 +121,18 @@ export default class ApplicationState {
 
     if(isResumingFromBackground || isResuming) {
       if(isResumingFromBackground) {
-        this.notifyOfState(ApplicationState.ResumingFromBackground);
         this.mostRecentState = ApplicationState.ResumingFromBackground;
+        this.notifyOfState(ApplicationState.ResumingFromBackground);
       }
 
       // Notify of GainingFocus even if resuming from background
-      this.notifyOfState(ApplicationState.GainingFocus);
       this.mostRecentState = ApplicationState.GainingFocus;
+      this.notifyOfState(ApplicationState.GainingFocus);
     }
 
     if(isLosingFocus) {
-      this.notifyOfState(ApplicationState.LosingFocus);
       this.mostRecentState = ApplicationState.LosingFocus;
+      this.notifyOfState(ApplicationState.LosingFocus);
 
       if(this.shouldLockApplication()) {
         this.lockApplication();

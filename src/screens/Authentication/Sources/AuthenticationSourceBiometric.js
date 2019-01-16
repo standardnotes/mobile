@@ -44,7 +44,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
       case "did-succeed":
        return `Success | ${this.isFace ? "Face ID" : "Fingerprint"}`
       case "did-fail":
-        return "Fingerprint failed. Tap to try again.";
+        return `${this.isFace ? "Face ID" : "Fingerprint"} failed. Tap to try again.`;
       default:
         return "Status not accounted for"
     }

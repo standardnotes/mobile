@@ -102,6 +102,12 @@ export default class Authenticate extends Abstract {
   }
 
   async beginAuthenticationForSource(source) {
+    if(ApplicationState.get().getMostRecentState() == ApplicationState.LosingFocus) {
+      // Authentication modal may be displayed on lose focus just before the app is closing.
+      // In this state however, we don't want to begin auth. We'll wait until the app gains focus.
+      return;
+    }
+
     if(source.type == "biometric") {
       // Begin authentication right away, we're not waiting for any input
       this.validateAuthentication(source);
