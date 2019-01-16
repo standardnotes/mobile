@@ -119,7 +119,8 @@ export default class NoteSideMenu extends AbstractSideMenu {
   runAction(action) {
     let run = () => {
       ItemActionManager.handleEvent(action, this.note, () => {
-        if(action == ItemActionManager.TrashEvent
+        if(action == ItemActionManager.ArchiveEvent
+          || action == ItemActionManager.TrashEvent
           || action == ItemActionManager.DeleteEvent
           || action == ItemActionManager.EmptyTrashEvent) {
           this.popToRoot();
