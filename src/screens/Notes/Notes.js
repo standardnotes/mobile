@@ -224,7 +224,7 @@ export default class Notes extends Abstract {
 
   async presentComposer(note) {
     this.props.navigation.navigate("Compose", {
-      title: note ? "Editor" : "Compose",
+      title: note ? "Note" : "Compose",
       noteId: note && note.uuid,
       selectedTagId: this.options.selectedTagIds.length && this.options.selectedTagIds[0],
     });
