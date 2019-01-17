@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
-import { Alert, View, WebView, Linking, Platform } from 'react-native';
+import { Alert, View, WebView, Linking, Platform, Text } from 'react-native';
 
 import ComponentManager from '@Lib/componentManager'
 import ModelManager from '@Lib/sfjs/modelManager'
 
 import StyleKit from "@Style/StyleKit"
 import ApplicationState from "@Lib/ApplicationState"
-
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default class Webview extends Component {
 
   constructor(props) {
     super(props);
+
+    this.loadStyles();
 
     this.identifier = `${Math.random()}`
 
@@ -46,6 +48,9 @@ export default class Webview extends Component {
     this.editor = ModelManager.get().findItem(this.props.editorId);
     this.note = ModelManager.get().findItem(this.props.noteId);
     ComponentManager.get().contextItemDidChangeInArea("editor-editor");
+
+    let expired = this.editor.valid_until && this.editor.valid_until <= new Date();
+    this.editor.readonly = expired;
   }
 
   componentWillUnmount() {
@@ -104,6 +109,12 @@ export default class Webview extends Component {
 
     return (
       <View style={[StyleKit.styles.flexContainer, {backgroundColor: StyleKit.variables.stylekitBackgroundColor}]}>
+        {this.editor.readonly &&
+          <View style={this.styles.lockedContainer}>
+            <Icon name={StyleKit.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
+            <Text style={this.styles.lockedText}>Extended expired. Editors are in a read-only state. To edit immediately, please switch to the Plain Editor.</Text>
+          </View>
+        }
         <WebView
            style={StyleKit.styles.flexContainer, {backgroundColor: "transparent"}}
            source={{uri: url}}
@@ -121,6 +132,28 @@ export default class Webview extends Component {
          />
       </View>
     );
+  }
+
+  loadStyles() {
+    let padding = 10;
+    this.styles = {
+      lockedContainer: {
+        justifyContent: 'flex-start',
+        flexDirection: 'row',
+        alignItems: "center",
+        padding: padding,
+        backgroundColor: StyleKit.variables.stylekitDangerColor,
+        borderBottomColor: StyleKit.variables.stylekitBorderColor,
+        borderBottomWidth: 1
+      },
+
+      lockedText: {
+        fontWeight: "bold",
+        fontSize: 12,
+        color: StyleKit.variables.stylekitBackgroundColor,
+        paddingLeft: 10
+      },
+    }
   }
 
 }

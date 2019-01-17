@@ -1,7 +1,7 @@
 /* This domain will be used to save context item client data */
 let ClientDataDomain = "org.standardnotes.sn.components";
 
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 
 import StyleKit from '@Style/StyleKit'
 import ModelManager from './sfjs/modelManager'
@@ -182,14 +182,28 @@ export default class ComponentManager {
       return;
     }
 
-    /**
-    Mobile only handles a subset of possible messages.
-    Possible Messages:
-      set-component-data
-      stream-context-item
-      save-items
+    // Actions that won't succeeed with readonly mode
+    let readwriteActions = [
+      "save-items",
+      "associate-item",
+      "deassociate-item",
+      "create-item",
+      "create-items",
+      "delete-items",
+      "set-component-data"
+    ];
 
+    if(component.readonly && readwriteActions.includes(message.action)) {
+      Alert.alert('Extended Expired', `The extension ${component.name} is trying to save, but it is in a locked state and cannot accept changes.`);
+      return;
+    }
 
+    /*
+      Mobile only handles a subset of possible messages.
+      Possible Messages:
+        set-component-data
+        stream-context-item
+        save-items
     */
 
     if(message.action === "stream-context-item") {
