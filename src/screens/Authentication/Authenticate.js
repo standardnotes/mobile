@@ -35,7 +35,9 @@ export default class Authenticate extends Abstract {
 
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       if(state == ApplicationState.GainingFocus) {
+        if(!this.state.activeSource) {
           this.begin();
+        }
       } else if(state == ApplicationState.Backgrounding) {
         this.cancel();
       }
@@ -83,6 +85,7 @@ export default class Authenticate extends Abstract {
   cancel() {
     if(this.state.activeSource) {
       this.state.activeSource.cancel();
+      this.setState({activeSource: null});
     }
   }
 
