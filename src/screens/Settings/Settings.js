@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {ScrollView, View, Alert, Keyboard, Platform} from 'react-native';
+import { SafeAreaView } from 'react-navigation';
 
 import Sync from '@SFJS/syncManager'
 import ModelManager from '@SFJS/modelManager'
@@ -242,7 +243,7 @@ export default class Settings extends Abstract {
     let signedIn = !Auth.get().offline();
 
     return (
-      <View style={StyleKit.styles.container}>
+      <SafeAreaView forceInset={{ bottom: 'never'}} style={StyleKit.styles.container}>
         <ScrollView style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
 
           {!signedIn && !this.state.confirmRegistration &&
@@ -318,7 +319,7 @@ export default class Settings extends Abstract {
           <CompanySection title={"Standard Notes"}/>
 
         </ScrollView>
-      </View>
+      </SafeAreaView>
     );
   }
 }

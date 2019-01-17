@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, Alert, SafeAreaView } from 'react-native';
+import { View, Text, Alert } from 'react-native';
+import { SafeAreaView } from 'react-navigation';
 
 import ModelManager from '@SFJS/modelManager'
 import Storage from '@SFJS/storageManager'
@@ -339,7 +340,7 @@ export default class Notes extends Abstract {
     }
 
     return (
-      <View style={StyleKit.styles.container}>
+      <SafeAreaView forceInset={{ bottom: 'never'}} style={StyleKit.styles.container}>
         {this.state.notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}
@@ -368,7 +369,7 @@ export default class Notes extends Abstract {
           paddingTop={ApplicationState.isIOS ? 1 : 0}
           iconTextComponent={<Icon style={{textAlignVertical: "center"}} name={StyleKit.nameForIcon("add")}/>}
         />
-      </View>
+      </SafeAreaView>
     );
   }
 
