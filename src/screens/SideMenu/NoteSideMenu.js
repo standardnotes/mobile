@@ -17,6 +17,7 @@ import StyleKit from "@Style/StyleKit"
 import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 import ModelManager from '@SFJS/modelManager'
 import Sync from '@SFJS/syncManager'
+import PrivilegesManager from "@SFJS/privilegesManager"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 import SideMenuCell from "@SideMenu/SideMenuCell"
@@ -118,7 +119,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
 
   runAction(action) {
     let run = () => {
-      ItemActionManager.handleEvent(action, this.note, () => {
+      ItemActionManager.handleEvent(action, this.note, async () => {
         if(action == ItemActionManager.ArchiveEvent
           || action == ItemActionManager.TrashEvent
           || action == ItemActionManager.DeleteEvent
@@ -127,6 +128,14 @@ export default class NoteSideMenu extends AbstractSideMenu {
         } else {
           this.forceUpdate();
           this.handler.onPropertyChange();
+
+          if(action == ItemActionManager.ProtectEvent) {
+            // Show Privileges management screen if protected notes privs are not set up yet
+            let actionRequiresPrivs = await PrivilegesManager.get().actionRequiresPrivilege(action);
+            if(!actionRequiresPrivs) {
+              this.props.navigation.navigate("ManagePrivileges");
+            }
+          }
         }
       });
     }

@@ -106,6 +106,18 @@ export default class ManagePrivileges extends Abstract {
       <View style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         <ScrollView>
 
+          <View style={this.styles.section}>
+            <SectionHeader title={"About Privileges"} />
+            <SectionedTableCell first={true} last={true}>
+              <Text style={[this.styles.aboutText, this.styles.cellText]}>
+                Privileges represent interface level authentication for accessing certain items and features. Privileges are meant to protect against unwanted access in the event of an unlocked application, but do not affect data encryption state.
+              </Text>
+              <Text style={[this.styles.aboutText, this.styles.cellText]}>
+                Privileges sync across your other devices—however, note that if you require a "Local Passcode" privilege, and another device does not have a local passcode set up, the local passcode requirement will be ignored on that device.
+              </Text>
+            </SectionedTableCell>
+          </View>
+
           {this.state.sessionExpirey && !this.state.sessionExpired &&
             <View style={this.styles.section}>
               <SectionHeader title={"Current Session"} />
@@ -134,17 +146,6 @@ export default class ManagePrivileges extends Abstract {
             </View>
           )}
 
-          <View style={this.styles.section}>
-            <SectionHeader title={"About Privileges"} />
-            <SectionedTableCell first={true} last={true}>
-              <Text style={[this.styles.aboutText, this.styles.cellText]}>
-                Privileges represent interface level authentication for accessing certain items and features. Privileges are meant to protect against unwanted access in the event of an unlocked application, but do not affect data encryption state.
-              </Text>
-              <Text style={[this.styles.aboutText, this.styles.cellText]}>
-                Privileges sync across your other devices—however, note that if you require a "Local Passcode" privilege, and another device does not have a local passcode set up, the local passcode requirement will be ignored on that device.
-              </Text>
-            </SectionedTableCell>
-          </View>
         </ScrollView>
       </View>
     );
