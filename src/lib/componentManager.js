@@ -30,6 +30,10 @@ export default class ComponentManager {
 
     this.handlers = [];
 
+    StyleKit.get().addThemeChangeObserver(() => {
+      this.postActiveThemesToAllComponents();
+    });
+
     ModelManager.get().addItemSyncObserver("component-manager", "*", (allItems, validItems, deletedItems, source) => {
 
       /* If the source of these new or updated items is from a Component itself saving items, we don't need to notify
@@ -388,6 +392,20 @@ export default class ComponentManager {
     var data = { themes: [url] }
 
     this.sendMessageToComponent(component, {action: "themes", data: data})
+  }
+
+  postActiveThemesToAllComponents() {
+    for(var component of this.components) {
+      // Skip over components that are themes themselves,
+      // or components that are not active, or components that don't have a window
+      // On desktop/web, we check if component.active is true as well below, but on mobile,
+      // .active isn't set
+      if(component.isTheme() || !component.window) {
+        continue;
+      }
+
+      this.postActiveThemeToComponent(component);
+    }
   }
 
   getEditors() {

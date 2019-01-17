@@ -28,7 +28,7 @@ export default class NoteCell extends ThemedPureComponent {
     // Debounce
     this.selectionTimeout = setTimeout(() => {
       this.setState({selected: true});
-    }, 25);
+    }, 30);
   };
 
   _onPressOut = () => {
@@ -148,7 +148,7 @@ export default class NoteCell extends ThemedPureComponent {
     let textColor = StyleKit.variables.stylekitInfoContrastColor;
     if(this.state.selected || this.props.highlighted) {
       bgColor = StyleKit.variables.stylekitInfoContrastColor;
-      textColor = flag.color
+      textColor = StyleKit.variables.stylekitInfoColor;
     }
     const styles = {
       background: {
