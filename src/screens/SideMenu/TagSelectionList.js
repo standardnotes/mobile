@@ -59,6 +59,7 @@ class TagSelectionList extends ThemedComponent {
   }
 
   componentWillUnmount() {
+    super.componentWillUnmount();
     ModelManager.get().removeItemSyncObserver(this.syncObserverId);
     Sync.get().removeEventHandler(this.syncEventHandler);
     Auth.get().removeEventHandler(this.signoutObserver);

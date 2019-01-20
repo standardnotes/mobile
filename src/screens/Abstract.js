@@ -106,6 +106,7 @@ export default class Abstract extends ThemedComponent {
   }
 
   componentWillUnmount() {
+    super.componentWillUnmount();
     this.willUnmount = true;
     this.mounted = false;
     for(var listener of this.listeners) {

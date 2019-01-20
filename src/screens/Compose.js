@@ -186,6 +186,11 @@ export default class Compose extends Abstract {
         this.changesMade();
       }, 300);
     }
+
+    // This was originally in didFocus, but the problem was if the handler isn't set,
+    // the side menu won't render. If we present Tag compose and dismiss, the side menu
+    // won't render until didFocus, so there would be a delay.
+    this.setSideMenuHandler();
   }
 
   componentDidFocus() {
@@ -202,8 +207,6 @@ export default class Compose extends Abstract {
         this.input.focus();
       }
     }
-
-    this.setSideMenuHandler();
   }
 
   setSideMenuHandler() {
