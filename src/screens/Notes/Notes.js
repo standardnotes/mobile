@@ -134,7 +134,15 @@ export default class Notes extends Abstract {
       }
     })
 
-    this.mappingObserver = ModelManager.get().addItemSyncObserver("notes-screen", ["Tag", "Note"], () => {
+    this.mappingObserver = ModelManager.get().addItemSyncObserver("notes-screen", ["Tag", "Note"], (allRelevantItems, validItems, deletedItems) => {
+      if(deletedItems.find((item) => item.content_type == "Tag")) {
+        // If a tag was deleted, let's check to see if we should reload our selected tags list
+        var tags = ModelManager.get().getTagsWithIds(this.options.selectedTagIds);
+        if(tags.length == 0) {
+          this.options.setSelectedTagIds(ModelManager.get().defaultSmartTag().uuid);
+        }
+      }
+      this.reloadHeaderBar(); // reload header bar in case a tag was renamed
       this.reloadList();
     })
 
