@@ -58,7 +58,7 @@ export default class NoteList extends ThemedComponent {
         archived={item.archived /* extraData */}
         locked={item.locked /* extraData */}
         protected={item.content.protected /* extraData */}
-        protected={item.content.hidePreview /* extraData */}
+        hidePreview={item.content.hidePreview /* extraData */}
       />
     )
   }

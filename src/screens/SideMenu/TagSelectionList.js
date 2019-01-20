@@ -116,6 +116,7 @@ class TagSelectionList extends ThemedComponent {
     });
 
     this.setState({actionSheet: sheet.actionSheetElement()});
+    this.forceUpdate(); // required to get actionSheet ref
     sheet.show();
   }
 

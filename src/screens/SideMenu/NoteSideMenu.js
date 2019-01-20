@@ -83,6 +83,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
     });
 
     this.setState({actionSheet: sheet.actionSheetElement()});
+    this.forceUpdate(); // required to get actionSheet ref
     sheet.show();
   }
 
@@ -128,7 +129,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         } else {
           this.forceUpdate();
           this.handler.onPropertyChange();
-          
+
           if(action == ItemActionManager.ProtectEvent) {
             // Show Privileges management screen if protected notes privs are not set up yet
             let configuredPrivs = await PrivilegesManager.get().grossCredentialsForAction(SFPrivilegesManager.ActionViewProtectedNotes);
