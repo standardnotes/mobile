@@ -28,7 +28,8 @@ export default class MigrationManager extends SFMigrationManager {
 
   registeredMigrations() {
     return [
-      this.downloadAllItemsToGetPrivileges()
+      this.downloadPrivileges(),
+      this.downloadSmartTags()
     ];
   }
 
@@ -38,20 +39,17 @@ export default class MigrationManager extends SFMigrationManager {
   of a user to get at the privileges.
   */
 
-  downloadAllItemsToGetPrivileges() {
+  downloadPrivileges() {
     let contentType = "SN|Privileges";
     return {
       name: "dl-all-to-get-privs",
       runOnlyOnce: true,
-      contentType: contentType, /* Not used currently, but server might be updated in the future */
       customHandler: async () => {
         if(Auth.get().offline()) {
           return;
         }
 
-        let options = {
-          contentType: contentType
-        }
+        let options = { contentType: contentType };
 
         // The user is signed in
         Sync.get().stateless_downloadAllItems(options).then((items) => {
@@ -68,6 +66,35 @@ export default class MigrationManager extends SFMigrationManager {
           // Singleton manager usually resolves singletons on sync completion callback,
           // but since we're manually mapping, we have to make it manually resolve singletons
           PrivilegesManager.get().singletonManager.resolveSingletons(mapped);
+        })
+      }
+    }
+  }
+
+  downloadSmartTags() {
+    let contentType = "SN|SmartTag";
+    return {
+      name: "dl-smart-tags",
+      runOnlyOnce: true,
+      customHandler: async () => {
+        if(Auth.get().offline()) {
+          return;
+        }
+
+        let options = { contentType: contentType };
+
+        // The user is signed in
+        Sync.get().stateless_downloadAllItems(options).then((items) => {
+          let matchingTags = items.filter((candidate) => {
+            return candidate.content_type == contentType;
+          });
+
+          if(matchingTags.length == 0) {
+            return;
+          }
+
+          ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
+            matchingTags, null, SFModelManager.MappingSourceRemoteRetrieved);
         })
       }
     }
