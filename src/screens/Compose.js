@@ -412,7 +412,7 @@ export default class Compose extends Abstract {
     var shouldDisplayEditor = noteEditor != null && this.note.uuid;
 
     return (
-      <SafeAreaView forceInset={{ bottom: 'never'}} style={[this.styles.container, StyleKit.styles.container]}>
+      <SafeAreaView forceInset={{ bottom: 'never'}} style={[this.styles.container, StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
             <Icon name={StyleKit.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
