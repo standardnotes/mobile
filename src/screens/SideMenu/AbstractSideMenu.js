@@ -25,8 +25,11 @@ export default class AbstractSideMenu extends Abstract {
       currentNavigationState,
       ["isDrawerIdle", "isDrawerOpen", "isTransitioning"]
     );
-    
-    if(!isSame) {
+
+    let isSameIdleState = newNavigationState.isDrawerIdle == currentNavigationState.isDrawerIdle
+
+    // These are just the sort of chance configuration of variables that indicate that a drawer will focus, and have it called only once
+    if(!isSame && !newNavigationState.isDrawerIdle && !isSameIdleState) {
       this.psuedo_willFocus();
     }
     return !isSame;
