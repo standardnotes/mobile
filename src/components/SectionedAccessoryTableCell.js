@@ -18,11 +18,19 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
   }
 
   onPress = () => {
+    if(this.props.disabled) {
+      return;
+    }
+
     this.props.onPress();
     this.forceUpdate();
   }
 
   onLongPress = () => {
+    if(this.props.disabled) {
+      return;
+    }
+    
     if(this.props.onLongPress) {
       this.props.onLongPress();
     }

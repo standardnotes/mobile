@@ -128,11 +128,11 @@ export default class NoteSideMenu extends AbstractSideMenu {
         } else {
           this.forceUpdate();
           this.handler.onPropertyChange();
-
+          
           if(action == ItemActionManager.ProtectEvent) {
             // Show Privileges management screen if protected notes privs are not set up yet
-            let actionRequiresPrivs = await PrivilegesManager.get().actionRequiresPrivilege(action);
-            if(!actionRequiresPrivs) {
+            let configuredPrivs = await PrivilegesManager.get().grossCredentialsForAction(SFPrivilegesManager.ActionViewProtectedNotes);
+            if(configuredPrivs.length == 0) {
               this.props.navigation.navigate("ManagePrivileges");
             }
           }

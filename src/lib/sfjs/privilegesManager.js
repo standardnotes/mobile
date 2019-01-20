@@ -111,4 +111,10 @@ export default class PrivilegesManager extends SFPrivilegesManager {
     return sources;
   }
 
+  async grossCredentialsForAction(action) {
+    let privs = await this.getPrivileges();
+    let creds = privs.getCredentialsForAction(action);
+    return creds;
+  }
+
 }

@@ -77,6 +77,17 @@ export default class ManagePrivileges extends Abstract {
     let availableCredentials = PrivilegesManager.get().getAvailableCredentials();
     let availableActions = PrivilegesManager.get().getAvailableActions();
 
+    let notConfiguredCredentials = [];
+    let hasLocalAuth = KeysManager.get().hasOfflinePasscode() || KeysManager.get().hasFingerprint();
+    let offline = Auth.get().offline();
+    for(let credential of availableCredentials) {
+      if(credential == PrivilegesManager.CredentialLocalPasscode && !hasLocalAuth) {
+        notConfiguredCredentials.push(credential);
+      } else if(credential == PrivilegesManager.CredentialAccountPassword && offline) {
+        notConfiguredCredentials.push(credential);
+      }
+    }
+
     this.credentialDisplayInfo = {};
     for(let cred of availableCredentials) {
       this.credentialDisplayInfo[cred] = this.displayInfoForCredential(cred);
@@ -86,6 +97,7 @@ export default class ManagePrivileges extends Abstract {
     this.setState({
       availableActions: availableActions,
       availableCredentials: availableCredentials,
+      notConfiguredCredentials: notConfiguredCredentials,
       sessionExpirey: sessionEndDate.toLocaleString(),
       sessionExpired: new Date() >= sessionEndDate
     });
@@ -95,6 +107,10 @@ export default class ManagePrivileges extends Abstract {
     this.privileges.toggleCredentialForAction(action, credential);
     PrivilegesManager.get().savePrivileges();
     this.forceUpdate();
+  }
+
+  credentialUnavailable = (credential) => {
+    return this.state.notConfiguredCredentials.includes(credential);
   }
 
   render() {
@@ -135,9 +151,11 @@ export default class ManagePrivileges extends Abstract {
               <SectionHeader title={this.displayInfoForAction(action)} />
               {this.state.availableCredentials.map((credential, credIndex) =>
                 <SectionedAccessoryTableCell
-                  text={this.displayInfoForCredential(credential)}
+                  text={this.displayInfoForCredential(credential) + (this.credentialUnavailable(credential) ? ' (Not Configured)' : '')}
                   key={`${actionIndex}+${credIndex}`}
                   first={credIndex == 0}
+                  disabled={this.credentialUnavailable(credential)}
+                  dimmed={this.credentialUnavailable(credential)}
                   last={credIndex == this.state.availableCredentials.length - 1}
                   selected={() => {return this.isCredentialRequiredForAction(action, credential)}}
                   onPress={() => {this.valueChanged(action, credential)}}
