@@ -20,11 +20,12 @@ export default class NoteList extends ThemedComponent {
           titleCancelColor={StyleKit.variable("stylekitInfoColor")}
           keyboardDismissMode={'interactive'}
           keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+          inputBorderRadius={4}
           inputStyle={
             {
               backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
               color: StyleKit.variables.stylekitForegroundColor,
-              height: 31
+              height: 30
             }
           }
         />
