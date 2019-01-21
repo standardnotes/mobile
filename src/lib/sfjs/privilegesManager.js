@@ -118,5 +118,4 @@ export default class PrivilegesManager extends SFPrivilegesManager {
     let creds = privs.getCredentialsForAction(action);
     return creds;
   }
-
 }
