@@ -22,6 +22,7 @@ import Settings from "@Screens/Settings/Settings"
 import InputModal from "@Screens/InputModal"
 import ManagePrivileges from "@Screens/ManagePrivileges"
 import Authenticate from "@Screens/Authentication/Authenticate"
+import KeyRecovery from "@Screens/KeyRecovery"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 
@@ -82,12 +83,17 @@ const ManagePrivilegesStack = createStackNavigator({
   Screen1: ManagePrivileges
 })
 
+const KeyRecoveryStack = createStackNavigator({
+  Screen1: KeyRecovery
+})
+
 const AppDrawer = createStackNavigator({
   Home: AppDrawerStack,
   Settings: SettingsStack,
   InputModal: InputModalStack,
   Authenticate: AuthenticateModalStack,
-  ManagePrivileges: ManagePrivilegesStack
+  ManagePrivileges: ManagePrivilegesStack,
+  KeyRecovery: KeyRecoveryStack
 }, {
   mode: "modal",
   headerMode: 'none',

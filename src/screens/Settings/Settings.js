@@ -52,6 +52,18 @@ export default class Settings extends Abstract {
       }
     })
 
+    if(__DEV__) {
+      props.navigation.setParams({
+        rightButton: {
+          title: "Destroy Data",
+          onPress: () => {
+            Auth.get().signout();
+            KeysManager.get().clearOfflineKeysAndData(true);
+          }
+        }
+      })
+    }
+
     this.sortOptions = [
       {key: "created_at", label: "Date Added"},
       {key: "client_updated_at", label: "Date Modified"},

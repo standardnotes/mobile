@@ -186,6 +186,12 @@ export default class Notes extends Abstract {
     display an alert instructing the user to log in. This happens when restoring from iCloud and data is restored but keys are not.
    */
   displayNeedSignInAlertForLocalItemsIfApplicable(items) {
+
+    if(KeysManager.get().shouldPresentKeyRecoveryWizard()) {
+      this.props.navigation.navigate("KeyRecovery");
+      return;
+    }
+
     if(!items || KeysManager.get().hasAccountKeys()) {
       return;
     }
@@ -302,7 +308,7 @@ export default class Notes extends Abstract {
     }
 
     if(item.errorDecrypting) {
-      Alert.alert("Unable to Decrypt", "This note could not be decrypted. Perhaps it was encrypted with another key? Please try signing out then signing back in, or visit standardnotes.org/help to learn more.");
+      this.props.navigation.navigate("Settings");
     } else {
       run();
     }

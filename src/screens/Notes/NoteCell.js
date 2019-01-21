@@ -47,6 +47,10 @@ export default class NoteCell extends ThemedPureComponent {
   }
 
   showActionSheet = () => {
+    if(this.props.item.errorDecrypting) {
+      return;
+    }
+
     let callbackForAction = (action) => {
       this.props.handleAction(this.props.item, action.key, () => {
         this.forceUpdate();
@@ -140,6 +144,13 @@ export default class NoteCell extends ThemedPureComponent {
       })
     }
 
+    if(note.errorDecrypting) {
+      flags.push({
+        text: "Missing Keys",
+        color: StyleKit.variables.stylekitDangerColor
+      })
+    }
+
     return flags;
   }
 
@@ -202,9 +213,6 @@ export default class NoteCell extends ThemedPureComponent {
 
             {note.errorDecrypting &&
               <View>
-                <Text style={[this.styles.noteTitle, this.styles.deleting]}>
-                  {"Password Required."}
-                </Text>
                 <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, highlight)}>
                   {"Please sign in to restore your decryption keys and notes."}
                 </Text>

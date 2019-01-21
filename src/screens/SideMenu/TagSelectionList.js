@@ -130,12 +130,16 @@ class TagSelectionList extends ThemedComponent {
 
   // must pass title, text, and tags as props so that it re-renders when either of those change
   renderTagCell = ({item}) => {
+    let title = item.deleted ? "Deleting..." : item.title;
+    if(item.errorDecrypting) {
+      title = "Unable to Decrypt";
+    }
     return (
       <View>
         <SideMenuCell
           onSelect={() => {this.onTagSelect(item)}}
           onLongPress={() => this.showActionSheet(item)}
-          text={item.deleted ? "Deleting..." : item.title}
+          text={title}
           iconDesc={this.iconDescriptorForTag(item)}
           key={item.uuid}
           selected={this.props.selectedTags.includes(item)}

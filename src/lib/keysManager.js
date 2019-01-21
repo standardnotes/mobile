@@ -103,6 +103,23 @@ export default class KeysManager {
   }
 
   /*
+    If a user was using the app offline without an account, and had a local passcode, then did
+    an iCloud restore, then they will have saved auth params (saved to storage),
+    but no keychain values (not saved to storage).
+
+    In this case, we want to present a recovery wizard where they can attempt values of their local passcode,
+    and see if it yeilds successful decryption. We can't verify whether the passcode they enter is correct,
+    since the valid hash value is stored in the keychain as well.
+   */
+  shouldPresentKeyRecoveryWizard() {
+    if(!this.accountAuthParams && this.offlineAuthParams && !this.offlineKeys) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /*
     We need to register local storage keys, so that when we want to sign out, we don't accidentally
     clear internal keys, like first_run. (If you accidentally delete the first_run key when you sign out,
     then the next time you sign in and refresh, it will treat it as a new run, and delete all data.)
@@ -271,7 +288,21 @@ export default class KeysManager {
 
   async setAccountAuthParams(authParams) {
     this.accountAuthParams = authParams;
-    return Storage.get().setItem("auth_params", JSON.stringify(authParams));
+    await Storage.get().setItem("auth_params", JSON.stringify(authParams));
+
+    if(this.offlineAuthParams && !this.offlineKeys) {
+      /*
+        This can happen if:
+        1. You are signed into an account and have a local passcode
+        2. You do an iCloud restore
+        3. Your Keychain is wiped, but storage isn't, so offlineAuthParams still exists.
+        4. You restore your account by signing in. At this point, no local passcode will actually be set.
+           The value of offlineAuthParams is stale. We want to delete it.
+      */
+
+      console.log("offlineAuthParams is stale, deleting");
+      await Storage.get().removeItem(OfflineParamsKey);
+    }
   }
 
   async setOfflineAuthParams(authParams) {
@@ -318,7 +349,7 @@ export default class KeysManager {
 
   async clearOfflineKeysAndData(force = false) {
     // make sure user is authenticated before performing this step
-    if(!this.offlineKeys.mk && !force) {
+    if(this.offlineKeys && !this.offlineKeys.mk && !force) {
       alert("Unable to remove passcode. Make sure you are properly authenticated and try again.");
       return false;
     }

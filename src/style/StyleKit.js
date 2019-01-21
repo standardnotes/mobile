@@ -388,7 +388,6 @@ export default class StyleKit {
         paddingTop: 13,
         paddingBottom: 12,
         backgroundColor: variables.stylekitBackgroundColor,
-        flex: 1,
       },
 
       textInputCell: {
