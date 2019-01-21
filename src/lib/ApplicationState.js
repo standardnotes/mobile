@@ -5,6 +5,7 @@ import OptionsState from "@Lib/OptionsState"
 import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
 import AuthenticationSourceBiometric from "@Screens/Authentication/Sources/AuthenticationSourceBiometric";
 var pjson = require('../../package.json')
+import PrivilegesManager from "@SFJS/privilegesManager";
 
 export default class ApplicationState {
 
@@ -134,7 +135,11 @@ export default class ApplicationState {
       this.mostRecentState = ApplicationState.LosingFocus;
       this.notifyOfState(ApplicationState.LosingFocus);
 
-      if(this.shouldLockApplication()) {
+      // If a privileges authentication session is in progress, we don't want to lock the application
+      // or return any sources. That's because while authenticating, Face ID prompts may trigger losing focus
+      // notifications, causing the app to lock. If the user backgrouds the app during privilege authentication,
+      // it will still be locked via the Backgrounding event.
+      if(this.shouldLockApplication() && !PrivilegesManager.get().authenticationInProgress()) {
         this.lockApplication();
       }
     }
@@ -256,7 +261,15 @@ export default class ApplicationState {
     // We don't want to do anything on gaining focus, since that may be called extraenously,
     // when you come back from notification center, etc. Any immediate locking should be handled
     // LosingFocus anyway.
-    if(!this.isAppVisibilityChange(state) || state == ApplicationState.GainingFocus) {
+    if(!this.isAppVisibilityChange(state)
+      || state == ApplicationState.GainingFocus) {
+      return {sources: []};
+    }
+
+    // If a privileges authentication session is in progress, we don't want to lock the application
+    // or return any sources. That's because while authenticating, Face ID prompts may trigger losing focus
+    // notifications, causing the app to lock.
+    if(PrivilegesManager.get().authenticationInProgress()) {
       return {sources: []};
     }
 

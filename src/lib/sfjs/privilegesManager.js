@@ -1,3 +1,4 @@
+import {Platform} from 'react-native'
 import ModelManager from "./modelManager";
 import Sync from "./syncManager";
 import { SFPrivilegesManager, SFSingletonManager } from "standard-file-js";
@@ -7,7 +8,6 @@ import AuthenticationSourceBiometric from "@Screens/Authentication/Sources/Authe
 import KeysManager from "@Lib/keysManager"
 import Storage from "@SFJS/storageManager"
 import Auth from "@SFJS/authManager"
-import ApplicationState from "@Lib/ApplicationState"
 import StyleKit from "@Style/StyleKit"
 
 export default class PrivilegesManager extends SFPrivilegesManager {
@@ -31,7 +31,9 @@ export default class PrivilegesManager extends SFPrivilegesManager {
         return Auth.get().offline();
       },
       hasLocalPasscode: async () => {
-        return KeysManager.get().hasOfflinePasscode();
+        let hasPasscode = KeysManager.get().hasOfflinePasscode();
+        let hasFingerprint = KeysManager.get().hasFingerprint();
+        return hasPasscode || hasFingerprint;
       },
       saveToStorage: async (key, value) => {
         return Storage.get().setItem(key, value);
@@ -65,8 +67,8 @@ export default class PrivilegesManager extends SFPrivilegesManager {
 
     navigation.navigate("Authenticate", {
       leftButton: {
-        title: ApplicationState.isIOS ? "Cancel" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
+        title: Platform.OS == "ios" ? "Cancel" : null,
+        iconName: Platform.OS == "ios" ? null : StyleKit.nameForIcon("close"),
       },
       authenticationSources: sources,
       hasCancelOption: true,

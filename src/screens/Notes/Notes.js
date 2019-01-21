@@ -327,7 +327,6 @@ export default class Notes extends Abstract {
   }
 
   handleActionsheetAction = (item, action, callback) => {
-    console.log("handleActionsheetAction", item, action);
     let run = () => {
       ItemActionManager.handleEvent(action, item, () => {
         callback();
