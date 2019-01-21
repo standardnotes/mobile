@@ -323,7 +323,7 @@ export default class Compose extends Abstract {
       this.statusTimeout = setTimeout(function(){
         this.saveError = true;
         this.syncTakingTooLong = false;
-        this.setSubTitle("Error syncing (changes saved offline)");
+        this.setSubTitle("Sync Unavailable (changes saved offline)", StyleKit.variables.stylekitWarningColor);
       }.bind(this), 200)
     }
   }

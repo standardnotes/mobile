@@ -12,15 +12,19 @@ export default class HeaderTitleView extends Component {
   render() {
     let styles = this.getStyles();
 
+    let subtitleStyles = styles.get('headerSubtitle');
+    if(this.props.subtitleColor) {
+      subtitleStyles[0].color = this.props.subtitleColor;
+      subtitleStyles[0].opacity = 1.0;
+    }
+
     return (
       <View style={styles.get('headerContainer')}>
+
         <Text style={styles.get('headerTitle')}>{this.props.title}</Text>
+
         {this.props.subtitle &&
-          <Text
-            numberOfLines={1}
-            style={styles.get('headerSubtitle')}
-            adjustsFontSizeToFit={true}
-          >
+          <Text numberOfLines={1} style={subtitleStyles} adjustsFontSizeToFit={true}>
             {this.props.subtitle}
           </Text>
         }

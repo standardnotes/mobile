@@ -62,27 +62,27 @@ export default class Root extends Abstract {
         this.showingErrorStatus = true;
         setTimeout( () => {
           // need timeout for syncing on app launch
-          this.setStatusBarText(text);
+          this.setSubTitle(text, StyleKit.variables.stylekitWarningColor);
         }, 250);
       } else if(status.retrievedCount > 20) {
         var text = `Downloading ${status.retrievedCount} items. Keep app open.`
-        this.setStatusBarText(text);
+        this.setSubTitle(text);
         this.showingDownloadStatus = true;
       } else if(this.showingDownloadStatus) {
         this.showingDownloadStatus = false;
         var text = "Download Complete.";
-        this.setStatusBarText(text);
+        this.setSubTitle(text);
         setTimeout(() => {
-          this.setStatusBarText(null);
+          this.setSubTitle(null);
         }, 2000);
       } else if(this.showingErrorStatus) {
-        this.setStatusBarText(null);
+        this.setSubTitle(null);
       }
     })
 
     this.signoutObserver = Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
-        this.setStatusBarText(null);
+        this.setSubTitle(null);
         let notifyObservers = false;
         ApplicationState.getOptions().reset(notifyObservers);
         this.reloadOptionsToDefault();
@@ -156,10 +156,10 @@ export default class Root extends Abstract {
 
   initializeData() {
     let encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
-    this.setStatusBarText(encryptionEnabled ? "Decrypting items..." : "Loading items...");
+    this.setSubTitle(encryptionEnabled ? "Decrypting items..." : "Loading items...");
     let incrementalCallback = (current, total) => {
       let notesString = `${current}/${total} items...`
-      this.setStatusBarText(encryptionEnabled ? `Decrypting ${notesString}` : `Loading ${notesString}`);
+      this.setSubTitle(encryptionEnabled ? `Decrypting ${notesString}` : `Loading ${notesString}`);
       // Incremental Callback
       if(!this.dataLoaded) {
         this.dataLoaded = true;
@@ -168,11 +168,11 @@ export default class Root extends Abstract {
     }
 
     let loadLocalCompletion = (items) => {
-      this.setStatusBarText("Syncing...");
+      this.setSubTitle("Syncing...");
       this.dataLoaded = true;
       // perform initial sync
       Sync.get().sync().then(() => {
-        this.setStatusBarText(null);
+        this.setSubTitle(null);
       });
     }
 
@@ -215,10 +215,6 @@ export default class Root extends Abstract {
         }
       }
     });
-  }
-
-  setStatusBarText(text) {
-    this.setSubTitle(text);
   }
 
   onNoteSelect = (note) => {

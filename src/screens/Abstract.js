@@ -22,7 +22,11 @@ export default class Abstract extends ThemedComponent {
     // this way, things like title and the Done button in the top left are visible during transition
     if(!templateOptions) { templateOptions = {}; }
     let options = {
-      headerTitle:<HeaderTitleView title={navigation.getParam("title") || templateOptions.title} subtitle={navigation.getParam("subtitle") || templateOptions.subtitle}/>,
+      headerTitle:<HeaderTitleView
+        title={navigation.getParam("title") || templateOptions.title} 
+        subtitle={navigation.getParam("subtitle") || templateOptions.subtitle}
+        subtitleColor={navigation.getParam("subtitleColor")}
+      />,
       headerStyle: {
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
@@ -170,9 +174,10 @@ export default class Abstract extends ThemedComponent {
     this.props.navigation.setParams(options);
   }
 
-  setSubTitle(subtitle) {
+  setSubTitle(subtitle, color) {
     let options = {};
     options.subtitle = subtitle;
+    options.subtitleColor = color;
     this.props.navigation.setParams(options);
   }
 
