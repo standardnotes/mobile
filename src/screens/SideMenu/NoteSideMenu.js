@@ -200,10 +200,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         text: "Restore Note",
         key: "restore-note",
         onSelect: () => {
-          this.note.content.trashed = false;
-          this.note.setDirty(true);
-          Sync.get().sync();
-          this.forceUpdate();
+          this.runAction(ItemActionManager.RestoreEvent);
         }
       },
       {

@@ -90,6 +90,7 @@ export default class NoteCell extends ThemedPureComponent {
       if(!this.props.item.content.trashed) {
         options.push(ActionSheetWrapper.BuildOption({text: "Move to Trash", key: ItemActionManager.TrashEvent, destructive: true, callback: callbackForAction}));
       } else {
+        options.push(ActionSheetWrapper.BuildOption({text: "Restore Note", key: ItemActionManager.RestoreEvent, destructive: false, callback: callbackForAction}));
         options.push(ActionSheetWrapper.BuildOption({text: "Delete Forever", key: ItemActionManager.DeleteEvent, destructive: true, callback: callbackForAction}));
       }
 

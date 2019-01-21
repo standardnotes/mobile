@@ -7,9 +7,8 @@ import Sync from './sfjs/syncManager'
 export default class ItemActionManager {
 
   static DeleteEvent = "DeleteEvent";
-
   static TrashEvent = "TrashEvent";
-
+  static RestoreEvent = "RestoreEvent";
   static EmptyTrashEvent = "EmptyTrashEvent";
 
   static PinEvent = "PinEvent";
@@ -79,6 +78,13 @@ export default class ItemActionManager {
           });
         }
       })
+    }
+
+    else if(event == this.RestoreEvent) {
+      item.content.trashed = false;
+      item.setDirty(true);
+      Sync.get().sync();
+      callback && callback();
     }
 
     else if(event == this.PinEvent || event == this.UnpinEvent) {
