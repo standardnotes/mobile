@@ -145,6 +145,15 @@ export default class Authenticate extends Abstract {
     }
   }
 
+  async onBiometricDirectPress(source) {
+    // Validate current auth if set. Validating will also handle going to next
+    if(this.state.activeSource && this.state.activeSource != source) {
+      this.validateAuthentication(this.state.activeSource);
+    } else {
+      this.beginAuthenticationForSource(source);
+    }
+  }
+
   onSuccess() {
     // Wait for componentWillBlur to call onSuccess callback.
     // This way, if the callback has another route change, the dismissal
@@ -208,7 +217,7 @@ export default class Authenticate extends Abstract {
           dimmed={source != this.state.activeSource}
           tinted={source == this.state.activeSource}
           text={source.label}
-          onPress={() => {this.beginAuthenticationForSource(source)}}
+          onPress={() => {this.onBiometricDirectPress(source)}}
         >
         </SectionedAccessoryTableCell>
       </View>
