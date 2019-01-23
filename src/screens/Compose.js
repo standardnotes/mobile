@@ -25,7 +25,8 @@ import {
   Keyboard,
   Text,
   ScrollView,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
 
 import StyleKit from "@Style/StyleKit"
@@ -304,6 +305,11 @@ export default class Compose extends Abstract {
   }
 
   onTextChange = (text) => {
+    if(this.note.locked) {
+      Alert.alert('Note Locked', "This note is locked. Please unlock this note to make changes.", [{text: 'OK'}])
+      return;
+    }
+    
     this.note.text = text;
 
     // Clear dynamic previews if using plain editor
