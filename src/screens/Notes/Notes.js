@@ -361,10 +361,13 @@ export default class Notes extends Abstract {
     }
   }
 
+  onUnlockPress = () => {
+    this.props.onUnlockPress();
+  }
 
   render() {
     if(this.state.lockContent) {
-      return <LockedView />;
+      return <LockedView onUnlockPress={this.onUnlockPress} />;
     }
 
     return (

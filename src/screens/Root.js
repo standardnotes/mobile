@@ -101,6 +101,14 @@ export default class Root extends Abstract {
     }
   }
 
+  onUnlockPress = () => {
+    let mostRecentState = ApplicationState.get().getMostRecentState();
+    let authProps = ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState);
+    if(authProps.sources.length > 0) {
+      this.presentAuthenticationModal(authProps);
+    }
+  }
+
   componentDidMount() {
     super.componentDidMount();
     if(this.authOnMount) {
@@ -254,6 +262,7 @@ export default class Root extends Abstract {
         {!isTablet &&
           <Notes
             ref={(ref) => {this.notesRef = ref}}
+            onUnlockPress={this.onUnlockPress}
             navigation={this.props.navigation}
           />
         }
@@ -263,6 +272,7 @@ export default class Root extends Abstract {
             <View style={[this.styles.left, {width: this.state.shouldSplitLayout ? "34%" : 0}]}>
               <Notes
                 ref={(ref) => {this.notesRef = ref}}
+                onUnlockPress={this.onUnlockPress}
                 navigation={this.props.navigation}
                 onNoteSelect={this.onNoteSelect}
               />
