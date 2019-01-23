@@ -38,6 +38,13 @@ export default class Webview extends Component {
     }
   }
 
+  componentDidMount() {
+    if(Platform.OS == "android" && Platform.Version <= 23) {
+      // postMessage doesn't work on Android <= 6 (API version 23) https://github.com/facebook/react-native/issues/11594
+      Alert.alert('Editors Not Supported', `Your version of Android does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.`, [{text: 'OK'}])
+    }
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if(prevProps.noteId != this.props.noteId || prevProps.editorId != this.props.editorId) {
       this.reloadData();
