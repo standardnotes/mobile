@@ -55,6 +55,10 @@ export default class Compose extends Abstract {
 
     this.loadStyles();
 
+    this.registerObservers();
+  }
+
+  registerObservers() {
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
       if(event == "sync:completed") {
         if(this.note.deleted || this.note.content.trashed) {
@@ -103,6 +107,12 @@ export default class Compose extends Abstract {
             }
           }
         }
+      }
+    });
+
+    this.signoutObserver = Auth.get().addEventHandler((event) => {
+      if(event == SFAuthManager.DidSignOutEvent) {
+        this.setNote(null);
       }
     });
   }
@@ -168,6 +178,7 @@ export default class Compose extends Abstract {
     // the component will blur, and this will be called. Then, because the right drawer is now locked,
     // we ignore render events. This will cause the screen to be white when you save the new tag.
     SideMenuManager.get().removeHandlerForRightSideMenu();
+    Auth.get().removeEventHandler(this.signoutObserver);
 
     Sync.get().removeEventHandler(this.syncObserver);
     ComponentManager.get().deregisterHandler(this.componentHandler);
