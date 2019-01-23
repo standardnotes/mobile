@@ -50,7 +50,9 @@ export default class Compose extends Abstract {
     if(noteId) { note = ModelManager.get().findItem(noteId);}
     this.setNote(note, true);
 
-    this.constructState({title: this.note.title, noteLocked: this.note.locked /* required to re-render on change */});
+    // Use true/false for note.locked as we don't want values of null or undefined, which may cause
+    // unnecessary renders.
+    this.constructState({title: this.note.title, noteLocked: this.note.locked ? true : false /* required to re-render on change */});
 
     this.configureHeaderBar();
 
@@ -91,7 +93,10 @@ export default class Compose extends Abstract {
 
           Do not make text part of the state, otherwise that would cause a re-render on every keystroke.
           */
-          this.setState({title: this.note.title, noteLocked: this.note.locked});
+
+          // Use true/false for note.locked as we don't want values of null or undefined, which may cause
+          // unnecessary renders. (on constructor it was undefined, and here, it was null, causing a re-render to occur on android, causing textview to reset cursor)
+          this.setState({title: this.note.title, noteLocked: this.note.locked ? true : false});
         }
       }
     });
