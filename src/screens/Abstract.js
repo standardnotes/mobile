@@ -23,7 +23,7 @@ export default class Abstract extends ThemedComponent {
     if(!templateOptions) { templateOptions = {}; }
     let options = {
       headerTitle:<HeaderTitleView
-        title={navigation.getParam("title") || templateOptions.title} 
+        title={navigation.getParam("title") || templateOptions.title}
         subtitle={navigation.getParam("subtitle") || templateOptions.subtitle}
         subtitleColor={navigation.getParam("subtitleColor")}
       />,
@@ -186,11 +186,13 @@ export default class Abstract extends ThemedComponent {
     this.configureNavBar();
   }
 
-  unlockContent() {
+  unlockContent(callback) {
     if(!this.loadedInitialState) {
       this.loadInitialState();
     }
-    this.mergeState({lockContent: false});
+    this.setState({lockContent: false}, () => {
+      callback && callback();
+    });
   }
 
   constructState(state) {

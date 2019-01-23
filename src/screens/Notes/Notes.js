@@ -27,6 +27,7 @@ export default class Notes extends Abstract {
 
   constructor(props) {
     super(props);
+    this.stateNotes = [];
 
     this.options = ApplicationState.getOptions();
     this.registerObservers();
@@ -61,11 +62,20 @@ export default class Notes extends Abstract {
     // not be sent again. So we want to make sure that we're able to reload state when component mounts,
     // and loadInitialState is called on componentDidMount
     this.reloadList();
+
   }
 
-  unlockContent() {
-    super.unlockContent();
-    this.reloadHeaderBar();
+  unlockContent(callback) {
+    super.unlockContent(() => {
+      // wait for the state.unlocked setState call to finish
+      if(this.searching) {
+        this.searching = false;
+        this.options.setSearchTerm(null);
+      }
+
+      this.reloadHeaderBar();
+      callback && callback();
+    });
   }
 
   componentWillFocus() {
@@ -119,15 +129,19 @@ export default class Notes extends Abstract {
 
   registerObservers() {
     this.optionsObserver = this.options.addChangeObserver((options, eventType) => {
+
+      this.reloadList(true);
+
       // should only show for non-search term change
       let shouldReloadSubtitleAfterNotesReload = false;
       if(eventType !== OptionsState.OptionsStateChangeEventSearch) {
         shouldReloadSubtitleAfterNotesReload = true;
         this.setSubTitle("Loading...");
         this.reloadHeaderBar();
+      } else {
+        this.reloadHeaderBar();
       }
 
-      this.reloadList(true);
 
       if(shouldReloadSubtitleAfterNotesReload) {
         this.setSubTitle(null);
@@ -215,8 +229,11 @@ export default class Notes extends Abstract {
     }
 
     var tags = ModelManager.get().getTagsWithIds(this.options.selectedTagIds);
-    // Tags might not be completely loaded yet, as reloadHeaderBar can be called from incrementalSync
-    if(tags.length > 0) {
+
+    if(this.searching) {
+      this.setTitle(`${this.stateNotes.length} search results`);
+    } else if(tags.length > 0) {
+      // Tags might not be completely loaded yet, as reloadHeaderBar can be called from incrementalSync
       var tag = tags[0];
       notesTitle = tag.title;
       this.setTitle(notesTitle);
@@ -315,15 +332,13 @@ export default class Notes extends Abstract {
   }
 
   onSearchTextChange = (text) => {
-    this.skipUpdatingNavBar = true;
+    this.searching = true;
     this.options.setSearchTerm(text);
-    this.skipUpdatingNavBar = false;
   }
 
   onSearchCancel = () => {
-    this.skipUpdatingNavBar = true;
+    this.searching = false;
     this.options.setSearchTerm(null);
-    this.skipUpdatingNavBar = false;
   }
 
   handleActionsheetAction = (item, action, callback) => {
