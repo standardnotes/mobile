@@ -1,11 +1,13 @@
 /* This domain will be used to save context item client data */
 let ClientDataDomain = "org.standardnotes.sn.components";
 
-import GlobalStyles from '../Styles'
-import App from '../app'
+import { Platform, Alert } from 'react-native';
+
+import StyleKit from '@Style/StyleKit'
 import ModelManager from './sfjs/modelManager'
 import Sync from './sfjs/syncManager'
 import SF from "./sfjs/sfjs"
+import ApplicationState from "@Lib/ApplicationState"
 
 export default class ComponentManager {
 
@@ -27,6 +29,10 @@ export default class ComponentManager {
     // this.loggingEnabled = true;
 
     this.handlers = [];
+
+    StyleKit.get().addThemeChangeObserver(() => {
+      this.postActiveThemesToAllComponents();
+    });
 
     ModelManager.get().addItemSyncObserver("component-manager", "*", (allItems, validItems, deletedItems, source) => {
 
@@ -147,7 +153,7 @@ export default class ComponentManager {
   }
 
   urlForComponent(component) {
-    var localReplacement = App.isIOS ? "localhost" : "10.0.2.2";
+    var localReplacement = ApplicationState.isIOS ? "localhost" : "10.0.2.2";
     var url = component.hosted_url || component.url;
     if(url) {
       url = url.replace("localhost", localReplacement).replace("sn.local", localReplacement);
@@ -180,14 +186,28 @@ export default class ComponentManager {
       return;
     }
 
-    /**
-    Mobile only handles a subset of possible messages.
-    Possible Messages:
-      set-component-data
-      stream-context-item
-      save-items
+    // Actions that won't succeeed with readonly mode
+    let readwriteActions = [
+      "save-items",
+      "associate-item",
+      "deassociate-item",
+      "create-item",
+      "create-items",
+      "delete-items",
+      "set-component-data"
+    ];
 
+    if(component.readonly && readwriteActions.includes(message.action)) {
+      Alert.alert('Extended Expired', `The extension ${component.name} is trying to save, but it is in a locked state and cannot accept changes.`);
+      return;
+    }
 
+    /*
+      Mobile only handles a subset of possible messages.
+      Possible Messages:
+        set-component-data
+        stream-context-item
+        save-items
     */
 
     if(message.action === "stream-context-item") {
@@ -202,7 +222,7 @@ export default class ComponentManager {
     for(let handler of this.handlers) {
       if(handler.areas.includes(component.area) || handler.areas.includes("*")) {
         setTimeout(function () {
-          handler.actionHandler(component, message.action, message.data);
+          handler.actionHandler && handler.actionHandler(component, message.action, message.data);
         }, 10);
       }
     }
@@ -332,10 +352,13 @@ export default class ComponentManager {
       componentData: component.componentData,
       data: {
         uuid: component.uuid,
-        environment: "mobile"
+        environment: "mobile",
+        platform: Platform.OS,
+        activeThemeUrls: [this.getActiveThemeUrl()]
       }
     });
 
+    // Some editors may not yet accept initial activeThemeUrls in component-registerd event
     this.postActiveThemeToComponent(component);
   }
 
@@ -352,18 +375,45 @@ export default class ComponentManager {
     })
   }
 
-  getActiveTheme() {
-    return this.componentsForArea("themes").find((theme) => {return theme.active});
+  getActiveThemeUrl() {
+    let theme = StyleKit.get().activeTheme;
+    if(theme) {
+      let url = this.urlForComponent(theme);
+      return url;
+    }
   }
 
   postActiveThemeToComponent(component) {
-    var activeTheme = GlobalStyles.get().activeTheme;
-
-    var data = {
-      themes: [(activeTheme && !activeTheme.default) ? this.urlForComponent(activeTheme) : null]
+    let url = this.getActiveThemeUrl();
+    if(!url) {
+      return;
     }
 
+    var data = { themes: [url] }
+
     this.sendMessageToComponent(component, {action: "themes", data: data})
+  }
+
+  postActiveThemesToAllComponents() {
+    for(var component of this.components) {
+      // Skip over components that are themes themselves,
+      // or components that are not active, or components that don't have a window
+      // On desktop/web, we check if component.active is true as well below, but on mobile,
+      // .active isn't set
+      if(component.isTheme() || !component.window) {
+        continue;
+      }
+
+      this.postActiveThemeToComponent(component);
+    }
+  }
+
+  getEditors() {
+    return this.componentsForArea("editor-editor");
+  }
+
+  getDefaultEditor() {
+    return this.getEditors().filter((e) => {return e.content.isMobileDefault})[0];
   }
 
   editorForNote(note) {
@@ -376,6 +426,17 @@ export default class ComponentManager {
         return editor;
       }
     }
+
+    // No editor found for note. Use default editor, if note does not prefer system editor
+    if(!note.content.mobilePrefersPlainEditor) {
+      return editors.filter((e) => {return e.content.isMobileDefault})[0];
+    }
+  }
+
+  setEditorAsMobileDefault(editor, isDefault) {
+    editor.content.isMobileDefault = isDefault;
+    editor.setDirty(true);
+    Sync.get().sync();
   }
 
   associateEditorWithNote(editor, note) {
@@ -392,8 +453,8 @@ export default class ComponentManager {
     }
 
     if(editor) {
-      if(note.getAppDataItem("prefersPlainEditor") == true) {
-        note.setAppDataItem("prefersPlainEditor", false);
+      if(note.content.mobilePrefersPlainEditor == true) {
+        note.content.mobilePrefersPlainEditor = false;
         note.setDirty(true);
       }
 
@@ -406,8 +467,8 @@ export default class ComponentManager {
       editor.setDirty(true);
     } else {
       // Note prefers plain editor
-      if(!note.getAppDataItem("prefersPlainEditor")) {
-        note.setAppDataItem("prefersPlainEditor", true);
+      if(!note.content.mobilePrefersPlainEditor) {
+        note.content.mobilePrefersPlainEditor = true;
         note.setDirty(true);
       }
     }

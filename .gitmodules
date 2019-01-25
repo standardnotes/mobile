@@ -16,3 +16,12 @@
 [submodule "vendor/react-native-navigation"]
 	path = vendor/react-native-navigation
 	url = git@github.com:mobitar/react-native-navigation.git
+[submodule "vendor/react-native-fab"]
+	path = vendor/react-native-fab
+	url = git@github.com:mobitar/React-Native-FAB.git
+[submodule "vendor/react-native-search-box"]
+	path = vendor/react-native-search-box
+	url = git@github.com:mobitar/react-native-search-box.git
+[submodule "vendor/react-native-alternate-icons"]
+	path = vendor/react-native-alternate-icons
+	url = git@github.com:mobitar/react-native-alternate-icons.git

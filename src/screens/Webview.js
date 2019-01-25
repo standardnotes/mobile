@@ -1,31 +1,29 @@
 import React, { Component } from 'react';
-import App from '../app'
-import ComponentManager from '../lib/componentManager'
-import ModelManager from '../lib/sfjs/modelManager'
-import TableSection from "../components/TableSection";
-import Icons from '../Icons';
-import LockedView from "../containers/LockedView";
-import Abstract from "./Abstract"
+import { Alert, View, WebView, Linking, Platform, Text } from 'react-native';
 
-import GlobalStyles from "../Styles"
+import ComponentManager from '@Lib/componentManager'
+import ModelManager from '@Lib/sfjs/modelManager'
 
-import { Alert, View, WebView, Linking, Platform } from 'react-native';
+import StyleKit from "@Style/StyleKit"
+import ApplicationState from "@Lib/ApplicationState"
+import Icon from 'react-native-vector-icons/Ionicons';
 
-export default class Webview extends Abstract {
-
-  static navigatorButtons = Platform.OS == 'android' ? {} : {
-    rightButtons: [{
-      title: "Info",
-      id: 'info',
-      showAsAction: 'ifRoom',
-    }]
-  };
+export default class Webview extends Component {
 
   constructor(props) {
     super(props);
 
-    this.editor = ModelManager.get().findItem(props.editorId);
-    this.note = ModelManager.get().findItem(props.noteId);
+    this.loadStyles();
+
+    this.identifier = `${Math.random()}`
+
+    ComponentManager.get().registerHandler({identifier: this.identifier, areas: ["note-tags", "editor-stack", "editor-editor"],
+       contextRequestHandler: (component) => {
+        return this.note;
+      }
+    });
+
+    this.reloadData();
 
     if(!this.note) {
       console.log("Unable to find note with ID", props.noteId);
@@ -38,111 +36,33 @@ export default class Webview extends Abstract {
       Alert.alert('Re-install Extension', `This extension is not installed correctly. Please use the web or desktop application to reinstall ${this.editor.name}, then try again.`, [{text: 'OK'}])
       return;
     }
-
-    this.handler = ComponentManager.get().registerHandler({identifier: "editor", areas: ["note-tags", "editor-stack", "editor-editor"],
-       contextRequestHandler: (component) => {
-        return this.note;
-      },
-      actionHandler: (component, action, data) => {
-        if(action === "save-items" || action === "save-success" || action == "save-error") {
-          if(data.items.map((item) => {return item.uuid}).includes(this.note.uuid)) {
-
-            if(action == "save-items") {
-              if(this.componentSaveTimeout) clearTimeout(this.componentSaveTimeout);
-              this.componentSaveTimeout = setTimeout(this.showSavingStatus.bind(this), 10);
-            }
-
-            else {
-              if(this.componentStatusTimeout) clearTimeout(this.componentStatusTimeout);
-              if(action == "save-success") {
-                this.componentStatusTimeout = setTimeout(this.showAllChangesSavedStatus.bind(this), 400);
-              } else {
-                this.componentStatusTimeout = setTimeout(this.showErrorStatus.bind(this), 400);
-              }
-            }
-          }
-        }
-      }
-    });
   }
 
   componentDidMount() {
-    super.componentDidMount();
-
-    var infoButton = {
-      title: "Info",
-      id: 'info',
-      showAsAction: 'ifRoom',
+    if(Platform.OS == "android" && Platform.Version <= 23) {
+      // postMessage doesn't work on Android <= 6 (API version 23) https://github.com/facebook/react-native/issues/11594
+      Alert.alert('Editors Not Supported', `Your version of Android does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.`, [{text: 'OK'}])
     }
+  }
 
-    if(Platform.OS === "android") {
-      infoButton.icon = Icons.getIcon("md-information-circle");
+  componentDidUpdate(prevProps, prevState) {
+    if(prevProps.noteId != this.props.noteId || prevProps.editorId != this.props.editorId) {
+      this.reloadData();
     }
+  }
 
-    if(this.props.navigator) {
-      this.props.navigator.setButtons({
-        rightButtons: [infoButton],
-        animated: false
-      });
-    }
+  reloadData() {
+    this.editor = ModelManager.get().findItem(this.props.editorId);
+    this.note = ModelManager.get().findItem(this.props.noteId);
+    ComponentManager.get().contextItemDidChangeInArea("editor-editor");
+
+    let expired = this.editor.valid_until && this.editor.valid_until <= new Date();
+    this.editor.readonly = expired;
   }
 
   componentWillUnmount() {
-    super.componentWillMount();
-    ComponentManager.get().deregisterHandler(this.handler);
+    ComponentManager.get().deregisterHandler(this.identifier);
     ComponentManager.get().deactivateComponent(this.editor);
-  }
-
-  showSavingStatus() {
-    this.setNavBarSubtitle("Saving...");
-  }
-
-  showAllChangesSavedStatus() {
-    this.setNavBarSubtitle("All changes saved");
-  }
-
-  showErrorStatus() {
-    this.setNavBarSubtitle("Error saving");
-  }
-
-  onNavigatorEvent(event) {
-    super.onNavigatorEvent(event);
-    if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
-      if (event.id == 'accept') { // this is the same id field from the static navigatorButtons definition
-        this.dismiss();
-      } else if (event.id == 'info') {
-        Alert.alert('Mobile Editors', "Mobile editors allow you to access your desktop editors directly from your mobile device. Note however that editors are primarily web-based and designed for a full desktop experience. Desktop editors are complex and stretch the possibilities of a web browser, let alone a mobile browser. It’s best to treat web editors on mobile as a way to view your marked up data, and if necessary, make minor modifications.", [
-          {text: 'OK'},
-          {text: 'Send Feedback', onPress: () => {
-            var platformString = App.isIOS ? "iOS" : "Android";
-            Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} editors feedback (v${App.version})`);
-          }}
-        ])
-      }
-    }
-  }
-
-  dismiss() {
-    let animationType = "slide-down";
-    this.props.navigator.dismissModal({animationType: animationType})
-  }
-
-  configureNavBar() {
-    if(!this.props.navigator) {
-      return;
-    }
-
-    this.props.navigator.setButtons({
-      leftButtons: [
-        {
-          title: 'Done',
-          id: 'accept',
-          showAsAction: 'ifRoom',
-          buttonFontSize: 17
-        }
-      ],
-      animated: false
-    });
   }
 
   onMessage = (message) => {
@@ -160,7 +80,6 @@ export default class Webview extends Abstract {
         Alert.alert('Note Locked', "This note is locked. Changes you make in the web editor will not be saved. Please unlock this note to make changes.", [{text: 'OK'}])
         this.didShowLockAlert = true;
       }
-      this.setNavBarSubtitle("Note Locked");
       return;
     }
     ComponentManager.get().handleMessage(this.editor, data);
@@ -168,7 +87,13 @@ export default class Webview extends Abstract {
 
   onFrameLoad = (event) => {
     ComponentManager.get().registerComponentWindow(this.editor, this.webView);
-    this.props.onLoadEnd();
+
+    // The parent will remove their loading screen on load end. We want to delay this by 100
+    // to avoid flicker that may result if using a dark theme. This delay will allow editor
+    // to load its theme
+    setTimeout(() => {
+      this.props.onLoadEnd();
+    }, 100);
   }
 
   onLoadStart = () => {
@@ -186,19 +111,19 @@ export default class Webview extends Abstract {
   }
 
   render() {
-    if(this.state.lockContent) {
-      return (<LockedView />);
-    }
-
     var editor = this.editor;
     var url = ComponentManager.get().urlForComponent(editor);
 
-    let bottomPadding = -34; // For some reason iOS inserts padding on bottom
-
     return (
-      <View style={[GlobalStyles.styles().flexContainer, this.props.style]}>
+      <View style={[StyleKit.styles.flexContainer, {backgroundColor: StyleKit.variables.stylekitBackgroundColor}]}>
+        {this.editor.readonly &&
+          <View style={this.styles.lockedContainer}>
+            <Icon name={StyleKit.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
+            <Text style={this.styles.lockedText}>Extended expired. Editors are in a read-only state. To edit immediately, please switch to the Plain Editor.</Text>
+          </View>
+        }
         <WebView
-           style={GlobalStyles.styles().flexContainer, {backgroundColor: "transparent"}}
+           style={StyleKit.styles.flexContainer, {backgroundColor: "transparent"}}
            source={{uri: url}}
            key={this.editor.uuid}
            ref={(webView) => this.webView = webView}
@@ -206,14 +131,36 @@ export default class Webview extends Abstract {
            onLoadStart={this.onLoadStart}
            onError={this.onLoadError}
            onMessage={this.onMessage}
-           contentInset={{top: 0, left: 0, bottom: bottomPadding, right: 0}}
-           scalesPageToFit={App.isIOS ? false : true}
+           contentInset={{top: 0, left: 0, bottom: 0, right: 0}}
+           scalesPageToFit={ApplicationState.isIOS ? false : true}
            injectedJavaScript = {
              `window.isNative = "true"`
           }
          />
       </View>
     );
+  }
+
+  loadStyles() {
+    let padding = 10;
+    this.styles = {
+      lockedContainer: {
+        justifyContent: 'flex-start',
+        flexDirection: 'row',
+        alignItems: "center",
+        padding: padding,
+        backgroundColor: StyleKit.variables.stylekitDangerColor,
+        borderBottomColor: StyleKit.variables.stylekitBorderColor,
+        borderBottomWidth: 1
+      },
+
+      lockedText: {
+        fontWeight: "bold",
+        fontSize: 12,
+        color: StyleKit.variables.stylekitBackgroundColor,
+        paddingLeft: 10
+      },
+    }
   }
 
 }

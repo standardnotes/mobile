@@ -1,54 +1,103 @@
 import React, { Component } from 'react';
-import { TextInput, View, TouchableHighlight, Platform} from 'react-native';
-import GlobalStyles from "../Styles"
-import TableSection from "../components/TableSection";
-import SectionedTableCell from "../components/SectionedTableCell";
-import SectionHeader from "../components/SectionHeader";
-import ButtonCell from "../components/ButtonCell";
-import Abstract from "./Abstract"
-import LockedView from "../containers/LockedView";
+import { TextInput, View, Keyboard, TouchableHighlight, Platform, Alert, SafeAreaView } from 'react-native';
+import StyleKit from "@Style/StyleKit"
+import TableSection from "@Components/TableSection";
+import SectionedTableCell from "@Components/SectionedTableCell";
+import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
+import SectionHeader from "@Components/SectionHeader";
+import ButtonCell from "@Components/ButtonCell";
+import Abstract from "@Screens/Abstract"
+import LockedView from "@Containers/LockedView";
+import ApplicationState from "@Lib/ApplicationState"
 
 export default class InputModal extends Abstract {
 
+  static navigationOptions = ({ navigation, navigationOptions }) => {
+    let templateOptions = {
+      leftButton: {
+        title: ApplicationState.isIOS ? "Cancel" : null,
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
+      }
+    }
+    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
+  };
+
   constructor(props) {
     super(props);
-    this.constructState({text: ""});
-  }
 
-  configureNavBar() {
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
-    this.props.navigator.setButtons({
-      leftButtons: [
-        {
-          title: 'Cancel',
-          id: 'cancel',
-          showAsAction: 'ifRoom'
-        },
-      ],
-      animated: false
-    });
-  }
-
-
-  onNavigatorEvent(event) {
-      if (event.type == 'NavBarButtonPress') {
-        this.props.navigator.dismissModal({animationType: "slide-down"});
+    props.navigation.setParams({
+      leftButton: {
+        title: ApplicationState.isIOS ? "Cancel" : null,
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
+        onPress: () => {
+          this.dismiss();
+        }
       }
+    })
+
+    this.requireConfirm = this.getProp("requireConfirm");
+    this.showKeyboardChooser = this.getProp("showKeyboardChooser");
+    this.keyboardType = "default";
+
+    this.constructState({text: this.getProp("initialValue") || ""});
   }
 
-  onSave = () => {
-    if(this.props.validate) {
-      if(!this.props.validate(this.state.text)) {
-        this.props.onError(this.state.text);
+  dismiss() {
+    this.props.navigation.goBack(null);
+  }
+
+  onTextSubmit = () => {
+    if(this.requireConfirm && !this.state.confirmText) {
+      this.confirmInputRef.focus();
+    } else {
+      this.submit();
+    }
+  }
+
+  onConfirmSubmit = () => {
+    this.submit();
+  }
+
+  submit = () => {
+    if(this.requireConfirm) {
+      if(this.state.text !== this.state.confirmText) {
+        Alert.alert('Invalid Confirmation', "The two values you entered do not match. Please try again.", [{text: 'OK'}])
         return;
       }
     }
-    this.props.onSave(this.state.text);
-    this.props.navigator.dismissModal({animationType: "slide-down"});
+    if(this.getProp("validate")) {
+      if(!this.getProp("validate")(this.state.text)) {
+        this.getProp("onError")(this.state.text);
+        return;
+      }
+    }
+    this.getProp("onSubmit")(this.state.text);
+    this.dismiss();
   }
 
   onTextChange = (text) => {
     this.setState({text: text})
+  }
+
+  onConfirmTextChange = (text) => {
+    this.setState({confirmText: text});
+  }
+
+  refreshKeyboard() {
+    if(ApplicationState.isIOS) {
+      // on Android, keyboard will update right away
+      Keyboard.dismiss();
+      setTimeout(() => {
+        this.inputRef && this.inputRef.focus();
+      }, 100);
+    }
+  }
+
+  onKeyboardOptionsSelect = (option) => {
+    this.keyboardType = option.key;
+    this.forceUpdate();
+    this.refreshKeyboard();
+    this.getProp("onKeyboardTypeChange")(option.key);
   }
 
   render() {
@@ -56,29 +105,71 @@ export default class InputModal extends Abstract {
       return (<LockedView />);
     }
 
+    let keyboardOptions = [
+      {title: "General", key: "default", selected: this.keyboardType == "default"},
+      {title: "Numeric", key: "numeric", selected: this.keyboardType == "numeric"}
+    ]
+
+    let keyboardOptionsCell = (
+      <SectionedOptionsTableCell title={"Keyboard Type"} options={keyboardOptions} onPress={this.onKeyboardOptionsSelect}/>
+    )
+
     return (
-      <View style={GlobalStyles.styles().container}>
-        <TableSection extraStyles={[GlobalStyles.styles().container]}>
-          <SectionHeader title={this.props.title} />
+      <SafeAreaView style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+        <TableSection extraStyles={[StyleKit.styles.container]}>
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
-              style={[GlobalStyles.styles().sectionedTableCellTextInput]}
-              placeholder={this.props.placeholder}
+              ref={(ref) => {this.inputRef = ref}}
+              style={[StyleKit.styles.sectionedTableCellTextInput]}
+              placeholder={this.getProp("placeholder")}
               onChangeText={this.onTextChange}
               value={this.state.text}
+              secureTextEntry={this.getProp("secureTextEntry")}
               autoCorrect={false}
               autoCapitalize={'none'}
+              keyboardType={this.keyboardType}
+              keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
               autoFocus={true}
-              placeholderTextColor={GlobalStyles.constants().mainDimColor}
+              placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
               underlineColorAndroid={'transparent'}
-              onSubmitEditing={this.onSave.bind(this)}
+              onSubmitEditing={this.onTextSubmit.bind(this)}
             />
           </SectionedTableCell>
 
-          <ButtonCell maxHeight={45} disabled={this.state.text.length == 0} title={"Save"} bold={true} onPress={() => this.onSave()} />
+          {this.requireConfirm &&
+            <SectionedTableCell textInputCell={true} first={false}>
+              <TextInput
+                ref={(ref) => {this.confirmInputRef = ref}}
+                style={[StyleKit.styles.sectionedTableCellTextInput]}
+                placeholder={this.getProp("confirmPlaceholder")}
+                onChangeText={this.onConfirmTextChange}
+                value={this.state.confirmText}
+                secureTextEntry={this.getProp("secureTextEntry")}
+                autoCorrect={false}
+                autoCapitalize={'none'}
+                keyboardType={this.keyboardType}
+                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+                placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
+                underlineColorAndroid={'transparent'}
+                onSubmitEditing={this.onConfirmSubmit.bind(this)}
+              />
+            </SectionedTableCell>
+          }
+
+          {this.showKeyboardChooser &&
+            keyboardOptionsCell
+          }
+
+          <ButtonCell
+            maxHeight={45}
+            disabled={this.state.text.length == 0}
+            title={"Save"}
+            bold={true}
+            onPress={() => this.submit()}
+          />
 
         </TableSection>
-      </View>
+      </SafeAreaView>
     );
   }
 

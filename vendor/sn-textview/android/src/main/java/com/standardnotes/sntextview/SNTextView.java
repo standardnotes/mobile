@@ -50,7 +50,7 @@ public class SNTextView extends LinearLayout {
         editText.setLayoutParams(new ScrollView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
         editText.setGravity(Gravity.TOP);
         editText.setInputType(editText.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-
+        editText.setTextIsSelectable(true);
         scrollView.addView(editText);
         this.addView(scrollView);
 
@@ -122,7 +122,23 @@ public class SNTextView extends LinearLayout {
     }
 
     public void setEditable(boolean editable) {
-        editText.setEnabled(editable);
+        /*
+            setRawInputType is the only solution that works for keeping the text selectable while disabled
+            previously we used setEnabled(false), but this would make text unselectable when the note is locked.
+            setInputType(null) also doesn't work because it removes the multiline functionality.
+            With setRawInputType, the keyboard doesn't come up, but if you're using a hardware keyboard,
+            changes will still be received. So we combine the below with javascript side lock checking to decline
+            any physical changes.
+
+            editText.setTextIsSelectable is also required for this to work, which is set at setup
+
+         */
+        if(!editable) {
+            editText.setRawInputType(InputType.TYPE_NULL);
+        } else {
+            editText.setRawInputType(editText.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        }
+
     }
 
     public void blur() {

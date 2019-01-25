@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
-import App from '../app'
-import Sync from '../lib/sfjs/syncManager'
-import ModelManager from '../lib/sfjs/modelManager'
-import Auth from '../lib/sfjs/authManager'
+import Sync from '@Lib/sfjs/syncManager'
+import ModelManager from '@Lib/sfjs/modelManager'
+import Auth from '@Lib/sfjs/authManager'
+import OptionsState from "@Lib/OptionsState"
+
+import SideMenuManager from "@SideMenu/SideMenuManager"
 
 import Abstract from "./Abstract"
 import Webview from "./Webview"
-import ComponentManager from '../lib/componentManager'
-import Icons from '../Icons';
-import LockedView from "../containers/LockedView";
+import ComponentManager from '@Lib/componentManager'
+import ApplicationState from "@Lib/ApplicationState"
+import LockedView from "@Containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
 
 import TextView from "sn-textview";
 
@@ -22,38 +25,78 @@ import {
   Keyboard,
   Text,
   ScrollView,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
 
-import GlobalStyles from "../Styles"
+import StyleKit from "@Style/StyleKit"
 
 export default class Compose extends Abstract {
 
-  static navigatorStyle = {
-    tabBarHidden: true
+  static navigationOptions = ({ navigation, navigationOptions }) => {
+    let templateOptions = {
+      rightButton: {
+        title: null,
+        iconName: StyleKit.nameForIcon("menu"),
+      }
+    }
+    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
   };
 
   constructor(props) {
     super(props);
-    var note = ModelManager.get().findItem(props.noteId);
-    if(!note) {
-      note = ModelManager.get().createItem({content_type: "Note", dummy: true, text: ""});
-      // We needed to add the item originally for default editors to work, but default editors was removed
-      // So the only way to select an editor is to make a change to the note, which will add it.
-      // The problem with adding it here is that if you open Compose and close it without making changes, it will save an empty note.
-      // ModelManager.get().addItem(note);
-      note.dummy = true;
-    }
 
-    this.note = note;
-    this.constructState({title: note.title, text: note.text});
+    let note, noteId = this.getProp("noteId");
+    if(noteId) { note = ModelManager.get().findItem(noteId);}
+    this.setNote(note, true);
+
+    // Use true/false for note.locked as we don't want values of null or undefined, which may cause
+    // unnecessary renders.
+    this.constructState({title: this.note.title, noteLocked: this.note.locked ? true : false /* required to re-render on change */});
+
+    this.configureHeaderBar();
 
     this.loadStyles();
 
+    this.registerObservers();
+  }
+
+  registerObservers() {
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
       if(event == "sync:completed") {
-        if(data.retrievedItems && this.note.uuid && data.retrievedItems.map((i) => i.uuid).includes(this.note.uuid)) {
-          this.refreshContent();
+        if(this.note.deleted || this.note.content.trashed) {
+          let clearNote = this.note.deleted == true;
+          // if Trashed, and we're in the Trash view, don't clear note.
+          if(!this.note.deleted) {
+            let selectedTag = this.getSelectedTag();
+            let isTrashTag = selectedTag != null && selectedTag.content.isTrashTag == true;
+            if(this.note.content.trashed) {
+              // clear the note if this is not the trash tag. Otherwise, keep it in view.
+              clearNote = !isTrashTag;
+            }
+          }
+
+          if(clearNote) {
+            this.props.navigation.closeRightDrawer();
+            this.setNote(null);
+          }
+        } else if(data.retrievedItems && this.note.uuid && data.retrievedItems.concat(data.savedItems).map((i) => i.uuid).includes(this.note.uuid)) {
+          /*
+          You have to be careful about when you render inside this component. Rendering with the native SNTextView component
+          can cause the cursor to go to the end of the input, both on iOS and Android. We want to force an update only if retrievedItems includes this item
+
+          However, if we make a change to a note from the side menu (such as pin, lock, etc), then we also want
+          to update ourselves. This would only be found in data.savedItems.
+
+          Actually, we only care about lock changes, because we display a banner if a note is locked. So we'll just
+          make that a part of the state then. Abstract does a deep compare on state before deciding if to render.
+
+          Do not make text part of the state, otherwise that would cause a re-render on every keystroke.
+          */
+
+          // Use true/false for note.locked as we don't want values of null or undefined, which may cause
+          // unnecessary renders. (on constructor it was undefined, and here, it was null, causing a re-render to occur on android, causing textview to reset cursor)
+          this.setState({title: this.note.title, noteLocked: this.note.locked ? true : false});
         }
       }
     });
@@ -73,132 +116,170 @@ export default class Compose extends Abstract {
       }
     });
 
-    this.configureNavBar(true);
+    this.signoutObserver = Auth.get().addEventHandler((event) => {
+      if(event == SFAuthManager.DidSignOutEvent) {
+        this.setNote(null);
+      }
+    });
   }
 
-  refreshContent() {
-    this.mergeState({title: this.note.title, text: this.note.text});
+  /*
+    In the Compose constructor, setNote is called with an empty value. This will create a new note.
+    This is fine for non-tablet, but on tablet, we select the first note of the current view options,
+    which initially is null, so setNote(null) will be called twice.
+
+    On tablet, in the options change observer, we select first note, which is null, will call setNote(null) again.
+    This is fine throughout normal lifecycle operation, but because the Compose constructor already calls setNote(null),
+    it will be called twice.
+
+    Two solutions can be:
+    1. In Compose constructor, check if tablet if note is null (hacky)
+    2. In setNote(null), if the current note is already a dummy, don't do anything.
+  */
+
+  setNote(note, isConstructor = false) {
+    if(!note) {
+      if(this.note && this.note.dummy) {
+        // This method can be called if the + button is pressed. On Tablet, it can be pressed even while we're
+        // already here. Just focus input if that's the case.
+        this.input && this.input.focus();
+        return;
+      }
+      note = ModelManager.get().createItem({content_type: "Note", dummy: true, text: ""});
+      note.dummy = true;
+      // Editors need a valid note with uuid and modelmanager mapped in order to interact with it
+      // Note that this can create dummy notes that aren't deleted automatically.
+      // Also useful to keep right menu enabled at all times. If the note has a uuid and is a dummy,
+      // it will be removed locally on blur
+      note.initUUID().then(() => {
+        ModelManager.get().addItem(note);
+        this.forceUpdate();
+      })
+    }
+
+    this.note = note;
+
+    if(!isConstructor) {
+      this.setState({title: note.title});
+      this.forceUpdate();
+    }
   }
 
-  componentDidMount() {
-    super.componentDidMount();
+  configureHeaderBar() {
+    this.props.navigation.setParams({
+      rightButton: {
+        title: null,
+        iconName: StyleKit.nameForIcon("menu"),
+        onPress: () => {
+          this.props.navigation.openRightDrawer();
+        }
+      }
+    })
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
+
+    // We don't want to do this in componentDid/WillBlur because when presenting new tag input modal,
+    // the component will blur, and this will be called. Then, because the right drawer is now locked,
+    // we ignore render events. This will cause the screen to be white when you save the new tag.
+    SideMenuManager.get().removeHandlerForRightSideMenu();
+    Auth.get().removeEventHandler(this.signoutObserver);
+
     Sync.get().removeEventHandler(this.syncObserver);
     ComponentManager.get().deregisterHandler(this.componentHandler);
   }
 
-  viewDidAppear() {
-    super.viewDidAppear();
+  componentWillFocus() {
+    super.componentWillFocus();
 
-    // Autofocus doesn't work properly on iOS due to navigation push, so we'll focus manually
-    if(App.isIOS) {
-      if(this.note.dummy) {
+    if(!ApplicationState.get().isTablet) {
+      this.props.navigation.lockRightDrawer(false);
+    }
+
+    if(this.note.dirty) {
+      // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
+      setTimeout(() => {
+        this.changesMade();
+      }, 300);
+    }
+
+    // This was originally in didFocus, but the problem was if the handler isn't set,
+    // the side menu won't render. If we present Tag compose and dismiss, the side menu
+    // won't render until didFocus, so there would be a delay.
+    this.setSideMenuHandler();
+  }
+
+  componentDidFocus() {
+    super.componentDidFocus();
+
+    if(this.note.dummy) {
+      if(this.refs.input) {
+        this.refs.input.focus();
+      }
+    }
+
+    if(ApplicationState.isIOS) {
+      if(this.note.dummy && this.input) {
         this.input.focus();
       }
     }
   }
 
-  // on iOS, declaring nav bar buttons as static prevents the flickering issue that occurs on nav push
-
-  static navigatorButtons = Platform.OS == 'android' ? {} : {
-    rightButtons: [{
-      title: "Manage",
-      id: 'tags',
-      showAsAction: 'ifRoom',
-    }]
-  };
-
-  configureNavBar(initial) {
-    super.configureNavBar();
-
-    // Only edit the nav bar once, it wont be changed
-    if(!initial) {
-      return;
-    }
-
-    var tagButton = {
-      title: "Manage",
-      id: 'tags',
-      showAsAction: 'ifRoom',
-    }
-
-    if(Platform.OS === "android") {
-      tagButton.icon = Icons.getIcon("md-pricetag");
-    }
-
-    if(!this.note.uuid) {
-      if(App.isIOS) {
-        tagButton.disabled = true;
-      } else {
-        tagButton = {};
-      }
-    }
-
-    this.props.navigator.setButtons({
-      rightButtons: [tagButton],
-      animated: false
-    });
-  }
-
-  onNavigatorEvent(event) {
-    super.onNavigatorEvent(event);
-
-    if(event.id == 'didAppear') {
-      if(this.note.dummy) {
-        if(this.refs.input) {
-          this.refs.input.focus();
+  setSideMenuHandler() {
+    SideMenuManager.get().setHandlerForRightSideMenu({
+      getCurrentNote: () => {
+        return this.note;
+      },
+      onEditorSelect: (editor) => {
+        if(editor) {
+          ComponentManager.get().associateEditorWithNote(editor, this.note);
+        } else {
+          ComponentManager.get().clearEditorForNote(this.note);
         }
-      }
-    } else if(event.id == "willAppear") {
-      if(this.needsEditorReload) {
         this.forceUpdate();
-        this.needsEditorReload = false;
-      }
-      if(this.note.dirty) {
-        // We want the "Saving..." / "All changes saved..." subtitle to be visible to the user, so we delay
-        setTimeout(() => {
-          this.changesMade();
-        }, 300);
-      }
-    }
-    if (event.type == 'NavBarButtonPress') {
-      if (event.id == 'tags') {
-        this.showOptions();
-      }
-    }
-  }
-
-  showOptions() {
-    if(App.isAndroid && this.input) {
-      this.input.blur();
-    }
-
-    this.previousOptions = {selectedTags: this.note.tags.map(function(tag){return tag.uuid})};
-    this.props.navigator.push({
-      screen: 'sn.Filter',
-      title: 'Options',
-      animationType: 'slide-up',
-      passProps: {
-        noteId: this.note.uuid,
-        onManageNoteEvent: () => {this.forceUpdate()},
-        singleSelectMode: false,
-        options: JSON.stringify(this.previousOptions),
-        onEditorSelect: () => {
-          this.needsEditorReload = true;
-        },
-        onOptionsChange: (options) => {
-          if(!_.isEqual(options.selectedTags, this.previousOptions.selectedTags)) {
-            var tags = ModelManager.get().findItems(options.selectedTags);
-            this.replaceTagsForNote(tags);
-            this.note.setDirty(true);
-            this.changesMade();
-          }
+        this.props.navigation.closeRightDrawer();
+      },
+      onPropertyChange: () => {
+        this.forceUpdate();
+      },
+      onTagSelect: (tag) => {
+        let selectedTags = this.note.tags.slice();
+        var selected = selectedTags.includes(tag);
+        if(selected) {
+          // deselect
+          selectedTags.splice(selectedTags.indexOf(tag), 1);
+        } else {
+          // select
+          selectedTags.push(tag);
         }
+        this.replaceTagsForNote(selectedTags);
+        this.changesMade();
+      },
+      getSelectedTags: () => {
+        // Return copy so that list re-renders every time if they change
+        return this.note.tags.slice();
+      },
+      onKeyboardDismiss: () => {
+        // Keyboard.dismiss() does not work for native views, which our tet input is
+        this.input && this.input.blur();
       }
     });
+  }
+
+  componentWillBlur() {
+    super.componentWillBlur();
+
+    if(!ApplicationState.get().isTablet) {
+      this.props.navigation.lockRightDrawer(true);
+    }
+
+    this.input && this.input.blur();
+
+    if(this.note.uuid && this.note.dummy) {
+      // A dummy note created to work with default external editor. Safe to delete.
+      ModelManager.get().removeItemLocally(this.note);
+    }
   }
 
   replaceTagsForNote(newTags) {
@@ -215,18 +296,25 @@ export default class Compose extends Abstract {
     }
 
     for(var newTag of newTags) {
-      newTag.addItemAsRelationship(note);
-      newTag.setDirty(true);
+      if(!oldTags.includes(newTag)) {
+        newTag.addItemAsRelationship(note);
+        newTag.setDirty(true);
+      }
     }
   }
 
   onTitleChange = (text) => {
-    this.mergeState({title: text})
+    this.setState({title: text})
     this.note.title = text;
     this.changesMade();
   }
 
   onTextChange = (text) => {
+    if(this.note.locked) {
+      Alert.alert('Note Locked', "This note is locked. Please unlock this note to make changes.", [{text: 'OK'}])
+      return;
+    }
+    
     this.note.text = text;
 
     // Clear dynamic previews if using plain editor
@@ -237,7 +325,7 @@ export default class Compose extends Abstract {
   }
 
   showSavingStatus() {
-    this.setNavBarSubtitle("Saving...");
+    this.setSubTitle("Saving...");
   }
 
   showSavedStatus(success) {
@@ -250,38 +338,49 @@ export default class Compose extends Abstract {
         }
         this.saveError = false;
         this.syncTakingTooLong = false;
-        this.setNavBarSubtitle(status);
+        this.setSubTitle(status);
       }, 200)
     } else {
       if(this.statusTimeout) clearTimeout(this.statusTimeout);
       this.statusTimeout = setTimeout(function(){
         this.saveError = true;
         this.syncTakingTooLong = false;
-        this.setNavBarSubtitle("Error syncing (changes saved offline)");
+        this.setSubTitle("Sync Unavailable (changes saved offline)", StyleKit.variables.stylekitWarningColor);
       }.bind(this), 200)
+    }
+  }
+
+  getSelectedTagId() {
+    // On tablet, we use props.selectedTagId
+    return this.getProp("selectedTagId") || this.props.selectedTagId;
+  }
+
+  getSelectedTag() {
+    let id = this.getSelectedTagId();
+    if(id) {
+      return ModelManager.get().getTagWithId(id);
     }
   }
 
   changesMade() {
     this.note.hasChanges = true;
 
+    // capture dummy status before timeout
+    let isDummy = this.note.dummy;
+
     if(this.saveTimeout) clearTimeout(this.saveTimeout);
     if(this.statusTimeout) clearTimeout(this.statusTimeout);
     this.saveTimeout = setTimeout(() => {
       this.showSavingStatus();
-      if(!this.note.uuid) {
-        this.note.initUUID().then(() => {
-          if(this.props.selectedTagId) {
-            var tag = ModelManager.get().findItem(this.props.selectedTagId);
-            tag.addItemAsRelationship(this.note);
-            tag.setDirty(true);
-          }
-          this.save();
-          this.configureNavBar(true);
-        });
-      } else {
-        this.save();
+      if(isDummy && this.getSelectedTagId()) {
+        var tag = this.getSelectedTag();
+        // Could be system tag, so wouldn't exist
+        if(tag && !tag.isSmartTag()) {
+          tag.addItemAsRelationship(this.note);
+          tag.setDirty(true);
+        }
       }
+      this.save();
     }, 275)
   }
 
@@ -331,13 +430,14 @@ export default class Compose extends Abstract {
 
     var noteEditor = ComponentManager.get().editorForNote(this.note);
     let windowWidth = this.state.windowWidth || Dimensions.get('window').width;
-    var shouldDisplayEditor = noteEditor != null;
+    // If new note with default editor, note.uuid may not be ready
+    var shouldDisplayEditor = noteEditor != null && this.note.uuid;
 
     return (
-      <View style={[this.styles.container, GlobalStyles.styles().container]}>
+      <SafeAreaView forceInset={{ bottom: 'never'}} style={[this.styles.container, StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
-            <Icon name={Icons.nameForIcon("lock")} size={20} color={GlobalStyles.constants().mainBackgroundColor} />
+            <Icon name={StyleKit.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
             <Text style={this.styles.lockedText}>Note Locked</Text>
           </View>
         }
@@ -347,9 +447,10 @@ export default class Compose extends Abstract {
           onChangeText={this.onTitleChange}
           value={this.state.title}
           placeholder={"Add Title"}
-          selectionColor={GlobalStyles.constants().mainTintColor}
+          selectionColor={StyleKit.variable("stylekitInfoColor")}
           underlineColorAndroid={'transparent'}
-          placeholderTextColor={GlobalStyles.constants().mainDimColor}
+          placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
+          keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
           autoCorrect={true}
           autoCapitalize={'sentences'}
           editable={!this.note.locked}
@@ -357,8 +458,11 @@ export default class Compose extends Abstract {
 
         {(this.state.loadingWebView || this.state.webViewError) &&
           <View style={[this.styles.loadingWebViewContainer]}>
-            <Text style={[this.styles.loadingWebViewText, {fontWeight: 'bold'}]}>
-              {this.state.webViewError ? "Unable to Load Editor" : "Loading Editor..."}
+            <Text style={[this.styles.loadingWebViewText]}>
+              {this.state.webViewError ? "Unable to Load" : "LOADING"}
+            </Text>
+            <Text style={[this.styles.loadingWebViewSubtitle]}>
+              {noteEditor.content.name}
             </Text>
           </View>
         }
@@ -376,12 +480,12 @@ export default class Compose extends Abstract {
 
         {!shouldDisplayEditor && Platform.OS == "android" &&
           <View style={[this.styles.noteTextContainer]}>
-            <TextView style={[GlobalStyles.stylesForKey("noteText"), this.styles.textContentAndroid]}
+            <TextView style={[StyleKit.stylesForKey("noteText"), this.styles.textContentAndroid]}
               ref={(ref) => this.input = ref}
               autoFocus={this.note.dummy}
               value={this.note.text}
-              selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor, 0.35)}
-              handlesColor={GlobalStyles.constants().mainTintColor}
+              selectionColor={StyleKit.lighten(StyleKit.variable("stylekitInfoColor"), 0.35)}
+              handlesColor={StyleKit.variable("stylekitInfoColor")}
               onChangeText={this.onTextChange}
               editable={!this.note.locked}
             />
@@ -389,21 +493,23 @@ export default class Compose extends Abstract {
         }
 
         {!shouldDisplayEditor && Platform.OS == "ios" &&
-          <TextView style={[GlobalStyles.stylesForKey("noteText"), {paddingBottom: 10}]}
+          <TextView style={[StyleKit.stylesForKey("noteText"), {paddingBottom: 10}]}
             ref={(ref) => this.input = ref}
             autoFocus={false}
             value={this.note.text}
             keyboardDismissMode={'interactive'}
-            selectionColor={GlobalStyles.lighten(GlobalStyles.constants().mainTintColor)}
+            keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+            selectionColor={StyleKit.lighten(StyleKit.variable("stylekitInfoColor"))}
             onChangeText={this.onTextChange}
             editable={!this.note.locked}
           />
         }
-      </View>
+      </SafeAreaView>
     );
   }
 
   loadStyles() {
+    let padding = 14;
     this.rawStyles = {
       container: {
         flex: 1,
@@ -414,13 +520,14 @@ export default class Compose extends Abstract {
       noteTitle: {
         fontWeight: "600",
         fontSize: 16,
-        color: GlobalStyles.constants().mainTextColor,
+        color: StyleKit.variables.stylekitForegroundColor,
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
         height: 50,
-        borderBottomColor: GlobalStyles.constants().composeBorderColor,
+        borderBottomColor: StyleKit.variables.stylekitBorderColor,
         borderBottomWidth: 1,
         paddingTop: Platform.OS === "ios" ? 5 : 12,
-        paddingLeft: GlobalStyles.constants().paddingLeft,
-        paddingRight: GlobalStyles.constants().paddingLeft,
+        paddingLeft: padding,
+        paddingRight: padding
       },
 
       lockedContainer: {
@@ -428,12 +535,19 @@ export default class Compose extends Abstract {
         justifyContent: 'flex-start',
         flexDirection: 'row',
         alignItems: "center",
-        height: 30,
-        maxHeight: 30,
-        paddingLeft: GlobalStyles.constants().paddingLeft,
-        backgroundColor: GlobalStyles.constants().mainTintColor,
-        borderBottomColor: GlobalStyles.constants().plainCellBorderColor,
+        height: 26,
+        maxHeight: 26,
+        paddingLeft: padding,
+        backgroundColor: StyleKit.variables.stylekitNeutralColor,
+        borderBottomColor: StyleKit.variables.stylekitBorderColor,
         borderBottomWidth: 1
+      },
+
+      lockedText: {
+        fontWeight: "bold",
+        fontSize: 12,
+        color: StyleKit.variables.stylekitBackgroundColor,
+        paddingLeft: 10
       },
 
       loadingWebViewContainer: {
@@ -445,18 +559,22 @@ export default class Compose extends Abstract {
         display: "flex",
         alignItems: "center",
         justifyContent: 'center',
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
       },
 
       loadingWebViewText: {
         paddingLeft: 0,
-        color: GlobalStyles.constants().mainTextColor,
-        opacity: 0.7
+        color: StyleKit.variable("stylekitForegroundColor"),
+        opacity: 0.7,
+        fontSize: 22,
+        fontWeight: 'bold'
       },
 
-      lockedText: {
-        fontWeight: "bold",
-        color: GlobalStyles.constants().mainBackgroundColor,
-        paddingLeft: 10
+      loadingWebViewSubtitle: {
+        paddingLeft: 0,
+        color: StyleKit.variable("stylekitForegroundColor"),
+        opacity: 0.7,
+        marginTop: 5
       },
 
       textContentAndroid: {
@@ -470,7 +588,7 @@ export default class Compose extends Abstract {
 
       noteTextContainer: {
         flexGrow: 1,
-        flex: 1
+        flex: 1,
       },
     }
 

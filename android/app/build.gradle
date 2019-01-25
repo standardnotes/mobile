@@ -72,6 +72,10 @@ import com.android.build.OutputFile
  * ]
  */
 
+project.ext.react = [
+    entryFile: "index.js"
+]
+
 apply from: "../../node_modules/react-native/react.gradle"
 
 /**
@@ -90,19 +94,27 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "com.standardnotes"
-        minSdkVersion 21
-        targetSdkVersion 25
-        versionCode 2031000
-        versionName "2.3.10"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+
+        versionCode 3000009
+        versionName "3.0.0"
+
         multiDexEnabled  true
+
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     signingConfigs {
@@ -147,18 +159,24 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:26.0.0'
-    compile project(':ReactAndroid');
-    compile project(':bugsnag-react-native')
-    compile project(':RNMail')
-    compile project(':SNTextView')
-    compile project(':react-native-navigation')
-    compile project(':react-native-keychain')
-    compile project(':react-native-vector-icons')
-    compile project(':react-native-aes-crypto')
-    compile project(':react-native-fingerprint-scanner')
-    compile project(':react-native-flag-secure-android')
+    compile project(':react-native-file-viewer')
+    compile project(':react-native-fs')
+    compile project(':react-native-gesture-handler')
+
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    implementation project(':bugsnag-react-native')
+    implementation project(':RNMail')
+    implementation project(':SNTextView')
+    implementation project(':react-native-keychain')
+    implementation project(':react-native-vector-icons')
+    implementation project(':react-native-aes-crypto')
+    implementation project(':react-native-fingerprint-scanner')
+    implementation project(':react-native-flag-secure-android')
+
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation 'com.android.support:design:27.1.0'
+    implementation "com.facebook.react:react-native:+"  // From node_modules
 }
 
 // Run this once to be able to run the application with BUCK
@@ -168,6 +186,6 @@ task copyDownloadableDepsToLibs(type: Copy) {
     into 'libs'
 }
 
-configurations.all {
-    exclude group: 'com.facebook.react', module: 'react-native'
-}
+//configurations.all {
+//    exclude group: 'com.facebook.react', module: 'react-native'
+//}

@@ -1,4 +1,4 @@
-import {moment} from "../../app"
+import moment from "@Lib/moment";
 
 // Override Item instance methods without overriding actual class, since we'd then need
 // to override all individual classes, like Note and Tag.
@@ -19,16 +19,6 @@ SFItem.prototype.updateFromJSON = function(json) {
 const original_dateToLocalizedString = SFItem.prototype.dateToLocalizedString;
 SFItem.prototype.dateToLocalizedString = function(date) {
   return moment(date).format('llll');
-}
-
-// Define these new methods
-
-SFItem.prototype.initUUID = async function() {
-  if(!this.uuid) {
-    return SFJS.crypto.generateUUID().then((uuid) => {
-      this.uuid = uuid;
-    })
-  }
 }
 
 // Define these getters

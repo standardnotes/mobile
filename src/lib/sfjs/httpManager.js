@@ -1,4 +1,4 @@
-import KeysManager from '../keysManager'
+import KeysManager from '@Lib/keysManager'
 
 export default class Server extends SFHttpManager {
 

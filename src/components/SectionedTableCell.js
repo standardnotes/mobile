@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import {View} from 'react-native';
 
-import GlobalStyles from "../Styles"
+import StyleKit from "@Style/StyleKit"
 
 export default class SectionedTableCell extends Component {
 
   rules() {
-    var rules = [GlobalStyles.styles().sectionedTableCell];
-    if(this.props.first) { rules.push(GlobalStyles.stylesForKey("sectionedTableCellFirst")); }
-    if(this.props.last) { rules.push(GlobalStyles.stylesForKey("sectionedTableCellLast")); }
-    if(this.props.textInputCell) {rules.push(GlobalStyles.styles().textInputCell); }
+    var rules = [StyleKit.styles.sectionedTableCell];
+    if(this.props.first) { rules.push(StyleKit.stylesForKey("sectionedTableCellFirst")); }
+    if(this.props.last) { rules.push(StyleKit.stylesForKey("sectionedTableCellLast")); }
+    if(this.props.textInputCell) {rules.push(StyleKit.styles.textInputCell); }
     if(this.props.height) {rules.push({height: this.props.height})};
     if(this.props.extraStyles) {
       rules = rules.concat(this.props.extraStyles);

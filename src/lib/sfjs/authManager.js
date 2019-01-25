@@ -1,8 +1,8 @@
 import {Platform} from 'react-native';
-import KeysManager from "../keysManager"
-import Storage from './storageManager'
-import Server from './httpManager'
-import AlertManager from './alertManager'
+import KeysManager from "@Lib/keysManager"
+import Storage from '@SFJS/storageManager'
+import Server from '@SFJS/httpManager'
+import AlertManager from '@SFJS/alertManager'
 
 export default class Auth extends SFAuthManager {
 
@@ -38,11 +38,19 @@ export default class Auth extends SFAuthManager {
   }
 
   async signout(clearAllData) {
+    this._keys = null;
     // DONT clear all data. We will do this ourselves manually, as we need to preserve certain data keys.
     super.signout(false);
   }
 
   async keys() {
+    // AuthManager only handles account related keys. If we are requesting keys,
+    // we are referring to account keys. KeysManager.activeKeys can return local passcode
+    // keys.
+    if(this.offline()) {
+      return null;
+    }
+
     return KeysManager.get().activeKeys();
   }
 
@@ -65,5 +73,12 @@ export default class Auth extends SFAuthManager {
       console.log("Error saving auth paramters", e);
       return null;
     }
+  }
+
+  async verifyAccountPassword(password) {
+    let authParams = await this.getAuthParams();
+    let keys = await SFJS.crypto.computeEncryptionKeysForUser(password, authParams);
+    let success = keys.mk === (await this.keys()).mk;
+    return success;
   }
 }

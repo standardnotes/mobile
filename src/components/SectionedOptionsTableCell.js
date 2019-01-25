@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import {View, Text, TouchableHighlight} from 'react-native';
+import ThemedComponent from "@Components/ThemedComponent";
 
-import GlobalStyles from "../Styles"
+import StyleKit from "@Style/StyleKit"
 
-export default class SectionedOptionsTableCell extends Component {
+export default class SectionedOptionsTableCell extends ThemedComponent {
 
   rules() {
-    var rules = [GlobalStyles.styles().sectionedTableCell];
-    if(this.props.first) { rules.push(GlobalStyles.styles().sectionedTableCellFirst); }
+    var rules = [StyleKit.styles.sectionedTableCell];
+    if(this.props.first) { rules.push(StyleKit.styles.sectionedTableCellFirst); }
     if(this.props.height) {rules.push({height: this.props.height})};
     if(this.props.extraStyles) {
       rules = rules.concat(this.props.extraStyles);
@@ -21,67 +22,71 @@ export default class SectionedOptionsTableCell extends Component {
       paddingTop: 0,
       paddingBottom: 0,
       paddingRight: 5,
-      maxHeight: GlobalStyles.constants().maxSettingsCellHeight
+      maxHeight: 45
     })
     return rules;
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.titleStyles = {
-      width: "42%",
-      minWidth: 0
-    }
-
-    this.optionsContainerStyle = {
-      width: "58%",
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: GlobalStyles.constants().mainBackgroundColor
-    }
-
-    this.buttonContainerStyles = {
-      borderLeftColor: GlobalStyles.constants().plainCellBorderColor,
-      borderLeftWidth: 1,
-      height: "100%",
-      flexGrow: 1,
-      padding: 10,
-      paddingTop: 12
-    };
-
-    this.buttonStyles = {
-      color: GlobalStyles.constants().mainDimColor,
-      fontSize: GlobalStyles.constants().mainTextFontSize,
-      textAlign: "center",
-      width: "100%",
-    }
-
-    this.selectedButtonStyles = {
-      color: GlobalStyles.constants().mainTintColor,
-    }
   }
 
   render() {
     return (
       <View style={this.rules()}>
-        <Text style={[GlobalStyles.styles().sectionedAccessoryTableCellLabel, this.titleStyles]}>{this.props.title}</Text>
-        <View style={this.optionsContainerStyle}>
+        <Text style={[StyleKit.styles.sectionedAccessoryTableCellLabel, this.styles.titleStyles]}>{this.props.title}</Text>
+        <View style={this.styles.optionsContainerStyle}>
           {this.props.options.map((option) => {
-            var buttonStyles = [this.buttonStyles];
+            var buttonStyles = [this.styles.buttonStyles];
             if(option.selected) {
-              buttonStyles.push(this.selectedButtonStyles);
+              buttonStyles.push(this.styles.selectedButtonStyles);
             }
             return (
-              <TouchableHighlight underlayColor={GlobalStyles.constants().plainCellBorderColor} key={option.title} style={[GlobalStyles.styles().view, this.buttonContainerStyles]} onPress={() => {this.props.onPress(option)}}>
-                <Text style={buttonStyles}>{option.title}</Text>
+              <TouchableHighlight
+                underlayColor={StyleKit.variable("stylekitBorderColor")}
+                key={option.title}
+                style={[StyleKit.styles.view, this.styles.buttonContainerStyles]}
+                onPress={() => {this.props.onPress(option)}}>
+                  <Text style={buttonStyles}>{option.title}</Text>
               </TouchableHighlight>
             )
           })}
         </View>
       </View>
     )
+  }
+
+  loadStyles() {
+    this.styles = {
+      titleStyles: {
+        width: "42%",
+        minWidth: 0
+      },
+
+      optionsContainerStyle: {
+        width: "58%",
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: StyleKit.variable("stylekitBackgroundColor")
+      },
+
+      buttonContainerStyles: {
+        borderLeftColor: StyleKit.variable("stylekitBorderColor"),
+        borderLeftWidth: 1,
+        height: "100%",
+        flexGrow: 1,
+        padding: 10,
+        paddingTop: 12
+      },
+
+      buttonStyles: {
+        color: StyleKit.variable("stylekitNeutralColor"),
+        fontSize: 16,
+        textAlign: "center",
+        width: "100%",
+      },
+
+      selectedButtonStyles: {
+        color: StyleKit.variable("stylekitInfoColor"),
+      }
+    }
   }
 }

@@ -1,7 +1,5 @@
 import {Platform} from 'react-native';
-import App from "../app"
 import FlagSecure from 'react-native-flag-secure-android';
-import ApplicationState from "../ApplicationState"
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 import SF from './sfjs/sfjs'
@@ -29,48 +27,18 @@ export default class KeysManager {
     this.accountRelatedStorageKeys = ["auth_params", "user"];
   }
 
-  loadLocalStateFromKeys(keys) {
-    if(keys) {
-      this.offlineKeys = keys.offline;
-      if(this.offlineKeys) {
-        this.passcodeTiming = this.offlineKeys.timing;
-      }
-
-      if(keys.fingerprint) {
-        this.fingerprintEnabled = keys.fingerprint.enabled;
-        this.fingerprintTiming = keys.fingerprint.timing;
-      }
-      this.accountKeys = _.omit(keys, ["offline", "fingerprint"]);
-      if(_.keys(this.accountKeys).length == 0) {
-        this.accountKeys = null;
-      }
-    } else {
-      this.offlineKeys = null;
-      this.passcodeTiming = null;
-      this.fingerprintEnabled = null;
-      this.fingerprintTiming = null;
-      this.accountKeys = null;
-    }
-  }
-
   async loadInitialData() {
-    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
-      if(state == ApplicationState.Unlocking || state == ApplicationState.ThemeChangeBegin) {
-        this.updateScreenshotPrivacy();
-      }
-    })
-
     var storageKeys = ["auth_params", OfflineParamsKey, "user", FirstRunKey, StorageEncryptionKey];
 
     return Promise.all([
 
-      Keychain.getKeys().then(function(keys){
+      Keychain.getKeys().then((keys) => {
         if(keys) {
-          this.loadLocalStateFromKeys(keys);
+          this.parseKeychainValue(keys);
         }
-      }.bind(this)),
+      }),
 
-      Storage.get().getMultiItems(storageKeys).then(function(items){
+      Storage.get().getMultiItems(storageKeys).then((items) => {
         // first run
         this.firstRun = items[FirstRunKey] === null || items[FirstRunKey] === undefined;
 
@@ -89,9 +57,14 @@ export default class KeysManager {
         // storage encryption
         if(items[StorageEncryptionKey] == null) {
           // default is true
-          this.storageEncryptionEnabled = true;
+          // Note that this defaults to true, but doesn't dictate if it's actually applied.
+          // For example, when you first install the app and have no account and no passcode,
+          // There will be no encryption source available. In the syncManager key request handler,
+          // we check if this flag is true and if there are active keys. We use this to indicate that
+          // when keys become available, we want storage encryption to be enabled by default.
+          this._storageEncryptionEnabled = true;
         } else {
-          this.storageEncryptionEnabled = JSON.parse(items[StorageEncryptionKey]) == true;
+          this._storageEncryptionEnabled = JSON.parse(items[StorageEncryptionKey]) == true;
         }
 
         // user
@@ -101,7 +74,7 @@ export default class KeysManager {
         } else {
           this.user = {};
         }
-      }.bind(this))
+      })
     ])
   }
 
@@ -122,11 +95,28 @@ export default class KeysManager {
       Storage.get().clear(),
       Keychain.clearKeys()
     ]).then(function(){
-      this.loadLocalStateFromKeys(null);
+      this.parseKeychainValue(null);
       this.accountAuthParams = null;
       this.user = null;
       Storage.get().setItem(FirstRunKey, "false");
     }.bind(this));
+  }
+
+  /*
+    If a user was using the app offline without an account, and had a local passcode, then did
+    an iCloud restore, then they will have saved auth params (saved to storage),
+    but no keychain values (not saved to storage).
+
+    In this case, we want to present a recovery wizard where they can attempt values of their local passcode,
+    and see if it yeilds successful decryption. We can't verify whether the passcode they enter is correct,
+    since the valid hash value is stored in the keychain as well.
+   */
+  shouldPresentKeyRecoveryWizard() {
+    if(!this.accountAuthParams && this.offlineAuthParams && !this.offlineKeys) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /*
@@ -138,13 +128,58 @@ export default class KeysManager {
     this.accountRelatedStorageKeys = _.uniq(this.accountRelatedStorageKeys.concat(storageKeys));
   }
 
+  parseKeychainValue(keys) {
+    if(keys) {
+      this.offlineKeys = keys.offline;
+      if(this.offlineKeys) {
+        this.passcodeTiming = this.offlineKeys.timing;
+      }
+
+      if(keys.fingerprint) {
+        this.fingerprintEnabled = keys.fingerprint.enabled;
+        this.fingerprintTiming = keys.fingerprint.timing;
+      }
+
+      if(keys.encryptedAccountKeys) {
+        // We won't handle this case here. We'll wait until setOfflineKeys is called
+        // by whoever authenticates local passcode. That's when we actually get the offline
+        // keys we can use to decrypt encryptedAccountKeys
+        this.encryptedAccountKeys = keys.encryptedAccountKeys;
+      } else {
+        this.accountKeys = _.omit(keys, ["offline", "fingerprint"]);
+        if(_.keys(this.accountKeys).length == 0) {
+          this.accountKeys = null;
+        }
+      }
+    } else {
+      this.offlineKeys = null;
+      this.passcodeTiming = null;
+      this.fingerprintEnabled = null;
+      this.fingerprintTiming = null;
+      this.accountKeys = null;
+    }
+  }
+
   // what we should write to keychain
-  generateKeychainStoreValue() {
+  async generateKeychainStoreValue() {
     var value = {fingerprint: {enabled: this.fingerprintEnabled, timing: this.fingerprintTiming}};
 
     if(this.accountKeys) {
-      _.merge(value, this.accountKeys);
+      // If offline local passcode keys are available, use that to encrypt account keys
+      // Don't encrypt offline pw because then we don't be able to verify passcode
+      if(this.offlineKeys) {
+        var encryptedKeys = new SFItem();
+        encryptedKeys.uuid = await SF.get().crypto.generateUUID();
+        encryptedKeys.content_type = "SN|Mobile|EncryptedKeys"
+        encryptedKeys.content.accountKeys = this.accountKeys;
+        var params = new SFItemParams(encryptedKeys, this.offlineKeys, this.offlineAuthParams);
+        let results = await params.paramsForSync();
+        value.encryptedAccountKeys = results;
+      } else {
+        _.merge(value, this.accountKeys);
+      }
     }
+
     if(this.offlineKeys) {
       _.merge(value, {offline: {pw: this.offlineKeys.pw, timing: this.passcodeTiming}});
     }
@@ -155,11 +190,11 @@ export default class KeysManager {
   async persistKeysToKeychain() {
     // This funciton is called when changes are made to authentication state
     this.updateScreenshotPrivacy();
-    return Keychain.setKeys(this.generateKeychainStoreValue());
+    return Keychain.setKeys(await this.generateKeychainStoreValue());
   }
 
   updateScreenshotPrivacy(enabled) {
-    if(App.isIOS) {
+    if(Platform.OS == "ios") {
       return;
     }
 
@@ -232,17 +267,19 @@ export default class KeysManager {
   // Storage Encryption
 
   async enableStorageEncryption() {
-    this.storageEncryptionEnabled = true;
-    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
+    this._storageEncryptionEnabled = true;
+    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this._storageEncryptionEnabled));
   }
 
   async disableStorageEncryption() {
-    this.storageEncryptionEnabled = false;
-    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this.storageEncryptionEnabled));
+    this._storageEncryptionEnabled = false;
+    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this._storageEncryptionEnabled));
   }
 
   isStorageEncryptionEnabled() {
-    return this.storageEncryptionEnabled;
+    // See comment in loadInitialData regarding why the value of this._storageEncryptionEnabled is not sufficient
+    // to determine whether it's actually enabled
+    return this._storageEncryptionEnabled && this.activeKeys();
   }
 
 
@@ -251,7 +288,21 @@ export default class KeysManager {
 
   async setAccountAuthParams(authParams) {
     this.accountAuthParams = authParams;
-    return Storage.get().setItem("auth_params", JSON.stringify(authParams));
+    await Storage.get().setItem("auth_params", JSON.stringify(authParams));
+
+    if(this.offlineAuthParams && !this.offlineKeys) {
+      /*
+        This can happen if:
+        1. You are signed into an account and have a local passcode
+        2. You do an iCloud restore
+        3. Your Keychain is wiped, but storage isn't, so offlineAuthParams still exists.
+        4. You restore your account by signing in. At this point, no local passcode will actually be set.
+           The value of offlineAuthParams is stale. We want to delete it.
+      */
+
+      console.log("offlineAuthParams is stale, deleting");
+      await Storage.get().removeItem(OfflineParamsKey);
+    }
   }
 
   async setOfflineAuthParams(authParams) {
@@ -296,9 +347,9 @@ export default class KeysManager {
 
   // Local Security
 
-  async clearOfflineKeysAndData() {
+  async clearOfflineKeysAndData(force = false) {
     // make sure user is authenticated before performing this step
-    if(!this.offlineKeys.mk) {
+    if(this.offlineKeys && !this.offlineKeys.mk && !force) {
       alert("Unable to remove passcode. Make sure you are properly authenticated and try again.");
       return false;
     }
@@ -316,9 +367,23 @@ export default class KeysManager {
     return this.persistKeysToKeychain();
   }
 
-  setOfflineKeys(keys) {
+  async setOfflineKeys(keys) {
     // offline keys are ephemeral and should not be stored anywhere
     this.offlineKeys = keys;
+
+    // Check to see if encryptedAccountKeys need decrypting
+    if(this.encryptedAccountKeys) {
+      // Decrypt and set
+      await SFJS.itemTransformer.decryptItem(this.encryptedAccountKeys, this.offlineKeys);
+      // itemTransformer modifies in place. this.encryptedAccountKeys should now be decrypted
+      let decryptedKeys = new SFItem(this.encryptedAccountKeys);
+      if(decryptedKeys.errorDecrypting) {
+        console.error("Fatal: Error decrypting account keys");
+      } else {
+        this.accountKeys = decryptedKeys.content.accountKeys;
+        this.encryptedAccountKeys = null;
+      }
+    }
   }
 
   offlinePasscodeHash() {
@@ -371,16 +436,19 @@ export default class KeysManager {
   }
 
   static getDeviceBiometricsAvailability(callback) {
+    let isAndroid = Platform.OS == "android";
     if(__DEV__) {
-      callback(true, "face", "Face ID");
+      if(isAndroid) {
+        callback(true, "touch", "Fingerprint (Dev)");
+      } else {
+        callback(true, "face", "Face ID");
+      }
       return;
     }
-    FingerprintScanner.isSensorAvailable()
-    .then((type) => {
+    FingerprintScanner.isSensorAvailable().then((type) => {
       var noun = (!type || type == "touch") ? "Fingerprint" : "Face ID";
       callback(true, type, noun);
-    })
-    .catch((error) => {
+    }).catch((error) => {
       callback(false);
     })
   }
