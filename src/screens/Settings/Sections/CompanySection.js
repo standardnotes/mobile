@@ -14,18 +14,18 @@ export default class CompanySection extends Component {
   onAction = (action) => {
     if(action == "feedback") {
       var platformString = Platform.OS == "android" ? "Android" : "iOS";
-      Linking.openURL(`mailto:hello@standardnotes.org?subject=${platformString} app feedback (v${ApplicationState.version})`);
+      ApplicationState.openURL(`mailto:hello@standardnotes.org?subject=${platformString} app feedback (v${ApplicationState.version})`);
     } else if(action == "learn_more") {
-      Linking.openURL("https://standardnotes.org");
+      ApplicationState.openURL("https://standardnotes.org");
     } else if(action == "privacy") {
-      Linking.openURL("https://standardnotes.org/privacy");
+      ApplicationState.openURL("https://standardnotes.org/privacy");
     } else if(action == "help") {
-      Linking.openURL("https://standardnotes.org/help");
+      ApplicationState.openURL("https://standardnotes.org/help");
     } else if(action == "rate") {
       if(ApplicationState.isIOS) {
-        Linking.openURL("https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8");
+        ApplicationState.openURL("https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8");
       } else {
-        Linking.openURL("market://details?id=com.standardnotes");
+        ApplicationState.openURL("market://details?id=com.standardnotes");
       }
     } else if(action == "friend") {
       let title = "Standard Notes";

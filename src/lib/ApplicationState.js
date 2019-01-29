@@ -1,4 +1,4 @@
-import {AppState, Platform, NativeModules} from 'react-native'
+import {AppState, Platform, NativeModules, Linking, Alert} from 'react-native'
 const { PlatformConstants } = NativeModules;
 import KeysManager from "@Lib/keysManager"
 import OptionsState from "@Lib/OptionsState"
@@ -298,5 +298,21 @@ export default class ApplicationState {
       sources: sources,
       onAuthenticate: this.unlockApplication.bind(this)
     }
+  }
+
+  static openURL(url) {
+    let showAlert = () => {
+      Alert.alert("Unable to Open", `Unable to open URL ${url}.`);
+    }
+
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (!supported) {
+          showAlert();
+        } else {
+          return Linking.openURL(url);
+        }
+      })
+      .catch((err) => showAlert());
   }
 }
