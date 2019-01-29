@@ -1,5 +1,7 @@
 package com.standardnotes;
 
+import com.standardnotes.SNSharePackage;
+
 import android.app.Application;
 import android.app.Activity;
 import android.content.Intent;
@@ -56,7 +58,8 @@ public class MainApplication extends Application implements ReactApplication {
               new RNMail(),
               new ReactNativeFingerprintScannerPackage(),
               new SNTextViewPackage(),
-              new FlagSecurePackage()
+              new FlagSecurePackage(),
+              new SNSharePackage()
       );
     }
 
