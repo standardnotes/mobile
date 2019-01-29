@@ -41,6 +41,12 @@ buck-out/
 \.buckd/
 *.keystore
 
+android-release.bundle
+android-release.bundle.map
+
+ios-release.bundle
+ios-release.bundle.map
+
 # fastlane
 #
 # It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
