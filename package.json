@@ -29,7 +29,8 @@
     "react-navigation-header-buttons": "^2.1.1",
     "regenerator": "^0.13.3",
     "sn-models": "0.1.12",
-    "standard-file-js": "0.3.37"
+    "standard-file-js": "0.3.37",
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "babel-jest": "^23.6.0",
