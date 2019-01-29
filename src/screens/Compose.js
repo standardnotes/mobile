@@ -314,7 +314,7 @@ export default class Compose extends Abstract {
       Alert.alert('Note Locked', "This note is locked. Please unlock this note to make changes.", [{text: 'OK'}])
       return;
     }
-    
+
     this.note.text = text;
 
     // Clear dynamic previews if using plain editor
@@ -462,7 +462,7 @@ export default class Compose extends Abstract {
               {this.state.webViewError ? "Unable to Load" : "LOADING"}
             </Text>
             <Text style={[this.styles.loadingWebViewSubtitle]}>
-              {noteEditor.content.name}
+              {noteEditor && noteEditor.content.name}
             </Text>
           </View>
         }
