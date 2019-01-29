@@ -50,7 +50,13 @@ public class SNTextView extends LinearLayout {
         editText.setLayoutParams(new ScrollView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
         editText.setGravity(Gravity.TOP);
         editText.setInputType(editText.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        editText.setTextIsSelectable(true);
+
+
+        // This was used in conjunction with setting raw input type for selecting lock notes.
+        // However, it causes the keyboard to not come up for editing existing notes.
+        // Tested while offline using brand new installation on Android 6 emulator, but a user with Android 7 also reported it.
+        // editText.setTextIsSelectable(true);
+
         scrollView.addView(editText);
         this.addView(scrollView);
 
@@ -132,12 +138,17 @@ public class SNTextView extends LinearLayout {
 
             editText.setTextIsSelectable is also required for this to work, which is set at setup
 
-         */
-        if(!editable) {
-            editText.setRawInputType(InputType.TYPE_NULL);
-        } else {
+            Update: setTextIsSelectable causes keyboard to not come up. Go back to setEnabled
+            until we can determine a different solution
+
+            Previous solution for selecting locked notes:
+            if(!editable) {
+              editText.setRawInputType(InputType.TYPE_NULL);
+            } else {
             editText.setRawInputType(editText.getInputType() | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        }
+            }
+         */
+        editText.setEnabled(editable);
 
     }
 

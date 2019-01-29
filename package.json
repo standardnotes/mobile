@@ -1,8 +1,8 @@
 {
   "name": "StandardNotes",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "versionIOS": "3.0.0",
-  "versionAndroid": "3.0.0",
+  "versionAndroid": "3.0.1",
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
