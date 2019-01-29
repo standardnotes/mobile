@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { View } from 'react-native';
+import { View, Linking, NativeModules } from 'react-native';
 import StyleKit from "@Style/StyleKit"
 import Sync from '@SFJS/syncManager'
 import Auth from '@SFJS/authManager'
@@ -13,6 +13,8 @@ import ApplicationState from "@Lib/ApplicationState"
 
 import Compose from "@Screens/Compose"
 import Notes from "@Screens/Notes/Notes"
+
+import * as Url from "url"
 
 export default class Root extends Abstract {
 
@@ -117,6 +119,65 @@ export default class Root extends Abstract {
         this.presentAuthenticationModal(this.authOnMount);
         this.authOnMount = null;
       }, 20);
+    } else {
+      this.initDeeplinking();
+    }
+  }
+
+  initDeeplinking() {
+    Linking.addEventListener('url', this._handleDeeplink);
+    
+    Linking.getInitialURL().then((url) => this._handleDeeplink({ url }));
+    NativeModules.SNShare.getSharedText().then((url) => this._handleDeeplink({ url }));
+  }
+
+  _handleDeeplink = (event)  => {
+    if (event.url) {
+      const url = Url.parse(event.url, true);
+      const path = url.hostname;
+
+      switch(path) {
+        case 'compose':
+          const { title, text } = url.query;
+          this._handleComposeDeeplink(title, text);
+          break;
+        default:
+          // do nothing
+      }
+    }
+  }
+
+  _handleComposeDeeplink(title, text) {
+    // we don't want an empty note
+    if (title || text) {
+      const note = ModelManager.get().createItem({content_type: "Note", dummy: false, title, text});
+
+      note.title = title ? title : '';
+      note.text = text ? text : '';
+      note.dummy = false;
+
+      note.initUUID().then(() => {
+        ModelManager.get().addItem(note);
+        note.setDirty(true);
+
+        Sync.get().sync().then((response) => {
+          if(response && response.error) {
+            AlertManager.get().confirm({
+              title: "Error Saving Note",
+              text: "Unable to save your new note. Please try again.",
+              confirmButtonText: "OK"
+            });
+          } else {
+            note.hasChanges = false;
+
+            // Present composer with new note
+            this.props.navigation.push("Compose", {
+              title: "Note",
+              noteId: note && note.uuid
+            });
+          }
+        });
+      });
     }
   }
 
@@ -221,6 +282,8 @@ export default class Root extends Abstract {
         if(this.dataLoaded) {
           Sync.get().sync();
         }
+
+        this.initDeeplinking();
       }
     });
   }
