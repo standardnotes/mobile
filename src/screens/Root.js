@@ -160,22 +160,10 @@ export default class Root extends Abstract {
         ModelManager.get().addItem(note);
         note.setDirty(true);
 
-        Sync.get().sync().then((response) => {
-          if(response && response.error) {
-            AlertManager.get().confirm({
-              title: "Error Saving Note",
-              text: "Unable to save your new note. Please try again.",
-              confirmButtonText: "OK"
-            });
-          } else {
-            note.hasChanges = false;
-
-            // Present composer with new note
-            this.props.navigation.push("Compose", {
-              title: "Note",
-              noteId: note && note.uuid
-            });
-          }
+        // Present composer with new note
+        this.props.navigation.push("Compose", {
+          title: "Note",
+          noteId: note && note.uuid
         });
       });
     }
