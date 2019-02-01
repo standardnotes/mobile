@@ -141,7 +141,7 @@ export default class App extends Component {
     MigrationManager.get().load();
 
     // Listen to sign out event
-    Auth.get().addEventHandler((event) => {
+    this.authEventHandler = Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
         Storage.get().clearAllModels();
         KeysManager.get().clearAccountKeysAndData();
@@ -151,8 +151,16 @@ export default class App extends Component {
     });
 
     this.state = {ready: false};
-
     this.loadInitialData();
+  }
+
+  /*
+    We initially didn't expect App to ever unmount. However, on Android, if you are in the root screen,
+    and press the physical back button, then strangely, App unmounts, but other components, like Notes, do not.
+    We've remedied this by modifiying Android back button behavior natively to background instead of quit, but we keep this below anyway.
+   */
+  componentWillUnmount() {
+    Auth.get().removeEventHandler(this.authEventHandler);
   }
 
   async loadInitialData() {

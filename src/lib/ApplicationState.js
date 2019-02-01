@@ -52,7 +52,6 @@ export default class ApplicationState {
     this.setTabletModeEnabled(this.isTabletDevice);
     this.initializeOptions();
 
-
     AppState.addEventListener('change', this.handleAppStateChange);
     this.didLaunch();
   }
@@ -178,6 +177,15 @@ export default class ApplicationState {
         this.lockApplication();
       }
     }
+
+    /*
+      Presumabely we added previous event tracking in case an app event was triggered before observers got the chance to register.
+      If we are backgrounding or losing focus, I assume we no longer care about previous events that occurred.
+      (This was added in relation to the issue where pressing the Android back button would reconstruct App and cause all events to be re-forwarded)
+     */
+    if(isEnteringBackground || isLosingFocus) {
+      this.clearPreviousState();
+    }
   }
 
   // Visibility change events are like active, inactive, background,
@@ -199,6 +207,10 @@ export default class ApplicationState {
 
   // Sent from App.js
   receiveApplicationStartEvent() {
+    if(this.didHandleApplicationStart) {
+      return;
+    }
+    this.didHandleApplicationStart = true;
     var authProps = this.getAuthenticationPropsForAppState(ApplicationState.Launching);
     if(authProps.sources.length == 0) {
       this.unlockApplication();
@@ -247,6 +259,10 @@ export default class ApplicationState {
     }
 
     return observer;
+  }
+
+  clearPreviousState() {
+    this.previousEvents = [];
   }
 
   removeStateObserver(observer) {
