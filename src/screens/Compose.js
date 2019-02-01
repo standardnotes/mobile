@@ -63,7 +63,10 @@ export default class Compose extends Abstract {
 
   registerObservers() {
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
+
       if(event == "sync:completed") {
+        let isInRetrieved = data.retrievedItems && data.retrievedItems.map((i) => i.uuid).includes(this.note.uuid);
+        let isInSaved = data.savedItems && data.savedItems.map((i) => i.uuid).includes(this.note.uuid);
         if(this.note.deleted || this.note.content.trashed) {
           let clearNote = this.note.deleted == true;
           // if Trashed, and we're in the Trash view, don't clear note.
@@ -80,7 +83,7 @@ export default class Compose extends Abstract {
             this.props.navigation.closeRightDrawer();
             this.setNote(null);
           }
-        } else if(data.retrievedItems && this.note.uuid && data.retrievedItems.concat(data.savedItems).map((i) => i.uuid).includes(this.note.uuid)) {
+        } else if(this.note.uuid && (isInRetrieved || isInSaved)) {
           /*
           You have to be careful about when you render inside this component. Rendering with the native SNTextView component
           can cause the cursor to go to the end of the input, both on iOS and Android. We want to force an update only if retrievedItems includes this item
@@ -94,9 +97,16 @@ export default class Compose extends Abstract {
           Do not make text part of the state, otherwise that would cause a re-render on every keystroke.
           */
 
+          let newState = {title: this.note.title, noteLocked: this.note.locked ? true : false};
+
+          // only include `text` if this item is coming back from retrieved, as this will cause text view cursor to reset to top
+          if(isInRetrieved) {
+            newState.text = this.note.text;
+          }
+
           // Use true/false for note.locked as we don't want values of null or undefined, which may cause
           // unnecessary renders. (on constructor it was undefined, and here, it was null, causing a re-render to occur on android, causing textview to reset cursor)
-          this.setState({title: this.note.title, noteLocked: this.note.locked ? true : false});
+          this.setState(newState);
         }
       }
     });
@@ -320,7 +330,11 @@ export default class Compose extends Abstract {
 
   onTextChange = (text) => {
     if(this.note.locked) {
+      // On Android, we don't disable the text view if the note is locked, as that also disables selection.
       Alert.alert('Note Locked', "This note is locked. Please unlock this note to make changes.", [{text: 'OK'}])
+      // For some reason, tested on Android, calling forceUpdate here with the intention of re-rendering the note's original text
+      // does not render the original text, but keeps the pending edits we have.
+      // this.forceUpdate();
       return;
     }
 
@@ -496,7 +510,6 @@ export default class Compose extends Abstract {
               selectionColor={StyleKit.lighten(StyleKit.variable("stylekitInfoColor"), 0.35)}
               handlesColor={StyleKit.variable("stylekitInfoColor")}
               onChangeText={this.onTextChange}
-              editable={!this.note.locked}
             />
           </View>
         }
