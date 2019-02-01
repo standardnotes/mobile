@@ -37,6 +37,11 @@ export default class Sync extends SFSyncManager {
 
       return {keys, auth_params, offline}
     })
+
+    // Content types appearing first are always mapped first
+    this.contentTypeLoadPriority = [
+      "SN|UserPreferences", "SN|Privileges",
+      "SN|Component", "SN|Theme"];
   }
 
   async resaveOfflineData() {

@@ -102,8 +102,8 @@ export default class Root extends Abstract {
   }
 
   onUnlockPress = () => {
-    let mostRecentState = ApplicationState.get().getMostRecentState();
-    let authProps = ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState);
+    let initialAppState = ApplicationState.Launching;
+    let authProps = ApplicationState.get().getAuthenticationPropsForAppState(initialAppState);
     if(authProps.sources.length > 0) {
       this.presentAuthenticationModal(authProps);
     }
