@@ -102,8 +102,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode 3000011
-        versionName "3.0.1"
+        versionCode 3000020
+        versionName "3.0.2"
 
         multiDexEnabled  true
 
