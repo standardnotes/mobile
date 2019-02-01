@@ -121,6 +121,15 @@ export default class Compose extends Abstract {
         this.setNote(null);
       }
     });
+
+    this.tabletModeChangeHandler = ApplicationState.get().addEventHandler((event, data) => {
+      if(event == ApplicationState.AppStateEventTabletModeChange) {
+        // If we are now in tablet mode after not being in tablet mode
+        if(data.new_isInTabletMode && !data.old_isInTabletMode) {
+          this.setSideMenuHandler();
+        }
+      }
+    })
   }
 
   /*
@@ -183,9 +192,9 @@ export default class Compose extends Abstract {
     // We don't want to do this in componentDid/WillBlur because when presenting new tag input modal,
     // the component will blur, and this will be called. Then, because the right drawer is now locked,
     // we ignore render events. This will cause the screen to be white when you save the new tag.
-    SideMenuManager.get().removeHandlerForRightSideMenu();
+    SideMenuManager.get().removeHandlerForRightSideMenu(this.rightMenuHandler);
     Auth.get().removeEventHandler(this.signoutObserver);
-
+    ApplicationState.get().removeEventHandler(this.tabletModeChangeHandler);
     Sync.get().removeEventHandler(this.syncObserver);
     ComponentManager.get().deregisterHandler(this.componentHandler);
   }
@@ -193,7 +202,7 @@ export default class Compose extends Abstract {
   componentWillFocus() {
     super.componentWillFocus();
 
-    if(!ApplicationState.get().isTablet) {
+    if(!ApplicationState.get().isInTabletMode) {
       this.props.navigation.lockRightDrawer(false);
     }
 
@@ -227,7 +236,7 @@ export default class Compose extends Abstract {
   }
 
   setSideMenuHandler() {
-    SideMenuManager.get().setHandlerForRightSideMenu({
+    this.rightMenuHandler = SideMenuManager.get().setHandlerForRightSideMenu({
       getCurrentNote: () => {
         return this.note;
       },
@@ -270,7 +279,7 @@ export default class Compose extends Abstract {
   componentWillBlur() {
     super.componentWillBlur();
 
-    if(!ApplicationState.get().isTablet) {
+    if(!ApplicationState.get().isInTabletMode) {
       this.props.navigation.lockRightDrawer(true);
     }
 

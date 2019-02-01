@@ -184,7 +184,7 @@ export default class ModelManager extends SFModelManager {
     let sortReverse = options.sortReverse;
 
     notes = notes.filter((note) => {
-      if(note.deleted) {
+      if(note.deleted || note.dummy) {
         return false;
       }
 

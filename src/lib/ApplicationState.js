@@ -30,6 +30,9 @@ export default class ApplicationState {
   // When the user enters their local passcode and/or fingerprint
   static Unlocking = "Unlocking";
 
+  /* Seperate events, unrelated to app state notifications */
+  static AppStateEventTabletModeChange = "AppStateEventTabletModeChange";
+
   static instance = null;
   static get() {
     if (this.instance == null) {
@@ -41,11 +44,14 @@ export default class ApplicationState {
 
   constructor() {
     this.observers = [];
+    this.eventSubscribers = [];
     this.locked = true;
     this.previousEvents = [];
     this._isAndroid = Platform.OS === "android";
 
+    this.setTabletModeEnabled(this.isTabletDevice);
     this.initializeOptions();
+
 
     AppState.addEventListener('change', this.handleAppStateChange);
     this.didLaunch();
@@ -91,9 +97,38 @@ export default class ApplicationState {
     return !this._isAndroid;
   }
 
-  get isTablet() {
+  get isTabletDevice() {
     const deviceType = PlatformConstants.interfaceIdiom;
     return deviceType == "pad";
+  }
+
+  get isInTabletMode() {
+    return this.tabletMode;
+  }
+
+  setTabletModeEnabled(enabled) {
+    if(enabled != this.tabletMode) {
+      this.tabletMode = enabled;
+      this.notifyEvent(
+        ApplicationState.AppStateEventTabletModeChange,
+        {new_isInTabletMode: enabled, old_isInTabletMode: !enabled}
+      );
+    }
+  }
+
+  addEventHandler(handler) {
+    this.eventSubscribers.push(handler);
+    return handler;
+  }
+
+  removeEventHandler(handler) {
+    _.pull(this.eventSubscribers, handler);
+  }
+
+  notifyEvent(event, data) {
+    for(let handler of this.eventSubscribers) {
+      handler(event, data);
+    }
   }
 
   handleAppStateChange = (nextAppState) => {

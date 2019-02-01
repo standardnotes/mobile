@@ -88,10 +88,7 @@ export default class Notes extends Abstract {
       We'll let Compose itself handle whether right drawer should be locked.
     */
 
-    if(!ApplicationState.get().isTablet) {
-      this.props.navigation.lockLeftDrawer(false);
-      this.props.navigation.lockRightDrawer(true);
-    }
+    this.reloadTabletStateForEvent({focus: true})
 
     if(this.loadNotesOnVisible) {
       this.loadNotesOnVisible = false;
@@ -99,13 +96,23 @@ export default class Notes extends Abstract {
     }
   }
 
+  reloadTabletStateForEvent({focus, blur}) {
+    if(focus) {
+      if(!ApplicationState.get().isInTabletMode) {
+        this.props.navigation.lockLeftDrawer(false);
+        this.props.navigation.lockRightDrawer(true);
+      }
+    } else if(blur) {
+      if(!ApplicationState.get().isInTabletMode) {
+        this.props.navigation.lockLeftDrawer(true);
+        this.props.navigation.lockRightDrawer(false);
+      }
+    }
+  }
+
   componentWillBlur() {
     super.componentWillBlur();
-
-    if(!ApplicationState.get().isTablet) {
-      this.props.navigation.lockLeftDrawer(true);
-      this.props.navigation.lockRightDrawer(false);
-    }
+    this.reloadTabletStateForEvent({blur: true})
   }
 
   componentDidFocus() {
@@ -119,8 +126,8 @@ export default class Notes extends Abstract {
   componentWillUnmount() {
     super.componentWillUnmount();
 
+    ApplicationState.get().removeEventHandler(this.tabletModeChangeHandler);
     Sync.get().removeEventHandler(this.syncObserver);
-
     Auth.get().removeEventHandler(this.signoutObserver);
     if(this.options) {
       this.options.removeChangeObserver(this.optionsObserver);
@@ -168,7 +175,7 @@ export default class Notes extends Abstract {
         this.reloadList();
         this.reloadHeaderBar();
         this.mergeState({decrypting: false, loading: false});
-        if(ApplicationState.get().isTablet) {
+        if(ApplicationState.get().isInTabletMode) {
           this.selectFirstNote();
         }
       } else if(event == "sync-exception") {
@@ -188,6 +195,32 @@ export default class Notes extends Abstract {
         })
       }
     });
+
+    this.tabletModeChangeHandler = ApplicationState.get().addEventHandler((event, data) => {
+      if(event == ApplicationState.AppStateEventTabletModeChange) {
+        // If we are now in tablet mode after not being in tablet mode
+        if(data.new_isInTabletMode && !data.old_isInTabletMode) {
+          // Pop to root, if we are in Compose window.
+          this.props.navigation.popToTop();
+          setTimeout(() => {
+            // Reselect previously selected note
+            if(this.state.selectedNoteId) {
+              let note = ModelManager.get().findItem(this.state.selectedNoteId);
+              if(note) {
+                this.selectNote(note);
+              }
+            }
+          }, 10);
+        }
+
+        if(!data.new_isInTabletMode) {
+          this.setState({selectedNoteId:null});
+          this.props.navigation.setParams({
+            rightButton: null
+          })
+        }
+      }
+    })
   }
 
   // Called by Root.js
@@ -285,9 +318,9 @@ export default class Notes extends Abstract {
 
   selectFirstNote() {
     if(this.stateNotes && this.stateNotes.length > 0) {
-      this.handleSelection(this.stateNotes[0]);
+      this.selectNote(this.stateNotes[0]);
     } else {
-      this.handleSelection(null);
+      this.selectNote(null);
     }
   }
 
@@ -301,7 +334,7 @@ export default class Notes extends Abstract {
     })
   }
 
-  handleSelection = (note) => {
+  selectNote = (note) => {
     this.handlePrivilegedAction(note && note.content.protected, SFPrivilegesManager.ActionViewProtectedNotes, () => {
       if(this.props.onNoteSelect) {
         this.props.onNoteSelect(note);
@@ -309,9 +342,7 @@ export default class Notes extends Abstract {
         this.presentComposer(note);
       }
 
-      if(ApplicationState.get().isTablet) {
-        this.setState({selectedNoteId: note && note.uuid});
-      }
+      this.setState({selectedNoteId: note && note.uuid});
     });
   }
 
@@ -321,7 +352,7 @@ export default class Notes extends Abstract {
         item.conflict_of = null;
       }
 
-      this.handleSelection(item);
+      this.selectNote(item);
     }
 
     if(item.errorDecrypting) {
@@ -386,7 +417,7 @@ export default class Notes extends Abstract {
             loading={this.state.loading}
             selectedTags={this.state.tags}
             options={this.options.displayOptions}
-            selectedNoteId={this.state.selectedNoteId}
+            selectedNoteId={ApplicationState.get().isInTabletMode && this.state.selectedNoteId}
             handleAction={this.handleActionsheetAction}
           />
         }
@@ -394,7 +425,7 @@ export default class Notes extends Abstract {
         <FAB
           buttonColor={StyleKit.variable("stylekitInfoColor")}
           iconTextColor={StyleKit.variable("stylekitInfoContrastColor")}
-          onClickAction={() => {this.handleSelection()}}
+          onClickAction={() => {this.selectNote()}}
           visible={true}
           size={30}
           paddingTop={ApplicationState.isIOS ? 1 : 0}
