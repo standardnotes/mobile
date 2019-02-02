@@ -23,7 +23,9 @@ export default class ReviewManager {
 
   static async getRunCount() {
     return Storage.get().getItem("runCount").then((runCount) => {
-      return JSON.parse(runCount);
+      if(runCount) {
+        return JSON.parse(runCount);
+      }
     })
   }
 

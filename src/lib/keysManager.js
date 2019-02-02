@@ -64,7 +64,7 @@ export default class KeysManager {
         }
 
         // storage encryption
-        if(items[StorageEncryptionKey] == null) {
+        if(items[StorageEncryptionKey] == null || items[StorageEncryptionKey] == undefined) {
           // default is true
           // Note that this defaults to true, but doesn't dictate if it's actually applied.
           // For example, when you first install the app and have no account and no passcode,
