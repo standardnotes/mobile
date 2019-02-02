@@ -69,7 +69,9 @@ export default class Storage extends SFStorageManager {
       let key = store[i][0];
       if(key.includes("Item-")) {
         let value = store[i][1];
-        items.push(JSON.parse(value));
+        if(value) {
+          items.push(JSON.parse(value));
+        }
       }
     })
 
