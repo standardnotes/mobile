@@ -63,6 +63,15 @@ export default class Authenticate extends Abstract {
   }
 
   componentWillUnmount() {
+
+    // Typically there should be no way to exit this window if it doesn't have a cancel option.
+    // However, on Android, you can press the hardware back button to dismiss it. We want to notify
+    // caller that this screen has unmounted
+    let onUnmount = this.getProp("onUnmount");
+    if(onUnmount) {
+      onUnmount();
+    }
+
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
   }

@@ -217,10 +217,12 @@ export default class Root extends Abstract {
       onSuccess: () => {
         authProps.onAuthenticate();
         this.authenticationInProgress = false;
-
         if(this.dataLoaded) {
           Sync.get().sync();
         }
+      },
+      onUnmount: () => {
+        this.authenticationInProgress = false;
       }
     });
   }
