@@ -34,7 +34,9 @@ export default class OptionsState {
 
   async loadSaved() {
     return Storage.get().getItem("options").then((result) => {
-      _.merge(this, _.omit(JSON.parse(result), ["changeObservers"]));
+      if(result) {
+        _.merge(this, _.omit(JSON.parse(result), ["changeObservers"]));
+      }
       this.rebuildOptions();
       this.notifyObservers();
     })

@@ -1,8 +1,8 @@
 {
   "name": "StandardNotes",
-  "version": "3.0.1",
-  "versionIOS": "3.0.0",
-  "versionAndroid": "3.0.1",
+  "version": "3.0.2",
+  "versionIOS": "3.0.2",
+  "versionAndroid": "3.0.2",
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
@@ -28,8 +28,8 @@
     "react-navigation": "^3.0.9",
     "react-navigation-header-buttons": "^2.1.1",
     "regenerator": "^0.13.3",
-    "sn-models": "0.1.12",
-    "standard-file-js": "0.3.37",
+    "sn-models": "0.1.13",
+    "standard-file-js": "0.3.42",
     "url": "^0.11.0"
   },
   "devDependencies": {

@@ -44,6 +44,8 @@ export default class SideMenuManager {
   */
   setHandlerForLeftSideMenu(handler) {
     this.leftSideMenuHandler = handler;
+
+    return handler;
   }
 
   /*
@@ -55,6 +57,8 @@ export default class SideMenuManager {
     this.rightSideMenuHandler = handler;
 
     this.rightSideMenu && this.rightSideMenu.forceUpdate();
+
+    return handler;
   }
 
   getHandlerForLeftSideMenu() {
@@ -65,8 +69,12 @@ export default class SideMenuManager {
     return this.rightSideMenuHandler;
   }
 
-  removeHandlerForRightSideMenu() {
-    this.rightSideMenuHandler = null;
+  removeHandlerForRightSideMenu(handler) {
+    // In tablet switching mode, a new Compose window may be created before the first one unmounts.
+    // If an old instance asks us to remove handler, we want to make sure it's not the new one
+    if(handler == this.rightSideMenuHandler) {
+      this.rightSideMenuHandler = null;
+    }
   }
 
   setLockedForLeftSideMenu(locked) {

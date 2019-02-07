@@ -104,8 +104,8 @@ export default class Root extends Abstract {
   }
 
   onUnlockPress = () => {
-    let mostRecentState = ApplicationState.get().getMostRecentState();
-    let authProps = ApplicationState.get().getAuthenticationPropsForAppState(mostRecentState);
+    let initialAppState = ApplicationState.Launching;
+    let authProps = ApplicationState.get().getAuthenticationPropsForAppState(initialAppState);
     if(authProps.sources.length > 0) {
       this.presentAuthenticationModal(authProps);
     }
@@ -266,12 +266,14 @@ export default class Root extends Abstract {
       onSuccess: () => {
         authProps.onAuthenticate();
         this.authenticationInProgress = false;
-
         if(this.dataLoaded) {
           Sync.get().sync();
         }
 
         this.initDeeplinking();
+      },
+      onUnmount: () => {
+        this.authenticationInProgress = false;
       }
     });
   }
@@ -283,15 +285,17 @@ export default class Root extends Abstract {
 
   onLayout = (e) => {
     let width = e.nativeEvent.layout.width;
-    let shouldSplitLayout = ApplicationState.get().isTablet;
-
     /*
     If you're in tablet mode, but on an iPad where this app is running side by side by another app,
     we only want to show the Compose window and not the list, because there isn't enough space.
     */
     const MinWidthToSplit = 450;
-    if(ApplicationState.get().isTablet && width < MinWidthToSplit) {
-      shouldSplitLayout = false;
+    if(ApplicationState.get().isTabletDevice) {
+      if(width < MinWidthToSplit) {
+        ApplicationState.get().setTabletModeEnabled(false);
+      } else {
+        ApplicationState.get().setTabletModeEnabled(true);
+      }
     }
 
     this.setState({
@@ -299,46 +303,38 @@ export default class Root extends Abstract {
       height: e.nativeEvent.layout.height,
       x: e.nativeEvent.layout.x,
       y: e.nativeEvent.layout.y,
-      shouldSplitLayout: shouldSplitLayout
+      shouldSplitLayout: ApplicationState.get().isInTabletMode
     });
   }
 
   render() {
     /* Don't render LockedView here since we need this.notesRef as soon as we can (for componentWillFocus callback) */
 
-    let isTablet = ApplicationState.get().isTablet;
+    let shouldSplitLayout = ApplicationState.get().isInTabletMode;
+
+    let notesStyles = shouldSplitLayout ? [this.styles.left, {width: shouldSplitLayout ? "34%" : 0}] : [StyleKit.styles.container, {flex: 1}];
+    let composeStyles = shouldSplitLayout ? [this.styles.right, {width: shouldSplitLayout ? "66%" : "100%"}] : null;
 
     return (
       <View onLayout={this.onLayout} style={[StyleKit.styles.container, this.styles.root]}>
-        {!isTablet &&
+        <View style={notesStyles}>
           <Notes
             ref={(ref) => {this.notesRef = ref}}
             onUnlockPress={this.onUnlockPress}
             navigation={this.props.navigation}
+            onNoteSelect={shouldSplitLayout && this.onNoteSelect /* tablet only */}
           />
+        </View>
+
+        {shouldSplitLayout &&
+          <View style={composeStyles}>
+            <Compose
+              ref={(ref) => {this.composer = ref}}
+              selectedTagId={this.state.selectedTagId}
+              navigation={this.props.navigation}
+            />
+          </View>
         }
-
-        {isTablet &&
-          <Fragment>
-            <View style={[this.styles.left, {width: this.state.shouldSplitLayout ? "34%" : 0}]}>
-              <Notes
-                ref={(ref) => {this.notesRef = ref}}
-                onUnlockPress={this.onUnlockPress}
-                navigation={this.props.navigation}
-                onNoteSelect={this.onNoteSelect}
-              />
-            </View>
-
-            <View style={[this.styles.right, {width: this.state.shouldSplitLayout ? "66%" : "100%"}]}>
-              <Compose
-                ref={(ref) => {this.composer = ref}}
-                selectedTagId={this.state.selectedTagId}
-                navigation={this.props.navigation}
-              />
-            </View>
-          </Fragment>
-        }
-
       </View>
     )
   }

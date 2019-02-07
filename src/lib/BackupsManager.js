@@ -1,4 +1,4 @@
-import { Share } from 'react-native';
+import { Share, Alert } from 'react-native';
 import Storage from '@SFJS/storageManager'
 import Auth from '@SFJS/authManager'
 import KeysManager from '@Lib/keysManager'

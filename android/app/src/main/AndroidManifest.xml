@@ -31,6 +31,7 @@
         android:name=".MainActivity"
         android:launchMode="singleTask"
         android:label="@string/app_name"
+        android:launchMode="singleTop"
         android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
         android:windowSoftInputMode="adjustResize">
         <intent-filter>

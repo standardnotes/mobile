@@ -259,7 +259,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
           side: "right",
           size: 17
         },
-        onSelect: () => { Linking.openURL("https://standardnotes.org/extensions")},
+        onSelect: () => { ApplicationState.openURL("https://standardnotes.org/extensions")},
       }));
     }
 

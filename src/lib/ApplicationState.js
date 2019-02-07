@@ -1,4 +1,4 @@
-import {AppState, Platform, NativeModules} from 'react-native'
+import {AppState, Platform, NativeModules, Linking, Alert} from 'react-native'
 const { PlatformConstants } = NativeModules;
 import KeysManager from "@Lib/keysManager"
 import OptionsState from "@Lib/OptionsState"
@@ -30,6 +30,9 @@ export default class ApplicationState {
   // When the user enters their local passcode and/or fingerprint
   static Unlocking = "Unlocking";
 
+  /* Seperate events, unrelated to app state notifications */
+  static AppStateEventTabletModeChange = "AppStateEventTabletModeChange";
+
   static instance = null;
   static get() {
     if (this.instance == null) {
@@ -41,10 +44,12 @@ export default class ApplicationState {
 
   constructor() {
     this.observers = [];
+    this.eventSubscribers = [];
     this.locked = true;
     this.previousEvents = [];
     this._isAndroid = Platform.OS === "android";
 
+    this.setTabletModeEnabled(this.isTabletDevice);
     this.initializeOptions();
 
     AppState.addEventListener('change', this.handleAppStateChange);
@@ -91,9 +96,38 @@ export default class ApplicationState {
     return !this._isAndroid;
   }
 
-  get isTablet() {
+  get isTabletDevice() {
     const deviceType = PlatformConstants.interfaceIdiom;
     return deviceType == "pad";
+  }
+
+  get isInTabletMode() {
+    return this.tabletMode;
+  }
+
+  setTabletModeEnabled(enabled) {
+    if(enabled != this.tabletMode) {
+      this.tabletMode = enabled;
+      this.notifyEvent(
+        ApplicationState.AppStateEventTabletModeChange,
+        {new_isInTabletMode: enabled, old_isInTabletMode: !enabled}
+      );
+    }
+  }
+
+  addEventHandler(handler) {
+    this.eventSubscribers.push(handler);
+    return handler;
+  }
+
+  removeEventHandler(handler) {
+    _.pull(this.eventSubscribers, handler);
+  }
+
+  notifyEvent(event, data) {
+    for(let handler of this.eventSubscribers) {
+      handler(event, data);
+    }
   }
 
   handleAppStateChange = (nextAppState) => {
@@ -143,6 +177,15 @@ export default class ApplicationState {
         this.lockApplication();
       }
     }
+
+    /*
+      Presumabely we added previous event tracking in case an app event was triggered before observers got the chance to register.
+      If we are backgrounding or losing focus, I assume we no longer care about previous events that occurred.
+      (This was added in relation to the issue where pressing the Android back button would reconstruct App and cause all events to be re-forwarded)
+     */
+    if(isEnteringBackground || isLosingFocus) {
+      this.clearPreviousState();
+    }
   }
 
   // Visibility change events are like active, inactive, background,
@@ -164,6 +207,10 @@ export default class ApplicationState {
 
   // Sent from App.js
   receiveApplicationStartEvent() {
+    if(this.didHandleApplicationStart) {
+      return;
+    }
+    this.didHandleApplicationStart = true;
     var authProps = this.getAuthenticationPropsForAppState(ApplicationState.Launching);
     if(authProps.sources.length == 0) {
       this.unlockApplication();
@@ -212,6 +259,10 @@ export default class ApplicationState {
     }
 
     return observer;
+  }
+
+  clearPreviousState() {
+    this.previousEvents = [];
   }
 
   removeStateObserver(observer) {
@@ -298,5 +349,21 @@ export default class ApplicationState {
       sources: sources,
       onAuthenticate: this.unlockApplication.bind(this)
     }
+  }
+
+  static openURL(url) {
+    let showAlert = () => {
+      Alert.alert("Unable to Open", `Unable to open URL ${url}.`);
+    }
+
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (!supported) {
+          showAlert();
+        } else {
+          return Linking.openURL(url);
+        }
+      })
+      .catch((err) => showAlert());
   }
 }

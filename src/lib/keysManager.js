@@ -30,7 +30,16 @@ export default class KeysManager {
   async loadInitialData() {
     var storageKeys = ["auth_params", OfflineParamsKey, "user", FirstRunKey, StorageEncryptionKey];
 
-    return Promise.all([
+    /*
+      We only want to call this once per app session. On Android, the App.js component may be unmounted
+      on hardware back button press. When it constructs again, it calls this function, resetting our values for offlineKeys
+      which we don't want to change, since on authentication, they are set by the passcode unlock success function.
+     */
+    if(this.loadInitialDataPromise) {
+      return this.loadInitialDataPromise;
+    }
+
+    this.loadInitialDataPromise = Promise.all([
 
       Keychain.getKeys().then((keys) => {
         if(keys) {
@@ -55,7 +64,7 @@ export default class KeysManager {
         }
 
         // storage encryption
-        if(items[StorageEncryptionKey] == null) {
+        if(items[StorageEncryptionKey] == null || items[StorageEncryptionKey] == undefined) {
           // default is true
           // Note that this defaults to true, but doesn't dictate if it's actually applied.
           // For example, when you first install the app and have no account and no passcode,
@@ -76,6 +85,8 @@ export default class KeysManager {
         }
       })
     ])
+
+    return this.loadInitialDataPromise;
   }
 
   isFirstRun() {
@@ -190,7 +201,8 @@ export default class KeysManager {
   async persistKeysToKeychain() {
     // This funciton is called when changes are made to authentication state
     this.updateScreenshotPrivacy();
-    return Keychain.setKeys(await this.generateKeychainStoreValue());
+    let value = await this.generateKeychainStoreValue();
+    return Keychain.setKeys(value);
   }
 
   updateScreenshotPrivacy(enabled) {

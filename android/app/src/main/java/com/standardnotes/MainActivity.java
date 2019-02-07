@@ -22,4 +22,12 @@ public class MainActivity extends ReactActivity {
       };
     }
 
+    /*
+     On back button press, background app instead of quitting it
+     https://github.com/facebook/react-native/issues/13775
+     */
+    @Override
+    public void invokeDefaultOnBackPressed() {
+        moveTaskToBack(true);
+    }
 }

@@ -28,7 +28,7 @@ export default class SideMenuCell extends ThemedComponent {
   }
 
   onLongPress = () => {
-    this.props.onLongPress();
+    this.props.onLongPress && this.props.onLongPress();
   }
 
   getIconElement() {
