@@ -9,6 +9,7 @@ import ActionSheet from 'react-native-actionsheet'
 import Abstract from "@Screens/Abstract"
 import AlertManager from "@SFJS/alertManager"
 import Auth from "@SFJS/authManager"
+import Sync from '@SFJS/syncManager'
 
 import SectionHeader from "@Components/SectionHeader";
 import TableSection from "@Components/TableSection";
@@ -37,15 +38,28 @@ export default class MainSideMenu extends AbstractSideMenu {
         this.forceUpdate();
       }
     });
+
+    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+      if(event == "enter-out-of-sync") {
+        this.setState({outOfSync: true});
+      } else if(event == "exit-out-of-sync") {
+        this.setState({outOfSync: false});
+      }
+    })
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
     Auth.get().removeEventHandler(this.signoutObserver);
+    Sync.get().removeEventHandler(this.syncEventHandler);
   }
 
   presentSettings() {
     this.props.navigation.navigate("Settings");
+  }
+
+  presentOutOfSyncResolution() {
+    
   }
 
   get handler() {
@@ -151,7 +165,11 @@ export default class MainSideMenu extends AbstractSideMenu {
         <SafeAreaView style={this.styles.firstSafeArea} />
         <SafeAreaView style={[viewStyles, this.styles.secondSafeArea]}>
 
-          <SideMenuHero onPress={() => {this.presentSettings()}}/>
+          <SideMenuHero
+            outOfSync={this.state.outOfSync}
+            onPress={() => {this.presentSettings()}}
+            onOutOfSyncPress={() => {this.presentOutOfSyncResolution()}}
+          />
 
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
 

@@ -332,7 +332,8 @@ export default class Notes extends Abstract {
   _onRefresh() {
     this.setSubTitle("Syncing...");
     this.setState({refreshing: true});
-    Sync.get().sync().then(() => {
+    // Perform integrity checks for hard reloads
+    Sync.get().sync({performIntegrityCheck: true}).then(() => {
       setTimeout(() => {
         this.setSubTitle(null);
       }, 100);
