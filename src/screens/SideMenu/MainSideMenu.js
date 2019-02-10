@@ -35,6 +35,7 @@ export default class MainSideMenu extends AbstractSideMenu {
 
     this.signoutObserver = Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
+        this.setState({outOfSync: false});
         this.forceUpdate();
       }
     });
@@ -58,8 +59,15 @@ export default class MainSideMenu extends AbstractSideMenu {
     this.props.navigation.navigate("Settings");
   }
 
-  presentOutOfSyncResolution() {
-    
+  outOfSyncPressed() {
+    AlertManager.get().confirm({
+      title: "Potentially Out of Sync",
+      text: "We've detected that the data in the current application session may not match the data on the server. This can happen due to poor network conditions, or if a large note fails to download on your device. To resolve this issue, we recommend first creating a backup of your data in the Settings screen, the signing out of your account and signing back in.",
+      confirmButtonText: "Open Settings",
+      onConfirm: () => {
+        this.presentSettings();
+      }
+    })
   }
 
   get handler() {
@@ -168,7 +176,7 @@ export default class MainSideMenu extends AbstractSideMenu {
           <SideMenuHero
             outOfSync={this.state.outOfSync}
             onPress={() => {this.presentSettings()}}
-            onOutOfSyncPress={() => {this.presentOutOfSyncResolution()}}
+            onOutOfSyncPress={() => {this.outOfSyncPressed()}}
           />
 
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>

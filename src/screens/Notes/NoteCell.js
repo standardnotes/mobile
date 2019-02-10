@@ -153,6 +153,13 @@ export default class NoteCell extends ThemedPureComponent {
       })
     }
 
+    if(note.content.conflict_of) {
+      flags.push({
+        text: "Conflicted Copy",
+        color: StyleKit.variables.stylekitDangerColor
+      })
+    }
+
     return flags;
   }
 
@@ -199,10 +206,6 @@ export default class NoteCell extends ThemedPureComponent {
 
             {note.deleted &&
               <Text style={this.styles.deleting}>Deleting...</Text>
-            }
-
-            {note.conflict_of &&
-              <Text style={this.styles.deleting}>Conflicted Copy</Text>
             }
 
             {flags.length > 0 &&

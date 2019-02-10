@@ -48,7 +48,7 @@ export default class SideMenuHero extends ThemedComponent {
         {this.props.outOfSync &&
           <TouchableOpacity style={this.styles.outOfSyncContainer} onPress={this.props.onOutOfSyncPress}>
             <View style={this.styles.iconCircle}>
-              <Circle backgroundColor={StyleKit.variables.stylekitWarningColor} borderColor={StyleKit.variables.stylekitWarningColor} />
+              <Circle size={10} backgroundColor={StyleKit.variables.stylekitWarningColor} borderColor={StyleKit.variables.stylekitWarningColor} />
             </View>
             <Text style={this.styles.outOfSync}>Potentially Out of Sync</Text>
           </TouchableOpacity>
@@ -90,7 +90,7 @@ export default class SideMenuHero extends ThemedComponent {
 
       iconCircle: {
         marginTop: 10,
-        width: 20,
+        width: 15,
       },
 
       outOfSync: {

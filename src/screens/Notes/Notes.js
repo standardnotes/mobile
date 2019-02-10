@@ -354,8 +354,10 @@ export default class Notes extends Abstract {
 
   _onPressItem = (item: hash) => {
     var run = () => {
-      if(item.conflict_of) {
-        item.conflict_of = null;
+      if(item.content.conflict_of) {
+        item.content.conflict_of = null;
+        item.setDirty(true, true);
+        Sync.get().sync();
       }
 
       this.selectNote(item);
