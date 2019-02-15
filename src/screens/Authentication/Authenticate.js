@@ -134,6 +134,11 @@ export default class Authenticate extends Abstract {
   }
 
   async validateAuthentication(source) {
+    // Don't double validate, otherwise the comparison of successfulSources.length will be misleading.
+    if(this.successfulSources.includes(source)) {
+      return;
+    }
+
     let result = await source.authenticate();
     if(source.isInSuccessState()) {
       this.successfulSources.push(source);

@@ -1,13 +1,18 @@
 import Storage from "./storageManager"
 import "../../models/extend/item.js";
 import { SFPredicate, SFPrivileges } from "standard-file-js";
+import { SNMfa, SNServerExtension, SNExtension, SNEditor } from 'sn-models';
 
 SFModelManager.ContentTypeClassMapping = {
   "Note" : SNNote,
   "Tag" : SNTag,
-  "SN|SmartTag": SNSmartTag,
+  "SN|SmartTag" : SNSmartTag,
+  "Extension" : SNExtension,
+  "SN|Editor" : SNEditor,
   "SN|Theme" : SNTheme,
   "SN|Component" : SNComponent,
+  "SF|Extension" : SNServerExtension,
+  "SF|MFA" : SNMfa,
   "SN|Privileges" : SFPrivileges
 };
 
