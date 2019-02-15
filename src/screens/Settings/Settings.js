@@ -114,7 +114,6 @@ export default class Settings extends Abstract {
       confirmButtonText: "Sign Out",
       onConfirm: () => {
         Auth.get().signout().then(() => {
-          console.log("Signed out");
           this.forceUpdate();
         })
       }
