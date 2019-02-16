@@ -38,9 +38,11 @@ export default class Auth extends SFAuthManager {
   }
 
   async signout(clearAllData) {
+    await Storage.get().clearAllModels();
+    await KeysManager.get().clearAccountKeysAndData();
     this._keys = null;
     // DONT clear all data. We will do this ourselves manually, as we need to preserve certain data keys.
-    super.signout(false);
+    return super.signout(false);
   }
 
   async keys() {

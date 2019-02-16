@@ -8,6 +8,8 @@ import ModelManager from '@SFJS/modelManager'
 import ApplicationState from "@Lib/ApplicationState"
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
+
+const Mailer = require('NativeModules').RNMail;
 const base64 = require('base-64');
 
 export default class BackupsManager {
@@ -61,9 +63,27 @@ export default class BackupsManager {
     if(ApplicationState.isIOS) {
       return this._exportIOS(filename, jsonString);
     } else {
-      let filepath = await this._exportAndroid(filename, jsonString);
-      return this._showFileSavePromptAndroid(filepath);
+      return this._showAndroidEmailOrSaveOption().then(async (result) => {
+        if(result == "email") {
+          return this._exportViaEmailAndroid(data, filename);
+        } else {
+          let filepath = await this._exportAndroid(filename, jsonString);
+          return this._showFileSavePromptAndroid(filepath);
+        }
+      })
     }
+  }
+
+  async _showAndroidEmailOrSaveOption() {
+    return AlertManager.get().confirm({
+      title: "Choose Export Method",
+      cancelButtonText: "Email",
+      confirmButtonText: "Save to Disk"
+    }).then(() => {
+      return "save";
+    }).catch(() => {
+      return "email";
+    })
   }
 
   async _exportIOS(filename, data) {
@@ -112,6 +132,37 @@ export default class BackupsManager {
     }).catch(() => {
       // Did Cancel, still success
       return true;
+    })
+  }
+
+  async _exportViaEmailAndroid(data, filename) {
+    return new Promise((resolve, reject) => {
+      var jsonString = JSON.stringify(data, null, 2 /* pretty print */);
+      var stringData = base64.encode(unescape(encodeURIComponent(jsonString)));
+      var fileType = ".json"; // Android creates a tmp file and expects dot with extension
+
+      var resolved = false;
+
+      Mailer.mail({
+        subject: 'Standard Notes Backup',
+        recipients: [''],
+        body: '',
+        isHTML: true,
+        attachment: { data: stringData, type: fileType, name: filename }
+      }, (error, event) => {
+        if(error) {
+          Alert.alert('Error', 'Unable to send email.');
+        }
+        resolved = true;
+        resolve();
+      });
+
+      // On Android the Mailer callback event isn't always triggered.
+      setTimeout(function () {
+        if(!resolved) {
+          resolve();
+        }
+      }, 2500);
     })
   }
 

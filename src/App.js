@@ -141,12 +141,10 @@ export default class App extends Component {
     MigrationManager.get().load();
 
     // Listen to sign out event
-    this.authEventHandler = Auth.get().addEventHandler((event) => {
+    this.authEventHandler = Auth.get().addEventHandler(async (event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
-        Storage.get().clearAllModels();
-        KeysManager.get().clearAccountKeysAndData();
         ModelManager.get().handleSignout();
-        Sync.get().handleSignout();
+        await Sync.get().handleSignout();
       }
     });
 
