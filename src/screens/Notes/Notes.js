@@ -198,7 +198,9 @@ export default class Notes extends Abstract {
 
     this.tabletModeChangeHandler = ApplicationState.get().addEventHandler((event, data) => {
       if(event == ApplicationState.KeyboardChangeEvent) {
-        this.forceUpdate();
+        if(ApplicationState.get().isInTabletMode) {
+          this.forceUpdate();
+        }
       }
       else if(event == ApplicationState.AppStateEventTabletModeChange) {
         // If we are now in tablet mode after not being in tablet mode

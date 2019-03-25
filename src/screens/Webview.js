@@ -23,6 +23,15 @@ export default class Webview extends Component {
       }
     });
 
+    this.keyboardListener = ApplicationState.get().addEventHandler((event, data) => {
+      if(event == ApplicationState.KeyboardChangeEvent) {
+        this.forceUpdate();
+        setTimeout(() => {
+          this.webView.injectJavaScript(`window.scrollTo(0, 0);`);
+        }, 10);
+      }
+    });
+
     this.reloadData();
 
     if(!this.note) {
@@ -63,6 +72,7 @@ export default class Webview extends Component {
   componentWillUnmount() {
     ComponentManager.get().deregisterHandler(this.identifier);
     ComponentManager.get().deactivateComponent(this.editor);
+    ApplicationState.get().removeEventHandler(this.keyboardListener);
   }
 
   onMessage = (message) => {
@@ -131,12 +141,14 @@ export default class Webview extends Component {
            onLoadStart={this.onLoadStart}
            onError={this.onLoadError}
            onMessage={this.onMessage}
+           hideKeyboardAccessoryView={true /* requires WebKit, not currently used */}
            contentInset={{top: 0, left: 0, bottom: 0, right: 0}}
            scalesPageToFit={ApplicationState.isIOS ? false : true}
            injectedJavaScript = {
              `window.isNative = "true"`
           }
          />
+         <View style={{backgroundColor: "transparent", height: ApplicationState.get().getKeyboardHeight()}} />
       </View>
     );
   }

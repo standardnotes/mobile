@@ -56,10 +56,8 @@ export default class ApplicationState {
     AppState.addEventListener('change', this.handleAppStateChange);
     this.didLaunch();
 
-    if(this.isTabletDevice) {
-      this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
-      this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
-    }
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
   }
 
   keyboardDidShow = (e) => {
