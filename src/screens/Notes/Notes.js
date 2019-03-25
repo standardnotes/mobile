@@ -197,7 +197,10 @@ export default class Notes extends Abstract {
     });
 
     this.tabletModeChangeHandler = ApplicationState.get().addEventHandler((event, data) => {
-      if(event == ApplicationState.AppStateEventTabletModeChange) {
+      if(event == ApplicationState.KeyboardChangeEvent) {
+        this.forceUpdate();
+      }
+      else if(event == ApplicationState.AppStateEventTabletModeChange) {
         // If we are now in tablet mode after not being in tablet mode
         if(data.new_isInTabletMode && !data.old_isInTabletMode) {
           // Pop to root, if we are in Compose window.
@@ -423,6 +426,7 @@ export default class Notes extends Abstract {
         }
 
         <FAB
+          style={ApplicationState.get().isInTabletMode ? {bottom: ApplicationState.get().getKeyboardHeight()} : null}
           buttonColor={StyleKit.variable("stylekitInfoColor")}
           iconTextColor={StyleKit.variable("stylekitInfoContrastColor")}
           onClickAction={() => {this.selectNote()}}

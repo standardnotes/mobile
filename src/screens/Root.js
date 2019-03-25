@@ -261,8 +261,8 @@ export default class Root extends Abstract {
 
     let shouldSplitLayout = ApplicationState.get().isInTabletMode;
 
-    let notesStyles = shouldSplitLayout ? [this.styles.left, {width: shouldSplitLayout ? "34%" : 0}] : [StyleKit.styles.container, {flex: 1}];
-    let composeStyles = shouldSplitLayout ? [this.styles.right, {width: shouldSplitLayout ? "66%" : "100%"}] : null;
+    let notesStyles = shouldSplitLayout ? [this.styles.left, {width: shouldSplitLayout ? "40%" : 0}] : [StyleKit.styles.container, {flex: 1}];
+    let composeStyles = shouldSplitLayout ? [this.styles.right, {width: shouldSplitLayout ? "60%" : "100%"}] : null;
 
     return (
       <View onLayout={this.onLayout} style={[StyleKit.styles.container, this.styles.root]}>

@@ -1,4 +1,4 @@
-import {AppState, Platform, NativeModules, Linking, Alert} from 'react-native'
+import {AppState, Platform, NativeModules, Linking, Alert, Keyboard } from 'react-native'
 const { PlatformConstants } = NativeModules;
 import KeysManager from "@Lib/keysManager"
 import OptionsState from "@Lib/OptionsState"
@@ -32,6 +32,7 @@ export default class ApplicationState {
 
   /* Seperate events, unrelated to app state notifications */
   static AppStateEventTabletModeChange = "AppStateEventTabletModeChange";
+  static KeyboardChangeEvent = "KeyboardChangeEvent";
 
   static instance = null;
   static get() {
@@ -54,6 +55,25 @@ export default class ApplicationState {
 
     AppState.addEventListener('change', this.handleAppStateChange);
     this.didLaunch();
+
+    if(this.isTabletDevice) {
+      this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
+      this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
+    }
+  }
+
+  keyboardDidShow = (e) => {
+    this.keyboardHeight = e.endCoordinates.height;
+    this.notifyEvent(ApplicationState.KeyboardChangeEvent);
+  }
+
+  keyboardDidHide = (e) => {
+    this.keyboardHeight = 0;
+    this.notifyEvent(ApplicationState.KeyboardChangeEvent);
+  }
+
+  getKeyboardHeight() {
+    return this.keyboardHeight;
   }
 
   initializeOptions() {
