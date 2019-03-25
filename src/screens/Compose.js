@@ -492,7 +492,7 @@ export default class Compose extends Abstract {
           editable={!this.note.locked}
         />
 
-        {(this.state.loadingWebView) &&
+        {this.state.loadingWebView &&
           <View style={[this.styles.loadingWebViewContainer]}>
             <Text style={[this.styles.loadingWebViewText]}>
               {"LOADING"}
@@ -545,6 +545,7 @@ export default class Compose extends Abstract {
 
   loadStyles() {
     let padding = 14;
+    let noteTitleHeight = 50;
     this.rawStyles = {
       container: {
         flex: 1,
@@ -557,7 +558,7 @@ export default class Compose extends Abstract {
         fontSize: 16,
         color: StyleKit.variables.stylekitForegroundColor,
         backgroundColor: StyleKit.variables.stylekitBackgroundColor,
-        height: 50,
+        height: noteTitleHeight,
         borderBottomColor: StyleKit.variables.stylekitBorderColor,
         borderBottomWidth: 1,
         paddingTop: Platform.OS === "ios" ? 5 : 12,
@@ -589,6 +590,7 @@ export default class Compose extends Abstract {
         position: "absolute",
         height: "100%",
         width: "100%",
+        top: noteTitleHeight,
         bottom: 0,
         zIndex: 300,
         display: "flex",
