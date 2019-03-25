@@ -65,7 +65,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
       isDefault = editor.content.isMobileDefault;
     }
 
-    let action = isDefault ? "Remove as Default Editor" : "Set as Default Editor";
+    let action = isDefault ? "Remove as Mobile Default" : "Set as Mobile Default";
     let sheet = new ActionSheetWrapper({
       title: editor && editor.name,
       options: [
@@ -239,6 +239,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
     for(let editor of editors) {
       let option = SideMenuSection.BuildOption({
         text: editor.name,
+        subtext: editor.content.isMobileDefault ? "Mobile Default" : null,
         key: editor.uuid || editor.name,
         selected: editor == selectedEditor,
         onSelect: () => {this.onEditorSelect(editor)},

@@ -8,8 +8,8 @@ import ThemedComponent from "@Components/ThemedComponent";
 
 export default class SideMenuSection extends ThemedComponent {
 
-  static BuildOption({text, key, iconDesc, dimmed, selected, onSelect, onLongPress}) {
-    return { text, key, iconDesc, dimmed, selected, onSelect, onLongPress };
+  static BuildOption({text, subtext, key, iconDesc, dimmed, selected, onSelect, onLongPress}) {
+    return { text, subtext, key, iconDesc, dimmed, selected, onSelect, onLongPress };
   }
 
   constructor(props) {
@@ -46,6 +46,7 @@ export default class SideMenuSection extends ThemedComponent {
             {options.map((option) => {
               return <SideMenuCell
                 text={option.text}
+                subtext={option.subtext}
                 key={option.key}
                 iconDesc={option.iconDesc}
                 dimmed={option.dimmed}

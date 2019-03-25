@@ -256,7 +256,7 @@ export default class Compose extends Abstract {
         } else {
           ComponentManager.get().clearEditorForNote(this.note);
         }
-        this.forceUpdate();
+        this.setState({loadingWebView: false, webViewError: false});
         this.props.navigation.closeRightDrawer();
       },
       onPropertyChange: () => {

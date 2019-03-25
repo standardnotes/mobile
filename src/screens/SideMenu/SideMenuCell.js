@@ -82,8 +82,14 @@ export default class SideMenuCell extends ThemedComponent {
           }
 
           <View style={this.aggregateStyles(this.styles.textContainer, this.styles.textContainerSelected, this.props.selected)}>
+            {this.props.subtext &&
+              <View style={this.aggregateStyles(this.styles.subtextContainer, this.styles.subtextContainerSelected, this.props.selected)}>
+              <Text style={this.aggregateStyles(this.styles.subtext, this.styles.subtextSelected, this.props.selected)}>{this.props.subtext}</Text>
+              </View>
+            }
             <Text style={this.aggregateStyles(this.styles.text, this.styles.textSelected, this.props.selected)}>{this.props.text}</Text>
           </View>
+
 
           {this.props.children}
 
@@ -103,13 +109,13 @@ export default class SideMenuCell extends ThemedComponent {
       selectionBgColor: StyleKit.hexToRGBA(StyleKit.variable("stylekitInfoColor"), 0.1),
 
       cell: {
-        minHeight: 42,
+        minHeight: this.props.subtext ? 52 : 42,
       },
 
       cellContent: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: "center"
+        alignItems: "center",
       },
 
       iconContainer: {
@@ -130,7 +136,7 @@ export default class SideMenuCell extends ThemedComponent {
       },
 
       textContainer: {
-        height: 24,
+        minHeight: this.props.subtext ? 38 : 24,
         marginLeft: 6
       },
 
@@ -140,10 +146,19 @@ export default class SideMenuCell extends ThemedComponent {
       },
 
       text: {
-        height: "100%",
         color: StyleKit.variables.stylekitContrastForegroundColor,
         fontWeight: 'bold',
         fontSize: 15,
+        paddingBottom: 0,
+        fontFamily: ApplicationState.isAndroid ? 'Roboto' : null, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+      },
+
+      subtext: {
+        color: StyleKit.variables.stylekitContrastForegroundColor,
+        opacity: 0.75,
+        fontSize: 12,
+        marginTop: -5,
+        marginBottom: 3,
         fontFamily: ApplicationState.isAndroid ? 'Roboto' : null, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 

@@ -429,11 +429,19 @@ export default class ComponentManager {
 
     // No editor found for note. Use default editor, if note does not prefer system editor
     if(!note.content.mobilePrefersPlainEditor) {
-      return editors.filter((e) => {return e.content.isMobileDefault})[0];
+      return this.getDefaultEditor();
     }
   }
 
   setEditorAsMobileDefault(editor, isDefault) {
+    if(isDefault) {
+      // Remove current default
+      let currentDefault = this.getDefaultEditor();
+      if(currentDefault) {
+        currentDefault.content.isMobileDefault = false;
+        currentDefault.setDirty(true);
+      }
+    }
     editor.content.isMobileDefault = isDefault;
     editor.setDirty(true);
     Sync.get().sync();
