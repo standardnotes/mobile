@@ -102,7 +102,7 @@ export default class BackupsManager {
   }
 
   async _exportAndroid(filename, data) {
-    let filepath = `${RNFS.DocumentDirectoryPath}/${filename}`;
+    let filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
     return RNFS.writeFile(filepath, data).then(() => {
       return filepath;
     })

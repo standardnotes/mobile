@@ -193,37 +193,34 @@ export default class NoteSideMenu extends AbstractSideMenu {
       options.push(option);
     }
 
-    return options;
-  }
-
-  buildOptionsForTrash() {
-    if(!this.note.content.trashed) {
-      return [];
+    if(this.note.content.trashed) {
+      options = options.concat([
+        {
+          text: "Restore",
+          textClass: "info",
+          key: "restore-note",
+          onSelect: () => {
+            this.runAction(ItemActionManager.RestoreEvent);
+          }
+        },
+        {
+          text: "Delete Forever",
+          textClass: "danger",
+          key: "delete-forever",
+          onSelect: () => {
+            this.runAction(ItemActionManager.DeleteEvent);
+          }
+        },
+        {
+          text: "Empty Trash",
+          textClass: "danger",
+          key: "empty trash",
+          onSelect: () => {
+            this.runAction(ItemActionManager.EmptyTrashEvent);
+          }
+        },
+      ]);
     }
-
-    let options = [
-      {
-        text: "Restore Note",
-        key: "restore-note",
-        onSelect: () => {
-          this.runAction(ItemActionManager.RestoreEvent);
-        }
-      },
-      {
-        text: "Delete Forever",
-        key: "delete-forever",
-        onSelect: () => {
-          this.runAction(ItemActionManager.DeleteEvent);
-        }
-      },
-      {
-        text: "Empty Trash",
-        key: "empty trash",
-        onSelect: () => {
-          this.runAction(ItemActionManager.EmptyTrashEvent);
-        }
-      },
-    ]
 
     return options;
   }
@@ -285,7 +282,6 @@ export default class NoteSideMenu extends AbstractSideMenu {
     }
 
     let noteOptions = this.buildOptionsForNoteManagement();
-    let trashOptions = this.buildOptionsForTrash();
     let editorOptions = this.buildOptionsForEditors();
     let selectedTags = this.handler.getSelectedTags();
 
@@ -295,10 +291,6 @@ export default class NoteSideMenu extends AbstractSideMenu {
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
 
             <SideMenuSection title="Options" options={noteOptions} />
-
-            {trashOptions.length > 0 &&
-              <SideMenuSection title="Trash" options={trashOptions} />
-            }
 
             <SideMenuSection title="Editors" options={editorOptions} collapsed={true} />
 

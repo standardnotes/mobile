@@ -68,9 +68,19 @@ export default class SideMenuCell extends ThemedComponent {
     }
   }
 
+  colorForTextClass = (textClass) => {
+    if(!textClass) {return null;}
+    return {
+      "info" : StyleKit.variables.stylekitInfoColor,
+      "danger" : StyleKit.variables.stylekitDangerColor,
+      "warning" : StyleKit.variables.stylekitWarningColor,
+    }[textClass];
+  }
+
   render() {
     let hasIcon = this.props.iconDesc;
     let iconSide = (hasIcon && this.props.iconDesc.side) ? this.props.iconDesc.side : (hasIcon ? "left" : null);
+    let textColor = this.colorForTextClass(this.props.textClass);
     return (
       <TouchableOpacity style={this.styles.cell} onPress={this.onPress} onLongPress={this.onLongPress}>
         <View style={this.styles.cellContent}>
@@ -87,7 +97,7 @@ export default class SideMenuCell extends ThemedComponent {
               <Text style={this.aggregateStyles(this.styles.subtext, this.styles.subtextSelected, this.props.selected)}>{this.props.subtext}</Text>
               </View>
             }
-            <Text style={this.aggregateStyles(this.styles.text, this.styles.textSelected, this.props.selected)}>{this.props.text}</Text>
+            <Text style={[this.aggregateStyles(this.styles.text, this.styles.textSelected, this.props.selected), (textColor ? {color: textColor} : null)]}>{this.props.text}</Text>
           </View>
 
 
