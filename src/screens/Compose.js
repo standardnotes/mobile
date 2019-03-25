@@ -257,6 +257,7 @@ export default class Compose extends Abstract {
           ComponentManager.get().clearEditorForNote(this.note);
         }
         this.setState({loadingWebView: false, webViewError: false});
+        this.forceUpdate();
         this.props.navigation.closeRightDrawer();
       },
       onPropertyChange: () => {
@@ -451,10 +452,15 @@ export default class Compose extends Abstract {
       this.state.title for the value. We also update the state onTitleChange.
     */
 
-    var noteEditor = ComponentManager.get().editorForNote(this.note);
+    let noteEditor = ComponentManager.get().editorForNote(this.note);
     let windowWidth = this.state.windowWidth || Dimensions.get('window').width;
     // If new note with default editor, note.uuid may not be ready
-    var shouldDisplayEditor = noteEditor != null && this.note.uuid;
+    let shouldDisplayEditor = noteEditor != null && this.note.uuid;
+
+    if(this.state.webViewError) {
+      // We'll display alert bar instead
+      shouldDisplayEditor = false;
+    }
 
     return (
       <SafeAreaView forceInset={{ bottom: 'never'}} style={[this.styles.container, StyleKit.styles.container, StyleKit.styles.baseBackground]}>
@@ -462,6 +468,13 @@ export default class Compose extends Abstract {
           <View style={this.styles.lockedContainer}>
             <Icon name={StyleKit.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
             <Text style={this.styles.lockedText}>Note Locked</Text>
+          </View>
+        }
+
+        {this.state.webViewError &&
+          <View style={this.styles.lockedContainer}>
+            <Icon name={StyleKit.nameForIcon("alert")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
+            <Text style={this.styles.lockedText}>Unable to load {noteEditor && noteEditor.content.name}</Text>
           </View>
         }
 
@@ -479,10 +492,10 @@ export default class Compose extends Abstract {
           editable={!this.note.locked}
         />
 
-        {(this.state.loadingWebView || this.state.webViewError) &&
+        {(this.state.loadingWebView) &&
           <View style={[this.styles.loadingWebViewContainer]}>
             <Text style={[this.styles.loadingWebViewText]}>
-              {this.state.webViewError ? "Unable to Load" : "LOADING"}
+              {"LOADING"}
             </Text>
             <Text style={[this.styles.loadingWebViewSubtitle]}>
               {noteEditor && noteEditor.content.name}
@@ -495,9 +508,9 @@ export default class Compose extends Abstract {
             key={noteEditor.uuid}
             noteId={this.note.uuid}
             editorId={noteEditor.uuid}
-            onLoadStart={() => {this.setState({loadingWebView: true})}}
+            onLoadStart={() => {this.setState({loadingWebView: true, webViewError: false})}}
             onLoadEnd={() => {this.setState({loadingWebView: false, webViewError: false})}}
-            onLoadError={() => {this.setState({webViewError: true})}}
+            onLoadError={() => {this.setState({loadingWebView: false, webViewError: true})}}
           />
         }
 

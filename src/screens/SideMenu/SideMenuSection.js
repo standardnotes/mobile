@@ -47,7 +47,7 @@ export default class SideMenuSection extends ThemedComponent {
               return <SideMenuCell
                 text={option.text}
                 subtext={option.subtext}
-                key={option.key}
+                key={option.text + option.subtext + option.key}
                 iconDesc={option.iconDesc}
                 dimmed={option.dimmed}
                 selected={option.selected}

@@ -54,11 +54,12 @@ export default class NoteSideMenu extends AbstractSideMenu {
   }
 
   onEditorLongPress = (editor) => {
-    let currentDefaultEDitor = ComponentManager.get().getDefaultEditor();
+    let currentDefaultEditor = ComponentManager.get().getDefaultEditor();
+
     let isDefault = false;
     if(!editor) {
       // System editor
-      if(currentDefaultEDitor)  {
+      if(currentDefaultEditor)  {
         isDefault = false;
       }
     } else {
@@ -66,16 +67,21 @@ export default class NoteSideMenu extends AbstractSideMenu {
     }
 
     let action = isDefault ? "Remove as Mobile Default" : "Set as Mobile Default";
+    if(!editor && !currentDefaultEditor) {
+      // Long pressing on plain editor while it is default, no actions available
+      action = "Is Mobile Default";
+    }
     let sheet = new ActionSheetWrapper({
       title: editor && editor.name,
       options: [
         ActionSheetWrapper.BuildOption({text: action, callback: () => {
           if(!editor) {
             // Default to plain
-            ComponentManager.get().setEditorAsMobileDefault(currentDefaultEDitor, false);
+            ComponentManager.get().setEditorAsMobileDefault(currentDefaultEditor, false);
           } else {
             ComponentManager.get().setEditorAsMobileDefault(editor, !isDefault);
           }
+          this.forceUpdate();
         }}),
       ], onCancel: () => {
         this.setState({actionSheet: null});

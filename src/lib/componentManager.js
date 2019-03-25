@@ -442,8 +442,12 @@ export default class ComponentManager {
         currentDefault.setDirty(true);
       }
     }
-    editor.content.isMobileDefault = isDefault;
-    editor.setDirty(true);
+
+    // Could be null if plain editor 
+    if(editor) {
+      editor.content.isMobileDefault = isDefault;
+      editor.setDirty(true);
+    }
     Sync.get().sync();
   }
 
