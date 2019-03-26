@@ -624,7 +624,11 @@ export default class Compose extends Abstract {
       webviewReloadButton: {
         position: "absolute",
         right: padding,
-        top: 6
+        height: "100%",
+        flex: 1,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: 'center'
       },
 
       webviewReloadButtonText: {
