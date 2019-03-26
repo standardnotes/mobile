@@ -66,6 +66,11 @@ export default class Webview extends Component {
   }
 
   onMessage = (message) => {
+    if(!this.note) {
+      // May be the case in tablet mode on app launch
+      return;
+    }
+
     var data;
     try {
       data = JSON.parse(message.nativeEvent.data);

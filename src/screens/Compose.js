@@ -20,11 +20,9 @@ import {
   StyleSheet,
   TextInput,
   View,
-  KeyboardAvoidingView,
+  TouchableOpacity,
   Platform,
-  Keyboard,
   Text,
-  ScrollView,
   Dimensions,
   Alert
 } from 'react-native';
@@ -440,6 +438,11 @@ export default class Compose extends Abstract {
     });
   }
 
+  reloadEditor = () => {
+    this.setState({loadingWebView: false, webViewError: false});
+    this.forceUpdate();
+  }
+
   render() {
     if(this.state.lockContent) {
       return (<LockedView />);
@@ -475,6 +478,9 @@ export default class Compose extends Abstract {
           <View style={this.styles.lockedContainer}>
             <Icon name={StyleKit.nameForIcon("alert")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
             <Text style={this.styles.lockedText}>Unable to load {noteEditor && noteEditor.content.name}</Text>
+            <TouchableOpacity style={this.styles.webviewReloadButton} onPress={this.reloadEditor}>
+              <Text style={this.styles.webviewReloadButtonText}>Reload</Text>
+            </TouchableOpacity>
           </View>
         }
 
@@ -612,6 +618,18 @@ export default class Compose extends Abstract {
         color: StyleKit.variable("stylekitForegroundColor"),
         opacity: 0.7,
         marginTop: 5
+      },
+
+      webviewReloadButton: {
+        position: "absolute",
+        right: padding,
+        top: 6
+      },
+
+      webviewReloadButtonText: {
+        color: StyleKit.variables.stylekitBackgroundColor,
+        fontSize: 12,
+        fontWeight: 'bold'
       },
 
       textContentAndroid: {
