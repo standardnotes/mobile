@@ -90,8 +90,17 @@ export default class Webview extends Component {
     ComponentManager.get().handleMessage(this.editor, data);
   }
 
-  onFrameLoad = (event) => {
-    ComponentManager.get().registerComponentWindow(this.editor, this.webView);
+  onFrameLoad = (syntheticEvent) => {
+    // We have no way of knowing if the webview load is successful or not. We have to wait to see if the error event is fired.
+    // Looking at the code, the error event is fired right after this, so we can wait just a few ms to see if the error event is fired
+    // before registering the component window. Otherwise, on error, this component will be dealloced, and a pending postMessage will cause
+    // a memory leak crash on Android in the form of "react native attempt to invoke virtual method double java.lang.double.doublevalue() on a null object reference"
+    if(this.registrationTimeout) {
+      clearTimeout(this.registrationTimeout);
+    }
+    this.registrationTimeout = setTimeout(() => {
+      ComponentManager.get().registerComponentWindow(this.editor, this.webView);
+    }, 1);
 
     // The parent will remove their loading screen on load end. We want to delay this by 100
     // to avoid flicker that may result if using a dark theme. This delay will allow editor
@@ -111,7 +120,8 @@ export default class Webview extends Component {
     }
   }
 
-  onLoadError = () => {
+  onLoadError = (syntheticEvent) => {
+    clearTimeout(this.registrationTimeout);
     this.props.onLoadError();
   }
 
@@ -132,6 +142,7 @@ export default class Webview extends Component {
            source={{uri: url}}
            key={this.editor.uuid}
            ref={(webView) => this.webView = webView}
+           /* onLoad and onLoadEnd seem to be the same exact thing, except that when an error occurs, onLoadEnd is called twice, whereas onLoad is called once (what we want) */
            onLoad={this.onFrameLoad}
            onLoadStart={this.onLoadStart}
            onError={this.onLoadError}

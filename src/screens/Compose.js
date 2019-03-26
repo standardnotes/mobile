@@ -458,7 +458,7 @@ export default class Compose extends Abstract {
     let noteEditor = ComponentManager.get().editorForNote(this.note);
     let windowWidth = this.state.windowWidth || Dimensions.get('window').width;
     // If new note with default editor, note.uuid may not be ready
-    let shouldDisplayEditor = noteEditor != null && this.note.uuid;
+    let shouldDisplayEditor = noteEditor != null && this.note.uuid != null;
 
     if(this.state.webViewError) {
       // We'll display alert bar instead
@@ -515,7 +515,8 @@ export default class Compose extends Abstract {
             noteId={this.note.uuid}
             editorId={noteEditor.uuid}
             onLoadStart={() => {this.setState({loadingWebView: true, webViewError: false})}}
-            onLoadEnd={() => {this.setState({loadingWebView: false, webViewError: false})}}
+            /* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */
+            onLoadEnd={() => {this.setState({loadingWebView: false})}}
             onLoadError={() => {this.setState({loadingWebView: false, webViewError: true})}}
           />
         }
