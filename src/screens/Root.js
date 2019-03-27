@@ -212,10 +212,21 @@ export default class Root extends Abstract {
 
     this.authenticationInProgress = true;
 
+    if(this.pendingAuthProps) {
+      // Existing unvalidated auth props. Don't use input authProps.
+      // This is to handle the case on Android where if a user has both fingerprint (immediate) and passcode (on quit),
+      // they can press the physical back button on launch to dismiss auth window, then come back into app, and it will only ask for fingerprint.
+      // We'll clear pendingAuthProps on success
+      authProps = this.pendingAuthProps;
+    } else {
+      this.pendingAuthProps = authProps;
+    }
+
     this.props.navigation.navigate("Authenticate", {
       authenticationSources: authProps.sources,
       onSuccess: () => {
         authProps.onAuthenticate();
+        this.pendingAuthProps = null;
         this.authenticationInProgress = false;
         if(this.dataLoaded) {
           Sync.get().sync();
