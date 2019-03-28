@@ -13,6 +13,8 @@ export default class Webview extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {};
+
     this.loadStyles();
 
     this.identifier = `${Math.random()}`
@@ -20,6 +22,12 @@ export default class Webview extends Component {
     ComponentManager.get().registerHandler({identifier: this.identifier, areas: ["note-tags", "editor-stack", "editor-editor"],
        contextRequestHandler: (component) => {
         return this.note;
+      }
+    });
+
+    this.keyboardListener = ApplicationState.get().addEventHandler((event, data) => {
+      if(event == ApplicationState.KeyboardChangeEvent) {
+        this.webView.injectJavaScript(`window.scrollTo(0,0); document.body.scrollTop = 0`);
       }
     });
 
@@ -63,6 +71,7 @@ export default class Webview extends Component {
   componentWillUnmount() {
     ComponentManager.get().deregisterHandler(this.identifier);
     ComponentManager.get().deactivateComponent(this.editor);
+    ApplicationState.get().removeEventHandler(this.keyboardListener);
   }
 
   onMessage = (message) => {
@@ -150,6 +159,7 @@ export default class Webview extends Component {
            useWebKit={true}
            hideKeyboardAccessoryView={true}
            cacheEnabled={true}
+           automaticallyAdjustContentInsets={false}
            contentInset={{top: 0, left: 0, bottom: 0, right: 0}}
            scalesPageToFit={true /* Android only, not available with WKWebView */}
            injectedJavaScript = {

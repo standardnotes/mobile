@@ -3,6 +3,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import <BugsnagReactNative/BugsnagReactNative.h>
+#import <WebKit/WKWebsiteDataStore.h>
 
 @implementation AppDelegate
 
@@ -15,8 +16,14 @@
   NSString *lastVersionClear = [[NSUserDefaults standardUserDefaults] objectForKey:lastVersionClearKey];
   NSString *currentVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"];
   if(![currentVersion isEqualToString:lastVersionClear]) {
+    // UIWebView
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
     [[NSUserDefaults standardUserDefaults] setObject:currentVersion forKey:lastVersionClearKey];
+    
+    // WebKit
+    NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
+    NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+    [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{}];
   }
   
   NSURL *jsCodeLocation;

@@ -56,8 +56,8 @@ export default class ApplicationState {
     AppState.addEventListener('change', this.handleAppStateChange);
     this.didLaunch();
 
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
-    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardDidShow);
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardDidHide);
   }
 
   keyboardDidShow = (e) => {
