@@ -204,7 +204,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
           }
         },
         {
-          text: "Delete Forever",
+          text: "Delete Permanently",
           textClass: "danger",
           key: "delete-forever",
           onSelect: () => {

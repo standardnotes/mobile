@@ -133,9 +133,30 @@ export default class Authenticate extends Abstract {
     this.forceUpdate();
   }
 
+  successfulSourcesIncludesSource(source) {
+    for(let candidate of this.successfulSources) {
+      if(candidate.identifier == source.identifier) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  isAllSourcesSuccessful() {
+    for(let source of this.sources) {
+      if(this.successfulSourcesIncludesSource(source) == false) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   async validateAuthentication(source) {
     // Don't double validate, otherwise the comparison of successfulSources.length will be misleading.
-    if(this.successfulSources.includes(source)) {
+    let alreadySuccessful = this.successfulSourcesIncludesSource(source);
+    if(alreadySuccessful) {
       return;
     }
 
@@ -149,7 +170,7 @@ export default class Authenticate extends Abstract {
       }
     }
 
-    if(this.successfulSources.length == this.sources.length) {
+    if(this.isAllSourcesSuccessful()) {
       this.onSuccess();
     } else {
       this.setState({submitDisabled: false});
@@ -180,6 +201,7 @@ export default class Authenticate extends Abstract {
     super.componentWillBlur();
     if(this.successful) {
       this.getProp("onSuccess")(this._sessionLength);
+      this.successful = false;
     }
   }
 
