@@ -156,7 +156,7 @@ export default class Authenticate extends Abstract {
   async validateAuthentication(source) {
     // Don't double validate, otherwise the comparison of successfulSources.length will be misleading.
     let alreadySuccessful = this.successfulSourcesIncludesSource(source);
-    if(alreadySuccessful) {
+    if(alreadySuccessful || source.isAuthenticating()) {
       return;
     }
 

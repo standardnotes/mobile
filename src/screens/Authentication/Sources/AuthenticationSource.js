@@ -37,6 +37,10 @@ export default class AuthenticationSource {
     return this.status == "did-succeed";
   }
 
+  isAuthenticating() {
+    return this.status == "processing";
+  }
+
   setAuthenticationValue(value) {
     this.authenticationValue = value;
   }
