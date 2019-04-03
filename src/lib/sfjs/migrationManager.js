@@ -17,8 +17,8 @@ export default class MigrationManager extends SFMigrationManager {
     return this.instance;
   }
 
-  constructor(modelManager, syncManager, storageManager) {
-    super(ModelManager.get(), Sync.get(), Storage.get());
+  constructor(modelManager, syncManager, storageManager, authManager) {
+    super(ModelManager.get(), Sync.get(), Storage.get(), Auth.get());
   }
 
   load() {
