@@ -28,8 +28,8 @@
     "react-navigation": "^3.0.9",
     "react-navigation-header-buttons": "^2.1.1",
     "regenerator": "^0.13.3",
-    "sn-models": "0.1.14",
-    "standard-file-js": "0.3.56"
+    "snjs": "0.2.0",
+    "standard-file-js": "0.3.58"
   },
   "devDependencies": {
     "babel-jest": "^23.6.0",

@@ -12,6 +12,19 @@ export default class AlertManager extends SFAlertManager {
     return this.instance;
   }
 
+  async alert({title, text, closeButtonText = "OK", onClose} = {}) {
+    return new Promise((resolve, reject) => {
+      // On iOS, confirm should go first. On Android, cancel should go first.
+      let buttons = [
+        {text: closeButtonText, onPress: () => {
+          resolve();
+          onClose && onClose();
+        }},
+      ];
+      Alert.alert(title, text, buttons, { cancelable: true })
+    })
+  }
+
   async confirm({title, text, confirmButtonText = "OK", cancelButtonText = "Cancel", onConfirm, onCancel} = {}) {
     return new Promise((resolve, reject) => {
       // On iOS, confirm should go first. On Android, cancel should go first.

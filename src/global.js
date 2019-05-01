@@ -45,10 +45,12 @@ import {
   SNNote,
   SNTag,
   SNTheme,
-  SNComponent
-} from 'sn-models';
+  SNComponent,
+  SNComponentManager
+} from 'snjs';
 
 global.SNNote = SNNote;
 global.SNTag = SNTag;
 global.SNTheme = SNTheme;
 global.SNComponent = SNComponent;
+global.SNComponentManager = SNComponentManager;
