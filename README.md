@@ -7,6 +7,7 @@
 
 - [iOS App Store](https://itunes.apple.com/us/app/standard-notes/id1285392450?mt=8) (iOS 8+)
 - [Google Play](https://play.google.com/store/apps/details?id=com.standardnotes) (Android 5.0+)
+- [F-Droid](https://f-droid.org/packages/com.standardnotes/) (Android 5.0+)
 - [Direct APK](https://github.com/standardnotes/mobile/releases)
 
 ## The Code
