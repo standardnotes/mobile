@@ -159,6 +159,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-webview')
     compile project(':react-native-file-viewer')
     compile project(':react-native-fs')
     compile project(':react-native-gesture-handler')

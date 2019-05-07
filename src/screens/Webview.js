@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Alert, View, WebView, Linking, Platform, Text } from 'react-native';
+import { Alert, View, Linking, Platform, Text } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 import ComponentManager from '@Lib/componentManager'
 import ModelManager from '@Lib/sfjs/modelManager'
@@ -27,7 +28,7 @@ export default class Webview extends Component {
 
     this.keyboardListener = ApplicationState.get().addEventHandler((event, data) => {
       if(event == ApplicationState.KeyboardChangeEvent) {
-        this.webView.injectJavaScript(`window.scrollTo(0,0); document.body.scrollTop = 0`);
+        // this.webView.injectJavaScript(`window.scrollTo(0,0); document.body.scrollTop = 0`);
       }
     });
 
@@ -99,6 +100,7 @@ export default class Webview extends Component {
     if(this.registrationTimeout) {
       clearTimeout(this.registrationTimeout);
     }
+
     this.registrationTimeout = setTimeout(() => {
       ComponentManager.get().registerComponentWindow(this.editor, this.webView);
     }, 1);
@@ -155,7 +157,15 @@ export default class Webview extends Component {
            contentInset={{top: 0, left: 0, bottom: 0, right: 0}}
            scalesPageToFit={true /* Android only, not available with WKWebView */}
            injectedJavaScript = {
-             `window.isNative = "true"`
+             `(function() {
+               window.isNative = "true";
+
+               window.parent.postMessage = function(data) {
+                window.parent.ReactNativeWebView.postMessage(data);
+               };
+
+               return true;
+             })()`
           }
          />
       </View>

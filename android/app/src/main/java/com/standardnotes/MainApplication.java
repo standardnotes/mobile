@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.vinzscam.reactnativefileviewer.RNFileViewerPackage;
 import com.rnfs.RNFSPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -46,6 +47,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
+            new RNCWebViewPackage(),
             new RNFileViewerPackage(),
             new RNFSPackage(),
             new RNGestureHandlerPackage(),
