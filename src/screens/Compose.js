@@ -7,7 +7,7 @@ import OptionsState from "@Lib/OptionsState"
 import SideMenuManager from "@SideMenu/SideMenuManager"
 
 import Abstract from "./Abstract"
-import Webview from "./Webview"
+import ComponentView from "./ComponentView"
 import ComponentManager from '@Lib/componentManager'
 import ApplicationState from "@Lib/ApplicationState"
 import LockedView from "@Containers/LockedView";
@@ -510,7 +510,7 @@ export default class Compose extends Abstract {
         }
 
         {shouldDisplayEditor &&
-          <Webview
+          <ComponentView
             key={noteEditor.uuid}
             noteId={this.note.uuid}
             editorId={noteEditor.uuid}

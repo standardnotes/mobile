@@ -9,7 +9,7 @@ import StyleKit from "@Style/StyleKit"
 import ApplicationState from "@Lib/ApplicationState"
 import Icon from 'react-native-vector-icons/Ionicons';
 
-export default class Webview extends Component {
+export default class ComponentView extends Component {
 
   constructor(props) {
     super(props);
