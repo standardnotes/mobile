@@ -153,8 +153,6 @@ export default class ComponentView extends Component {
            useWebKit={true}
            hideKeyboardAccessoryView={true}
            cacheEnabled={true}
-           automaticallyAdjustContentInsets={false}
-           contentInset={{top: 0, left: 0, bottom: 0, right: 0}}
            scalesPageToFit={true /* Android only, not available with WKWebView */}
            injectedJavaScript = {
              `(function() {

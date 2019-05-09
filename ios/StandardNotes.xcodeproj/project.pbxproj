@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -37,6 +38,7 @@
 		300BF5D7132F46BCAB353149 /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04047F33889C425483EB8244 /* libRNGestureHandler.a */; };
 		3B66E39D04514331AF08A4D1 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 074A7613CE8C41BAB3C4193E /* FontAwesome5_Solid.ttf */; };
 		40F325481D4F4F04AC15D0A9 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 48127930FB1344778C168838 /* libRNVectorIcons.a */; };
+		4C4C0C80E5254E16BA086A86 /* libRNCWebView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4449457EB3FC4387810027F1 /* libRNCWebView.a */; };
 		5A8928DC2824482A99763067 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EF2E9E34ADA441EDB4CE8370 /* FontAwesome5_Regular.ttf */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		6C1915C4DE9040A9BB17CFBB /* libRNStoreReview.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB6F6B9BC7144FCB2C08D40 /* libRNStoreReview.a */; };
@@ -57,7 +59,6 @@
 		CDB58A211F6C51A4009EF868 /* libReactNativeFingerprintScanner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB58A0F1F6C5174009EF868 /* libReactNativeFingerprintScanner.a */; };
 		CDB58A221F6C5235009EF868 /* libRCTAes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB58A091F6C516B009EF868 /* libRCTAes.a */; };
 		F0D84FDB75374348BC0017C2 /* libBugsnagReactNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD3F9197A5F41C0904D7E60 /* libBugsnagReactNative.a */; };
-		4C4C0C80E5254E16BA086A86 /* libRNCWebView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4449457EB3FC4387810027F1 /* libRNCWebView.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -327,6 +328,13 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNStoreReview;
 		};
+		CD5AEDE322825CB8002439FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC178A0479CE4154896293C3 /* RNCWebView.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNCWebView;
+		};
 		CD885F771F70228400B91C20 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 737AF67874434967865855D8 /* BugsnagReactNative.xcodeproj */;
@@ -484,6 +492,7 @@
 		2D02E4901E0B4A5D006451C7 /* StandardNotes-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "StandardNotes-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FAF1266E8404686B7F36870 /* RNFS.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		37A42F4068AE42DD8D2DF182 /* libRNFileViewer.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFileViewer.a; sourceTree = "<group>"; };
+		4449457EB3FC4387810027F1 /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNCWebView.a; sourceTree = "<group>"; };
 		48127930FB1344778C168838 /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		54ED130E749A46A3B15B27F2 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		59DCF8530F2945FFAA0300FD /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
@@ -511,10 +520,9 @@
 		CDCF33ADCFE845D588CC4E66 /* libRNKeychain.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNKeychain.a; sourceTree = "<group>"; };
 		CEB6B877AE784055A8E294A8 /* libRNFS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFS.a; sourceTree = "<group>"; };
 		D38724A93AC141D6B51D1356 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		EC178A0479CE4154896293C3 /* RNCWebView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCWebView.xcodeproj; path = "../node_modules/react-native-webview/ios/RNCWebView.xcodeproj"; sourceTree = "<group>"; };
 		EF2E9E34ADA441EDB4CE8370 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
 		EFD3F9197A5F41C0904D7E60 /* libBugsnagReactNative.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libBugsnagReactNative.a; sourceTree = "<group>"; };
-		EC178A0479CE4154896293C3 /* RNCWebView.xcodeproj */ = {isa = PBXFileReference; name = "RNCWebView.xcodeproj"; path = "../node_modules/react-native-webview/ios/RNCWebView.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		4449457EB3FC4387810027F1 /* libRNCWebView.a */ = {isa = PBXFileReference; name = "libRNCWebView.a"; path = "libRNCWebView.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -846,6 +854,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		CD5AEDE022825CB8002439FB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CD5AEDE422825CB8002439FB /* libRNCWebView.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		CD885F741F70228400B91C20 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -906,7 +922,7 @@
 				04047F33889C425483EB8244 /* libRNGestureHandler.a */,
 				CEB6B877AE784055A8E294A8 /* libRNFS.a */,
 				37A42F4068AE42DD8D2DF182 /* libRNFileViewer.a */,
-				D05F80465E0B4CC8B5A37AF1 /* libRNCWebView.a */,
+				4449457EB3FC4387810027F1 /* libRNCWebView.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -1131,6 +1147,10 @@
 				{
 					ProductGroup = CDB58A0B1F6C5174009EF868 /* Products */;
 					ProjectRef = CDB58A0A1F6C5174009EF868 /* ReactNativeFingerprintScanner.xcodeproj */;
+				},
+				{
+					ProductGroup = CD5AEDE022825CB8002439FB /* Products */;
+					ProjectRef = EC178A0479CE4154896293C3 /* RNCWebView.xcodeproj */;
 				},
 				{
 					ProductGroup = CDEBDDB721E044BD00333D77 /* Products */;
@@ -1426,6 +1446,13 @@
 			fileType = archive.ar;
 			path = libRNStoreReview.a;
 			remoteRef = CD4D91841F7BE11800080678 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD5AEDE422825CB8002439FB /* libRNCWebView.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNCWebView.a;
+			remoteRef = CD5AEDE322825CB8002439FB /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		CD885F781F70228400B91C20 /* libBugsnagReactNative.a */ = {
