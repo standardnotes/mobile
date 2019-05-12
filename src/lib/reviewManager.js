@@ -2,7 +2,7 @@ import {Platform} from 'react-native';
 import * as StoreReview from 'react-native-store-review';
 import Storage from "./sfjs/storageManager";
 
-let NumRunsBeforeAskingForReview = [18, 65, 120]
+let NumRunsBeforeAskingForReview = [18, 45, 105]
 
 export default class ReviewManager {
 
