@@ -26,12 +26,6 @@ export default class ComponentView extends Component {
       }
     });
 
-    this.keyboardListener = ApplicationState.get().addEventHandler((event, data) => {
-      if(event == ApplicationState.KeyboardChangeEvent) {
-        // this.webView.injectJavaScript(`window.scrollTo(0,0); document.body.scrollTop = 0`);
-      }
-    });
-
     this.reloadData();
 
     if(!this.note) {
@@ -72,7 +66,6 @@ export default class ComponentView extends Component {
   componentWillUnmount() {
     ComponentManager.get().deregisterHandler(this.identifier);
     ComponentManager.get().deactivateComponent(this.editor);
-    ApplicationState.get().removeEventHandler(this.keyboardListener);
   }
 
   onMessage = (message) => {
@@ -156,10 +149,8 @@ export default class ComponentView extends Component {
            scalesPageToFit={true /* Android only, not available with WKWebView */}
            injectedJavaScript = {
              `(function() {
-               window.isNative = "true";
-
                window.parent.postMessage = function(data) {
-                window.parent.ReactNativeWebView.postMessage(data);
+                 window.parent.ReactNativeWebView.postMessage(data);
                };
 
                return true;
