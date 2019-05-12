@@ -13,6 +13,10 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
     });
   }
 
+  get sort() {
+    return 0;
+  }
+
   get identifier() {
     return "local-passcode-auth-source";
   }
