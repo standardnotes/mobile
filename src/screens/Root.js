@@ -163,6 +163,9 @@ export default class Root extends Abstract {
   }
 
   initializeData() {
+    // Ensure no sync executes until initial data load
+    Sync.get().lockSyncing();
+
     let encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.setSubTitle(encryptionEnabled ? "Decrypting items..." : "Loading items...");
     let incrementalCallback = (current, total) => {
@@ -176,6 +179,7 @@ export default class Root extends Abstract {
     }
 
     let loadLocalCompletion = (items) => {
+      Sync.get().unlockSyncing();
       this.setSubTitle("Syncing...");
       this.dataLoaded = true;
       // perform initial sync
