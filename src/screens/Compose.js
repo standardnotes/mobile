@@ -351,6 +351,7 @@ export default class Compose extends Abstract {
   }
 
   showSavedStatus(success) {
+    const debouceMs = 300; // minimum time message is shown
     if(success) {
       if(this.statusTimeout) clearTimeout(this.statusTimeout);
       this.statusTimeout = setTimeout(() => {
@@ -361,14 +362,14 @@ export default class Compose extends Abstract {
         this.saveError = false;
         this.syncTakingTooLong = false;
         this.setSubTitle(status);
-      }, 200)
+      }, debouceMs)
     } else {
       if(this.statusTimeout) clearTimeout(this.statusTimeout);
       this.statusTimeout = setTimeout(function(){
         this.saveError = true;
         this.syncTakingTooLong = false;
         this.setSubTitle("Sync Unavailable (changes saved offline)", StyleKit.variables.stylekitWarningColor);
-      }.bind(this), 200)
+      }.bind(this), debouceMs)
     }
   }
 
@@ -403,7 +404,7 @@ export default class Compose extends Abstract {
         }
       }
       this.save();
-    }, 275)
+    }, 325);
   }
 
   sync(note, callback) {

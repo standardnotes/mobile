@@ -26,9 +26,10 @@ export default class NoteCell extends ThemedPureComponent {
 
   _onPressIn = () => {
     // Debounce
+    const delay = 25;
     this.selectionTimeout = setTimeout(() => {
       this.setState({selected: true});
-    }, 30);
+    }, delay);
   };
 
   _onPressOut = () => {
