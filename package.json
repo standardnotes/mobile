@@ -12,6 +12,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "1.4.0",
     "base-64": "^0.1.0",
     "bugsnag-react-native": "^2.12.6",
     "immutable": "^3.8.1",

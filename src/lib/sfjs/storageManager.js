@@ -1,4 +1,5 @@
-import { AsyncStorage } from 'react-native';
+import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default class Storage extends SFStorageManager {
 
@@ -10,6 +11,11 @@ export default class Storage extends SFStorageManager {
     }
 
     return this.instance;
+  }
+
+  constructor() {
+    super();
+    this.isAndroid = Platform.OS == 'android';
   }
 
   async getItem(key) {
@@ -59,22 +65,80 @@ export default class Storage extends SFStorageManager {
 
   // Models
 
-  async getAllModels() {
-    var items = [];
-    var keys = await AsyncStorage.getAllKeys();
 
-    var stores = await AsyncStorage.multiGet(keys);
-    stores.map((result, i, store) => {
-      // get at each store's key/value so you can work with it
-      let key = store[i][0];
-      if(key.includes("Item-")) {
+  async getAllModels() {
+    const itemsFromStores = (stores) => {
+      let items = [];
+      stores.map((result, i, store) => {
+        let key = store[i][0];
         let value = store[i][1];
         if(value) {
           items.push(JSON.parse(value));
         }
-      }
-    })
+      })
 
+      return items;
+    }
+
+    /*
+    As of react-native-asyncstorage 1.4.0:
+
+    If Android has items saved that are over ~1MB, then:
+
+      let stores = await AsyncStorage.multiGet(keys);
+      items = items.concat(itemsFromStores(stores));
+
+    will fail silently and no items will load.
+
+      let item = await AsyncStorage.getItem(key);
+      items.push(JSON.parse(item));
+
+    will fail with an exception 'Cursor Window: Window is full'
+
+      let item = itemsFromStores(await AsyncStorage.multiGet([key]))[0];
+      items.push(item);
+
+    will succeed completely.
+
+    Issue created here: https://github.com/react-native-community/react-native-async-storage/issues/105
+
+    So what we'll do for now is if Android, use multiGet with just 1 key each time.
+    We need to determine why multiGet([key]) works, but getItem(key) doesn't.
+
+    It looks like the reason getItem fails while multiGet doesn't is because getItem
+    correctly returns the exception. However, even when there is an exception, getItem
+    internally still retrieves the item value. So the value and exception are both present,
+    but only the exception is sent.
+
+    Whereas with multiGet, exceptions aren't reported at all, so the value is sent up.
+    When multiGet gets patched to reports errors, I suspect this loophole will no longer work.
+
+    However, getItem's `callback` param can be used instead of the promise, which will return both a value and an exception,
+    and we can choose which one we want to handle.
+
+    multiGet also currently totally fails if even 1 key fails:
+    https://github.com/react-native-community/react-native-async-storage/issues/106
+    */
+
+    let keys = await this.getAllModelKeys();
+    let items = [];
+    if(this.isAndroid) {
+      for(let key of keys) {
+        try {
+          let item = itemsFromStores(await AsyncStorage.multiGet([key]))[0];
+          items.push(item);
+        } catch (e) {
+          console.log("Error getting item", key, e);
+        }
+      }
+    } else {
+      try {
+        let stores = await AsyncStorage.multiGet(keys);
+        items = items.concat(itemsFromStores(stores));
+      } catch(e) {
+        console.log("Error getting items", keys, e);
+      }
+    }
     return items;
   }
 
