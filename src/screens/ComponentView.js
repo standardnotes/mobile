@@ -121,6 +121,26 @@ export default class ComponentView extends Component {
     this.props.onLoadError();
   }
 
+  onShouldStartLoadWithRequest = (request) => {
+    /*
+    We want to handle link clicks within an editor by opening the browser instead of loading inline.
+    On iOS, onShouldStartLoadWithRequest is called for all requests including the initial request to load the editor.
+    On iOS, clicks in the editors have a navigationType of 'click', but on Android, this is not the case (no navigationType).
+    However, on Android, this function is not called for the initial request.
+    So that might be one way to determine if this request is a click or the actual editor load request.
+    But I don't think it's safe to rely on this being the case in the future.
+    So on Android, we'll handle url loads only if the url isn't equal to the editor url.
+     */
+
+    let editorUrl = ComponentManager.get().urlForComponent(this.editor);
+    if((ApplicationState.isIOS && request.navigationType == 'click')
+    || (ApplicationState.isAndroid && request.url != editorUrl)) {
+      ApplicationState.openURL(request.url);
+      return false;
+    }
+    return true;
+  }
+
   render() {
     var editor = this.editor;
     var url = ComponentManager.get().urlForComponent(editor);
@@ -145,6 +165,7 @@ export default class ComponentView extends Component {
            onMessage={this.onMessage}
            useWebKit={true}
            hideKeyboardAccessoryView={true}
+           onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
            cacheEnabled={true}
            scalesPageToFit={true /* Android only, not available with WKWebView */}
            injectedJavaScript = {
