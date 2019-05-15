@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import AlertManager from './alertManager';
 
 export default class Storage extends SFStorageManager {
 
@@ -16,6 +17,7 @@ export default class Storage extends SFStorageManager {
   constructor() {
     super();
     this.isAndroid = Platform.OS == 'android';
+    this.platformString = this.isAndroid ? "Android" : "iOS";
   }
 
   async getItem(key) {
@@ -93,7 +95,9 @@ export default class Storage extends SFStorageManager {
       let item = await AsyncStorage.getItem(key);
       items.push(JSON.parse(item));
 
-    will fail with an exception 'Cursor Window: Window is full'
+    will fail with an exception 'Cursor Window: Window is full'.
+    But actually if you wrap it in a try catch, then it will throw an exception correctly.
+    So that's what we're using now on Android.
 
       let item = itemsFromStores(await AsyncStorage.multiGet([key]))[0];
       items.push(item);
@@ -122,12 +126,17 @@ export default class Storage extends SFStorageManager {
 
     let keys = await this.getAllModelKeys();
     let items = [];
+    let failedItemIds = [];
     if(this.isAndroid) {
       for(let key of keys) {
         try {
-          let item = itemsFromStores(await AsyncStorage.multiGet([key]))[0];
-          items.push(item);
+          let item = await AsyncStorage.getItem(key);
+          if(item) {
+            items.push(JSON.parse(item));
+          }
         } catch (e) {
+          let id = key.replace("Item-", "");
+          failedItemIds.push(id);
           console.log("Error getting item", key, e);
         }
       }
@@ -139,7 +148,26 @@ export default class Storage extends SFStorageManager {
         console.log("Error getting items", keys, e);
       }
     }
+
+    if(failedItemIds.length > 0) {
+      this.showLoadFailForItemIds(failedItemIds);
+    }
+
     return items;
+  }
+
+  showLoadFailForItemIds(failedItemIds) {
+    let text = `The following items could not be loaded. This may happen if you are in low-memory conditions, or if the note is very large in size. For compatibility with ${this.platformString}, we recommend breaking up large notes into smaller chunks using the desktop or web app.\n\nItems:\n`
+    let index = 0;
+    text += failedItemIds.map((id) => {
+      let result = id;
+      if(index != failedItemIds.length - 1) {
+        result += "\n";
+      }
+      index++;
+      return result;
+    })
+    AlertManager.get().alert({title: "Unable to load item", text: text})
   }
 
   keyForItem(item) {
