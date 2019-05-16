@@ -18,6 +18,10 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
     })
   }
 
+  get sort() {
+    return 2;
+  }
+
   get identifier() {
     return "biometric-auth-source";
   }

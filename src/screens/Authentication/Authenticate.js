@@ -77,6 +77,7 @@ export default class Authenticate extends Abstract {
   }
 
   submitPressed() {
+    // If we just pressed submit on the only pending source left, disable submit button
     if(this.pendingSources.length == 1) {
       this.setState({submitDisabled: true});
     }
@@ -114,13 +115,11 @@ export default class Authenticate extends Abstract {
   }
 
   async beginAuthenticationForSource(source) {
-    if(ApplicationState.get().getMostRecentState() == ApplicationState.LosingFocus) {
-      // Authentication modal may be displayed on lose focus just before the app is closing.
-      // In this state however, we don't want to begin auth. We'll wait until the app gains focus.
-      return;
-    }
+    // Authentication modal may be displayed on lose focus just before the app is closing.
+    // In this state however, we don't want to begin auth. We'll wait until the app gains focus.
+    let isLosingFocus = ApplicationState.get().getMostRecentState() == ApplicationState.LosingFocus;
 
-    if(source.type == "biometric") {
+    if(source.type == "biometric" && !isLosingFocus) {
       // Begin authentication right away, we're not waiting for any input
       this.validateAuthentication(source);
     } else if(source.type == "input") {
@@ -128,6 +127,7 @@ export default class Authenticate extends Abstract {
         source.inputRef.focus();
       }
     }
+
     source.setWaitingForInput();
     this.setState({activeSource: source});
     this.forceUpdate();
@@ -160,10 +160,14 @@ export default class Authenticate extends Abstract {
       return;
     }
 
+    // Disable submit while we're processing. Will be re-enabled below.
+    this.setState({submitDisabled: true});
+
     let result = await source.authenticate();
     if(source.isInSuccessState()) {
       this.successfulSources.push(source);
       _.pull(this.pendingSources, source);
+      this.forceUpdate();
     } else {
       if(result.error && result.error.message) {
         Alert.alert("Unsuccessful", result.error.message);

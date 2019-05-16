@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Alert, View, WebView, Linking, Platform, Text } from 'react-native';
+import { Alert, View, Linking, Platform, Text } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 import ComponentManager from '@Lib/componentManager'
 import ModelManager from '@Lib/sfjs/modelManager'
@@ -8,7 +9,7 @@ import StyleKit from "@Style/StyleKit"
 import ApplicationState from "@Lib/ApplicationState"
 import Icon from 'react-native-vector-icons/Ionicons';
 
-export default class Webview extends Component {
+export default class ComponentView extends Component {
 
   constructor(props) {
     super(props);
@@ -22,12 +23,6 @@ export default class Webview extends Component {
     ComponentManager.get().registerHandler({identifier: this.identifier, areas: ["note-tags", "editor-stack", "editor-editor"],
        contextRequestHandler: (component) => {
         return this.note;
-      }
-    });
-
-    this.keyboardListener = ApplicationState.get().addEventHandler((event, data) => {
-      if(event == ApplicationState.KeyboardChangeEvent) {
-        this.webView.injectJavaScript(`window.scrollTo(0,0); document.body.scrollTop = 0`);
       }
     });
 
@@ -49,7 +44,7 @@ export default class Webview extends Component {
   componentDidMount() {
     if(Platform.OS == "android" && Platform.Version <= 23) {
       // postMessage doesn't work on Android <= 6 (API version 23) https://github.com/facebook/react-native/issues/11594
-      Alert.alert('Editors Not Supported', `Your version of Android does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.`, [{text: 'OK'}])
+      Alert.alert('Editors Not Supported', `Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.`, [{text: 'OK'}])
     }
   }
 
@@ -71,7 +66,6 @@ export default class Webview extends Component {
   componentWillUnmount() {
     ComponentManager.get().deregisterHandler(this.identifier);
     ComponentManager.get().deactivateComponent(this.editor);
-    ApplicationState.get().removeEventHandler(this.keyboardListener);
   }
 
   onMessage = (message) => {
@@ -80,7 +74,7 @@ export default class Webview extends Component {
       return;
     }
 
-    var data;
+    let data;
     try {
       data = JSON.parse(message.nativeEvent.data);
     } catch (e) {
@@ -88,14 +82,6 @@ export default class Webview extends Component {
       return;
     }
 
-    // Ignore any incoming events (like save events) if the note is locked. Allow messages that are required for component setup (administrative)
-    if(this.note.locked && !ComponentManager.get().isReadOnlyMessage(data)) {
-      if(!this.didShowLockAlert) {
-        Alert.alert('Note Locked', "This note is locked. Changes you make in the web editor will not be saved. Please unlock this note to make changes.", [{text: 'OK'}])
-        this.didShowLockAlert = true;
-      }
-      return;
-    }
     ComponentManager.get().handleMessage(this.editor, data);
   }
 
@@ -107,6 +93,7 @@ export default class Webview extends Component {
     if(this.registrationTimeout) {
       clearTimeout(this.registrationTimeout);
     }
+
     this.registrationTimeout = setTimeout(() => {
       ComponentManager.get().registerComponentWindow(this.editor, this.webView);
     }, 1);
@@ -134,6 +121,26 @@ export default class Webview extends Component {
     this.props.onLoadError();
   }
 
+  onShouldStartLoadWithRequest = (request) => {
+    /*
+    We want to handle link clicks within an editor by opening the browser instead of loading inline.
+    On iOS, onShouldStartLoadWithRequest is called for all requests including the initial request to load the editor.
+    On iOS, clicks in the editors have a navigationType of 'click', but on Android, this is not the case (no navigationType).
+    However, on Android, this function is not called for the initial request.
+    So that might be one way to determine if this request is a click or the actual editor load request.
+    But I don't think it's safe to rely on this being the case in the future.
+    So on Android, we'll handle url loads only if the url isn't equal to the editor url.
+     */
+
+    let editorUrl = ComponentManager.get().urlForComponent(this.editor);
+    if((ApplicationState.isIOS && request.navigationType == 'click')
+    || (ApplicationState.isAndroid && request.url != editorUrl)) {
+      ApplicationState.openURL(request.url);
+      return false;
+    }
+    return true;
+  }
+
   render() {
     var editor = this.editor;
     var url = ComponentManager.get().urlForComponent(editor);
@@ -158,12 +165,17 @@ export default class Webview extends Component {
            onMessage={this.onMessage}
            useWebKit={true}
            hideKeyboardAccessoryView={true}
+           onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
            cacheEnabled={true}
-           automaticallyAdjustContentInsets={false}
-           contentInset={{top: 0, left: 0, bottom: 0, right: 0}}
            scalesPageToFit={true /* Android only, not available with WKWebView */}
            injectedJavaScript = {
-             `window.isNative = "true"`
+             `(function() {
+               window.parent.postMessage = function(data) {
+                 window.parent.ReactNativeWebView.postMessage(data);
+               };
+
+               return true;
+             })()`
           }
          />
       </View>

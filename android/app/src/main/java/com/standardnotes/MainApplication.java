@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.vinzscam.reactnativefileviewer.RNFileViewerPackage;
 import com.rnfs.RNFSPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -45,18 +47,20 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-              new MainReactPackage(),
-            new RNFileViewerPackage(),
-            new RNFSPackage(),
-            new RNGestureHandlerPackage(),
-              BugsnagReactNative.getPackage(),
-              new KeychainPackage(),
-              new VectorIconsPackage(),
-              new RCTAesPackage(),
-              new RNMail(),
-              new ReactNativeFingerprintScannerPackage(),
-              new SNTextViewPackage(),
-              new FlagSecurePackage()
+        new MainReactPackage(),
+            new AsyncStoragePackage(),
+        new RNCWebViewPackage(),
+        new RNFileViewerPackage(),
+        new RNFSPackage(),
+        new RNGestureHandlerPackage(),
+        BugsnagReactNative.getPackage(),
+        new KeychainPackage(),
+        new VectorIconsPackage(),
+        new RCTAesPackage(),
+        new RNMail(),
+        new ReactNativeFingerprintScannerPackage(),
+        new SNTextViewPackage(),
+        new FlagSecurePackage()
       );
     }
 
@@ -76,10 +80,6 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
 
     SoLoader.init(this, /* native exopackage */ false);
-
-    // Set AsyncStorage size, default is 6mb
-    long size = 50L * 1024L * 1024L; // 50 MB
-    com.facebook.react.modules.storage.ReactDatabaseSupplier.getInstance(getApplicationContext()).setMaximumSize(size);
 
     registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
       @Override

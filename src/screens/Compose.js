@@ -7,7 +7,7 @@ import OptionsState from "@Lib/OptionsState"
 import SideMenuManager from "@SideMenu/SideMenuManager"
 
 import Abstract from "./Abstract"
-import Webview from "./Webview"
+import ComponentView from "./ComponentView"
 import ComponentManager from '@Lib/componentManager'
 import ApplicationState from "@Lib/ApplicationState"
 import LockedView from "@Containers/LockedView";
@@ -351,6 +351,7 @@ export default class Compose extends Abstract {
   }
 
   showSavedStatus(success) {
+    const debouceMs = 300; // minimum time message is shown
     if(success) {
       if(this.statusTimeout) clearTimeout(this.statusTimeout);
       this.statusTimeout = setTimeout(() => {
@@ -361,14 +362,14 @@ export default class Compose extends Abstract {
         this.saveError = false;
         this.syncTakingTooLong = false;
         this.setSubTitle(status);
-      }, 200)
+      }, debouceMs)
     } else {
       if(this.statusTimeout) clearTimeout(this.statusTimeout);
       this.statusTimeout = setTimeout(function(){
         this.saveError = true;
         this.syncTakingTooLong = false;
         this.setSubTitle("Sync Unavailable (changes saved offline)", StyleKit.variables.stylekitWarningColor);
-      }.bind(this), 200)
+      }.bind(this), debouceMs)
     }
   }
 
@@ -403,7 +404,7 @@ export default class Compose extends Abstract {
         }
       }
       this.save();
-    }, 275)
+    }, 325);
   }
 
   sync(note, callback) {
@@ -510,7 +511,7 @@ export default class Compose extends Abstract {
         }
 
         {shouldDisplayEditor &&
-          <Webview
+          <ComponentView
             key={noteEditor.uuid}
             noteId={this.note.uuid}
             editorId={noteEditor.uuid}

@@ -16,9 +16,14 @@ SFItem.prototype.updateFromJSON = function(json) {
   }
 }
 
-const original_dateToLocalizedString = SFItem.prototype.dateToLocalizedString;
 SFItem.prototype.dateToLocalizedString = function(date) {
   return moment(date).format('llll');
+}
+
+SFItem.prototype.updatedAtTimestamp = function() {
+  // date is a moment date
+  // in the base class we do date.getTime(), but that doesn't work with moment dates.
+  return this.updated_at.valueOf();
 }
 
 // Define these getters

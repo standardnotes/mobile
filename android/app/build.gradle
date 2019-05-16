@@ -102,8 +102,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode 3000050
-        versionName "3.0.5"
+        versionCode 3000060
+        versionName "3.0.6"
 
         multiDexEnabled  true
 
@@ -159,6 +159,8 @@ android {
 }
 
 dependencies {
+    compile project(':@react-native-community_async-storage')
+    compile project(':react-native-webview')
     compile project(':react-native-file-viewer')
     compile project(':react-native-fs')
     compile project(':react-native-gesture-handler')

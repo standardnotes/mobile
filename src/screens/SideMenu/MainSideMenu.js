@@ -9,6 +9,7 @@ import ActionSheet from 'react-native-actionsheet'
 import Abstract from "@Screens/Abstract"
 import AlertManager from "@SFJS/alertManager"
 import Auth from "@SFJS/authManager"
+import Sync from '@SFJS/syncManager'
 
 import SectionHeader from "@Components/SectionHeader";
 import TableSection from "@Components/TableSection";
@@ -34,18 +35,39 @@ export default class MainSideMenu extends AbstractSideMenu {
 
     this.signoutObserver = Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
+        this.setState({outOfSync: false});
         this.forceUpdate();
       }
     });
+
+    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+      if(event == "enter-out-of-sync") {
+        this.setState({outOfSync: true});
+      } else if(event == "exit-out-of-sync") {
+        this.setState({outOfSync: false});
+      }
+    })
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
     Auth.get().removeEventHandler(this.signoutObserver);
+    Sync.get().removeEventHandler(this.syncEventHandler);
   }
 
   presentSettings() {
     this.props.navigation.navigate("Settings");
+  }
+
+  outOfSyncPressed() {
+    AlertManager.get().confirm({
+      title: "Potentially Out of Sync",
+      text: "We've detected that the data in the current application session may not match the data on the server. This can happen due to poor network conditions, or if a large note fails to download on your device. To resolve this issue, we recommend first creating a backup of your data in the Settings screen, the signing out of your account and signing back in.",
+      confirmButtonText: "Open Settings",
+      onConfirm: () => {
+        this.presentSettings();
+      }
+    })
   }
 
   get handler() {
@@ -151,7 +173,11 @@ export default class MainSideMenu extends AbstractSideMenu {
         <SafeAreaView style={this.styles.firstSafeArea} />
         <SafeAreaView style={[viewStyles, this.styles.secondSafeArea]}>
 
-          <SideMenuHero onPress={() => {this.presentSettings()}}/>
+          <SideMenuHero
+            outOfSync={this.state.outOfSync}
+            onPress={() => {this.presentSettings()}}
+            onOutOfSyncPress={() => {this.outOfSyncPressed()}}
+          />
 
           <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
 

@@ -9,6 +9,10 @@ export default class AuthenticationSourceAccountPassword extends AuthenticationS
     super();
   }
 
+  get sort() {
+    return 1;
+  }
+
   get identifier() {
     return "account-password-auth-source";
   }

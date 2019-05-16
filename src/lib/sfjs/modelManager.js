@@ -1,7 +1,7 @@
 import Storage from "./storageManager"
 import "../../models/extend/item.js";
 import { SFPredicate, SFPrivileges } from "standard-file-js";
-import { SNMfa, SNServerExtension, SNExtension, SNEditor } from 'sn-models';
+import { SNMfa, SNServerExtension, SNExtension, SNEditor } from 'snjs';
 
 SFModelManager.ContentTypeClassMapping = {
   "Note" : SNNote,
@@ -250,5 +250,26 @@ export default class ModelManager extends SFModelManager {
     })
 
     return {notes: notes, tags: tags};
+  }
+
+  /*
+  Misc
+  */
+
+  humanReadableDisplayForContentType(contentType) {
+    return {
+      "Note" : "note",
+      "Tag" : "tag",
+      "SN|SmartTag": "smart tag",
+      "Extension" : "action-based extension",
+      "SN|Component" : "component",
+      "SN|Editor" : "editor",
+      "SN|Theme" : "theme",
+      "SF|Extension" : "server extension",
+      "SF|MFA" : "two-factor authentication setting",
+      "SN|FileSafe|Credentials": "FileSafe credential",
+      "SN|FileSafe|FileMetadata": "FileSafe file",
+      "SN|FileSafe|Integration": "FileSafe integration"
+    }[contentType];
   }
 }

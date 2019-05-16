@@ -332,7 +332,8 @@ export default class Notes extends Abstract {
   _onRefresh() {
     this.setSubTitle("Syncing...");
     this.setState({refreshing: true});
-    Sync.get().sync().then(() => {
+    // Perform integrity checks for hard reloads
+    Sync.get().sync({performIntegrityCheck: true}).then(() => {
       setTimeout(() => {
         this.setSubTitle(null);
       }, 100);
@@ -353,8 +354,10 @@ export default class Notes extends Abstract {
 
   _onPressItem = (item: hash) => {
     var run = () => {
-      if(item.conflict_of) {
-        item.conflict_of = null;
+      if(item.content.conflict_of) {
+        item.content.conflict_of = null;
+        item.setDirty(true, true);
+        Sync.get().sync();
       }
 
       this.selectNote(item);

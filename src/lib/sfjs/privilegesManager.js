@@ -107,7 +107,9 @@ export default class PrivilegesManager extends SFPrivilegesManager {
     let credentials = await this.netCredentialsForAction(action);
     let sources = [];
     for(var credential of credentials) {
-      sources = sources.concat(sourcesForCredential(credential));
+      sources = sources.concat(sourcesForCredential(credential)).sort((a, b) => {
+        return a.sort - b.sort;
+      })
     }
 
     return sources;

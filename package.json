@@ -1,8 +1,8 @@
 {
   "name": "StandardNotes",
-  "version": "3.0.5",
-  "versionIOS": "3.0.5",
-  "versionAndroid": "3.0.5",
+  "version": "3.0.6",
+  "versionIOS": "3.0.6",
+  "versionAndroid": "3.0.6",
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
@@ -12,6 +12,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "1.4.0",
     "base-64": "^0.1.0",
     "bugsnag-react-native": "^2.12.6",
     "immutable": "^3.8.1",
@@ -25,11 +26,12 @@
     "react-native-keychain": "^1.2.1",
     "react-native-store-review": "^0.1.3",
     "react-native-vector-icons": "6.1.0",
+    "react-native-webview": "5.8.1",
     "react-navigation": "^3.0.9",
     "react-navigation-header-buttons": "^2.1.1",
     "regenerator": "^0.13.3",
-    "sn-models": "0.1.14",
-    "standard-file-js": "0.3.56"
+    "snjs": "0.2.0",
+    "standard-file-js": "0.3.58"
   },
   "devDependencies": {
     "babel-jest": "^23.6.0",

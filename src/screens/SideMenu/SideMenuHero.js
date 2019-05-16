@@ -7,6 +7,7 @@ import ModelManager from "@SFJS/modelManager"
 
 import StyleKit from "@Style/StyleKit"
 import ThemedComponent from "@Components/ThemedComponent";
+import Circle from "@Components/Circle"
 
 
 export default class SideMenuHero extends ThemedComponent {
@@ -43,6 +44,15 @@ export default class SideMenuHero extends ThemedComponent {
         <TouchableOpacity onPress={this.props.onPress}>
           <Text style={this.styles.subtitle}>{textData.text}</Text>
         </TouchableOpacity>
+
+        {this.props.outOfSync &&
+          <TouchableOpacity style={this.styles.outOfSyncContainer} onPress={this.props.onOutOfSyncPress}>
+            <View style={this.styles.iconCircle}>
+              <Circle size={10} backgroundColor={StyleKit.variables.stylekitWarningColor} borderColor={StyleKit.variables.stylekitWarningColor} />
+            </View>
+            <Text style={this.styles.outOfSync}>Potentially Out of Sync</Text>
+          </TouchableOpacity>
+        }
       </View>
     )
   }
@@ -70,6 +80,24 @@ export default class SideMenuHero extends ThemedComponent {
         fontSize: 13,
         color: StyleKit.variables.stylekitContrastForegroundColor,
         opacity: 0.6
+      },
+
+      outOfSyncContainer: {
+        flex: 0,
+        flexDirection: 'row',
+        alignItems: "center"
+      },
+
+      iconCircle: {
+        marginTop: 10,
+        width: 15,
+      },
+
+      outOfSync: {
+        marginTop: 10,
+        fontSize: 13,
+        color: StyleKit.variables.stylekitWarningColor,
+        fontWeight: "bold"
       }
     }
   }
