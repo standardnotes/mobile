@@ -35,9 +35,10 @@ export default class ComponentView extends Component {
     let url = ComponentManager.get().urlForComponent(this.editor);
     console.log("Loading editor", url);
 
-    if(!url) {
+    if(this.editor.offlineOnly) {
+      Alert.alert('Offline Only', `You've marked ${this.editor.name} as 'offline only', which means it can only be accessed via the desktop app. To use this editor on mobile, please use the web or desktop app and check 'Use hosted when local is unavailable' in the editor's extension settings. Otherwise, please change to another editor to edit this note.`, [{text: 'OK'}])
+    } else if(!url) {
       Alert.alert('Re-install Extension', `This extension is not installed correctly. Please use the web or desktop application to reinstall ${this.editor.name}, then try again.`, [{text: 'OK'}])
-      return;
     }
   }
 
@@ -141,6 +142,15 @@ export default class ComponentView extends Component {
     return true;
   }
 
+  defaultInjectedJavaScript = () => {
+    return `(function() {
+      window.parent.postMessage = function(data) {
+        window.parent.ReactNativeWebView.postMessage(data);
+      };
+      return true;
+    })()`
+  }
+
   render() {
     var editor = this.editor;
     var url = ComponentManager.get().urlForComponent(editor);
@@ -153,31 +163,25 @@ export default class ComponentView extends Component {
             <Text style={this.styles.lockedText}>Extended expired. Editors are in a read-only state. To edit immediately, please switch to the Plain Editor.</Text>
           </View>
         }
-        <WebView
-           style={StyleKit.styles.flexContainer, {backgroundColor: "transparent"}}
-           source={{uri: url}}
-           key={this.editor.uuid}
-           ref={(webView) => this.webView = webView}
-           /* onLoad and onLoadEnd seem to be the same exact thing, except that when an error occurs, onLoadEnd is called twice, whereas onLoad is called once (what we want) */
-           onLoad={this.onFrameLoad}
-           onLoadStart={this.onLoadStart}
-           onError={this.onLoadError}
-           onMessage={this.onMessage}
-           useWebKit={true}
-           hideKeyboardAccessoryView={true}
-           onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
-           cacheEnabled={true}
-           scalesPageToFit={true /* Android only, not available with WKWebView */}
-           injectedJavaScript = {
-             `(function() {
-               window.parent.postMessage = function(data) {
-                 window.parent.ReactNativeWebView.postMessage(data);
-               };
-
-               return true;
-             })()`
-          }
-         />
+        {url &&
+          <WebView
+             style={StyleKit.styles.flexContainer, {backgroundColor: "transparent"}}
+             source={{uri: url}}
+             key={this.editor.uuid}
+             ref={(webView) => this.webView = webView}
+             /* onLoad and onLoadEnd seem to be the same exact thing, except that when an error occurs, onLoadEnd is called twice, whereas onLoad is called once (what we want) */
+             onLoad={this.onFrameLoad}
+             onLoadStart={this.onLoadStart}
+             onError={this.onLoadError}
+             onMessage={this.onMessage}
+             useWebKit={true}
+             hideKeyboardAccessoryView={true}
+             onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
+             cacheEnabled={true}
+             scalesPageToFit={true /* Android only, not available with WKWebView */}
+             injectedJavaScript={this.defaultInjectedJavaScript()}
+           />
+        }
       </View>
     );
   }
