@@ -408,7 +408,7 @@ export default class Compose extends Abstract {
   }
 
   sync(note, callback) {
-    note.setDirty(true);
+    note.setDirty(true, true);
 
     Sync.get().sync().then((response) => {
       if(response && response.error) {
