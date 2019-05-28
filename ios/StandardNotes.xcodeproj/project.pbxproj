@@ -350,6 +350,13 @@
 			remoteGlobalIDString = 8AD256131D6DE5F600C7D842;
 			remoteInfo = BugsnagReactNative;
 		};
+		CD8A7096229DB6F0003BCE3E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 19A39FBB53A3465B81022E02 /* RNGestureHandler.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B5C32A36220C603B000FFB8D;
+			remoteInfo = "RNGestureHandler-tvOS";
+		};
 		CDB589F41F6C5148009EF868 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */;
@@ -952,6 +959,7 @@
 			isa = PBXGroup;
 			children = (
 				CDE0D5F921D4012300E093B5 /* libRNGestureHandler.a */,
+				CD8A7097229DB6F0003BCE3E /* libRNGestureHandler-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1493,6 +1501,13 @@
 			fileType = archive.ar;
 			path = libBugsnagReactNative.a;
 			remoteRef = CD885F771F70228400B91C20 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD8A7097229DB6F0003BCE3E /* libRNGestureHandler-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRNGestureHandler-tvOS.a";
+			remoteRef = CD8A7096229DB6F0003BCE3E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		CDB589F51F6C5148009EF868 /* libRCTBlob-tvOS.a */ = {
