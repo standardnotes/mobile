@@ -62,7 +62,10 @@ export default class Compose extends Abstract {
   registerObservers() {
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
 
-      if(event == "sync:completed") {
+      if(event == "sync:error") {
+        this.showSavedStatus(false);
+      }
+      else if(event == "sync:completed") {
         let isInRetrieved = data.retrievedItems && data.retrievedItems.map((i) => i.uuid).includes(this.note.uuid);
         let isInSaved = data.savedItems && data.savedItems.map((i) => i.uuid).includes(this.note.uuid);
         if(this.note.deleted || this.note.content.trashed) {
@@ -106,19 +109,18 @@ export default class Compose extends Abstract {
           // unnecessary renders. (on constructor it was undefined, and here, it was null, causing a re-render to occur on android, causing textview to reset cursor)
           this.setState(newState);
         }
+
+        if((isInSaved && !this.note.dirty) || this.saveError) {
+          this.showSavedStatus(true);
+        }
       }
     });
 
     this.componentHandler = ComponentManager.get().registerHandler({identifier: "composer", areas: ["editor-editor"],
       actionHandler: (component, action, data) => {
-        if(action === "save-items" || action === "save-success" || action == "save-error") {
+        if(action === "save-items") {
           if(data.items.map((item) => {return item.uuid}).includes(this.note.uuid)) {
-            if(action == "save-items") {
-              if(this.componentSaveTimeout) clearTimeout(this.componentSaveTimeout);
-              this.componentSaveTimeout = setTimeout(this.showSavingStatus.bind(this), 10);
-            } else {
-              this.showSavedStatus(action == "save-success");
-            }
+            this.showSavingStatus();
           }
         }
       }
@@ -434,9 +436,8 @@ export default class Compose extends Abstract {
       note.dummy = false;
       ModelManager.get().addItem(note);
     }
-    this.sync(note, (success) => {
-      this.showSavedStatus(success);
-    });
+
+    this.sync(note);
   }
 
   reloadEditor = () => {

@@ -89,7 +89,10 @@ export default class Authenticate extends Abstract {
 
   componentWillFocus() {
     super.componentWillFocus();
-    this.begin();
+
+    if(ApplicationState.get().getMostRecentState() !== ApplicationState.LosingFocus) {
+      this.begin();
+    }
   }
 
   cancel() {
@@ -194,19 +197,35 @@ export default class Authenticate extends Abstract {
   }
 
   onSuccess() {
-    // Wait for componentWillBlur to call onSuccess callback.
+    // Wait for componentWillBlur/componentDidlBlur to call onSuccess callback.
     // This way, if the callback has another route change, the dismissal
     // of this one won't affect it.
-    this.successful = true;
+    this.needsSuccessCallback = true;
     this.dismiss();
   }
 
   componentWillBlur() {
     super.componentWillBlur();
-    if(this.successful) {
-      this.getProp("onSuccess")(this._sessionLength);
-      this.successful = false;
+    if(this.needsSuccessCallback) {
+      this.triggerSuccessCallback();
     }
+  }
+
+  /*
+    On Android, when pressing physical back then re-opening app and authenticating and closing modal,
+    componentWillBlur is not called for some reason. componentDidBlur is called however, albiet ~2 seconds later.
+    Note however that this only seems to happen on the emulator, and not on physical device.
+   */
+  componentDidBlur() {
+    super.componentDidBlur();
+    if(this.needsSuccessCallback) {
+      this.triggerSuccessCallback();
+    }
+  }
+
+  triggerSuccessCallback() {
+    this.getProp("onSuccess")(this._sessionLength);
+    this.needsSuccessCallback = false;
   }
 
   inputTextChanged(text, source) {

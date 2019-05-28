@@ -47,7 +47,6 @@ export default class ApplicationState {
     this.observers = [];
     this.eventSubscribers = [];
     this.locked = true;
-    this.previousEvents = [];
     this._isAndroid = Platform.OS === "android";
 
     this.setTabletModeEnabled(this.isTabletDevice);
@@ -163,8 +162,6 @@ export default class ApplicationState {
     var isLosingFocus = nextAppState == 'inactive';
 
     if(isEnteringBackground) {
-      // Set most recent state before notifying observers, in case they need to query this value.
-      this.mostRecentState = ApplicationState.Backgrounding;
       this.notifyOfState(ApplicationState.Backgrounding);
 
       if(this.shouldLockApplication()) {
@@ -174,17 +171,14 @@ export default class ApplicationState {
 
     if(isResumingFromBackground || isResuming) {
       if(isResumingFromBackground) {
-        this.mostRecentState = ApplicationState.ResumingFromBackground;
         this.notifyOfState(ApplicationState.ResumingFromBackground);
       }
 
       // Notify of GainingFocus even if resuming from background
-      this.mostRecentState = ApplicationState.GainingFocus;
       this.notifyOfState(ApplicationState.GainingFocus);
     }
 
     if(isLosingFocus) {
-      this.mostRecentState = ApplicationState.LosingFocus;
       this.notifyOfState(ApplicationState.LosingFocus);
 
       // If a privileges authentication session is in progress, we don't want to lock the application
@@ -201,9 +195,9 @@ export default class ApplicationState {
       If we are backgrounding or losing focus, I assume we no longer care about previous events that occurred.
       (This was added in relation to the issue where pressing the Android back button would reconstruct App and cause all events to be re-forwarded)
      */
-    if(isEnteringBackground || isLosingFocus) {
-      this.clearPreviousState();
-    }
+    // if(isEnteringBackground || isLosingFocus) {
+    //   this.clearPreviousState();
+    // }
   }
 
   // Visibility change events are like active, inactive, background,
@@ -237,16 +231,17 @@ export default class ApplicationState {
 
   didLaunch() {
     this.notifyOfState(ApplicationState.Launching);
-    this.mostRecentState = ApplicationState.Launching;
   }
 
   notifyOfState(state) {
     if(this.ignoreStateChanges) {return;}
+
+    // Set most recent state before notifying observers, in case they need to query this value.
+    this.mostRecentState = state;
+
     for(var observer of this.observers) {
       observer.callback(state);
     }
-
-    this.previousEvents.push(state);
   }
 
   /* End State */
@@ -272,16 +267,16 @@ export default class ApplicationState {
     var observer = {key: Math.random, callback: callback};
     this.observers.push(observer);
 
-    for(var prevState of this.previousEvents) {
-      callback(prevState);
+    if(this.mostRecentState) {
+      callback(this.mostRecentState);
     }
 
     return observer;
   }
 
-  clearPreviousState() {
-    this.previousEvents = [];
-  }
+  // clearPreviousState() {
+  //   this.previousEvents = [];
+  // }
 
   removeStateObserver(observer) {
     _.pull(this.observers, observer);
