@@ -73,7 +73,7 @@ export default class KeyRecovery extends Abstract {
     let useKeys = async (confirm) => {
       let run = async () => {
         await KeysManager.get().persistOfflineKeys(keys);
-        ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(this.items, null, SFModelManager.MappingSourceLocalRetrieved);
+        await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(this.items, null, SFModelManager.MappingSourceLocalRetrieved);
         await Sync.get().writeItemsToLocalStorage(this.items);
         this.dismiss();
       }
