@@ -33,6 +33,9 @@
     "snjs": "0.2.3",
     "standard-file-js": "0.3.60"
   },
+  "resolutions": {
+    "stacktrace-parser": "0.1.4"
+  },
   "devDependencies": {
     "babel-jest": "^23.6.0",
     "jest": "23.6.0",
