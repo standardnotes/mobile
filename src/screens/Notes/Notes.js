@@ -356,7 +356,7 @@ export default class Notes extends Abstract {
     var run = () => {
       if(item.content.conflict_of) {
         item.content.conflict_of = null;
-        item.setDirty(true, true);
+        item.setDirty(true);
         Sync.get().sync();
       }
 

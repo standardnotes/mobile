@@ -251,6 +251,7 @@ export default class AuthSection extends Component {
                 autoCorrect={false}
                 autoCapitalize={'none'}
                 keyboardType={'email-address'}
+                textContentType={"emailAddress"}
                 keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
@@ -263,6 +264,7 @@ export default class AuthSection extends Component {
                 placeholder={"Password"}
                 onChangeText={(text) => this.passwordInputChanged(text)}
                 value={this.state.password}
+                textContentType={"password"}
                 secureTextEntry={true}
                 keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}

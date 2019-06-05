@@ -52,7 +52,7 @@ export default class MigrationManager extends SFMigrationManager {
         let options = { contentType: contentType };
 
         // The user is signed in
-        Sync.get().stateless_downloadAllItems(options).then((items) => {
+        Sync.get().stateless_downloadAllItems(options).then(async (items) => {
           let matchingPrivs = items.filter((candidate) => {
             return candidate.content_type == contentType;
           });
@@ -61,7 +61,7 @@ export default class MigrationManager extends SFMigrationManager {
             return;
           }
 
-          let mapped = ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
+          let mapped = await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
             matchingPrivs, null, SFModelManager.MappingSourceRemoteRetrieved);
           // Singleton manager usually resolves singletons on sync completion callback,
           // but since we're manually mapping, we have to make it manually resolve singletons
@@ -84,7 +84,7 @@ export default class MigrationManager extends SFMigrationManager {
         let options = { contentType: contentType };
 
         // The user is signed in
-        Sync.get().stateless_downloadAllItems(options).then((items) => {
+        Sync.get().stateless_downloadAllItems(options).then(async (items) => {
           let matchingTags = items.filter((candidate) => {
             return candidate.content_type == contentType;
           });
@@ -93,7 +93,7 @@ export default class MigrationManager extends SFMigrationManager {
             return;
           }
 
-          ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
+          await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
             matchingTags, null, SFModelManager.MappingSourceRemoteRetrieved);
         })
       }

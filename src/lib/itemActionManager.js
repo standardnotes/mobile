@@ -96,7 +96,7 @@ export default class ItemActionManager {
 
     else if(event == this.LockEvent || event == this.UnlockEvent) {
       item.setAppDataItem("locked", event == this.LockEvent);
-      item.setDirty(true, true);
+      item.setDirty(true);
       Sync.get().sync();
       callback && callback();
     }
