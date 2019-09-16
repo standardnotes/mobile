@@ -132,11 +132,12 @@ export default class MainSideMenu extends AbstractSideMenu {
     let themes = StyleKit.get().themes();
     let options = [];
     for(let theme of themes) {
+      const dimmed = theme.getNotAvailOnMobile() || (theme.content.package_info && theme.content.package_info.no_mobile);
       let option = SideMenuSection.BuildOption({
         text: theme.name,
         key: theme.uuid || theme.name,
         iconDesc: this.iconDescriptorForTheme(theme),
-        dimmed: theme.getNotAvailOnMobile() || theme.content.package_info.no_mobile,
+        dimmed,
         selected: StyleKit.get().isThemeActive(theme),
         onSelect: () => {this.onThemeSelect(theme)},
         onLongPress: () => {this.onThemeLongPress(theme)}
