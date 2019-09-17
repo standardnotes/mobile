@@ -137,7 +137,7 @@ export default class MainSideMenu extends AbstractSideMenu {
         text: theme.name,
         key: theme.uuid || theme.name,
         iconDesc: this.iconDescriptorForTheme(theme),
-        dimmed,
+        dimmed: dimmed,
         selected: StyleKit.get().isThemeActive(theme),
         onSelect: () => {this.onThemeSelect(theme)},
         onLongPress: () => {this.onThemeLongPress(theme)}
