@@ -18,8 +18,8 @@
     "immutable": "^3.8.1",
     "lodash": "^4.17.11",
     "moment": "^2.23.0",
-    "react": "16.6.3",
-    "react-native": "0.57.8",
+    "react": "16.8.3",
+    "react-native": "0.59.10",
     "react-native-file-viewer": "^1.0.10",
     "react-native-fs": "^2.13.3",
     "react-native-gesture-handler": "^1.0.12",
@@ -35,10 +35,12 @@
     "stacktrace-parser": "0.1.4"
   },
   "devDependencies": {
-    "babel-jest": "^23.6.0",
+    "@babel/core": "^7.4.5",
+    "@babel/runtime": "^7.4.5",
+    "babel-jest": "^24.8.0",
     "jest": "23.6.0",
-    "metro-react-native-babel-preset": "^0.51.1",
-    "react-test-renderer": "16.6.3"
+    "metro-react-native-babel-preset": "^0.54.1",
+    "react-test-renderer": "16.8.3"
   },
   "jest": {
     "preset": "react-native"

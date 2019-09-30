@@ -56,9 +56,11 @@
 		CD399CE321E181C7006106AE /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE021E181C6006106AE /* Red.png */; };
 		CD399CE421E181C7006106AE /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE121E181C7006106AE /* Red@3x.png */; };
 		CD399CE521E181C7006106AE /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE221E181C7006106AE /* Red@2x.png */; };
+		CD743C792342ACC700535CC9 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		CDB58A201F6C5193009EF868 /* libRNMail.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB58A161F6C5179009EF868 /* libRNMail.a */; };
 		CDB58A211F6C51A4009EF868 /* libReactNativeFingerprintScanner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB58A0F1F6C5174009EF868 /* libReactNativeFingerprintScanner.a */; };
 		CDB58A221F6C5235009EF868 /* libRCTAes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB58A091F6C516B009EF868 /* libRCTAes.a */; };
+		ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		F0D84FDB75374348BC0017C2 /* libBugsnagReactNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD3F9197A5F41C0904D7E60 /* libBugsnagReactNative.a */; };
 /* End PBXBuildFile section */
 
@@ -537,6 +539,7 @@
 		CEB6B877AE784055A8E294A8 /* libRNFS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFS.a; sourceTree = "<group>"; };
 		D38724A93AC141D6B51D1356 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		EC178A0479CE4154896293C3 /* RNCWebView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCWebView.xcodeproj; path = "../node_modules/react-native-webview/ios/RNCWebView.xcodeproj"; sourceTree = "<group>"; };
+		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EF2E9E34ADA441EDB4CE8370 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
 		EFD3F9197A5F41C0904D7E60 /* libBugsnagReactNative.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libBugsnagReactNative.a; sourceTree = "<group>"; };
 		FF655164AD874250A8F6E20E /* RNCAsyncStorage.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCAsyncStorage.xcodeproj; path = "../node_modules/@react-native-community/async-storage/ios/RNCAsyncStorage.xcodeproj"; sourceTree = "<group>"; };
@@ -548,6 +551,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */,
+				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -555,6 +559,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
 				CD399CD021E16BD6006106AE /* libReactNativeAlternateIcons.a in Frameworks */,
 				CD17667C1F795DC100165C83 /* libSNTextView.a in Frameworks */,
 				CDB58A221F6C5235009EF868 /* libRCTAes.a in Frameworks */,
@@ -590,6 +595,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD743C792342ACC700535CC9 /* JavaScriptCore.framework in Frameworks */,
 				2D02E4C91E0B4AEC006451C7 /* libReact.a in Frameworks */,
 				2D02E4C21E0B4AEC006451C7 /* libRCTAnimation.a in Frameworks */,
 				2D02E4C31E0B4AEC006451C7 /* libRCTImage-tvOS.a in Frameworks */,
@@ -951,6 +957,7 @@
 				37A42F4068AE42DD8D2DF182 /* libRNFileViewer.a */,
 				4449457EB3FC4387810027F1 /* libRNCWebView.a */,
 				1009A2994551440E819E2CE6 /* libRNCAsyncStorage.a */,
+				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
