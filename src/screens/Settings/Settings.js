@@ -123,7 +123,7 @@ export default class Settings extends Abstract {
   onStorageEncryptionEnable = () => {
     AlertManager.get().confirm({
       title: "Enable Storage Encryption?",
-      text: "Storage encryption improves your security by encrypting your data on your device. It may increase app start-up speed.",
+      text: "Storage encryption improves your security by encrypting your data on your device. It may increase app start-up time.",
       confirmButtonText: "Enable",
       onConfirm: () => {
         this.mergeState({storageEncryptionLoading: true});
