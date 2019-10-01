@@ -14,7 +14,7 @@ export default class CompanySection extends Component {
   onAction = (action) => {
     if(action == "feedback") {
       var platformString = Platform.OS == "android" ? "Android" : "iOS";
-      ApplicationState.openURL(`mailto:hello@standardnotes.org?subject=${platformString} app feedback (v${ApplicationState.version})`);
+      ApplicationState.openURL(`mailto:help@standardnotes.org?subject=${platformString} app feedback (v${ApplicationState.version})`);
     } else if(action == "learn_more") {
       ApplicationState.openURL("https://standardnotes.org");
     } else if(action == "privacy") {
@@ -67,7 +67,7 @@ export default class CompanySection extends Component {
 
         <ButtonCell leftAligned={true} title="Contact Support" onPress={() => this.onAction("feedback")}>
           <View style={{display: "flex", flexDirection: "column"}}>
-            <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 3}}>hello@standardnotes.org</Text>
+            <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 3}}>help@standardnotes.org</Text>
           </View>
         </ButtonCell>
 
