@@ -13,7 +13,8 @@ export default class TextView extends Component {
   }
 
   blur() {
-    UIManager.dispatchViewManagerCommand(findNodeHandle(this.ref), UIManager.SNTextView.Commands.blur, []);
+    let command = UIManager.getViewManagerConfig('SNTextView').Commands.blur;
+    UIManager.dispatchViewManagerCommand(findNodeHandle(this.ref), command, []);
   }
 
   focus() {
