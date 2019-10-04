@@ -120,6 +120,12 @@ export default class Notes extends Abstract {
 
     this.setSideMenuHandler();
 
+    // When this Notes component regains focus we want to make sure to reload Tablet State to ensure the MainSideMenu
+    // is accessible again and doesn't remain locked. During authentication (namely FaceID on iOS),
+    // the componentWillBlur and componentWillFocus events would sometimes cause a race condition that would
+    // result in a locked MainSideMenu. When this Notes component regained focus, the MainSideMenu would remain locked.
+    this.reloadTabletStateForEvent({focus: true})
+
     this.forceUpdate();
   }
 
