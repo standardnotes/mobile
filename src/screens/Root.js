@@ -1,5 +1,6 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component, Platform } from 'react';
 import { TouchableHighlight, View, Text } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import StyleKit from "@Style/StyleKit"
 import Sync from '@SFJS/syncManager'
 import Auth from '@SFJS/authManager'
@@ -37,9 +38,16 @@ export default class Root extends Abstract {
     })
 
     this.applicationStateEventHandler = ApplicationState.get().addEventHandler((event, data) => {
-      // update state to toggle Notes side menu if we triggered the collapse
       if(event == ApplicationState.AppStateEventNoteSideMenuToggle) {
+        // update state to toggle Notes side menu if we triggered the collapse
         this.setState({notesListCollapsed: data.new_isNoteSideMenuCollapsed});
+      }
+      else if(event == ApplicationState.KeyboardChangeEvent) {
+        // need to refresh the height of the keyboard when it opens so that we can change the position
+        // of the sidebar collapse icon
+        if(ApplicationState.get().isInTabletMode) {
+          this.setState({keyboardHeight: ApplicationState.get().getKeyboardHeight()});
+        }
       }
     })
 
@@ -274,7 +282,8 @@ export default class Root extends Abstract {
       x: e.nativeEvent.layout.x,
       y: e.nativeEvent.layout.y,
       shouldSplitLayout: ApplicationState.get().isInTabletMode,
-      notesListCollapsed: ApplicationState.get().isNoteSideMenuCollapsed
+      notesListCollapsed: ApplicationState.get().isNoteSideMenuCollapsed,
+      keyboardHeight: ApplicationState.get().getKeyboardHeight()
     });
   }
 
@@ -293,6 +302,14 @@ export default class Root extends Abstract {
 
     let notesStyles = shouldSplitLayout ? [this.styles.left, {width: notesListCollapsed ? 0 : "40%"}] : [StyleKit.styles.container, {flex: 1}];
     let composeStyles = shouldSplitLayout ? [this.styles.right, {width: notesListCollapsed ? "100%" : "60%"}] : null;
+
+    const collapseIconPrefix = StyleKit.platformIconPrefix();
+    const iconNames = { 
+      md: ["arrow-dropright", "arrow-dropleft"],
+      ios: ["arrow-forward", "arrow-back"]
+    };
+    let collapseIconName = collapseIconPrefix + "-" + iconNames[collapseIconPrefix][notesListCollapsed ? 0 : 1];
+    let collapseIconBottomPosition = this.state.keyboardHeight > this.state.height / 2 ? this.state.keyboardHeight : "50%";
 
     return (
       <View onLayout={this.onLayout} style={[StyleKit.styles.container, this.styles.root]}>
@@ -314,11 +331,11 @@ export default class Root extends Abstract {
             />
 
             <TouchableHighlight 
-              underlayColor={StyleKit.variable("stylekitBorderColor")}
-              style={[StyleKit.styles.contrastBackground, this.styles.toggleButton]} 
+              underlayColor={StyleKit.variable("stylekitBackgroundColor")}
+              style={[StyleKit.styles.contrastBackground, this.styles.toggleButton, {bottom: collapseIconBottomPosition}]} 
               onPress={this.toggleNoteSideMenu}>
               <View>
-                <Text style={[this.styles.toggleButtonText]}>{notesListCollapsed ? ">" : "<"}</Text>
+                <Icon name={collapseIconName} size={24} color={StyleKit.variable("stylekitInfoColor")} />
               </View>
             </TouchableHighlight>
           </View>
@@ -344,13 +361,8 @@ export default class Root extends Abstract {
         justifyContent: "center",
         position: "absolute",
         left: 0,
-        top: "50%",
-        height: 25,
         padding: 2,
-        marginTop: -12.5
-      },
-      toggleButtonText: {
-        color: StyleKit.variables.stylekitInfoColor
+        marginTop: -12
       }
     }
   }
