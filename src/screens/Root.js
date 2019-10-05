@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { View } from 'react-native';
+import { TouchableHighlight, View, Text } from 'react-native';
 import StyleKit from "@Style/StyleKit"
 import Sync from '@SFJS/syncManager'
 import Auth from '@SFJS/authManager'
@@ -33,6 +33,13 @@ export default class Root extends Abstract {
         if(this.dataLoaded) {
           Sync.get().sync();
         }
+      }
+    })
+
+    this.applicationStateEventHandler = ApplicationState.get().addEventHandler((event, data) => {
+      // update state to toggle Notes side menu if we triggered the collapse
+      if(event == ApplicationState.AppStateEventNoteSideMenuToggle) {
+        this.setState({notesListCollapsed: data.new_isNoteSideMenuCollapsed});
       }
     })
 
@@ -123,6 +130,7 @@ export default class Root extends Abstract {
   componentWillUnmount() {
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
+    ApplicationState.get().removeEventHandler(this.applicationStateEventHandler);
     Sync.get().removeEventHandler(this.syncEventHandler);
     Sync.get().removeSyncStatusObserver(this.syncStatusObserver);
     clearInterval(this.syncTimer);
@@ -265,17 +273,26 @@ export default class Root extends Abstract {
       height: e.nativeEvent.layout.height,
       x: e.nativeEvent.layout.x,
       y: e.nativeEvent.layout.y,
-      shouldSplitLayout: ApplicationState.get().isInTabletMode
+      shouldSplitLayout: ApplicationState.get().isInTabletMode,
+      notesListCollapsed: ApplicationState.get().isNoteSideMenuCollapsed
     });
+  }
+
+  toggleNoteSideMenu = () => {
+    if(!ApplicationState.get().isInTabletMode) {
+      return;
+    }
+
+    ApplicationState.get().setNoteSideMenuCollapsed(!ApplicationState.get().isNoteSideMenuCollapsed)
   }
 
   render() {
     /* Don't render LockedView here since we need this.notesRef as soon as we can (for componentWillFocus callback) */
 
-    let shouldSplitLayout = ApplicationState.get().isInTabletMode;
+    let {shouldSplitLayout, notesListCollapsed} = this.state;
 
-    let notesStyles = shouldSplitLayout ? [this.styles.left, {width: shouldSplitLayout ? "40%" : 0}] : [StyleKit.styles.container, {flex: 1}];
-    let composeStyles = shouldSplitLayout ? [this.styles.right, {width: shouldSplitLayout ? "60%" : "100%"}] : null;
+    let notesStyles = shouldSplitLayout ? [this.styles.left, {width: notesListCollapsed ? 0 : "40%"}] : [StyleKit.styles.container, {flex: 1}];
+    let composeStyles = shouldSplitLayout ? [this.styles.right, {width: notesListCollapsed ? "100%" : "60%"}] : null;
 
     return (
       <View onLayout={this.onLayout} style={[StyleKit.styles.container, this.styles.root]}>
@@ -295,6 +312,15 @@ export default class Root extends Abstract {
               selectedTagId={this.state.selectedTagId}
               navigation={this.props.navigation}
             />
+
+            <TouchableHighlight 
+              underlayColor={StyleKit.variable("stylekitBorderColor")}
+              style={[StyleKit.styles.contrastBackground, this.styles.toggleButton]} 
+              onPress={this.toggleNoteSideMenu}>
+              <View>
+                <Text style={[this.styles.toggleButtonText]}>{notesListCollapsed ? ">" : "<"}</Text>
+              </View>
+            </TouchableHighlight>
           </View>
         }
       </View>
@@ -313,6 +339,18 @@ export default class Root extends Abstract {
       },
       right: {
 
+      },
+      toggleButton: {
+        justifyContent: "center",
+        position: "absolute",
+        left: 0,
+        top: "50%",
+        height: 25,
+        padding: 2,
+        marginTop: -12.5
+      },
+      toggleButtonText: {
+        color: StyleKit.variables.stylekitInfoColor
       }
     }
   }
