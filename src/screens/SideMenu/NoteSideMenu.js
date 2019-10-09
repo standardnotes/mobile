@@ -197,7 +197,6 @@ export default class NoteSideMenu extends AbstractSideMenu {
       options = options.concat([
         {
           text: "Restore",
-          textClass: "info",
           key: "restore-note",
           onSelect: () => {
             this.runAction(ItemActionManager.RestoreEvent);
