@@ -24,7 +24,7 @@ export default class Root extends Abstract {
   shouldPresentSplash() {
     // Prohibit offline functionality for first time users only (no notes)
     let offline = Auth.get().offline();
-    let numNotes = ModelManager.get().notes.length;
+    let numNotes = ModelManager.get().noteCount();
     return offline && numNotes == 0;
   }
 

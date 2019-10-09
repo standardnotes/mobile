@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, KeyboardAvoidingView, SafeAreaView, ScrollView, Image, BackHandler } from 'react-native';
+import { View, Text, KeyboardAvoidingView, SafeAreaView, ScrollView, Image, BackHandler, Keyboard } from 'react-native';
 import StyleKit from "@Style/StyleKit"
 import Abstract from "@Screens/Abstract"
 import ApplicationState from "@Lib/ApplicationState"
@@ -16,6 +16,12 @@ export default class Splash extends Abstract {
   componentDidMount() {
     super.componentDidMount();
     BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+  }
+
+  componentDidFocus() {
+    super.componentDidFocus();
+    // Tablets have Compose default to new note
+    Keyboard.dismiss();
   }
 
   componentWillUnmount() {

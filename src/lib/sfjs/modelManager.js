@@ -86,6 +86,10 @@ export default class ModelManager extends SFModelManager {
     return Storage.get().deleteModel(item);
   }
 
+  noteCount() {
+    return this.notes.filter((n) => !n.dummy).length;
+  }
+
   /* Be sure not to use just findItems in your views, because those won't find system smart tags */
   getTagsWithIds(ids) {
     let tagMatches = ModelManager.get().findItems(ids);
