@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, KeyboardAvoidingView, SafeAreaView, ScrollView, Image } from 'react-native';
+import { View, Text, KeyboardAvoidingView, SafeAreaView, ScrollView, Image, BackHandler } from 'react-native';
 import StyleKit from "@Style/StyleKit"
 import Abstract from "@Screens/Abstract"
 import ApplicationState from "@Lib/ApplicationState"
@@ -10,14 +10,28 @@ export default class Splash extends Abstract {
 
   constructor(props) {
     super(props);
-
     this.state = {}
   }
+
+  componentDidMount() {
+    super.componentDidMount();
+    BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+  }
+
+  onBackButtonPressAndroid = () => {
+    // Disable back press
+    return true;
+  };
 
   render() {
     return (
       <SafeAreaView style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
-        <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column',justifyContent: 'center'}} behavior="padding">
+        <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column',justifyContent: 'center'}} behavior={ApplicationState.isAndroid ? null : 'padding'}>
           <ScrollView style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
             <View style={this.styles.headerContainer}>
               <Image style={this.styles.image} source={require('@Style/Images/sn-splash-logo.png')}/>
@@ -46,7 +60,8 @@ export default class Splash extends Abstract {
         alignItems: 'center',
         textAlign: "center",
         paddingTop: 20,
-        padding: 15
+        padding: 15,
+        color: StyleKit.variables.stylekitForegroundColor
       },
       image: {
         width: 175,
@@ -58,11 +73,13 @@ export default class Splash extends Abstract {
         fontSize: 30,
         fontWeight: "500",
         textAlign: "center",
+        color: StyleKit.variables.stylekitForegroundColor
       },
       headerSecondLine: {
         fontSize: 30,
         fontWeight: "500",
         textAlign: "center",
+        color: StyleKit.variables.stylekitForegroundColor
       },
       headerBrandText: {
         color: StyleKit.variables.stylekitInfoColor,
@@ -73,8 +90,8 @@ export default class Splash extends Abstract {
         fontSize: 14,
         marginTop: 6,
         textAlign: "center",
+        color: StyleKit.variables.stylekitForegroundColor
       }
     }
   }
-
 }
