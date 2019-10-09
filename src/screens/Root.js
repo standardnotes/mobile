@@ -325,7 +325,7 @@ export default class Root extends Abstract {
     let composeStyles = shouldSplitLayout ? [this.styles.right, {width: notesListCollapsed ? "100%" : "60%"}] : null;
 
     const collapseIconPrefix = StyleKit.platformIconPrefix();
-    const iconNames = { 
+    const iconNames = {
       md: ["arrow-dropright", "arrow-dropleft"],
       ios: ["arrow-forward", "arrow-back"]
     };
@@ -351,12 +351,12 @@ export default class Root extends Abstract {
               navigation={this.props.navigation}
             />
 
-            <TouchableHighlight 
+            <TouchableHighlight
               underlayColor={StyleKit.variable("stylekitBackgroundColor")}
-              style={[StyleKit.styles.contrastBackground, this.styles.toggleButton, {bottom: collapseIconBottomPosition}]} 
+              style={[this.styles.toggleButtonContainer, this.styles.toggleButton, {bottom: collapseIconBottomPosition}]}
               onPress={this.toggleNoteSideMenu}>
               <View>
-                <Icon name={collapseIconName} size={24} color={StyleKit.variable("stylekitInfoColor")} />
+                <Icon name={collapseIconName} size={24} color={StyleKit.hexToRGBA(StyleKit.variables.stylekitInfoColor, 0.85)} />
               </View>
             </TouchableHighlight>
           </View>
@@ -378,11 +378,16 @@ export default class Root extends Abstract {
       right: {
 
       },
+      toggleButtonContainer: {
+        backgroundColor: StyleKit.hexToRGBA(StyleKit.variables.stylekitContrastBackgroundColor, 0.5)
+      },
       toggleButton: {
         justifyContent: "center",
         position: "absolute",
         left: 0,
-        padding: 2,
+        padding: 7,
+        borderTopRightRadius: 4,
+        borderBottomRightRadius: 4,
         marginTop: -12
       }
     }
