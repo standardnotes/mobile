@@ -89,8 +89,14 @@ export default class KeysManager {
     return this.loadInitialDataPromise;
   }
 
-  isFirstRun() {
-    return this.firstRun;
+  async isFirstRun() {
+    // First run depends on AsyncStorage returning null for FirstRunKey. But what if
+    // AsyncStorage returns null by mistake due to a regression in the library, or an exception?
+    // We want to be more careful with this, as we delete all data on FirstRun.
+    // In addition to this key, we'll make sure that storageManager.getAllModelKeys.length is 0.
+    // This way, if this.firstRun happens to be true, but we have some models, we don't take any destructive action.
+    let numModels = (await Storage.get().getAllModelKeys()).length;
+    return this.firstRun && numModels == 0;
   }
 
   async handleFirstRun() {

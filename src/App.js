@@ -183,7 +183,7 @@ export default class App extends Component {
       this.setState({ready: true});
     }
 
-    if(KeysManager.get().isFirstRun()) {
+    if(await KeysManager.get().isFirstRun()) {
       KeysManager.get().handleFirstRun().then(ready);
     } else {
       ready();
