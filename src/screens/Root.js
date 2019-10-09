@@ -21,6 +21,17 @@ export default class Root extends Abstract {
     this.registerObservers();
   }
 
+  shouldPresentSplash() {
+    // Prohibit offline functionality for first time users only (no notes)
+    let offline = Auth.get().offline();
+    let numNotes = ModelManager.get().notes.length;
+    return offline && numNotes == 0;
+  }
+
+  presentSplash() {
+    this.props.navigation.navigate("Splash");
+  }
+
   registerObservers() {
 
     this.stateObserver = ApplicationState.get().addStateObserver((state) => {
@@ -37,7 +48,12 @@ export default class Root extends Abstract {
     })
 
     this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
-     if(event == "sync-session-invalid") {
+      if(event == "local-data-loaded") {
+        if(this.shouldPresentSplash()) {
+          this.presentSplash();
+        }
+      }
+      else if(event == "sync-session-invalid") {
         if(!this.didShowSessionInvalidAlert) {
           this.didShowSessionInvalidAlert = true;
           AlertManager.get().confirm({
@@ -87,6 +103,10 @@ export default class Root extends Abstract {
         ApplicationState.getOptions().reset(notifyObservers);
         this.reloadOptionsToDefault();
         ApplicationState.getOptions().notifyObservers();
+
+        if(this.shouldPresentSplash()) {
+          this.presentSplash();
+        }
       }
     });
 
@@ -111,6 +131,7 @@ export default class Root extends Abstract {
 
   componentDidMount() {
     super.componentDidMount();
+
     if(this.authOnMount) {
       // Perform in timeout to avoid stutter when presenting modal on initial app start.
       setTimeout(() => {
