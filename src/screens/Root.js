@@ -1,5 +1,6 @@
-import React, { Component, Fragment } from 'react';
-import { View } from 'react-native';
+import React, { Component, Platform } from 'react';
+import { TouchableHighlight, View, Text } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import StyleKit from "@Style/StyleKit"
 import Sync from '@SFJS/syncManager'
 import Auth from '@SFJS/authManager'
@@ -43,6 +44,20 @@ export default class Root extends Abstract {
         // we only want to perform sync here if the app is resuming, not if it's a fresh start
         if(this.dataLoaded) {
           Sync.get().sync();
+        }
+      }
+    })
+
+    this.applicationStateEventHandler = ApplicationState.get().addEventHandler((event, data) => {
+      if(event == ApplicationState.AppStateEventNoteSideMenuToggle) {
+        // update state to toggle Notes side menu if we triggered the collapse
+        this.setState({notesListCollapsed: data.new_isNoteSideMenuCollapsed});
+      }
+      else if(event == ApplicationState.KeyboardChangeEvent) {
+        // need to refresh the height of the keyboard when it opens so that we can change the position
+        // of the sidebar collapse icon
+        if(ApplicationState.get().isInTabletMode) {
+          this.setState({keyboardHeight: ApplicationState.get().getKeyboardHeight()});
         }
       }
     })
@@ -144,6 +159,7 @@ export default class Root extends Abstract {
   componentWillUnmount() {
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
+    ApplicationState.get().removeEventHandler(this.applicationStateEventHandler);
     Sync.get().removeEventHandler(this.syncEventHandler);
     Sync.get().removeSyncStatusObserver(this.syncStatusObserver);
     clearInterval(this.syncTimer);
@@ -286,17 +302,35 @@ export default class Root extends Abstract {
       height: e.nativeEvent.layout.height,
       x: e.nativeEvent.layout.x,
       y: e.nativeEvent.layout.y,
-      shouldSplitLayout: ApplicationState.get().isInTabletMode
+      shouldSplitLayout: ApplicationState.get().isInTabletMode,
+      notesListCollapsed: ApplicationState.get().isNoteSideMenuCollapsed,
+      keyboardHeight: ApplicationState.get().getKeyboardHeight()
     });
+  }
+
+  toggleNoteSideMenu = () => {
+    if(!ApplicationState.get().isInTabletMode) {
+      return;
+    }
+
+    ApplicationState.get().setNoteSideMenuCollapsed(!ApplicationState.get().isNoteSideMenuCollapsed)
   }
 
   render() {
     /* Don't render LockedView here since we need this.notesRef as soon as we can (for componentWillFocus callback) */
 
-    let shouldSplitLayout = ApplicationState.get().isInTabletMode;
+    let {shouldSplitLayout, notesListCollapsed} = this.state;
 
-    let notesStyles = shouldSplitLayout ? [this.styles.left, {width: shouldSplitLayout ? "40%" : 0}] : [StyleKit.styles.container, {flex: 1}];
-    let composeStyles = shouldSplitLayout ? [this.styles.right, {width: shouldSplitLayout ? "60%" : "100%"}] : null;
+    let notesStyles = shouldSplitLayout ? [this.styles.left, {width: notesListCollapsed ? 0 : "40%"}] : [StyleKit.styles.container, {flex: 1}];
+    let composeStyles = shouldSplitLayout ? [this.styles.right, {width: notesListCollapsed ? "100%" : "60%"}] : null;
+
+    const collapseIconPrefix = StyleKit.platformIconPrefix();
+    const iconNames = { 
+      md: ["arrow-dropright", "arrow-dropleft"],
+      ios: ["arrow-forward", "arrow-back"]
+    };
+    let collapseIconName = collapseIconPrefix + "-" + iconNames[collapseIconPrefix][notesListCollapsed ? 0 : 1];
+    let collapseIconBottomPosition = this.state.keyboardHeight > this.state.height / 2 ? this.state.keyboardHeight : "50%";
 
     return (
       <View onLayout={this.onLayout} style={[StyleKit.styles.container, this.styles.root]}>
@@ -316,6 +350,15 @@ export default class Root extends Abstract {
               selectedTagId={this.state.selectedTagId}
               navigation={this.props.navigation}
             />
+
+            <TouchableHighlight 
+              underlayColor={StyleKit.variable("stylekitBackgroundColor")}
+              style={[StyleKit.styles.contrastBackground, this.styles.toggleButton, {bottom: collapseIconBottomPosition}]} 
+              onPress={this.toggleNoteSideMenu}>
+              <View>
+                <Icon name={collapseIconName} size={24} color={StyleKit.variable("stylekitInfoColor")} />
+              </View>
+            </TouchableHighlight>
           </View>
         }
       </View>
@@ -334,6 +377,13 @@ export default class Root extends Abstract {
       },
       right: {
 
+      },
+      toggleButton: {
+        justifyContent: "center",
+        position: "absolute",
+        left: 0,
+        padding: 2,
+        marginTop: -12
       }
     }
   }

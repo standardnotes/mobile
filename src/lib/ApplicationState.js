@@ -32,6 +32,7 @@ export default class ApplicationState {
 
   /* Seperate events, unrelated to app state notifications */
   static AppStateEventTabletModeChange = "AppStateEventTabletModeChange";
+  static AppStateEventNoteSideMenuToggle = "AppStateEventNoteSideMenuToggle";
   static KeyboardChangeEvent = "KeyboardChangeEvent";
 
   static instance = null;
@@ -128,6 +129,20 @@ export default class ApplicationState {
       this.notifyEvent(
         ApplicationState.AppStateEventTabletModeChange,
         {new_isInTabletMode: enabled, old_isInTabletMode: !enabled}
+      );
+    }
+  }
+
+  get isNoteSideMenuCollapsed() {
+    return this.noteSideMenuCollapsed;
+  }
+
+  setNoteSideMenuCollapsed(collapsed) {
+    if(collapsed != this.noteSideMenuCollapsed) {
+      this.noteSideMenuCollapsed = collapsed;
+      this.notifyEvent(
+        ApplicationState.AppStateEventNoteSideMenuToggle,
+        {new_isNoteSideMenuCollapsed: collapsed, old_isNoteSideMenuCollapsed: !collapsed}
       );
     }
   }

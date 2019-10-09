@@ -519,9 +519,12 @@ export default class StyleKit {
     }
   }
 
+  static platformIconPrefix() {
+    return Platform.OS == "android" ? "md" : "ios";
+  }
+
   static nameForIcon(iconName) {
-    const iconPrefix = Platform.OS == "android" ? "md" : "ios";
-    return iconPrefix + "-" + iconName;
+    return StyleKit.platformIconPrefix() + "-" + iconName;
   }
 
   static getColorLuminosity(hexCode) {
