@@ -217,6 +217,7 @@ export default class KeysManager {
         this.legacy_fingerprint = keys.fingerprint;
         this.biometricPrefs.enabled = keys.fingerprint.enabled;
         this.biometricPrefs.timing = keys.fingerprint.timing;
+        delete keys.fingerprint;
       }
 
       if(keys.encryptedAccountKeys) {
@@ -307,7 +308,7 @@ export default class KeysManager {
   }
 
   hasAccountKeys() {
-    return _.keys(this.accountKeys).length > 0;
+    return this.accountKeys && this.accountKeys.mk != null;
   }
 
   isOfflineEncryptionEnabled() {
