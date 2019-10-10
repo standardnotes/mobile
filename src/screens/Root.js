@@ -170,21 +170,25 @@ export default class Root extends Abstract {
   componentWillFocus() {
     super.componentWillFocus();
     this.notesRef && this.notesRef.componentWillFocus();
+    this.composeRef && this.composeRef.componentWillFocus();
   }
 
   componentDidFocus() {
     super.componentDidFocus();
     this.notesRef && this.notesRef.componentDidFocus();
+    this.composeRef && this.composeRef.componentDidFocus();
   }
 
   componentDidBlur() {
     super.componentDidBlur();
     this.notesRef && this.notesRef.componentDidBlur();
+    this.composeRef && this.composeRef.componentDidBlur();
   }
 
   componentWillBlur() {
     super.componentWillBlur();
     this.notesRef && this.notesRef.componentWillBlur();
+    this.composeRef && this.composeRef.componentWillBlur();
   }
 
   loadInitialState() {
@@ -278,7 +282,7 @@ export default class Root extends Abstract {
   }
 
   onNoteSelect = (note) => {
-    this.composer.setNote(note);
+    this.composeRef.setNote(note);
     this.setState({selectedTagId: this.notesRef.options.selectedTagIds.length && this.notesRef.options.selectedTagIds[0]});
   }
 
@@ -346,7 +350,7 @@ export default class Root extends Abstract {
         {shouldSplitLayout &&
           <View style={composeStyles}>
             <Compose
-              ref={(ref) => {this.composer = ref}}
+              ref={(ref) => {this.composeRef = ref}}
               selectedTagId={this.state.selectedTagId}
               navigation={this.props.navigation}
             />

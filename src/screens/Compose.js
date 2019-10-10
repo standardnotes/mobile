@@ -59,6 +59,12 @@ export default class Compose extends Abstract {
     this.registerObservers();
   }
 
+  componentDidMount() {
+    super.componentDidMount();
+    // On tablet, willFocus/didFocus not called on initial launch, causing right side menu to not render. So we'll set handler here.
+    this.setSideMenuHandler();
+  }
+
   registerObservers() {
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
 
