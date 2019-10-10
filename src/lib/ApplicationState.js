@@ -312,8 +312,8 @@ export default class ApplicationState {
 
   shouldLockApplication() {
     var showPasscode = KeysManager.get().hasOfflinePasscode() && KeysManager.get().passcodeTiming == "immediately";
-    var showFingerprint = KeysManager.get().hasFingerprint() && KeysManager.get().fingerprintTiming == "immediately";
-    return showPasscode || showFingerprint;
+    var showBiometrics = KeysManager.get().hasBiometrics() && KeysManager.get().biometricPrefs.timing == "immediately";
+    return showPasscode || showBiometrics;
   }
 
   lockApplication() {
@@ -353,9 +353,9 @@ export default class ApplicationState {
     }
 
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
-    var hasFingerprint = KeysManager.get().hasFingerprint();
+    var hasBiometrics = KeysManager.get().hasBiometrics();
 
-    var showPasscode = hasPasscode, showFingerprint = hasFingerprint;
+    var showPasscode = hasPasscode, showBiometrics = hasBiometrics;
 
     if(
       state == ApplicationState.Backgrounding ||
@@ -363,14 +363,14 @@ export default class ApplicationState {
       state == ApplicationState.LosingFocus
     ) {
       showPasscode = hasPasscode && KeysManager.get().passcodeTiming == "immediately";
-      showFingerprint = hasFingerprint && KeysManager.get().fingerprintTiming == "immediately";
+      showBiometrics = hasBiometrics && KeysManager.get().biometricPrefs.timing == "immediately";
     }
 
-    var title = showPasscode && showFingerprint ? "Authentication Required" : (showPasscode ? "Passcode Required" : "Fingerprint Required");
+    var title = showPasscode && showBiometrics ? "Authentication Required" : (showPasscode ? "Passcode Required" : "Fingerprint Required");
 
     let sources = [];
     if(showPasscode) { sources.push(new AuthenticationSourceLocalPasscode()); }
-    if(showFingerprint) { sources.push(new AuthenticationSourceBiometric()); }
+    if(showBiometrics) { sources.push(new AuthenticationSourceBiometric()); }
 
     return {
       title: title,

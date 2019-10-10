@@ -31,7 +31,7 @@
     "react-navigation-header-buttons": "^2.1.1",
     "regenerator": "^0.13.3",
     "snjs": "0.2.8",
-    "standard-file-js": "0.3.63",
+    "standard-file-js": "0.3.67",
     "stacktrace-parser": "0.1.4"
   },
   "devDependencies": {

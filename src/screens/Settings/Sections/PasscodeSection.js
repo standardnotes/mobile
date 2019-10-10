@@ -38,7 +38,7 @@ export default class PasscodeSection extends Component {
   }
 
   onFingerprintOptionPress = (option) => {
-    KeysManager.get().setFingerprintTiming(option.key);
+    KeysManager.get().setBiometricsTiming(option.key);
     this.forceUpdate();
   }
 
@@ -66,11 +66,11 @@ export default class PasscodeSection extends Component {
 
     var biometricsNoun = this.state.biometricsNoun;
 
-    var fingerprintTitle = this.props.hasFingerprint ? `Disable ${biometricsNoun} Lock` : `Enable ${biometricsNoun} Lock`;
-    var fingerprintOnPress = this.props.hasFingerprint ? this.props.onFingerprintDisable : this.props.onFingerprintEnable;
+    var fingerprintTitle = this.props.hasBiometrics ? `Disable ${biometricsNoun} Lock` : `Enable ${biometricsNoun} Lock`;
+    var fingerprintOnPress = this.props.hasBiometrics ? this.props.onFingerprintDisable : this.props.onFingerprintEnable;
 
     var passcodeOptions = KeysManager.get().getPasscodeTimingOptions();
-    var fingerprintOptions = KeysManager.get().getFingerprintTimingOptions();
+    var fingerprintOptions = KeysManager.get().getBiometricsTimingOptions();
 
     if(!this.state.fingerprintAvailable) {
       fingerprintTitle = "Enable Fingerprint Lock (Not Available)"
@@ -89,13 +89,13 @@ export default class PasscodeSection extends Component {
 
         <ButtonCell leftAligned={true} title={passcodeTitle} onPress={passcodeOnPress} />
 
-        <ButtonCell last={!this.props.hasFingerprint && !this.props.hasPasscode} disabled={!this.state.fingerprintAvailable} leftAligned={true} title={fingerprintTitle} onPress={fingerprintOnPress} />
+        <ButtonCell last={!this.props.hasBiometrics && !this.props.hasPasscode} disabled={!this.state.fingerprintAvailable} leftAligned={true} title={fingerprintTitle} onPress={fingerprintOnPress} />
 
         {this.props.hasPasscode &&
-          <SectionedOptionsTableCell last={!this.props.hasFingerprint} title={"Require Passcode"} options={passcodeOptions} onPress={this.onPasscodeOptionPress}/>
+          <SectionedOptionsTableCell last={!this.props.hasBiometrics} title={"Require Passcode"} options={passcodeOptions} onPress={this.onPasscodeOptionPress}/>
         }
 
-        {this.props.hasFingerprint &&
+        {this.props.hasBiometrics &&
           <SectionedOptionsTableCell last={true} title={`Require ${biometricsNoun}`} options={fingerprintOptions} onPress={this.onFingerprintOptionPress}/>
         }
 

@@ -9,6 +9,7 @@ import AlertManager from "@SFJS/alertManager"
 import Keychain from "./keychain"
 
 let OfflineParamsKey = "pc_params";
+let BiometricsPrefs = "biometrics_prefs";
 let FirstRunKey = "first_run";
 let StorageEncryptionKey = "storage_encryption";
 
@@ -25,11 +26,50 @@ export default class KeysManager {
   }
 
   constructor() {
+    this.biometricPrefs = {};
     this.accountRelatedStorageKeys = ["auth_params", "user"];
   }
 
+  async runPendingMigrations() {
+    const migrationName = "10102019KeychainToStorage";
+    if((await Storage.get().getItem(migrationName)) == null) {
+      console.log("Running migration", migrationName);
+      await this.migrateKeychainPrefsToStorage();
+      await Storage.get().setItem(migrationName, "true");
+    }
+  }
+
+  async migrateKeychainPrefsToStorage() {
+    // Move JWT from keychain to user (we want to go away on app uninstall rather than persist)
+    let jwt = this.activeKeys() && this.activeKeys().jwt;
+    if(jwt) {
+      this.user.jwt = jwt;
+      this.activeKeys().jwt = null;
+      await this.saveUser(this.user);
+    }
+
+    // Move biometrics preference to storage
+    if(this.legacy_fingerprint) {
+      this.biometricPrefs.enabled = this.legacy_fingerprint.enabled;
+      this.biometricPrefs.timing = this.legacy_fingerprint.timing;
+      await this.saveBiometricPrefs();
+      this.legacy_fingerprint = null;
+    }
+
+    if(jwt || this.legacy_fingerprint) {
+      await this.persistKeysToKeychain();
+    }
+  }
+
   async loadInitialData() {
-    var storageKeys = ["auth_params", OfflineParamsKey, "user", FirstRunKey, StorageEncryptionKey];
+    let storageKeys = [
+      "auth_params",
+      "user",
+      OfflineParamsKey,
+      FirstRunKey,
+      StorageEncryptionKey,
+      BiometricsPrefs
+    ];
 
     /*
       We only want to call this once per app session. On Android, the App.js component may be unmounted
@@ -55,6 +95,11 @@ export default class KeysManager {
         var authParams = items.auth_params;
         if(authParams) {
           this.accountAuthParams = JSON.parse(authParams);
+        }
+
+        let biometricPrefs = items[BiometricsPrefs];
+        if(biometricPrefs) {
+          this.biometricPrefs = JSON.parse(biometricPrefs);
         }
 
         // offline params
@@ -84,7 +129,13 @@ export default class KeysManager {
           this.user = {};
         }
       })
-    ])
+    ]).then(() => {
+      // We only want to run migrations in unlocked app state. If account keys are present, run now,
+      // otherwise wait until offline keys have been set so that account keys are decrypted.
+      if(!this.encryptedAccountKeys) {
+        return this.runPendingMigrations();
+      }
+    })
 
     return this.loadInitialDataPromise;
   }
@@ -117,7 +168,10 @@ export default class KeysManager {
         this.parseKeychainValue(null);
         this.accountAuthParams = null;
         this.user = null;
-        Storage.get().setItem(FirstRunKey, "false");
+        await Storage.get().setItem(FirstRunKey, "false");
+      },
+      onCancel: async () => {
+        await Storage.get().setItem(FirstRunKey, "false");
       }
     })
   }
@@ -155,9 +209,11 @@ export default class KeysManager {
         this.passcodeTiming = this.offlineKeys.timing;
       }
 
+      // Legacy, migrated to Storage
       if(keys.fingerprint) {
-        this.fingerprintEnabled = keys.fingerprint.enabled;
-        this.fingerprintTiming = keys.fingerprint.timing;
+        this.legacy_fingerprint = keys.fingerprint;
+        this.biometricPrefs.enabled = keys.fingerprint.enabled;
+        this.biometricPrefs.timing = keys.fingerprint.timing;
       }
 
       if(keys.encryptedAccountKeys) {
@@ -166,7 +222,7 @@ export default class KeysManager {
         // keys we can use to decrypt encryptedAccountKeys
         this.encryptedAccountKeys = keys.encryptedAccountKeys;
       } else {
-        this.accountKeys = _.omit(keys, ["offline", "fingerprint"]);
+        this.accountKeys = _.omit(keys, ["offline"]);
         if(_.keys(this.accountKeys).length == 0) {
           this.accountKeys = null;
         }
@@ -174,15 +230,13 @@ export default class KeysManager {
     } else {
       this.offlineKeys = null;
       this.passcodeTiming = null;
-      this.fingerprintEnabled = null;
-      this.fingerprintTiming = null;
       this.accountKeys = null;
     }
   }
 
   // what we should write to keychain
   async generateKeychainStoreValue() {
-    var value = {fingerprint: {enabled: this.fingerprintEnabled, timing: this.fingerprintTiming}};
+    let value = {};
 
     if(this.accountKeys) {
       // If offline local passcode keys are available, use that to encrypt account keys
@@ -220,8 +274,8 @@ export default class KeysManager {
     }
 
     var hasImmediatePasscode = this.hasOfflinePasscode() && this.passcodeTiming == "immediately";
-    var hasImmedateFingerprint = this.hasFingerprint() && this.fingerprintTiming == "immediately";
-    var enabled = hasImmediatePasscode || hasImmedateFingerprint;
+    var hasImmedateBiometrics = this.hasBiometrics() && this.biometricPrefs.timing == "immediately";
+    var enabled = hasImmediatePasscode || hasImmedateBiometrics;
 
     if(enabled) {
       FlagSecure.activate();
@@ -278,8 +332,7 @@ export default class KeysManager {
   }
 
   jwt() {
-    var keys = this.activeKeys();
-    return keys && keys.jwt;
+    return this.user && this.user.jwt;
   }
 
 
@@ -403,6 +456,7 @@ export default class KeysManager {
       } else {
         this.accountKeys = decryptedKeys.content.accountKeys;
         this.encryptedAccountKeys = null;
+        await this.runPendingMigrations();
       }
     }
   }
@@ -415,8 +469,8 @@ export default class KeysManager {
     return this.offlineKeys && this.offlineKeys.pw !== null;
   }
 
-  hasFingerprint() {
-    return this.fingerprintEnabled;
+  hasBiometrics() {
+    return this.biometricPrefs.enabled;
   }
 
   async setPasscodeTiming(timing) {
@@ -424,22 +478,26 @@ export default class KeysManager {
     return this.persistKeysToKeychain();
   }
 
-  async setFingerprintTiming(timing) {
-    this.fingerprintTiming = timing;
-    return this.persistKeysToKeychain();
+  async setBiometricsTiming(timing) {
+    this.biometricPrefs.timing = timing;
+    return this.saveBiometricPrefs();
   }
 
-  async enableFingerprint() {
-    this.fingerprintEnabled = true;
-    if(!this.fingerprintTiming) {
-      this.fingerprintTiming = "on-quit";
+  async enableBiometrics() {
+    this.biometricPrefs.enabled = true;
+    if(!this.biometricPrefs.timing) {
+      this.biometricPrefs.timing = "on-quit";
     }
-    return this.persistKeysToKeychain();
+    return this.saveBiometricPrefs();
   }
 
-  async disableFingerprint() {
-    this.fingerprintEnabled = false;
-    return this.persistKeysToKeychain();
+  async disableBiometrics() {
+    this.biometricPrefs.enabled = false;
+    return this.saveBiometricPrefs();
+  }
+
+  async saveBiometricPrefs() {
+    return Storage.get().setItem(BiometricsPrefs, JSON.stringify(this.biometricPrefs));
   }
 
   getPasscodeTimingOptions() {
@@ -449,10 +507,10 @@ export default class KeysManager {
     ]
   }
 
-  getFingerprintTimingOptions() {
+  getBiometricsTimingOptions() {
     return [
-      {title: "Immediately", key: "immediately", selected: this.fingerprintTiming == "immediately"},
-      {title: "On Quit", key: "on-quit", selected: this.fingerprintTiming == "on-quit"},
+      {title: "Immediately", key: "immediately", selected: this.biometricPrefs.timing == "immediately"},
+      {title: "On Quit", key: "on-quit", selected: this.biometricPrefs.timing == "on-quit"},
     ]
   }
 

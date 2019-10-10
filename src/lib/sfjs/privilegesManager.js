@@ -32,8 +32,8 @@ export default class PrivilegesManager extends SFPrivilegesManager {
       },
       hasLocalPasscode: async () => {
         let hasPasscode = KeysManager.get().hasOfflinePasscode();
-        let hasFingerprint = KeysManager.get().hasFingerprint();
-        return hasPasscode || hasFingerprint;
+        let hasBiometrics = KeysManager.get().hasBiometrics();
+        return hasPasscode || hasBiometrics;
       },
       saveToStorage: async (key, value) => {
         return Storage.get().setItem(key, value);
@@ -96,10 +96,10 @@ export default class PrivilegesManager extends SFPrivilegesManager {
         return [new AuthenticationSourceAccountPassword()];
       } else if(credential == SFPrivilegesManager.CredentialLocalPasscode) {
         var hasPasscode = KeysManager.get().hasOfflinePasscode();
-        var hasFingerprint = KeysManager.get().hasFingerprint();
+        var hasBiometrics = KeysManager.get().hasBiometrics();
         let sources = [];
         if(hasPasscode) {sources.push(new AuthenticationSourceLocalPasscode());}
-        if(hasFingerprint) {sources.push(new AuthenticationSourceBiometric());}
+        if(hasBiometrics) {sources.push(new AuthenticationSourceBiometric());}
         return sources;
       }
     }

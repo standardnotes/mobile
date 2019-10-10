@@ -57,6 +57,7 @@ export default class Settings extends Abstract {
         rightButton: {
           title: "Destroy Data",
           onPress: () => {
+            Storage.get().clear();
             Auth.get().signout();
             KeysManager.get().clearOfflineKeysAndData(true);
           }
@@ -82,9 +83,9 @@ export default class Settings extends Abstract {
 
   loadSecurityStatus() {
     var hasPasscode = KeysManager.get().hasOfflinePasscode();
-    var hasFingerprint = KeysManager.get().hasFingerprint();
+    var hasBiometrics = KeysManager.get().hasBiometrics();
     var encryptedStorage = KeysManager.get().isStorageEncryptionEnabled();
-    this.mergeState({hasPasscode: hasPasscode, hasFingerprint: hasFingerprint, storageEncryption: encryptedStorage})
+    this.mergeState({hasPasscode: hasPasscode, hasBiometrics: hasBiometrics, storageEncryption: encryptedStorage})
   }
 
   componentWillUnmount() {
@@ -214,13 +215,13 @@ export default class Settings extends Abstract {
   }
 
   onFingerprintEnable = () => {
-    KeysManager.get().enableFingerprint();
+    KeysManager.get().enableBiometrics();
     this.loadSecurityStatus();
   }
 
   onFingerprintDisable = () => {
     this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManagePasscode, () => {
-      KeysManager.get().disableFingerprint();
+      KeysManager.get().disableBiometrics();
       this.loadSecurityStatus();
     });
   }
@@ -313,7 +314,7 @@ export default class Settings extends Abstract {
 
           <PasscodeSection
             hasPasscode={this.state.hasPasscode}
-            hasFingerprint={this.state.hasFingerprint}
+            hasBiometrics={this.state.hasBiometrics}
             storageEncryption={this.state.storageEncryption}
             storageEncryptionLoading={this.state.storageEncryptionLoading}
             onStorageEncryptionEnable={this.onStorageEncryptionEnable}

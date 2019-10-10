@@ -78,7 +78,7 @@ export default class ManagePrivileges extends Abstract {
     let availableActions = PrivilegesManager.get().getAvailableActions();
 
     let notConfiguredCredentials = [];
-    let hasLocalAuth = KeysManager.get().hasOfflinePasscode() || KeysManager.get().hasFingerprint();
+    let hasLocalAuth = KeysManager.get().hasOfflinePasscode() || KeysManager.get().hasBiometrics();
     let offline = Auth.get().offline();
     for(let credential of availableCredentials) {
       if(credential == PrivilegesManager.CredentialLocalPasscode && !hasLocalAuth) {
