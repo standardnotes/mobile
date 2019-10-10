@@ -88,7 +88,7 @@ export default class KeysManager {
         }
       }),
 
-      Storage.get().getMultiItems(storageKeys).then((items) => {
+      Storage.get().getMultiItems(storageKeys).then(async (items) => {
         this.missingFirstRunKey = items[FirstRunKey] === null || items[FirstRunKey] === undefined;
 
         // auth params
@@ -129,7 +129,9 @@ export default class KeysManager {
           this.user = {};
         }
       })
-    ]).then(() => {
+    ]).then(async () => {
+      await this.markApplicationAsRan();
+
       // We only want to run migrations in unlocked app state. If account keys are present, run now,
       // otherwise wait until offline keys have been set so that account keys are decrypted.
       if(!this.encryptedAccountKeys) {
@@ -147,6 +149,10 @@ export default class KeysManager {
     let hasKeys = this.activeKeys() != null;
     let noData = this.missingFirstRunKey === true;
     return hasKeys && noData;
+  }
+
+  async markApplicationAsRan() {
+    return Storage.get().setItem(FirstRunKey, "false");
   }
 
   async wipeData() {
@@ -168,10 +174,7 @@ export default class KeysManager {
         this.parseKeychainValue(null);
         this.accountAuthParams = null;
         this.user = null;
-        await Storage.get().setItem(FirstRunKey, "false");
-      },
-      onCancel: async () => {
-        await Storage.get().setItem(FirstRunKey, "false");
+        await this.markApplicationAsRan();
       }
     })
   }
