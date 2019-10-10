@@ -99,6 +99,7 @@ dependencies {
     implementation project(':bugsnag-react-native')
     implementation project(':RNMail')
     implementation project(':SNTextView')
+    implementation project(':standard-notes-rn')
     implementation project(':react-native-keychain')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-aes-crypto')

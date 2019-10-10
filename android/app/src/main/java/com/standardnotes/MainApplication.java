@@ -31,6 +31,7 @@ import com.tectiv3.aes.RCTAesPackage;
 import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 import com.kristiansorens.flagsecure.FlagSecurePackage;
 import com.bugsnag.BugsnagReactNative;
+import org.standardnotes.SNReactNative.SNReactNativePackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +61,8 @@ public class MainApplication extends Application implements ReactApplication {
         new RNMail(),
         new ReactNativeFingerprintScannerPackage(),
         new SNTextViewPackage(),
-        new FlagSecurePackage()
+        new FlagSecurePackage(),
+        new SNReactNativePackage()
       );
     }
 

@@ -7,6 +7,7 @@ import ModelManager from './sfjs/modelManager'
 import Storage from './sfjs/storageManager'
 import AlertManager from "@SFJS/alertManager"
 import Keychain from "./keychain"
+import SNReactNative from 'standard-notes-rn';
 
 let OfflineParamsKey = "pc_params";
 let BiometricsPrefs = "biometrics_prefs";
@@ -130,8 +131,6 @@ export default class KeysManager {
         }
       })
     ]).then(async () => {
-      await this.markApplicationAsRan();
-
       // We only want to run migrations in unlocked app state. If account keys are present, run now,
       // otherwise wait until offline keys have been set so that account keys are decrypted.
       if(!this.encryptedAccountKeys) {
@@ -165,16 +164,18 @@ export default class KeysManager {
 
     return AlertManager.get().confirm({
       title: "Previous Installation",
-      text: `We've detected a previous installation of Standard Notes based on your keychain data. Would you like to wipe all data from previous installation? (If you're seeing this message in error, it might mean we're having issues loading your local database. Please restart the app and try again.)`,
-      confirmButtonText: "Delete Data",
-      cancelButtonText: "Keep Data",
+      text: `We've detected a previous installation of Standard Notes based on your keychain data. You must wipe all data from previous installation to continue.\n\nIf you're seeing this message in error, it might mean we're having issues loading your local database. Please restart the app and try again.`,
+      confirmButtonText: "Delete Local Data",
+      cancelButtonText: "Quit App",
       onConfirm: async () => {
         await Storage.get().clear();
         await Keychain.clearKeys()
         this.parseKeychainValue(null);
         this.accountAuthParams = null;
         this.user = null;
-        await this.markApplicationAsRan();
+      },
+      onCancel: () => {
+        SNReactNative.exitApp();
       }
     })
   }

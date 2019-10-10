@@ -25,3 +25,6 @@
 [submodule "vendor/react-native-alternate-icons"]
 	path = vendor/react-native-alternate-icons
 	url = git@github.com:mobitar/react-native-alternate-icons.git
+[submodule "vendor/standard-notes-rn"]
+	path = vendor/standard-notes-rn
+	url = git@github.com:standardnotes/standard-notes-rn.git

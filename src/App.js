@@ -179,6 +179,7 @@ export default class App extends Component {
     await KeysManager.get().loadInitialData();
 
     let ready = () => {
+      KeysManager.get().markApplicationAsRan();
       ApplicationState.get().receiveApplicationStartEvent();
       this.setState({ready: true});
     }

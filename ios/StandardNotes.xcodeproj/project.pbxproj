@@ -56,6 +56,7 @@
 		CD399CE321E181C7006106AE /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE021E181C6006106AE /* Red.png */; };
 		CD399CE421E181C7006106AE /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE121E181C7006106AE /* Red@3x.png */; };
 		CD399CE521E181C7006106AE /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE221E181C7006106AE /* Red@2x.png */; };
+		CD534871234FD44900FCD828 /* libSNReactNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CD534870234FD43200FCD828 /* libSNReactNative.a */; };
 		CD743C792342ACC700535CC9 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		CD743CCE2342AD3F00535CC9 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		CDB58A201F6C5193009EF868 /* libRNMail.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDB58A161F6C5179009EF868 /* libRNMail.a */; };
@@ -311,6 +312,13 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNStoreReview;
 		};
+		CD53486F234FD43200FCD828 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD534835234FD43200FCD828 /* SNReactNative.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 15209BEF1D250F63000D0F44;
+			remoteInfo = SNReactNative;
+		};
 		CD5AEDE322825CB8002439FB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EC178A0479CE4154896293C3 /* RNCWebView.xcodeproj */;
@@ -532,6 +540,7 @@
 		CD399CE021E181C6006106AE /* Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red.png; sourceTree = "<group>"; };
 		CD399CE121E181C7006106AE /* Red@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@3x.png"; sourceTree = "<group>"; };
 		CD399CE221E181C7006106AE /* Red@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@2x.png"; sourceTree = "<group>"; };
+		CD534835234FD43200FCD828 /* SNReactNative.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SNReactNative.xcodeproj; path = "../vendor/standard-notes-rn/ios/SNReactNative.xcodeproj"; sourceTree = "<group>"; };
 		CDB58A041F6C516B009EF868 /* RCTAes.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAes.xcodeproj; path = "../vendor/react-native-aes/ios/RCTAes.xcodeproj"; sourceTree = "<group>"; };
 		CDB58A0A1F6C5174009EF868 /* ReactNativeFingerprintScanner.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeFingerprintScanner.xcodeproj; path = "../vendor/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.xcodeproj"; sourceTree = "<group>"; };
 		CDB58A101F6C5178009EF868 /* RNMail.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNMail.xcodeproj; path = "../vendor/react-native-mail/RNMail.xcodeproj"; sourceTree = "<group>"; };
@@ -560,6 +569,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD534871234FD44900FCD828 /* libSNReactNative.a in Frameworks */,
 				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
 				CD399CD021E16BD6006106AE /* libReactNativeAlternateIcons.a in Frameworks */,
 				CD17667C1F795DC100165C83 /* libSNTextView.a in Frameworks */,
@@ -781,6 +791,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				CD534835234FD43200FCD828 /* SNReactNative.xcodeproj */,
 				CD399C9921E16BCC006106AE /* ReactNativeAlternateIcons.xcodeproj */,
 				CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */,
 				CDB58A101F6C5178009EF868 /* RNMail.xcodeproj */,
@@ -884,6 +895,14 @@
 			isa = PBXGroup;
 			children = (
 				CD4D91851F7BE11800080678 /* libRNStoreReview.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD534836234FD43200FCD828 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CD534870234FD43200FCD828 /* libSNReactNative.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1224,6 +1243,10 @@
 					ProjectRef = 54ED130E749A46A3B15B27F2 /* RNVectorIcons.xcodeproj */;
 				},
 				{
+					ProductGroup = CD534836234FD43200FCD828 /* Products */;
+					ProjectRef = CD534835234FD43200FCD828 /* SNReactNative.xcodeproj */;
+				},
+				{
 					ProductGroup = CD17664D1F795AE500165C83 /* Products */;
 					ProjectRef = CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */;
 				},
@@ -1468,6 +1491,13 @@
 			fileType = archive.ar;
 			path = libRNStoreReview.a;
 			remoteRef = CD4D91841F7BE11800080678 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD534870234FD43200FCD828 /* libSNReactNative.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSNReactNative.a;
+			remoteRef = CD53486F234FD43200FCD828 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		CD5AEDE422825CB8002439FB /* libRNCWebView.a */ = {
