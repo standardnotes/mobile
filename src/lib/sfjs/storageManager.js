@@ -192,7 +192,7 @@ export default class Storage extends SFStorageManager {
     Each item is saved individually.
   */
   async saveModels(items) {
-    if(items.length == 0) {
+    if(!items || items.length == 0) {
       return;
     }
 

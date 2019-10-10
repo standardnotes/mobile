@@ -5,6 +5,7 @@ import FingerprintScanner from 'react-native-fingerprint-scanner';
 import SF from './sfjs/sfjs'
 import ModelManager from './sfjs/modelManager'
 import Storage from './sfjs/storageManager'
+import AlertManager from "@SFJS/alertManager"
 import Keychain from "./keychain"
 
 let OfflineParamsKey = "pc_params";
@@ -48,8 +49,7 @@ export default class KeysManager {
       }),
 
       Storage.get().getMultiItems(storageKeys).then((items) => {
-        // first run
-        this.firstRun = items[FirstRunKey] === null || items[FirstRunKey] === undefined;
+        this.missingFirstRunKey = items[FirstRunKey] === null || items[FirstRunKey] === undefined;
 
         // auth params
         var authParams = items.auth_params;
@@ -89,34 +89,37 @@ export default class KeysManager {
     return this.loadInitialDataPromise;
   }
 
-  async isFirstRun() {
-    // First run depends on AsyncStorage returning null for FirstRunKey. But what if
-    // AsyncStorage returns null by mistake due to a regression in the library, or an exception?
-    // We want to be more careful with this, as we delete all data on FirstRun.
-    // In addition to this key, we'll make sure that storageManager.getAllModelKeys.length is 0.
-    // This way, if this.firstRun happens to be true, but we have some models, we don't take any destructive action.
-    let numModels = (await Storage.get().getAllModelKeys()).length;
-    return this.firstRun && numModels == 0;
+  async needsWipe() {
+    // Needs wipe if has keys but no data. However, since "no data" can be incorrectly reported by underlying
+    // AsyncStorage failures, we want to confirm with the user before deleting anything.
+
+    let hasKeys = this.activeKeys() != null;
+    let noData = this.missingFirstRunKey === true;
+    return hasKeys && noData;
   }
 
-  async handleFirstRun() {
-    // on first run, clear keys and data.
-    // why? on iOS keychain data is persisted between installs/uninstalls.
-    // this prevents the user from deleting the app and reinstalling if they forgot their local passocde
+  async wipeData() {
+    // On iOS, keychain data is persisted between installs/uninstalls. (https://stackoverflow.com/questions/4747404/delete-keychain-items-when-an-app-is-uninstalled)
+    // This prevents the user from deleting the app and reinstalling if they forgot their local passocde
     // or if fingerprint scanning isn't working. By deleting all data on first run, we allow the user to reset app
     // state after uninstall.
 
-    console.log("===Handling First Run===");
+    console.log("===Wiping Data===");
 
-    return Promise.all([
-      Storage.get().clear(),
-      Keychain.clearKeys()
-    ]).then(function(){
-      this.parseKeychainValue(null);
-      this.accountAuthParams = null;
-      this.user = null;
-      Storage.get().setItem(FirstRunKey, "false");
-    }.bind(this));
+    return AlertManager.get().confirm({
+      title: "Previous Installation",
+      text: `We've detected a previous installation of Standard Notes based on your keychain data. Would you like to wipe all data from previous installation? (If you're seeing this message in error, it might mean we're having issues loading your local database. Please restart the app and try again.)`,
+      confirmButtonText: "Delete Data",
+      cancelButtonText: "Keep Data",
+      onConfirm: async () => {
+        await Storage.get().clear();
+        await Keychain.clearKeys()
+        this.parseKeychainValue(null);
+        this.accountAuthParams = null;
+        this.user = null;
+        Storage.get().setItem(FirstRunKey, "false");
+      }
+    })
   }
 
   /*

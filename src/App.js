@@ -183,8 +183,8 @@ export default class App extends Component {
       this.setState({ready: true});
     }
 
-    if(await KeysManager.get().isFirstRun()) {
-      KeysManager.get().handleFirstRun().then(ready);
+    if(await KeysManager.get().needsWipe()) {
+      KeysManager.get().wipeData().then(ready).catch(ready);
     } else {
       ready();
     }
