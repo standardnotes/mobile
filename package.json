@@ -8,16 +8,15 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "android": "cd ./android && ./gradlew app:assembleDebug && ./gradlew installDebug",
-    "clear-cache": "watchman watch-del-all && rm -rf $TMPDIR/react-native-packager-cache-* && rm -rf $TMPDIR/metro-bundler-cache-*",
-    "test": "jest"
+    "clear-cache": "watchman watch-del-all && rm -rf $TMPDIR/react-native-packager-cache-* && rm -rf $TMPDIR/metro-bundler-cache-*"
   },
   "dependencies": {
     "@react-native-community/async-storage": "1.4.0",
     "base-64": "^0.1.0",
     "bugsnag-react-native": "^2.12.6",
-    "immutable": "^3.8.1",
-    "lodash": "^4.17.11",
-    "moment": "^2.23.0",
+    "immutable": "^3.8.2",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
     "react": "16.8.3",
     "react-native": "0.59.10",
     "react-native-file-viewer": "^1.0.10",
@@ -31,14 +30,12 @@
     "react-navigation-header-buttons": "^2.1.1",
     "regenerator": "^0.13.3",
     "snjs": "0.2.8",
-    "standard-file-js": "0.3.67",
+    "standard-file-js": "0.3.69",
     "stacktrace-parser": "0.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/runtime": "^7.4.5",
-    "babel-jest": "^24.8.0",
-    "jest": "23.6.0",
     "metro-react-native-babel-preset": "^0.54.1",
     "react-test-renderer": "16.8.3"
   },
