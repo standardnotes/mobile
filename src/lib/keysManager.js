@@ -32,23 +32,22 @@ export default class KeysManager {
   }
 
   async runPendingMigrations() {
-    const migrationName = "10102019KeychainToStorage";
-    if((await Storage.get().getItem(migrationName)) == null) {
-      console.log("Running migration", migrationName);
-      await this.migrateKeychainPrefsToStorage();
-      await Storage.get().setItem(migrationName, "true");
+    const biometricsMigrationName = "10102019KeychainToStorage";
+    if((await Storage.get().getItem(biometricsMigrationName)) == null) {
+      console.log("Running migration", biometricsMigrationName);
+      await this.migrateBiometricsPrefsToStorage();
+      await Storage.get().setItem(biometricsMigrationName, "true");
+    }
+
+    const jwtUndoMigration = "10232019JwtToKeychain";
+    if((await Storage.get().getItem(jwtUndoMigration)) == null) {
+      console.log("Running migration", jwtUndoMigration);
+      await this.undoJwtMigration();
+      await Storage.get().setItem(jwtUndoMigration, "true");
     }
   }
 
-  async migrateKeychainPrefsToStorage() {
-    // Move JWT from keychain to user (we want to go away on app uninstall rather than persist)
-    let jwt = this.activeKeys() && this.activeKeys().jwt;
-    if(jwt) {
-      this.user.jwt = jwt;
-      this.activeKeys().jwt = null;
-      await this.saveUser(this.user);
-    }
-
+  async migrateBiometricsPrefsToStorage() {
     // Move biometrics preference to storage
     if(this.legacy_fingerprint) {
       this.biometricPrefs.enabled = this.legacy_fingerprint.enabled;
@@ -57,9 +56,26 @@ export default class KeysManager {
       this.legacy_fingerprint = null;
     }
 
-    if(jwt || this.legacy_fingerprint) {
+    if(this.legacy_fingerprint) {
       await this.persistKeysToKeychain();
     }
+  }
+
+  /*
+    In 10102019KeychainToStorage, we migrated JWT from being stored the keychain to being stored in storage.
+    This was so that when the user uninstalled the app, their JWT would be wiped (rather than retained in the keychain).
+    However, it would be more secure to keep JWT in keychain, even if it persists between uninstalls.
+  */
+  async undoJwtMigration() {
+    let jwt = this.user && this.user.jwt;
+    if(!jwt) {
+      return;
+    }
+
+    this.user.jwt = null;
+    this.activeKeys().jwt = jwt;
+    await this.saveUser(this.user);
+    await this.persistKeysToKeychain();
   }
 
   async loadInitialData() {
@@ -337,7 +353,8 @@ export default class KeysManager {
   }
 
   jwt() {
-    return this.user && this.user.jwt;
+    let keys = this.activeKeys();
+    return keys && keys.jwt;
   }
 
 

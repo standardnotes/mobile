@@ -32,8 +32,8 @@ export default class Auth extends SFAuthManager {
   }
 
   offline() {
-    var user = KeysManager.get().user;
-    return !user || !user.jwt;
+    let keys = KeysManager.get().activeKeys() || {};
+    return !keys.jwt;
   }
 
   async signout(clearAllData) {
@@ -66,9 +66,9 @@ export default class Auth extends SFAuthManager {
     try {
       this._keys = keys;
       return Promise.all([
-        KeysManager.get().persistAccountKeys(keys),
+        KeysManager.get().persistAccountKeys(_.merge(keys, {jwt: response.token})),
         KeysManager.get().setAccountAuthParams(authParams),
-        KeysManager.get().saveUser({server: url, email: email, jwt: response.token})
+        KeysManager.get().saveUser({server: url, email: email})
       ]);
     } catch(e) {
       console.log("Error saving auth paramters", e);
