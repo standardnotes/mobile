@@ -4,6 +4,7 @@ import { WebView } from 'react-native-webview';
 
 import ComponentManager from '@Lib/componentManager'
 import ModelManager from '@Lib/sfjs/modelManager'
+import UserPrefsManager from '@Lib/userPrefsManager'
 
 import StyleKit from "@Style/StyleKit"
 import ApplicationState from "@Lib/ApplicationState"
@@ -45,7 +46,20 @@ export default class ComponentView extends Component {
   componentDidMount() {
     if(Platform.OS == "android" && Platform.Version <= 23) {
       // postMessage doesn't work on Android <= 6 (API version 23) https://github.com/facebook/react-native/issues/11594
-      Alert.alert('Editors Not Supported', `Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.`, [{text: 'OK'}])
+      UserPrefsManager.get().getDontShowAgainEditorsNotSupported().then((dontShowAgain) => {
+        if(dontShowAgain) {
+          return;
+        }
+
+        Alert.alert(
+          'Editors Not Supported',
+          'Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.',
+          [
+            {text: "Don't show again", onPress: () => UserPrefsManager.get().setDontShowAgainEditorsNotSupported()},
+            {text: 'OK'}
+          ]
+        )
+      })
     }
   }
 
