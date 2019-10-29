@@ -2,6 +2,7 @@ import SF from '@SFJS/sfjs'
 import Storage from '@SFJS/storageManager'
 import KeysManager from '@Lib/keysManager'
 import AuthenticationSource from "./AuthenticationSource"
+import StyleKit from "@Style/StyleKit"
 
 export default class AuthenticationSourceLocalPasscode extends AuthenticationSource {
   constructor() {
@@ -11,6 +12,27 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
       this.keyboardType = result || 'default';
       this.requiresInterfaceReload();
     });
+  }
+
+  get headerButtonText() {
+    return this.isWaitingForInput() && "Change Keyboard";
+  }
+
+  get headerButtonStyles() {
+    return {
+      color: StyleKit.variables.stylekitNeutralColor,
+      fontSize: StyleKit.constants.mainTextFontSize - 5
+    }
+  }
+
+  headerButtonAction = () => {
+    if(this.keyboardType == "default") {
+      this.keyboardType = "numeric";
+    } else  {
+      this.keyboardType = "default";
+    }
+
+    this.requiresInterfaceReload();
   }
 
   get sort() {

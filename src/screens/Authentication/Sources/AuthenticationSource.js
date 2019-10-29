@@ -33,6 +33,10 @@ export default class AuthenticationSource {
     this.status = "did-fail";
   }
 
+  isWaitingForInput() {
+    return this.status == "waiting-input";
+  }
+
   isInSuccessState() {
     return this.status == "did-succeed";
   }

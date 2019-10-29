@@ -17,8 +17,8 @@ export default class SectionHeader extends ThemedComponent {
           }
         </View>
         {this.props.buttonText &&
-          <TouchableOpacity onPress={this.props.buttonAction}>
-            <Text style={this.styles.button}>{this.props.buttonText}</Text>
+          <TouchableOpacity style={this.styles.buttonContainer} onPress={this.props.buttonAction}>
+            <Text style={[this.styles.button, this.props.buttonStyles]}>{this.props.buttonText}</Text>
           </TouchableOpacity>
         }
       </View>
@@ -52,6 +52,12 @@ export default class SectionHeader extends ThemedComponent {
         marginTop: 4,
         paddingLeft: StyleKit.constants.paddingLeft,
         color: StyleKit.variables.stylekitNeutralColor,
+      },
+
+      buttonContainer: {
+        flex: 1,
+        alignItems: "flex-end",
+        justifyContent: "center",
       },
 
       button: {

@@ -159,7 +159,9 @@ export default class Settings extends Abstract {
       secureTextEntry: true,
       requireConfirm: true,
       showKeyboardChooser: true,
-      onSubmit: async (value) => {
+      onSubmit: async (value, keyboardType) => {
+        Storage.get().setItem("passcodeKeyboardType", keyboardType);
+
         let identifier = await SF.get().crypto.generateUUID();
 
         SF.get().crypto.generateInitialKeysAndAuthParamsForUser(identifier, value).then((results) => {
@@ -179,9 +181,6 @@ export default class Settings extends Abstract {
             Alert.alert("Passcode Error", "There was an error setting up your passcode. Please try again.");
           }
         });
-      },
-      onKeyboardTypeChange: (type) => {
-        Storage.get().setItem("passcodeKeyboardType", type);
       }
     });
   }

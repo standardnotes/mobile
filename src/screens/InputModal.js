@@ -71,7 +71,7 @@ export default class InputModal extends Abstract {
         return;
       }
     }
-    this.getProp("onSubmit")(this.state.text);
+    this.getProp("onSubmit")(this.state.text, this.keyboardType);
     this.dismiss();
   }
 
@@ -97,7 +97,6 @@ export default class InputModal extends Abstract {
     this.keyboardType = option.key;
     this.forceUpdate();
     this.refreshKeyboard();
-    this.getProp("onKeyboardTypeChange")(option.key);
   }
 
   render() {

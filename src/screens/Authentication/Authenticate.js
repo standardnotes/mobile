@@ -62,6 +62,10 @@ export default class Authenticate extends Abstract {
     this.successfulSources = [];
   }
 
+  get sources() {
+    return this.getProp("authenticationSources");
+  }
+
   componentWillUnmount() {
 
     // Typically there should be no way to exit this window if it doesn't have a cancel option.
@@ -104,10 +108,6 @@ export default class Authenticate extends Abstract {
 
   begin() {
     this.beginNextAuthentication();
-  }
-
-  get sources() {
-    return this.getProp("authenticationSources");
   }
 
   beginNextAuthentication() {
@@ -290,6 +290,9 @@ export default class Authenticate extends Abstract {
           title={source.title + (source.status == "waiting-turn" ? " — Waiting" : "")}
           subtitle={hasHeaderSubtitle && source.label}
           tinted={source == this.state.activeSource}
+          buttonText={source.headerButtonText}
+          buttonAction={source.headerButtonAction}
+          buttonStyles={source.headerButtonStyles}
         />
         {source.type == "input" &&
           inputAuthenticationSource(source)
