@@ -9,6 +9,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  // Disable NSURLCache for general network requests. Caches are not protected by NSFileProtectionComplete.
+  // Disabling, or implementing a custom subclass are only two solutions. https://stackoverflow.com/questions/27933387/nsurlcache-and-data-protection
+  NSURLCache *sharedCache = [[NSURLCache alloc] initWithMemoryCapacity:0 diskCapacity:0 diskPath:nil];
+  [NSURLCache setSharedURLCache:sharedCache];
+  
   [BugsnagReactNative start];
 
   // Clear web editor cache after every app update
@@ -18,13 +23,15 @@
   if(![currentVersion isEqualToString:lastVersionClear]) {
     // UIWebView
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
-    [[NSUserDefaults standardUserDefaults] setObject:currentVersion forKey:lastVersionClearKey];
 
     // WebKit
     NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
     NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
     [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{}];
+
+    [[NSUserDefaults standardUserDefaults] setObject:currentVersion forKey:lastVersionClearKey];
   }
+  
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge moduleName:@"StandardNotes" initialProperties:nil];
