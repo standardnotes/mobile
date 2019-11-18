@@ -56,6 +56,8 @@
 		CD399CE321E181C7006106AE /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE021E181C6006106AE /* Red.png */; };
 		CD399CE421E181C7006106AE /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE121E181C7006106AE /* Red@3x.png */; };
 		CD399CE521E181C7006106AE /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE221E181C7006106AE /* Red@2x.png */; };
+		CD50BA5D238346A9003C261C /* TrustKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD50B90C238325F4003C261C /* TrustKit.framework */; };
+		CD50BA5E238346AA003C261C /* TrustKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CD50B90C238325F4003C261C /* TrustKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CD534871234FD44900FCD828 /* libSNReactNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CD534870234FD43200FCD828 /* libSNReactNative.a */; };
 		CD743C792342ACC700535CC9 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		CD743CCE2342AD3F00535CC9 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
@@ -313,6 +315,62 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNStoreReview;
 		};
+		CD50B90B238325F4003C261C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8C8480471A896EE30017C155;
+			remoteInfo = TrustKit;
+		};
+		CD50B90D238325F4003C261C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8C8716961B23A91D00267E1D;
+			remoteInfo = TrustKit_Static;
+		};
+		CD50B90F238325F4003C261C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8C8480521A896EE30017C155;
+			remoteInfo = TrustKitTests;
+		};
+		CD50B911238325F4003C261C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8CA6CBFD1BAE2ADD00BDA419;
+			remoteInfo = "TrustKit OS X";
+		};
+		CD50B913238325F4003C261C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8CA6CC061BAE2ADD00BDA419;
+			remoteInfo = "TrustKit OS XTests";
+		};
+		CD50B915238325F4003C261C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8C84CBB21D6E0981009B3E7D;
+			remoteInfo = "TrustKit tvOS";
+		};
+		CD50B917238325F4003C261C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8C84CBDD1D6E1718009B3E7D;
+			remoteInfo = "TrustKit tvOS Tests";
+		};
+		CD50B919238325F4003C261C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8CC5D24E1D6E64D10074F515;
+			remoteInfo = "TrustKit watchOS";
+		};
 		CD53486F234FD43200FCD828 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CD534835234FD43200FCD828 /* SNReactNative.xcodeproj */;
@@ -490,6 +548,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		CD50BA5F238346AA003C261C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CD50BA5E238346AA003C261C /* TrustKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		00457F9447544666906F6C53 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
@@ -549,6 +621,7 @@
 		CD399CE021E181C6006106AE /* Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red.png; sourceTree = "<group>"; };
 		CD399CE121E181C7006106AE /* Red@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@3x.png"; sourceTree = "<group>"; };
 		CD399CE221E181C7006106AE /* Red@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@2x.png"; sourceTree = "<group>"; };
+		CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = TrustKit.xcodeproj; path = ../vendor/TrustKit/TrustKit.xcodeproj; sourceTree = "<group>"; };
 		CD534835234FD43200FCD828 /* SNReactNative.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SNReactNative.xcodeproj; path = "../vendor/standard-notes-rn/ios/SNReactNative.xcodeproj"; sourceTree = "<group>"; };
 		CDB58A041F6C516B009EF868 /* RCTAes.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAes.xcodeproj; path = "../vendor/react-native-aes/ios/RCTAes.xcodeproj"; sourceTree = "<group>"; };
 		CDB58A0A1F6C5174009EF868 /* ReactNativeFingerprintScanner.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeFingerprintScanner.xcodeproj; path = "../vendor/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.xcodeproj"; sourceTree = "<group>"; };
@@ -591,6 +664,7 @@
 				5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
+				CD50BA5D238346A9003C261C /* TrustKit.framework in Frameworks */,
 				00C302E81ABCBA2D00DB3ED1 /* libRCTImage.a in Frameworks */,
 				133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */,
 				00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */,
@@ -801,6 +875,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */,
 				CD534835234FD43200FCD828 /* SNReactNative.xcodeproj */,
 				CD399C9921E16BCC006106AE /* ReactNativeAlternateIcons.xcodeproj */,
 				CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */,
@@ -905,6 +980,21 @@
 			isa = PBXGroup;
 			children = (
 				CD4D91851F7BE11800080678 /* libRNStoreReview.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD50B8C8238325F4003C261C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CD50B90C238325F4003C261C /* TrustKit.framework */,
+				CD50B90E238325F4003C261C /* libTrustKit_Static.a */,
+				CD50B910238325F4003C261C /* TrustKitTests.xctest */,
+				CD50B912238325F4003C261C /* TrustKit.framework */,
+				CD50B914238325F4003C261C /* TrustKit OS XTests.xctest */,
+				CD50B916238325F4003C261C /* TrustKit.framework */,
+				CD50B918238325F4003C261C /* TrustKit tvOS Tests.xctest */,
+				CD50B91A238325F4003C261C /* TrustKit.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1056,6 +1146,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				CD50BA5F238346AA003C261C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1260,6 +1351,10 @@
 				{
 					ProductGroup = CD17664D1F795AE500165C83 /* Products */;
 					ProjectRef = CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */;
+				},
+				{
+					ProductGroup = CD50B8C8238325F4003C261C /* Products */;
+					ProjectRef = CD50B8C7238325F4003C261C /* TrustKit.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -1502,6 +1597,62 @@
 			fileType = archive.ar;
 			path = libRNStoreReview.a;
 			remoteRef = CD4D91841F7BE11800080678 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD50B90C238325F4003C261C /* TrustKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = TrustKit.framework;
+			remoteRef = CD50B90B238325F4003C261C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD50B90E238325F4003C261C /* libTrustKit_Static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libTrustKit_Static.a;
+			remoteRef = CD50B90D238325F4003C261C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD50B910238325F4003C261C /* TrustKitTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = TrustKitTests.xctest;
+			remoteRef = CD50B90F238325F4003C261C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD50B912238325F4003C261C /* TrustKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = TrustKit.framework;
+			remoteRef = CD50B911238325F4003C261C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD50B914238325F4003C261C /* TrustKit OS XTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "TrustKit OS XTests.xctest";
+			remoteRef = CD50B913238325F4003C261C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD50B916238325F4003C261C /* TrustKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = TrustKit.framework;
+			remoteRef = CD50B915238325F4003C261C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD50B918238325F4003C261C /* TrustKit tvOS Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "TrustKit tvOS Tests.xctest";
+			remoteRef = CD50B917238325F4003C261C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		CD50B91A238325F4003C261C /* TrustKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = TrustKit.framework;
+			remoteRef = CD50B919238325F4003C261C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		CD534870234FD43200FCD828 /* libSNReactNative.a */ = {

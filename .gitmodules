@@ -28,3 +28,6 @@
 [submodule "vendor/standard-notes-rn"]
 	path = vendor/standard-notes-rn
 	url = git@github.com:standardnotes/standard-notes-rn.git
+[submodule "vendor/TrustKit"]
+	path = vendor/TrustKit
+	url = git@github.com:datatheorem/TrustKit.git
