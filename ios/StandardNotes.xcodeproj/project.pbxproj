@@ -56,7 +56,8 @@
 		CD399CE321E181C7006106AE /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE021E181C6006106AE /* Red.png */; };
 		CD399CE421E181C7006106AE /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE121E181C7006106AE /* Red@3x.png */; };
 		CD399CE521E181C7006106AE /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE221E181C7006106AE /* Red@2x.png */; };
-		CD50B91C23832722003C261C /* TrustKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD50B90C238325F4003C261C /* TrustKit.framework */; };
+		CD50BA5D238346A9003C261C /* TrustKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD50B90C238325F4003C261C /* TrustKit.framework */; };
+		CD50BA5E238346AA003C261C /* TrustKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CD50B90C238325F4003C261C /* TrustKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CD534871234FD44900FCD828 /* libSNReactNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CD534870234FD43200FCD828 /* libSNReactNative.a */; };
 		CD743C792342ACC700535CC9 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		CD743CCE2342AD3F00535CC9 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
@@ -547,6 +548,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		CD50BA5F238346AA003C261C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CD50BA5E238346AA003C261C /* TrustKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		00457F9447544666906F6C53 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
@@ -636,7 +651,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CD50B91C23832722003C261C /* TrustKit.framework in Frameworks */,
 				CD534871234FD44900FCD828 /* libSNReactNative.a in Frameworks */,
 				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
 				CD399CD021E16BD6006106AE /* libReactNativeAlternateIcons.a in Frameworks */,
@@ -650,6 +664,7 @@
 				5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
+				CD50BA5D238346A9003C261C /* TrustKit.framework in Frameworks */,
 				00C302E81ABCBA2D00DB3ED1 /* libRCTImage.a in Frameworks */,
 				133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */,
 				00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */,
@@ -1131,6 +1146,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				CD50BA5F238346AA003C261C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

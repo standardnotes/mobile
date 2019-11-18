@@ -1,5 +1,7 @@
 package com.standardnotes;
 
+import com.facebook.react.modules.network.OkHttpClientProvider;
+
 import android.app.Application;
 import android.app.Activity;
 import android.content.Intent;
@@ -81,6 +83,8 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
 
+    rebuildOkHtttp();
+
     SoLoader.init(this, /* native exopackage */ false);
 
     registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
@@ -123,5 +127,9 @@ public class MainApplication extends Application implements ReactApplication {
     if(!BuildConfig.DEBUG) {
       BugsnagReactNative.start(this);
     }
+  }
+
+  private void rebuildOkHtttp() {
+    OkHttpClientProvider.setOkHttpClientFactory(new CustomClientFactory());
   }
 }

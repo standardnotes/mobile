@@ -12,9 +12,9 @@
 {
   [BugsnagReactNative start];
   
-  [self disableUrlCache];
-  
   [self configurePinning];
+
+  [self disableUrlCache];
 
   [self clearWebEditorCache];
 
@@ -64,17 +64,17 @@
     
     // The list of domains we want to pin and their configuration
     kTSKPinnedDomains: @{
-      @"sync.standardnotes.org" : @{
+      @"standardnotes.org" : @{
         kTSKIncludeSubdomains:@YES,
         
-        // Do not block connections if pinning validation failed so the App doesn't break
-        kTSKEnforcePinning:@NO,
+        kTSKEnforcePinning:@YES,
       
         // Send reports for pin validation failures so we can track them
-        kTSKReportUris: @[@"https://standard.report-uri.com/r/d/csp/reportOnly"],
+        kTSKReportUris: @[@"https://standard.report-uri.com/r/d/hpkp/reportOnly"],
         
         // The pinned public keys' Subject Public Key Info hashes
         kTSKPublicKeyHashes : @[
+          @"Vjs8r4z+80wjNcr1YKepWQboSIRi63WsWXhIMN+eWys=",
           @"C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=",
           @"YLh1dUR9y6Kja30RrAn7JKnbQG/uEtLMkBgFF2Fuihg=",
           @"sRHdihwgkaib1P1gxX8HFszlD+7/gTfNvuAybgLPNis=",
