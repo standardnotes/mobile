@@ -10,6 +10,7 @@ import Keychain from "./keychain"
 import SNReactNative from 'standard-notes-rn';
 
 let OfflineParamsKey = "pc_params";
+let EncryptedAccountKeysKey = "encrypted_account_keys";
 let BiometricsPrefs = "biometrics_prefs";
 let FirstRunKey = "first_run";
 let StorageEncryptionKey = "storage_encryption";
@@ -57,7 +58,7 @@ export default class KeysManager {
     }
 
     if(this.legacy_fingerprint) {
-      await this.persistKeysToKeychain();
+      await this.persistKeys();
     }
   }
 
@@ -75,7 +76,7 @@ export default class KeysManager {
     this.user.jwt = null;
     this.activeKeys().jwt = jwt;
     await this.saveUser(this.user);
-    await this.persistKeysToKeychain();
+    await this.persistKeys();
   }
 
   async loadInitialData() {
@@ -83,6 +84,7 @@ export default class KeysManager {
       "auth_params",
       "user",
       OfflineParamsKey,
+      EncryptedAccountKeysKey,
       FirstRunKey,
       StorageEncryptionKey,
       BiometricsPrefs
@@ -123,6 +125,11 @@ export default class KeysManager {
         var pcParams = items[OfflineParamsKey];
         if(pcParams) {
           this.offlineAuthParams = JSON.parse(pcParams);
+        }
+
+        let encryptedAccountKeys = items[EncryptedAccountKeysKey];
+        if(encryptedAccountKeys) {
+          this.encryptedAccountKeys = JSON.parse(encryptedAccountKeys);
         }
 
         // storage encryption
@@ -238,6 +245,7 @@ export default class KeysManager {
       }
 
       if(keys.encryptedAccountKeys) {
+        // LEGACY: storing encryptedAccountKeys in keychain is legacy behavior. Now stored in storage.
         // We won't handle this case here. We'll wait until setOfflineKeys is called
         // by whoever authenticates local passcode. That's when we actually get the offline
         // keys we can use to decrypt encryptedAccountKeys
@@ -259,20 +267,9 @@ export default class KeysManager {
   async generateKeychainStoreValue() {
     let value = {};
 
-    if(this.accountKeys) {
-      // If offline local passcode keys are available, use that to encrypt account keys
-      // Don't encrypt offline pw because then we don't be able to verify passcode
-      if(this.offlineKeys) {
-        var encryptedKeys = new SFItem();
-        encryptedKeys.uuid = await SF.get().crypto.generateUUID();
-        encryptedKeys.content_type = "SN|Mobile|EncryptedKeys"
-        encryptedKeys.content.accountKeys = this.accountKeys;
-        var params = new SFItemParams(encryptedKeys, this.offlineKeys, this.offlineAuthParams);
-        let results = await params.paramsForSync();
-        value.encryptedAccountKeys = results;
-      } else {
-        _.merge(value, this.accountKeys);
-      }
+    // If no offline keys, store account keys directly. Otherwise we'll encrypt account keys and store in storage.
+    if(this.accountKeys && !this.offlineKeys) {
+      _.merge(value, this.accountKeys);
     }
 
     if(this.offlineKeys) {
@@ -282,9 +279,24 @@ export default class KeysManager {
     return value;
   }
 
-  async persistKeysToKeychain() {
+  async persistKeys() {
     // This funciton is called when changes are made to authentication state
     this.updateScreenshotPrivacy();
+
+    if(this.accountKeys && this.offlineKeys) {
+      // If offline local passcode keys are available, use that to encrypt account keys
+      // Don't encrypt offline pw because then we don't be able to verify passcode
+      var encryptedKeys = new SFItem();
+      encryptedKeys.uuid = await SF.get().crypto.generateUUID();
+      encryptedKeys.content_type = "SN|Mobile|EncryptedKeys"
+      encryptedKeys.content.accountKeys = this.accountKeys;
+      var params = new SFItemParams(encryptedKeys, this.offlineKeys, this.offlineAuthParams);
+      let results = await params.paramsForSync();
+      await Storage.get().setItem(EncryptedAccountKeysKey, JSON.stringify(results));
+    } else {
+      await Storage.get().removeItem(EncryptedAccountKeysKey);
+    }
+
     let value = await this.generateKeychainStoreValue();
     return Keychain.setKeys(value);
   }
@@ -307,7 +319,7 @@ export default class KeysManager {
 
   async persistAccountKeys(keys) {
     this.accountKeys = keys;
-    return this.persistKeysToKeychain();
+    return this.persistKeys();
   }
 
   async saveUser(user) {
@@ -349,7 +361,7 @@ export default class KeysManager {
     this.accountAuthParams = null;
     this.user = null;
     await Storage.get().clearKeys(this.accountRelatedStorageKeys);
-    return this.persistKeysToKeychain();
+    return this.persistKeys();
   }
 
   jwt() {
@@ -452,7 +464,7 @@ export default class KeysManager {
     this.offlineKeys = null;
     this.offlineAuthParams = null;
     await Storage.get().removeItem(OfflineParamsKey);
-    return this.persistKeysToKeychain();
+    return this.persistKeys();
   }
 
   async persistOfflineKeys(keys) {
@@ -460,7 +472,7 @@ export default class KeysManager {
     if(!this.passcodeTiming) {
       this.passcodeTiming = "on-quit";
     }
-    return this.persistKeysToKeychain();
+    return this.persistKeys();
   }
 
   async setOfflineKeys(keys) {
@@ -497,7 +509,7 @@ export default class KeysManager {
 
   async setPasscodeTiming(timing) {
     this.passcodeTiming = timing;
-    return this.persistKeysToKeychain();
+    return this.persistKeys();
   }
 
   async setBiometricsTiming(timing) {
