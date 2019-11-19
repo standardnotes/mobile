@@ -1,14 +1,15 @@
 {
   "name": "StandardNotes",
-  "version": "3.0.16",
-  "versionIOS": "3.0.16",
-  "versionAndroid": "3.0.16",
+  "version": "3.0.17",
+  "versionIOS": "3.0.17",
+  "versionAndroid": "3.0.17",
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "android": "cd ./android && ./gradlew app:assembleDebug && ./gradlew installDebug",
-    "clear-cache": "watchman watch-del-all && rm -rf $TMPDIR/react-native-packager-cache-* && rm -rf $TMPDIR/metro-bundler-cache-*"
+    "clear-cache": "watchman watch-del-all && rm -rf $TMPDIR/react-native-packager-cache-* && rm -rf $TMPDIR/metro-bundler-cache-*",
+    "build-android": "cd android && ./gradlew bundleRelease"
   },
   "dependencies": {
     "@react-native-community/async-storage": "1.4.0",
