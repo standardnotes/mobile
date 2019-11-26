@@ -6,8 +6,11 @@
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start",
-    "android": "cd ./android && ./gradlew app:assembleDebug && ./gradlew installDebug",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint .",
     "clear-cache": "watchman watch-del-all && rm -rf $TMPDIR/react-native-packager-cache-* && rm -rf $TMPDIR/metro-bundler-cache-*",
     "build-android": "cd android && ./gradlew bundleRelease"
   },
@@ -18,8 +21,8 @@
     "immutable": "^3.8.2",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "react": "16.8.3",
-    "react-native": "0.59.10",
+    "react": "16.9.0",
+    "react-native": "0.61.5",
     "react-native-file-viewer": "^1.0.10",
     "react-native-fs": "^2.13.3",
     "react-native-gesture-handler": "^1.0.12",
@@ -35,10 +38,14 @@
     "stacktrace-parser": "0.1.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/runtime": "^7.4.5",
-    "metro-react-native-babel-preset": "^0.54.1",
-    "react-test-renderer": "16.8.3"
+    "@babel/core": "^7.6.2",
+    "@babel/runtime": "^7.6.2",
+    "@react-native-community/eslint-config": "^0.0.5",
+    "babel-jest": "^24.9.0",
+    "eslint": "^6.5.1",
+    "jest": "^24.9.0",
+    "metro-react-native-babel-preset": "^0.56.0",
+    "react-test-renderer": "16.9.0"
   },
   "jest": {
     "preset": "react-native"
