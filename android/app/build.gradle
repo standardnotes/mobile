@@ -122,19 +122,12 @@ android {
 
 dependencies {
     compile project(':@react-native-community_async-storage')
-    compile project(':react-native-webview')
-    compile project(':react-native-file-viewer')
-    compile project(':react-native-fs')
-    compile project(':react-native-gesture-handler')
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    implementation project(':bugsnag-react-native')
     implementation project(':RNMail')
     implementation project(':SNTextView')
     implementation project(':standard-notes-rn')
-    implementation project(':react-native-keychain')
-    implementation project(':react-native-vector-icons')
     implementation project(':react-native-aes-crypto')
     implementation project(':react-native-fingerprint-scanner')
     implementation project(':react-native-flag-secure-android')

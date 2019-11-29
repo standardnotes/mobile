@@ -6,19 +6,11 @@ applyNativeModulesSettingsGradle(settings)
 include ':@react-native-community_async-storage'
 project(':@react-native-community_async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/async-storage/android')
 
-include ':react-native-webview'
-project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-webview/android')
 
-include ':react-native-file-viewer'
-project(':react-native-file-viewer').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-file-viewer/android')
 
-include ':react-native-fs'
-project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fs/android')
 
 include ':app'
 
-include ':react-native-gesture-handler'
-project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-gesture-handler/android')
 
 include ':SNTextView'
 project(':SNTextView').projectDir = new File(rootProject.projectDir, '../vendor/sn-textview/android')
@@ -26,14 +18,8 @@ project(':SNTextView').projectDir = new File(rootProject.projectDir, '../vendor/
 include ':standard-notes-rn'
 project(':standard-notes-rn').projectDir = new File(rootProject.projectDir, '../vendor/standard-notes-rn/android')
 
-include ':bugsnag-react-native'
-project(':bugsnag-react-native').projectDir = new File(rootProject.projectDir, '../node_modules/bugsnag-react-native/android')
 
-include ':react-native-keychain'
-project(':react-native-keychain').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-keychain/android')
 
-include ':react-native-vector-icons'
-project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')
 
 include ':react-native-aes-crypto'
 project(':react-native-aes-crypto').projectDir = new File(rootProject.projectDir, '../vendor/react-native-aes/android')

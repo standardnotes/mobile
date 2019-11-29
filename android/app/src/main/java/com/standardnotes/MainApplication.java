@@ -12,10 +12,6 @@ import android.view.WindowManager;
 
 import com.facebook.react.ReactApplication;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import com.reactnativecommunity.webview.RNCWebViewPackage;
-import com.vinzscam.reactnativefileviewer.RNFileViewerPackage;
-import com.rnfs.RNFSPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -25,13 +21,10 @@ import com.facebook.soloader.SoLoader;
 
 import com.chirag.RNMail.RNMail;
 import com.kristiansorens.flagsecure.FlagSecure;
-import com.oblador.keychain.KeychainPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
 import com.standardnotes.sntextview.SNTextViewPackage;
 import com.tectiv3.aes.RCTAesPackage;
 import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 import com.kristiansorens.flagsecure.FlagSecurePackage;
-import com.bugsnag.BugsnagReactNative;
 import org.standardnotes.SNReactNative.SNReactNativePackage;
 
 import java.lang.reflect.InvocationTargetException;

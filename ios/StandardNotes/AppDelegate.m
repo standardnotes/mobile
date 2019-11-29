@@ -61,17 +61,17 @@
   NSDictionary *trustKitConfig =
   @{
     kTSKSwizzleNetworkDelegates: @YES,
-    
+
     // The list of domains we want to pin and their configuration
     kTSKPinnedDomains: @{
       @"standardnotes.org" : @{
         kTSKIncludeSubdomains:@YES,
-        
+
         kTSKEnforcePinning:@YES,
-      
+
         // Send reports for pin validation failures so we can track them
         kTSKReportUris: @[@"https://standard.report-uri.com/r/d/hpkp/reportOnly"],
-        
+
         // The pinned public keys' Subject Public Key Info hashes
         kTSKPublicKeyHashes : @[
           @"Vjs8r4z+80wjNcr1YKepWQboSIRi63WsWXhIMN+eWys=",

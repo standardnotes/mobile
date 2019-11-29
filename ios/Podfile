@@ -28,10 +28,27 @@ target 'StandardNotes' do
   pod 'ReactCommon/jscallinvoker', :path => "../node_modules/react-native/ReactCommon"
   pod 'ReactCommon/turbomodule/core', :path => "../node_modules/react-native/ReactCommon"
   pod 'Yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
-  
+
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
+
+  pod 'SNReactNative', :git => 'https://github.com/bryvin/standard-notes-rn.git'
+  pod 'react-native-aes', :git => 'https://github.com/bryvin/react-native-aes.git', :branch => 'pod'
+  pod 'ReactNativeAlternateIcons', :git => 'https://github.com/bryvin/react-native-alternate-icons.git'
+  pod 'react-native-fingerprint-scanner', :git => 'https://github.com/bryvin/react-native-fingerprint-scanner.git', :branch => 'rn-upgrade'
+
+
+  pod 'react-native-mail', :git => 'https://github.com/mobitar/react-native-mail.git'
+
+  # this is needed to avoid including multiple references to react.
+  post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      if target.name == "React"
+        target.remove_from_project
+      end
+    end
+  end
 
   target 'StandardNotesTests' do
     inherit! :search_paths

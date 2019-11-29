@@ -6,7 +6,7 @@
 //  Copyright © 2017 standardnotes. All rights reserved.
 //
 
-#import <React/RCTViewManager.h>
+#import "RCTViewManager.h"
 
 @interface SNTextViewManager : RCTViewManager<UITextViewDelegate>
 
