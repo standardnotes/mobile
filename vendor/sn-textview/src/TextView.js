@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-const DeprecatedColorPropType = require('DeprecatedColorPropType');
+import { DeprecatedColorPropType } from 'react-native';
 import {requireNativeComponent, View, TextInput, findNodeHandle, UIManager, Platform} from 'react-native';
 
 export default class TextView extends Component {

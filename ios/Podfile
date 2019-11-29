@@ -33,12 +33,13 @@ target 'StandardNotes' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
+  # Standard Notes Specific
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
   pod 'SNReactNative', :git => 'https://github.com/bryvin/standard-notes-rn.git'
-  pod 'react-native-aes', :git => 'https://github.com/bryvin/react-native-aes.git', :branch => 'pod'
+  pod 'react-native-aes', :git => 'https://github.com/bryvin/react-native-aes.git'
+  pod 'react-native-fingerprint-scanner', :git => 'https://github.com/bryvin/react-native-fingerprint-scanner.git'
   pod 'ReactNativeAlternateIcons', :git => 'https://github.com/bryvin/react-native-alternate-icons.git'
-  pod 'react-native-fingerprint-scanner', :git => 'https://github.com/bryvin/react-native-fingerprint-scanner.git', :branch => 'rn-upgrade'
-
-
   pod 'react-native-mail', :git => 'https://github.com/mobitar/react-native-mail.git'
 
   # this is needed to avoid including multiple references to react.

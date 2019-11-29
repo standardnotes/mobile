@@ -16,10 +16,3 @@
 [submodule "vendor/TrustKit"]
 	path = vendor/TrustKit
 	url = git@github.com:datatheorem/TrustKit.git
-[submodule "ios/Pods/react-native-fingerprint-scanner"]
-	path = ios/Pods/react-native-fingerprint-scanner
-	url = git://github.com/bryvin/react-native-fingerprint-scanner.git
-	branch = rn-upgrade
-[submodule "ios/Pods/react-native-alternate-icons"]
-	path = ios/Pods/react-native-alternate-icons
-	url = git://github.com/bryvin/react-native-alternate-icons.git
