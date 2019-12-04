@@ -1,18 +1,11 @@
 package com.standardnotes.sntextview;
 
-import android.graphics.Color;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.infer.annotation.Assertions;
-import com.facebook.react.ReactPackage;
-import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.Spacing;
@@ -20,11 +13,8 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewProps;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.annotations.ReactPropGroup;
-import com.facebook.react.views.text.DefaultStyleValuesUtil;
 
 import java.util.Map;
-
-import static java.security.AccessController.getContext;
 
 /**
  * Created by mo on 9/20/17.

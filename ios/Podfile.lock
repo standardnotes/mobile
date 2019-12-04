@@ -187,11 +187,11 @@ PODS:
     - React-cxxreact (= 0.61.5)
     - React-jsi (= 0.61.5)
   - React-jsinspector (0.61.5)
-  - react-native-aes (1.1.0):
+  - react-native-aes (1.3.6):
     - React
   - react-native-fingerprint-scanner (2.2.0):
     - React
-  - react-native-mail (3.0.4):
+  - react-native-mail (4.1.0):
     - React
   - react-native-webview (7.5.2):
     - React
@@ -232,7 +232,7 @@ PODS:
     - ReactCommon/jscallinvoker (= 0.61.5)
   - ReactNativeAlternateIcons (0.3.0):
     - React
-  - RNCAsyncStorage (1.4.0):
+  - RNCAsyncStorage (1.6.3):
     - React
   - RNFileViewer (1.0.1):
     - React
@@ -240,7 +240,11 @@ PODS:
     - React
   - RNGestureHandler (1.5.2):
     - React
-  - RNKeychain (3.1.3):
+  - RNKeychain (4.0.1):
+    - React
+  - RNReanimated (1.4.0):
+    - React
+  - RNScreens (2.0.0-alpha.17):
     - React
   - RNStoreReview (0.1.5):
     - React
@@ -268,9 +272,9 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
-  - react-native-aes (from `https://github.com/bryvin/react-native-aes.git`)
-  - react-native-fingerprint-scanner (from `https://github.com/bryvin/react-native-fingerprint-scanner.git`)
-  - react-native-mail (from `https://github.com/mobitar/react-native-mail.git`)
+  - react-native-aes (from `../vendor/react-native-aes`)
+  - react-native-fingerprint-scanner (from `../vendor/react-native-fingerprint-scanner`)
+  - react-native-mail (from `../vendor/react-native-mail`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -283,15 +287,17 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/jscallinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - ReactNativeAlternateIcons (from `https://github.com/bryvin/react-native-alternate-icons.git`)
+  - ReactNativeAlternateIcons (from `../vendor/react-native-alternate-icons`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - RNFileViewer (from `../node_modules/react-native-file-viewer/ios`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
+  - RNReanimated (from `../node_modules/react-native-reanimated`)
+  - RNScreens (from `../node_modules/react-native-screens`)
   - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
-  - SNReactNative (from `https://github.com/bryvin/standard-notes-rn.git`)
+  - SNReactNative (from `../vendor/standard-notes-rn`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -330,11 +336,11 @@ EXTERNAL SOURCES:
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-aes:
-    :git: https://github.com/bryvin/react-native-aes.git
+    :path: "../vendor/react-native-aes"
   react-native-fingerprint-scanner:
-    :git: https://github.com/bryvin/react-native-fingerprint-scanner.git
+    :path: "../vendor/react-native-fingerprint-scanner"
   react-native-mail:
-    :git: https://github.com/mobitar/react-native-mail.git
+    :path: "../vendor/react-native-mail"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -358,7 +364,7 @@ EXTERNAL SOURCES:
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
   ReactNativeAlternateIcons:
-    :git: https://github.com/bryvin/react-native-alternate-icons.git
+    :path: "../vendor/react-native-alternate-icons"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
   RNFileViewer:
@@ -369,31 +375,18 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNKeychain:
     :path: "../node_modules/react-native-keychain"
+  RNReanimated:
+    :path: "../node_modules/react-native-reanimated"
+  RNScreens:
+    :path: "../node_modules/react-native-screens"
   RNStoreReview:
     :path: "../node_modules/react-native-store-review/ios"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   SNReactNative:
-    :git: https://github.com/bryvin/standard-notes-rn.git
+    :path: "../vendor/standard-notes-rn"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
-
-CHECKOUT OPTIONS:
-  react-native-aes:
-    :commit: 19164634dabcbfbab57bcd2f00bb45532d3db7e9
-    :git: https://github.com/bryvin/react-native-aes.git
-  react-native-fingerprint-scanner:
-    :commit: 59b403ffcbb46195e2446b86587f189513e64296
-    :git: https://github.com/bryvin/react-native-fingerprint-scanner.git
-  react-native-mail:
-    :commit: 10981109d3e14214ddf5dcca18002cb580f25c66
-    :git: https://github.com/mobitar/react-native-mail.git
-  ReactNativeAlternateIcons:
-    :commit: f08f34f3aabb219ff04d472822b4089939808ccd
-    :git: https://github.com/bryvin/react-native-alternate-icons.git
-  SNReactNative:
-    :commit: e6c6617c1c3dc2aeb4dae8c965511253acc56a45
-    :git: https://github.com/bryvin/standard-notes-rn.git
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
@@ -412,9 +405,9 @@ SPEC CHECKSUMS:
   React-jsi: cb2cd74d7ccf4cffb071a46833613edc79cdf8f7
   React-jsiexecutor: d5525f9ed5f782fdbacb64b9b01a43a9323d2386
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
-  react-native-aes: a47bee559f17d7e578b2a90a8c875f76a677d47a
+  react-native-aes: 30cdabac81ff8461d2a838d4fd042bb3df74e23d
   react-native-fingerprint-scanner: 122837e7989a3bd42668ac85e3e29190c66f8190
-  react-native-mail: 8bf6f105a7df00faad2ad258671611a6ac9f3ba4
+  react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-webview: 7eefdb64f283cae1bebe82ebd8ddeb4b805900c0
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
@@ -426,17 +419,19 @@ SPEC CHECKSUMS:
   React-RCTText: 9ccc88273e9a3aacff5094d2175a605efa854dbe
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
-  ReactNativeAlternateIcons: 7e3c205c5a6b7ad81c256ada3701e56848732c4e
-  RNCAsyncStorage: b82dc6e5b39a625d70e3b3492bff75c0de94ba71
+  ReactNativeAlternateIcons: b2a8a729d9d9756ed0652c352694f190407f297f
+  RNCAsyncStorage: 6b57de0f6cb0dcfd17521af1681fa39001d3efff
   RNFileViewer: 5047ecf40477339723cc08abd55b5ebcefcef4b5
   RNFS: 0d4191b1052bef9ce70deff00a5b4169c62bbd9b
   RNGestureHandler: 946a7691e41df61e2c4b1884deab41a4cdc3afff
-  RNKeychain: c658833a9cb2cbcba6423bdd6e16cce59e27da0e
+  RNKeychain: 45dbd50d1ac4bd42c3740f76ffb135abf05746d0
+  RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
+  RNScreens: f5e2ff7ccde2a1bfcf2a48c6fd07fdcf1fd95223
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   SNReactNative: c47c4fd6d310eea152cc52e23f4fd306491efee3
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: e431e6b49fa27a98755a028abca737dea5648d4c
+PODFILE CHECKSUM: 45a5ca3a5141c74e1344b9f5525c36e69a49e8ef
 
 COCOAPODS: 1.8.4

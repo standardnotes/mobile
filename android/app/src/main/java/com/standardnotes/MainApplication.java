@@ -1,30 +1,39 @@
 package com.standardnotes;
 
+import com.bugsnag.BugsnagReactNative;
+import com.chirag.RNMail.RNMail;
+import com.facebook.react.PackageList;
 import com.facebook.react.modules.network.OkHttpClientProvider;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import com.facebook.react.ReactApplication;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.facebook.react.shell.MainReactPackage;
+import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
+import com.kristiansorens.flagsecure.FlagSecure;
+import com.kristiansorens.flagsecure.FlagSecurePackage;
+import com.oblador.keychain.KeychainPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.soloader.SoLoader;
 
-import com.chirag.RNMail.RNMail;
-import com.kristiansorens.flagsecure.FlagSecure;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
+import com.rnfs.RNFSPackage;
 import com.standardnotes.sntextview.SNTextViewPackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
 import com.tectiv3.aes.RCTAesPackage;
-import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
-import com.kristiansorens.flagsecure.FlagSecurePackage;
+import com.vinzscam.reactnativefileviewer.RNFileViewerPackage;
+
+
 import org.standardnotes.SNReactNative.SNReactNativePackage;
 
 import java.lang.reflect.InvocationTargetException;
@@ -47,15 +56,18 @@ public class MainApplication extends Application implements ReactApplication {
       // Packages that cannot be autolinked yet can be added manually here, for example:
       // packages.add(new MyReactNativePackage());
 
-      packages.add(new MainReactPackage());
-      packages.add(new AsyncStoragePackage());
-      packages.add(new RNCWebViewPackage());
-      packages.add(new RNFileViewerPackage());
-      packages.add(new RNFSPackage());
-      packages.add(new RNGestureHandlerPackage());
-      packages.add(BugsnagReactNative.getPackage());
-      packages.add(new KeychainPackage());
-      packages.add(new VectorIconsPackage());
+//      packages.add(new MainReactPackage(),
+//            new RNScreensPackage(),
+//            new ReanimatedPackage());
+
+//      packages.add(new AsyncStoragePackage());
+//      packages.add(new RNCWebViewPackage());
+//      packages.add(new RNFileViewerPackage());
+//      packages.add(new RNFSPackage());
+//      packages.add(new RNGestureHandlerPackage());
+//      packages.add(BugsnagReactNative.getPackage());
+//      packages.add(new KeychainPackage());
+//      packages.add(new VectorIconsPackage());
       packages.add(new RCTAesPackage());
       packages.add(new RNMail());
       packages.add(new ReactNativeFingerprintScannerPackage());
@@ -77,6 +89,7 @@ public class MainApplication extends Application implements ReactApplication {
     return mReactNativeHost;
   }
 
+  @SuppressLint("NewApi")
   @Override
   public void onCreate() {
     super.onCreate();
