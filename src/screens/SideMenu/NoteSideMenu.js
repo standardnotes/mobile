@@ -270,7 +270,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
   }
 
   render() {
-    var viewStyles = [StyleKit.styles.container, this.styles.sideMenu];
+    const viewStyles = [StyleKit.styles.container, this.styles.sideMenu];
 
     if(this.state.lockContent) {
       return (<LockedView style={viewStyles} />);
@@ -280,30 +280,35 @@ export default class NoteSideMenu extends AbstractSideMenu {
       return <View style={viewStyles} />;
     }
 
-    let noteOptions = this.buildOptionsForNoteManagement();
-    let editorOptions = this.buildOptionsForEditors();
-    let selectedTags = this.handler.getSelectedTags();
+    const noteOptions = this.buildOptionsForNoteManagement();
+    const editorOptions = this.buildOptionsForEditors();
+    const selectedTags = this.handler.getSelectedTags();
+
+    const sideMenuComponents = [
+      <SideMenuSection title="Options" key="options-section" options={noteOptions} />,
+
+      <SideMenuSection title="Editors" key="editors-section" options={editorOptions} collapsed={true} />,
+
+      <SideMenuSection title="Tags" key="tags-section">
+        <TagSelectionList
+          key="tags-section-list"
+          hasBottomPadding={ApplicationState.isAndroid}
+          contentType="Tag"
+          onTagSelect={this.onTagSelect}
+          selectedTags={selectedTags}
+          emptyPlaceholder={"Create a new tag using the tag button in the bottom right corner."}
+        />
+      </SideMenuSection>
+    ];
 
     return (
       <Fragment>
         <SafeAreaView style={[viewStyles, this.styles.safeArea]}>
-          <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
-
-            <SideMenuSection title="Options" options={noteOptions} />
-
-            <SideMenuSection title="Editors" options={editorOptions} collapsed={true} />
-
-            <SideMenuSection title="Tags">
-              <TagSelectionList
-                hasBottomPadding={ApplicationState.isAndroid}
-                contentType="Tag"
-                onTagSelect={this.onTagSelect}
-                selectedTags={selectedTags}
-                emptyPlaceholder={"Create a new tag using the tag button in the bottom right corner."}
-              />
-            </SideMenuSection>
-
-          </ScrollView>
+          <FlatList
+            style={this.styles.flatList}
+            data={sideMenuComponents}
+            renderItem={({item}) => item}
+          />
 
           <FAB
             buttonColor={StyleKit.variables.stylekitInfoColor}
@@ -334,7 +339,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         flex: 1,
         flexDirection: "column"
       },
-      scrollView: {
+      flatList: {
         padding: 15,
         backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       }

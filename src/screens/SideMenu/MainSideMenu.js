@@ -165,7 +165,7 @@ export default class MainSideMenu extends AbstractSideMenu {
   }
 
   render() {
-    var viewStyles = [StyleKit.styles.container, this.styles.sideMenu];
+    const viewStyles = [StyleKit.styles.container, this.styles.sideMenu];
 
     if(this.state.lockContent) {
       return (<LockedView style={viewStyles} />);
@@ -176,8 +176,32 @@ export default class MainSideMenu extends AbstractSideMenu {
       return <View style={viewStyles} />;
     }
 
-    let themeOptions = this.buildOptionsForThemes();
-    let selectedTags = this.handler.getSelectedTags();
+    const themeOptions = this.buildOptionsForThemes();
+    const selectedTags = this.handler.getSelectedTags();
+
+    const sideMenuComponents = [
+      <SideMenuSection title="Themes" key="themes-section" options={themeOptions} collapsed={true} />,
+
+      <SideMenuSection title="Views" key="views-section">
+        <TagSelectionList
+          key="views-section-list"
+          contentType="SN|SmartTag"
+          onTagSelect={this.onTagSelect}
+          selectedTags={selectedTags}
+        />
+      </SideMenuSection>,
+
+      <SideMenuSection title="Tags" key="tags-section">
+        <TagSelectionList
+          key="tags-section-list"
+          hasBottomPadding={ApplicationState.isAndroid}
+          emptyPlaceholder={"No tags. Create one from the note composer."}
+          contentType="Tag"
+          onTagSelect={this.onTagSelect}
+          selectedTags={selectedTags}
+        />
+      </SideMenuSection>
+    ];
 
     return (
       <Fragment>
@@ -190,24 +214,11 @@ export default class MainSideMenu extends AbstractSideMenu {
             onOutOfSyncPress={() => {this.outOfSyncPressed()}}
           />
 
-          <ScrollView style={this.styles.scrollView} removeClippedSubviews={false}>
-
-            <SideMenuSection title="Themes" options={themeOptions} collapsed={true} />
-
-            <SideMenuSection title="Views">
-              <TagSelectionList contentType="SN|SmartTag" onTagSelect={this.onTagSelect} selectedTags={selectedTags} />
-            </SideMenuSection>
-
-            <SideMenuSection title="Tags">
-              <TagSelectionList
-                hasBottomPadding={ApplicationState.isAndroid}
-                emptyPlaceholder={"No tags. Create one from the note composer."}
-                contentType="Tag"
-                onTagSelect={this.onTagSelect}
-                selectedTags={selectedTags}
-              />
-            </SideMenuSection>
-          </ScrollView>
+          <FlatList
+            style={this.styles.flatList}
+            data={sideMenuComponents}
+            renderItem={({item}) => item}
+          />
 
           <FAB
             buttonColor={StyleKit.variables.stylekitInfoColor}
@@ -244,7 +255,7 @@ export default class MainSideMenu extends AbstractSideMenu {
         flex: 1,
         flexDirection: "column"
       },
-      scrollView: {
+      flatList: {
         padding: 15,
         backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       }
