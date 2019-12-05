@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DeprecatedColorPropType } from 'react-native';
+import { ColorPropType } from 'react-native';
 import {requireNativeComponent, View, TextInput, findNodeHandle, UIManager, Platform} from 'react-native';
 
 export default class TextView extends Component {
@@ -50,7 +50,7 @@ TextView.propTypes = {
   text: PropTypes.string,
   autoFocus: PropTypes.bool,
   editable: PropTypes.bool,
-  handlesColor: DeprecatedColorPropType,
+  handlesColor: ColorPropType,
   keyboardDismissMode: PropTypes.oneOf([
       'none', // default
       'on-drag', // Cross-platform
