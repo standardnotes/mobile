@@ -124,7 +124,6 @@ android {
 }
 
 dependencies {
-    implementation project(':@react-native-community_async-storage')
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
 

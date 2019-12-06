@@ -20,7 +20,6 @@ import com.kristiansorens.flagsecure.FlagSecure;
 import com.kristiansorens.flagsecure.FlagSecurePackage;
 import com.oblador.keychain.KeychainPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
