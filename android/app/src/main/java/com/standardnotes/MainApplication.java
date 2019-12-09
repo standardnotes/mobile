@@ -13,31 +13,21 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.facebook.react.ReactApplication;
-import com.swmansion.rnscreens.RNScreensPackage;
-import com.facebook.react.shell.MainReactPackage;
 import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 import com.kristiansorens.flagsecure.FlagSecure;
 import com.kristiansorens.flagsecure.FlagSecurePackage;
-import com.oblador.keychain.KeychainPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 
-import com.reactnativecommunity.webview.RNCWebViewPackage;
-import com.rnfs.RNFSPackage;
 import com.standardnotes.sntextview.SNTextViewPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
-import com.swmansion.reanimated.ReanimatedPackage;
 import com.tectiv3.aes.RCTAesPackage;
-import com.vinzscam.reactnativefileviewer.RNFileViewerPackage;
 
 
 import org.standardnotes.SNReactNative.SNReactNativePackage;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -52,21 +42,6 @@ public class MainApplication extends Application implements ReactApplication {
       @SuppressWarnings("UnnecessaryLocalVariable")
       List<ReactPackage> packages = new PackageList(this).getPackages();
 
-      // Packages that cannot be autolinked yet can be added manually here, for example:
-      // packages.add(new MyReactNativePackage());
-
-//      packages.add(new MainReactPackage(),
-//            new RNScreensPackage(),
-//            new ReanimatedPackage());
-
-//      packages.add(new AsyncStoragePackage());
-//      packages.add(new RNCWebViewPackage());
-//      packages.add(new RNFileViewerPackage());
-//      packages.add(new RNFSPackage());
-//      packages.add(new RNGestureHandlerPackage());
-//      packages.add(BugsnagReactNative.getPackage());
-//      packages.add(new KeychainPackage());
-//      packages.add(new VectorIconsPackage());
       packages.add(new RCTAesPackage());
       packages.add(new RNMail());
       packages.add(new ReactNativeFingerprintScannerPackage());

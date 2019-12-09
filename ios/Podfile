@@ -2,7 +2,7 @@ platform :ios, '9.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'StandardNotes' do
-    # Pods for StandardNotes
+  # React Native Pods
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"
@@ -57,12 +57,4 @@ target 'StandardNotes' do
   end
 
   use_native_modules!
-end
-
-target 'StandardNotes-tvOS' do
-  # Pods for StandardNotes-tvOS
-  target 'StandardNotes-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
 end
