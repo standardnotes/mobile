@@ -252,6 +252,7 @@ PODS:
     - React
   - SNReactNative (1.0.0):
     - React
+  - TrustKit (1.6.3)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -298,11 +299,13 @@ DEPENDENCIES:
   - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - SNReactNative (from `../vendor/standard-notes-rn`)
+  - TrustKit (= 1.6.3)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - TrustKit
 
 EXTERNAL SOURCES:
   BugsnagReactNative:
@@ -430,8 +433,9 @@ SPEC CHECKSUMS:
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   SNReactNative: c47c4fd6d310eea152cc52e23f4fd306491efee3
+  TrustKit: a2f0c3a926f0a3ce3c082db9a39f1f540dbb04cb
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: 108cb723d3957fd89beaa615b5fde99d822899be
+PODFILE CHECKSUM: b743f5abcefc13b4d383bf65fdc075485ceb01c1
 
 COCOAPODS: 1.8.4

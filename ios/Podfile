@@ -1,4 +1,4 @@
-platform :ios, '9.0'
+platform :ios, '10.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'StandardNotes' do
@@ -34,6 +34,8 @@ target 'StandardNotes' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
   # Standard Notes Specific
+  pod 'TrustKit', '1.6.3'
+
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
   pod 'SNReactNative', :path => '../vendor/standard-notes-rn'
@@ -42,11 +44,19 @@ target 'StandardNotes' do
   pod 'ReactNativeAlternateIcons', :path => '../vendor/react-native-alternate-icons'
   pod 'react-native-mail', :path => '../vendor/react-native-mail'
 
-  # this is needed to avoid including multiple references to react.
   post_install do |installer|
     installer.pods_project.targets.each do |target|
+      # this is needed to avoid including multiple references to react.
       if target.name == "React"
         target.remove_from_project
+      end
+
+      # this is needed to rollback TrustKit to deployment target 9.0 so that iOS 9
+      # is still allowed to run the App
+      if target.name == "TrustKit"
+        target.build_configurations.each do |config|
+          config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "9.0"
+        end
       end
     end
   end
