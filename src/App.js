@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import { View, Text } from "react-native";
 import { Client } from 'bugsnag-react-native';
-import { createStackNavigator, createAppContainer, createDrawerNavigator, DrawerActions, NavigationActions } from "react-navigation";
+import { createAppContainer, NavigationActions } from "react-navigation";
+
+import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
+import { createStackNavigator } from 'react-navigation-stack';
 
 import KeysManager from './lib/keysManager'
 import StyleKit from "./style/StyleKit"
