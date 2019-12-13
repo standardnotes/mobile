@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {ScrollView, View, Alert, Keyboard, Platform} from 'react-native';
-import { SafeAreaView } from 'react-navigation';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import Sync from '@SFJS/syncManager'
 import ModelManager from '@SFJS/modelManager'

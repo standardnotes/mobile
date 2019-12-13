@@ -552,14 +552,14 @@ export default class KeysManager {
     let isAndroid = Platform.OS == "android";
     if(__DEV__) {
       if(isAndroid) {
-        callback(true, "touch", "Fingerprint (Dev)");
+        callback(true, "Fingerprint", "Fingerprint (Dev)");
       } else {
-        callback(true, "face", "Face ID");
+        callback(true, "Face ID", "Face ID");
       }
       return;
     }
     FingerprintScanner.isSensorAvailable().then((type) => {
-      var noun = (!type || type == "touch") ? "Fingerprint" : "Face ID";
+      var noun = (!type || type == "Touch ID" || type == "Fingerprint") ? "Fingerprint" : "Face ID";
       callback(true, type, noun);
     }).catch((error) => {
       callback(false);

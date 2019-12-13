@@ -19,7 +19,7 @@ export default class PasscodeSection extends Component {
     super(props);
     var state = { fingerprintAvailable: false || __DEV__};
     if(__DEV__) {
-      state.biometricsType = ApplicationState.isAndroid ? "touch" : "face";
+      state.biometricsType = ApplicationState.isAndroid ? "Fingerprint" : "Face ID";
       state.biometricsNoun = ApplicationState.isAndroid ? "Fingerprint" : "Face ID";
     }
 

@@ -68,31 +68,27 @@ const AppDrawerStack = createDrawerNavigator({
         return NavigationActions.setParams({params: { dummy: true }, key: route.key})
       }
     };
-  },
+  }
 })
 
 const SettingsStack = createStackNavigator({
-  Screen1: Settings
+  screen: Settings
 })
 
 const InputModalStack = createStackNavigator({
-  Screen1: InputModal
+  screen: InputModal
 })
 
 const AuthenticateModalStack = createStackNavigator({
-  Screen1: Authenticate
+  screen: Authenticate
 })
 
 const ManagePrivilegesStack = createStackNavigator({
-  Screen1: ManagePrivileges
+  screen: ManagePrivileges
 })
 
 const KeyRecoveryStack = createStackNavigator({
-  Screen1: KeyRecovery
-})
-
-const SplashStack = createStackNavigator({
-  Screen1: Splash
+  screen: KeyRecovery
 })
 
 const AppDrawer = createStackNavigator({
@@ -111,6 +107,7 @@ const AppDrawer = createStackNavigator({
 }, {
   mode: "modal",
   headerMode: 'none',
+  transitionConfig: TransitionConfig
 })
 
 AppDrawer.navigationOptions = ({ navigation }) => {
@@ -118,6 +115,14 @@ AppDrawer.navigationOptions = ({ navigation }) => {
     drawerLockMode: SideMenuManager.get().isLeftSideMenuLocked() ? "locked-closed" : null,
   }
 };
+
+const TransitionConfig = () => {
+  return {
+    transitionSpec: {
+      duration: 150
+    }
+  }
+}
 
 const DrawerStack = createDrawerNavigator({
   Main: AppDrawer,
@@ -139,6 +144,7 @@ const DrawerStack = createDrawerNavigator({
       }
     };
   },
+  transitionConfig: TransitionConfig
 });
 
 const AppContainer = createAppContainer(DrawerStack);

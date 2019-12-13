@@ -1,7 +1,9 @@
 import React, { Component, Fragment } from 'react';
 import { ScrollView, View, Text, FlatList, Linking } from 'react-native';
+import { DrawerActions } from 'react-navigation-drawer';
 
-import { SafeAreaView } from 'react-navigation';
+import SafeAreaView from 'react-native-safe-area-view';
+
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
 import ActionSheet from 'react-native-actionsheet'
@@ -257,6 +259,7 @@ export default class MainSideMenu extends AbstractSideMenu {
       },
       flatList: {
         padding: 15,
+        flex: 1,
         backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       }
     }

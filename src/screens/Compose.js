@@ -12,7 +12,7 @@ import ComponentManager from '@Lib/componentManager'
 import ApplicationState from "@Lib/ApplicationState"
 import LockedView from "@Containers/LockedView";
 import Icon from 'react-native-vector-icons/Ionicons';
-import { SafeAreaView } from 'react-navigation';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import TextView from "sn-textview";
 

@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { ScrollView, View, Text, FlatList, Linking } from 'react-native';
 
-import { SafeAreaView } from 'react-navigation';
+import SafeAreaView from 'react-native-safe-area-view';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
 import ActionSheet from 'react-native-actionsheet'
