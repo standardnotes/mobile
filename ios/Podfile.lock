@@ -193,7 +193,7 @@ PODS:
     - React
   - react-native-mail (4.1.0):
     - React
-  - react-native-webview (7.5.2):
+  - react-native-webview (8.0.1):
     - React
   - React-RCTActionSheet (0.61.5):
     - React-Core/RCTActionSheetHeaders (= 0.61.5)
@@ -411,7 +411,7 @@ SPEC CHECKSUMS:
   react-native-aes: 30cdabac81ff8461d2a838d4fd042bb3df74e23d
   react-native-fingerprint-scanner: b4acf41aa6f8f76c3b62fce0e018e290abbe838c
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-webview: 7eefdb64f283cae1bebe82ebd8ddeb4b805900c0
+  react-native-webview: b1ea98894c474b27c4080779939959e1f3653147
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72

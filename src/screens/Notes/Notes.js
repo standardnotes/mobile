@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Alert, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 
 import ModelManager from '@SFJS/modelManager'
@@ -374,22 +374,23 @@ export default class Notes extends Abstract {
     } else {
       run();
     }
+
+    if(!ApplicationState.get().isInTabletMode) {
+      // Make sure we close the keyboard here, otherwise the
+      // search box keeps focus and leaves the Keyboard open. It creates a glitchy state
+      // that leave the Keyboard confused if it should be open or closed
+      Keyboard.dismiss();
+    }
   }
 
   onSearchTextChange = (text) => {
-    return new Promise((resolve, reject) => {
-      this.searching = true;
-      this.options.setSearchTerm(text);
-      resolve();
-    });
+    this.searching = true;
+    this.options.setSearchTerm(text);
   }
 
   onSearchCancel = () => {
-    return new Promise((resolve, reject) => {
-      this.searching = false;
-      this.options.setSearchTerm(null);
-      resolve();
-    });
+    this.searching = false;
+    this.options.setSearchTerm(null);
   }
 
   handleActionsheetAction = (item, action, callback) => {

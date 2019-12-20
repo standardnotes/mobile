@@ -88,10 +88,6 @@ export default class Settings extends Abstract {
     this.mergeState({hasPasscode: hasPasscode, hasBiometrics: hasBiometrics, storageEncryption: encryptedStorage})
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return super.shouldComponentUpdate(nextProps, nextState);
-  }
-
   componentWillUnmount() {
     super.componentWillUnmount();
     Sync.get().removeEventHandler(this.syncEventHandler);
