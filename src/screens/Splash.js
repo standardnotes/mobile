@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, KeyboardAvoidingView, ScrollView, Image, BackHandler, Keyboard } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeAreaView } from 'react-navigation';
 import StyleKit from "@Style/StyleKit"
 import Abstract from "@Screens/Abstract"
 import ApplicationState from "@Lib/ApplicationState"

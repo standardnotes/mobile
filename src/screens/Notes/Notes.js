@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, Alert } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeAreaView } from 'react-navigation';
 
 import ModelManager from '@SFJS/modelManager'
 import Storage from '@SFJS/storageManager'
@@ -377,13 +377,19 @@ export default class Notes extends Abstract {
   }
 
   onSearchTextChange = (text) => {
-    this.searching = true;
-    this.options.setSearchTerm(text);
+    return new Promise((resolve, reject) => {
+      this.searching = true;
+      this.options.setSearchTerm(text);
+      resolve();
+    });
   }
 
   onSearchCancel = () => {
-    this.searching = false;
-    this.options.setSearchTerm(null);
+    return new Promise((resolve, reject) => {
+      this.searching = false;
+      this.options.setSearchTerm(null);
+      resolve();
+    });
   }
 
   handleActionsheetAction = (item, action, callback) => {
@@ -416,7 +422,7 @@ export default class Notes extends Abstract {
     }
 
     return (
-      <SafeAreaView forceInset={{ bottom: 'never'}} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView forceInset={{ bottom: 'never', horizontal: 'always' }} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         {this.state.notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}

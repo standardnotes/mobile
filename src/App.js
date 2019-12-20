@@ -1,10 +1,12 @@
-import React, {Component} from 'react';
-import { View, Text } from "react-native";
+import React, { Component } from 'react';
+import { View, Text, Animated } from "react-native";
 import { Client } from 'bugsnag-react-native';
 import { createAppContainer, NavigationActions } from "react-navigation";
 
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
+import { enableScreens } from 'react-native-screens';
+enableScreens();
 
 import KeysManager from './lib/keysManager'
 import StyleKit from "./style/StyleKit"
@@ -40,14 +42,12 @@ if(__DEV__ === false) {
 const AppStack = createStackNavigator({
   Notes: {screen: Root},
   Compose: {screen: Compose},
-
 }, {
-  initialRouteName: 'Notes'
+  initialRouteName: 'Notes',
+  navigationOptions: ({ navigation }) => ({
+    drawerLockMode: SideMenuManager.get().isRightSideMenuLocked() ? "locked-closed" : null
+  })
 })
-
-AppStack.navigationOptions = ({ navigation }) => {
-  return {drawerLockMode: SideMenuManager.get().isRightSideMenuLocked() ? "locked-closed" : null}
-};
 
 const AppDrawerStack = createDrawerNavigator({
   Main: AppStack
@@ -107,22 +107,16 @@ const AppDrawer = createStackNavigator({
 }, {
   mode: "modal",
   headerMode: 'none',
-  transitionConfig: TransitionConfig
-})
-
-AppDrawer.navigationOptions = ({ navigation }) => {
-  return {
-    drawerLockMode: SideMenuManager.get().isLeftSideMenuLocked() ? "locked-closed" : null,
-  }
-};
-
-const TransitionConfig = () => {
-  return {
+  transitionConfig: () => ({
     transitionSpec: {
-      duration: 150
+      duration: 300,
+      timing: Animated.timing
     }
-  }
-}
+  }),
+  navigationOptions: ({ navigation }) => ({
+    drawerLockMode: SideMenuManager.get().isLeftSideMenuLocked() ? "locked-closed" : null,
+  })
+})
 
 const DrawerStack = createDrawerNavigator({
   Main: AppDrawer,
@@ -143,8 +137,7 @@ const DrawerStack = createDrawerNavigator({
         return NavigationActions.setParams({params: { dummy: true }, key: route.key})
       }
     };
-  },
-  transitionConfig: TransitionConfig
+  }
 });
 
 const AppContainer = createAppContainer(DrawerStack);

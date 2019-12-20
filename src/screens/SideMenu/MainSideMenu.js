@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { ScrollView, View, Text, FlatList, Linking } from 'react-native';
 import { DrawerActions } from 'react-navigation-drawer';
 
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeAreaView } from 'react-navigation';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
@@ -208,7 +208,7 @@ export default class MainSideMenu extends AbstractSideMenu {
     return (
       <Fragment>
         <SafeAreaView style={this.styles.firstSafeArea} />
-        <SafeAreaView style={[viewStyles, this.styles.secondSafeArea]}>
+        <SafeAreaView forceInset={{ top: 'never', bottom: 'always', left: 'always', right: 'never' }} style={[viewStyles, this.styles.secondSafeArea]}>
 
           <SideMenuHero
             outOfSync={this.state.outOfSync}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {ScrollView, View, Alert, Keyboard, Platform} from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeAreaView } from 'react-navigation';
 
 import Sync from '@SFJS/syncManager'
 import ModelManager from '@SFJS/modelManager'
@@ -86,6 +86,10 @@ export default class Settings extends Abstract {
     var hasBiometrics = KeysManager.get().hasBiometrics();
     var encryptedStorage = KeysManager.get().isStorageEncryptionEnabled();
     this.mergeState({hasPasscode: hasPasscode, hasBiometrics: hasBiometrics, storageEncryption: encryptedStorage})
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return super.shouldComponentUpdate(nextProps, nextState);
   }
 
   componentWillUnmount() {
@@ -254,7 +258,7 @@ export default class Settings extends Abstract {
     let signedIn = !Auth.get().offline();
 
     return (
-      <SafeAreaView forceInset={{ bottom: 'never'}} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView forceInset={{ top: 'never', bottom: 'never', left: 'always' }} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         <ScrollView style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
 
           {!signedIn && !this.state.confirmRegistration &&

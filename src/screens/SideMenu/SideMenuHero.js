@@ -9,7 +9,6 @@ import StyleKit from "@Style/StyleKit"
 import ThemedComponent from "@Components/ThemedComponent";
 import Circle from "@Components/Circle"
 
-
 export default class SideMenuHero extends ThemedComponent {
 
   getText() {

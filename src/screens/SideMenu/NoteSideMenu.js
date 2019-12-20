@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { ScrollView, View, Text, FlatList, Linking } from 'react-native';
 
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeAreaView } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FAB from 'react-native-fab';
 import ActionSheet from 'react-native-actionsheet'
@@ -303,7 +303,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
 
     return (
       <Fragment>
-        <SafeAreaView style={[viewStyles, this.styles.safeArea]}>
+        <SafeAreaView forceInset={{ left: 'never', bottom: 'always' }} style={[viewStyles, this.styles.safeArea]}>
           <FlatList
             style={this.styles.flatList}
             data={sideMenuComponents}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { TextInput, View, Keyboard, TouchableHighlight, Platform, Alert } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeAreaView } from 'react-navigation';
 import StyleKit from "@Style/StyleKit"
 import TableSection from "@Components/TableSection";
 import SectionedTableCell from "@Components/SectionedTableCell";
