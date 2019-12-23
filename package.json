@@ -29,7 +29,7 @@
     "react-native-gesture-handler": "^1.5.2",
     "react-native-keychain": "^4.0.1",
     "react-native-reanimated": "^1.4.0",
-    "react-native-screens": "^2.0.0-alpha.17",
+    "react-native-screens": "^1.0.0-alpha.23",
     "react-native-store-review": "^0.1.5",
     "react-native-vector-icons": "6.6.0",
     "react-native-webview": "^8.0.1",

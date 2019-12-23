@@ -5,8 +5,6 @@ import { createAppContainer, NavigationActions } from "react-navigation";
 
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
-import { enableScreens } from 'react-native-screens';
-enableScreens();
 
 import KeysManager from './lib/keysManager'
 import StyleKit from "./style/StyleKit"
