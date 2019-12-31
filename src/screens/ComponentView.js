@@ -193,6 +193,7 @@ export default class ComponentView extends Component {
              onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
              cacheEnabled={true}
              scalesPageToFit={true /* Android only, not available with WKWebView */}
+             autoManageStatusBarEnabled={false /* To prevent StatusBar from changing colors when focusing */}
              injectedJavaScript={this.defaultInjectedJavaScript()}
            />
         }

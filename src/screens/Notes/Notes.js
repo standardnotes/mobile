@@ -423,7 +423,7 @@ export default class Notes extends Abstract {
     }
 
     return (
-      <SafeAreaView forceInset={{ bottom: 'never', horizontal: 'always' }} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView forceInset={{ top: 'never', bottom: 'never', horizontal: 'always' }} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         {this.state.notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}

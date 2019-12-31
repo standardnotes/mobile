@@ -32,7 +32,7 @@
     "react-native-screens": "^1.0.0-alpha.23",
     "react-native-store-review": "^0.1.5",
     "react-native-vector-icons": "6.6.0",
-    "react-native-webview": "^8.0.1",
+    "react-native-webview": "https://github.com/standardnotes/react-native-webview.git",
     "react-navigation": "^4.0.10",
     "react-navigation-drawer": "^2.3.3",
     "react-navigation-header-buttons": "^2.1.1",
