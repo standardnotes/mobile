@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Animated } from "react-native";
 import { Client } from 'bugsnag-react-native';
 import { createAppContainer, NavigationActions } from "react-navigation";
-
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
+import { useDarkModeContext, eventEmitter as darkModeEventEmitter } from 'react-native-dark-mode'
 
 import KeysManager from './lib/keysManager'
 import StyleKit from "./style/StyleKit"
@@ -140,48 +140,41 @@ const DrawerStack = createDrawerNavigator({
 
 const AppContainer = createAppContainer(DrawerStack);
 
-export default class App extends Component {
+export default function App(props) {
+  const [isReady, setIsReady] = useState(false);
 
-  constructor(props) {
-    super(props);
+  // initialize StyleKit with the status of Dark Mode on the user's device
+  StyleKit.get().setModeTo(useDarkModeContext());
 
-    KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
+  // if user switches light/dark mode while on the app, update theme accordingly
+  darkModeEventEmitter.on('currentModeChanged', changeCurrentMode)
 
-    // Initialize iOS review manager. Will automatically handle requesting review logic.
-    ReviewManager.initialize();
+  KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
 
-    PrivilegesManager.get().loadPrivileges();
-    MigrationManager.get().load();
+  // Initialize iOS review manager. Will automatically handle requesting review logic.
+  ReviewManager.initialize();
 
-    // Listen to sign out event
-    this.authEventHandler = Auth.get().addEventHandler(async (event) => {
-      if(event == SFAuthManager.DidSignOutEvent) {
-        ModelManager.get().handleSignout();
-        await Sync.get().handleSignout();
-      }
-    });
+  PrivilegesManager.get().loadPrivileges();
+  MigrationManager.get().load();
 
-    this.state = {ready: false};
-    this.loadInitialData();
-  }
+  // Listen to sign out event
+  this.authEventHandler = Auth.get().addEventHandler(async (event) => {
+    if(event == SFAuthManager.DidSignOutEvent) {
+      ModelManager.get().handleSignout();
+      await Sync.get().handleSignout();
+    }
+  });
 
-  /*
-    We initially didn't expect App to ever unmount. However, on Android, if you are in the root screen,
-    and press the physical back button, then strangely, App unmounts, but other components, like Notes, do not.
-    We've remedied this by modifiying Android back button behavior natively to background instead of quit, but we keep this below anyway.
-   */
-  componentWillUnmount() {
-    Auth.get().removeEventHandler(this.authEventHandler);
-  }
+  loadInitialData();
 
-  async loadInitialData() {
+  async function loadInitialData() {
     await StyleKit.get().resolveInitialTheme();
     await KeysManager.get().loadInitialData();
 
     let ready = () => {
       KeysManager.get().markApplicationAsRan();
       ApplicationState.get().receiveApplicationStartEvent();
-      this.setState({ready: true});
+      setIsReady(true);
     }
 
     if(await KeysManager.get().needsWipe()) {
@@ -191,13 +184,25 @@ export default class App extends Component {
     }
   }
 
-  render() {
-    if(!this.state.ready) {
-      return null;
-    }
-
-    return (
-      <AppContainer /* persistenceKey="if-you-want-it" */ />
-    )
+  function changeCurrentMode(newMode) {
+    StyleKit.get().setModeTo(newMode);
+    StyleKit.get().activateThemeForCurrentMode();
   }
+
+  useEffect(() => {
+    return () => {
+      /*
+        We initially didn't expect App to ever unmount. However, on Android, if you are in the root screen,
+        and press the physical back button, then strangely, App unmounts, but other components, like Notes, do not.
+        We've remedied this by modifiying Android back button behavior natively to background instead of quit, but we keep this below anyway.
+      */
+      Auth.get().removeEventHandler(authEventHandler);
+
+      // Make sure we remove the event listener for dark/light mode changes
+      darkModeEventEmitter.off('currentModeChanged', changeCurrentMode)
+    };
+  });
+
+
+  return !isReady ? null : (<AppContainer /* persistenceKey="if-you-want-it" */ />);
 }

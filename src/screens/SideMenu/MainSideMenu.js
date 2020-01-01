@@ -18,6 +18,7 @@ import TableSection from "@Components/TableSection";
 import LockedView from "@Containers/LockedView";
 
 import StyleKit from "@Style/StyleKit"
+import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 
 import SideMenuManager from "@SideMenu/SideMenuManager"
 import SideMenuCell from "@SideMenu/SideMenuCell"
@@ -97,6 +98,44 @@ export default class MainSideMenu extends AbstractSideMenu {
   }
 
   onThemeLongPress = (theme) => {
+    const setLightThemeActionName = `${theme.content[StyleKit.storageKeyForMode("light")] ? "Current" : "Set as"} Light Theme`;
+    const setDarkThemeActionName = `${theme.content[StyleKit.storageKeyForMode("dark")] ? "Current" : "Set as"} Dark Theme`;
+
+    let actionSheetOptions = [];
+
+    // if this theme is a mobile theme, allow it to be set as the preferred option for light/dark mode
+    if(theme.content.package_info && !theme.content.package_info.no_mobile) {
+      actionSheetOptions.push(
+        ActionSheetWrapper.BuildOption({text: setLightThemeActionName, callback: () => {
+          StyleKit.get().assignThemeForMode(theme, "light");
+        }}),
+        ActionSheetWrapper.BuildOption({text: setDarkThemeActionName, callback: () => {
+          StyleKit.get().assignThemeForMode(theme, "dark");
+        }})
+      )
+    }
+
+    // Note: can Red/Blue theme be redownloaded? if not prevent this from being an option
+    actionSheetOptions.push(
+      ActionSheetWrapper.BuildOption({text: "Redownload", callback: () => {
+        this.onThemeRedownload(theme);
+      }})
+    );
+
+    let sheet = new ActionSheetWrapper({
+      title: `${theme.name} Options`,
+      options: actionSheetOptions,
+      onCancel: () => {
+        this.setState({actionSheet: null});
+      }
+    });
+
+    this.setState({actionSheet: sheet.actionSheetElement()});
+    this.forceUpdate(); // required to get actionSheet ref
+    sheet.show();
+  }
+
+  onThemeRedownload(theme) {
     AlertManager.get().confirm({
       title: "Redownload Theme",
       text: "Themes are cached when downloaded. To retrieve the latest version, press Redownload.",
@@ -232,6 +271,7 @@ export default class MainSideMenu extends AbstractSideMenu {
             iconTextComponent={<Icon name={StyleKit.nameForIcon("settings")}/>}
           />
 
+          {this.state.actionSheet && this.state.actionSheet}
         </SafeAreaView>
       </Fragment>
     );
