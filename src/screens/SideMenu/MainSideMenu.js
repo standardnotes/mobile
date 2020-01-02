@@ -20,6 +20,8 @@ import LockedView from "@Containers/LockedView";
 import StyleKit from "@Style/StyleKit"
 import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 
+import { supportsDarkMode } from 'react-native-dark-mode'
+
 import SideMenuManager from "@SideMenu/SideMenuManager"
 import SideMenuCell from "@SideMenu/SideMenuCell"
 import SideMenuHero from "@SideMenu/SideMenuHero"
@@ -98,7 +100,8 @@ export default class MainSideMenu extends AbstractSideMenu {
   }
 
   onThemeLongPress = (theme) => {
-    const setLightThemeActionName = `${theme.content[StyleKit.storageKeyForMode("light")] ? "Current" : "Set as"} Light Theme`;
+    const lightThemeName = supportsDarkMode ? "Light" : "Active";
+    const setLightThemeActionName = `${theme.content[StyleKit.storageKeyForMode("light")] ? "Current" : "Set as"} ${lightThemeName} Theme`;
     const setDarkThemeActionName = `${theme.content[StyleKit.storageKeyForMode("dark")] ? "Current" : "Set as"} Dark Theme`;
 
     let actionSheetOptions = [];
@@ -108,19 +111,27 @@ export default class MainSideMenu extends AbstractSideMenu {
       actionSheetOptions.push(
         ActionSheetWrapper.BuildOption({text: setLightThemeActionName, callback: () => {
           StyleKit.get().assignThemeForMode(theme, "light");
-        }}),
-        ActionSheetWrapper.BuildOption({text: setDarkThemeActionName, callback: () => {
-          StyleKit.get().assignThemeForMode(theme, "dark");
         }})
-      )
+      );
+
+      // only add a dark mode option if this device supports dark/light mode
+      if(supportsDarkMode) {
+        actionSheetOptions.push(
+          ActionSheetWrapper.BuildOption({text: setDarkThemeActionName, callback: () => {
+            StyleKit.get().assignThemeForMode(theme, "dark");
+          }})
+        )
+      }
     }
 
-    // Note: can Red/Blue theme be redownloaded? if not prevent this from being an option
-    actionSheetOptions.push(
-      ActionSheetWrapper.BuildOption({text: "Redownload", callback: () => {
-        this.onThemeRedownload(theme);
-      }})
-    );
+    // system themes cannot be redownloaded, so prevent this option from being added on long press
+    if(!theme.content.isSystemTheme) {
+      actionSheetOptions.push(
+        ActionSheetWrapper.BuildOption({text: "Redownload", callback: () => {
+          this.onThemeRedownload(theme);
+        }})
+      );
+    }
 
     let sheet = new ActionSheetWrapper({
       title: `${theme.name} Options`,

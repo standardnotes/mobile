@@ -94,7 +94,7 @@ export default class StyleKit {
     // we loop instead of finding the specific theme with the matching mode incase of any sync
     // conflicts happen to assign 2 themes as the theme for a specific mode
     _.forEach(this.themes(), _theme => {
-      if(_theme.content[storageKey]) {
+      if(_theme.content && _theme.content[storageKey]) {
         _theme.content[storageKey] = false;
         _theme.setDirty(true);
       }
