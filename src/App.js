@@ -19,6 +19,7 @@ import ReviewManager from './lib/reviewManager'
 
 import Compose from "@Screens/Compose"
 import Splash from "@Screens/Splash"
+import OfflineConfirm from "@Screens/OfflineConfirm"
 import Root from "@Screens/Root"
 import MainSideMenu from "@SideMenu/MainSideMenu"
 import NoteSideMenu from "@SideMenu/NoteSideMenu"
@@ -101,7 +102,13 @@ const AppDrawer = createStackNavigator({
     navigationOptions: {
      gesturesEnabled: false,
    },
-  }
+  },
+  OfflineConfirm: {
+    screen: OfflineConfirm,
+    navigationOptions: {
+     gesturesEnabled: false,
+   },
+  },
 }, {
   mode: "modal",
   headerMode: 'none',

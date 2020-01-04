@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import { View, Text, KeyboardAvoidingView, ScrollView, Image, BackHandler, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import StyleKit from "@Style/StyleKit"
+import ButtonCell from "@Components/ButtonCell";
 import Abstract from "@Screens/Abstract"
+import AuthSection from "@Screens/Settings/Sections/AuthSection"
 import ApplicationState from "@Lib/ApplicationState"
 import AlertManager from "@SFJS/alertManager"
-import AuthSection from "@Screens/Settings/Sections/AuthSection"
 
 export default class Splash extends Abstract {
 
@@ -30,6 +31,10 @@ export default class Splash extends Abstract {
     BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
   }
 
+  showAdvanced() {
+    this.props.navigation.navigate("OfflineConfirm");
+  }
+
   onBackButtonPressAndroid = () => {
     // Disable back press
     return true;
@@ -52,6 +57,7 @@ export default class Splash extends Abstract {
             <AuthSection
               onAuthSuccess = {() => {this.dismiss()}}
             />
+            <ButtonCell last={true} bold={true} title="Use Offline" onPress={() => this.showAdvanced()} />
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>

@@ -2,6 +2,7 @@ import Storage from './sfjs/storageManager'
 
 const LastExportDateKey = 'LastExportDateKey'
 const DontShowAgainUnsupportedEditorsKey = 'DoNotShowAgainUnsupportedEditorsKey'
+const AgreedToOfflineDisclaimerKey = 'AgreedToOfflineDisclaimerKey'
 
 export default class UserPrefsManager {
   static instance = null
@@ -45,5 +46,19 @@ export default class UserPrefsManager {
     }
 
     return this.dontShowAgainUnsupportedEditors;
+  }
+
+  async setAgreedToOfflineDisclaimer() {
+    await Storage.get().setItem(AgreedToOfflineDisclaimerKey, JSON.stringify(true));
+    this.agreedToOfflineDisclaimer = true;
+  }
+
+  async getAgreedToOfflineDisclaimer() {
+    if(this.agreedToOfflineDisclaimer === null || this.agreedToOfflineDisclaimer === undefined) {
+      let agreedToOfflineDisclaimer = await Storage.get().getItem(AgreedToOfflineDisclaimerKey);
+      this.agreedToOfflineDisclaimer = agreedToOfflineDisclaimer !== null;
+    }
+
+    return this.agreedToOfflineDisclaimer;
   }
 }

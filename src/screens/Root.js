@@ -11,6 +11,7 @@ import AlertManager from '@SFJS/alertManager'
 import Abstract from "@Screens/Abstract"
 import LockedView from "@Containers/LockedView";
 import ApplicationState from "@Lib/ApplicationState"
+import UserPrefsManager from '@Lib/userPrefsManager'
 
 import Compose from "@Screens/Compose"
 import Notes from "@Screens/Notes/Notes"
@@ -30,7 +31,13 @@ export default class Root extends Abstract {
   }
 
   presentSplash() {
-    this.props.navigation.navigate("Splash");
+    UserPrefsManager.get().getAgreedToOfflineDisclaimer().then(agreedToOfflineDisclaimer => {
+      if(agreedToOfflineDisclaimer) {
+        return;
+      }
+
+      this.props.navigation.navigate("Splash");
+    });
   }
 
   registerObservers() {
