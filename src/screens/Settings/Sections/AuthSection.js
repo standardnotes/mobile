@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import {TextInput, View, Text, Keyboard, Alert} from 'react-native';
+import UserPrefsManager from '@Lib/userPrefsManager'
 import StyleKit from "@Style/StyleKit"
 import Sync from '@SFJS/syncManager'
 import SF from '@SFJS/sfjs'
@@ -23,6 +24,7 @@ export default class AuthSection extends Component {
       signingIn: false,
       registering: false,
       strictSignIn: false,
+      agreedToOfflineDisclaimer: false,
       signInButtonText: DEFAULT_SIGN_IN_TEXT,
       registerButtonText: DEFAULT_REGISTER_TEXT
     };
@@ -30,10 +32,18 @@ export default class AuthSection extends Component {
 
   componentDidMount() {
     this.setState({server: Auth.get().serverUrl()})
+
+    UserPrefsManager.get().getAgreedToOfflineDisclaimer().then(agreedToOfflineDisclaimer => {
+      this.setState({agreedToOfflineDisclaimer: agreedToOfflineDisclaimer})
+    });
   }
 
   showAdvanced = () => {
     this.setState({showAdvanced: true});
+  }
+
+  showOfflineDisclaimer = () => {
+    this.props.navigation.navigate('OfflineDisclaimer');
   }
 
   onSignInPress = () => {
@@ -309,7 +319,7 @@ export default class AuthSection extends Component {
         {this.props.title &&
           <SectionHeader title={this.props.title} />
         }
-        
+
         {this.state.mfa &&
           renderMfaSubcontent()
         }
@@ -329,7 +339,11 @@ export default class AuthSection extends Component {
         }
 
         {!this.state.showAdvanced && !this.state.mfa &&
-          <ButtonCell last={true} title="Advanced Options" onPress={() => this.showAdvanced()} />
+          <ButtonCell last={true} title="Other Options" onPress={() => this.showAdvanced()} />
+        }
+
+        {this.state.showAdvanced && !this.state.agreedToOfflineDisclaimer &&
+          <ButtonCell title="Use without an account" onPress={() => this.showOfflineDisclaimer()} />
         }
       </TableSection>
     )

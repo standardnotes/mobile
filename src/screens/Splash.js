@@ -31,10 +31,6 @@ export default class Splash extends Abstract {
     BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
   }
 
-  showAdvanced() {
-    this.props.navigation.navigate("OfflineConfirm");
-  }
-
   onBackButtonPressAndroid = () => {
     // Disable back press
     return true;
@@ -42,9 +38,9 @@ export default class Splash extends Abstract {
 
   render() {
     return (
-      <SafeAreaView style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
-        <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column',justifyContent: 'center'}} behavior={ApplicationState.isAndroid ? null : 'padding'}>
-          <ScrollView style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
+      <SafeAreaView forceInset={{ top: 'always' }} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+        <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column', justifyContent: 'center'}} behavior={ApplicationState.isAndroid ? null : 'padding'}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
             <View style={this.styles.headerContainer}>
               <Image style={this.styles.image} source={require('@Style/Images/sn-splash-logo.png')}/>
               <Text style={this.styles.headerFirstLine}>Create your free</Text>
@@ -54,10 +50,13 @@ export default class Splash extends Abstract {
               </Text>
               <Text style={this.styles.subHeader}>Access your notes no matter which device you're on.</Text>
             </View>
-            <AuthSection
-              onAuthSuccess = {() => {this.dismiss()}}
-            />
-            <ButtonCell last={true} bold={true} title="Use Offline" onPress={() => this.showAdvanced()} />
+
+            <View style={{ flex: 1 }}>
+              <AuthSection
+                navigation={this.props.navigation}
+                onAuthSuccess = {() => {this.dismiss()}}
+              />
+            </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -67,11 +66,11 @@ export default class Splash extends Abstract {
   loadStyles() {
     this.styles = {
       headerContainer: {
-        display: "flex",
+        display: 'flex',
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        textAlign: "center",
+        textAlign: 'center',
         paddingTop: 20,
         padding: 15,
         color: StyleKit.variables.stylekitForegroundColor
@@ -80,29 +79,29 @@ export default class Splash extends Abstract {
         width: 175,
         height: 175,
         marginBottom: 20,
-        resizeMode: "cover",
+        resizeMode: 'cover',
       },
       headerFirstLine: {
         fontSize: 30,
-        fontWeight: "500",
-        textAlign: "center",
+        fontWeight: '500',
+        textAlign: 'center',
         color: StyleKit.variables.stylekitForegroundColor
       },
       headerSecondLine: {
         fontSize: 30,
-        fontWeight: "500",
-        textAlign: "center",
+        fontWeight: '500',
+        textAlign: 'center',
         color: StyleKit.variables.stylekitForegroundColor
       },
       headerBrandText: {
         color: StyleKit.variables.stylekitInfoColor,
-        fontWeight: "bold",
-        textAlign: "center",
+        fontWeight: 'bold',
+        textAlign: 'center',
       },
       subHeader: {
         fontSize: 14,
         marginTop: 6,
-        textAlign: "center",
+        textAlign: 'center',
         color: StyleKit.variables.stylekitForegroundColor
       }
     }
