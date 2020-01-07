@@ -342,6 +342,7 @@ export default class StyleKit {
         backgroundColor: variables.stylekitContrastBackgroundColor
       },
       container: {
+        flex: 1,
         height: "100%",
       },
 

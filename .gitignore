@@ -20,7 +20,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-project.xcworkspace
+.xcworkspace
 
 # Android/IntelliJ
 #
@@ -40,6 +40,7 @@ yarn-error.log
 buck-out/
 \.buckd/
 *.keystore
+!debug.keystore
 
 android/app/release
 android-release.bundle
@@ -62,3 +63,7 @@ ios-release.bundle.map
 
 # Bundle artifact
 *.jsbundle
+
+# CocoaPods
+/ios/Pods/
+/ios/StandardNotes.xcodeproj/project.xcworkspace

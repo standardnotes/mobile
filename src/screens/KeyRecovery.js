@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { TextInput, View, Text, Platform, Alert, SafeAreaView } from 'react-native';
+import { TextInput, View, Text, Platform, Alert } from 'react-native';
+import { SafeAreaView } from 'react-navigation';
 import StyleKit from "@Style/StyleKit"
 import SF from '@SFJS/sfjs'
 import KeysManager from "@Lib/keysManager"

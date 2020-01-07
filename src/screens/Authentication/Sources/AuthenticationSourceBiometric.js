@@ -35,7 +35,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
   }
 
   get isFace() {
-    return this.biometricsType == "face";
+    return this.biometricsType == "Face ID";
   }
 
   get label() {

@@ -1,7 +1,10 @@
-import React, {Component} from 'react';
-import { View, Text } from "react-native";
+import React, { Component } from 'react';
+import { View, Text, Animated } from "react-native";
 import { Client } from 'bugsnag-react-native';
-import { createStackNavigator, createAppContainer, createDrawerNavigator, DrawerActions, NavigationActions } from "react-navigation";
+import { createAppContainer, NavigationActions } from "react-navigation";
+
+import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
+import { createStackNavigator } from 'react-navigation-stack';
 
 import KeysManager from './lib/keysManager'
 import StyleKit from "./style/StyleKit"
@@ -37,14 +40,12 @@ if(__DEV__ === false) {
 const AppStack = createStackNavigator({
   Notes: {screen: Root},
   Compose: {screen: Compose},
-
 }, {
-  initialRouteName: 'Notes'
+  initialRouteName: 'Notes',
+  navigationOptions: ({ navigation }) => ({
+    drawerLockMode: SideMenuManager.get().isRightSideMenuLocked() ? "locked-closed" : null
+  })
 })
-
-AppStack.navigationOptions = ({ navigation }) => {
-  return {drawerLockMode: SideMenuManager.get().isRightSideMenuLocked() ? "locked-closed" : null}
-};
 
 const AppDrawerStack = createDrawerNavigator({
   Main: AppStack
@@ -65,31 +66,27 @@ const AppDrawerStack = createDrawerNavigator({
         return NavigationActions.setParams({params: { dummy: true }, key: route.key})
       }
     };
-  },
+  }
 })
 
 const SettingsStack = createStackNavigator({
-  Screen1: Settings
+  screen: Settings
 })
 
 const InputModalStack = createStackNavigator({
-  Screen1: InputModal
+  screen: InputModal
 })
 
 const AuthenticateModalStack = createStackNavigator({
-  Screen1: Authenticate
+  screen: Authenticate
 })
 
 const ManagePrivilegesStack = createStackNavigator({
-  Screen1: ManagePrivileges
+  screen: ManagePrivileges
 })
 
 const KeyRecoveryStack = createStackNavigator({
-  Screen1: KeyRecovery
-})
-
-const SplashStack = createStackNavigator({
-  Screen1: Splash
+  screen: KeyRecovery
 })
 
 const AppDrawer = createStackNavigator({
@@ -108,13 +105,16 @@ const AppDrawer = createStackNavigator({
 }, {
   mode: "modal",
   headerMode: 'none',
-})
-
-AppDrawer.navigationOptions = ({ navigation }) => {
-  return {
+  transitionConfig: () => ({
+    transitionSpec: {
+      duration: 300,
+      timing: Animated.timing
+    }
+  }),
+  navigationOptions: ({ navigation }) => ({
     drawerLockMode: SideMenuManager.get().isLeftSideMenuLocked() ? "locked-closed" : null,
-  }
-};
+  })
+})
 
 const DrawerStack = createDrawerNavigator({
   Main: AppDrawer,
@@ -135,7 +135,7 @@ const DrawerStack = createDrawerNavigator({
         return NavigationActions.setParams({params: { dummy: true }, key: route.key})
       }
     };
-  },
+  }
 });
 
 const AppContainer = createAppContainer(DrawerStack);

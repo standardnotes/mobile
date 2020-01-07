@@ -1,33 +1,27 @@
 [submodule "vendor/react-native-actionsheet"]
 	path = vendor/react-native-actionsheet
-	url = git@github.com:mobitar/react-native-actionsheet.git
+	url = git@github.com:standardnotes/react-native-actionsheet.git
 [submodule "vendor/react-native-aes"]
 	path = vendor/react-native-aes
-	url = git@github.com:mobitar/react-native-aes.git
+	url = git@github.com:standardnotes/react-native-aes.git
 [submodule "vendor/react-native-mail"]
 	path = vendor/react-native-mail
-	url = git@github.com:mobitar/react-native-mail.git
+	url = git@github.com:standardnotes/react-native-mail.git
 [submodule "vendor/react-native-fingerprint-scanner"]
 	path = vendor/react-native-fingerprint-scanner
-	url = git@github.com:mobitar/react-native-fingerprint-scanner.git
+	url = git@github.com:standardnotes/react-native-fingerprint-scanner.git
 [submodule "vendor/react-native-flag-secure-android"]
 	path = vendor/react-native-flag-secure-android
-	url = git@github.com:mobitar/react-native-flag-secure-android.git
-[submodule "vendor/react-native-navigation"]
-	path = vendor/react-native-navigation
-	url = git@github.com:mobitar/react-native-navigation.git
+	url = git@github.com:standardnotes/react-native-flag-secure-android.git
 [submodule "vendor/react-native-fab"]
 	path = vendor/react-native-fab
-	url = git@github.com:mobitar/React-Native-FAB.git
+	url = git@github.com:standardnotes/React-Native-FAB.git
 [submodule "vendor/react-native-search-box"]
 	path = vendor/react-native-search-box
-	url = git@github.com:mobitar/react-native-search-box.git
+	url = git@github.com:standardnotes/react-native-search-box.git
 [submodule "vendor/react-native-alternate-icons"]
 	path = vendor/react-native-alternate-icons
-	url = git@github.com:mobitar/react-native-alternate-icons.git
+	url = git@github.com:standardnotes/react-native-alternate-icons.git
 [submodule "vendor/standard-notes-rn"]
 	path = vendor/standard-notes-rn
 	url = git@github.com:standardnotes/standard-notes-rn.git
-[submodule "vendor/TrustKit"]
-	path = vendor/TrustKit
-	url = git@github.com:datatheorem/TrustKit.git

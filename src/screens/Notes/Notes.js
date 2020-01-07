@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Alert, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 
 import ModelManager from '@SFJS/modelManager'
@@ -374,6 +374,13 @@ export default class Notes extends Abstract {
     } else {
       run();
     }
+
+    if(!ApplicationState.get().isInTabletMode) {
+      // Make sure we close the keyboard here, otherwise the
+      // search box keeps focus and leaves the Keyboard open. It creates a glitchy state
+      // that leave the Keyboard confused if it should be open or closed
+      Keyboard.dismiss();
+    }
   }
 
   onSearchTextChange = (text) => {
@@ -416,7 +423,7 @@ export default class Notes extends Abstract {
     }
 
     return (
-      <SafeAreaView forceInset={{ bottom: 'never'}} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView forceInset={{ top: 'never', bottom: 'never', horizontal: 'always' }} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         {this.state.notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}

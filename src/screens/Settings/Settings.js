@@ -254,7 +254,7 @@ export default class Settings extends Abstract {
     let signedIn = !Auth.get().offline();
 
     return (
-      <SafeAreaView forceInset={{ bottom: 'never'}} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView forceInset={{ top: 'never', bottom: 'never', left: 'always' }} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         <ScrollView style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}} keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
 
           {!signedIn && !this.state.confirmRegistration &&

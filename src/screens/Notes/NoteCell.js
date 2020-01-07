@@ -14,8 +14,12 @@ export default class NoteCell extends ThemedPureComponent {
     this.state = {selected: false, options: props.options || {}};
   }
 
-  componentWillReceiveProps(props) {
-    this.setState({options: props.options || {}});
+  static getDerivedStateFromProps(props, state) {
+    if (props.options !== state.options) {
+      return { options: props.options };
+    }
+
+    return null;
   }
 
   _onPress = () => {

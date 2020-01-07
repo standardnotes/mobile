@@ -287,7 +287,7 @@ export default class Compose extends Abstract {
         return this.note.tags.slice();
       },
       onKeyboardDismiss: () => {
-        // Keyboard.dismiss() does not work for native views, which our tet input is
+        // Keyboard.dismiss() does not work for native views, which our text input is
         this.input && this.input.blur();
       }
     });
@@ -474,7 +474,7 @@ export default class Compose extends Abstract {
     }
 
     return (
-      <SafeAreaView forceInset={{ bottom: 'never', vertical: 'never'}} style={[this.styles.container, StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView forceInset={{ bottom: 'never', vertical: 'never', left: 'always' }} style={[this.styles.container, StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
             <Icon name={StyleKit.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />

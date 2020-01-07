@@ -1,43 +1,33 @@
 package com.standardnotes;
 
+import com.bugsnag.BugsnagReactNative;
+import com.chirag.RNMail.RNMail;
+import com.facebook.react.PackageList;
 import com.facebook.react.modules.network.OkHttpClientProvider;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import com.facebook.react.ReactApplication;
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import com.reactnativecommunity.webview.RNCWebViewPackage;
-import com.vinzscam.reactnativefileviewer.RNFileViewerPackage;
-import com.rnfs.RNFSPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
+import com.kristiansorens.flagsecure.FlagSecure;
+import com.kristiansorens.flagsecure.FlagSecurePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
-import com.chirag.RNMail.RNMail;
-import com.kristiansorens.flagsecure.FlagSecure;
-import com.oblador.keychain.KeychainPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
 import com.standardnotes.sntextview.SNTextViewPackage;
 import com.tectiv3.aes.RCTAesPackage;
-import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
-import com.kristiansorens.flagsecure.FlagSecurePackage;
-import com.bugsnag.BugsnagReactNative;
+
+
 import org.standardnotes.SNReactNative.SNReactNativePackage;
 
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -49,23 +39,17 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-        new MainReactPackage(),
-        new AsyncStoragePackage(),
-        new RNCWebViewPackage(),
-        new RNFileViewerPackage(),
-        new RNFSPackage(),
-        new RNGestureHandlerPackage(),
-        BugsnagReactNative.getPackage(),
-        new KeychainPackage(),
-        new VectorIconsPackage(),
-        new RCTAesPackage(),
-        new RNMail(),
-        new ReactNativeFingerprintScannerPackage(),
-        new SNTextViewPackage(),
-        new FlagSecurePackage(),
-        new SNReactNativePackage()
-      );
+      @SuppressWarnings("UnnecessaryLocalVariable")
+      List<ReactPackage> packages = new PackageList(this).getPackages();
+
+      packages.add(new RCTAesPackage());
+      packages.add(new RNMail());
+      packages.add(new ReactNativeFingerprintScannerPackage());
+      packages.add(new SNTextViewPackage());
+      packages.add(new FlagSecurePackage());
+      packages.add(new SNReactNativePackage());
+
+      return packages;
     }
 
     @Override
@@ -79,6 +63,7 @@ public class MainApplication extends Application implements ReactApplication {
     return mReactNativeHost;
   }
 
+  @SuppressLint("NewApi")
   @Override
   public void onCreate() {
     super.onCreate();
@@ -86,6 +71,8 @@ public class MainApplication extends Application implements ReactApplication {
     rebuildOkHtttp();
 
     SoLoader.init(this, /* native exopackage */ false);
+
+    initializeFlipper(this); // Remove this line if you don't want Flipper enabled
 
     registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
       @Override
@@ -131,5 +118,31 @@ public class MainApplication extends Application implements ReactApplication {
 
   private void rebuildOkHtttp() {
     OkHttpClientProvider.setOkHttpClientFactory(new CustomClientFactory());
+  }
+
+  /**
+   * Loads Flipper in React Native templates.
+   *
+   * @param context
+   */
+  private static void initializeFlipper(Context context) {
+    if (BuildConfig.DEBUG) {
+      try {
+        /*
+         We use reflection here to pick up the class that initializes Flipper,
+        since Flipper library is not available in release mode
+        */
+        Class<?> aClass = Class.forName("com.facebook.flipper.ReactNativeFlipper");
+        aClass.getMethod("initializeFlipper", Context.class).invoke(null, context);
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+      } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

@@ -9,7 +9,7 @@ import ApplicationState from "@Lib/ApplicationState"
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
 
-const Mailer = require('NativeModules').RNMail;
+const Mailer = 'react-native-mail';
 const base64 = require('base-64');
 
 export default class BackupsManager {

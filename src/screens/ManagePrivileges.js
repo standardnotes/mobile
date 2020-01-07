@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { TextInput, View, Text, Platform, SafeAreaView, ScrollView } from 'react-native';
+import { TextInput, View, Text, Platform, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-navigation';
 import StyleKit from "@Style/StyleKit"
 import TableSection from "@Components/TableSection";
 import SectionedTableCell from "@Components/SectionedTableCell";
@@ -119,7 +120,7 @@ export default class ManagePrivileges extends Abstract {
     }
 
     return (
-      <View style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         <ScrollView>
 
           <View style={this.styles.section}>
@@ -165,7 +166,7 @@ export default class ManagePrivileges extends Abstract {
           )}
 
         </ScrollView>
-      </View>
+      </SafeAreaView>
     );
   }
 
