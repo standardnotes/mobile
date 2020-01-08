@@ -1,28 +1,35 @@
 import React, { Component } from 'react';
-import { TextInput, View, Text, Platform, ScrollView } from 'react-native';
+import {
+  TextInput,
+  View,
+  Text,
+  Platform,
+  ScrollView
+} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import StyleKit from "@Style/StyleKit"
-import TableSection from "@Components/TableSection";
-import SectionedTableCell from "@Components/SectionedTableCell";
-import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
-import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell"
-import SectionHeader from "@Components/SectionHeader";
-import ButtonCell from "@Components/ButtonCell";
-import Abstract from "@Screens/Abstract"
-import LockedView from "@Containers/LockedView";
-import ApplicationState from "@Lib/ApplicationState"
-import Auth from "@SFJS/authManager"
-import KeysManager from "@Lib/keysManager"
-import PrivilegesManager from "@SFJS/privilegesManager"
+import ButtonCell from '@Components/ButtonCell';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import TableSection from '@Components/TableSection';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import Auth from '@SFJS/authManager';
+import PrivilegesManager from '@SFJS/privilegesManager';
+import Abstract from '@Screens/Abstract';
+import { ICON_CHECKMARK } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class ManagePrivileges extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
-    let templateOptions = {
+    const templateOptions = {
       title: "Privileges",
       leftButton: {
         title: ApplicationState.isIOS ? "Done" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("checkmark"),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CHECKMARK),
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -39,7 +46,7 @@ export default class ManagePrivileges extends Abstract {
     props.navigation.setParams({
       leftButton: {
         title: ApplicationState.isIOS ? "Done" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("checkmark"),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CHECKMARK),
         onPress: () => {
           this.dismiss();
         }

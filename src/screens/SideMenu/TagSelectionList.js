@@ -1,22 +1,23 @@
 import React, { Component, Fragment } from 'react';
-import { ScrollView, View, Text, FlatList } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  FlatList
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-import Sync from '@SFJS/syncManager'
-import ItemActionManager from '@Lib/itemActionManager'
-import ModelManager from '@SFJS/modelManager'
-import Auth from "@SFJS/authManager"
-
-import StyleKit from "@Style/StyleKit"
-import SideMenuCell from "@SideMenu/SideMenuCell"
-
-import ThemedComponent from "@Components/ThemedComponent";
-
-import ApplicationState from "@Lib/ApplicationState"
-import OptionsState from "@Lib/OptionsState"
-import ActionSheetWrapper from "@Style/ActionSheetWrapper"
-
 import { withNavigation } from 'react-navigation';
+import ThemedComponent from '@Components/ThemedComponent';
+import ApplicationState from '@Lib/ApplicationState';
+import ItemActionManager from '@Lib/itemActionManager';
+import OptionsState from '@Lib/OptionsState';
+import { SCREEN_INPUT_MODAL } from '@Screens/screens';
+import Auth from '@SFJS/authManager';
+import ModelManager from '@SFJS/modelManager';
+import Sync from '@SFJS/syncManager';
+import SideMenuCell from '@SideMenu/SideMenuCell';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import StyleKit from '@Style/StyleKit';
 
 class TagSelectionList extends ThemedComponent {
 
@@ -92,7 +93,7 @@ class TagSelectionList extends ThemedComponent {
       title: tag.title,
       options: [
         ActionSheetWrapper.BuildOption({text: "Rename", callback: () => {
-          this.props.navigation.navigate("InputModal", {
+          this.props.navigation.navigate(SCREEN_INPUT_MODAL, {
             title: 'Rename Tag',
             placeholder: "Tag name",
             initialValue: tag.title,

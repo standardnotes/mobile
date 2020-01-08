@@ -1,35 +1,43 @@
+import { Client } from 'bugsnag-react-native';
 import React, { Component } from 'react';
 import { View, Text, Animated } from 'react-native';
-import { Client } from 'bugsnag-react-native';
 import { createAppContainer, NavigationActions } from 'react-navigation';
-
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
-
-import KeysManager from './lib/keysManager'
-import StyleKit from './style/StyleKit'
-import ApplicationState from '@Lib/ApplicationState'
-import Auth from './lib/sfjs/authManager'
-import ModelManager from './lib/sfjs/modelManager'
-import PrivilegesManager from '@SFJS/privilegesManager'
-import MigrationManager from '@SFJS/migrationManager'
-import Sync from './lib/sfjs/syncManager'
-import Storage from './lib/sfjs/storageManager'
-import ReviewManager from './lib/reviewManager'
-
-import Compose from '@Screens/Compose'
-import Splash from '@Screens/Splash'
-import OfflineDisclaimer from '@Screens/OfflineDisclaimer'
-import Root from '@Screens/Root'
-import MainSideMenu from '@SideMenu/MainSideMenu'
-import NoteSideMenu from '@SideMenu/NoteSideMenu'
-import Settings from '@Screens/Settings/Settings'
-import InputModal from '@Screens/InputModal'
-import ManagePrivileges from '@Screens/ManagePrivileges'
-import Authenticate from '@Screens/Authentication/Authenticate'
-import KeyRecovery from '@Screens/KeyRecovery'
-
-import SideMenuManager from '@SideMenu/SideMenuManager'
+import KeysManager from '@Lib/keysManager';
+import StyleKit from '@Style/StyleKit';
+import ApplicationState from '@Lib/ApplicationState';
+import Auth from '@Lib/sfjs/authManager';
+import ModelManager from '@Lib/sfjs/modelManager';
+import PrivilegesManager from '@SFJS/privilegesManager';
+import MigrationManager from '@SFJS/migrationManager';
+import Sync from '@Lib/sfjs/syncManager';
+import Storage from '@Lib/sfjs/storageManager';
+import ReviewManager from '@Lib/reviewManager';
+import Authenticate from '@Screens/Authentication/Authenticate';
+import Compose from '@Screens/Compose';
+import {
+  SCREEN_SPLASH,
+  SCREEN_OFFLINE_DISCLAIMER,
+  SCREEN_AUTHENTICATE,
+  SCREEN_HOME,
+  SCREEN_NOTES,
+  SCREEN_COMPOSE,
+  SCREEN_INPUT_MODAL,
+  SCREEN_SETTINGS,
+  SCREEN_MANAGE_PRIVILEGES,
+  SCREEN_KEY_RECOVERY
+} from '@Screens/screens';
+import InputModal from '@Screens/InputModal';
+import KeyRecovery from '@Screens/KeyRecovery';
+import MainSideMenu from '@SideMenu/MainSideMenu';
+import ManagePrivileges from '@Screens/ManagePrivileges';
+import NoteSideMenu from '@SideMenu/NoteSideMenu';
+import OfflineDisclaimer from '@Screens/OfflineDisclaimer';
+import Root from '@Screens/Root';
+import Settings from '@Screens/Settings/Settings';
+import SideMenuManager from '@SideMenu/SideMenuManager';
+import Splash from '@Screens/Splash';
 
 if(__DEV__ === false) {
   const bugsnag = new Client()
@@ -39,10 +47,10 @@ if(__DEV__ === false) {
 }
 
 const AppStack = createStackNavigator({
-  Notes: {screen: Root},
-  Compose: {screen: Compose},
+  [SCREEN_NOTES]: {screen: Root},
+  [SCREEN_COMPOSE]: {screen: Compose},
 }, {
-  initialRouteName: 'Notes',
+  initialRouteName: SCREEN_NOTES,
   navigationOptions: ({ navigation }) => ({
     drawerLockMode: SideMenuManager.get().isRightSideMenuLocked() ? 'locked-closed' : null
   })
@@ -95,19 +103,19 @@ const OfflineDisclaimerStack = createStackNavigator({
 })
 
 const AppDrawer = createStackNavigator({
-  Home: AppDrawerStack,
-  Settings: SettingsStack,
-  InputModal: InputModalStack,
-  Authenticate: AuthenticateModalStack,
-  ManagePrivileges: ManagePrivilegesStack,
-  KeyRecovery: KeyRecoveryStack,
-  Splash: {
+  [SCREEN_HOME]: AppDrawerStack,
+  [SCREEN_SETTINGS]: SettingsStack,
+  [SCREEN_INPUT_MODAL]: InputModalStack,
+  [SCREEN_AUTHENTICATE]: AuthenticateModalStack,
+  [SCREEN_MANAGE_PRIVILEGES]: ManagePrivilegesStack,
+  [SCREEN_KEY_RECOVERY]: KeyRecoveryStack,
+  [SCREEN_SPLASH]: {
     screen: Splash,
     navigationOptions: {
      gesturesEnabled: false,
    },
   },
-  OfflineDisclaimer: OfflineDisclaimerStack
+  [SCREEN_OFFLINE_DISCLAIMER]: OfflineDisclaimerStack
 }, {
   mode: 'modal',
   headerMode: 'none',

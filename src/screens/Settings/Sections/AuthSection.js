@@ -1,16 +1,22 @@
 import React, { Component, Fragment } from 'react';
-import {TextInput, View, Text, Keyboard, Alert} from 'react-native';
-import UserPrefsManager from '@Lib/userPrefsManager'
-import StyleKit from "@Style/StyleKit"
-import Sync from '@SFJS/syncManager'
-import SF from '@SFJS/sfjs'
-import Auth from '@SFJS/authManager'
-
-import SectionHeader from "@Components/SectionHeader";
-import ButtonCell from "@Components/ButtonCell";
-import TableSection from "@Components/TableSection";
-import SectionedTableCell from "@Components/SectionedTableCell";
-import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
+import {
+  TextInput,
+  View,
+  Text,
+  Keyboard,
+  Alert
+} from 'react-native';
+import ButtonCell from '@Components/ButtonCell';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import SectionHeader from '@Components/SectionHeader';
+import TableSection from '@Components/TableSection';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import UserPrefsManager from '@Lib/userPrefsManager';
+import { SCREEN_OFFLINE_DISCLAIMER } from '@Screens/screens';
+import Auth from '@SFJS/authManager';
+import SF from '@SFJS/sfjs';
+import Sync from '@SFJS/syncManager';
+import StyleKit from '@Style/StyleKit';
 
 const DEFAULT_SIGN_IN_TEXT = "Sign In";
 const DEFAULT_REGISTER_TEXT = "Register";
@@ -43,7 +49,7 @@ export default class AuthSection extends Component {
   }
 
   showOfflineDisclaimer = () => {
-    this.props.navigation.navigate('OfflineDisclaimer');
+    this.props.navigation.navigate(SCREEN_OFFLINE_DISCLAIMER);
   }
 
   onSignInPress = () => {

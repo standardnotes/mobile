@@ -1,12 +1,20 @@
 import React, { Component } from 'react';
-import { View, Text, KeyboardAvoidingView, ScrollView, Image, BackHandler, Keyboard } from 'react-native';
+import {
+  View,
+  Text,
+  KeyboardAvoidingView,
+  ScrollView,
+  Image,
+  BackHandler,
+  Keyboard
+} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import StyleKit from "@Style/StyleKit"
 import ButtonCell from "@Components/ButtonCell";
-import Abstract from "@Screens/Abstract"
-import AuthSection from "@Screens/Settings/Sections/AuthSection"
 import ApplicationState from "@Lib/ApplicationState"
 import AlertManager from "@SFJS/alertManager"
+import StyleKit from "@Style/StyleKit"
+import Abstract from "@Screens/Abstract"
+import AuthSection from "@Screens/Settings/Sections/AuthSection"
 
 export default class Splash extends Abstract {
 

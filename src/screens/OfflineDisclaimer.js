@@ -1,29 +1,34 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, KeyboardAvoidingView, ScrollView, Keyboard } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  KeyboardAvoidingView,
+  ScrollView,
+  Keyboard
+} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-
-import StyleKit from '@Style/StyleKit'
-
-import SectionHeader from '@Components/SectionHeader';
 import ButtonCell from '@Components/ButtonCell';
-
-import Abstract from '@Screens/Abstract'
-
-import ApplicationState from '@Lib/ApplicationState'
-import UserPrefsManager from '@Lib/userPrefsManager'
-
-import AlertManager from '@SFJS/alertManager'
+import SectionHeader from '@Components/SectionHeader';
+import ApplicationState from '@Lib/ApplicationState';
+import UserPrefsManager from '@Lib/userPrefsManager';
+import { stripNonAlphanumeric, isMatchCaseInsensitive } from '@Lib/utils';
+import AlertManager from '@SFJS/alertManager';
+import Abstract from '@Screens/Abstract';
+import { SCREEN_HOME } from '@Screens/screens';
+import { ICON_CLOSE } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 const DISCLAIMER_TEXT = "I understand that using the app without an account carries risks, and that I am responsible for making my own backups at regular intervals from the Settings menu.";
 
 export default class OfflineDisclaimer extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
-    let templateOptions = {
+    const templateOptions = {
       title: "No Account",
       leftButton: {
         title: ApplicationState.isIOS ? 'Cancel' : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon('close'),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CLOSE),
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -35,7 +40,7 @@ export default class OfflineDisclaimer extends Abstract {
     props.navigation.setParams({
       leftButton: {
         title: ApplicationState.isIOS ? 'Cancel' : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon('close'),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
         }
@@ -50,16 +55,16 @@ export default class OfflineDisclaimer extends Abstract {
 
   onAgreeToDisclaimer() {
     UserPrefsManager.get().setAgreedToOfflineDisclaimer().then(() => {
-      this.props.navigation.navigate('Home');
+      this.props.navigation.navigate(SCREEN_HOME);
     });
   }
 
-  onInputChange = (text) => {
-    const stillWaiting = text.toLowerCase().replace(/\W/g, '') !== DISCLAIMER_TEXT.toLowerCase().replace(/\W/g, '');
+  onInputChange = (inputText) => {
+    const isMatching = isMatchCaseInsensitive(stripNonAlphanumeric(inputText), stripNonAlphanumeric(DISCLAIMER_TEXT));
 
     this.setState({
-      userInput: text,
-      waitingOnAgreement: stillWaiting
+      userInput: inputText,
+      waitingOnAgreement: !isMatching
     });
   }
 
@@ -150,7 +155,6 @@ export default class OfflineDisclaimer extends Abstract {
       },
       disclaimerText: {
         padding: textPadding,
-        // fontStyle: 'italic'
         fontWeight: '600'
       },
       inputTextContainer: {

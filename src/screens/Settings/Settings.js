@@ -1,39 +1,41 @@
 import React, { Component } from 'react';
-import {ScrollView, View, Alert, Keyboard, Platform} from 'react-native';
+import {
+  ScrollView,
+  Alert
+} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-
-import Sync from '@SFJS/syncManager'
-import ModelManager from '@SFJS/modelManager'
-import AlertManager from '@SFJS/alertManager'
-import SF from '@SFJS/sfjs'
-import Auth from '@SFJS/authManager'
-import Storage from "@SFJS/storageManager"
-
-import KeysManager from '@Lib/keysManager'
-import OptionsState from "@Lib/OptionsState"
-import ApplicationState from "@Lib/ApplicationState"
-import StyleKit from "@Style/StyleKit"
-
-import SectionHeader from "@Components/SectionHeader";
-import TableSection from "@Components/TableSection";
-import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
-import Abstract from "@Screens/Abstract"
-import LockedView from "@Containers/LockedView";
-
-import AuthSection from "@Screens/Settings/Sections/AuthSection"
-import OptionsSection from "@Screens/Settings/Sections/OptionsSection"
-import PasscodeSection from "@Screens/Settings/Sections/PasscodeSection"
-import EncryptionSection from "@Screens/Settings/Sections/EncryptionSection"
-import CompanySection from "@Screens/Settings/Sections/CompanySection"
+import SectionHeader from '@Components/SectionHeader';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import TableSection from '@Components/TableSection';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import AlertManager from '@SFJS/alertManager';
+import Auth from '@SFJS/authManager';
+import SF from '@SFJS/sfjs';
+import Storage from '@SFJS/storageManager';
+import Sync from '@SFJS/syncManager';
+import Abstract from '@Screens/Abstract';
+import {
+  SCREEN_INPUT_MODAL,
+  SCREEN_MANAGE_PRIVILEGES
+} from '@Screens/screens';
+import AuthSection from '@Screens/Settings/Sections/AuthSection';
+import CompanySection from '@Screens/Settings/Sections/CompanySection';
+import EncryptionSection from '@Screens/Settings/Sections/EncryptionSection';
+import OptionsSection from '@Screens/Settings/Sections/OptionsSection';
+import PasscodeSection from '@Screens/Settings/Sections/PasscodeSection';
+import { ICON_CHECKMARK } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class Settings extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
-    let templateOptions = {
+    const templateOptions = {
       title: "Settings",
       leftButton: {
         title: ApplicationState.isIOS ? "Done" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("checkmark"),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CHECKMARK),
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -45,7 +47,7 @@ export default class Settings extends Abstract {
     props.navigation.setParams({
       leftButton: {
         title: ApplicationState.isIOS ? "Done" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("checkmark"),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CHECKMARK),
         onPress: () => {
           this.dismiss();
         }
@@ -152,7 +154,7 @@ export default class Settings extends Abstract {
   }
 
   onPasscodeEnable = () => {
-    this.props.navigation.navigate("InputModal", {
+    this.props.navigation.navigate(SCREEN_INPUT_MODAL, {
       title: "Setup Passcode",
       placeholder: "Enter a passcode",
       confirmPlaceholder: "Confirm passcode",
@@ -242,7 +244,7 @@ export default class Settings extends Abstract {
 
   openManagePrivs = () => {
     this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManagePrivileges, () => {
-      this.props.navigation.navigate("ManagePrivileges")
+      this.props.navigation.navigate(SCREEN_MANAGE_PRIVILEGES)
     })
   }
 

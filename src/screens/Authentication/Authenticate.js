@@ -1,21 +1,28 @@
 import React, { Component } from 'react';
-import { TextInput, View, Text, Alert, Button, ScrollView } from 'react-native';
-
-import Abstract from "@Screens/Abstract"
-import SectionHeader from "@Components/SectionHeader";
-import ButtonCell from "@Components/ButtonCell";
-import TableSection from "@Components/TableSection";
-import SectionedTableCell from "@Components/SectionedTableCell";
-import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
-import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
-import StyleKit from "@Style/StyleKit"
+import {
+  TextInput,
+  View,
+  Text,
+  Alert,
+  Button,
+  ScrollView
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import ApplicationState from "@Lib/ApplicationState"
+import ButtonCell from '@Components/ButtonCell';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import TableSection from '@Components/TableSection';
+import ApplicationState from '@Lib/ApplicationState';
+import Abstract from '@Screens/Abstract';
+import { ICON_CLOSE } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class Authenticate extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
-    let templateOptions = {
+    const templateOptions = {
       // On Android, not having a left button will make the title appear all the way at the edge
       // Below will add some padding
       title: ApplicationState.isAndroid ? "  Authenticate" : "Authenticate"
@@ -49,7 +56,7 @@ export default class Authenticate extends Abstract {
       props.navigation.setParams({
         leftButton: {
           title: ApplicationState.isIOS ? "Cancel" : null,
-          iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
+          iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CLOSE),
           onPress: () => {
             this.getProp("onCancel")();
             this.dismiss();
