@@ -17,7 +17,11 @@ import SectionHeader from "@Components/SectionHeader";
 import TableSection from "@Components/TableSection";
 import LockedView from "@Containers/LockedView";
 
-import StyleKit from "@Style/StyleKit"
+import StyleKit, {
+  LIGHT_MODE_KEY,
+  DARK_MODE_KEY,
+  themeStorageKeyForMode
+} from "@Style/StyleKit";
 import ActionSheetWrapper from "@Style/ActionSheetWrapper"
 
 import { supportsDarkMode } from 'react-native-dark-mode'
@@ -46,9 +50,9 @@ export default class MainSideMenu extends AbstractSideMenu {
     });
 
     this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
-      if(event == "enter-out-of-sync") {
+      if(event == 'enter-out-of-sync') {
         this.setState({outOfSync: true});
-      } else if(event == "exit-out-of-sync") {
+      } else if(event == 'exit-out-of-sync') {
         this.setState({outOfSync: false});
       }
     })
@@ -100,25 +104,28 @@ export default class MainSideMenu extends AbstractSideMenu {
   }
 
   onThemeLongPress = (theme) => {
-    const lightThemeName = supportsDarkMode ? "Light" : "Active";
-    const setLightThemeActionName = `${theme.content[StyleKit.storageKeyForMode("light")] ? "Current" : "Set as"} ${lightThemeName} Theme`;
-    const setDarkThemeActionName = `${theme.content[StyleKit.storageKeyForMode("dark")] ? "Current" : "Set as"} Dark Theme`;
-
     let actionSheetOptions = [];
 
     // if this theme is a mobile theme, allow it to be set as the preferred option for light/dark mode
     if(theme.content.package_info && !theme.content.package_info.no_mobile) {
+      const allowsDarkModeChoice = supportsDarkMode && !theme.content.isSystemTheme;
+      const lightThemeAction = this.themeActionForMode({theme: theme, mode: LIGHT_MODE_KEY});
+      const lightThemeName = allowsDarkModeChoice ? "Light" : "Active";
+      const setLightThemeActionName = `${lightThemeAction} ${lightThemeName} Theme`;
+
       actionSheetOptions.push(
         ActionSheetWrapper.BuildOption({text: setLightThemeActionName, callback: () => {
-          StyleKit.get().assignThemeForMode(theme, "light");
+          StyleKit.get().saveThemeForMode({theme: theme, mode: LIGHT_MODE_KEY});
         }})
       );
 
-      // only add a dark mode option if this device supports dark/light mode
-      if(supportsDarkMode) {
+      // only add a dark mode option if this theme supports dark/light mode
+      if(allowsDarkModeChoice) {
+        const setDarkThemeActionName = `${this.themeActionForMode({theme: theme, mode: DARK_MODE_KEY})} Dark Theme`;
+
         actionSheetOptions.push(
           ActionSheetWrapper.BuildOption({text: setDarkThemeActionName, callback: () => {
-            StyleKit.get().assignThemeForMode(theme, "dark");
+            StyleKit.get().saveThemeForMode({theme: theme, mode: DARK_MODE_KEY});
           }})
         )
       }
@@ -157,15 +164,24 @@ export default class MainSideMenu extends AbstractSideMenu {
     })
   }
 
+  themeActionForMode({theme, mode}) {
+    const isThemeForCurrentMode = StyleKit.get().isThemeActive(theme) &&
+        mode === StyleKit.get().currentDarkMode;
+
+    return isThemeForCurrentMode ||
+        theme.content[themeStorageKeyForMode(mode)]
+        ? "Current" : "Set as";
+  }
+
   iconDescriptorForTheme = (theme) => {
     let desc = {
-      type: "circle",
-      side: "right"
+      type: 'circle',
+      side: 'right'
     };
 
     let dockIcon = theme.content.package_info && theme.content.package_info.dock_icon;
 
-    if(dockIcon && dockIcon.type == "circle") {
+    if(dockIcon && dockIcon.type == 'circle') {
       _.merge(desc, {
         backgroundColor: dockIcon.background_color,
         borderColor: dockIcon.border_color,
@@ -202,9 +218,9 @@ export default class MainSideMenu extends AbstractSideMenu {
     if(themes.length == 2) {
       options.push(SideMenuSection.BuildOption({
         text: "Get More Themes",
-        key: "get-theme",
+        key: 'get-theme',
         iconDesc: {
-          type: "icon",
+          type: 'icon',
           name: StyleKit.nameForIcon("brush"),
           side: "right",
           size: 17

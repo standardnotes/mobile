@@ -147,7 +147,7 @@ export default function App(props) {
   StyleKit.get().setModeTo(useDarkModeContext());
 
   // if user switches light/dark mode while on the app, update theme accordingly
-  darkModeEventEmitter.on('currentModeChanged', changeCurrentMode)
+  darkModeEventEmitter.on('currentModeChanged', changeCurrentMode);
 
   KeysManager.get().registerAccountRelatedStorageKeys(["options"]);
 

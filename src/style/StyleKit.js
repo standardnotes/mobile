@@ -13,6 +13,17 @@ import IconChanger from 'react-native-alternate-icons';
 import redJSON from './Themes/red.json';
 import blueJSON from './Themes/blue.json';
 
+export const LIGHT_MODE_KEY = 'light';
+export const DARK_MODE_KEY = 'dark';
+export const LIGHT_CONTENT = 'light-content';
+export const DARK_CONTENT = 'dark-content';
+export const LIGHT_MODE_THEME_KEY = 'isMobileLightTheme';
+export const DARK_MODE_THEME_KEY = 'isMobileDarkTheme';
+
+export function themeStorageKeyForMode(mode) {
+  return mode === DARK_MODE_KEY ? DARK_MODE_THEME_KEY : LIGHT_MODE_THEME_KEY;
+}
+
 export default class StyleKit {
 
   static instance = null;
@@ -32,15 +43,14 @@ export default class StyleKit {
 
     this.createDefaultThemes();
 
-    KeysManager.get().registerAccountRelatedStorageKeys(["savedTheme"]);
+    KeysManager.get().registerAccountRelatedStorageKeys(['savedTheme']);
 
-    ModelManager.get().addItemSyncObserver("themes", "SN|Theme", (allItems, validItems, deletedItems, source) => {
+    ModelManager.get().addItemSyncObserver('themes', 'SN|Theme', (allItems, validItems, deletedItems, source) => {
       if(this.activeTheme && this.activeTheme.isSwapIn) {
         var matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
         if(matchingTheme) {
           this.setActiveTheme(matchingTheme);
           this.activeTheme.isSwapIn = false;
-          this.activeTheme.setMobileActive(true);
         }
       }
     });
@@ -70,29 +80,23 @@ export default class StyleKit {
     }
   }
 
-  getCurrentDarkMode() {
-    return this.currentDarkMode === "dark";
-  }
-
   setModeTo(mode) {
-    // 'light' or 'dark'
     this.currentDarkMode = mode;
   }
 
-  storageKeyForCurrentMode() {
-    return this.getCurrentDarkMode() ? "isMobileDarkTheme" : "isMobileLightTheme";
+  themeStorageKeyForCurrentMode() {
+    return themeStorageKeyForMode(this.currentDarkMode);
   }
 
-  static storageKeyForMode(mode) {
-    return mode === "dark" ? "isMobileDarkTheme" : "isMobileLightTheme";
-  }
+  saveThemeForMode({theme, mode}) {
+    const modeToSaveFor = theme.content.isSystemTheme ? this.currentDarkMode : mode;
+    const storageKey = themeStorageKeyForMode(modeToSaveFor);
 
-  assignThemeForMode(theme, mode) {
-    const storageKey = StyleKit.storageKeyForMode(mode);
-
-    // unset the themes that were previously set for this key
-    // we loop instead of finding the specific theme with the matching mode incase of any sync
-    // conflicts happen to assign 2 themes as the theme for a specific mode
+    /**
+      Unset the themes that were previously set for this key. We loop instead
+      of finding the specific theme with the matching mode incase of any sync
+      conflicts happen to assign 2 themes as the theme for a specific mode.
+    */
     _.forEach(this.themes(), _theme => {
       if(_theme.content && _theme.content[storageKey]) {
         _theme.content[storageKey] = false;
@@ -104,18 +108,23 @@ export default class StyleKit {
     theme.content[storageKey] = true;
     theme.setDirty(true);
 
-    // if we're changing the theme for a specific mode and we're currently on that mode, then set this theme as active
-    if(this.currentDarkMode == mode && this.activeTheme.uuid != theme.uuid) {
+    /**
+      If we're changing the theme for a specific mode and we're currently on
+      that mode, then set this theme as active
+    */
+    if(this.currentDarkMode === modeToSaveFor && this.activeTheme.uuid !== theme.uuid) {
       this.setActiveTheme(theme);
-      theme.setMobileActive(true);
     }
 
     Sync.get().sync();
   }
 
-  // When downloading an external theme, we can't depend on it having all the variables present.
-  // So we will merge them with this template variable list to make sure the end result has all
-  // variables the app expects. Return a copy as the result may be modified before use.
+  /**
+    When downloading an external theme, we can't depend on it having all the
+    variables present. So we will merge them with this template variable list
+    to make sure the end result has all variables the app expects. Return a
+    copy as the result may be modified before use.
+  */
   templateVariables() {
     return _.clone(redJSON);
   }
@@ -136,7 +145,7 @@ export default class StyleKit {
 
     for(var option of options) {
       let variables = option.variables;
-      variables.statusBar = Platform.OS == "android" ? "light-content" : "dark-content";
+      variables.statusBar = Platform.OS == 'android' ? LIGHT_CONTENT : DARK_CONTENT;
 
       let theme = new SNTheme({
         uuid: option.name,
@@ -147,7 +156,7 @@ export default class StyleKit {
           variables: variables,
           package_info: {
             dock_icon: {
-              type: "circle",
+              type: 'circle',
               background_color: variables.stylekitInfoColor,
               border_color: variables.stylekitInfoColor
             }
@@ -160,21 +169,20 @@ export default class StyleKit {
   }
 
   async resolveInitialTheme() {
-    let runDefaultTheme = async () => {
+    const runDefaultTheme = async () => {
       let theme;
-      let savedSystemThemeId = await Storage.get().getItem("savedSystemThemeId");
+      const savedSystemThemeId = await Storage.get().getItem('savedSystemThemeId');
       if(savedSystemThemeId) {
         theme = this.systemThemes.find((candidate) => candidate.uuid == savedSystemThemeId);
       } else {
         theme = this.systemThemes[0];
       }
 
-      theme.setMobileActive(true);
       this.setActiveTheme(theme);
     }
 
     // Get the active theme from storage rather than waiting for local database to load
-    var themeResult = await Storage.get().getItem("savedTheme");
+    const themeResult = await Storage.get().getItem('savedTheme');
     if(!themeResult) {
       return runDefaultTheme();
     }
@@ -182,8 +190,8 @@ export default class StyleKit {
     // JSON stringified content is generic and includes all items property at time of stringification
     // So we parse it, then set content to itself, so that the mapping can be handled correctly.
     try {
-      var parsedTheme = JSON.parse(themeResult);
-      var theme = new SNTheme(parsedTheme);
+      const parsedTheme = JSON.parse(themeResult);
+      let theme = new SNTheme(parsedTheme);
       theme.isSwapIn = true;
       this.setActiveTheme(theme);
     } catch (e) {
@@ -211,7 +219,7 @@ export default class StyleKit {
   static stylesForKey(key) {
     var allStyles = this.styles;
     var styles = [allStyles[key]];
-    var platform = Platform.OS == "android" ? "Android" : "IOS";
+    var platform = Platform.OS == 'android' ? "Android" : "IOS";
     var platformStyles = allStyles[key+platform];
     if(platformStyles) {
       styles.push(platformStyles);
@@ -227,9 +235,9 @@ export default class StyleKit {
 
     if(theme.luminosity < 130) {
       // is dark color, return white status bar
-      return "light-content";
+      return LIGHT_CONTENT;
     } else {
-      return "dark-content";
+      return DARK_CONTENT;
     }
   }
 
@@ -240,9 +248,9 @@ export default class StyleKit {
 
     if(theme.luminosity < 130) {
       // is dark color, return dark keyboard
-      return "dark";
+      return DARK_MODE_KEY;
     } else {
-      return "light";
+      return LIGHT_MODE_KEY;
     }
   }
 
@@ -266,13 +274,14 @@ export default class StyleKit {
   }
 
   setActiveTheme(theme) {
+    const isAndroid = Platform.OS === 'android';
+
     // merge default variables in case this theme has variables that are missing
     let variables = theme.content.variables;
     theme.content.variables = _.merge(this.templateVariables(), variables);
+    theme.setMobileActive(true);
 
     this.activeTheme = theme;
-
-    const isAndroid = Platform.OS == "android";
 
     // On Android, a time out is required, especially during app startup
     setTimeout(() => {
@@ -294,7 +303,7 @@ export default class StyleKit {
       IconChanger.supportDevice((supported) => {
         if(supported) {
           IconChanger.getIconName((currentName) => {
-            if(theme.content.isInitial && currentName != "default") {
+            if(theme.content.isInitial && currentName != 'default') {
               // Clear the icon to default
               IconChanger.setIconName(null);
             } else {
@@ -320,16 +329,16 @@ export default class StyleKit {
 
     var performActivation = async () => {
       // assign this as the preferential theme for current light/dark mode the user is using
-      this.assignThemeForMode(theme, this.currentDarkMode);
+      this.saveThemeForMode({theme: theme, mode: this.currentDarkMode});
 
       if(theme.content.isSystemTheme) {
-        Storage.get().setItem("savedSystemThemeId", theme.uuid);
-        Storage.get().removeItem("savedTheme");
+        Storage.get().setItem('savedSystemThemeId', theme.uuid);
+        Storage.get().removeItem('savedTheme');
       } else if(writeToStorage) {
         let transformer = new SFItemParams(theme);
         let params = await transformer.paramsForLocalStorage();
-        Storage.get().setItem("savedTheme", JSON.stringify(params));
-        Storage.get().removeItem("savedSystemThemeId");
+        Storage.get().setItem('savedTheme', JSON.stringify(params));
+        Storage.get().removeItem('savedSystemThemeId');
       }
     }
 
@@ -364,9 +373,8 @@ export default class StyleKit {
   activateThemeForCurrentMode() {
     if(this.themeChange) clearTimeout(this.themeChange);
     this.themeChange = setTimeout(() => {
-      const storageKey = this.storageKeyForCurrentMode();
-
-      let matchingTheme = this.themes().find((candidate) => candidate.content[storageKey]);
+      const storageKey = this.themeStorageKeyForCurrentMode();
+      const matchingTheme = this.themes().find((candidate) => candidate.content[storageKey]);
 
       if(matchingTheme) {
         if(matchingTheme.uuid === this.activeTheme.uuid) {
@@ -378,7 +386,7 @@ export default class StyleKit {
         this.activateTheme(matchingTheme);
       } else {
         // No matching theme found, set currently active theme as the default for this mode (light/dark)
-        this.assignThemeForMode(this.activeTheme, this.currentDarkMode);
+        this.saveThemeForMode({theme: this.activeTheme, mode: this.currentDarkMode});
       }
     }, 300);
   }
@@ -412,7 +420,7 @@ export default class StyleKit {
       },
       container: {
         flex: 1,
-        height: "100%",
+        height: '100%',
       },
 
       flexContainer: {
@@ -470,7 +478,7 @@ export default class StyleKit {
         fontSize: mainTextFontSize,
         padding: 0,
         color: variables.stylekitForegroundColor,
-        height: "100%"
+        height: '100%'
       },
 
       sectionedTableCellFirst: {
@@ -486,13 +494,13 @@ export default class StyleKit {
         paddingTop: 0,
         paddingBottom: 0,
         minHeight: 47,
-        backgroundColor: "transparent"
+        backgroundColor: 'transparent'
       },
 
       sectionedAccessoryTableCellLabel: {
         fontSize: mainTextFontSize,
         color: variables.stylekitForegroundColor,
-        minWidth: "80%"
+        minWidth: '80%'
       },
 
       buttonCell: {
@@ -503,14 +511,14 @@ export default class StyleKit {
       },
 
       buttonCellButton: {
-        textAlign: "center",
-        textAlignVertical: "center",
-        color: Platform.OS == "android" ? variables.stylekitForegroundColor : variables.stylekitInfoColor,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        color: Platform.OS == 'android' ? variables.stylekitForegroundColor : variables.stylekitInfoColor,
         fontSize: mainTextFontSize,
       },
 
       buttonCellButtonLeft: {
-        textAlign: "left",
+        textAlign: 'left',
       },
 
       noteText: {
@@ -573,11 +581,11 @@ export default class StyleKit {
 
       actionSheetCancelButtonTitle: {
         color: variables.stylekitInfoColor,
-        fontWeight: "normal"
+        fontWeight: 'normal'
       },
 
       bold: {
-        fontWeight: "bold"
+        fontWeight: 'bold'
       },
     }
   }
@@ -590,7 +598,7 @@ export default class StyleKit {
   }
 
   static platformIconPrefix() {
-    return Platform.OS == "android" ? "md" : "ios";
+    return Platform.OS == 'android' ? 'md' : 'ios';
   }
 
   static nameForIcon(iconName) {
