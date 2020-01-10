@@ -32,14 +32,12 @@ export default class Root extends Abstract {
     return offline && numNotes == 0;
   }
 
-  presentSplash() {
-    UserPrefsManager.get().getAgreedToOfflineDisclaimer().then(agreedToOfflineDisclaimer => {
-      if(agreedToOfflineDisclaimer) {
-        return;
-      }
+  async presentSplash() {
+    const agreed = await UserPrefsManager.get().getAgreedToOfflineDisclaimer();
 
+    if(!agreed) {
       this.props.navigation.navigate(SCREEN_SPLASH);
-    });
+    }
   }
 
   registerObservers() {

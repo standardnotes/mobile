@@ -113,9 +113,14 @@ const AppDrawer = createStackNavigator({
     screen: Splash,
     navigationOptions: {
      gesturesEnabled: false,
-   },
+   }
   },
-  [SCREEN_OFFLINE_DISCLAIMER]: OfflineDisclaimerStack
+  [SCREEN_OFFLINE_DISCLAIMER]: {
+    screen: OfflineDisclaimerStack,
+    navigationOptions: {
+     gesturesEnabled: false,
+   }
+  }
 }, {
   mode: 'modal',
   headerMode: 'none',
