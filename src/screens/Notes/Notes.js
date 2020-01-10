@@ -3,8 +3,8 @@ import {
   View,
   Text,
   Alert,
-  Keyboard }
-from 'react-native';
+  Keyboard
+} from 'react-native';
 import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';

@@ -45,12 +45,22 @@ export default class OfflineDisclaimer extends Abstract {
           this.dismiss();
         }
       }
-    })
+    });
+
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow.bind(this));
 
     this.state = {
       userInput: '',
       waitingOnAgreement: true
     }
+  }
+
+  componentWillUnmount () {
+    this.keyboardDidShowListener.remove();
+  }
+
+  _keyboardDidShow() {
+    this.scrollView.scrollToEnd({animated: true});
   }
 
   onAgreeToDisclaimer() {
@@ -81,7 +91,7 @@ export default class OfflineDisclaimer extends Abstract {
 
     return (
       <SafeAreaView style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
-        <KeyboardAvoidingView keyboardVerticalOffset={70} style={{ flex: 1, flexGrow: 1, flexDirection: 'column' }} behavior={ApplicationState.isAndroid ? null : 'padding'}>
+        <KeyboardAvoidingView keyboardVerticalOffset={70} style={{ flex: 1, flexGrow: 1, flexDirection: 'column' }} behavior={ApplicationState.isAndroid ? 'null' : 'padding'}>
           <ScrollView
             ref={(view) => {
               this.scrollView = view;
@@ -115,14 +125,10 @@ export default class OfflineDisclaimer extends Abstract {
                   style={this.styles.disclaimerInput}
                   value={this.state.userInput}
                   onChangeText={this.onInputChange}
-                  onFocus={() => {
-                    this.scrollView.scrollToEnd({ animated: true });
-                  }}
                   placeholder="Enter disclaimer here"
                   keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                   underlineColorAndroid={'transparent'}
                   placeholderTextColor={StyleKit.variable('stylekitNeutralColor')}
-                  selectionColor={StyleKit.variable('stylekitInfoColor')}
                   autoCorrect={true}
                   autoCapitalize={'sentences'}
                   multiline={true}
@@ -155,7 +161,7 @@ export default class OfflineDisclaimer extends Abstract {
       },
       disclaimerText: {
         padding: textPadding,
-        fontWeight: '600'
+        fontWeight: 'bold'
       },
       inputTextContainer: {
         paddingLeft: componentPadding,
