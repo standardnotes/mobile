@@ -47,6 +47,7 @@ export default class OfflineDisclaimer extends Abstract {
       }
     });
 
+    this.scrollView = null;
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow.bind(this));
 
     this.state = {
@@ -91,7 +92,7 @@ export default class OfflineDisclaimer extends Abstract {
 
     return (
       <SafeAreaView style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
-        <KeyboardAvoidingView keyboardVerticalOffset={70} style={{ flex: 1, flexGrow: 1, flexDirection: 'column' }} behavior={ApplicationState.isAndroid ? 'null' : 'padding'}>
+        <KeyboardAvoidingView keyboardVerticalOffset={70} style={{ flex: 1, flexGrow: 1, flexDirection: 'column' }} behavior={ApplicationState.isAndroid ? null : 'padding'}>
           <ScrollView
             ref={(view) => {
               this.scrollView = view;
@@ -106,11 +107,9 @@ export default class OfflineDisclaimer extends Abstract {
 
               <Text style={textStyles}>
                 Using Standard Notes without an account carries risks, as your data is not backed up anywhere. You may lose your data at anytime, for example, due to an OS update, or if we accidentally ship a bug in our code that does something unintended.
-              </Text>
-              <Text style={textStyles}>
+                {'\n'}{'\n'}
                 You may proceed without an account, but we consider this an advanced mode of usage. You must manually create and export backups of your data regularly from the Settings menu.
-              </Text>
-              <Text style={textStyles}>
+                {'\n'}{'\n'}
                 To proceed, please type the following sentence into the text area below.
               </Text>
 
