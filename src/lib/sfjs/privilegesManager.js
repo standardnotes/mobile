@@ -1,14 +1,16 @@
-import {Platform} from 'react-native'
-import ModelManager from "./modelManager";
-import Sync from "./syncManager";
+import { Platform } from 'react-native'
 import { SFPrivilegesManager, SFSingletonManager } from "standard-file-js";
-import AuthenticationSourceAccountPassword from "@Screens/Authentication/Sources/AuthenticationSourceAccountPassword";
-import AuthenticationSourceLocalPasscode from "@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode";
-import AuthenticationSourceBiometric from "@Screens/Authentication/Sources/AuthenticationSourceBiometric";
-import KeysManager from "@Lib/keysManager"
-import Storage from "@SFJS/storageManager"
-import Auth from "@SFJS/authManager"
-import StyleKit from "@Style/StyleKit"
+import ModelManager from './modelManager';
+import Sync from './syncManager';
+import KeysManager from '@Lib/keysManager';
+import { SCREEN_AUTHENTICATE } from '@Screens/screens';
+import AuthenticationSourceAccountPassword from '@Screens/Authentication/Sources/AuthenticationSourceAccountPassword';
+import AuthenticationSourceBiometric from '@Screens/Authentication/Sources/AuthenticationSourceBiometric';
+import AuthenticationSourceLocalPasscode from '@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode';
+import Storage from '@SFJS/storageManager';
+import Auth from '@SFJS/authManager';
+import { ICON_CLOSE } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class PrivilegesManager extends SFPrivilegesManager {
 
@@ -65,10 +67,10 @@ export default class PrivilegesManager extends SFPrivilegesManager {
     let sessionLengthOptions = await this.getSessionLengthOptions();
     let selectedSessionLength = await this.getSelectedSessionLength();
 
-    navigation.navigate("Authenticate", {
+    navigation.navigate(SCREEN_AUTHENTICATE, {
       leftButton: {
         title: Platform.OS == "ios" ? "Cancel" : null,
-        iconName: Platform.OS == "ios" ? null : StyleKit.nameForIcon("close"),
+        iconName: Platform.OS == "ios" ? null : StyleKit.nameForIcon(ICON_CLOSE),
       },
       authenticationSources: sources,
       hasCancelOption: true,

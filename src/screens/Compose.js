@@ -1,21 +1,4 @@
 import React, { Component } from 'react';
-import Sync from '@Lib/sfjs/syncManager'
-import ModelManager from '@Lib/sfjs/modelManager'
-import Auth from '@Lib/sfjs/authManager'
-import OptionsState from "@Lib/OptionsState"
-
-import SideMenuManager from "@SideMenu/SideMenuManager"
-
-import Abstract from "./Abstract"
-import ComponentView from "./ComponentView"
-import ComponentManager from '@Lib/componentManager'
-import ApplicationState from "@Lib/ApplicationState"
-import LockedView from "@Containers/LockedView";
-import Icon from 'react-native-vector-icons/Ionicons';
-import { SafeAreaView } from 'react-navigation';
-
-import TextView from "sn-textview";
-
 import {
   StyleSheet,
   TextInput,
@@ -26,16 +9,33 @@ import {
   Dimensions,
   Alert
 } from 'react-native';
-
-import StyleKit from "@Style/StyleKit"
+import TextView from 'sn-textview';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import ComponentManager from '@Lib/componentManager';
+import OptionsState from '@Lib/OptionsState';
+import Auth from '@Lib/sfjs/authManager';
+import ModelManager from '@Lib/sfjs/modelManager';
+import Sync from '@Lib/sfjs/syncManager'
+import SideMenuManager from '@SideMenu/SideMenuManager';
+import {
+  ICON_ALERT,
+  ICON_LOCK,
+  ICON_MENU
+} from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
+import Abstract from './Abstract';
+import ComponentView from './ComponentView';
 
 export default class Compose extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
-    let templateOptions = {
+    const templateOptions = {
       rightButton: {
         title: null,
-        iconName: StyleKit.nameForIcon("menu"),
+        iconName: StyleKit.nameForIcon(ICON_MENU),
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -194,7 +194,7 @@ export default class Compose extends Abstract {
     this.props.navigation.setParams({
       rightButton: {
         title: null,
-        iconName: StyleKit.nameForIcon("menu"),
+        iconName: StyleKit.nameForIcon(ICON_MENU),
         onPress: () => {
           this.props.navigation.openRightDrawer();
         }
@@ -477,14 +477,14 @@ export default class Compose extends Abstract {
       <SafeAreaView forceInset={{ bottom: 'never', vertical: 'never', left: 'always' }} style={[this.styles.container, StyleKit.styles.container, StyleKit.styles.baseBackground]}>
         {this.note.locked &&
           <View style={this.styles.lockedContainer}>
-            <Icon name={StyleKit.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
+            <Icon name={StyleKit.nameForIcon(ICON_LOCK)} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
             <Text style={this.styles.lockedText}>Note Locked</Text>
           </View>
         }
 
         {this.state.webViewError &&
           <View style={this.styles.lockedContainer}>
-            <Icon name={StyleKit.nameForIcon("alert")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
+            <Icon name={StyleKit.nameForIcon(ICON_ALERT)} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
             <Text style={this.styles.lockedText}>Unable to load {noteEditor && noteEditor.content.name}</Text>
             <TouchableOpacity style={this.styles.webviewReloadButton} onPress={this.reloadEditor}>
               <Text style={this.styles.webviewReloadButtonText}>Reload</Text>

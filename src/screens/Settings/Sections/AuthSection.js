@@ -1,15 +1,22 @@
 import React, { Component, Fragment } from 'react';
-import {TextInput, View, Text, Keyboard, Alert} from 'react-native';
-import StyleKit from "@Style/StyleKit"
-import Sync from '@SFJS/syncManager'
-import SF from '@SFJS/sfjs'
-import Auth from '@SFJS/authManager'
-
-import SectionHeader from "@Components/SectionHeader";
-import ButtonCell from "@Components/ButtonCell";
-import TableSection from "@Components/TableSection";
-import SectionedTableCell from "@Components/SectionedTableCell";
-import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
+import {
+  TextInput,
+  View,
+  Text,
+  Keyboard,
+  Alert
+} from 'react-native';
+import ButtonCell from '@Components/ButtonCell';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import SectionHeader from '@Components/SectionHeader';
+import TableSection from '@Components/TableSection';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import UserPrefsManager from '@Lib/userPrefsManager';
+import { SCREEN_OFFLINE_DISCLAIMER } from '@Screens/screens';
+import Auth from '@SFJS/authManager';
+import SF from '@SFJS/sfjs';
+import Sync from '@SFJS/syncManager';
+import StyleKit from '@Style/StyleKit';
 
 const DEFAULT_SIGN_IN_TEXT = "Sign In";
 const DEFAULT_REGISTER_TEXT = "Register";
@@ -23,6 +30,7 @@ export default class AuthSection extends Component {
       signingIn: false,
       registering: false,
       strictSignIn: false,
+      agreedToOfflineDisclaimer: false,
       signInButtonText: DEFAULT_SIGN_IN_TEXT,
       registerButtonText: DEFAULT_REGISTER_TEXT
     };
@@ -30,10 +38,18 @@ export default class AuthSection extends Component {
 
   componentDidMount() {
     this.setState({server: Auth.get().serverUrl()})
+
+    UserPrefsManager.get().getAgreedToOfflineDisclaimer().then(agreedToOfflineDisclaimer => {
+      this.setState({agreedToOfflineDisclaimer: agreedToOfflineDisclaimer})
+    });
   }
 
   showAdvanced = () => {
     this.setState({showAdvanced: true});
+  }
+
+  showOfflineDisclaimer = () => {
+    this.props.navigation.navigate(SCREEN_OFFLINE_DISCLAIMER);
   }
 
   onSignInPress = () => {
@@ -309,7 +325,7 @@ export default class AuthSection extends Component {
         {this.props.title &&
           <SectionHeader title={this.props.title} />
         }
-        
+
         {this.state.mfa &&
           renderMfaSubcontent()
         }
@@ -329,7 +345,11 @@ export default class AuthSection extends Component {
         }
 
         {!this.state.showAdvanced && !this.state.mfa &&
-          <ButtonCell last={true} title="Advanced Options" onPress={() => this.showAdvanced()} />
+          <ButtonCell last={true} title="Other Options" onPress={() => this.showAdvanced()} />
+        }
+
+        {this.state.showAdvanced && !this.state.agreedToOfflineDisclaimer &&
+          <ButtonCell title="Use without an account" onPress={() => this.showOfflineDisclaimer()} />
         }
       </TableSection>
     )
