@@ -1,19 +1,22 @@
 import React, { Component, Platform } from 'react';
 import { TouchableHighlight, View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import StyleKit from "@Style/StyleKit"
-import Sync from '@SFJS/syncManager'
-import Auth from '@SFJS/authManager'
-import KeysManager from '@Lib/keysManager'
-import ModelManager from "@SFJS/modelManager"
-import AlertManager from '@SFJS/alertManager'
-
-import Abstract from "@Screens/Abstract"
-import LockedView from "@Containers/LockedView";
-import ApplicationState from "@Lib/ApplicationState"
-
-import Compose from "@Screens/Compose"
-import Notes from "@Screens/Notes/Notes"
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import UserPrefsManager from '@Lib/userPrefsManager';
+import Abstract from '@Screens/Abstract';
+import Compose from '@Screens/Compose';
+import Notes from '@Screens/Notes/Notes';
+import {
+  SCREEN_SPLASH,
+  SCREEN_AUTHENTICATE
+} from '@Screens/screens';
+import AlertManager from '@SFJS/alertManager';
+import Auth from '@SFJS/authManager';
+import ModelManager from '@SFJS/modelManager';
+import Sync from '@SFJS/syncManager';
+import StyleKit from '@Style/StyleKit';
 
 export default class Root extends Abstract {
 
@@ -29,8 +32,12 @@ export default class Root extends Abstract {
     return offline && numNotes == 0;
   }
 
-  presentSplash() {
-    this.props.navigation.navigate("Splash");
+  async presentSplash() {
+    const agreed = await UserPrefsManager.get().getAgreedToOfflineDisclaimer();
+
+    if(!agreed) {
+      this.props.navigation.navigate(SCREEN_SPLASH);
+    }
   }
 
   registerObservers() {
@@ -265,7 +272,7 @@ export default class Root extends Abstract {
       this.pendingAuthProps = authProps;
     }
 
-    this.props.navigation.navigate("Authenticate", {
+    this.props.navigation.navigate(SCREEN_AUTHENTICATE, {
       authenticationSources: authProps.sources,
       onSuccess: () => {
         authProps.onAuthenticate();

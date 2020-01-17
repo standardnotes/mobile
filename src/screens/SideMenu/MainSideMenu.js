@@ -1,40 +1,43 @@
 import React, { Component, Fragment } from 'react';
-import { ScrollView, View, Text, FlatList, Linking } from 'react-native';
-import { DrawerActions } from 'react-navigation-drawer';
-
-import { SafeAreaView } from 'react-navigation';
-
-import Icon from 'react-native-vector-icons/Ionicons';
+import {
+  ScrollView,
+  View,
+  Text,
+  FlatList,
+  Linking
+} from 'react-native';
+import ActionSheet from 'react-native-actionsheet';
+import { supportsDarkMode } from 'react-native-dark-mode';
 import FAB from 'react-native-fab';
-import ActionSheet from 'react-native-actionsheet'
-
-import Abstract from "@Screens/Abstract"
-import AlertManager from "@SFJS/alertManager"
-import Auth from "@SFJS/authManager"
-import Sync from '@SFJS/syncManager'
-
-import SectionHeader from "@Components/SectionHeader";
-import TableSection from "@Components/TableSection";
-import LockedView from "@Containers/LockedView";
-
+import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
+import { DrawerActions } from 'react-navigation-drawer';
+import SectionHeader from '@Components/SectionHeader';
+import TableSection from '@Components/TableSection';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import OptionsState from '@Lib/OptionsState';
+import Abstract from '@Screens/Abstract';
+import { SCREEN_SETTINGS } from '@Screens/screens';
+import AbstractSideMenu from '@SideMenu/AbstractSideMenu';
+import SideMenuCell from '@SideMenu/SideMenuCell';
+import SideMenuHero from '@SideMenu/SideMenuHero';
+import SideMenuManager from '@SideMenu/SideMenuManager';
+import SideMenuSection from '@SideMenu/SideMenuSection';
+import TagSelectionList from '@SideMenu/TagSelectionList';
+import AlertManager from '@SFJS/alertManager';
+import Auth from '@SFJS/authManager';
+import Sync from '@SFJS/syncManager';
+import {
+  ICON_BRUSH,
+  ICON_SETTINGS
+} from '@Style/icons';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
 import StyleKit, {
   LIGHT_MODE_KEY,
   DARK_MODE_KEY,
   themeStorageKeyForMode
-} from "@Style/StyleKit";
-import ActionSheetWrapper from "@Style/ActionSheetWrapper"
-
-import { supportsDarkMode } from 'react-native-dark-mode'
-
-import SideMenuManager from "@SideMenu/SideMenuManager"
-import SideMenuCell from "@SideMenu/SideMenuCell"
-import SideMenuHero from "@SideMenu/SideMenuHero"
-import SideMenuSection from "@SideMenu/SideMenuSection"
-import TagSelectionList from "@SideMenu/TagSelectionList"
-
-import ApplicationState from "@Lib/ApplicationState"
-import OptionsState from "@Lib/OptionsState"
-import AbstractSideMenu from "@SideMenu/AbstractSideMenu"
+} from '@Style/StyleKit';
 
 export default class MainSideMenu extends AbstractSideMenu {
 
@@ -65,7 +68,7 @@ export default class MainSideMenu extends AbstractSideMenu {
   }
 
   presentSettings() {
-    this.props.navigation.navigate("Settings");
+    this.props.navigation.navigate(SCREEN_SETTINGS);
   }
 
   outOfSyncPressed() {
@@ -221,8 +224,8 @@ export default class MainSideMenu extends AbstractSideMenu {
         key: 'get-theme',
         iconDesc: {
           type: 'icon',
-          name: StyleKit.nameForIcon("brush"),
-          side: "right",
+          name: StyleKit.nameForIcon(ICON_BRUSH),
+          side: 'right',
           size: 17
         },
         onSelect: () => { ApplicationState.openURL("https://standardnotes.org/extensions")},
@@ -295,7 +298,7 @@ export default class MainSideMenu extends AbstractSideMenu {
             visible={true}
             size={29}
             paddingTop={ApplicationState.isIOS ? 2 : 0}
-            iconTextComponent={<Icon name={StyleKit.nameForIcon("settings")}/>}
+            iconTextComponent={<Icon name={StyleKit.nameForIcon(ICON_SETTINGS)}/>}
           />
 
           {this.state.actionSheet && this.state.actionSheet}
@@ -322,7 +325,7 @@ export default class MainSideMenu extends AbstractSideMenu {
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         color: StyleKit.variables.stylekitForegroundColor,
         flex: 1,
-        flexDirection: "column"
+        flexDirection: 'column'
       },
       flatList: {
         padding: 15,

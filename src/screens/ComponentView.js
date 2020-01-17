@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
-import { Alert, View, Linking, Platform, Text } from 'react-native';
-import { WebView } from 'react-native-webview';
-
-import ComponentManager from '@Lib/componentManager'
-import ModelManager from '@Lib/sfjs/modelManager'
-import UserPrefsManager from '@Lib/userPrefsManager'
-
-import StyleKit from "@Style/StyleKit"
-import ApplicationState from "@Lib/ApplicationState"
+import {
+  Alert,
+  View,
+  Linking,
+  Platform,
+  Text
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { WebView } from 'react-native-webview';
+import ApplicationState from '@Lib/ApplicationState';
+import ComponentManager from '@Lib/componentManager';
+import ModelManager from '@Lib/sfjs/modelManager';
+import UserPrefsManager from '@Lib/userPrefsManager';
+import { ICON_LOCK } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class ComponentView extends Component {
 
@@ -173,7 +178,7 @@ export default class ComponentView extends Component {
       <View style={[StyleKit.styles.flexContainer, {backgroundColor: StyleKit.variables.stylekitBackgroundColor}]}>
         {this.editor.readonly &&
           <View style={this.styles.lockedContainer}>
-            <Icon name={StyleKit.nameForIcon("lock")} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
+            <Icon name={StyleKit.nameForIcon(ICON_LOCK)} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
             <Text style={this.styles.lockedText}>Extended expired. Editors are in a read-only state. To edit immediately, please switch to the Plain Editor.</Text>
           </View>
         }

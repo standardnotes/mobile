@@ -1,27 +1,34 @@
 import React, { Component } from 'react';
-import { TextInput, View, Text, Platform, Alert } from 'react-native';
+import {
+  TextInput,
+  View,
+  Text,
+  Platform,
+  Alert
+} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import StyleKit from "@Style/StyleKit"
-import SF from '@SFJS/sfjs'
-import KeysManager from "@Lib/keysManager"
-import ModelManager from "@SFJS/modelManager"
-import Sync from "@SFJS/syncManager"
-import TableSection from "@Components/TableSection";
-import SectionedTableCell from "@Components/SectionedTableCell";
-import SectionHeader from "@Components/SectionHeader";
-import ButtonCell from "@Components/ButtonCell";
-import Abstract from "@Screens/Abstract"
-import ApplicationState from "@Lib/ApplicationState"
-import AlertManager from "@SFJS/alertManager"
+import ButtonCell from '@Components/ButtonCell';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import TableSection from '@Components/TableSection';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import ModelManager from '@SFJS/modelManager';
+import SF from '@SFJS/sfjs';
+import Sync from '@SFJS/syncManager';
+import Abstract from '@Screens/Abstract';
+import AlertManager from '@SFJS/alertManager';
+import { ICON_CLOSE } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class KeyRecovery extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
-    let templateOptions = {
+    const templateOptions = {
       title: "Key Recovery",
       leftButton: {
         title: ApplicationState.isIOS ? "Cancel" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CLOSE),
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -33,7 +40,7 @@ export default class KeyRecovery extends Abstract {
     props.navigation.setParams({
       leftButton: {
         title: ApplicationState.isIOS ? "Cancel" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
         }

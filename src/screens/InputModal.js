@@ -1,23 +1,31 @@
 import React, { Component } from 'react';
-import { TextInput, View, Keyboard, TouchableHighlight, Platform, Alert } from 'react-native';
+import {
+  TextInput,
+  View,
+  Keyboard,
+  TouchableHighlight,
+  Platform,
+  Alert
+} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import StyleKit from "@Style/StyleKit"
-import TableSection from "@Components/TableSection";
-import SectionedTableCell from "@Components/SectionedTableCell";
-import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
-import SectionHeader from "@Components/SectionHeader";
-import ButtonCell from "@Components/ButtonCell";
-import Abstract from "@Screens/Abstract"
-import LockedView from "@Containers/LockedView";
-import ApplicationState from "@Lib/ApplicationState"
+import TableSection from '@Components/TableSection';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
+import SectionHeader from '@Components/SectionHeader';
+import ButtonCell from '@Components/ButtonCell';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import Abstract from '@Screens/Abstract';
+import { ICON_CLOSE } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class InputModal extends Abstract {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
-    let templateOptions = {
+    const templateOptions = {
       leftButton: {
         title: ApplicationState.isIOS ? "Cancel" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CLOSE),
       }
     }
     return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
@@ -29,7 +37,7 @@ export default class InputModal extends Abstract {
     props.navigation.setParams({
       leftButton: {
         title: ApplicationState.isIOS ? "Cancel" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon("close"),
+        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
         }

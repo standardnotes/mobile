@@ -1,14 +1,14 @@
 import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
-import ModelManager from "@Lib/sfjs/modelManager"
-import Server from "@Lib/sfjs/httpManager"
-import Sync from '@Lib/sfjs/syncManager'
-import { SFItemParams } from 'standard-file-js';
-import Storage from "@Lib/sfjs/storageManager"
-import Auth from "@Lib/sfjs/authManager"
-import KeysManager from '@Lib/keysManager'
-import CSSParser from "@Style/Util/CSSParser";
-import ThemeDownloader from "@Style/Util/ThemeDownloader"
 import IconChanger from 'react-native-alternate-icons';
+import { SFItemParams } from 'standard-file-js';
+import Auth from '@Lib/sfjs/authManager';
+import Server from '@Lib/sfjs/httpManager';
+import KeysManager from '@Lib/keysManager';
+import ModelManager from '@Lib/sfjs/modelManager';
+import Storage from '@Lib/sfjs/storageManager';
+import Sync from '@Lib/sfjs/syncManager';
+import CSSParser from '@Style/Util/CSSParser';
+import ThemeDownloader from '@Style/Util/ThemeDownloader';
 
 import redJSON from './Themes/red.json';
 import blueJSON from './Themes/blue.json';

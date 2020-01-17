@@ -1,8 +1,8 @@
 {
   "name": "StandardNotes",
-  "version": "3.0.18",
-  "versionIOS": "3.0.18",
-  "versionAndroid": "3.0.18",
+  "version": "3.0.19",
+  "versionIOS": "3.0.19",
+  "versionAndroid": "3.0.19",
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
@@ -13,7 +13,8 @@
     "test": "jest",
     "lint": "eslint .",
     "clear-cache": "watchman watch-del-all && rm -rf $TMPDIR/react-native-packager-cache-* && rm -rf $TMPDIR/metro-bundler-cache-*",
-    "build-android": "cd android && ./gradlew bundleRelease"
+    "bundle-android": "cd android && ./gradlew bundleRelease",
+    "apk-android": "cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@react-native-community/async-storage": "1.6.3",

@@ -1,27 +1,37 @@
 import React, { Component } from 'react';
-import { View, Text, Alert, Keyboard } from 'react-native';
-import { SafeAreaView } from 'react-navigation';
-
-import ModelManager from '@SFJS/modelManager'
-import Storage from '@SFJS/storageManager'
-import Sync from '@SFJS/syncManager'
-import AlertManager from '@SFJS/alertManager'
-
-import Auth from '@SFJS/authManager'
-import KeysManager from '@Lib/keysManager'
-import Keychain from "@Lib/keychain"
-import ItemActionManager from '@Lib/itemActionManager'
-
-import SideMenuManager from "@SideMenu/SideMenuManager"
-
-import Abstract from "@Screens/Abstract"
-import StyleKit from "@Style/StyleKit"
-import NoteList from "@Screens/Notes/NoteList"
-import OptionsState from "@Lib/OptionsState"
-import LockedView from "@Containers/LockedView"
-import ApplicationState from "@Lib/ApplicationState"
-import Icon from 'react-native-vector-icons/Ionicons';
+import {
+  View,
+  Text,
+  Alert,
+  Keyboard
+} from 'react-native';
 import FAB from 'react-native-fab';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
+import LockedView from '@Containers/LockedView';
+import AlertManager from '@SFJS/alertManager';
+import Auth from '@SFJS/authManager';
+import ModelManager from '@SFJS/modelManager';
+import Storage from '@SFJS/storageManager';
+import Sync from '@SFJS/syncManager';
+import ApplicationState from '@Lib/ApplicationState';
+import ItemActionManager from '@Lib/itemActionManager';
+import Keychain from '@Lib/keychain';
+import KeysManager from '@Lib/keysManager';
+import OptionsState from '@Lib/OptionsState';
+import Abstract from '@Screens/Abstract';
+import NoteList from '@Screens/Notes/NoteList';
+import {
+  SCREEN_SETTINGS,
+  SCREEN_KEY_RECOVERY,
+  SCREEN_COMPOSE
+} from '@Screens/screens';
+import SideMenuManager from '@SideMenu/SideMenuManager';
+import {
+  ICON_MENU,
+  ICON_ADD
+} from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class Notes extends Abstract {
 
@@ -36,7 +46,7 @@ export default class Notes extends Abstract {
       title: "All notes",
       leftButton: {
         title: null,
-        iconName: StyleKit.nameForIcon("menu"),
+        iconName: StyleKit.nameForIcon(ICON_MENU),
         onPress: () => {
           this.props.navigation.openLeftDrawer();
         }
@@ -246,7 +256,7 @@ export default class Notes extends Abstract {
   displayNeedSignInAlertForLocalItemsIfApplicable(items) {
 
     if(KeysManager.get().shouldPresentKeyRecoveryWizard()) {
-      this.props.navigation.navigate("KeyRecovery");
+      this.props.navigation.navigate(SCREEN_KEY_RECOVERY);
       return;
     }
 
@@ -299,7 +309,7 @@ export default class Notes extends Abstract {
   }
 
   async presentComposer(note) {
-    this.props.navigation.navigate("Compose", {
+    this.props.navigation.navigate(SCREEN_COMPOSE, {
       title: note ? "Note" : "Compose",
       noteId: note && note.uuid,
       selectedTagId: this.options.selectedTagIds.length && this.options.selectedTagIds[0],
@@ -370,7 +380,7 @@ export default class Notes extends Abstract {
     }
 
     if(item.errorDecrypting) {
-      this.props.navigation.navigate("Settings");
+      this.props.navigation.navigate(SCREEN_SETTINGS);
     } else {
       run();
     }
@@ -451,7 +461,7 @@ export default class Notes extends Abstract {
           visible={true}
           size={30}
           paddingTop={ApplicationState.isIOS ? 1 : 0}
-          iconTextComponent={<Icon style={{textAlignVertical: "center"}} name={StyleKit.nameForIcon("add")}/>}
+          iconTextComponent={<Icon style={{textAlignVertical: "center"}} name={StyleKit.nameForIcon(ICON_ADD)}/>}
         />
       </SafeAreaView>
     );

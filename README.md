@@ -41,11 +41,4 @@ You'll then find the APK in this directory:
 > android/app/build/outputs/apk/release
 
 ## Contributing
-We love community contributions! Before contributing, please read our [Longevity Statement](https://standardnotes.org/longevity) to better understand how we approach adding new features. Unlike other projects, adding new features is something we prefer *not* to do, so if you have a feature which you think is absolutely essential, please create a discussion issue first before coding.
-
-## Classic Codebase (Deprecated)
-
-You can find the "classic" versions of our applications, which are built in Swift and Java/Kotlin, respectively, via these links:
-
-1. [Swift-based iOS app](https://github.com/standardnotes/ios) (deprecated)
-2. [Java/Kotlin based Android app](https://github.com/standardnotes/android) (deprecated)
+Before contributing, please read our [Longevity Statement](https://standardnotes.org/longevity) to better understand how we approach adding new features. Unlike other projects, adding new features is something we prefer *not* to do, so if you have a feature which you think is absolutely essential, please create a discussion issue first before coding.

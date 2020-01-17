@@ -1,32 +1,41 @@
 import React, { Component, Fragment } from 'react';
 import { ScrollView, View, Text, FlatList, Linking } from 'react-native';
-
-import { SafeAreaView } from 'react-navigation';
-import Icon from 'react-native-vector-icons/Ionicons';
-import FAB from 'react-native-fab';
 import ActionSheet from 'react-native-actionsheet'
-import ComponentManager from "@Lib/componentManager"
-import Abstract from "@Screens/Abstract"
-
-import SectionHeader from "@Components/SectionHeader";
-import TableSection from "@Components/TableSection";
-import LockedView from "@Containers/LockedView";
-import ItemActionManager from "@Lib/itemActionManager"
-
-import StyleKit from "@Style/StyleKit"
-import ActionSheetWrapper from "@Style/ActionSheetWrapper"
-import ModelManager from '@SFJS/modelManager'
-import Sync from '@SFJS/syncManager'
-import PrivilegesManager from "@SFJS/privilegesManager"
-
-import SideMenuManager from "@SideMenu/SideMenuManager"
-import SideMenuCell from "@SideMenu/SideMenuCell"
-import SideMenuHero from "@SideMenu/SideMenuHero"
-import SideMenuSection from "@SideMenu/SideMenuSection"
-import TagSelectionList from "@SideMenu/TagSelectionList"
-
-import ApplicationState from "@Lib/ApplicationState"
-import AbstractSideMenu from "@SideMenu/AbstractSideMenu"
+import FAB from 'react-native-fab';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
+import SectionHeader from '@Components/SectionHeader';
+import TableSection from '@Components/TableSection';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import ComponentManager from '@Lib/componentManager';
+import ItemActionManager from '@Lib/itemActionManager';
+import Abstract from '@Screens/Abstract';
+import {
+  SCREEN_INPUT_MODAL,
+  SCREEN_MANAGE_PRIVILEGES
+} from '@Screens/screens';
+import ModelManager from '@SFJS/modelManager';
+import PrivilegesManager from '@SFJS/privilegesManager';
+import Sync from '@SFJS/syncManager';
+import AbstractSideMenu from '@SideMenu/AbstractSideMenu';
+import SideMenuCell from '@SideMenu/SideMenuCell';
+import SideMenuHero from '@SideMenu/SideMenuHero';
+import SideMenuManager from '@SideMenu/SideMenuManager';
+import SideMenuSection from '@SideMenu/SideMenuSection';
+import TagSelectionList from '@SideMenu/TagSelectionList';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import {
+  ICON_BOOKMARK,
+  ICON_ARCHIVE,
+  ICON_LOCK,
+  ICON_FINGER_PRINT,
+  ICON_SHARE,
+  ICON_TRASH,
+  ICON_MEDICAL,
+  ICON_PRICE_TAG
+} from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class NoteSideMenu extends AbstractSideMenu {
 
@@ -94,7 +103,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
   }
 
   presentNewTag = () => {
-    this.props.navigation.navigate("InputModal", {
+    this.props.navigation.navigate(SCREEN_INPUT_MODAL, {
       title: 'New Tag',
       placeholder: "New tag name",
       onSubmit: (text) => {
@@ -140,7 +149,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
             // Show Privileges management screen if protected notes privs are not set up yet
             let configuredPrivs = await PrivilegesManager.get().grossCredentialsForAction(SFPrivilegesManager.ActionViewProtectedNotes);
             if(configuredPrivs.length == 0) {
-              this.props.navigation.navigate("ManagePrivileges");
+              this.props.navigation.navigate(SCREEN_MANAGE_PRIVILEGES);
             }
           }
         }
@@ -169,15 +178,15 @@ export default class NoteSideMenu extends AbstractSideMenu {
     let protectEvent = protectOption == "Protect" ? ItemActionManager.ProtectEvent : ItemActionManager.UnprotectEvent;
 
     let rawOptions = [
-      { text: pinOption, key: pinEvent, icon: "bookmark" },
-      { text: archiveOption, key: archiveEvent, icon: "archive" },
-      { text: lockOption, key: lockEvent, icon: "lock" },
-      { text: protectOption, key: protectEvent, icon: "finger-print" },
-      { text: "Share", key: ItemActionManager.ShareEvent, icon: "share" },
+      { text: pinOption, key: pinEvent, icon: ICON_BOOKMARK },
+      { text: archiveOption, key: archiveEvent, icon: ICON_ARCHIVE },
+      { text: lockOption, key: lockEvent, icon: ICON_LOCK },
+      { text: protectOption, key: protectEvent, icon: ICON_FINGER_PRINT },
+      { text: "Share", key: ItemActionManager.ShareEvent, icon: ICON_SHARE },
     ];
 
     if(!this.note.content.trashed) {
-      rawOptions.push({ text: "Move to Trash", key: ItemActionManager.TrashEvent, icon: "trash" });
+      rawOptions.push({ text: "Move to Trash", key: ItemActionManager.TrashEvent, icon: ICON_TRASH });
     }
 
     let options = [];
@@ -258,7 +267,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         key: "get-editors",
         iconDesc: {
           type: "icon",
-          name: StyleKit.nameForIcon("medical"),
+          name: StyleKit.nameForIcon(ICON_MEDICAL),
           side: "right",
           size: 17
         },
@@ -317,7 +326,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
             visible={true}
             size={30}
             paddingTop={ApplicationState.isIOS ? 1 : 0}
-            iconTextComponent={<Icon name={StyleKit.nameForIcon("pricetag")}/>}
+            iconTextComponent={<Icon name={StyleKit.nameForIcon(ICON_PRICE_TAG)}/>}
           />
         </SafeAreaView>
         {this.state.actionSheet && this.state.actionSheet}
