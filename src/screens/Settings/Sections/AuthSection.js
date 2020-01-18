@@ -11,7 +11,9 @@ import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell
 import SectionHeader from '@Components/SectionHeader';
 import TableSection from '@Components/TableSection';
 import SectionedTableCell from '@Components/SectionedTableCell';
-import UserPrefsManager from '@Lib/userPrefsManager';
+import UserPrefsManager, {
+  AGREED_TO_OFFLINE_DISCLAIMER_KEY
+} from '@Lib/userPrefsManager';
 import { SCREEN_OFFLINE_DISCLAIMER } from '@Screens/screens';
 import Auth from '@SFJS/authManager';
 import SF from '@SFJS/sfjs';
@@ -39,16 +41,18 @@ export default class AuthSection extends Component {
   componentDidMount() {
     this.setState({server: Auth.get().serverUrl()})
 
-    UserPrefsManager.get().getAgreedToOfflineDisclaimer().then(agreedToOfflineDisclaimer => {
-      this.setState({agreedToOfflineDisclaimer: agreedToOfflineDisclaimer})
-    });
+    UserPrefsManager.get()
+      .isPrefSet({ key: AGREED_TO_OFFLINE_DISCLAIMER_KEY })
+      .then(agreed => {
+        this.setState({ agreedToOfflineDisclaimer: agreed })
+      });
   }
 
   showAdvanced = () => {
     this.setState({showAdvanced: true});
   }
 
-  showOfflineDisclaimer = () => {
+  presentOfflineDisclaimer = () => {
     this.props.navigation.navigate(SCREEN_OFFLINE_DISCLAIMER);
   }
 
@@ -349,7 +353,7 @@ export default class AuthSection extends Component {
         }
 
         {this.state.showAdvanced && !this.state.agreedToOfflineDisclaimer &&
-          <ButtonCell title="Use without an account" onPress={() => this.showOfflineDisclaimer()} />
+          <ButtonCell title="Use without an account" onPress={() => this.presentOfflineDisclaimer()} />
         }
       </TableSection>
     )

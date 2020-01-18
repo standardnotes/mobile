@@ -11,7 +11,9 @@ import { WebView } from 'react-native-webview';
 import ApplicationState from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
 import ModelManager from '@Lib/sfjs/modelManager';
-import UserPrefsManager from '@Lib/userPrefsManager';
+import UserPrefsManager, {
+  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY
+} from '@Lib/userPrefsManager';
 import { ICON_LOCK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
@@ -51,20 +53,29 @@ export default class ComponentView extends Component {
   componentDidMount() {
     if(Platform.OS == "android" && Platform.Version <= 23) {
       // postMessage doesn't work on Android <= 6 (API version 23) https://github.com/facebook/react-native/issues/11594
-      UserPrefsManager.get().getDontShowAgainEditorsNotSupported().then((dontShowAgain) => {
-        if(dontShowAgain) {
-          return;
-        }
+      UserPrefsManager.get()
+        .isPrefSet({ key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY })
+        .then(dontShowAgain => {
+          if (dontShowAgain) {
+            return;
+          }
 
-        Alert.alert(
-          'Editors Not Supported',
-          'Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.',
-          [
-            {text: "Don't show again", onPress: () => UserPrefsManager.get().setDontShowAgainEditorsNotSupported()},
-            {text: 'OK'}
-          ]
-        )
-      })
+          Alert.alert(
+            "Editors Not Supported",
+            "Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.",
+            [
+              {
+                text: "Don't show again",
+                onPress: () =>
+                  UserPrefsManager.get().setPref({
+                    key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
+                    value: true
+                  })
+              },
+              { text: "OK" }
+            ]
+          );
+        });
     }
   }
 
