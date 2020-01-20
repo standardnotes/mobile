@@ -28,25 +28,23 @@ export default class Root extends Abstract {
   }
 
   /**
-    Make sure all users who are now using the app offline agree to the
-    offline disclaimer. Even if they had previously used the app solely
-    offline, we want to make them aware of the risks before allowing
-    them to continue.
-  */
-  presentSplashIfNeeded() {
+   * Present the Splash screen if required
+   *
+   * Make sure all users who are now using the app offline agree to the
+   * offline disclaimer.
+   */
+  async presentSplashIfNeeded() {
     const offline = Auth.get().offline();
+    const numNotes = ModelManager.get().noteCount();
 
-    UserPrefsManager.get()
-      .isPrefSet({ key: AGREED_TO_OFFLINE_DISCLAIMER_KEY })
-      .then(agreed => {
-        if(offline && !agreed) {
-          this.presentSplash();
-        }
-      });
-  }
+    if(offline && numNotes === 0) {
+      const agreed = await UserPrefsManager.get()
+        .isPrefSet({ key: AGREED_TO_OFFLINE_DISCLAIMER_KEY });
 
-  presentSplash() {
-    this.props.navigation.navigate(SCREEN_SPLASH);
+      if(!agreed) {
+        this.props.navigation.navigate(SCREEN_SPLASH);
+      }
+    }
   }
 
   registerObservers() {
@@ -81,9 +79,9 @@ export default class Root extends Abstract {
       }
     );
 
-    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+    this.syncEventHandler = Sync.get().addEventHandler(async (event, data) => {
       if(event == 'local-data-loaded') {
-        this.presentSplashIfNeeded();
+        await this.presentSplashIfNeeded();
       }
       else if(event == 'sync-session-invalid') {
         if(!this.didShowSessionInvalidAlert) {
@@ -128,7 +126,7 @@ export default class Root extends Abstract {
       }
     })
 
-    this.signoutObserver = Auth.get().addEventHandler((event) => {
+    this.signoutObserver = Auth.get().addEventHandler(async (event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
         this.setSubTitle(null);
         const notifyObservers = false;
@@ -136,7 +134,7 @@ export default class Root extends Abstract {
         this.reloadOptionsToDefault();
         ApplicationState.getOptions().notifyObservers();
 
-        this.presentSplashIfNeeded();
+        await this.presentSplashIfNeeded();
       }
     });
 

@@ -28,7 +28,7 @@ export default class ComponentView extends Component {
 
     this.identifier = `${Math.random()}`
 
-    ComponentManager.get().registerHandler({identifier: this.identifier, areas: ["note-tags", "editor-stack", "editor-editor"],
+    ComponentManager.get().registerHandler({identifier: this.identifier, areas: ['note-tags', 'editor-stack', 'editor-editor'],
        contextRequestHandler: (component) => {
         return this.note;
       }
@@ -40,7 +40,7 @@ export default class ComponentView extends Component {
       console.log("Unable to find note with ID", props.noteId);
     }
 
-    let url = ComponentManager.get().urlForComponent(this.editor);
+    const url = ComponentManager.get().urlForComponent(this.editor);
     console.log("Loading editor", url);
 
     if(this.editor.offlineOnly) {
@@ -50,32 +50,30 @@ export default class ComponentView extends Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if(Platform.OS == "android" && Platform.Version <= 23) {
       // postMessage doesn't work on Android <= 6 (API version 23) https://github.com/facebook/react-native/issues/11594
-      UserPrefsManager.get()
-        .isPrefSet({ key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY })
-        .then(dontShowAgain => {
-          if (dontShowAgain) {
-            return;
-          }
 
-          Alert.alert(
-            "Editors Not Supported",
-            "Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.",
-            [
-              {
-                text: "Don't show again",
-                onPress: () =>
-                  UserPrefsManager.get().setPref({
-                    key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
-                    value: true
-                  })
-              },
-              { text: "OK" }
-            ]
-          );
-        });
+      const dontShowAgain = await UserPrefsManager.get()
+        .isPrefSet({ key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY });
+
+      if(!dontShowAgain) {
+        Alert.alert(
+          "Editors Not Supported",
+          "Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.",
+          [
+            {
+              text: "Don't show again",
+              onPress: () =>
+                UserPrefsManager.get().setPref({
+                  key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
+                  value: true
+                })
+            },
+            { text: "OK" }
+          ]
+        );
+      }
     }
   }
 
@@ -88,9 +86,9 @@ export default class ComponentView extends Component {
   reloadData() {
     this.editor = ModelManager.get().findItem(this.props.editorId);
     this.note = ModelManager.get().findItem(this.props.noteId);
-    ComponentManager.get().contextItemDidChangeInArea("editor-editor");
+    ComponentManager.get().contextItemDidChangeInArea('editor-editor');
 
-    let expired = this.editor.valid_until && this.editor.valid_until <= new Date();
+    const expired = this.editor.valid_until && this.editor.valid_until <= new Date();
     this.editor.readonly = expired;
   }
 
@@ -163,7 +161,7 @@ export default class ComponentView extends Component {
     So on Android, we'll handle url loads only if the url isn't equal to the editor url.
      */
 
-    let editorUrl = ComponentManager.get().urlForComponent(this.editor);
+    const editorUrl = ComponentManager.get().urlForComponent(this.editor);
     if((ApplicationState.isIOS && request.navigationType == 'click')
     || (ApplicationState.isAndroid && request.url != editorUrl)) {
       ApplicationState.openURL(request.url);
@@ -182,20 +180,20 @@ export default class ComponentView extends Component {
   }
 
   render() {
-    var editor = this.editor;
-    var url = ComponentManager.get().urlForComponent(editor);
+    const editor = this.editor;
+    const url = ComponentManager.get().urlForComponent(editor);
 
     return (
       <View style={[StyleKit.styles.flexContainer, {backgroundColor: StyleKit.variables.stylekitBackgroundColor}]}>
         {this.editor.readonly &&
           <View style={this.styles.lockedContainer}>
-            <Icon name={StyleKit.nameForIcon(ICON_LOCK)} size={16} color={StyleKit.variable("stylekitBackgroundColor")} />
+            <Icon name={StyleKit.nameForIcon(ICON_LOCK)} size={16} color={StyleKit.variables.stylekitBackgroundColor} />
             <Text style={this.styles.lockedText}>Extended expired. Editors are in a read-only state. To edit immediately, please switch to the Plain Editor.</Text>
           </View>
         }
         {url &&
           <WebView
-             style={StyleKit.styles.flexContainer, {backgroundColor: "transparent"}}
+             style={StyleKit.styles.flexContainer, {backgroundColor: 'transparent'}}
              source={{uri: url}}
              key={this.editor.uuid}
              ref={(webView) => this.webView = webView}
@@ -231,7 +229,7 @@ export default class ComponentView extends Component {
       },
 
       lockedText: {
-        fontWeight: "bold",
+        fontWeight: 'bold',
         fontSize: 12,
         color: StyleKit.variables.stylekitBackgroundColor,
         paddingLeft: 10
