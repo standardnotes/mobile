@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import {Alert} from 'react-native';
 import StyleKit from "@Style/StyleKit"
 import {TextInput, View, Text} from 'react-native';
-import UserPrefsManager from "@Lib/userPrefsManager"
+import UserPrefsManager, {
+  LAST_EXPORT_DATE_KEY
+} from "@Lib/userPrefsManager"
 import KeysManager from "@Lib/keysManager"
 import Auth from '@SFJS/authManager'
 import SectionHeader from "@Components/SectionHeader";
@@ -32,9 +34,11 @@ class OptionsSection extends Abstract {
 
   componentDidMount() {
     super.componentDidMount();
-    UserPrefsManager.get().getLastExportDate().then((date) => {
-      this.setState({lastExportDate: date});
-    })
+    UserPrefsManager.get()
+      .getPrefAsDate({ key: LAST_EXPORT_DATE_KEY })
+      .then((date) => {
+        this.setState({ lastExportDate: date });
+      });
   }
 
   onExportPress = (option) => {
@@ -49,14 +53,15 @@ class OptionsSection extends Abstract {
     this.handlePrivilegedAction(true, SFPrivilegesManager.ActionManageBackups, async () => {
       BackupsManager.get().export(encrypted).then((success) => {
         if(success) {
-          var date = new Date();
-          this.setState({lastExportDate: date});
-          UserPrefsManager.get().setLastExportDate(date);
+          const date = new Date();
+          this.setState({ lastExportDate: date });
+          UserPrefsManager.get()
+            .setPref({ key: LAST_EXPORT_DATE_KEY, value: date });
         }
-        this.setState({loadingExport: false});
+        this.setState({ loadingExport: false });
       })
     }, () => {
-      this.setState({loadingExport: false});
+      this.setState({ loadingExport: false });
     });
   }
 
@@ -76,21 +81,21 @@ class OptionsSection extends Abstract {
   }
 
   render() {
-    var lastExportString, stale;
-    if(this.props.lastExportDate) {
-      var formattedDate = moment(this.props.lastExportDate).format('lll');
+    let lastExportString, stale;
+    if(this.state.lastExportDate) {
+      let formattedDate = moment(this.state.lastExportDate).format('lll');
       lastExportString = `Last exported on ${formattedDate}`;
 
       // Date is stale if more than 7 days ago
       let staleThreshold = 7 * 86400;
-      stale = ((new Date() - this.props.lastExportDate) / 1000) > staleThreshold;
+      stale = ((new Date() - this.state.lastExportDate) / 1000) > staleThreshold;
     } else {
       lastExportString = "Your data has not yet been backed up.";
     }
 
     let signedIn = !Auth.get().offline();
 
-    var hasLastExportSection = !signedIn;
+    let hasLastExportSection = !signedIn;
 
     return (
       <TableSection>
@@ -116,8 +121,8 @@ class OptionsSection extends Abstract {
         {hasLastExportSection &&
           <SectionedAccessoryTableCell
             last={true}
-            onPress={() => {(!this.props.lastExportDate || stale) && this.showDataBackupAlert()}}
-            tinted={!this.props.lastExportDate || stale}
+            onPress={() => {(!this.state.lastExportDate || stale) && this.showDataBackupAlert()}}
+            tinted={!this.state.lastExportDate || stale}
             text={lastExportString}
           />
         }

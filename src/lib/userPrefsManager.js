@@ -1,8 +1,12 @@
-import Storage from './sfjs/storageManager'
+import {
+  dateFromJsonString,
+  isNullOrUndefined
+} from '@Lib/utils';
+import Storage from '@SFJS/storageManager';
 
-const LastExportDateKey = 'LastExportDateKey'
-const DontShowAgainUnsupportedEditorsKey = 'DoNotShowAgainUnsupportedEditorsKey'
-const AgreedToOfflineDisclaimerKey = 'AgreedToOfflineDisclaimerKey'
+export const LAST_EXPORT_DATE_KEY                     = 'LastExportDateKey'
+export const DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY  = 'DoNotShowAgainUnsupportedEditorsKey'
+export const AGREED_TO_OFFLINE_DISCLAIMER_KEY         = 'AgreedToOfflineDisclaimerKey'
 
 export default class UserPrefsManager {
   static instance = null
@@ -13,52 +17,41 @@ export default class UserPrefsManager {
     return this.instance;
   }
 
-  async setLastExportDate(date) {
-    await Storage.get().setItem(LastExportDateKey, JSON.stringify(date));
-    this.lastExportDate = date;
+  constructor() {
+    this.data = {};
   }
 
-  async clearLastExportDate() {
-    this.lastExportDate = null;
-    return Storage.get().clearKeys([LastExportDateKey]);
+  async clearPref({ key }) {
+    this.data[key] = null;
+    return Storage.get().clearKeys([key]);
   }
 
-  async getLastExportDate() {
-    if(!this.lastExportDate) {
-      let date = await Storage.get().getItem(LastExportDateKey);
-      if(date) {
-        this.lastExportDate = new Date(JSON.parse(date));
-      }
+  async setPref({ key, value }) {
+    await Storage.get().setItem(key, JSON.stringify(value));
+    this.data[key] = value;
+  }
+
+  async getPref({ key }) {
+    if(isNullOrUndefined(this.data[key])) {
+      this.data[key] = await Storage.get().getItem(key);
     }
 
-    return this.lastExportDate;
+    return this.data[key];
   }
 
-  async setDontShowAgainEditorsNotSupported() {
-    await Storage.get().setItem(DontShowAgainUnsupportedEditorsKey, JSON.stringify(true));
-    this.dontShowAgainUnsupportedEditors = true;
-  }
-
-  async getDontShowAgainEditorsNotSupported() {
-    if(this.dontShowAgainUnsupportedEditors === null || this.dontShowAgainUnsupportedEditors === undefined) {
-      let dontShowAgain = await Storage.get().getItem(DontShowAgainUnsupportedEditorsKey);
-      this.dontShowAgainUnsupportedEditors = dontShowAgain !== null;
+  async getPrefAsDate({ key }) {
+    if(isNullOrUndefined(this.data[key])) {
+      this.data[key] = dateFromJsonString(await Storage.get().getItem(key));
     }
 
-    return this.dontShowAgainUnsupportedEditors;
+    return this.data[key];
   }
 
-  async setAgreedToOfflineDisclaimer() {
-    await Storage.get().setItem(AgreedToOfflineDisclaimerKey, JSON.stringify(true));
-    this.agreedToOfflineDisclaimer = true;
+  async isPrefSet({ key }) {
+    return await this.getPref({ key: key }) !== null;
   }
 
-  async getAgreedToOfflineDisclaimer() {
-    if(this.agreedToOfflineDisclaimer === null || this.agreedToOfflineDisclaimer === undefined) {
-      let agreedToOfflineDisclaimer = await Storage.get().getItem(AgreedToOfflineDisclaimerKey);
-      this.agreedToOfflineDisclaimer = agreedToOfflineDisclaimer !== null;
-    }
-
-    return this.agreedToOfflineDisclaimer;
+  async isPrefEqualTo({ key, value }) {
+    return await this.getPref({ key: key }) === value;
   }
 }
