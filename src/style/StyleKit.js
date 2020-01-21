@@ -8,21 +8,17 @@ import ModelManager from '@Lib/sfjs/modelManager';
 import Storage from '@Lib/sfjs/storageManager';
 import Sync from '@Lib/sfjs/syncManager';
 import CSSParser from '@Style/Util/CSSParser';
+import {
+  themeStorageKeyForMode,
+  statusBarColorForTheme,
+  keyboardColorForTheme,
+  LIGHT_CONTENT,
+  DARK_CONTENT
+} from '@Style/utils';
 import ThemeDownloader from '@Style/Util/ThemeDownloader';
 
 import redJSON from './Themes/red.json';
 import blueJSON from './Themes/blue.json';
-
-export const LIGHT_MODE_KEY = 'light';
-export const DARK_MODE_KEY = 'dark';
-export const LIGHT_CONTENT = 'light-content';
-export const DARK_CONTENT = 'dark-content';
-export const LIGHT_MODE_THEME_KEY = 'isMobileLightTheme';
-export const DARK_MODE_THEME_KEY = 'isMobileDarkTheme';
-
-export function themeStorageKeyForMode(mode) {
-  return mode === DARK_MODE_KEY ? DARK_MODE_THEME_KEY : LIGHT_MODE_THEME_KEY;
-}
 
 export default class StyleKit {
 
@@ -47,7 +43,7 @@ export default class StyleKit {
 
     ModelManager.get().addItemSyncObserver('themes', 'SN|Theme', (allItems, validItems, deletedItems, source) => {
       if(this.activeTheme && this.activeTheme.isSwapIn) {
-        var matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
+        const matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
         if(matchingTheme) {
           this.setActiveTheme(matchingTheme);
           this.activeTheme.isSwapIn = false;
@@ -120,18 +116,18 @@ export default class StyleKit {
   }
 
   /**
-    When downloading an external theme, we can't depend on it having all the
-    variables present. So we will merge them with this template variable list
-    to make sure the end result has all variables the app expects. Return a
-    copy as the result may be modified before use.
-  */
+   * When downloading an external theme, we can't depend on it having all the
+   * variables present. So we will merge them with this template variable list
+   * to make sure the end result has all variables the app expects. Return a
+   * copy as the result may be modified before use.
+   */
   templateVariables() {
     return _.clone(redJSON);
   }
 
   createDefaultThemes() {
     this.systemThemes = [];
-    let options = [
+    const options = [
       {
         variables: blueJSON,
         name: "Blue",
@@ -144,10 +140,10 @@ export default class StyleKit {
     ];
 
     for(var option of options) {
-      let variables = option.variables;
+      const variables = option.variables;
       variables.statusBar = Platform.OS == 'android' ? LIGHT_CONTENT : DARK_CONTENT;
 
-      let theme = new SNTheme({
+      const theme = new SNTheme({
         uuid: option.name,
         content: {
           isSystemTheme: true,
@@ -217,49 +213,22 @@ export default class StyleKit {
   }
 
   static stylesForKey(key) {
-    var allStyles = this.styles;
-    var styles = [allStyles[key]];
-    var platform = Platform.OS == 'android' ? "Android" : "IOS";
-    var platformStyles = allStyles[key+platform];
+    const allStyles = this.styles;
+    const styles = [allStyles[key]];
+    const platform = Platform.OS == 'android' ? 'Android' : 'IOS';
+    const platformStyles = allStyles[key+platform];
     if(platformStyles) {
       styles.push(platformStyles);
     }
     return styles;
   }
 
-  statusBarColorForTheme(theme) {
-    // The main nav bar uses contrast background color
-    if(!theme.luminosity) {
-      theme.luminosity = StyleKit.getColorLuminosity(theme.content.variables.stylekitContrastBackgroundColor);
-    }
-
-    if(theme.luminosity < 130) {
-      // is dark color, return white status bar
-      return LIGHT_CONTENT;
-    } else {
-      return DARK_CONTENT;
-    }
-  }
-
-  keyboardColorForTheme(theme) {
-    if(!theme.luminosity) {
-      theme.luminosity = StyleKit.getColorLuminosity(theme.content.variables.stylekitContrastBackgroundColor);
-    }
-
-    if(theme.luminosity < 130) {
-      // is dark color, return dark keyboard
-      return DARK_MODE_KEY;
-    } else {
-      return LIGHT_MODE_KEY;
-    }
-  }
-
   keyboardColorForActiveTheme() {
-    return this.keyboardColorForTheme(this.activeTheme);
+    return keyboardColorForTheme(this.activeTheme);
   }
 
   themes() {
-    let themes = ModelManager.get().themes.sort((a, b) => {
+    const themes = ModelManager.get().themes.sort((a, b) => {
       if(!a.name || !b.name) { return -1; }
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
     });
@@ -274,18 +243,33 @@ export default class StyleKit {
   }
 
   setActiveTheme(theme) {
-    const isAndroid = Platform.OS === 'android';
-
     // merge default variables in case this theme has variables that are missing
-    let variables = theme.content.variables;
+    const variables = theme.content.variables;
     theme.content.variables = _.merge(this.templateVariables(), variables);
     theme.setMobileActive(true);
 
     this.activeTheme = theme;
 
+    this.changeDeviceItems(theme);
+
+    this.reloadStyles();
+
+    this.notifyObserversOfThemeChange();
+  }
+
+  /**
+   * Changes local device items for newly activated theme
+   *
+   * This includes:
+   *     - Status Bar color
+   *     - Local App Icon color
+   */
+  changeDeviceItems(theme) {
+    const isAndroid = Platform.OS === 'android';
+
     // On Android, a time out is required, especially during app startup
     setTimeout(() => {
-      let statusBarColor = this.statusBarColorForTheme(theme);
+      const statusBarColor = statusBarColorForTheme(theme);
       StatusBar.setBarStyle(statusBarColor, true);
       // setBackgroundColor is only for Android
       if(isAndroid) {
@@ -316,10 +300,6 @@ export default class StyleKit {
         }
       })
     }
-
-    this.reloadStyles();
-
-    this.notifyObserversOfThemeChange();
   }
 
   activateTheme(theme, writeToStorage = true) {
@@ -327,7 +307,7 @@ export default class StyleKit {
       this.activeTheme.setMobileActive(false);
     }
 
-    var performActivation = async () => {
+    const performActivation = async () => {
       // assign this as the preferential theme for current light/dark mode the user is using
       this.saveThemeForMode({theme: theme, mode: this.currentDarkMode});
 
@@ -344,7 +324,7 @@ export default class StyleKit {
 
     // Theme may have been downloaded before stylekit changes. So if it doesn't have the info color,
     // it needs to be refreshed
-    let hasValidInfoColor = theme.content.variables && theme.content.variables.stylekitInfoColor;
+    const hasValidInfoColor = theme.content.variables && theme.content.variables.stylekitInfoColor;
     if(!hasValidInfoColor) {
       ThemeDownloader.get().downloadTheme(theme).then((variables) => {
         if(!variables) {
@@ -370,7 +350,7 @@ export default class StyleKit {
     }
   }
 
-  activateThemeForCurrentMode() {
+    activateThemeForCurrentMode() {
     if(this.themeChange) clearTimeout(this.themeChange);
     this.themeChange = setTimeout(() => {
       const storageKey = this.themeStorageKeyForCurrentMode();
@@ -394,23 +374,12 @@ export default class StyleKit {
   async downloadThemeAndReload(theme) {
     await ThemeDownloader.get().downloadTheme(theme);
     await Sync.get().sync();
-    this.activateTheme(theme);
-  }
-
-  static isIPhoneX() {
-    // See https://mydevice.io/devices/ for device dimensions
-    const X_WIDTH = 375;
-    const X_HEIGHT = 812;
-    const { height: D_HEIGHT, width: D_WIDTH } = Dimensions.get('window');
-    return Platform.OS === 'ios' &&
-      ((D_HEIGHT === X_HEIGHT && D_WIDTH === X_WIDTH) ||
-        (D_HEIGHT === X_WIDTH && D_WIDTH === X_HEIGHT));
   }
 
   reloadStyles() {
-    let variables = this.activeTheme.content.variables;
-    let mainTextFontSize = this.constants.mainTextFontSize;
-    let paddingLeft = this.constants.paddingLeft;
+    const variables = this.activeTheme.content.variables;
+    const mainTextFontSize = this.constants.mainTextFontSize;
+    const paddingLeft = this.constants.paddingLeft;
     this.styles = {
       baseBackground: {
         backgroundColor: variables.stylekitBackgroundColor
@@ -604,52 +573,4 @@ export default class StyleKit {
   static nameForIcon(iconName) {
     return StyleKit.platformIconPrefix() + "-" + iconName;
   }
-
-  static getColorLuminosity(hexCode) {
-    var c = hexCode;
-    c = c.substring(1);      // strip #
-    var rgb = parseInt(c, 16);   // convert rrggbb to decimal
-    var r = (rgb >> 16) & 0xff;  // extract red
-    var g = (rgb >>  8) & 0xff;  // extract green
-    var b = (rgb >>  0) & 0xff;  // extract blue
-
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
-  }
-
-  static shadeBlend(p,c0,c1) {
-    var n=p<0?p*-1:p,u=Math.round,w=parseInt;
-    if(c0.length>7){
-      var f=c0.split(","),t=(c1?c1:p<0?"rgb(0,0,0)":"rgb(255,255,255)").split(","),R=w(f[0].slice(4)),G=w(f[1]),B=w(f[2]);
-      return "rgb("+(u((w(t[0].slice(4))-R)*n)+R)+","+(u((w(t[1])-G)*n)+G)+","+(u((w(t[2])-B)*n)+B)+")"
-    } else{
-      var f=w(c0.slice(1),16),t=w((c1?c1:p<0?"#000000":"#FFFFFF").slice(1),16),R1=f>>16,G1=f>>8&0x00FF,B1=f&0x0000FF;
-      return "#"+(0x1000000+(u(((t>>16)-R1)*n)+R1)*0x10000+(u(((t>>8&0x00FF)-G1)*n)+G1)*0x100+(u(((t&0x0000FF)-B1)*n)+B1)).toString(16).slice(1)
-    }
-  }
-
-  static darken(color, value = -0.15) {
-    return this.shadeBlend(value, color);
-  }
-
-  static lighten(color, value = 0.25) {
-    return this.shadeBlend(value, color);
-  }
-
-  static hexToRGBA(hex, alpha) {
-    if(!hex || !hex.startsWith("#")) {
-      return null;
-    }
-    var c;
-    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-      c= hex.substring(1).split('');
-      if(c.length== 3){
-          c= [c[0], c[0], c[1], c[1], c[2], c[2]];
-      }
-      c= '0x'+c.join('');
-      return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+',' + alpha + ')';
-    } else {
-      throw new Error('Bad Hex');
-    }
-  }
-
 }

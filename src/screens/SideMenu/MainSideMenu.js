@@ -33,11 +33,12 @@ import {
   ICON_SETTINGS
 } from '@Style/icons';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
-import StyleKit, {
+import StyleKit from '@Style/StyleKit';
+import {
   LIGHT_MODE_KEY,
   DARK_MODE_KEY,
   themeStorageKeyForMode
-} from '@Style/StyleKit';
+} from '@Style/utils';
 
 export default class MainSideMenu extends AbstractSideMenu {
 

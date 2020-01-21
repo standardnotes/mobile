@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Circle from "@Components/Circle"
 import ThemedComponent from "@Components/ThemedComponent";
 import ApplicationState from "@Lib/ApplicationState"
-
 import StyleKit from "@Style/StyleKit"
-import Circle from "@Components/Circle"
+import { hexToRGBA } from '@Style/utils';
 
 export default class SideMenuCell extends ThemedComponent {
 
@@ -85,7 +85,7 @@ export default class SideMenuCell extends ThemedComponent {
 
     // if this is a dimmed cell, override text color with Neutral color
     if(this.props.dimmed) {
-      textColor = StyleKit.variable("stylekitNeutralColor");
+      textColor = StyleKit.variables.stylekitNeutralColor;
     }
 
     return (
@@ -123,7 +123,7 @@ export default class SideMenuCell extends ThemedComponent {
   loadStyles() {
     this.styles = {
       iconColor: StyleKit.variables.stylekitInfoColor,
-      selectionBgColor: StyleKit.hexToRGBA(StyleKit.variable("stylekitInfoColor"), 0.1),
+      selectionBgColor: hexToRGBA(StyleKit.variables.stylekitInfoColor, 0.1),
 
       cell: {
         minHeight: this.props.subtext ? 52 : 42,
@@ -132,24 +132,24 @@ export default class SideMenuCell extends ThemedComponent {
       cellContent: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: "center",
+        alignItems: 'center',
       },
 
       iconContainer: {
         flex: 0,
-        justifyContent: "center",
+        justifyContent: 'center',
         flexDirection: 'column',
       },
 
       iconContainerLeft: {
         marginRight: 6,
-        height: "100%",
+        height: '100%',
       },
 
       iconContainerRight: {
         marginLeft: 6,
         marginRight: 4,
-        height: "100%",
+        height: '100%',
       },
 
       textContainer: {
@@ -158,7 +158,7 @@ export default class SideMenuCell extends ThemedComponent {
       },
 
       textContainerSelected: {
-        borderBottomColor: StyleKit.variable("stylekitInfoColor"),
+        borderBottomColor: StyleKit.variables.stylekitInfoColor,
         borderBottomWidth: 2,
       },
 
@@ -183,22 +183,22 @@ export default class SideMenuCell extends ThemedComponent {
         marginTop: -3,
         width: 20,
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center"
+        justifyContent: 'center',
+        alignItems: 'center'
       },
 
       iconCircle: {
         marginTop: -5,
         width: 20,
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center"
+        justifyContent: 'center',
+        alignItems: 'center'
       },
 
       iconAscii: {
         fontSize: 15,
         fontWeight: "bold",
-        color: StyleKit.variable("stylekitNeutralColor"),
+        color: StyleKit.variables.stylekitNeutralColor,
         opacity: 0.6,
         marginTop: -4
       }
