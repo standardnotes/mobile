@@ -188,7 +188,7 @@ export default function App(props) {
   loadInitialData();
 
   async function loadInitialData() {
-    await StyleKit.get().resolveInitialTheme();
+    await StyleKit.get().resolveInitialThemes();
     await KeysManager.get().loadInitialData();
 
     let ready = () => {

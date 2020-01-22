@@ -34,10 +34,10 @@ import {
 } from '@Style/icons';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
 import StyleKit from '@Style/StyleKit';
+import ThemePreferences from '@Style/ThemePreferences';
 import {
   LIGHT_MODE_KEY,
   DARK_MODE_KEY,
-  themeStorageKeyForMode
 } from '@Style/utils';
 
 export default class MainSideMenu extends AbstractSideMenu {
@@ -103,7 +103,8 @@ export default class MainSideMenu extends AbstractSideMenu {
       return;
     }
 
-    StyleKit.get().activateTheme(theme);
+    const mode = supportsDarkMode ? StyleKit.get().currentDarkMode : LIGHT_MODE_KEY;
+    StyleKit.get().assignThemeForMode({ theme: theme, mode: mode });
     this.forceUpdate();
   }
 
@@ -112,24 +113,23 @@ export default class MainSideMenu extends AbstractSideMenu {
 
     // if this theme is a mobile theme, allow it to be set as the preferred option for light/dark mode
     if(theme.content.package_info && !theme.content.package_info.no_mobile) {
-      const allowsDarkModeChoice = supportsDarkMode && !theme.content.isSystemTheme;
       const lightThemeAction = this.themeActionForMode({theme: theme, mode: LIGHT_MODE_KEY});
-      const lightThemeName = allowsDarkModeChoice ? "Light" : "Active";
+      const lightThemeName = supportsDarkMode ? "Light" : "Active";
       const setLightThemeActionName = `${lightThemeAction} ${lightThemeName} Theme`;
 
       actionSheetOptions.push(
         ActionSheetWrapper.BuildOption({text: setLightThemeActionName, callback: () => {
-          StyleKit.get().saveThemeForMode({theme: theme, mode: LIGHT_MODE_KEY});
+          StyleKit.get().assignThemeForMode({ theme: theme, mode: LIGHT_MODE_KEY });
         }})
       );
 
       // only add a dark mode option if this theme supports dark/light mode
-      if(allowsDarkModeChoice) {
+      if(supportsDarkMode) {
         const setDarkThemeActionName = `${this.themeActionForMode({theme: theme, mode: DARK_MODE_KEY})} Dark Theme`;
 
         actionSheetOptions.push(
           ActionSheetWrapper.BuildOption({text: setDarkThemeActionName, callback: () => {
-            StyleKit.get().saveThemeForMode({theme: theme, mode: DARK_MODE_KEY});
+            StyleKit.get().assignThemeForMode({ theme: theme, mode: DARK_MODE_KEY });
           }})
         )
       }
@@ -169,11 +169,7 @@ export default class MainSideMenu extends AbstractSideMenu {
   }
 
   themeActionForMode({theme, mode}) {
-    const isThemeForCurrentMode = StyleKit.get().isThemeActive(theme) &&
-        mode === StyleKit.get().currentDarkMode;
-
-    return isThemeForCurrentMode ||
-        theme.content[themeStorageKeyForMode(mode)]
+    return ThemePreferences.get().isPrefForMode({ mode: mode, theme: theme })
         ? "Current" : "Set as";
   }
 

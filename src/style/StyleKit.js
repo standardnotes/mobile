@@ -1,5 +1,6 @@
 import { StyleSheet, StatusBar, Alert, Platform, Dimensions } from 'react-native';
 import IconChanger from 'react-native-alternate-icons';
+import { supportsDarkMode } from 'react-native-dark-mode';
 import { SFItemParams } from 'standard-file-js';
 import Auth from '@Lib/sfjs/authManager';
 import Server from '@Lib/sfjs/httpManager';
@@ -7,13 +8,15 @@ import KeysManager from '@Lib/keysManager';
 import ModelManager from '@Lib/sfjs/modelManager';
 import Storage from '@Lib/sfjs/storageManager';
 import Sync from '@Lib/sfjs/syncManager';
+import ThemePreferences from '@Style/ThemePreferences';
 import CSSParser from '@Style/Util/CSSParser';
 import {
-  themeStorageKeyForMode,
   statusBarColorForTheme,
   keyboardColorForTheme,
   LIGHT_CONTENT,
-  DARK_CONTENT
+  DARK_CONTENT,
+  LIGHT_MODE_KEY,
+  DARK_MODE_KEY
 } from '@Style/utils';
 import ThemeDownloader from '@Style/Util/ThemeDownloader';
 
@@ -39,11 +42,11 @@ export default class StyleKit {
 
     this.createDefaultThemes();
 
-    KeysManager.get().registerAccountRelatedStorageKeys(['savedTheme']);
+    // KeysManager.get().registerAccountRelatedStorageKeys(['savedTheme']);
 
     ModelManager.get().addItemSyncObserver('themes', 'SN|Theme', (allItems, validItems, deletedItems, source) => {
       if(this.activeTheme && this.activeTheme.isSwapIn) {
-        const matchingTheme = _.find(this.themes(), {uuid: this.activeTheme.uuid});
+        const matchingTheme = _.find(this.themes(), { uuid: this.activeTheme.uuid });
         if(matchingTheme) {
           this.setActiveTheme(matchingTheme);
           this.activeTheme.isSwapIn = false;
@@ -52,7 +55,7 @@ export default class StyleKit {
     });
 
     // once themes have synced, activate the theme for our current mode
-    this.activateThemeForCurrentMode();
+    // this.activateThemeForCurrentMode();
 
     this.signoutObserver = Auth.get().addEventHandler((event) => {
       if(event == SFAuthManager.DidSignOutEvent) {
@@ -80,35 +83,18 @@ export default class StyleKit {
     this.currentDarkMode = mode;
   }
 
-  themeStorageKeyForCurrentMode() {
-    return themeStorageKeyForMode(this.currentDarkMode);
-  }
+  assignThemeForMode({ theme, mode }) {
+    if(!supportsDarkMode) {
+      mode = LIGHT_MODE_KEY;
+    }
 
-  saveThemeForMode({theme, mode}) {
-    const modeToSaveFor = theme.content.isSystemTheme ? this.currentDarkMode : mode;
-    const storageKey = themeStorageKeyForMode(modeToSaveFor);
-
-    /**
-      Unset the themes that were previously set for this key. We loop instead
-      of finding the specific theme with the matching mode incase of any sync
-      conflicts happen to assign 2 themes as the theme for a specific mode.
-    */
-    _.forEach(this.themes(), _theme => {
-      if(_theme.content && _theme.content[storageKey]) {
-        _theme.content[storageKey] = false;
-        _theme.setDirty(true);
-      }
-    });
-
-    // assign this new theme to this mode
-    theme.content[storageKey] = true;
-    theme.setDirty(true);
+    ThemePreferences.get().setPrefForMode({ mode: mode, theme: theme });
 
     /**
-      If we're changing the theme for a specific mode and we're currently on
-      that mode, then set this theme as active
-    */
-    if(this.currentDarkMode === modeToSaveFor && this.activeTheme.uuid !== theme.uuid) {
+     * If we're changing the theme for a specific mode and we're currently on
+     * that mode, then set this theme as active
+     */
+    if(this.currentDarkMode === mode && this.activeTheme.uuid !== theme.uuid) {
       this.setActiveTheme(theme);
     }
 
@@ -164,30 +150,29 @@ export default class StyleKit {
     }
   }
 
-  async resolveInitialTheme() {
-    const runDefaultTheme = async () => {
-      let theme;
-      const savedSystemThemeId = await Storage.get().getItem('savedSystemThemeId');
-      if(savedSystemThemeId) {
-        theme = this.systemThemes.find((candidate) => candidate.uuid == savedSystemThemeId);
-      } else {
-        theme = this.systemThemes[0];
-      }
+  async resolveInitialThemes() {
+    const runDefaultTheme = () => {
+      this.setActiveTheme(this.systemThemes[0]);
 
-      this.setActiveTheme(theme);
+      /*
+        TODO: store this as the default as a backup
+      */
     }
 
-    // Get the active theme from storage rather than waiting for local database to load
-    const themeResult = await Storage.get().getItem('savedTheme');
-    if(!themeResult) {
+    await ThemePreferences.get().loadFromStorage();
+
+    let themeData = ThemePreferences.get().getPrefForMode(this.currentDarkMode);
+    if(!themeData) {
       return runDefaultTheme();
     }
 
-    // JSON stringified content is generic and includes all items property at time of stringification
-    // So we parse it, then set content to itself, so that the mapping can be handled correctly.
     try {
-      const parsedTheme = JSON.parse(themeResult);
-      let theme = new SNTheme(parsedTheme);
+      /*
+        TODO: if this is a system theme based on uuid, use app's JSON data
+        and resave to ensure we are always using latest styling
+      */
+
+      const theme = new SNTheme(themeData);
       theme.isSwapIn = true;
       this.setActiveTheme(theme);
     } catch (e) {
@@ -302,24 +287,14 @@ export default class StyleKit {
     }
   }
 
-  activateTheme(theme, writeToStorage = true) {
+  activateTheme(theme) {
     if(this.activeTheme) {
       this.activeTheme.setMobileActive(false);
     }
 
     const performActivation = async () => {
       // assign this as the preferential theme for current light/dark mode the user is using
-      this.saveThemeForMode({theme: theme, mode: this.currentDarkMode});
-
-      if(theme.content.isSystemTheme) {
-        Storage.get().setItem('savedSystemThemeId', theme.uuid);
-        Storage.get().removeItem('savedTheme');
-      } else if(writeToStorage) {
-        let transformer = new SFItemParams(theme);
-        let params = await transformer.paramsForLocalStorage();
-        Storage.get().setItem('savedTheme', JSON.stringify(params));
-        Storage.get().removeItem('savedSystemThemeId');
-      }
+      this.assignThemeForMode({ theme: theme, mode: this.currentDarkMode });
     }
 
     // Theme may have been downloaded before stylekit changes. So if it doesn't have the info color,
@@ -350,25 +325,22 @@ export default class StyleKit {
     }
   }
 
-    activateThemeForCurrentMode() {
-    if(this.themeChange) clearTimeout(this.themeChange);
-    this.themeChange = setTimeout(() => {
-      const storageKey = this.themeStorageKeyForCurrentMode();
-      const matchingTheme = this.themes().find((candidate) => candidate.content[storageKey]);
+  activateThemeForCurrentMode() {
+    const uuid = ThemePreferences.get().getPrefUuidForMode(this.currentDarkMode);
+    const matchingTheme = _.find(this.themes(), { uuid: uuid });
 
-      if(matchingTheme) {
-        if(matchingTheme.uuid === this.activeTheme.uuid) {
-          // Found a match and it's already active, no need to switch
-          return;
-        }
-
-        // found a matching theme for user preference, switch to that theme
-        this.activateTheme(matchingTheme);
-      } else {
-        // No matching theme found, set currently active theme as the default for this mode (light/dark)
-        this.saveThemeForMode({theme: this.activeTheme, mode: this.currentDarkMode});
+    if(matchingTheme) {
+      if(matchingTheme.uuid === this.activeTheme.uuid) {
+        // Found a match and it's already active, no need to switch
+        return;
       }
-    }, 300);
+
+      // found a matching theme for user preference, switch to that theme
+      this.activateTheme(matchingTheme);
+    } else {
+      // No matching theme found, set currently active theme as the default for this mode (light/dark)
+      this.assignThemeForMode({ theme: this.activeTheme, mode: this.currentDarkMode });
+    }
   }
 
   async downloadThemeAndReload(theme) {

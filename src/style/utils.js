@@ -2,12 +2,6 @@ export const LIGHT_MODE_KEY         = 'light';
 export const DARK_MODE_KEY          = 'dark';
 export const LIGHT_CONTENT          = 'light-content';
 export const DARK_CONTENT           = 'dark-content';
-export const LIGHT_MODE_THEME_KEY   = 'isMobileLightTheme';
-export const DARK_MODE_THEME_KEY    = 'isMobileDarkTheme';
-
-export function themeStorageKeyForMode(mode) {
-  return mode === DARK_MODE_KEY ? DARK_MODE_THEME_KEY : LIGHT_MODE_THEME_KEY;
-}
 
 export function statusBarColorForTheme(theme) {
   // The main nav bar uses contrast background color
