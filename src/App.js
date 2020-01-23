@@ -1,7 +1,10 @@
 import { Client } from 'bugsnag-react-native';
-import React, { useState, useEffect } from 'react';
+import React, { Component } from 'react';
 import { View, Text, Animated } from 'react-native';
-import { useDarkModeContext, eventEmitter as darkModeEventEmitter } from 'react-native-dark-mode'
+import {
+  initialMode,
+  eventEmitter as darkModeEventEmitter
+} from 'react-native-dark-mode'
 import { createAppContainer, NavigationActions } from 'react-navigation';
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
@@ -160,41 +163,56 @@ const DrawerStack = createDrawerNavigator({
 
 const AppContainer = createAppContainer(DrawerStack);
 
-export default function App(props) {
-  const [isReady, setIsReady] = useState(false);
+export default class App extends Component {
 
-  // initialize StyleKit with the status of Dark Mode on the user's device
-  StyleKit.get().setModeTo(useDarkModeContext());
+  constructor(props) {
+    super(props);
 
-  // if user switches light/dark mode while on the app, update theme accordingly
-  darkModeEventEmitter.on('currentModeChanged', changeCurrentMode);
+    StyleKit.get().setModeTo(initialMode);
+    darkModeEventEmitter.on('currentModeChanged', this.changeCurrentMode);
 
-  KeysManager.get().registerAccountRelatedStorageKeys(['options']);
+    KeysManager.get().registerAccountRelatedStorageKeys(['options']);
 
-  // Initialize iOS review manager. Will automatically handle requesting review logic.
-  ReviewManager.initialize();
+    // Initialize iOS review manager. Will automatically handle requesting review logic.
+    ReviewManager.initialize();
 
-  PrivilegesManager.get().loadPrivileges();
-  MigrationManager.get().load();
+    PrivilegesManager.get().loadPrivileges();
+    MigrationManager.get().load();
 
-  // Listen to sign out event
-  this.authEventHandler = Auth.get().addEventHandler(async (event) => {
-    if(event == SFAuthManager.DidSignOutEvent) {
-      ModelManager.get().handleSignout();
-      await Sync.get().handleSignout();
-    }
-  });
+    // Listen to sign out event
+    this.authEventHandler = Auth.get().addEventHandler(async (event) => {
+      if(event == SFAuthManager.DidSignOutEvent) {
+        ModelManager.get().handleSignout();
+        await Sync.get().handleSignout();
+      }
+    });
 
-  loadInitialData();
+    this.state = { ready: false };
+    this.loadInitialData();
+  }
 
-  async function loadInitialData() {
+  /**
+   * We initially didn't expect App to ever unmount. However, on Android,
+   * if you are in the root screen, and press the physical back button,
+   * then strangely, App unmounts, but other components, like Notes, do not.
+   * We've remedied this by modifiying Android back button behavior natively
+   * to background instead of quit, but we keep this below anyway.
+   */
+  componentWillUnmount() {
+    Auth.get().removeEventHandler(this.authEventHandler);
+
+    /** Make sure we remove the event listener for dark/light mode changes */
+    darkModeEventEmitter.off('currentModeChanged', this.changeCurrentMode)
+  }
+
+  async loadInitialData() {
     await StyleKit.get().resolveInitialThemes();
     await KeysManager.get().loadInitialData();
 
-    let ready = () => {
+    const ready = () => {
       KeysManager.get().markApplicationAsRan();
       ApplicationState.get().receiveApplicationStartEvent();
-      setIsReady(true);
+      this.setState({ ready: true });
     }
 
     if(await KeysManager.get().needsWipe()) {
@@ -204,27 +222,18 @@ export default function App(props) {
     }
   }
 
-  function changeCurrentMode(newMode) {
+  changeCurrentMode(newMode) {
     StyleKit.get().setModeTo(newMode);
-    StyleKit.get().activateThemeForCurrentMode();
+    StyleKit.get().activatePreferredTheme();
   }
 
-  useEffect(() => {
-    return () => {
-      /**
-        We initially didn't expect App to ever unmount. However, on Android, if you
-        are in the root screen, and press the physical back button, then strangely,
-        App unmounts, but other components, like Notes, do not.
-        We've remedied this by modifiying Android back button behavior natively to
-        background instead of quit, but we keep this below anyway.
-       */
-      Auth.get().removeEventHandler(authEventHandler);
+  render() {
+    if(!this.state.ready) {
+      return null;
+    }
 
-      // Make sure we remove the event listener for dark/light mode changes
-      darkModeEventEmitter.off('currentModeChanged', changeCurrentMode)
-    };
-  });
-
-
-  return !isReady ? null : (<AppContainer /* persistenceKey="if-you-want-it" */ />);
+    return (
+      <AppContainer /* persistenceKey="if-you-want-it" */ />
+    )
+  }
 }

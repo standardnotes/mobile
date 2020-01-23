@@ -7,7 +7,6 @@ import {
   Linking
 } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import { supportsDarkMode } from 'react-native-dark-mode';
 import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
@@ -103,56 +102,79 @@ export default class MainSideMenu extends AbstractSideMenu {
       return;
     }
 
-    const mode = supportsDarkMode ? StyleKit.get().currentDarkMode : LIGHT_MODE_KEY;
+    const mode = StyleKit.doesDeviceSupportDarkMode()
+      ? StyleKit.get().currentDarkMode
+      : LIGHT_MODE_KEY;
+
     StyleKit.get().assignThemeForMode({ theme: theme, mode: mode });
     this.forceUpdate();
   }
 
   onThemeLongPress = (theme) => {
-    let actionSheetOptions = [];
+    const actionSheetOptions = [];
 
-    // if this theme is a mobile theme, allow it to be set as the preferred option for light/dark mode
+    /** If this theme is a mobile theme, allow it to be set as the preferred
+     * option for light/dark mode
+     */
     if(theme.content.package_info && !theme.content.package_info.no_mobile) {
-      const lightThemeAction = this.themeActionForMode({theme: theme, mode: LIGHT_MODE_KEY});
-      const lightThemeName = supportsDarkMode ? "Light" : "Active";
-      const setLightThemeActionName = `${lightThemeAction} ${lightThemeName} Theme`;
+      const lightThemeAction = this.getModeActionForTheme({
+        theme: theme,
+        mode: LIGHT_MODE_KEY
+      });
+      const lightName = StyleKit.doesDeviceSupportDarkMode() ? "Light" : "Active";
+      const lightText = `${lightThemeAction} ${lightName} Theme`;
 
       actionSheetOptions.push(
-        ActionSheetWrapper.BuildOption({text: setLightThemeActionName, callback: () => {
-          StyleKit.get().assignThemeForMode({ theme: theme, mode: LIGHT_MODE_KEY });
-        }})
+        ActionSheetWrapper.BuildOption({
+          text: lightText,
+          callback: () => {
+            StyleKit.get().assignThemeForMode({
+              theme: theme,
+              mode: LIGHT_MODE_KEY
+            });
+          }
+        })
       );
 
-      // only add a dark mode option if this theme supports dark/light mode
-      if(supportsDarkMode) {
-        const setDarkThemeActionName = `${this.themeActionForMode({theme: theme, mode: DARK_MODE_KEY})} Dark Theme`;
+      /** only add a dark mode option if this theme supports dark/light mode */
+      if(StyleKit.doesDeviceSupportDarkMode()) {
+        const darkText = `${this.getModeActionForTheme({
+          theme: theme,
+          mode: DARK_MODE_KEY
+        })} Dark Theme`;
 
         actionSheetOptions.push(
-          ActionSheetWrapper.BuildOption({text: setDarkThemeActionName, callback: () => {
-            StyleKit.get().assignThemeForMode({ theme: theme, mode: DARK_MODE_KEY });
-          }})
+          ActionSheetWrapper.BuildOption({
+            text: darkText,
+            callback: () => {
+              StyleKit.get().assignThemeForMode({
+                theme: theme,
+                mode: DARK_MODE_KEY
+              });
+            }
+          })
         )
       }
     }
 
-    // system themes cannot be redownloaded, so prevent this option from being added on long press
+    /** system themes cannot be redownloaded */
     if(!theme.content.isSystemTheme) {
       actionSheetOptions.push(
-        ActionSheetWrapper.BuildOption({text: "Redownload", callback: () => {
+        ActionSheetWrapper.BuildOption({ text: "Redownload", callback: () => {
           this.onThemeRedownload(theme);
         }})
       );
     }
 
-    let sheet = new ActionSheetWrapper({
+    const sheet = new ActionSheetWrapper({
       title: `${theme.name} Options`,
       options: actionSheetOptions,
       onCancel: () => {
-        this.setState({actionSheet: null});
+        this.setState({ actionSheet: null });
       }
     });
 
-    this.setState({actionSheet: sheet.actionSheetElement()});
+    this.setState({ actionSheet: sheet.actionSheetElement() });
     this.forceUpdate(); // required to get actionSheet ref
     sheet.show();
   }
@@ -168,7 +190,7 @@ export default class MainSideMenu extends AbstractSideMenu {
     })
   }
 
-  themeActionForMode({theme, mode}) {
+  getModeActionForTheme({ theme, mode }) {
     return ThemePreferences.get().isPrefForMode({ mode: mode, theme: theme })
         ? "Current" : "Set as";
   }
