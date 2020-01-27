@@ -14,7 +14,7 @@ import KeysManager from '@Lib/keysManager';
 import ModelManager from '@Lib/sfjs/modelManager';
 import Storage from '@Lib/sfjs/storageManager';
 import Sync from '@Lib/sfjs/syncManager';
-import ThemePreferences from '@Style/ThemePreferences';
+import ThemeManager from '@Style/ThemeManager';
 import CSSParser from '@Style/Util/CSSParser';
 import {
   statusBarColorForTheme,
@@ -34,7 +34,7 @@ export default class StyleKit {
   static instance = null;
 
   static get() {
-    if (this.instance === null) {
+    if(this.instance === null) {
       this.instance = new StyleKit();
     }
 
@@ -72,6 +72,11 @@ export default class StyleKit {
     });
   }
 
+  async initialize() {
+    await ThemeManager.get().initialize();
+    await this.resolveInitialTheme();
+  }
+
   setModeTo(mode) {
     this.currentDarkMode = mode;
   }
@@ -86,7 +91,7 @@ export default class StyleKit {
   }
 
   notifyObserversOfThemeChange() {
-    for(let observer of this.themeChangeObservers) {
+    for(const observer of this.themeChangeObservers) {
       observer();
     }
   }
@@ -96,7 +101,7 @@ export default class StyleKit {
       mode = LIGHT_MODE_KEY;
     }
 
-    ThemePreferences.get().setPrefForMode({ mode: mode, theme: theme });
+    ThemeManager.get().setThemeForMode({ mode: mode, theme: theme });
 
     /**
      * If we're changing the theme for a specific mode and we're currently on
@@ -157,12 +162,12 @@ export default class StyleKit {
     }
   }
 
-  async resolveInitialThemes() {
+  async resolveInitialTheme() {
     const currentMode = this.currentDarkMode;
     const runDefaultTheme = () => {
       const defaultTheme = this.systemThemes[0];
 
-      ThemePreferences.get().setPrefForMode({
+      ThemeManager.get().setThemeForMode({
         mode: currentMode,
         theme: defaultTheme
       });
@@ -170,9 +175,9 @@ export default class StyleKit {
       this.setActiveTheme(defaultTheme);
     }
 
-    await ThemePreferences.get().loadFromStorage();
+    await ThemeManager.get().loadFromStorage();
 
-    const themeData = ThemePreferences.get().getPrefForMode(currentMode);
+    const themeData = ThemeManager.get().getThemeForMode(currentMode);
     if(!themeData) {
       return runDefaultTheme();
     }
@@ -181,9 +186,7 @@ export default class StyleKit {
       const matchingTheme = _.find(this.systemThemes, { uuid: themeData.uuid });
       let newTheme;
 
-      /**
-       * Use latest app theme data if preference is a previous system theme.
-       */
+      /** Use latest app theme data if preference is a previous system theme. */
       if(matchingTheme) {
         newTheme = matchingTheme;
       } else {
@@ -215,7 +218,7 @@ export default class StyleKit {
   }
 
   setActiveTheme(theme) {
-    /** merge default variables to ensure this theme has all the variables */
+    /** Merge default variables to ensure this theme has all the variables. */
     const variables = theme.content.variables;
     theme.content.variables = _.merge(this.templateVariables(), variables);
 
@@ -229,7 +232,7 @@ export default class StyleKit {
   }
 
   /**
-   * Updates local device items for newly activated theme
+   * Updates local device items for newly activated theme.
    *
    * This includes:
    *     - Status Bar color
@@ -238,7 +241,7 @@ export default class StyleKit {
   updateDeviceForTheme(theme) {
     const isAndroid = Platform.OS === 'android';
 
-    // On Android, a time out is required, especially during app startup
+    /** On Android, a time out is required, especially during app startup. */
     setTimeout(() => {
       const statusBarColor = statusBarColorForTheme(theme);
       StatusBar.setBarStyle(statusBarColor, true);
@@ -247,7 +250,7 @@ export default class StyleKit {
         /**
          * Android <= v22 does not support changing status bar text color.
          * It will always be white, so we have to make sure background color
-         * has proper contrast
+         * has proper contrast.
          */
         if(Platform.Version <= 22) {
           StatusBar.setBackgroundColor("#000000");
@@ -263,12 +266,12 @@ export default class StyleKit {
       IconChanger.supportDevice((supported) => {
         if(supported) {
           IconChanger.getIconName((currentName) => {
-            if(theme.content.isInitial && currentName != 'default') {
-              // Clear the icon to default
+            if(theme.content.isInitial && currentName !== 'default') {
+              /** Clear the icon to default. */
               IconChanger.setIconName(null);
             } else {
               const newName = theme.content.name;
-              if(newName != currentName) {
+              if(newName !== currentName) {
                 IconChanger.setIconName(newName);
               }
             }
@@ -315,19 +318,19 @@ export default class StyleKit {
   }
 
   activatePreferredTheme() {
-    const uuid = ThemePreferences.get().getPrefUuidForMode(this.currentDarkMode);
+    const uuid = ThemeManager.get().getThemeUuidForMode(this.currentDarkMode);
     const matchingTheme = _.find(this.themes(), { uuid: uuid });
 
     if(matchingTheme) {
       if(matchingTheme.uuid === this.activeTheme.uuid) {
-        /** Found a match and it's already active, no need to switch */
+        /** Found a match and it's already active, no need to switch. */
         return;
       }
 
-      /** found a matching theme for user preference, switch to that theme */
+      /** found a matching theme for user preference, switch to that theme. */
       this.activateTheme(matchingTheme);
     } else {
-      /** No matching theme found, set currently active theme as the default */
+      /** No matching theme found, set currently active theme as the default. */
       this.assignThemeForMode({
         theme: this.activeTheme,
         mode: this.currentDarkMode

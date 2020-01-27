@@ -169,7 +169,7 @@ export default class App extends Component {
     super(props);
 
     StyleKit.get().setModeTo(initialMode);
-    darkModeEventEmitter.on('currentModeChanged', this.changeCurrentMode);
+    darkModeEventEmitter.on('currentModeChanged', this.onChangeCurrentMode);
 
     KeysManager.get().registerAccountRelatedStorageKeys(['options']);
 
@@ -202,11 +202,11 @@ export default class App extends Component {
     Auth.get().removeEventHandler(this.authEventHandler);
 
     /** Make sure we remove the event listener for dark/light mode changes */
-    darkModeEventEmitter.off('currentModeChanged', this.changeCurrentMode)
+    darkModeEventEmitter.off('currentModeChanged', this.onChangeCurrentMode);
   }
 
   async loadInitialData() {
-    await StyleKit.get().resolveInitialThemes();
+    await StyleKit.get().initialize();
     await KeysManager.get().loadInitialData();
 
     const ready = () => {
@@ -222,8 +222,9 @@ export default class App extends Component {
     }
   }
 
-  changeCurrentMode(newMode) {
-    StyleKit.get().setModeTo(newMode);
+  /** @private */
+  onChangeCurrentMode(mode) {
+    StyleKit.get().setModeTo(mode);
     StyleKit.get().activatePreferredTheme();
   }
 

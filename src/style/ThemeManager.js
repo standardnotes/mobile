@@ -1,5 +1,8 @@
 import { SFItemParams } from 'standard-file-js';
 import UserPrefsManager from '@Lib/userPrefsManager';
+import {
+  isNullOrUndefined
+} from '@Lib/utils';
 import Storage from '@SFJS/storageManager';
 import StyleKit from '@Style/StyleKit';
 import {
@@ -15,27 +18,26 @@ function getThemeKeyForMode(mode) {
   return mode === LIGHT_MODE_KEY ? LIGHT_THEME_KEY : DARK_THEME_KEY;
 }
 
-export default class ThemePreferences {
+export default class ThemeManager {
 
   static instance = null;
 
   static get() {
-    if (this.instance == null) {
-      this.instance = new ThemePreferences();
+    if(isNullOrUndefined(this.instance)) {
+      this.instance = new ThemeManager();
     }
-
     return this.instance;
   }
 
-  constructor() {
+  async initialize() {
     this.data = null;
 
-    this.runPendingMigrations();
+    await this.runPendingMigrations();
   }
 
   async runPendingMigrations() {
     const themePrefMigrationName = '01212020SavedThemePref';
-    if((await Storage.get().getItem(themePrefMigrationName)) == null) {
+    if(isNullOrUndefined(await Storage.get().getItem(themePrefMigrationName))) {
       console.log("Running migration", themePrefMigrationName);
       await this.migrateThemePrefForModes();
       await Storage.get().setItem(themePrefMigrationName, 'true');
@@ -43,8 +45,8 @@ export default class ThemePreferences {
   }
 
   async migrateThemePrefForModes() {
-    const savedSystemThemeIdKey = "savedSystemThemeId";
-    const savedThemeKey = "savedTheme";
+    const savedSystemThemeIdKey = 'savedSystemThemeId';
+    const savedThemeKey = 'savedTheme';
     const systemThemeId = await Storage.get().getItem(systemThemeId);
     const savedTheme = await Storage.get().getItem(savedThemeKey);
 
@@ -78,32 +80,29 @@ export default class ThemePreferences {
     await UserPrefsManager.get().clearPref({ key: savedThemeKey });
   }
 
-  getPrefUuidForMode(mode) {
-    const pref = this.getPrefForMode(mode);
+  getThemeUuidForMode(mode) {
+    const pref = this.getThemeForMode(mode);
     return pref && pref.uuid;
   }
 
-  isPrefForMode({ mode, theme }) {
-    const pref = this.getPrefForMode(mode);
+  isThemeEnabledForMode({ mode, theme }) {
+    const pref = this.getThemeForMode(mode);
     return pref.uuid === theme.uuid;
   }
 
-  getPrefForMode(mode) {
+  getThemeForMode(mode) {
     return this.data[getThemeKeyForMode(mode)];
   }
 
-  async setPrefForMode({ mode, theme }) {
+  async setThemeForMode({ mode, theme }) {
     const themeData = await this.buildThemeDataForTheme(theme);
-
     this.data[getThemeKeyForMode(mode)] = themeData;
-
     this.saveToStorage();
   }
 
   async buildDefaultPreferences() {
     const theme = StyleKit.get().systemThemes[0];
     const themeData = await this.buildThemeDataForTheme(theme);
-
     return {
       [LIGHT_THEME_KEY]: themeData,
       [DARK_THEME_KEY]: themeData
@@ -112,24 +111,21 @@ export default class ThemePreferences {
 
   async buildThemeDataForTheme(theme) {
     const transformer = new SFItemParams(theme);
-    return await transformer.paramsForLocalStorage();
+    return transformer.paramsForLocalStorage();
   }
 
   async loadFromStorage() {
     this.data = await UserPrefsManager.get().getPref({
       key: THEME_PREFERENCES_KEY
     });
-
     if(!this.data) {
       this.data = await this.buildDefaultPreferences();
     }
-
     return this.data;
   }
 
   saveToStorage() {
     if(this.saveAction) clearTimeout(this.saveAction);
-
     this.saveAction = setTimeout(async () => {
       await UserPrefsManager.get().setPref({
         key: THEME_PREFERENCES_KEY,
