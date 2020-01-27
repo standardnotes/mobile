@@ -11,7 +11,9 @@ import { SafeAreaView } from 'react-navigation';
 import ButtonCell from '@Components/ButtonCell';
 import SectionHeader from '@Components/SectionHeader';
 import ApplicationState from '@Lib/ApplicationState';
-import UserPrefsManager from '@Lib/userPrefsManager';
+import UserPrefsManager, {
+  AGREED_TO_OFFLINE_DISCLAIMER_KEY
+} from '@Lib/userPrefsManager';
 import { stripNonAlphanumeric, isMatchCaseInsensitive } from '@Lib/utils';
 import AlertManager from '@SFJS/alertManager';
 import Abstract from '@Screens/Abstract';
@@ -88,10 +90,12 @@ export default class OfflineDisclaimer extends Abstract {
   }
 
   componentDidMount() {
+    super.componentDidMount();
     this._onLayout(null)
   }
 
   componentWillUnmount() {
+    super.componentWillUnmount();
     this.keyboardDidShowListener.remove();
   }
 
@@ -121,7 +125,7 @@ export default class OfflineDisclaimer extends Abstract {
 
   onAgreeToDisclaimer() {
     UserPrefsManager.get()
-      .setAgreedToOfflineDisclaimer()
+      .setPref({ key: AGREED_TO_OFFLINE_DISCLAIMER_KEY, value: true })
       .then(() => {
         this.props.navigation.navigate(SCREEN_HOME);
       });
