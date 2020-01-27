@@ -52,13 +52,12 @@ export default class ThemeManager {
 
     let themeData;
     if(savedTheme) {
-      themeData = savedTheme;
+      themeData = JSON.parse(savedTheme);
     } else if(systemThemeId) {
       const systemTheme = _.find(
         StyleKit.get().systemThemes,
         { uuid: systemThemeId }
       );
-
       themeData = this.buildThemeDataForTheme(systemTheme);
     }
 
