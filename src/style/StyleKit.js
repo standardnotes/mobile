@@ -339,8 +339,18 @@ export default class StyleKit {
   }
 
   async downloadThemeAndReload(theme) {
-    await ThemeDownloader.get().downloadTheme(theme);
+    const updatedVariables = await ThemeDownloader.get().downloadTheme(theme);
+
+    /** Merge default variables to ensure this theme has all the variables. */
+    const appliedVariables = _.merge(this.templateVariables(), updatedVariables);
+    theme.content.variables = appliedVariables;
+    theme.setDirty(true);
+
     await Sync.get().sync();
+
+    if(theme.uuid === this.activeTheme.uuid) {
+      this.setActiveTheme(theme);
+    }
   }
 
   reloadStyles() {
