@@ -446,10 +446,10 @@ export default class StyleKit {
       },
 
       buttonCellButton: {
-        textAlign: "center",
-        textAlignVertical: "center",
+        textAlign: 'center',
+        textAlignVertical: 'center',
         color:
-          Platform.OS === "android"
+          Platform.OS === 'android'
             ? variables.stylekitForegroundColor
             : variables.stylekitInfoColor,
         fontSize: mainTextFontSize
