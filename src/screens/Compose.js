@@ -26,6 +26,7 @@ import {
   ICON_MENU
 } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
+import { lighten } from '@Style/utils';
 import Abstract from './Abstract';
 import ComponentView from './ComponentView';
 
@@ -535,8 +536,8 @@ export default class Compose extends Abstract {
               ref={(ref) => this.input = ref}
               autoFocus={this.note.dummy}
               value={this.note.text}
-              selectionColor={StyleKit.lighten(StyleKit.variable("stylekitInfoColor"), 0.35)}
-              handlesColor={StyleKit.variable("stylekitInfoColor")}
+              selectionColor={lighten(StyleKit.variables.stylekitInfoColor, 0.35)}
+              handlesColor={StyleKit.variables.stylekitInfoColor}
               onChangeText={this.onTextChange}
             />
           </View>
@@ -550,7 +551,7 @@ export default class Compose extends Abstract {
             value={this.note.text}
             keyboardDismissMode={'interactive'}
             keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
-            selectionColor={StyleKit.lighten(StyleKit.variable("stylekitInfoColor"))}
+            selectionColor={lighten(StyleKit.variables.stylekitInfoColor)}
             onChangeText={this.onTextChange}
             editable={!this.note.locked}
           />

@@ -19,6 +19,7 @@ import Auth from '@SFJS/authManager';
 import ModelManager from '@SFJS/modelManager';
 import Sync from '@SFJS/syncManager';
 import StyleKit from '@Style/StyleKit';
+import { hexToRGBA } from '@Style/utils';
 
 export default class Root extends Abstract {
 
@@ -414,7 +415,7 @@ export default class Root extends Abstract {
                 <Icon
                   name={collapseIconName}
                   size={24}
-                  color={StyleKit.hexToRGBA(
+                  color={hexToRGBA(
                     StyleKit.variables.stylekitInfoColor,
                     0.85
                   )}
@@ -441,7 +442,7 @@ export default class Root extends Abstract {
 
       },
       toggleButtonContainer: {
-        backgroundColor: StyleKit.hexToRGBA(StyleKit.variables.stylekitContrastBackgroundColor, 0.5)
+        backgroundColor: hexToRGBA(StyleKit.variables.stylekitContrastBackgroundColor, 0.5)
       },
       toggleButton: {
         justifyContent: 'center',

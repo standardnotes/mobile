@@ -4,9 +4,9 @@ import {
 } from '@Lib/utils';
 import Storage from '@SFJS/storageManager';
 
-export const LAST_EXPORT_DATE_KEY                     = 'LastExportDateKey'
-export const DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY  = 'DoNotShowAgainUnsupportedEditorsKey'
-export const AGREED_TO_OFFLINE_DISCLAIMER_KEY         = 'AgreedToOfflineDisclaimerKey'
+export const LAST_EXPORT_DATE_KEY                     = 'LastExportDateKey';
+export const DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY  = 'DoNotShowAgainUnsupportedEditorsKey';
+export const AGREED_TO_OFFLINE_DISCLAIMER_KEY         = 'AgreedToOfflineDisclaimerKey';
 
 export default class UserPrefsManager {
   static instance = null
@@ -33,7 +33,7 @@ export default class UserPrefsManager {
 
   async getPref({ key }) {
     if(isNullOrUndefined(this.data[key])) {
-      this.data[key] = await Storage.get().getItem(key);
+      this.data[key] = JSON.parse(await Storage.get().getItem(key));
     }
 
     return this.data[key];

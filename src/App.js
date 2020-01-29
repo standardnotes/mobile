@@ -1,11 +1,14 @@
 import { Client } from 'bugsnag-react-native';
 import React, { Component } from 'react';
 import { View, Text, Animated } from 'react-native';
+import {
+  initialMode,
+  eventEmitter as darkModeEventEmitter
+} from 'react-native-dark-mode'
 import { createAppContainer, NavigationActions } from 'react-navigation';
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
 import KeysManager from '@Lib/keysManager';
-import StyleKit from '@Style/StyleKit';
 import ApplicationState from '@Lib/ApplicationState';
 import Auth from '@Lib/sfjs/authManager';
 import ModelManager from '@Lib/sfjs/modelManager';
@@ -38,6 +41,7 @@ import Root from '@Screens/Root';
 import Settings from '@Screens/Settings/Settings';
 import SideMenuManager from '@SideMenu/SideMenuManager';
 import Splash from '@Screens/Splash';
+import StyleKit from '@Style/StyleKit';
 
 if(__DEV__ === false) {
   const bugsnag = new Client()
@@ -164,6 +168,9 @@ export default class App extends Component {
   constructor(props) {
     super(props);
 
+    StyleKit.get().setModeTo(initialMode);
+    darkModeEventEmitter.on('currentModeChanged', this.onChangeCurrentMode);
+
     KeysManager.get().registerAccountRelatedStorageKeys(['options']);
 
     // Initialize iOS review manager. Will automatically handle requesting review logic.
@@ -180,29 +187,32 @@ export default class App extends Component {
       }
     });
 
-    this.state = {ready: false};
+    this.state = { ready: false };
     this.loadInitialData();
   }
 
   /**
-    We initially didn't expect App to ever unmount. However, on Android, if you
-    are in the root screen, and press the physical back button, then strangely,
-    App unmounts, but other components, like Notes, do not.
-    We've remedied this by modifiying Android back button behavior natively to
-    background instead of quit, but we keep this below anyway.
+   * We initially didn't expect App to ever unmount. However, on Android,
+   * if you are in the root screen, and press the physical back button,
+   * then strangely, App unmounts, but other components, like Notes, do not.
+   * We've remedied this by modifiying Android back button behavior natively
+   * to background instead of quit, but we keep this below anyway.
    */
   componentWillUnmount() {
     Auth.get().removeEventHandler(this.authEventHandler);
+
+    /** Make sure we remove the event listener for dark/light mode changes */
+    darkModeEventEmitter.off('currentModeChanged', this.onChangeCurrentMode);
   }
 
   async loadInitialData() {
-    await StyleKit.get().resolveInitialTheme();
+    await StyleKit.get().initialize();
     await KeysManager.get().loadInitialData();
 
-    let ready = () => {
+    const ready = () => {
       KeysManager.get().markApplicationAsRan();
       ApplicationState.get().receiveApplicationStartEvent();
-      this.setState({ready: true});
+      this.setState({ ready: true });
     }
 
     if(await KeysManager.get().needsWipe()) {
@@ -210,6 +220,12 @@ export default class App extends Component {
     } else {
       ready();
     }
+  }
+
+  /** @private */
+  onChangeCurrentMode(mode) {
+    StyleKit.get().setModeTo(mode);
+    StyleKit.get().activatePreferredTheme();
   }
 
   render() {

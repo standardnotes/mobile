@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import StyleKit from "@Style/StyleKit"
 import ActionSheet from 'react-native-actionsheet'
-import ActionSheetWrapper from "@Style/ActionSheetWrapper"
-import ItemActionManager from '@Lib/itemActionManager'
+import Icon from 'react-native-vector-icons/Ionicons';
 import ThemedPureComponent from "@Components/ThemedPureComponent";
+import ItemActionManager from '@Lib/itemActionManager'
+import ActionSheetWrapper from "@Style/ActionSheetWrapper"
+import StyleKit from "@Style/StyleKit"
+import { hexToRGBA } from '@Style/utils';
 
 export default class NoteCell extends ThemedPureComponent {
 
@@ -282,13 +283,13 @@ export default class NoteCell extends ThemedPureComponent {
       noteCell: {
         padding: padding,
         paddingRight: padding * 2,
-        borderBottomColor: StyleKit.hexToRGBA(StyleKit.variables.stylekitBorderColor, 0.75),
+        borderBottomColor: hexToRGBA(StyleKit.variables.stylekitBorderColor, 0.75),
         borderBottomWidth: 1,
-        backgroundColor: StyleKit.variable("stylekitBackgroundColor"),
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       },
 
       noteCellSelected: {
-        backgroundColor: StyleKit.variable("stylekitInfoColor"),
+        backgroundColor: StyleKit.variables.stylekitInfoColor,
       },
 
       noteTagsContainer: {
@@ -312,51 +313,51 @@ export default class NoteCell extends ThemedPureComponent {
       noteTag: {
         marginRight: 2,
         fontSize: 12,
-        color: StyleKit.variable("stylekitForegroundColor"),
+        color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.5,
       },
 
       noteTagSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor"),
+        color: StyleKit.variables.stylekitInfoContrastColor,
         opacity: 0.8
       },
 
       noteTitle: {
         fontWeight: "bold",
         fontSize: 16,
-        color: StyleKit.variable("stylekitForegroundColor")
+        color: StyleKit.variables.stylekitForegroundColor
       },
 
       noteTitleSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor")
+        color: StyleKit.variables.stylekitInfoContrastColor
       },
 
       noteText: {
         fontSize: 15,
         marginTop: 4,
-        color: StyleKit.variable("stylekitForegroundColor"),
+        color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.8,
         lineHeight: 21
       },
 
       noteTextSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor")
+        color: StyleKit.variables.stylekitInfoContrastColor
       },
 
       noteDate: {
         marginTop: 5,
         fontSize: 12,
-        color: StyleKit.variable("stylekitForegroundColor"),
+        color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.5
       },
 
       noteDateSelected: {
-        color: StyleKit.variable("stylekitInfoContrastColor"),
+        color: StyleKit.variables.stylekitInfoContrastColor,
         opacity: 0.8
       },
 
       deleting: {
-        color: StyleKit.variable("stylekitInfoColor"),
+        color: StyleKit.variables.stylekitInfoColor,
         marginBottom: 5,
       }
     });

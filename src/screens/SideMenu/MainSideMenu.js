@@ -31,7 +31,13 @@ import {
   ICON_BRUSH,
   ICON_SETTINGS
 } from '@Style/icons';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
 import StyleKit from '@Style/StyleKit';
+import ThemeManager from '@Style/ThemeManager';
+import {
+  LIGHT_MODE_KEY,
+  DARK_MODE_KEY,
+} from '@Style/utils';
 
 export default class MainSideMenu extends AbstractSideMenu {
 
@@ -40,16 +46,16 @@ export default class MainSideMenu extends AbstractSideMenu {
     this.constructState({});
 
     this.signoutObserver = Auth.get().addEventHandler((event) => {
-      if(event == SFAuthManager.DidSignOutEvent) {
+      if(event === SFAuthManager.DidSignOutEvent) {
         this.setState({outOfSync: false});
         this.forceUpdate();
       }
     });
 
     this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
-      if(event == "enter-out-of-sync") {
+      if(event === 'enter-out-of-sync') {
         this.setState({outOfSync: true});
-      } else if(event == "exit-out-of-sync") {
+      } else if(event === 'exit-out-of-sync') {
         this.setState({outOfSync: false});
       }
     })
@@ -86,7 +92,7 @@ export default class MainSideMenu extends AbstractSideMenu {
   }
 
   onThemeSelect = (theme) => {
-    // Prevent themes that aren't meant for mobile from being activated
+    /** Prevent themes that aren't meant for mobile from being activated. */
     if(theme.content.package_info && theme.content.package_info.no_mobile) {
       AlertManager.get().alert({
         title: "Not Available",
@@ -96,11 +102,85 @@ export default class MainSideMenu extends AbstractSideMenu {
       return;
     }
 
-    StyleKit.get().activateTheme(theme);
+    const mode = StyleKit.doesDeviceSupportDarkMode()
+      ? StyleKit.get().currentDarkMode
+      : LIGHT_MODE_KEY;
+
+    StyleKit.get().assignThemeForMode({ theme: theme, mode: mode });
     this.forceUpdate();
   }
 
   onThemeLongPress = (theme) => {
+    const actionSheetOptions = [];
+
+    /**
+     * If this theme is a mobile theme, allow it to be set as the preferred
+     * option for light/dark mode.
+     */
+    if(theme.content.package_info && !theme.content.package_info.no_mobile) {
+      const lightThemeAction = this.getModeActionForTheme({
+        theme: theme,
+        mode: LIGHT_MODE_KEY
+      });
+      const lightName = StyleKit.doesDeviceSupportDarkMode() ? "Light" : "Active";
+      const lightText = `${lightThemeAction} ${lightName} Theme`;
+
+      actionSheetOptions.push(
+        ActionSheetWrapper.BuildOption({
+          text: lightText,
+          callback: () => {
+            StyleKit.get().assignThemeForMode({
+              theme: theme,
+              mode: LIGHT_MODE_KEY
+            });
+          }
+        })
+      );
+
+      /** Only display a dark mode option if this device supports dark/light. */
+      if(StyleKit.doesDeviceSupportDarkMode()) {
+        const darkText = `${this.getModeActionForTheme({
+          theme: theme,
+          mode: DARK_MODE_KEY
+        })} Dark Theme`;
+
+        actionSheetOptions.push(
+          ActionSheetWrapper.BuildOption({
+            text: darkText,
+            callback: () => {
+              StyleKit.get().assignThemeForMode({
+                theme: theme,
+                mode: DARK_MODE_KEY
+              });
+            }
+          })
+        )
+      }
+    }
+
+    /** System themes cannot be redownloaded. */
+    if(!theme.content.isSystemTheme) {
+      actionSheetOptions.push(
+        ActionSheetWrapper.BuildOption({ text: "Redownload", callback: () => {
+          this.onThemeRedownload(theme);
+        }})
+      );
+    }
+
+    const sheet = new ActionSheetWrapper({
+      title: `${theme.name} Options`,
+      options: actionSheetOptions,
+      onCancel: () => {
+        this.setState({ actionSheet: null });
+      }
+    });
+
+    this.setState({ actionSheet: sheet.actionSheetElement() });
+    this.forceUpdate(); // required to get actionSheet ref
+    sheet.show();
+  }
+
+  onThemeRedownload(theme) {
     AlertManager.get().confirm({
       title: "Redownload Theme",
       text: "Themes are cached when downloaded. To retrieve the latest version, press Redownload.",
@@ -111,15 +191,21 @@ export default class MainSideMenu extends AbstractSideMenu {
     })
   }
 
+  getModeActionForTheme({ theme, mode }) {
+    return ThemeManager.get().isThemeEnabledForMode({ mode: mode, theme: theme })
+        ? "Current" : "Set as";
+  }
+
   iconDescriptorForTheme = (theme) => {
-    let desc = {
-      type: "circle",
-      side: "right"
+    const desc = {
+      type: 'circle',
+      side: 'right'
     };
 
-    let dockIcon = theme.content.package_info && theme.content.package_info.dock_icon;
+    const dockIcon =
+      theme.content.package_info && theme.content.package_info.dock_icon;
 
-    if(dockIcon && dockIcon.type == "circle") {
+    if(dockIcon && dockIcon.type === 'circle') {
       _.merge(desc, {
         backgroundColor: dockIcon.background_color,
         borderColor: dockIcon.border_color,
@@ -153,14 +239,14 @@ export default class MainSideMenu extends AbstractSideMenu {
     }
 
     // Red and Blue default
-    if(themes.length == 2) {
+    if(themes.length === 2) {
       options.push(SideMenuSection.BuildOption({
         text: "Get More Themes",
-        key: "get-theme",
+        key: 'get-theme',
         iconDesc: {
-          type: "icon",
+          type: 'icon',
           name: StyleKit.nameForIcon(ICON_BRUSH),
-          side: "right",
+          side: 'right',
           size: 17
         },
         onSelect: () => { ApplicationState.openURL("https://standardnotes.org/extensions")},
@@ -178,7 +264,7 @@ export default class MainSideMenu extends AbstractSideMenu {
     }
 
     if(!this.handler || SideMenuManager.get().isLeftSideMenuLocked()) {
-      // Return empty, but colored view
+      /** Return empty, but colored view. */
       return <View style={viewStyles} />;
     }
 
@@ -236,6 +322,7 @@ export default class MainSideMenu extends AbstractSideMenu {
             iconTextComponent={<Icon name={StyleKit.nameForIcon(ICON_SETTINGS)}/>}
           />
 
+          {this.state.actionSheet && this.state.actionSheet}
         </SafeAreaView>
       </Fragment>
     );
@@ -259,7 +346,7 @@ export default class MainSideMenu extends AbstractSideMenu {
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         color: StyleKit.variables.stylekitForegroundColor,
         flex: 1,
-        flexDirection: "column"
+        flexDirection: 'column'
       },
       flatList: {
         padding: 15,
