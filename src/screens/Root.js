@@ -4,14 +4,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
-import UserPrefsManager, {
-  AGREED_TO_OFFLINE_DISCLAIMER_KEY
-} from '@Lib/userPrefsManager';
 import Abstract from '@Screens/Abstract';
 import Compose from '@Screens/Compose';
 import Notes from '@Screens/Notes/Notes';
 import {
-  SCREEN_SPLASH,
   SCREEN_AUTHENTICATE
 } from '@Screens/screens';
 import AlertManager from '@SFJS/alertManager';
@@ -28,26 +24,6 @@ export default class Root extends Abstract {
     this.registerObservers();
   }
 
-  /**
-   * Present the Splash screen if required
-   *
-   * Make sure all users who are now using the app offline agree to the
-   * offline disclaimer.
-   */
-  async presentSplashIfNeeded() {
-    const offline = Auth.get().offline();
-    const numNotes = ModelManager.get().noteCount();
-
-    if(offline && numNotes === 0) {
-      const agreed = await UserPrefsManager.get()
-        .isPrefSet({ key: AGREED_TO_OFFLINE_DISCLAIMER_KEY });
-
-      if(!agreed) {
-        this.props.navigation.navigate(SCREEN_SPLASH);
-      }
-    }
-  }
-
   registerObservers() {
     this.stateObserver = ApplicationState.get().addStateObserver(state => {
       const authProps = ApplicationState.get().getAuthenticationPropsForAppState(
@@ -55,7 +31,7 @@ export default class Root extends Abstract {
       );
       if(authProps.sources.length > 0) {
         this.presentAuthenticationModal(authProps);
-      } else if(state == ApplicationState.GainingFocus) {
+      } else if(state === ApplicationState.GainingFocus) {
         // we only want to perform sync here if the app is resuming, not if it's a fresh start
         if(this.dataLoaded) {
           Sync.get().sync();
@@ -65,10 +41,10 @@ export default class Root extends Abstract {
 
     this.applicationStateEventHandler = ApplicationState.get().addEventHandler(
       (event, data) => {
-        if(event == ApplicationState.AppStateEventNoteSideMenuToggle) {
+        if(event === ApplicationState.AppStateEventNoteSideMenuToggle) {
           // update state to toggle Notes side menu if we triggered the collapse
           this.setState({ notesListCollapsed: data.new_isNoteSideMenuCollapsed });
-        } else if(event == ApplicationState.KeyboardChangeEvent) {
+        } else if(event === ApplicationState.KeyboardChangeEvent) {
           // need to refresh the height of the keyboard when it opens so that we can change the position
           // of the sidebar collapse icon
           if(ApplicationState.get().isInTabletMode) {
@@ -81,10 +57,7 @@ export default class Root extends Abstract {
     );
 
     this.syncEventHandler = Sync.get().addEventHandler(async (event, data) => {
-      if(event == 'local-data-loaded') {
-        await this.presentSplashIfNeeded();
-      }
-      else if(event == 'sync-session-invalid') {
+      if(event === 'sync-session-invalid') {
         if(!this.didShowSessionInvalidAlert) {
           this.didShowSessionInvalidAlert = true;
           AlertManager.get().confirm({
@@ -128,14 +101,12 @@ export default class Root extends Abstract {
     })
 
     this.signoutObserver = Auth.get().addEventHandler(async (event) => {
-      if(event == SFAuthManager.DidSignOutEvent) {
+      if(event === SFAuthManager.DidSignOutEvent) {
         this.setSubTitle(null);
         const notifyObservers = false;
         ApplicationState.getOptions().reset(notifyObservers);
         this.reloadOptionsToDefault();
         ApplicationState.getOptions().notifyObservers();
-
-        await this.presentSplashIfNeeded();
       }
     });
 
@@ -144,7 +115,7 @@ export default class Root extends Abstract {
 
   reloadOptionsToDefault() {
     const options = ApplicationState.getOptions();
-    if(options.selectedTagIds.length == 0) {
+    if(options.selectedTagIds.length === 0) {
       // select default All notes smart tag
       options.setSelectedTagIds(ModelManager.get().defaultSmartTag().uuid);
     }

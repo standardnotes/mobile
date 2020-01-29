@@ -1,5 +1,3 @@
-export const SCREEN_SPLASH                  = 'Splash';
-export const SCREEN_OFFLINE_DISCLAIMER      = 'OfflineDisclaimer';
 export const SCREEN_AUTHENTICATE            = 'Authenticate';
 
 export const SCREEN_HOME                    = 'Home';

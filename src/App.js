@@ -20,8 +20,6 @@ import ReviewManager from '@Lib/reviewManager';
 import Authenticate from '@Screens/Authentication/Authenticate';
 import Compose from '@Screens/Compose';
 import {
-  SCREEN_SPLASH,
-  SCREEN_OFFLINE_DISCLAIMER,
   SCREEN_AUTHENTICATE,
   SCREEN_HOME,
   SCREEN_NOTES,
@@ -36,11 +34,9 @@ import KeyRecovery from '@Screens/KeyRecovery';
 import MainSideMenu from '@SideMenu/MainSideMenu';
 import ManagePrivileges from '@Screens/ManagePrivileges';
 import NoteSideMenu from '@SideMenu/NoteSideMenu';
-import OfflineDisclaimer from '@Screens/OfflineDisclaimer';
 import Root from '@Screens/Root';
 import Settings from '@Screens/Settings/Settings';
 import SideMenuManager from '@SideMenu/SideMenuManager';
-import Splash from '@Screens/Splash';
 import StyleKit from '@Style/StyleKit';
 
 if(__DEV__ === false) {
@@ -102,29 +98,13 @@ const KeyRecoveryStack = createStackNavigator({
   screen: KeyRecovery
 })
 
-const OfflineDisclaimerStack = createStackNavigator({
-  screen: OfflineDisclaimer
-})
-
 const AppDrawer = createStackNavigator({
   [SCREEN_HOME]: AppDrawerStack,
   [SCREEN_SETTINGS]: SettingsStack,
   [SCREEN_INPUT_MODAL]: InputModalStack,
   [SCREEN_AUTHENTICATE]: AuthenticateModalStack,
   [SCREEN_MANAGE_PRIVILEGES]: ManagePrivilegesStack,
-  [SCREEN_KEY_RECOVERY]: KeyRecoveryStack,
-  [SCREEN_SPLASH]: {
-    screen: Splash,
-    navigationOptions: {
-     gesturesEnabled: false,
-   }
-  },
-  [SCREEN_OFFLINE_DISCLAIMER]: {
-    screen: OfflineDisclaimerStack,
-    navigationOptions: {
-     gesturesEnabled: false,
-   }
-  }
+  [SCREEN_KEY_RECOVERY]: KeyRecoveryStack
 }, {
   mode: 'modal',
   headerMode: 'none',

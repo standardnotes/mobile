@@ -6,7 +6,6 @@ import Storage from '@SFJS/storageManager';
 
 export const LAST_EXPORT_DATE_KEY                     = 'LastExportDateKey';
 export const DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY  = 'DoNotShowAgainUnsupportedEditorsKey';
-export const AGREED_TO_OFFLINE_DISCLAIMER_KEY         = 'AgreedToOfflineDisclaimerKey';
 
 export default class UserPrefsManager {
   static instance = null

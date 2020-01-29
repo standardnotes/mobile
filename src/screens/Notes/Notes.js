@@ -56,8 +56,8 @@ export default class Notes extends Abstract {
 
   loadInitialState() {
     // We may be here on non-launch state, where local data will already have been loaded.
-    let initialDataLoaded = Sync.get().initialDataLoaded();
-    let encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
+    const initialDataLoaded = Sync.get().initialDataLoaded();
+    const encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.mergeState({
       refreshing: false,
       decrypting: !initialDataLoaded && encryptionEnabled,
@@ -72,7 +72,6 @@ export default class Notes extends Abstract {
     // not be sent again. So we want to make sure that we're able to reload state when component mounts,
     // and loadInitialState is called on componentDidMount
     this.reloadList();
-
   }
 
   unlockContent(callback) {
@@ -152,7 +151,6 @@ export default class Notes extends Abstract {
 
   registerObservers() {
     this.optionsObserver = this.options.addChangeObserver((options, eventType) => {
-
       this.reloadList(true);
 
       // should only show for non-search term change
@@ -171,11 +169,11 @@ export default class Notes extends Abstract {
       }
     })
 
-    this.mappingObserver = ModelManager.get().addItemSyncObserver("notes-screen", ["Tag", "Note"], (allRelevantItems, validItems, deletedItems) => {
-      if(deletedItems.find((item) => item.content_type == "Tag")) {
+    this.mappingObserver = ModelManager.get().addItemSyncObserver('notes-screen', ['Tag', 'Note'], (allRelevantItems, validItems, deletedItems) => {
+      if(deletedItems.find((item) => item.content_type === 'Tag')) {
         // If a tag was deleted, let's check to see if we should reload our selected tags list
         var tags = ModelManager.get().getTagsWithIds(this.options.selectedTagIds);
-        if(tags.length == 0) {
+        if(tags.length === 0) {
           this.options.setSelectedTagIds(ModelManager.get().defaultSmartTag().uuid);
         }
       }
@@ -184,9 +182,9 @@ export default class Notes extends Abstract {
     })
 
     this.syncObserver = Sync.get().addEventHandler((event, data) => {
-      if(event == "sync:completed") {
+      if(event === 'sync:completed') {
         this.mergeState({refreshing: false, loading: false});
-      } else if(event == "local-data-loaded") {
+      } else if(event === 'local-data-loaded') {
         this.displayNeedSignInAlertForLocalItemsIfApplicable(ModelManager.get().allItems);
         this.reloadList();
         this.reloadHeaderBar();
@@ -194,17 +192,17 @@ export default class Notes extends Abstract {
         if(ApplicationState.get().isInTabletMode) {
           this.selectFirstNote();
         }
-      } else if(event == "sync-exception") {
+      } else if(event === 'sync-exception') {
         Alert.alert("Issue Syncing", `There was an error while trying to save your items. Please contact support and share this message: ${data}`);
       }
     })
 
     this.signoutObserver = Auth.get().addEventHandler((event) => {
-      if(event == SFAuthManager.DidSignOutEvent) {
+      if(event === SFAuthManager.DidSignOutEvent) {
         this.reloadList();
-      } else if(event == SFAuthManager.WillSignInEvent) {
+      } else if(event === SFAuthManager.WillSignInEvent) {
         this.mergeState({loading: true})
-      } else if(event == SFAuthManager.DidSignInEvent) {
+      } else if(event === SFAuthManager.DidSignInEvent) {
         // Check if there are items that are errorDecrypting and try decrypting with new keys
         Sync.get().refreshErroredItems().then(() => {
           this.reloadList();
@@ -213,12 +211,12 @@ export default class Notes extends Abstract {
     });
 
     this.tabletModeChangeHandler = ApplicationState.get().addEventHandler((event, data) => {
-      if(event == ApplicationState.KeyboardChangeEvent) {
+      if(event === ApplicationState.KeyboardChangeEvent) {
         if(ApplicationState.get().isInTabletMode) {
           this.forceUpdate();
         }
       }
-      else if(event == ApplicationState.AppStateEventTabletModeChange) {
+      else if(event === ApplicationState.AppStateEventTabletModeChange) {
         // If we are now in tablet mode after not being in tablet mode
         if(data.new_isInTabletMode && !data.old_isInTabletMode) {
           // Pop to root, if we are in Compose window.
@@ -254,7 +252,6 @@ export default class Notes extends Abstract {
     display an alert instructing the user to log in. This happens when restoring from iCloud and data is restored but keys are not.
    */
   displayNeedSignInAlertForLocalItemsIfApplicable(items) {
-
     if(KeysManager.get().shouldPresentKeyRecoveryWizard()) {
       this.props.navigation.navigate(SCREEN_KEY_RECOVERY);
       return;
@@ -264,8 +261,8 @@ export default class Notes extends Abstract {
       return;
     }
 
-    var needsDecrypt = false;
-    for(var item of items) {
+    let needsDecrypt = false;
+    for(const item of items) {
       if(item.errorDecrypting) {
         needsDecrypt = true;
         break;
@@ -273,7 +270,10 @@ export default class Notes extends Abstract {
     }
 
     if(needsDecrypt) {
-      Alert.alert("Missing Keys", "Some of your items cannot be decrypted because the keys are missing. This can happen if you restored your device from backup. Please sign in to restore your data.");
+      Alert.alert(
+        "Missing Keys",
+        "Some of your items cannot be decrypted because the keys are missing. This can happen if you restored your device from backup. Please sign in to restore your data."
+      );
     }
   }
 
@@ -282,13 +282,13 @@ export default class Notes extends Abstract {
       return;
     }
 
-    var tags = ModelManager.get().getTagsWithIds(this.options.selectedTagIds);
+    const tags = ModelManager.get().getTagsWithIds(this.options.selectedTagIds);
 
     if(this.searching) {
       this.setTitle(`${this.stateNotes.length} search results`);
     } else if(tags.length > 0) {
       // Tags might not be completely loaded yet, as reloadHeaderBar can be called from incrementalSync
-      var tag = tags[0];
+      const tag = tags[0];
       notesTitle = tag.title;
       this.setTitle(notesTitle);
     }
@@ -325,9 +325,8 @@ export default class Notes extends Abstract {
 
     console.log("===Reload Notes List===");
 
-    var result = ModelManager.get().getNotes(this.options);
-    var notes = result.notes;
-    var tags = result.tags;
+    const result = ModelManager.get().getNotes(this.options);
+    const { notes, tags } = result;
 
     this.setState({notes: notes, tags: tags, refreshing: false});
 
@@ -369,7 +368,7 @@ export default class Notes extends Abstract {
   }
 
   _onPressItem = (item: hash) => {
-    var run = () => {
+    const run = () => {
       if(item.content.conflict_of) {
         item.content.conflict_of = null;
         item.setDirty(true);
@@ -404,20 +403,32 @@ export default class Notes extends Abstract {
   }
 
   handleActionsheetAction = (item, action, callback) => {
-    let run = () => {
-      ItemActionManager.handleEvent(action, item, () => {
-        callback();
-      }, () => {
-        // afterConfirmCallback
-        // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
-        callback();
-      });
+    const run = () => {
+      ItemActionManager.handleEvent(
+        action,
+        item,
+        () => {
+          callback();
+        },
+        () => {
+          // afterConfirmCallback
+          // We want to show "Deleting.." on top of note cell after the user confirms the dialogue
+          callback();
+        }
+      );
     }
 
-    if(action == ItemActionManager.TrashEvent || action == ItemActionManager.DeleteEvent) {
-      this.handlePrivilegedAction(true, SFPrivilegesManager.ActionDeleteNote, () => {
-        run();
-      })
+    if(
+      action === ItemActionManager.TrashEvent ||
+      action === ItemActionManager.DeleteEvent
+    ) {
+      this.handlePrivilegedAction(
+        true,
+        SFPrivilegesManager.ActionDeleteNote,
+        () => {
+          run();
+        }
+      );
     } else {
       run();
     }
@@ -433,7 +444,10 @@ export default class Notes extends Abstract {
     }
 
     return (
-      <SafeAreaView forceInset={{ top: 'never', bottom: 'never', horizontal: 'always' }} style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView
+        forceInset={{ top: 'never', bottom: 'never', horizontal: 'always' }}
+        style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}
+      >
         {this.state.notes &&
           <NoteList
             onRefresh={this._onRefresh.bind(this)}
@@ -455,13 +469,13 @@ export default class Notes extends Abstract {
 
         <FAB
           style={ApplicationState.get().isInTabletMode ? {bottom: ApplicationState.get().getKeyboardHeight()} : null}
-          buttonColor={StyleKit.variable("stylekitInfoColor")}
-          iconTextColor={StyleKit.variable("stylekitInfoContrastColor")}
+          buttonColor={StyleKit.variables.stylekitInfoColor}
+          iconTextColor={StyleKit.variables.stylekitInfoContrastColor}
           onClickAction={() => {this.selectNote()}}
           visible={true}
           size={30}
           paddingTop={ApplicationState.isIOS ? 1 : 0}
-          iconTextComponent={<Icon style={{textAlignVertical: "center"}} name={StyleKit.nameForIcon(ICON_ADD)}/>}
+          iconTextComponent={<Icon style={{textAlignVertical: 'center'}} name={StyleKit.nameForIcon(ICON_ADD)}/>}
         />
       </SafeAreaView>
     );

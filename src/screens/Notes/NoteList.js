@@ -1,23 +1,41 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, FlatList, RefreshControl, ScrollView, Text } from 'react-native';
-import NoteCell from "@Screens/Notes/NoteCell"
-import Search from 'react-native-search-box'
-import StyleKit from "@Style/StyleKit"
-import ApplicationState from "@Lib/ApplicationState"
-import ThemedComponent from "@Components/ThemedComponent"
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  RefreshControl,
+  ScrollView,
+  Text
+} from 'react-native';
+import Search from 'react-native-search-box';
+import ThemedComponent from '@Components/ThemedComponent';
+import ApplicationState from '@Lib/ApplicationState';
+import NoteCell from '@Screens/Notes/NoteCell';
+import OfflineBanner from '@Screens/Notes/OfflineBanner';
+import Auth from '@SFJS/authManager';
+import StyleKit from '@Style/StyleKit';
 
 export default class NoteList extends ThemedComponent {
 
   renderHeader = () => {
+    const isOffline = Auth.get().offline();
+
     return (
-      <View style={{paddingLeft: 5, paddingRight: 5, paddingTop: 5, backgroundColor: StyleKit.variable("stylekitBackgroundColor")}}>
+      <View
+        style={{
+          paddingLeft: 5,
+          paddingRight: 5,
+          paddingTop: 5,
+          backgroundColor: StyleKit.variables.stylekitBackgroundColor
+        }}
+      >
         <Search
           onChangeText={this.props.onSearchChange}
           onCancel={this.props.onSearchCancel}
           onDelete={this.props.onSearchCancel}
           blurOnSubmit={true}
-          backgroundColor={StyleKit.variable("stylekitBackgroundColor")}
-          titleCancelColor={StyleKit.variable("stylekitInfoColor")}
+          backgroundColor={StyleKit.variables.stylekitBackgroundColor}
+          titleCancelColor={StyleKit.variables.stylekitInfoColor}
           keyboardDismissMode={'interactive'}
           keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
           inputBorderRadius={4}
@@ -29,16 +47,27 @@ export default class NoteList extends ThemedComponent {
             }
           }
         />
+
+        {isOffline && <OfflineBanner />}
       </View>
     );
   };
 
-  // must pass title, text, and tags as props so that it re-renders when either of those change
+  /**
+   * @private
+   * Must pass title, text, and tags as props so that it re-renders when either
+   * of those change.
+   */
   _renderItem = ({item}) => {
-    // On Android, only one tag is selected at a time. If it is selected, we don't need to display the tags string
-    // above the note cell
-    let selectedTags = this.props.selectedTags || [];
-    let renderTags = ApplicationState.isIOS || selectedTags.length == 0 || (!item.tags.includes(selectedTags[0]));
+    /**
+     * On Android, only one tag is selected at a time. If it is selected, we
+     * don't need to display the tags string above the note cell.
+     */
+    const selectedTags = this.props.selectedTags || [];
+    const renderTags =
+      ApplicationState.isIOS ||
+      selectedTags.length === 0 ||
+      (!item.tags.includes(selectedTags[0]));
 
     return (
       <NoteCell
@@ -66,7 +95,7 @@ export default class NoteList extends ThemedComponent {
   }
 
   render() {
-    var placeholderText = "";
+    let placeholderText = "";
     if(this.props.decrypting) {
       placeholderText = "Decrypting notes...";
     } else if(this.props.loading) {
@@ -76,8 +105,9 @@ export default class NoteList extends ThemedComponent {
     }
 
     return (
-      <View style={{backgroundColor: StyleKit.variable("stylekitBackgroundColor")}}>
-
+      <View
+        style={{backgroundColor: StyleKit.variables.stylekitBackgroundColor}}
+      >
         {placeholderText.length > 0 &&
           <View style={this.styles.loadingTextContainer}>
             <Text style={this.styles.loadingText}>
@@ -86,7 +116,8 @@ export default class NoteList extends ThemedComponent {
           </View>
         }
 
-        <FlatList style={{height: "100%"}}
+        <FlatList
+          style={{height: '100%'}}
           initialNumToRender={6}
           windowSize={6}
           maxToRenderPerBatch={6}
@@ -103,7 +134,6 @@ export default class NoteList extends ThemedComponent {
           renderItem={this._renderItem}
           ListHeaderComponent={this.renderHeader}
         />
-
       </View>
     )
   }
@@ -119,13 +149,13 @@ export default class NoteList extends ThemedComponent {
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: -1,
-        position: "absolute",
-        height: "100%",
-        width: "100%"
+        position: 'absolute',
+        height: '100%',
+        width: '100%'
       },
 
       loadingText: {
-        position: "absolute",
+        position: 'absolute',
         opacity: 0.5,
         color: StyleKit.variables.stylekitForegroundColor
       }
