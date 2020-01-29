@@ -12,15 +12,14 @@ import ThemedComponent from '@Components/ThemedComponent';
 import ApplicationState from '@Lib/ApplicationState';
 import NoteCell from '@Screens/Notes/NoteCell';
 import OfflineBanner from '@Screens/Notes/OfflineBanner';
+import Auth from '@SFJS/authManager';
 import StyleKit from '@Style/StyleKit';
 
 export default class NoteList extends ThemedComponent {
 
-  _onPressSignIn = () => {
-
-  }
-
   renderHeader = () => {
+    const isOffline = Auth.get().offline();
+
     return (
       <View
         style={{
@@ -49,7 +48,7 @@ export default class NoteList extends ThemedComponent {
           }
         />
 
-        <OfflineBanner />
+        {isOffline && <OfflineBanner />}
       </View>
     );
   };

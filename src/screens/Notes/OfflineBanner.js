@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ThemedPureComponent from '@Components/ThemedPureComponent';
+import { SCREEN_SETTINGS } from '@Screens/screens';
 import {
   ICON_USER,
   ICON_FORWARD
@@ -11,10 +13,10 @@ import StyleKit from '@Style/StyleKit';
 const NOT_BACKED_UP_TEXT = "Data not backed up";
 const SIGN_IN_TEXT = "Sign in or register to backup your notes";
 
-export default class OfflineBanner extends ThemedPureComponent {
+export class OfflineBanner extends ThemedPureComponent {
 
   _onPress = () => {
-    // this.props.navigation.openLeftDrawer();
+    this.props.navigation.navigate(SCREEN_SETTINGS);
   }
 
   render() {
@@ -74,6 +76,7 @@ export default class OfflineBanner extends ThemedPureComponent {
         color: StyleKit.variables.stylekitForegroundColor
       },
       subText: {
+        marginTop: 2,
         fontSize: 11,
         color: StyleKit.variables.stylekitNeutralColor
       },
@@ -83,3 +86,5 @@ export default class OfflineBanner extends ThemedPureComponent {
     });
   }
 }
+
+export default withNavigation(OfflineBanner);
