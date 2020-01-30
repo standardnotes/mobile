@@ -47,7 +47,7 @@ export default class ThemeManager {
   async migrateThemePrefForModes() {
     const savedSystemThemeIdKey = 'savedSystemThemeId';
     const savedThemeKey = 'savedTheme';
-    const systemThemeId = await Storage.get().getItem(systemThemeId);
+    const systemThemeId = await Storage.get().getItem(savedSystemThemeIdKey);
     const savedTheme = await Storage.get().getItem(savedThemeKey);
 
     let themeData;
