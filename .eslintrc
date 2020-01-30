@@ -1,0 +1,36 @@
+{
+  "root": true,
+  "extends": [
+    "@react-native-community"
+  ],
+  "parser": "babel-eslint",
+  "rules": {
+    "no-throw-literal": 0,
+    "no-console": "error",
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
+      }
+    ]
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "env": {
+    "browser": true,
+    "react-native/react-native": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

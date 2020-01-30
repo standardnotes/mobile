@@ -1,10 +1,10 @@
 import { Client } from 'bugsnag-react-native';
 import React, { Component } from 'react';
-import { View, Text, Animated } from 'react-native';
+import { Animated } from 'react-native';
 import {
   initialMode,
-  eventEmitter as darkModeEventEmitter
-} from 'react-native-dark-mode'
+  eventEmitter as darkModeEventEmitter,
+} from 'react-native-dark-mode';
 import { createAppContainer, NavigationActions } from 'react-navigation';
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
@@ -15,7 +15,6 @@ import ModelManager from '@Lib/sfjs/modelManager';
 import PrivilegesManager from '@SFJS/privilegesManager';
 import MigrationManager from '@SFJS/migrationManager';
 import Sync from '@Lib/sfjs/syncManager';
-import Storage from '@Lib/sfjs/storageManager';
 import ReviewManager from '@Lib/reviewManager';
 import Authenticate from '@Screens/Authentication/Authenticate';
 import Compose from '@Screens/Compose';
@@ -27,7 +26,7 @@ import {
   SCREEN_INPUT_MODAL,
   SCREEN_SETTINGS,
   SCREEN_MANAGE_PRIVILEGES,
-  SCREEN_KEY_RECOVERY
+  SCREEN_KEY_RECOVERY,
 } from '@Screens/screens';
 import InputModal from '@Screens/InputModal';
 import KeyRecovery from '@Screens/KeyRecovery';
@@ -39,112 +38,143 @@ import Settings from '@Screens/Settings/Settings';
 import SideMenuManager from '@SideMenu/SideMenuManager';
 import StyleKit from '@Style/StyleKit';
 
-if(__DEV__ === false) {
-  const bugsnag = new Client()
+if (__DEV__ === false) {
+  const bugsnag = new Client();
 
   // Disable console.log for non-dev builds
   console.log = () => {};
 }
 
-const AppStack = createStackNavigator({
-  [SCREEN_NOTES]: {screen: Root},
-  [SCREEN_COMPOSE]: {screen: Compose},
-}, {
-  initialRouteName: SCREEN_NOTES,
-  navigationOptions: ({ navigation }) => ({
-    drawerLockMode: SideMenuManager.get().isRightSideMenuLocked() ? 'locked-closed' : null
-  })
-})
-
-const AppDrawerStack = createDrawerNavigator({
-  Main: AppStack
-}, {
-  contentComponent: ({ navigation }) => (
-    <NoteSideMenu ref={(ref) => {SideMenuManager.get().setRightSideMenuReference(ref)}} navigation={navigation} />
-  ),
-  drawerPosition: 'right',
-  drawerType: 'slide',
-  getCustomActionCreators: (route, stateKey) => {
-    return {
-      openRightDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
-      closeRightDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
-      lockRightDrawer: (lock) => {
-        // this is the key part
-        SideMenuManager.get().setLockedForRightSideMenu(lock);
-        // We have to return something
-        return NavigationActions.setParams({params: { dummy: true }, key: route.key})
-      }
-    };
+const AppStack = createStackNavigator(
+  {
+    [SCREEN_NOTES]: { screen: Root },
+    [SCREEN_COMPOSE]: { screen: Compose },
+  },
+  {
+    initialRouteName: SCREEN_NOTES,
+    navigationOptions: ({ navigation }) => ({
+      drawerLockMode: SideMenuManager.get().isRightSideMenuLocked()
+        ? 'locked-closed'
+        : null,
+    }),
   }
-})
+);
+
+const AppDrawerStack = createDrawerNavigator(
+  {
+    Main: AppStack,
+  },
+  {
+    contentComponent: ({ navigation }) => (
+      <NoteSideMenu
+        ref={ref => {
+          SideMenuManager.get().setRightSideMenuReference(ref);
+        }}
+        navigation={navigation}
+      />
+    ),
+    drawerPosition: 'right',
+    drawerType: 'slide',
+    getCustomActionCreators: (route, stateKey) => {
+      return {
+        openRightDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
+        closeRightDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
+        lockRightDrawer: lock => {
+          // this is the key part
+          SideMenuManager.get().setLockedForRightSideMenu(lock);
+          // We have to return something
+          return NavigationActions.setParams({
+            params: { dummy: true },
+            key: route.key,
+          });
+        },
+      };
+    },
+  }
+);
 
 const SettingsStack = createStackNavigator({
-  screen: Settings
-})
+  screen: Settings,
+});
 
 const InputModalStack = createStackNavigator({
-  screen: InputModal
-})
+  screen: InputModal,
+});
 
 const AuthenticateModalStack = createStackNavigator({
-  screen: Authenticate
-})
+  screen: Authenticate,
+});
 
 const ManagePrivilegesStack = createStackNavigator({
-  screen: ManagePrivileges
-})
+  screen: ManagePrivileges,
+});
 
 const KeyRecoveryStack = createStackNavigator({
-  screen: KeyRecovery
-})
-
-const AppDrawer = createStackNavigator({
-  [SCREEN_HOME]: AppDrawerStack,
-  [SCREEN_SETTINGS]: SettingsStack,
-  [SCREEN_INPUT_MODAL]: InputModalStack,
-  [SCREEN_AUTHENTICATE]: AuthenticateModalStack,
-  [SCREEN_MANAGE_PRIVILEGES]: ManagePrivilegesStack,
-  [SCREEN_KEY_RECOVERY]: KeyRecoveryStack
-}, {
-  mode: 'modal',
-  headerMode: 'none',
-  transitionConfig: () => ({
-    transitionSpec: {
-      duration: 300,
-      timing: Animated.timing
-    }
-  }),
-  navigationOptions: ({ navigation }) => ({
-    drawerLockMode: SideMenuManager.get().isLeftSideMenuLocked() ? 'locked-closed' : null,
-  })
-})
-
-const DrawerStack = createDrawerNavigator({
-  Main: AppDrawer,
-}, {
-  contentComponent: ({ navigation }) => (
-    <MainSideMenu ref={(ref) => {SideMenuManager.get().setLeftSideMenuReference(ref)}} navigation={navigation} />
-  ),
-  drawerPosition: 'left',
-  drawerType: 'slide',
-  getCustomActionCreators: (route, stateKey) => {
-    return {
-      openLeftDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
-      closeLeftDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
-      lockLeftDrawer: (lock) => {
-        // this is the key part
-        SideMenuManager.get().setLockedForLeftSideMenu(lock)
-        // We have to return something
-        return NavigationActions.setParams({params: { dummy: true }, key: route.key})
-      }
-    };
-  }
+  screen: KeyRecovery,
 });
+
+const AppDrawer = createStackNavigator(
+  {
+    [SCREEN_HOME]: AppDrawerStack,
+    [SCREEN_SETTINGS]: SettingsStack,
+    [SCREEN_INPUT_MODAL]: InputModalStack,
+    [SCREEN_AUTHENTICATE]: AuthenticateModalStack,
+    [SCREEN_MANAGE_PRIVILEGES]: ManagePrivilegesStack,
+    [SCREEN_KEY_RECOVERY]: KeyRecoveryStack,
+  },
+  {
+    mode: 'modal',
+    headerMode: 'none',
+    transitionConfig: () => ({
+      transitionSpec: {
+        duration: 300,
+        timing: Animated.timing,
+      },
+    }),
+    navigationOptions: ({ navigation }) => ({
+      drawerLockMode: SideMenuManager.get().isLeftSideMenuLocked()
+        ? 'locked-closed'
+        : null,
+    }),
+  }
+);
+
+const DrawerStack = createDrawerNavigator(
+  {
+    Main: AppDrawer,
+  },
+  {
+    contentComponent: ({ navigation }) => (
+      <MainSideMenu
+        ref={ref => {
+          SideMenuManager.get().setLeftSideMenuReference(ref);
+        }}
+        navigation={navigation}
+      />
+    ),
+    drawerPosition: 'left',
+    drawerType: 'slide',
+    getCustomActionCreators: (route, stateKey) => {
+      return {
+        openLeftDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
+        closeLeftDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
+        lockLeftDrawer: lock => {
+          // this is the key part
+          SideMenuManager.get().setLockedForLeftSideMenu(lock);
+          // We have to return something
+          return NavigationActions.setParams({
+            params: { dummy: true },
+            key: route.key,
+          });
+        },
+      };
+    },
+  }
+);
 
 const AppContainer = createAppContainer(DrawerStack);
 
 export default class App extends Component {
-
   constructor(props) {
     super(props);
 
@@ -153,15 +183,18 @@ export default class App extends Component {
 
     KeysManager.get().registerAccountRelatedStorageKeys(['options']);
 
-    // Initialize iOS review manager. Will automatically handle requesting review logic.
+    /**
+     * Initialize iOS review manager. Will automatically handle requesting
+     * review logic.
+     */
     ReviewManager.initialize();
 
     PrivilegesManager.get().loadPrivileges();
     MigrationManager.get().load();
 
-    // Listen to sign out event
-    this.authEventHandler = Auth.get().addEventHandler(async (event) => {
-      if(event == SFAuthManager.DidSignOutEvent) {
+    /** Listen to sign out event */
+    this.authEventHandler = Auth.get().addEventHandler(async event => {
+      if (event === SFAuthManager.DidSignOutEvent) {
         ModelManager.get().handleSignout();
         await Sync.get().handleSignout();
       }
@@ -193,10 +226,13 @@ export default class App extends Component {
       KeysManager.get().markApplicationAsRan();
       ApplicationState.get().receiveApplicationStartEvent();
       this.setState({ ready: true });
-    }
+    };
 
-    if(await KeysManager.get().needsWipe()) {
-      KeysManager.get().wipeData().then(ready).catch(ready);
+    if (await KeysManager.get().needsWipe()) {
+      KeysManager.get()
+        .wipeData()
+        .then(ready)
+        .catch(ready);
     } else {
       ready();
     }
@@ -209,12 +245,10 @@ export default class App extends Component {
   }
 
   render() {
-    if(!this.state.ready) {
+    if (!this.state.ready) {
       return null;
     }
 
-    return (
-      <AppContainer /* persistenceKey="if-you-want-it" */ />
-    )
+    return <AppContainer /* persistenceKey="if-you-want-it" */ />;
   }
 }

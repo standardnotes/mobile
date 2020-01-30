@@ -1,28 +1,16 @@
-import {
-  StyleSheet,
-  StatusBar,
-  Alert,
-  Platform,
-  Dimensions
-} from 'react-native';
+import { StatusBar, Alert, Platform } from 'react-native';
 import IconChanger from 'react-native-alternate-icons';
 import { supportsDarkMode } from 'react-native-dark-mode';
-import { SFItemParams } from 'standard-file-js';
 import Auth from '@Lib/sfjs/authManager';
-import Server from '@Lib/sfjs/httpManager';
-import KeysManager from '@Lib/keysManager';
 import ModelManager from '@Lib/sfjs/modelManager';
-import Storage from '@Lib/sfjs/storageManager';
 import Sync from '@Lib/sfjs/syncManager';
 import ThemeManager from '@Style/ThemeManager';
-import CSSParser from '@Style/Util/CSSParser';
 import {
   statusBarColorForTheme,
   keyboardColorForTheme,
   LIGHT_CONTENT,
   DARK_CONTENT,
   LIGHT_MODE_KEY,
-  DARK_MODE_KEY
 } from '@Style/utils';
 import ThemeDownloader from '@Style/Util/ThemeDownloader';
 
@@ -30,11 +18,10 @@ import THEME_RED_JSON from './Themes/red.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 
 export default class StyleKit {
-
   static instance = null;
 
   static get() {
-    if(this.instance === null) {
+    if (this.instance === null) {
       this.instance = new StyleKit();
     }
 
@@ -48,10 +35,10 @@ export default class StyleKit {
     this.buildDefaultThemes();
 
     ModelManager.get().addItemSyncObserver(
-      "themes",
-      "SN|Theme",
+      'themes',
+      'SN|Theme',
       (allItems, validItems, deletedItems, source) => {
-        if(
+        if (
           this.activeTheme &&
           !this.activeTheme.isSystemTheme &&
           this.activeTheme.isSwapIn
@@ -65,8 +52,8 @@ export default class StyleKit {
       }
     );
 
-    this.signoutObserver = Auth.get().addEventHandler((event) => {
-      if(event === SFAuthManager.DidSignOutEvent) {
+    this.signoutObserver = Auth.get().addEventHandler(event => {
+      if (event === SFAuthManager.DidSignOutEvent) {
         this.activateTheme(this.systemThemes[0]);
       }
     });
@@ -91,13 +78,13 @@ export default class StyleKit {
   }
 
   notifyObserversOfThemeChange() {
-    for(const observer of this.themeChangeObservers) {
+    for (const observer of this.themeChangeObservers) {
       observer();
     }
   }
 
   assignThemeForMode({ theme, mode }) {
-    if(!StyleKit.doesDeviceSupportDarkMode()) {
+    if (!StyleKit.doesDeviceSupportDarkMode()) {
       mode = LIGHT_MODE_KEY;
     }
 
@@ -107,7 +94,7 @@ export default class StyleKit {
      * If we're changing the theme for a specific mode and we're currently on
      * that mode, then set this theme as active
      */
-    if(this.currentDarkMode === mode && this.activeTheme.uuid !== theme.uuid) {
+    if (this.currentDarkMode === mode && this.activeTheme.uuid !== theme.uuid) {
       this.setActiveTheme(theme);
     }
   }
@@ -127,16 +114,16 @@ export default class StyleKit {
     const options = [
       {
         variables: THEME_BLUE_JSON,
-        name: "Blue",
-        isInitial: true
+        name: 'Blue',
+        isInitial: true,
       },
       {
         variables: THEME_RED_JSON,
-        name: "Red",
-      }
+        name: 'Red',
+      },
     ];
 
-    for(let option of options) {
+    for (const option of options) {
       const variables = option.variables;
       variables.statusBar =
         Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
@@ -152,10 +139,10 @@ export default class StyleKit {
             dock_icon: {
               type: 'circle',
               background_color: variables.stylekitInfoColor,
-              border_color: variables.stylekitInfoColor
-            }
-          }
-        }
+              border_color: variables.stylekitInfoColor,
+            },
+          },
+        },
       });
 
       this.systemThemes.push(theme);
@@ -169,16 +156,16 @@ export default class StyleKit {
 
       ThemeManager.get().setThemeForMode({
         mode: currentMode,
-        theme: defaultTheme
+        theme: defaultTheme,
       });
 
       this.setActiveTheme(defaultTheme);
-    }
+    };
 
     await ThemeManager.get().loadFromStorage();
 
     const themeData = ThemeManager.get().getThemeForMode(currentMode);
-    if(!themeData) {
+    if (!themeData) {
       return runDefaultTheme();
     }
 
@@ -187,7 +174,7 @@ export default class StyleKit {
       let newTheme;
 
       /** Use latest app theme data if preference is a previous system theme. */
-      if(matchingTheme) {
+      if (matchingTheme) {
         newTheme = matchingTheme;
       } else {
         newTheme = new SNTheme(themeData);
@@ -207,7 +194,9 @@ export default class StyleKit {
 
   themes() {
     const themes = ModelManager.get().themes.sort((a, b) => {
-      if(!a.name || !b.name) { return -1; }
+      if (!a.name || !b.name) {
+        return -1;
+      }
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
     });
     return this.systemThemes.concat(themes);
@@ -242,49 +231,52 @@ export default class StyleKit {
     const isAndroid = Platform.OS === 'android';
 
     /** On Android, a time out is required, especially during app startup. */
-    setTimeout(() => {
-      const statusBarColor = statusBarColorForTheme(theme);
-      StatusBar.setBarStyle(statusBarColor, true);
+    setTimeout(
+      () => {
+        const statusBarColor = statusBarColorForTheme(theme);
+        StatusBar.setBarStyle(statusBarColor, true);
 
-      if(isAndroid) {
-        /**
-         * Android <= v22 does not support changing status bar text color.
-         * It will always be white, so we have to make sure background color
-         * has proper contrast.
-         */
-        if(Platform.Version <= 22) {
-          StatusBar.setBackgroundColor("#000000");
-        } else {
-          StatusBar.setBackgroundColor(
-            theme.content.variables.stylekitContrastBackgroundColor
-          );
+        if (isAndroid) {
+          /**
+           * Android <= v22 does not support changing status bar text color.
+           * It will always be white, so we have to make sure background color
+           * has proper contrast.
+           */
+          if (Platform.Version <= 22) {
+            StatusBar.setBackgroundColor('#000000');
+          } else {
+            StatusBar.setBackgroundColor(
+              theme.content.variables.stylekitContrastBackgroundColor
+            );
+          }
         }
-      }
-    }, isAndroid ? 100 : 0);
+      },
+      isAndroid ? 100 : 0
+    );
 
-    if(theme.content.isSystemTheme && !isAndroid) {
-      IconChanger.supportDevice((supported) => {
-        if(supported) {
-          IconChanger.getIconName((currentName) => {
-            if(theme.content.isInitial && currentName !== 'default') {
+    if (theme.content.isSystemTheme && !isAndroid) {
+      IconChanger.supportDevice(supported => {
+        if (supported) {
+          IconChanger.getIconName(currentName => {
+            if (theme.content.isInitial && currentName !== 'default') {
               /** Clear the icon to default. */
               IconChanger.setIconName(null);
             } else {
               const newName = theme.content.name;
-              if(newName !== currentName) {
+              if (newName !== currentName) {
                 IconChanger.setIconName(newName);
               }
             }
-          })
+          });
         }
-      })
+      });
     }
   }
 
   activateTheme(theme) {
     const performActivation = () => {
       this.assignThemeForMode({ theme: theme, mode: this.currentDarkMode });
-    }
+    };
 
     /**
      * Update theme with StyleKit changes if the user has an old version.
@@ -292,26 +284,28 @@ export default class StyleKit {
     const hasValidInfoColor =
       theme.content.variables && theme.content.variables.stylekitInfoColor;
 
-    if(!hasValidInfoColor) {
-      ThemeDownloader.get().downloadTheme(theme).then((variables) => {
-        if(!variables) {
-          Alert.alert("Not Available", "This theme is not available on mobile.");
-          return;
-        }
+    if (!hasValidInfoColor) {
+      ThemeDownloader.get()
+        .downloadTheme(theme)
+        .then(variables => {
+          if (!variables) {
+            Alert.alert("Not Available", "This theme is not available on mobile.");
+            return;
+          }
 
-        if(variables !== theme.content.variables) {
-          theme.content.variables = variables;
-          theme.setDirty(true);
-        }
+          if (variables !== theme.content.variables) {
+            theme.content.variables = variables;
+            theme.setDirty(true);
+          }
 
-        if(theme.getNotAvailOnMobile()) {
-          theme.setNotAvailOnMobile(false);
-          theme.setDirty(true);
-        }
+          if (theme.getNotAvailOnMobile()) {
+            theme.setNotAvailOnMobile(false);
+            theme.setDirty(true);
+          }
 
-        Sync.get().sync();
-        performActivation();
-      });
+          Sync.get().sync();
+          performActivation();
+        });
     } else {
       performActivation();
     }
@@ -321,8 +315,8 @@ export default class StyleKit {
     const uuid = ThemeManager.get().getThemeUuidForMode(this.currentDarkMode);
     const matchingTheme = _.find(this.themes(), { uuid: uuid });
 
-    if(matchingTheme) {
-      if(matchingTheme.uuid === this.activeTheme.uuid) {
+    if (matchingTheme) {
+      if (matchingTheme.uuid === this.activeTheme.uuid) {
         /** Found a match and it's already active, no need to switch. */
         return;
       }
@@ -333,7 +327,7 @@ export default class StyleKit {
       /** No matching theme found, set currently active theme as the default. */
       this.assignThemeForMode({
         theme: this.activeTheme,
-        mode: this.currentDarkMode
+        mode: this.currentDarkMode,
       });
     }
   }
@@ -342,13 +336,16 @@ export default class StyleKit {
     const updatedVariables = await ThemeDownloader.get().downloadTheme(theme);
 
     /** Merge default variables to ensure this theme has all the variables. */
-    const appliedVariables = _.merge(this.templateVariables(), updatedVariables);
+    const appliedVariables = _.merge(
+      this.templateVariables(),
+      updatedVariables
+    );
     theme.content.variables = appliedVariables;
     theme.setDirty(true);
 
     await Sync.get().sync();
 
-    if(theme.uuid === this.activeTheme.uuid) {
+    if (theme.uuid === this.activeTheme.uuid) {
       this.setActiveTheme(theme);
     }
   }
@@ -358,10 +355,10 @@ export default class StyleKit {
     const { mainTextFontSize, paddingLeft } = this.constants;
     this.styles = {
       baseBackground: {
-        backgroundColor: variables.stylekitBackgroundColor
+        backgroundColor: variables.stylekitBackgroundColor,
       },
       contrastBackground: {
-        backgroundColor: variables.stylekitContrastBackgroundColor
+        backgroundColor: variables.stylekitContrastBackgroundColor,
       },
       container: {
         flex: 1,
@@ -377,11 +374,11 @@ export default class StyleKit {
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
       },
 
       flexedItem: {
-        flexGrow: 1
+        flexGrow: 1,
       },
 
       uiText: {
@@ -389,18 +386,14 @@ export default class StyleKit {
         fontSize: mainTextFontSize,
       },
 
-      view: {
+      view: {},
 
-      },
-
-      contrastView: {
-
-      },
+      contrastView: {},
 
       tableSection: {
         marginTop: 10,
         marginBottom: 10,
-        backgroundColor: variables.stylekitBackgroundColor
+        backgroundColor: variables.stylekitBackgroundColor,
       },
 
       sectionedTableCell: {
@@ -416,14 +409,14 @@ export default class StyleKit {
       textInputCell: {
         maxHeight: 50,
         paddingTop: 0,
-        paddingBottom: 0
+        paddingBottom: 0,
       },
 
       sectionedTableCellTextInput: {
         fontSize: mainTextFontSize,
         padding: 0,
         color: variables.stylekitForegroundColor,
-        height: '100%'
+        height: '100%',
       },
 
       sectionedTableCellFirst: {
@@ -431,28 +424,26 @@ export default class StyleKit {
         borderTopWidth: 1,
       },
 
-      sectionedTableCellLast: {
-
-      },
+      sectionedTableCellLast: {},
 
       sectionedAccessoryTableCell: {
         paddingTop: 0,
         paddingBottom: 0,
         minHeight: 47,
-        backgroundColor: 'transparent'
+        backgroundColor: 'transparent',
       },
 
       sectionedAccessoryTableCellLabel: {
         fontSize: mainTextFontSize,
         color: variables.stylekitForegroundColor,
-        minWidth: '80%'
+        minWidth: '80%',
       },
 
       buttonCell: {
         paddingTop: 0,
         paddingBottom: 0,
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
       },
 
       buttonCellButton: {
@@ -462,7 +453,7 @@ export default class StyleKit {
           Platform.OS === 'android'
             ? variables.stylekitForegroundColor
             : variables.stylekitInfoColor,
-        fontSize: mainTextFontSize
+        fontSize: mainTextFontSize,
       },
 
       buttonCellButtonLeft: {
@@ -477,7 +468,7 @@ export default class StyleKit {
         paddingLeft: paddingLeft,
         paddingRight: paddingLeft,
         paddingBottom: 10,
-        backgroundColor: variables.stylekitBackgroundColor
+        backgroundColor: variables.stylekitBackgroundColor,
       },
 
       noteTextIOS: {
@@ -487,12 +478,10 @@ export default class StyleKit {
 
       noteTextNoPadding: {
         paddingLeft: 0,
-        paddingRight: 0
+        paddingRight: 0,
       },
 
-      actionSheetWrapper: {
-
-      },
+      actionSheetWrapper: {},
 
       actionSheetOverlay: {
         /** This is the dimmed background */
@@ -504,22 +493,22 @@ export default class StyleKit {
          * This will also set button border bottoms, since margin is used
          * instead of borders
          */
-        backgroundColor: variables.stylekitBorderColor
+        backgroundColor: variables.stylekitBorderColor,
       },
 
       actionSheetTitleWrapper: {
         backgroundColor: variables.stylekitBackgroundColor,
-        marginBottom: 1
+        marginBottom: 1,
       },
 
       actionSheetTitleText: {
         color: variables.stylekitForegroundColor,
-        opacity: 0.5
+        opacity: 0.5,
       },
 
       actionSheetButtonWrapper: {
         backgroundColor: variables.stylekitBackgroundColor,
-        marginTop: 0
+        marginTop: 0,
       },
 
       actionSheetButtonTitle: {
@@ -527,25 +516,25 @@ export default class StyleKit {
       },
 
       actionSheetCancelButtonWrapper: {
-        marginTop: 0
+        marginTop: 0,
       },
 
       actionSheetCancelButtonTitle: {
         color: variables.stylekitInfoColor,
-        fontWeight: 'normal'
+        fontWeight: 'normal',
       },
 
       bold: {
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       },
-    }
+    };
   }
 
   buildConstants() {
     this.constants = {
       mainTextFontSize: 16,
-      paddingLeft: 14
-    }
+      paddingLeft: 14,
+    };
   }
 
   static doesDeviceSupportDarkMode() {
@@ -556,7 +545,7 @@ export default class StyleKit {
      * that was not available until Android 8.0 (26)
      * https://developer.android.com/reference/android/content/res/Configuration#UI_MODE_NIGHT_UNDEFINED
      */
-    if(isAndroid && Platform.Version < 26) {
+    if (isAndroid && Platform.Version < 26) {
       return false;
     }
 
@@ -583,8 +572,8 @@ export default class StyleKit {
     const allStyles = this.styles;
     const styles = [allStyles[key]];
     const platform = Platform.OS === 'android' ? 'Android' : 'IOS';
-    const platformStyles = allStyles[key+platform];
-    if(platformStyles) {
+    const platformStyles = allStyles[key + platform];
+    if (platformStyles) {
       styles.push(platformStyles);
     }
     return styles;

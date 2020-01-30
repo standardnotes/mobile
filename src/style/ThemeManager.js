@@ -1,29 +1,23 @@
 import { SFItemParams } from 'standard-file-js';
 import UserPrefsManager from '@Lib/userPrefsManager';
-import {
-  isNullOrUndefined
-} from '@Lib/utils';
+import { isNullOrUndefined } from '@Lib/utils';
 import Storage from '@SFJS/storageManager';
 import StyleKit from '@Style/StyleKit';
-import {
-  LIGHT_MODE_KEY,
-  DARK_MODE_KEY
-} from '@Style/utils';
+import { LIGHT_MODE_KEY } from '@Style/utils';
 
-const THEME_PREFERENCES_KEY             = 'ThemePreferencesKey';
-const LIGHT_THEME_KEY                   = 'lightTheme';
-const DARK_THEME_KEY                    = 'darkTheme';
+const THEME_PREFERENCES_KEY = 'ThemePreferencesKey';
+const LIGHT_THEME_KEY = 'lightTheme';
+const DARK_THEME_KEY = 'darkTheme';
 
 function getThemeKeyForMode(mode) {
   return mode === LIGHT_MODE_KEY ? LIGHT_THEME_KEY : DARK_THEME_KEY;
 }
 
 export default class ThemeManager {
-
   static instance = null;
 
   static get() {
-    if(isNullOrUndefined(this.instance)) {
+    if (isNullOrUndefined(this.instance)) {
       this.instance = new ThemeManager();
     }
     return this.instance;
@@ -37,7 +31,9 @@ export default class ThemeManager {
 
   async runPendingMigrations() {
     const themePrefMigrationName = '01212020SavedThemePref';
-    if(isNullOrUndefined(await Storage.get().getItem(themePrefMigrationName))) {
+    if (
+      isNullOrUndefined(await Storage.get().getItem(themePrefMigrationName))
+    ) {
       console.log("Running migration", themePrefMigrationName);
       await this.migrateThemePrefForModes();
       await Storage.get().setItem(themePrefMigrationName, 'true');
@@ -51,28 +47,27 @@ export default class ThemeManager {
     const savedTheme = await Storage.get().getItem(savedThemeKey);
 
     let themeData;
-    if(savedTheme) {
+    if (savedTheme) {
       themeData = JSON.parse(savedTheme);
-    } else if(systemThemeId) {
-      const systemTheme = _.find(
-        StyleKit.get().systemThemes,
-        { uuid: systemThemeId }
-      );
+    } else if (systemThemeId) {
+      const systemTheme = _.find(StyleKit.get().systemThemes, {
+        uuid: systemThemeId,
+      });
       themeData = this.buildThemeDataForTheme(systemTheme);
     }
 
-    if(!themeData) {
+    if (!themeData) {
       this.data = await this.buildDefaultPreferences();
     } else {
       this.data = {
         [LIGHT_THEME_KEY]: themeData,
-        [DARK_THEME_KEY]: themeData
-      }
+        [DARK_THEME_KEY]: themeData,
+      };
     }
 
     await UserPrefsManager.get().setPref({
       key: THEME_PREFERENCES_KEY,
-      value: this.data
+      value: this.data,
     });
 
     await UserPrefsManager.get().clearPref({ key: savedSystemThemeIdKey });
@@ -104,8 +99,8 @@ export default class ThemeManager {
     const themeData = await this.buildThemeDataForTheme(theme);
     return {
       [LIGHT_THEME_KEY]: themeData,
-      [DARK_THEME_KEY]: themeData
-    }
+      [DARK_THEME_KEY]: themeData,
+    };
   }
 
   async buildThemeDataForTheme(theme) {
@@ -115,20 +110,22 @@ export default class ThemeManager {
 
   async loadFromStorage() {
     this.data = await UserPrefsManager.get().getPref({
-      key: THEME_PREFERENCES_KEY
+      key: THEME_PREFERENCES_KEY,
     });
-    if(!this.data) {
+    if (!this.data) {
       this.data = await this.buildDefaultPreferences();
     }
     return this.data;
   }
 
   saveToStorage() {
-    if(this.saveAction) clearTimeout(this.saveAction);
+    if (this.saveAction) {
+      clearTimeout(this.saveAction);
+    }
     this.saveAction = setTimeout(async () => {
       await UserPrefsManager.get().setPref({
         key: THEME_PREFERENCES_KEY,
-        value: this.data
+        value: this.data,
       });
     }, 250);
   }
