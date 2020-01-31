@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
-import FingerprintScanner from 'react-native-fingerprint-scanner'
-import AuthenticationSource from "./AuthenticationSource"
-import KeysManager from "@Lib/keysManager"
+import FingerprintScanner from 'react-native-fingerprint-scanner';
+import KeysManager from '@Lib/keysManager';
+import AuthenticationSource from '@Screens/Authentication/Sources/AuthenticationSource';
 
 export default class AuthenticationSourceBiometric extends AuthenticationSource {
   constructor() {
@@ -15,7 +15,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
       this.biometricsType = type;
       this.biometricsNoun = noun;
       this.requiresInterfaceReload();
-    })
+    });
   }
 
   get sort() {
@@ -23,39 +23,41 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
   }
 
   get identifier() {
-    return "biometric-auth-source";
+    return 'biometric-auth-source';
   }
 
   get type() {
-    return "biometric";
+    return 'biometric';
   }
 
   get title() {
-    return this.isFace ? "Face ID" : "Fingerprint";
+    return this.isFace ? 'Face ID' : 'Fingerprint';
   }
 
   get isFace() {
-    return this.biometricsType == "Face ID";
+    return this.biometricsType === 'Face ID';
   }
 
   get label() {
     switch (this.status) {
-      case "waiting-turn":
-      case "waiting-input":
-        return `Please scan your ${this.isFace ? "face" : "fingerprint"}`
-      case "processing":
-        return `Waiting for ${this.isFace ? "Face ID" : "Fingerprint"}`;
-      case "did-succeed":
-       return `Success | ${this.isFace ? "Face ID" : "Fingerprint"}`
-      case "did-fail":
-        return `${this.isFace ? "Face ID" : "Fingerprint"} failed. Tap to try again.`;
+      case 'waiting-turn':
+      case 'waiting-input':
+        return `Please scan your ${this.isFace ? 'face' : 'fingerprint'}`;
+      case 'processing':
+        return `Waiting for ${this.isFace ? 'Face ID' : 'Fingerprint'}`;
+      case 'did-succeed':
+        return `Success | ${this.isFace ? 'Face ID' : 'Fingerprint'}`;
+      case 'did-fail':
+        return `${
+          this.isFace ? 'Face ID' : 'Fingerprint'
+        } failed. Tap to try again.`;
       default:
-        return "Status not accounted for"
+        return 'Status not accounted for';
     }
   }
 
   setWaitingForInput() {
-    if(this.status != "processing") {
+    if (this.status !== 'processing') {
       this.authenticate();
     }
   }
@@ -63,49 +65,50 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
   async authenticate() {
     this.didBegin();
 
-    if(Platform.OS == "android") {
+    if (Platform.OS === 'android') {
       return FingerprintScanner.authenticate({
         // onAttempt: this.handleInvalidAttempt
-      }).then(() => {
-        return this._success();
       })
-      .catch((error) => {
-        console.log("Fingerprint error", error);
-        return this._fail("Authentication failed. Tap to try again.");
-      });
+        .then(() => {
+          return this._success();
+        })
+        .catch(error => {
+          console.log('Fingerprint error', error);
+          return this._fail('Authentication failed. Tap to try again.');
+        });
     } else {
       // iOS
       return FingerprintScanner.authenticate({
         fallbackEnabled: true,
-        description: 'Fingerprint is required to access your notes.' })
+        description: 'Fingerprint is required to access your notes.',
+      })
         .then(() => {
           return this._success();
         })
-        .catch((error) => {
-          if(error.name == "UserCancel") {
+        .catch(error => {
+          if (error.name === 'UserCancel') {
             return this._fail();
           } else {
-            return this._fail("Authentication failed. Tap to try again.");
+            return this._fail('Authentication failed. Tap to try again.');
           }
-        }
-      );
+        });
     }
   }
 
   cancel() {
     FingerprintScanner.release();
-    this.status = "waiting-turn";
+    this.status = 'waiting-turn';
   }
 
   _success() {
     this.didSucceed();
     FingerprintScanner.release();
-    return {success: true};
+    return { success: true };
   }
 
   _fail(message) {
     this.didFail();
     // FingerprintScanner.release();
-    return {success: false, error: {message: message}};
+    return { success: false, error: { message: message } };
   }
 }

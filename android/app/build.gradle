@@ -137,7 +137,6 @@ dependencies {
     implementation project(':SNTextView')
     implementation project(':standard-notes-rn')
     implementation project(':react-native-aes-crypto')
-    implementation project(':react-native-fingerprint-scanner')
     implementation project(':react-native-flag-secure-android')
 
     if (enableHermes) {

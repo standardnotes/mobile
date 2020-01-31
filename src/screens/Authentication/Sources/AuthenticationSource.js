@@ -1,48 +1,52 @@
 export default class AuthenticationSource {
   constructor() {
-    this.status = "waiting-turn";
+    this.status = 'waiting-turn';
   }
 
   initializeForInterface() {
-    // Sometimes a source object may be created with no intention of displaying it (perhaps to read its would-be properties)
-    // if initializeForInterface, it means it will be actually displayed, so the source should get ready to be displayed in the UI
-    // e.g, to determine whether a biometric is face or fingerprint
+    /**
+     * Sometimes a source object may be created with no intention of displaying
+     * it (perhaps to read its would-be properties) if initializeForInterface,
+     * it means it will be actually displayed, so the source should get ready
+     * to be displayed in the UI.
+     * e.g, to determine whether a biometric is face or fingerprint
+     */
   }
 
   get identifier() {
-    return "auth-source";
+    return 'auth-source';
   }
 
   get label() {
-    return "Not Configured";
+    return 'Not Configured';
   }
 
   setWaitingForInput() {
-    this.status = "waiting-input";
+    this.status = 'waiting-input';
   }
 
   didBegin() {
-    this.status = "processing";
+    this.status = 'processing';
   }
 
   didSucceed() {
-    this.status = "did-succeed";
+    this.status = 'did-succeed';
   }
 
   didFail() {
-    this.status = "did-fail";
+    this.status = 'did-fail';
   }
 
   isWaitingForInput() {
-    return this.status == "waiting-input";
+    return this.status === 'waiting-input';
   }
 
   isInSuccessState() {
-    return this.status == "did-succeed";
+    return this.status === 'did-succeed';
   }
 
   isAuthenticating() {
-    return this.status == "processing";
+    return this.status === 'processing';
   }
 
   setAuthenticationValue(value) {
@@ -53,13 +57,9 @@ export default class AuthenticationSource {
     return this.authenticationValue;
   }
 
-  async authenticate() {
+  async authenticate() {}
 
-  }
-
-  cancel() {
-
-  }
+  cancel() {}
 
   requiresInterfaceReload() {
     this.onRequiresInterfaceReload && this.onRequiresInterfaceReload();

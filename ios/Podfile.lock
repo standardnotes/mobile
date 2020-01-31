@@ -189,7 +189,7 @@ PODS:
   - React-jsinspector (0.61.5)
   - react-native-aes (1.3.6):
     - React
-  - react-native-fingerprint-scanner (3.0.2):
+  - react-native-fingerprint-scanner (4.0.0):
     - React
   - react-native-mail (4.1.0):
     - React
@@ -276,7 +276,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-aes (from `../vendor/react-native-aes`)
-  - react-native-fingerprint-scanner (from `../vendor/react-native-fingerprint-scanner`)
+  - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-mail (from `../vendor/react-native-mail`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -344,7 +344,7 @@ EXTERNAL SOURCES:
   react-native-aes:
     :path: "../vendor/react-native-aes"
   react-native-fingerprint-scanner:
-    :path: "../vendor/react-native-fingerprint-scanner"
+    :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-mail:
     :path: "../vendor/react-native-mail"
   react-native-webview:
@@ -414,7 +414,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: d5525f9ed5f782fdbacb64b9b01a43a9323d2386
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
   react-native-aes: 30cdabac81ff8461d2a838d4fd042bb3df74e23d
-  react-native-fingerprint-scanner: b4acf41aa6f8f76c3b62fce0e018e290abbe838c
+  react-native-fingerprint-scanner: bfcf11a00eee4bb68e6d4e5cdd67d69bed687ea6
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-webview: b1ea98894c474b27c4080779939959e1f3653147
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
@@ -442,6 +442,6 @@ SPEC CHECKSUMS:
   TrustKit: a2f0c3a926f0a3ce3c082db9a39f1f540dbb04cb
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: b743f5abcefc13b4d383bf65fdc075485ceb01c1
+PODFILE CHECKSUM: 0e0c260a51051996bec27dff2f6b3c13aef69813
 
 COCOAPODS: 1.8.4
