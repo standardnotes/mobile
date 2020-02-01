@@ -174,6 +174,10 @@ export default class Authenticate extends Abstract {
   }
 
   async validateAuthentication(source) {
+    if (this.state.sourceLocked) {
+      return;
+    }
+
     /**
      * Don't double validate, otherwise the comparison of
      * successfulSources.length will be misleading.
@@ -191,6 +195,8 @@ export default class Authenticate extends Abstract {
       this.successfulSources.push(source);
       _.pull(this.pendingSources, source);
       this.forceUpdate();
+    } else if (source.isLocked()) {
+      this.onSourceLocked(source);
     } else {
       if (result.error && result.error.message) {
         Alert.alert('Unsuccessful', result.error.message);
@@ -208,12 +214,31 @@ export default class Authenticate extends Abstract {
   }
 
   async onBiometricDirectPress(source) {
+    if (source.isLocked()) {
+      return;
+    }
+
     /** Validate current auth if set. Validating will also handle going to next */
     if (this.state.activeSource && this.state.activeSource !== source) {
       this.validateAuthentication(this.state.activeSource);
     } else {
       this.beginAuthenticationForSource(source);
     }
+  }
+
+  /**
+   * @private
+   * When a source returns in a locked status we create a timeout for the lock
+   * period.
+   */
+  onSourceLocked(source) {
+    this.setState({ sourceLocked: true, submitDisabled: true });
+
+    setTimeout(() => {
+      source.setWaitingForInput();
+      this.setState({ sourceLocked: false, submitDisabled: false });
+      this.forceUpdate();
+    }, source.lockTimeout);
   }
 
   onSuccess() {
@@ -327,14 +352,17 @@ export default class Authenticate extends Abstract {
     );
 
     const hasHeaderSubtitle = source.type === 'input';
+    let sourceTitle = source.title;
+    if (source.status === 'waiting-turn') {
+      sourceTitle += ' - Waiting';
+    } else if (source.status === 'locked') {
+      sourceTitle += ' - Locked';
+    }
 
     return (
       <View key={source.identifier}>
         <SectionHeader
-          title={
-            source.title +
-            (source.status === 'waiting-turn' ? ' — Waiting' : '')
-          }
+          title={sourceTitle}
           subtitle={hasHeaderSubtitle && source.label}
           tinted={source === this.state.activeSource}
           buttonText={source.headerButtonText}
@@ -370,10 +398,10 @@ export default class Authenticate extends Abstract {
             onPress={() => this.submitPressed()}
           />
 
-          {this.sessionLengthOptions && this.sessionLengthOptions.length > 0 &&
+          {this.sessionLengthOptions && this.sessionLengthOptions.length > 0 && (
             <View style={this.styles.rememberForSection}>
               <SectionHeader title={'Remember For'} />
-              {this.sessionLengthOptions.map((option, index) =>
+              {this.sessionLengthOptions.map((option, index) => (
                 <SectionedAccessoryTableCell
                   text={option.label}
                   key={`${index}`}
@@ -386,9 +414,9 @@ export default class Authenticate extends Abstract {
                     this.setSessionLength(option.value);
                   }}
                 />
-              )}
+              ))}
             </View>
-          }
+          )}
         </ScrollView>
       </View>
     );

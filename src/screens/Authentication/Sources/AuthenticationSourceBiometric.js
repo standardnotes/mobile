@@ -12,6 +12,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
     super.initializeForInterface();
 
     KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
+      this.isAvailable = available;
       this.biometricsType = type;
       this.biometricsNoun = noun;
       this.requiresInterfaceReload();
@@ -31,26 +32,40 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
   }
 
   get title() {
-    return this.isFace ? 'Face ID' : 'Fingerprint';
+    return this.biometricsType;
   }
 
+  get isFingerprint() {
+    return (
+      this.biometricsType === 'Touch ID' ||
+      this.biometricsType === 'Fingerprint'
+    );
+  }
   get isFace() {
     return this.biometricsType === 'Face ID';
   }
 
   get label() {
+    /** Android X doesn't provide an exact type */
+    let noun = 'face or fingerprint';
+    if (this.isFingerprint) {
+      noun = 'fingerprint';
+    } else if (this.isFace) {
+      noun = 'face';
+    }
+
     switch (this.status) {
       case 'waiting-turn':
       case 'waiting-input':
-        return `Please scan your ${this.isFace ? 'face' : 'fingerprint'}`;
+        return `Please scan your ${noun}`;
       case 'processing':
-        return `Waiting for ${this.isFace ? 'Face ID' : 'Fingerprint'}`;
+        return `Waiting for ${this.biometricsNoun}`;
       case 'did-succeed':
-        return `Success | ${this.isFace ? 'Face ID' : 'Fingerprint'}`;
+        return `Success | ${this.biometricsNoun}`;
       case 'did-fail':
-        return `${
-          this.isFace ? 'Face ID' : 'Fingerprint'
-        } failed. Tap to try again.`;
+        return `${this.biometricsNoun} failed. Tap to try again.`;
+      case 'locked':
+        return `${this.biometricsNoun} locked. Try again in 30 seconds.`;
       default:
         return 'Status not accounted for';
     }
@@ -63,24 +78,42 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
   }
 
   async authenticate() {
+    if (!this.isAvailable) {
+      this.didFail();
+      return {
+        success: false,
+        error: {
+          message: 'This device either does not have a biometric sensor or it may not configured.',
+        },
+      };
+    }
+
     this.didBegin();
 
     if (Platform.OS === 'android') {
       return FingerprintScanner.authenticate({
-        // onAttempt: this.handleInvalidAttempt
+        description: 'Biometrics are required to access your notes.',
       })
         .then(() => {
           return this._success();
         })
         .catch(error => {
-          console.log('Fingerprint error', error);
-          return this._fail('Authentication failed. Tap to try again.');
+          console.log('Biometrics error', error);
+
+          if (error.name === 'DeviceLocked') {
+            this.setLocked();
+            return this._fail(
+              'Authentication failed. Wait 30 seconds to try again.'
+            );
+          } else {
+            return this._fail('Authentication failed. Tap to try again.');
+          }
         });
     } else {
       // iOS
       return FingerprintScanner.authenticate({
         fallbackEnabled: true,
-        description: 'Fingerprint is required to access your notes.',
+        description: 'This is required to access your notes.',
       })
         .then(() => {
           return this._success();
@@ -107,8 +140,9 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
   }
 
   _fail(message) {
-    this.didFail();
-    // FingerprintScanner.release();
+    if (!this.isLocked()) {
+      this.didFail();
+    }
     return { success: false, error: { message: message } };
   }
 }

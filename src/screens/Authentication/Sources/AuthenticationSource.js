@@ -1,3 +1,5 @@
+const DEFAULT_LOCK_TIMEOUT = 30 * 1000;
+
 export default class AuthenticationSource {
   constructor() {
     this.status = 'waiting-turn';
@@ -21,6 +23,14 @@ export default class AuthenticationSource {
     return 'Not Configured';
   }
 
+  get lockTimeout() {
+    return DEFAULT_LOCK_TIMEOUT;
+  }
+
+  setLocked() {
+    this.status = 'locked';
+  }
+
   setWaitingForInput() {
     this.status = 'waiting-input';
   }
@@ -35,6 +45,10 @@ export default class AuthenticationSource {
 
   didFail() {
     this.status = 'did-fail';
+  }
+
+  isLocked() {
+    return this.status === 'locked';
   }
 
   isWaitingForInput() {

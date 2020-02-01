@@ -1,26 +1,24 @@
 import React, { Component } from 'react';
-import StyleKit from "@Style/StyleKit"
-import {TextInput, View, Alert, Text} from 'react-native';
-
-import SectionHeader from "@Components/SectionHeader";
-import ButtonCell from "@Components/ButtonCell";
-import TableSection from "@Components/TableSection";
-import SectionedTableCell from "@Components/SectionedTableCell";
-import SectionedAccessoryTableCell from "@Components/SectionedAccessoryTableCell";
-import SectionedOptionsTableCell from "@Components/SectionedOptionsTableCell";
-
-import ApplicationState from "@Lib/ApplicationState"
-import FingerprintScanner from 'react-native-fingerprint-scanner';
-import KeysManager from "@Lib/keysManager"
+import { Alert, Text } from 'react-native';
+import ButtonCell from '@Components/ButtonCell';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
+import TableSection from '@Components/TableSection';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import StyleKit from '@Style/StyleKit';
 
 export default class PasscodeSection extends Component {
-
   constructor(props) {
     super(props);
-    var state = { fingerprintAvailable: false || __DEV__};
-    if(__DEV__) {
-      state.biometricsType = ApplicationState.isAndroid ? "Fingerprint" : "Face ID";
-      state.biometricsNoun = ApplicationState.isAndroid ? "Fingerprint" : "Face ID";
+    let state = { biometricsAvailable: false || __DEV__ };
+    if (__DEV__) {
+      state.biometricsType = ApplicationState.isAndroid
+        ? 'Fingerprint'
+        : 'Face ID';
+      state.biometricsNoun = ApplicationState.isAndroid
+        ? 'Fingerprint'
+        : 'Face ID';
     }
 
     this.state = state;
@@ -28,77 +26,132 @@ export default class PasscodeSection extends Component {
 
   componentDidMount() {
     KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
-      this.setState({fingerprintAvailable: available, biometricsType: type, biometricsNoun: noun})
-    })
+      this.setState({
+        biometricsAvailable: available,
+        biometricsType: type,
+        biometricsNoun: noun,
+      });
+    });
   }
 
-  onPasscodeOptionPress = (option) => {
+  onPasscodeOptionPress = option => {
     KeysManager.get().setPasscodeTiming(option.key);
     this.forceUpdate();
-  }
+  };
 
-  onFingerprintOptionPress = (option) => {
+  onBiometricsOptionPress = option => {
     KeysManager.get().setBiometricsTiming(option.key);
     this.forceUpdate();
-  }
+  };
 
   render() {
-    var source = KeysManager.get().encryptionSource();
-    var encryptionAvailable = source !== null;
+    const source = KeysManager.get().encryptionSource();
+    const encryptionAvailable = source !== null;
 
-    var storageEncryptionTitle = encryptionAvailable ? (this.props.storageEncryption ? "Disable Storage Encryption" : "Enable Storage Encryption") : "Storage Encryption";
-    var storageOnPress = this.props.storageEncryption ? this.props.onStorageEncryptionDisable : this.props.onStorageEncryptionEnable;
-    var storageSubText = "Encrypts your data before saving to your device's local storage.";
+    const storageEncryptionTitle = encryptionAvailable
+      ? this.props.storageEncryption
+        ? 'Disable Storage Encryption'
+        : 'Enable Storage Encryption'
+      : 'Storage Encryption';
+    let storageOnPress = this.props.storageEncryption
+      ? this.props.onStorageEncryptionDisable
+      : this.props.onStorageEncryptionEnable;
+    let storageSubText =
+      "Encrypts your data before saving to your device's local storage.";
 
-    if(encryptionAvailable) {
-      storageSubText += this.props.storageEncryption ?" Disable to improve app start-up speed." : " May decrease app start-up speed.";
+    if (encryptionAvailable) {
+      storageSubText += this.props.storageEncryption
+        ? ' Disable to improve app start-up speed.'
+        : ' May decrease app start-up speed.';
     } else {
-      storageSubText += " Sign in, register, or add a local passcode to enable this option.";
+      storageSubText +=
+        ' Sign in, register, or add a local passcode to enable this option.';
       storageOnPress = null;
     }
 
-    if(this.props.storageEncryptionLoading) {
-      storageSubText = "Applying changes...";
+    if (this.props.storageEncryptionLoading) {
+      storageSubText = 'Applying changes...';
     }
 
-    var passcodeTitle = this.props.hasPasscode ? "Disable Passcode Lock" : "Enable Passcode Lock";
-    var passcodeOnPress = this.props.hasPasscode ? this.props.onDisable : this.props.onEnable;
+    const passcodeTitle = this.props.hasPasscode
+      ? 'Disable Passcode Lock'
+      : 'Enable Passcode Lock';
+    const passcodeOnPress = this.props.hasPasscode
+      ? this.props.onDisable
+      : this.props.onEnable;
 
-    var biometricsNoun = this.state.biometricsNoun;
+    const { biometricsNoun } = this.state;
 
-    var fingerprintTitle = this.props.hasBiometrics ? `Disable ${biometricsNoun} Lock` : `Enable ${biometricsNoun} Lock`;
-    var fingerprintOnPress = this.props.hasBiometrics ? this.props.onFingerprintDisable : this.props.onFingerprintEnable;
+    let biometricTitle = this.props.hasBiometrics
+      ? `Disable ${biometricsNoun} Lock`
+      : `Enable ${biometricsNoun} Lock`;
+    let biometricOnPress = this.props.hasBiometrics
+      ? this.props.onFingerprintDisable
+      : this.props.onFingerprintEnable;
 
-    var passcodeOptions = KeysManager.get().getPasscodeTimingOptions();
-    var fingerprintOptions = KeysManager.get().getBiometricsTimingOptions();
+    const passcodeOptions = KeysManager.get().getPasscodeTimingOptions();
+    const biometricOptions = KeysManager.get().getBiometricsTimingOptions();
 
-    if(!this.state.fingerprintAvailable) {
-      fingerprintTitle = "Enable Fingerprint Lock (Not Available)"
-      fingerprintOnPress = function() {
-        Alert.alert("Not Available", "Your device does not support fingerprint authentication.");
-      }
+    if (!this.state.biometricsAvailable) {
+      biometricTitle = 'Enable Biometric Lock (Not Available)';
+      biometricOnPress = () => {
+        Alert.alert(
+          'Not Available',
+          'Your device does not support biometric authentication.'
+        );
+      };
     }
     return (
       <TableSection>
-
         <SectionHeader title={this.props.title} />
 
-        <ButtonCell first={true} leftAligned={true} title={storageEncryptionTitle} onPress={storageOnPress}>
-          <Text style={{color: StyleKit.variable("stylekitNeutralColor"), marginTop: 2}}>{storageSubText}</Text>
+        <ButtonCell
+          first={true}
+          leftAligned={true}
+          title={storageEncryptionTitle}
+          onPress={storageOnPress}
+        >
+          <Text
+            style={{
+              color: StyleKit.variables.stylekitNeutralColor,
+              marginTop: 2,
+            }}
+          >
+            {storageSubText}
+          </Text>
         </ButtonCell>
 
-        <ButtonCell leftAligned={true} title={passcodeTitle} onPress={passcodeOnPress} />
+        <ButtonCell
+          leftAligned={true}
+          title={passcodeTitle}
+          onPress={passcodeOnPress}
+        />
 
-        <ButtonCell last={!this.props.hasBiometrics && !this.props.hasPasscode} disabled={!this.state.fingerprintAvailable} leftAligned={true} title={fingerprintTitle} onPress={fingerprintOnPress} />
+        <ButtonCell
+          last={!this.props.hasBiometrics && !this.props.hasPasscode}
+          disabled={!this.state.biometricsAvailable}
+          leftAligned={true}
+          title={biometricTitle}
+          onPress={biometricOnPress}
+        />
 
-        {this.props.hasPasscode &&
-          <SectionedOptionsTableCell last={!this.props.hasBiometrics} title={"Require Passcode"} options={passcodeOptions} onPress={this.onPasscodeOptionPress}/>
-        }
+        {this.props.hasPasscode && (
+          <SectionedOptionsTableCell
+            last={!this.props.hasBiometrics}
+            title={'Require Passcode'}
+            options={passcodeOptions}
+            onPress={this.onPasscodeOptionPress}
+          />
+        )}
 
-        {this.props.hasBiometrics &&
-          <SectionedOptionsTableCell last={true} title={`Require ${biometricsNoun}`} options={fingerprintOptions} onPress={this.onFingerprintOptionPress}/>
-        }
-
+        {this.props.hasBiometrics && (
+          <SectionedOptionsTableCell
+            last={true}
+            title={`Require ${biometricsNoun}`}
+            options={biometricOptions}
+            onPress={this.onBiometricsOptionPress}
+          />
+        )}
       </TableSection>
     );
   }

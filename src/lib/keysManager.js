@@ -1,22 +1,21 @@
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
-import SF from './sfjs/sfjs'
-import ModelManager from './sfjs/modelManager'
-import Storage from './sfjs/storageManager'
-import AlertManager from "@SFJS/alertManager"
-import Keychain from "./keychain"
+import SF from './sfjs/sfjs';
+import ModelManager from './sfjs/modelManager';
+import Storage from './sfjs/storageManager';
+import AlertManager from '@SFJS/alertManager';
+import Keychain from './keychain';
 import SNReactNative from 'standard-notes-rn';
 
-let OfflineParamsKey = "pc_params";
-let EncryptedAccountKeysKey = "encrypted_account_keys";
-let BiometricsPrefs = "biometrics_prefs";
-let FirstRunKey = "first_run";
-let StorageEncryptionKey = "storage_encryption";
+const OfflineParamsKey = 'pc_params';
+const EncryptedAccountKeysKey = 'encrypted_account_keys';
+const BiometricsPrefs = 'biometrics_prefs';
+const FirstRunKey = 'first_run';
+const StorageEncryptionKey = 'storage_encryption';
 
 export default class KeysManager {
-
   static instance = null;
 
   static get() {
@@ -29,35 +28,35 @@ export default class KeysManager {
 
   constructor() {
     this.biometricPrefs = {};
-    this.accountRelatedStorageKeys = ["auth_params", "user"];
+    this.accountRelatedStorageKeys = ['auth_params', 'user'];
   }
 
   async runPendingMigrations() {
-    const biometricsMigrationName = "10102019KeychainToStorage";
-    if((await Storage.get().getItem(biometricsMigrationName)) == null) {
-      console.log("Running migration", biometricsMigrationName);
+    const biometricsMigrationName = '10102019KeychainToStorage';
+    if ((await Storage.get().getItem(biometricsMigrationName)) == null) {
+      console.log('Running migration', biometricsMigrationName);
       await this.migrateBiometricsPrefsToStorage();
-      await Storage.get().setItem(biometricsMigrationName, "true");
+      await Storage.get().setItem(biometricsMigrationName, 'true');
     }
 
-    const jwtUndoMigration = "10232019JwtToKeychain";
-    if((await Storage.get().getItem(jwtUndoMigration)) == null) {
-      console.log("Running migration", jwtUndoMigration);
+    const jwtUndoMigration = '10232019JwtToKeychain';
+    if ((await Storage.get().getItem(jwtUndoMigration)) == null) {
+      console.log('Running migration', jwtUndoMigration);
       await this.undoJwtMigration();
-      await Storage.get().setItem(jwtUndoMigration, "true");
+      await Storage.get().setItem(jwtUndoMigration, 'true');
     }
   }
 
   async migrateBiometricsPrefsToStorage() {
     // Move biometrics preference to storage
-    if(this.legacy_fingerprint) {
+    if (this.legacy_fingerprint) {
       this.biometricPrefs.enabled = this.legacy_fingerprint.enabled;
       this.biometricPrefs.timing = this.legacy_fingerprint.timing;
       await this.saveBiometricPrefs();
       this.legacy_fingerprint = null;
     }
 
-    if(this.legacy_fingerprint) {
+    if (this.legacy_fingerprint) {
       await this.persistKeys();
     }
   }
@@ -69,7 +68,7 @@ export default class KeysManager {
   */
   async undoJwtMigration() {
     let jwt = this.user && this.user.jwt;
-    if(!jwt) {
+    if (!jwt) {
       return;
     }
 
@@ -80,14 +79,14 @@ export default class KeysManager {
   }
 
   async loadInitialData() {
-    let storageKeys = [
-      "auth_params",
-      "user",
+    const storageKeys = [
+      'auth_params',
+      'user',
       OfflineParamsKey,
       EncryptedAccountKeysKey,
       FirstRunKey,
       StorageEncryptionKey,
-      BiometricsPrefs
+      BiometricsPrefs,
     ];
 
     /*
@@ -95,71 +94,77 @@ export default class KeysManager {
       on hardware back button press. When it constructs again, it calls this function, resetting our values for offlineKeys
       which we don't want to change, since on authentication, they are set by the passcode unlock success function.
      */
-    if(this.loadInitialDataPromise) {
+    if (this.loadInitialDataPromise) {
       return this.loadInitialDataPromise;
     }
 
     this.loadInitialDataPromise = Promise.all([
-
-      Keychain.getKeys().then((keys) => {
-        if(keys) {
+      Keychain.getKeys().then(keys => {
+        if (keys) {
           this.parseKeychainValue(keys);
         }
       }),
 
-      Storage.get().getMultiItems(storageKeys).then(async (items) => {
-        this.missingFirstRunKey = items[FirstRunKey] === null || items[FirstRunKey] === undefined;
+      Storage.get()
+        .getMultiItems(storageKeys)
+        .then(async items => {
+          this.missingFirstRunKey =
+            items[FirstRunKey] === null || items[FirstRunKey] === undefined;
 
-        // auth params
-        var authParams = items.auth_params;
-        if(authParams) {
-          this.accountAuthParams = JSON.parse(authParams);
-        }
+          // auth params
+          var authParams = items.auth_params;
+          if (authParams) {
+            this.accountAuthParams = JSON.parse(authParams);
+          }
 
-        let biometricPrefs = items[BiometricsPrefs];
-        if(biometricPrefs) {
-          this.biometricPrefs = JSON.parse(biometricPrefs);
-        }
+          let biometricPrefs = items[BiometricsPrefs];
+          if (biometricPrefs) {
+            this.biometricPrefs = JSON.parse(biometricPrefs);
+          }
 
-        // offline params
-        var pcParams = items[OfflineParamsKey];
-        if(pcParams) {
-          this.offlineAuthParams = JSON.parse(pcParams);
-        }
+          // offline params
+          var pcParams = items[OfflineParamsKey];
+          if (pcParams) {
+            this.offlineAuthParams = JSON.parse(pcParams);
+          }
 
-        let encryptedAccountKeys = items[EncryptedAccountKeysKey];
-        if(encryptedAccountKeys) {
-          this.encryptedAccountKeys = JSON.parse(encryptedAccountKeys);
-        }
+          let encryptedAccountKeys = items[EncryptedAccountKeysKey];
+          if (encryptedAccountKeys) {
+            this.encryptedAccountKeys = JSON.parse(encryptedAccountKeys);
+          }
 
-        // storage encryption
-        if(items[StorageEncryptionKey] == null || items[StorageEncryptionKey] == undefined) {
-          // default is true
-          // Note that this defaults to true, but doesn't dictate if it's actually applied.
-          // For example, when you first install the app and have no account and no passcode,
-          // There will be no encryption source available. In the syncManager key request handler,
-          // we check if this flag is true and if there are active keys. We use this to indicate that
-          // when keys become available, we want storage encryption to be enabled by default.
-          this._storageEncryptionEnabled = true;
-        } else {
-          this._storageEncryptionEnabled = JSON.parse(items[StorageEncryptionKey]) == true;
-        }
+          // storage encryption
+          if (
+            items[StorageEncryptionKey] == null ||
+            items[StorageEncryptionKey] == undefined
+          ) {
+            // default is true
+            // Note that this defaults to true, but doesn't dictate if it's actually applied.
+            // For example, when you first install the app and have no account and no passcode,
+            // There will be no encryption source available. In the syncManager key request handler,
+            // we check if this flag is true and if there are active keys. We use this to indicate that
+            // when keys become available, we want storage encryption to be enabled by default.
+            this._storageEncryptionEnabled = true;
+          } else {
+            this._storageEncryptionEnabled =
+              JSON.parse(items[StorageEncryptionKey]) === true;
+          }
 
-        // user
-        var user = items.user;
-        if(user) {
-          this.user = JSON.parse(user);
-        } else {
-          this.user = {};
-        }
-      })
+          // user
+          var user = items.user;
+          if (user) {
+            this.user = JSON.parse(user);
+          } else {
+            this.user = {};
+          }
+        }),
     ]).then(async () => {
       // We only want to run migrations in unlocked app state. If account keys are present, run now,
       // otherwise wait until offline keys have been set so that account keys are decrypted.
-      if(!this.encryptedAccountKeys) {
+      if (!this.encryptedAccountKeys) {
         return this.runPendingMigrations();
       }
-    })
+    });
 
     return this.loadInitialDataPromise;
   }
@@ -174,7 +179,7 @@ export default class KeysManager {
   }
 
   async markApplicationAsRan() {
-    return Storage.get().setItem(FirstRunKey, "false");
+    return Storage.get().setItem(FirstRunKey, 'false');
   }
 
   async wipeData() {
@@ -186,21 +191,21 @@ export default class KeysManager {
     console.log("===Wiping Data===");
 
     return AlertManager.get().confirm({
-      title: "Previous Installation",
-      text: `We've detected a previous installation of Standard Notes based on your keychain data. You must wipe all data from previous installation to continue.\n\nIf you're seeing this message in error, it might mean we're having issues loading your local database. Please restart the app and try again.`,
-      confirmButtonText: "Delete Local Data",
-      cancelButtonText: "Quit App",
+      title: 'Previous Installation',
+      text: "We've detected a previous installation of Standard Notes based on your keychain data. You must wipe all data from previous installation to continue.\n\nIf you're seeing this message in error, it might mean we're having issues loading your local database. Please restart the app and try again.",
+      confirmButtonText: 'Delete Local Data',
+      cancelButtonText: 'Quit App',
       onConfirm: async () => {
         await Storage.get().clear();
-        await Keychain.clearKeys()
+        await Keychain.clearKeys();
         this.parseKeychainValue(null);
         this.accountAuthParams = null;
         this.user = null;
       },
       onCancel: () => {
         SNReactNative.exitApp();
-      }
-    })
+      },
+    });
   }
 
   /*
@@ -213,7 +218,11 @@ export default class KeysManager {
     since the valid hash value is stored in the keychain as well.
    */
   shouldPresentKeyRecoveryWizard() {
-    if(!this.accountAuthParams && this.offlineAuthParams && !this.offlineKeys) {
+    if (
+      !this.accountAuthParams &&
+      this.offlineAuthParams &&
+      !this.offlineKeys
+    ) {
       return true;
     } else {
       return false;
@@ -226,33 +235,35 @@ export default class KeysManager {
     then the next time you sign in and refresh, it will treat it as a new run, and delete all data.)
   */
   registerAccountRelatedStorageKeys(storageKeys) {
-    this.accountRelatedStorageKeys = _.uniq(this.accountRelatedStorageKeys.concat(storageKeys));
+    this.accountRelatedStorageKeys = _.uniq(
+      this.accountRelatedStorageKeys.concat(storageKeys)
+    );
   }
 
   parseKeychainValue(keys) {
-    if(keys) {
+    if (keys) {
       this.offlineKeys = keys.offline;
-      if(this.offlineKeys) {
+      if (this.offlineKeys) {
         this.passcodeTiming = this.offlineKeys.timing;
       }
 
       // Legacy, migrated to Storage
-      if(keys.fingerprint) {
+      if (keys.fingerprint) {
         this.legacy_fingerprint = keys.fingerprint;
         this.biometricPrefs.enabled = keys.fingerprint.enabled;
         this.biometricPrefs.timing = keys.fingerprint.timing;
         delete keys.fingerprint;
       }
 
-      if(keys.encryptedAccountKeys) {
+      if (keys.encryptedAccountKeys) {
         // LEGACY: storing encryptedAccountKeys in keychain is legacy behavior. Now stored in storage.
         // We won't handle this case here. We'll wait until setOfflineKeys is called
         // by whoever authenticates local passcode. That's when we actually get the offline
         // keys we can use to decrypt encryptedAccountKeys
         this.encryptedAccountKeys = keys.encryptedAccountKeys;
       } else {
-        this.accountKeys = _.omit(keys, ["offline"]);
-        if(_.keys(this.accountKeys).length == 0) {
+        this.accountKeys = _.omit(keys, ['offline']);
+        if (_.keys(this.accountKeys).length === 0) {
           this.accountKeys = null;
         }
       }
@@ -268,12 +279,14 @@ export default class KeysManager {
     let value = {};
 
     // If no offline keys, store account keys directly. Otherwise we'll encrypt account keys and store in storage.
-    if(this.accountKeys && !this.offlineKeys) {
+    if (this.accountKeys && !this.offlineKeys) {
       _.merge(value, this.accountKeys);
     }
 
-    if(this.offlineKeys) {
-      _.merge(value, {offline: {pw: this.offlineKeys.pw, timing: this.passcodeTiming}});
+    if (this.offlineKeys) {
+      _.merge(value, {
+        offline: { pw: this.offlineKeys.pw, timing: this.passcodeTiming },
+      });
     }
 
     return value;
@@ -283,16 +296,23 @@ export default class KeysManager {
     // This funciton is called when changes are made to authentication state
     this.updateScreenshotPrivacy();
 
-    if(this.accountKeys && this.offlineKeys) {
+    if (this.accountKeys && this.offlineKeys) {
       // If offline local passcode keys are available, use that to encrypt account keys
       // Don't encrypt offline pw because then we don't be able to verify passcode
-      var encryptedKeys = new SFItem();
+      const encryptedKeys = new SFItem();
       encryptedKeys.uuid = await SF.get().crypto.generateUUID();
-      encryptedKeys.content_type = "SN|Mobile|EncryptedKeys"
+      encryptedKeys.content_type = 'SN|Mobile|EncryptedKeys';
       encryptedKeys.content.accountKeys = this.accountKeys;
-      var params = new SFItemParams(encryptedKeys, this.offlineKeys, this.offlineAuthParams);
-      let results = await params.paramsForSync();
-      await Storage.get().setItem(EncryptedAccountKeysKey, JSON.stringify(results));
+      const params = new SFItemParams(
+        encryptedKeys,
+        this.offlineKeys,
+        this.offlineAuthParams
+      );
+      const results = await params.paramsForSync();
+      await Storage.get().setItem(
+        EncryptedAccountKeysKey,
+        JSON.stringify(results)
+      );
     } else {
       await Storage.get().removeItem(EncryptedAccountKeysKey);
     }
@@ -301,16 +321,18 @@ export default class KeysManager {
     return Keychain.setKeys(value);
   }
 
-  updateScreenshotPrivacy(enabled) {
-    if(Platform.OS == "ios") {
+  updateScreenshotPrivacy() {
+    if (Platform.OS === 'ios') {
       return;
     }
 
-    var hasImmediatePasscode = this.hasOfflinePasscode() && this.passcodeTiming == "immediately";
-    var hasImmedateBiometrics = this.hasBiometrics() && this.biometricPrefs.timing == "immediately";
-    var enabled = hasImmediatePasscode || hasImmedateBiometrics;
+    const hasImmediatePasscode =
+      this.hasOfflinePasscode() && this.passcodeTiming === 'immediately';
+    const hasImmedateBiometrics =
+      this.hasBiometrics() && this.biometricPrefs.timing === 'immediately';
+    const enabled = hasImmediatePasscode || hasImmedateBiometrics;
 
-    if(enabled) {
+    if (enabled) {
       FlagSecure.activate();
     } else {
       FlagSecure.deactivate();
@@ -324,12 +346,12 @@ export default class KeysManager {
 
   async saveUser(user) {
     this.user = user;
-    return Storage.get().setItem("user", JSON.stringify(user));
+    return Storage.get().setItem('user', JSON.stringify(user));
   }
 
   /* The keys to use for encryption. If user is signed in, use those keys, otherwise use offline keys */
   activeKeys() {
-    if(this.hasAccountKeys()) {
+    if (this.hasAccountKeys()) {
       return this.accountKeys;
     } else {
       return this.offlineKeys;
@@ -346,10 +368,10 @@ export default class KeysManager {
   }
 
   encryptionSource() {
-    if(this.accountKeys && this.accountKeys.mk !== null) {
-      return "account";
-    } else if(this.offlineKeys && this.offlineKeys.mk !== null) {
-      return "offline";
+    if (this.accountKeys && this.accountKeys.mk !== null) {
+      return 'account';
+    } else if (this.offlineKeys && this.offlineKeys.mk !== null) {
+      return 'offline';
     } else {
       return null;
     }
@@ -369,19 +391,22 @@ export default class KeysManager {
     return keys && keys.jwt;
   }
 
-
-
-
   // Storage Encryption
 
   async enableStorageEncryption() {
     this._storageEncryptionEnabled = true;
-    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this._storageEncryptionEnabled));
+    return Storage.get().setItem(
+      StorageEncryptionKey,
+      JSON.stringify(this._storageEncryptionEnabled)
+    );
   }
 
   async disableStorageEncryption() {
     this._storageEncryptionEnabled = false;
-    return Storage.get().setItem(StorageEncryptionKey, JSON.stringify(this._storageEncryptionEnabled));
+    return Storage.get().setItem(
+      StorageEncryptionKey,
+      JSON.stringify(this._storageEncryptionEnabled)
+    );
   }
 
   isStorageEncryptionEnabled() {
@@ -390,15 +415,13 @@ export default class KeysManager {
     return this._storageEncryptionEnabled && this.activeKeys();
   }
 
-
-
   // Auth Params
 
   async setAccountAuthParams(authParams) {
     this.accountAuthParams = authParams;
-    await Storage.get().setItem("auth_params", JSON.stringify(authParams));
+    await Storage.get().setItem('auth_params', JSON.stringify(authParams));
 
-    if(this.offlineAuthParams && !this.offlineKeys) {
+    if (this.offlineAuthParams && !this.offlineKeys) {
       /*
         This can happen if:
         1. You are signed into an account and have a local passcode
@@ -419,31 +442,29 @@ export default class KeysManager {
   }
 
   defaultProtocolVersionForKeys(keys) {
-    if(keys && keys.ak) {
+    if (keys && keys.ak) {
       // If there's no version stored, and there's an ak, it has to be 002. Newer versions would have thier version stored in authParams.
-      return "002";
+      return '002';
     } else {
-      return "001";
+      return '001';
     }
   }
 
   activeAuthParams() {
-    if(this.accountKeys) {
+    if (this.accountKeys) {
       var params = this.accountAuthParams;
-      if(params && !params.version) {
+      if (params && !params.version) {
         params.version = this.defaultProtocolVersionForKeys(this.accountKeys);
       }
       return params;
-    } else if(this.offlineAuthParams) {
+    } else if (this.offlineAuthParams) {
       var params = this.offlineAuthParams;
-      if(params && !params.version) {
+      if (params && !params.version) {
         params.version = this.defaultProtocolVersionForKeys(this.offlineKeys);
       }
       return params;
     }
   }
-
-
 
   // User
 
@@ -451,13 +472,11 @@ export default class KeysManager {
     return this.user && this.user.email;
   }
 
-
-
   // Local Security
 
   async clearOfflineKeysAndData(force = false) {
     // make sure user is authenticated before performing this step
-    if(this.offlineKeys && !this.offlineKeys.mk && !force) {
+    if (this.offlineKeys && !this.offlineKeys.mk && !force) {
       alert("Unable to remove passcode. Make sure you are properly authenticated and try again.");
       return false;
     }
@@ -469,8 +488,8 @@ export default class KeysManager {
 
   async persistOfflineKeys(keys) {
     this.setOfflineKeys(keys);
-    if(!this.passcodeTiming) {
-      this.passcodeTiming = "on-quit";
+    if (!this.passcodeTiming) {
+      this.passcodeTiming = 'on-quit';
     }
     return this.persistKeys();
   }
@@ -480,12 +499,15 @@ export default class KeysManager {
     this.offlineKeys = keys;
 
     // Check to see if encryptedAccountKeys need decrypting
-    if(this.encryptedAccountKeys) {
+    if (this.encryptedAccountKeys) {
       // Decrypt and set
-      await SFJS.itemTransformer.decryptItem(this.encryptedAccountKeys, this.offlineKeys);
+      await SFJS.itemTransformer.decryptItem(
+        this.encryptedAccountKeys,
+        this.offlineKeys
+      );
       // itemTransformer modifies in place. this.encryptedAccountKeys should now be decrypted
       let decryptedKeys = new SFItem(this.encryptedAccountKeys);
-      if(decryptedKeys.errorDecrypting) {
+      if (decryptedKeys.errorDecrypting) {
         console.error("Fatal: Error decrypting account keys");
       } else {
         this.accountKeys = decryptedKeys.content.accountKeys;
@@ -519,8 +541,8 @@ export default class KeysManager {
 
   async enableBiometrics() {
     this.biometricPrefs.enabled = true;
-    if(!this.biometricPrefs.timing) {
-      this.biometricPrefs.timing = "on-quit";
+    if (!this.biometricPrefs.timing) {
+      this.biometricPrefs.timing = 'on-quit';
     }
     return this.saveBiometricPrefs();
   }
@@ -531,39 +553,62 @@ export default class KeysManager {
   }
 
   async saveBiometricPrefs() {
-    return Storage.get().setItem(BiometricsPrefs, JSON.stringify(this.biometricPrefs));
+    return Storage.get().setItem(
+      BiometricsPrefs,
+      JSON.stringify(this.biometricPrefs)
+    );
   }
 
   getPasscodeTimingOptions() {
     return [
-      {title: "Immediately", key: "immediately", selected: this.passcodeTiming == "immediately"},
-      {title: "On Quit", key: "on-quit", selected: this.passcodeTiming == "on-quit"},
-    ]
+      {
+        title: 'Immediately',
+        key: 'immediately',
+        selected: this.passcodeTiming === 'immediately',
+      },
+      {
+        title: 'On Quit',
+        key: 'on-quit',
+        selected: this.passcodeTiming === 'on-quit',
+      },
+    ];
   }
 
   getBiometricsTimingOptions() {
     return [
-      {title: "Immediately", key: "immediately", selected: this.biometricPrefs.timing == "immediately"},
-      {title: "On Quit", key: "on-quit", selected: this.biometricPrefs.timing == "on-quit"},
-    ]
+      {
+        title: 'Immediately',
+        key: 'immediately',
+        selected: this.biometricPrefs.timing === 'immediately',
+      },
+      {
+        title: 'On Quit',
+        key: 'on-quit',
+        selected: this.biometricPrefs.timing === 'on-quit',
+      },
+    ];
   }
 
   static getDeviceBiometricsAvailability(callback) {
-    let isAndroid = Platform.OS == "android";
-    if(__DEV__) {
-      if(isAndroid) {
-        callback(true, "Fingerprint", "Fingerprint (Dev)");
+    if (__DEV__) {
+      const isAndroid = Platform.OS === 'android';
+      if (isAndroid && Platform.Version < 23) {
+        callback(true, 'Fingerprint', 'Fingerprint (Dev)');
+      } else if (isAndroid) {
+        callback(true, 'Biometrics', 'Biometrics (Dev)');
       } else {
-        callback(true, "Face ID", "Face ID");
+        callback(true, 'Face ID', 'Face ID');
       }
       return;
     }
-    FingerprintScanner.isSensorAvailable().then((type) => {
-      var noun = (!type || type == "Touch ID" || type == "Fingerprint") ? "Fingerprint" : "Face ID";
-      callback(true, type, noun);
-    }).catch((error) => {
-      callback(false);
-    })
+    FingerprintScanner.isSensorAvailable()
+      .then(type => {
+        const noun =
+          type === 'Touch ID' || type === 'Fingerprint' ? 'Fingerprint' : type;
+        callback(true, type, noun);
+      })
+      .catch(error => {
+        callback(false);
+      });
   }
-
 }
