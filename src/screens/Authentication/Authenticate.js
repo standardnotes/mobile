@@ -87,6 +87,10 @@ export default class Authenticate extends Abstract {
   }
 
   submitPressed() {
+    if (this.activeSource && this.activeSource.isLocked()) {
+      return;
+    }
+
     /**
      * If we just pressed submit on the only pending source left, disable
      * submit button
@@ -187,7 +191,7 @@ export default class Authenticate extends Abstract {
       return;
     }
 
-    // Disable submit while we're processing. Will be re-enabled below.
+    /** Disable submit while we're processing. Will be re-enabled below. */
     this.setState({ submitDisabled: true });
 
     const result = await source.authenticate();
@@ -197,6 +201,7 @@ export default class Authenticate extends Abstract {
       this.forceUpdate();
     } else if (source.isLocked()) {
       this.onSourceLocked(source);
+      return;
     } else {
       if (result.error && result.error.message) {
         Alert.alert('Unsuccessful', result.error.message);
@@ -229,14 +234,14 @@ export default class Authenticate extends Abstract {
   /**
    * @private
    * When a source returns in a locked status we create a timeout for the lock
-   * period.
+   * period. This will auto reprompt the user for auth after the period is up.
    */
   onSourceLocked(source) {
     this.setState({ sourceLocked: true, submitDisabled: true });
 
     setTimeout(() => {
-      source.setWaitingForInput();
       this.setState({ sourceLocked: false, submitDisabled: false });
+      this.beginAuthenticationForSource(source);
       this.forceUpdate();
     }, source.lockTimeout);
   }

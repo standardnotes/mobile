@@ -1,19 +1,13 @@
-import React, { Component, Fragment } from 'react';
-import { ScrollView, View, Text, FlatList } from 'react-native';
-
-import ApplicationState from "@Lib/ApplicationState"
-
-/*
-  Because SideMenus (SideMenu and NoteSideMenu) are rendering by React Navigation as drawer components
-  on app startup, we can't give them params at will. We need a way for components like the Compose
-  screen to talk to the NoteSideMenu and give it the current note context. The only way seems to be
-  some shared singleton object, which is this.
-
-  This object will handle state for both side menus.
-*/
-
+/**
+ * Because SideMenus (SideMenu and NoteSideMenu) are rendering by React
+ * Navigation as drawer components on app startup, we can't give them params at
+ * will. We need a way for components like the Compose screen to talk to the
+ * NoteSideMenu and give it the current note context. The only way seems to be
+ * some shared singleton object, which is this.
+ *
+ * This object will handle state for both side menus.
+ */
 export default class SideMenuManager {
-
   static instance = null;
   static get() {
     if (this.instance == null) {
@@ -24,35 +18,41 @@ export default class SideMenuManager {
   }
 
   setLeftSideMenuReference(ref) {
-    // The ref handler of the main component sometimes passes null, then passes the correct reference
-    if(!this.leftSideMenu) {
+    /**
+     * The ref handler of the main component sometimes passes null, then passes
+     * the correct reference
+     */
+    if (!this.leftSideMenu) {
       this.leftSideMenu = ref;
     }
   }
 
   setRightSideMenuReference(ref) {
-    // The ref handler of the main component sometimes passes null, then passes the correct reference
-    if(!this.rightSideMenu) {
+    /**
+     * The ref handler of the main component sometimes passes null, then passes
+     * the correct reference
+     */
+    if (!this.rightSideMenu) {
       this.rightSideMenu = ref;
     }
   }
 
-  /*
-    @param handler.onEditorSelect
-    @param handler.onTagSelect
-    @param handler.getSelectedTags
-  */
+  /**
+   * @param handler.onEditorSelect
+   * @param handler.onTagSelect
+   * @param handler.getSelectedTags
+   */
   setHandlerForLeftSideMenu(handler) {
     this.leftSideMenuHandler = handler;
 
     return handler;
   }
 
-  /*
-    @param handler.onTagSelect
-    @param handler.getSelectedTags
-    @param handler.getCurrentNote
-  */
+  /**
+   * @param handler.onTagSelect
+   * @param handler.getSelectedTags
+   * @param handler.getCurrentNote
+   */
   setHandlerForRightSideMenu(handler) {
     this.rightSideMenuHandler = handler;
 
@@ -72,7 +72,7 @@ export default class SideMenuManager {
   removeHandlerForRightSideMenu(handler) {
     // In tablet switching mode, a new Compose window may be created before the first one unmounts.
     // If an old instance asks us to remove handler, we want to make sure it's not the new one
-    if(handler == this.rightSideMenuHandler) {
+    if (handler === this.rightSideMenuHandler) {
       this.rightSideMenuHandler = null;
     }
   }
@@ -92,5 +92,4 @@ export default class SideMenuManager {
   isRightSideMenuLocked() {
     return this.rightSideMenuLocked;
   }
-
 }

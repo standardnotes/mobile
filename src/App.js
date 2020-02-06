@@ -41,7 +41,7 @@ import StyleKit from '@Style/StyleKit';
 if (__DEV__ === false) {
   const bugsnag = new Client();
 
-  // Disable console.log for non-dev builds
+  /** Disable console.log for non-dev builds */
   console.log = () => {};
 }
 
@@ -80,9 +80,9 @@ const AppDrawerStack = createDrawerNavigator(
         openRightDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
         closeRightDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
         lockRightDrawer: lock => {
-          // this is the key part
+          /** This is the key part */
           SideMenuManager.get().setLockedForRightSideMenu(lock);
-          // We have to return something
+          /** We have to return something. */
           return NavigationActions.setParams({
             params: { dummy: true },
             key: route.key,
@@ -159,9 +159,9 @@ const DrawerStack = createDrawerNavigator(
         openLeftDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
         closeLeftDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
         lockLeftDrawer: lock => {
-          // this is the key part
+          /** This is the key part. */
           SideMenuManager.get().setLockedForLeftSideMenu(lock);
-          // We have to return something
+          /** We have to return something. */
           return NavigationActions.setParams({
             params: { dummy: true },
             key: route.key,

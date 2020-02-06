@@ -12,6 +12,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
     super.initializeForInterface();
 
     KeysManager.getDeviceBiometricsAvailability((available, type, noun) => {
+      this.isReady = true;
       this.isAvailable = available;
       this.biometricsType = type;
       this.biometricsNoun = noun;
@@ -32,7 +33,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
   }
 
   get title() {
-    return this.biometricsType;
+    return this.biometricsType || 'Biometrics';
   }
 
   get isFingerprint() {
@@ -78,7 +79,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
   }
 
   async authenticate() {
-    if (!this.isAvailable) {
+    if (this.isReady && !this.isAvailable) {
       this.didFail();
       return {
         success: false,
@@ -92,6 +93,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
 
     if (Platform.OS === 'android') {
       return FingerprintScanner.authenticate({
+        deviceCredentialAllowed: true,
         description: 'Biometrics are required to access your notes.',
       })
         .then(() => {
@@ -102,6 +104,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
 
           if (error.name === 'DeviceLocked') {
             this.setLocked();
+            FingerprintScanner.release();
             return this._fail(
               'Authentication failed. Wait 30 seconds to try again.'
             );
