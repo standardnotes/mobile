@@ -17,7 +17,7 @@ export function isMatchCaseInsensitive(a, b) {
  * Returns a Date object from a JSON stringifed date
  */
 export function dateFromJsonString(str) {
-  if(str) {
+  if (str) {
     return new Date(JSON.parse(str));
   }
 

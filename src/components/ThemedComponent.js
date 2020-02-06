@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
-import StyleKit from "@Style/StyleKit"
+import { Component } from 'react';
+import StyleKit from '@Style/StyleKit';
 
 export default class ThemedComponent extends Component {
-
   constructor(props) {
     super(props);
 
@@ -24,12 +23,7 @@ export default class ThemedComponent extends Component {
     this.updateStyles();
   }
 
-  loadStyles() {
+  loadStyles() {}
 
-  }
-
-  updateStyles() {
-
-  }
-
+  updateStyles() {}
 }

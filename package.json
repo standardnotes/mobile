@@ -27,6 +27,7 @@
     "react-native": "0.61.5",
     "react-native-dark-mode": "^0.2.1",
     "react-native-file-viewer": "^2.0.0",
+    "react-native-fingerprint-scanner": "https://github.com/standardnotes/react-native-fingerprint-scanner.git#5984941f452e978da9d18f8ad324a16b0b459580",
     "react-native-fs": "^2.16.2",
     "react-native-gesture-handler": "^1.5.2",
     "react-native-keychain": "^4.0.1",

@@ -40,7 +40,6 @@ target 'StandardNotes' do
 
   pod 'SNReactNative', :path => '../vendor/standard-notes-rn'
   pod 'react-native-aes', :path => '../vendor/react-native-aes'
-  pod 'react-native-fingerprint-scanner', :path => '../vendor/react-native-fingerprint-scanner'
   pod 'ReactNativeAlternateIcons', :path => '../vendor/react-native-alternate-icons'
   pod 'react-native-mail', :path => '../vendor/react-native-mail'
 

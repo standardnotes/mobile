@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.facebook.react.ReactApplication;
-import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 import com.kristiansorens.flagsecure.FlagSecure;
 import com.kristiansorens.flagsecure.FlagSecurePackage;
 import com.facebook.react.ReactNativeHost;
@@ -44,7 +43,6 @@ public class MainApplication extends Application implements ReactApplication {
 
       packages.add(new RCTAesPackage());
       packages.add(new RNMail());
-      packages.add(new ReactNativeFingerprintScannerPackage());
       packages.add(new SNTextViewPackage());
       packages.add(new FlagSecurePackage());
       packages.add(new SNReactNativePackage());

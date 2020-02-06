@@ -18,8 +18,5 @@ project(':react-native-aes-crypto').projectDir = new File(rootProject.projectDir
 include ':RNMail'
 project(':RNMail').projectDir = new File(rootProject.projectDir, '../vendor/react-native-mail/android/')
 
-include ':react-native-fingerprint-scanner'
-project(':react-native-fingerprint-scanner').projectDir = new File(rootProject.projectDir, '../vendor/react-native-fingerprint-scanner/android/')
-
 include ':react-native-flag-secure-android'
 project(':react-native-flag-secure-android').projectDir = new File(rootProject.projectDir, '../vendor/react-native-flag-secure-android/android/')

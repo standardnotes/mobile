@@ -7,9 +7,6 @@
 [submodule "vendor/react-native-mail"]
 	path = vendor/react-native-mail
 	url = git@github.com:standardnotes/react-native-mail.git
-[submodule "vendor/react-native-fingerprint-scanner"]
-	path = vendor/react-native-fingerprint-scanner
-	url = git@github.com:standardnotes/react-native-fingerprint-scanner.git
 [submodule "vendor/react-native-flag-secure-android"]
 	path = vendor/react-native-flag-secure-android
 	url = git@github.com:standardnotes/react-native-flag-secure-android.git
