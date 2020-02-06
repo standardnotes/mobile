@@ -7,6 +7,10 @@
   "rules": {
     "no-throw-literal": 0,
     "no-console": "error",
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
     "react/jsx-filename-extension": [
       1,
       {
