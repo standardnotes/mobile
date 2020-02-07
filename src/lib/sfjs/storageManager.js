@@ -1,9 +1,9 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import AlertManager from './alertManager';
+import AlertManager from '@Lib/sfjs/alertManager';
+import { isNullOrUndefined } from '@Lib/utils';
 
 export default class Storage extends SFStorageManager {
-
   static instance = null;
 
   static get() {
@@ -16,21 +16,21 @@ export default class Storage extends SFStorageManager {
 
   constructor() {
     super();
-    this.isAndroid = Platform.OS == 'android';
-    this.platformString = this.isAndroid ? "Android" : "iOS";
+    this.isAndroid = Platform.OS === 'android';
+    this.platformString = this.isAndroid ? 'Android' : 'iOS';
   }
 
   async getItem(key) {
     try {
       return AsyncStorage.getItem(key);
     } catch (error) {
-      console.log("Error getting item", error);
+      console.log('Error getting item', error);
       return null;
     }
   }
 
   async getMultiItems(keys) {
-    return AsyncStorage.multiGet(keys).then((stores) => {
+    return AsyncStorage.multiGet(keys).then(stores => {
       var items = {};
       stores.map((result, i, store) => {
         let key = store[i][0];
@@ -42,13 +42,13 @@ export default class Storage extends SFStorageManager {
   }
 
   async setItem(key, value) {
-    if(value == null || value == undefined || key == null || key == undefined) {
+    if (isNullOrUndefined(value) || isNullOrUndefined(key)) {
       return;
     }
     try {
       return AsyncStorage.setItem(key, value);
     } catch (error) {
-      console.log("Error setting item", error);
+      console.log('Error setting item', error);
       return null;
     }
   }
@@ -66,21 +66,19 @@ export default class Storage extends SFStorageManager {
   }
 
   // Models
-
-
   async getAllModels() {
-    const itemsFromStores = (stores) => {
-      let items = [];
+    const itemsFromStores = stores => {
+      const items = [];
       stores.map((result, i, store) => {
-        let key = store[i][0];
-        let value = store[i][1];
-        if(value) {
+        const key = store[i][0];
+        const value = store[i][1];
+        if (value) {
           items.push(JSON.parse(value));
         }
-      })
+      });
 
       return items;
-    }
+    };
 
     /*
     As of react-native-asyncstorage 1.4.0:
@@ -124,32 +122,32 @@ export default class Storage extends SFStorageManager {
     https://github.com/react-native-community/react-native-async-storage/issues/106
     */
 
-    let keys = await this.getAllModelKeys();
+    const keys = await this.getAllModelKeys();
     let items = [];
-    let failedItemIds = [];
-    if(this.isAndroid) {
-      for(let key of keys) {
+    const failedItemIds = [];
+    if (this.isAndroid) {
+      for (const key of keys) {
         try {
-          let item = await AsyncStorage.getItem(key);
-          if(item) {
+          const item = await AsyncStorage.getItem(key);
+          if (item) {
             items.push(JSON.parse(item));
           }
         } catch (e) {
-          let id = key.replace("Item-", "");
+          const id = key.replace('Item-', '');
           failedItemIds.push(id);
-          console.log("Error getting item", key, e);
+          console.log('Error getting item', key, e);
         }
       }
     } else {
       try {
         let stores = await AsyncStorage.multiGet(keys);
         items = items.concat(itemsFromStores(stores));
-      } catch(e) {
-        console.log("Error getting items", keys, e);
+      } catch (e) {
+        console.log('Error getting items', keys, e);
       }
     }
 
-    if(failedItemIds.length > 0) {
+    if (failedItemIds.length > 0) {
       this.showLoadFailForItemIds(failedItemIds);
     }
 
@@ -159,26 +157,26 @@ export default class Storage extends SFStorageManager {
   showLoadFailForItemIds(failedItemIds) {
     let text = `The following items could not be loaded. This may happen if you are in low-memory conditions, or if the note is very large in size. For compatibility with ${this.platformString}, we recommend breaking up large notes into smaller chunks using the desktop or web app.\n\nItems:\n`
     let index = 0;
-    text += failedItemIds.map((id) => {
+    text += failedItemIds.map(id => {
       let result = id;
-      if(index != failedItemIds.length - 1) {
-        result += "\n";
+      if (index !== failedItemIds.length - 1) {
+        result += '\n';
       }
       index++;
       return result;
-    })
-    AlertManager.get().alert({title: "Unable to load item", text: text})
+    });
+    AlertManager.get().alert({ title: 'Unable to load item', text: text });
   }
 
   keyForItem(item) {
-    return "Item-" + item.uuid;
+    return 'Item-' + item.uuid;
   }
 
   async getAllModelKeys() {
-    var keys = await AsyncStorage.getAllKeys();
-    var filtered = keys.filter((key) => {
-      return key.includes("Item-");
-    })
+    const keys = await AsyncStorage.getAllKeys();
+    const filtered = keys.filter(key => {
+      return key.includes('Item-');
+    });
     return filtered;
   }
 
@@ -192,13 +190,18 @@ export default class Storage extends SFStorageManager {
     Each item is saved individually.
   */
   async saveModels(items) {
-    if(!items || items.length == 0) {
+    if (!items || items.length === 0) {
       return;
     }
 
-    return Promise.all(items.map((item) => {
-      return AsyncStorage.setItem(this.keyForItem(item), JSON.stringify(item));
-    }));
+    return Promise.all(
+      items.map(item => {
+        return AsyncStorage.setItem(
+          this.keyForItem(item),
+          JSON.stringify(item)
+        );
+      })
+    );
   }
 
   async deleteModel(item) {
@@ -206,7 +209,7 @@ export default class Storage extends SFStorageManager {
   }
 
   async clearAllModels(callback) {
-    var itemKeys = await this.getAllModelKeys();
+    const itemKeys = await this.getAllModelKeys();
     return AsyncStorage.multiRemove(itemKeys);
   }
 }

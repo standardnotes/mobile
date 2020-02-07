@@ -6,7 +6,7 @@
   "parser": "babel-eslint",
   "rules": {
     "no-throw-literal": 0,
-    "no-console": "error",
+    // "no-console": "error",
     "comma-dangle": [
       "error",
       "never"

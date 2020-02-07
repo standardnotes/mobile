@@ -1,10 +1,10 @@
-import { NativeModules, Platform } from 'react-native';
-import { StandardFile, SFAbstractCrypto, SFItemTransformer } from 'standard-file-js';
-var base64 = require('base-64');
-var Aes = NativeModules.Aes;
+import { NativeModules } from 'react-native';
+import { StandardFile, SFAbstractCrypto } from 'standard-file-js';
+
+const base64 = require('base-64');
+const Aes = NativeModules.Aes;
 
 export default class SF extends StandardFile {
-
   static instance = null;
   static get() {
     if (this.instance == null) {
@@ -23,9 +23,8 @@ export default class SF extends StandardFile {
 }
 
 class SFReactNativeCrypto extends SFAbstractCrypto {
-
   async generateUUID() {
-    return Aes.randomUuid().then((uuid) => {
+    return Aes.randomUuid().then(uuid => {
       return uuid.toLowerCase();
     });
   }
@@ -36,14 +35,14 @@ class SFReactNativeCrypto extends SFAbstractCrypto {
   }
 
   async decryptText({ciphertextToAuth, contentCiphertext, encryptionKey, iv, authHash, authKey} = {}, requiresAuth) {
-    if(requiresAuth && !authHash) {
+    if (requiresAuth && !authHash) {
       console.log("Auth hash is required.");
       return;
     }
 
-    if(authHash) {
+    if (authHash) {
       var localAuthHash = await Aes.hmac256(ciphertextToAuth, authKey);
-      if(authHash !== localAuthHash) {
+      if (authHash !== localAuthHash) {
         console.log("Auth hash does not match, returning null.");
         return null;
       }

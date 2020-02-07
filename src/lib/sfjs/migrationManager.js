@@ -1,12 +1,12 @@
-import ModelManager from "@SFJS/modelManager";
-import Sync from "@SFJS/syncManager";
-import Storage from "@SFJS/storageManager";
-import Auth from "@SFJS/authManager";
-import PrivilegesManager from "@SFJS/privilegesManager"
-var base64 = require('base-64');
+import Auth from '@SFJS/authManager';
+import ModelManager from '@SFJS/modelManager';
+import PrivilegesManager from '@SFJS/privilegesManager';
+import Storage from '@SFJS/storageManager';
+import Sync from '@SFJS/syncManager';
+
+const base64 = require('base-64');
 
 export default class MigrationManager extends SFMigrationManager {
-
   static instance = null;
 
   static get() {
@@ -27,10 +27,7 @@ export default class MigrationManager extends SFMigrationManager {
   }
 
   registeredMigrations() {
-    return [
-      this.downloadPrivileges(),
-      this.downloadSmartTags()
-    ];
+    return [this.downloadPrivileges(), this.downloadSmartTags()];
   }
 
   /*
@@ -40,64 +37,74 @@ export default class MigrationManager extends SFMigrationManager {
   */
 
   downloadPrivileges() {
-    let contentType = "SN|Privileges";
+    let contentType = 'SN|Privileges';
     return {
-      name: "dl-all-to-get-privs",
+      name: 'dl-all-to-get-privs',
       runOnlyOnce: true,
       customHandler: async () => {
-        if(Auth.get().offline()) {
+        if (Auth.get().offline()) {
           return;
         }
 
         let options = { contentType: contentType };
 
         // The user is signed in
-        Sync.get().stateless_downloadAllItems(options).then(async (items) => {
-          let matchingPrivs = items.filter((candidate) => {
-            return candidate.content_type == contentType;
+        Sync.get()
+          .stateless_downloadAllItems(options)
+          .then(async items => {
+            const matchingPrivs = items.filter(candidate => {
+              return candidate.content_type === contentType;
+            });
+
+            if (matchingPrivs.length === 0) {
+              return;
+            }
+
+            const mapped = await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
+              matchingPrivs,
+              null,
+              SFModelManager.MappingSourceRemoteRetrieved
+            );
+            // Singleton manager usually resolves singletons on sync completion callback,
+            // but since we're manually mapping, we have to make it manually resolve singletons
+            PrivilegesManager.get().singletonManager.resolveSingletons(mapped);
           });
-
-          if(matchingPrivs.length == 0) {
-            return;
-          }
-
-          let mapped = await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
-            matchingPrivs, null, SFModelManager.MappingSourceRemoteRetrieved);
-          // Singleton manager usually resolves singletons on sync completion callback,
-          // but since we're manually mapping, we have to make it manually resolve singletons
-          PrivilegesManager.get().singletonManager.resolveSingletons(mapped);
-        })
       }
-    }
+    };
   }
 
   downloadSmartTags() {
-    let contentType = "SN|SmartTag";
+    const contentType = 'SN|SmartTag';
     return {
-      name: "dl-smart-tags",
+      name: 'dl-smart-tags',
       runOnlyOnce: true,
       customHandler: async () => {
-        if(Auth.get().offline()) {
+        if (Auth.get().offline()) {
           return;
         }
 
-        let options = { contentType: contentType };
+        const options = { contentType: contentType };
 
         // The user is signed in
-        Sync.get().stateless_downloadAllItems(options).then(async (items) => {
-          let matchingTags = items.filter((candidate) => {
-            return candidate.content_type == contentType;
+        Sync.get()
+          .stateless_downloadAllItems(options)
+          .then(async items => {
+            let matchingTags = items.filter(candidate => {
+              return candidate.content_type === contentType;
+            });
+
+            if (matchingTags.length === 0) {
+              return;
+            }
+
+            await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
+              matchingTags,
+              null,
+              SFModelManager.MappingSourceRemoteRetrieved
+            );
           });
-
-          if(matchingTags.length == 0) {
-            return;
-          }
-
-          await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
-            matchingTags, null, SFModelManager.MappingSourceRemoteRetrieved);
-        })
       }
-    }
+    };
   }
 
   /* Overrides */

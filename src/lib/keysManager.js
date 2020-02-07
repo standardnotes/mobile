@@ -1,13 +1,14 @@
 import { Platform } from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-
-import SF from './sfjs/sfjs';
-import ModelManager from './sfjs/modelManager';
-import Storage from './sfjs/storageManager';
-import AlertManager from '@SFJS/alertManager';
-import Keychain from './keychain';
 import SNReactNative from 'standard-notes-rn';
+
+import Keychain from '@Lib/keychain';
+import { isNullOrUndefined } from '@Lib/utils';
+import AlertManager from '@SFJS/alertManager';
+import ModelManager from '@SFJS/modelManager';
+import SF from '@SFJS/sfjs';
+import Storage from '@SFJS/storageManager';
 
 const OfflineParamsKey = 'pc_params';
 const EncryptedAccountKeysKey = 'encrypted_account_keys';
@@ -86,7 +87,7 @@ export default class KeysManager {
       EncryptedAccountKeysKey,
       FirstRunKey,
       StorageEncryptionKey,
-      BiometricsPrefs,
+      BiometricsPrefs
     ];
 
     /*
@@ -134,10 +135,7 @@ export default class KeysManager {
           }
 
           // storage encryption
-          if (
-            items[StorageEncryptionKey] == null ||
-            items[StorageEncryptionKey] == undefined
-          ) {
+          if (isNullOrUndefined(items[StorageEncryptionKey])) {
             // default is true
             // Note that this defaults to true, but doesn't dictate if it's actually applied.
             // For example, when you first install the app and have no account and no passcode,
@@ -157,7 +155,7 @@ export default class KeysManager {
           } else {
             this.user = {};
           }
-        }),
+        })
     ]).then(async () => {
       // We only want to run migrations in unlocked app state. If account keys are present, run now,
       // otherwise wait until offline keys have been set so that account keys are decrypted.
@@ -204,7 +202,7 @@ export default class KeysManager {
       },
       onCancel: () => {
         SNReactNative.exitApp();
-      },
+      }
     });
   }
 
@@ -285,7 +283,7 @@ export default class KeysManager {
 
     if (this.offlineKeys) {
       _.merge(value, {
-        offline: { pw: this.offlineKeys.pw, timing: this.passcodeTiming },
+        offline: { pw: this.offlineKeys.pw, timing: this.passcodeTiming }
       });
     }
 
@@ -431,7 +429,7 @@ export default class KeysManager {
            The value of offlineAuthParams is stale. We want to delete it.
       */
 
-      console.log("offlineAuthParams is stale, deleting");
+      console.log('offlineAuthParams is stale, deleting');
       await Storage.get().removeItem(OfflineParamsKey);
     }
   }
@@ -477,7 +475,10 @@ export default class KeysManager {
   async clearOfflineKeysAndData(force = false) {
     // make sure user is authenticated before performing this step
     if (this.offlineKeys && !this.offlineKeys.mk && !force) {
-      alert("Unable to remove passcode. Make sure you are properly authenticated and try again.");
+      // eslint-disable-next-line no-alert
+      alert(
+        'Unable to remove passcode. Make sure you are properly authenticated and try again.'
+      );
       return false;
     }
     this.offlineKeys = null;
@@ -508,7 +509,7 @@ export default class KeysManager {
       // itemTransformer modifies in place. this.encryptedAccountKeys should now be decrypted
       let decryptedKeys = new SFItem(this.encryptedAccountKeys);
       if (decryptedKeys.errorDecrypting) {
-        console.error("Fatal: Error decrypting account keys");
+        console.error('Fatal: Error decrypting account keys');
       } else {
         this.accountKeys = decryptedKeys.content.accountKeys;
         this.encryptedAccountKeys = null;
@@ -564,13 +565,13 @@ export default class KeysManager {
       {
         title: 'Immediately',
         key: 'immediately',
-        selected: this.passcodeTiming === 'immediately',
+        selected: this.passcodeTiming === 'immediately'
       },
       {
         title: 'On Quit',
         key: 'on-quit',
-        selected: this.passcodeTiming === 'on-quit',
-      },
+        selected: this.passcodeTiming === 'on-quit'
+      }
     ];
   }
 
@@ -579,13 +580,13 @@ export default class KeysManager {
       {
         title: 'Immediately',
         key: 'immediately',
-        selected: this.biometricPrefs.timing === 'immediately',
+        selected: this.biometricPrefs.timing === 'immediately'
       },
       {
         title: 'On Quit',
         key: 'on-quit',
-        selected: this.biometricPrefs.timing === 'on-quit',
-      },
+        selected: this.biometricPrefs.timing === 'on-quit'
+      }
     ];
   }
 
