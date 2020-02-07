@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import {DeviceEventEmitter, Modal, View, Text} from 'react-native';
-import StyleKit from "@Style/StyleKit";
-import PlatformStyles from "../models/PlatformStyles";
+import { View, Text } from 'react-native';
+import PlatformStyles from '@Root/models/PlatformStyles';
+import StyleKit from '@Style/StyleKit';
 
 export default class HeaderTitleView extends Component {
-
   constructor(props) {
     super(props);
   }
@@ -13,57 +12,60 @@ export default class HeaderTitleView extends Component {
     let styles = this.getStyles();
 
     let subtitleStyles = styles.get('headerSubtitle');
-    if(this.props.subtitleColor) {
+    if (this.props.subtitleColor) {
       subtitleStyles[0].color = this.props.subtitleColor;
       subtitleStyles[0].opacity = 1.0;
     }
 
     return (
       <View style={styles.get('headerContainer')}>
-
         <Text style={styles.get('headerTitle')}>{this.props.title}</Text>
 
-        {this.props.subtitle &&
-          <Text numberOfLines={1} style={subtitleStyles} adjustsFontSizeToFit={true}>
+        {this.props.subtitle && (
+          <Text
+            numberOfLines={1}
+            style={subtitleStyles}
+            adjustsFontSizeToFit={true}
+          >
             {this.props.subtitle}
           </Text>
-        }
+        )}
       </View>
-    )
+    );
   }
 
   getStyles() {
     return new PlatformStyles({
       headerContainer: {
-        backgroundColor: StyleKit.variable("stylekitContrastBackgroundColor"),
+        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         flex: 1,
         justifyContent: 'flex-start',
-        flexDirection: "column"
+        flexDirection: 'column'
       },
 
       headerContainerAndroid: {
-        alignItems: 'flex-start',
+        alignItems: 'flex-start'
       },
 
       headerTitle: {
-        color: StyleKit.variable("stylekitForegroundColor"),
-        fontWeight: "bold",
+        color: StyleKit.variables.stylekitForegroundColor,
+        fontWeight: 'bold',
         fontSize: 18,
-        textAlign: "center",
+        textAlign: 'center'
       },
 
       headerSubtitle: {
-        color: StyleKit.variable("stylekitForegroundColor"),
+        color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.6,
-        fontSize: 12,
+        fontSize: 12
       },
 
       headerSubtitleIOS: {
-        textAlign: "center",
+        textAlign: 'center'
       },
 
       headerSubtitleAndroid: {
-        fontSize: 13,
+        fontSize: 13
       }
     });
   }
