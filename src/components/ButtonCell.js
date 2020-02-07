@@ -39,7 +39,8 @@ export default class ButtonCell extends SectionedTableCell {
           ...this.rules()
         ]}
         disabled={this.props.disabled}
-        onPress={this.props.onPress}>
+        onPress={this.props.onPress}
+      >
         <View>
           <Text style={this.buttonRules()}>{this.props.title}</Text>
           {this.props.children && this.props.children}
