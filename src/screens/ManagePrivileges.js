@@ -1,18 +1,10 @@
-import React, { Component } from 'react';
-import {
-  TextInput,
-  View,
-  Text,
-  Platform,
-  ScrollView
-} from 'react-native';
+import React from 'react';
+import { View, Text, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import ButtonCell from '@Components/ButtonCell';
 import SectionHeader from '@Components/SectionHeader';
 import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
-import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
 import SectionedTableCell from '@Components/SectionedTableCell';
-import TableSection from '@Components/TableSection';
 import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
@@ -23,16 +15,21 @@ import { ICON_CHECKMARK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
 export default class ManagePrivileges extends Abstract {
-
   static navigationOptions = ({ navigation, navigationOptions }) => {
     const templateOptions = {
-      title: "Privileges",
+      title: 'Privileges',
       leftButton: {
-        title: ApplicationState.isIOS ? "Done" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CHECKMARK),
+        title: ApplicationState.isIOS ? 'Done' : null,
+        iconName: ApplicationState.isIOS
+          ? null
+          : StyleKit.nameForIcon(ICON_CHECKMARK)
       }
-    }
-    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
+    };
+    return Abstract.getDefaultNavigationOptions({
+      navigation,
+      navigationOptions,
+      templateOptions
+    });
   };
 
   constructor(props) {
@@ -41,17 +38,19 @@ export default class ManagePrivileges extends Abstract {
     this.state = {
       availableActions: [],
       availableCredentials: []
-    }
+    };
 
     props.navigation.setParams({
       leftButton: {
-        title: ApplicationState.isIOS ? "Done" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CHECKMARK),
+        title: ApplicationState.isIOS ? 'Done' : null,
+        iconName: ApplicationState.isIOS
+          ? null
+          : StyleKit.nameForIcon(ICON_CHECKMARK),
         onPress: () => {
           this.dismiss();
         }
       }
-    })
+    });
 
     this.hasPasscode = KeysManager.get().hasOfflinePasscode();
     this.hasAccount = !Auth.get().offline();
@@ -68,40 +67,50 @@ export default class ManagePrivileges extends Abstract {
   }
 
   isCredentialRequiredForAction(action, credential) {
-    if(!this.privileges) {
+    if (!this.privileges) {
       return false;
     }
     return this.privileges.isCredentialRequiredForAction(action, credential);
   }
 
   clearSession = () => {
-    PrivilegesManager.get().clearSession().then(() => {
-      this.reloadPrivileges();
-    })
-  }
+    PrivilegesManager.get()
+      .clearSession()
+      .then(() => {
+        this.reloadPrivileges();
+      });
+  };
 
   async reloadPrivileges() {
     this.privileges = await PrivilegesManager.get().getPrivileges();
-    let availableCredentials = PrivilegesManager.get().getAvailableCredentials();
-    let availableActions = PrivilegesManager.get().getAvailableActions();
+    const availableCredentials = PrivilegesManager.get().getAvailableCredentials();
+    const availableActions = PrivilegesManager.get().getAvailableActions();
 
-    let notConfiguredCredentials = [];
-    let hasLocalAuth = KeysManager.get().hasOfflinePasscode() || KeysManager.get().hasBiometrics();
-    let offline = Auth.get().offline();
-    for(let credential of availableCredentials) {
-      if(credential == PrivilegesManager.CredentialLocalPasscode && !hasLocalAuth) {
+    const notConfiguredCredentials = [];
+    const hasLocalAuth =
+      KeysManager.get().hasOfflinePasscode() ||
+      KeysManager.get().hasBiometrics();
+    const offline = Auth.get().offline();
+    for (const credential of availableCredentials) {
+      if (
+        credential === PrivilegesManager.CredentialLocalPasscode &&
+        !hasLocalAuth
+      ) {
         notConfiguredCredentials.push(credential);
-      } else if(credential == PrivilegesManager.CredentialAccountPassword && offline) {
+      } else if (
+        credential === PrivilegesManager.CredentialAccountPassword &&
+        offline
+      ) {
         notConfiguredCredentials.push(credential);
       }
     }
 
     this.credentialDisplayInfo = {};
-    for(let cred of availableCredentials) {
+    for (const cred of availableCredentials) {
       this.credentialDisplayInfo[cred] = this.displayInfoForCredential(cred);
     }
 
-    let sessionEndDate = await PrivilegesManager.get().getSessionExpirey();
+    const sessionEndDate = await PrivilegesManager.get().getSessionExpirey();
     this.setState({
       availableActions: availableActions,
       availableCredentials: availableCredentials,
@@ -117,21 +126,22 @@ export default class ManagePrivileges extends Abstract {
     this.forceUpdate();
   }
 
-  credentialUnavailable = (credential) => {
+  credentialUnavailable = credential => {
     return this.state.notConfiguredCredentials.includes(credential);
-  }
+  };
 
   render() {
-    if(this.state.lockContent) {
-      return (<LockedView />);
+    if (this.state.lockContent) {
+      return <LockedView />;
     }
 
     return (
-      <SafeAreaView style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView
+        style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}
+      >
         <ScrollView>
-
           <View style={this.styles.section}>
-            <SectionHeader title={"About Privileges"} />
+            <SectionHeader title={'About Privileges'} />
             <SectionedTableCell first={true} last={true}>
               <Text style={[this.styles.aboutText, this.styles.cellText]}>
                 Privileges represent interface level authentication for accessing certain items and features. Privileges are meant to protect against unwanted access in the event of an unlocked application, but do not affect data encryption state.
@@ -142,36 +152,54 @@ export default class ManagePrivileges extends Abstract {
             </SectionedTableCell>
           </View>
 
-          {this.state.sessionExpirey && !this.state.sessionExpired &&
+          {this.state.sessionExpirey && !this.state.sessionExpired && (
             <View style={this.styles.section}>
-              <SectionHeader title={"Current Session"} />
+              <SectionHeader title={'Current Session'} />
               <SectionedTableCell first={true}>
                 <Text style={[this.styles.cellText]}>
                   You will not be asked to authenticate until {this.state.sessionExpirey}.
                 </Text>
               </SectionedTableCell>
-              <ButtonCell last={true} leftAligned={true} title={`Clear Local Session`} onPress={this.clearSession} />
-            </View>
-          }
-
-          {this.state.availableActions.map((action, actionIndex) =>
-            <View style={this.styles.section} key={`${actionIndex}`}>
-              <SectionHeader title={this.displayInfoForAction(action)} />
-              {this.state.availableCredentials.map((credential, credIndex) =>
-                <SectionedAccessoryTableCell
-                  text={this.displayInfoForCredential(credential) + (this.credentialUnavailable(credential) ? ' (Not Configured)' : '')}
-                  key={`${actionIndex}+${credIndex}`}
-                  first={credIndex == 0}
-                  disabled={this.credentialUnavailable(credential)}
-                  dimmed={this.credentialUnavailable(credential)}
-                  last={credIndex == this.state.availableCredentials.length - 1}
-                  selected={() => {return this.isCredentialRequiredForAction(action, credential)}}
-                  onPress={() => {this.valueChanged(action, credential)}}
-                />
-              )}
+              <ButtonCell
+                last={true}
+                leftAligned={true}
+                title={'Clear Local Session'}
+                onPress={this.clearSession}
+              />
             </View>
           )}
 
+          {this.state.availableActions.map((action, actionIndex) => (
+            <View style={this.styles.section} key={`${actionIndex}`}>
+              <SectionHeader title={this.displayInfoForAction(action)} />
+              {this.state.availableCredentials.map((credential, credIndex) => (
+                <SectionedAccessoryTableCell
+                  text={
+                    this.displayInfoForCredential(credential) +
+                    (this.credentialUnavailable(credential)
+                      ? ' (Not Configured)'
+                      : '')
+                  }
+                  key={`${actionIndex}+${credIndex}`}
+                  first={credIndex === 0}
+                  disabled={this.credentialUnavailable(credential)}
+                  dimmed={this.credentialUnavailable(credential)}
+                  last={
+                    credIndex === this.state.availableCredentials.length - 1
+                  }
+                  selected={() => {
+                    return this.isCredentialRequiredForAction(
+                      action,
+                      credential
+                    );
+                  }}
+                  onPress={() => {
+                    this.valueChanged(action, credential);
+                  }}
+                />
+              ))}
+            </View>
+          ))}
         </ScrollView>
       </SafeAreaView>
     );
@@ -185,12 +213,11 @@ export default class ManagePrivileges extends Abstract {
       cellText: {
         lineHeight: 19,
         fontSize: 16,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: StyleKit.variables.stylekitForegroundColor
       },
       aboutText: {
         marginBottom: 8
       }
-    }
+    };
   }
-
 }

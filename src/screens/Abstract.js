@@ -1,100 +1,138 @@
-import React, { Component } from 'react';
-import {DeviceEventEmitter, Modal, View, Text} from 'react-native';
-import StyleKit from "@Style/StyleKit";
-import ApplicationState from "@Lib/ApplicationState"
-import HeaderTitleView from "@Components/HeaderTitleView"
-import HeaderButtons, { HeaderButton, Item } from 'react-navigation-header-buttons';
+import React from 'react';
+import HeaderButtons, {
+  HeaderButton,
+  Item
+} from 'react-navigation-header-buttons';
 import Icon from 'react-native-vector-icons/Ionicons';
-import ThemedComponent from "@Components/ThemedComponent";
-import PrivilegesManager from "@SFJS/privilegesManager"
+import HeaderTitleView from '@Components/HeaderTitleView';
+import ThemedComponent from '@Components/ThemedComponent';
+import ApplicationState from '@Lib/ApplicationState';
+import PrivilegesManager from '@SFJS/privilegesManager';
+import StyleKit from '@Style/StyleKit';
 
 const IoniconsHeaderButton = passMeFurther => (
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
   // and it is important to pass those props to `HeaderButton`
   // then you may add some information like icon size or color (if you use icons)
-  <HeaderButton {...passMeFurther} IconComponent={Icon} iconSize={30} color={StyleKit.variable("stylekitInfoColor")} />
+  <HeaderButton
+    {...passMeFurther}
+    IconComponent={Icon}
+    iconSize={30}
+    color={StyleKit.variables.stylekitInfoColor}
+  />
 );
 
 export default class Abstract extends ThemedComponent {
-
-  static getDefaultNavigationOptions = ({ navigation, navigationOptions, templateOptions }) => {
+  static getDefaultNavigationOptions = ({
+    navigation,
+    navigationOptions,
+    templateOptions
+  }) => {
     // templateOptions allow subclasses to specifiy things they want to display in nav bar before it actually loads.
     // this way, things like title and the Done button in the top left are visible during transition
-    if(!templateOptions) { templateOptions = {}; }
+    if (!templateOptions) {
+      templateOptions = {};
+    }
     let options = {
-      headerTitle:<HeaderTitleView
-        title={navigation.getParam("title") || templateOptions.title}
-        subtitle={navigation.getParam("subtitle") || templateOptions.subtitle}
-        subtitleColor={navigation.getParam("subtitleColor")}
-      />,
+      headerTitle: (
+        <HeaderTitleView
+          title={navigation.getParam('title') || templateOptions.title}
+          subtitle={navigation.getParam('subtitle') || templateOptions.subtitle}
+          subtitleColor={navigation.getParam('subtitleColor')}
+        />
+      ),
       headerStyle: {
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
         borderBottomWidth: 1
       },
-      headerTintColor: StyleKit.variable("stylekitInfoColor")
-    }
+      headerTintColor: StyleKit.variables.stylekitInfoColor
+    };
 
     let headerLeft, headerRight;
-    let leftButton = navigation.getParam('leftButton') || templateOptions.leftButton;
-    if(leftButton) {
+    let leftButton =
+      navigation.getParam('leftButton') || templateOptions.leftButton;
+    if (leftButton) {
       headerLeft = (
         <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-          <Item disabled={leftButton.disabled} title={leftButton.title} iconName={leftButton.iconName} onPress={leftButton.onPress} />
+          <Item
+            disabled={leftButton.disabled}
+            title={leftButton.title}
+            iconName={leftButton.iconName}
+            onPress={leftButton.onPress}
+          />
         </HeaderButtons>
-      )
+      );
 
       options.headerLeft = headerLeft;
     }
 
-    let rightButton = navigation.getParam('rightButton') || templateOptions.rightButton;
-    if(rightButton) {
+    let rightButton =
+      navigation.getParam('rightButton') || templateOptions.rightButton;
+    if (rightButton) {
       headerRight = (
         <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-          <Item disabled={rightButton.disabled} title={rightButton.title} iconName={rightButton.iconName} onPress={rightButton.onPress} />
+          <Item
+            disabled={rightButton.disabled}
+            title={rightButton.title}
+            iconName={rightButton.iconName}
+            onPress={rightButton.onPress}
+          />
         </HeaderButtons>
-      )
+      );
 
       options.headerRight = headerRight;
     }
 
     return options;
-  }
+  };
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
-    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions});
+    return Abstract.getDefaultNavigationOptions({
+      navigation,
+      navigationOptions
+    });
   };
 
   constructor(props) {
     super(props);
 
-    this.state = {lockContent: true};
+    this.state = { lockContent: true };
 
     this.listeners = [
-      this.props.navigation.addListener('willFocus', payload => {this.componentWillFocus();}),
-      this.props.navigation.addListener('didFocus', payload => {this.componentDidFocus();}),
-      this.props.navigation.addListener('willBlur', payload => {this.componentWillBlur();}),
-      this.props.navigation.addListener('didBlur', payload => {this.componentDidBlur();})
+      this.props.navigation.addListener('willFocus', payload => {
+        this.componentWillFocus();
+      }),
+      this.props.navigation.addListener('didFocus', payload => {
+        this.componentDidFocus();
+      }),
+      this.props.navigation.addListener('willBlur', payload => {
+        this.componentWillBlur();
+      }),
+      this.props.navigation.addListener('didBlur', payload => {
+        this.componentDidBlur();
+      })
     ];
 
-    this._stateObserver = ApplicationState.get().addStateObserver((state) => {
-      if(!this.isMounted()) {
+    this._stateObserver = ApplicationState.get().addStateObserver(state => {
+      if (!this.isMounted()) {
         return;
       }
 
-      if(state == ApplicationState.Unlocking) {
+      if (state === ApplicationState.Unlocking) {
         this.unlockContent();
       }
 
-      if(state == ApplicationState.Locking) {
+      if (state === ApplicationState.Locking) {
         this.lockContent();
       }
-    })
+    });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    let isSame = Abstract.IsDeepEqual(nextProps, this.props, null, ["navigation"])
-        && Abstract.IsDeepEqual(nextState, this.state);
+    let isSame =
+      Abstract.IsDeepEqual(nextProps, this.props, null, ['navigation']) &&
+      Abstract.IsDeepEqual(nextState, this.state);
     return !isSame;
   }
 
@@ -103,17 +141,17 @@ export default class Abstract extends ThemedComponent {
     try {
       // Navigator doesnt really use activeTheme. We pass it here just as a way to trigger
       // navigationOptions to reload.
-      this.props.navigation.setParams({activeTheme: StyleKit.get().activeTheme});
-    } catch {
-
-    }
+      this.props.navigation.setParams({
+        activeTheme: StyleKit.get().activeTheme
+      });
+    } catch {}
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
     this.willUnmount = true;
     this.mounted = false;
-    for(var listener of this.listeners) {
+    for (const listener of this.listeners) {
       listener.remove();
     }
     ApplicationState.get().removeStateObserver(this._stateObserver);
@@ -124,11 +162,11 @@ export default class Abstract extends ThemedComponent {
     this.mounted = true;
     this.configureNavBar(true);
 
-    if(ApplicationState.get().isUnlocked() && !this.loadedInitialState) {
+    if (ApplicationState.get().isUnlocked() && !this.loadedInitialState) {
       this.loadInitialState();
     }
 
-    if(this._renderOnMount) {
+    if (this._renderOnMount) {
       this._renderOnMount = false;
       this.forceUpdate();
 
@@ -143,9 +181,9 @@ export default class Abstract extends ThemedComponent {
   }
 
   componentWillFocus() {
-    this.willBeVisible = true
+    this.willBeVisible = true;
 
-    if(ApplicationState.get().isUnlocked() && this.state.lockContent) {
+    if (ApplicationState.get().isUnlocked() && this.state.lockContent) {
       this.unlockContent();
     }
   }
@@ -163,10 +201,12 @@ export default class Abstract extends ThemedComponent {
     this.visible = false;
   }
 
-  getProp = (prop) => {
+  getProp = prop => {
     // this.props.navigation could be undefined if we're in the drawer
-    return this.props.navigation.getParam && this.props.navigation.getParam(prop);
-  }
+    return (
+      this.props.navigation.getParam && this.props.navigation.getParam(prop)
+    );
+  };
 
   setTitle(title) {
     let options = {};
@@ -182,21 +222,24 @@ export default class Abstract extends ThemedComponent {
   }
 
   lockContent() {
-    this.mergeState({lockContent: true});
+    this.mergeState({ lockContent: true });
     this.configureNavBar();
   }
 
   unlockContent(callback) {
-    if(!this.loadedInitialState) {
+    if (!this.loadedInitialState) {
       this.loadInitialState();
     }
-    this.setState({lockContent: false}, () => {
+    this.setState({ lockContent: false }, () => {
       callback && callback();
     });
   }
 
   constructState(state) {
-    this.state = _.merge({lockContent: ApplicationState.get().isLocked()}, state);
+    this.state = _.merge(
+      { lockContent: ApplicationState.get().isLocked() },
+      state
+    );
   }
 
   mergeState(state) {
@@ -213,7 +256,7 @@ export default class Abstract extends ThemedComponent {
   }
 
   renderOnMount(callback) {
-    if(this.isMounted()) {
+    if (this.isMounted()) {
       this.forceUpdate();
       callback && callback();
     } else {
@@ -226,9 +269,7 @@ export default class Abstract extends ThemedComponent {
     return this.mounted;
   }
 
-  configureNavBar(initial) {
-
-  }
+  configureNavBar(initial) {}
 
   popToRoot() {
     this.props.navigation.popToTop();
@@ -242,12 +283,19 @@ export default class Abstract extends ThemedComponent {
   }
 
   async handlePrivilegedAction(isProtected, action, run, onCancel) {
-    if(isProtected) {
-      let actionRequiresPrivs = await PrivilegesManager.get().actionRequiresPrivilege(action);
-      if(actionRequiresPrivs) {
-        PrivilegesManager.get().presentPrivilegesModal(action, this.props.navigation, () => {
-          run();
-        }, onCancel);
+    if (isProtected) {
+      const actionRequiresPrivs = await PrivilegesManager.get().actionRequiresPrivilege(
+        action
+      );
+      if (actionRequiresPrivs) {
+        PrivilegesManager.get().presentPrivilegesModal(
+          action,
+          this.props.navigation,
+          () => {
+            run();
+          },
+          onCancel
+        );
       } else {
         run();
       }
@@ -257,20 +305,24 @@ export default class Abstract extends ThemedComponent {
   }
 
   static IsShallowEqual = (newObj, prevObj, keys) => {
-    if(!keys) {keys = Object.keys(newObj)};
-    for(var key of keys) {
-      if(newObj[key] !== prevObj[key]) {
+    if (!keys) {
+      keys = Object.keys(newObj);
+    }
+    for (var key of keys) {
+      if (newObj[key] !== prevObj[key]) {
         return false;
       }
     }
     return true;
-  }
+  };
 
   static IsDeepEqual = (newObj, prevObj, keys, omitKeys = []) => {
-    if(!keys) {keys = Object.keys(newObj)};
-    for(var omitKey of omitKeys) {
+    if (!keys) {
+      keys = Object.keys(newObj);
+    }
+    for (var omitKey of omitKeys) {
       _.pull(keys, omitKey);
     }
     return _.isEqual(_.pick(newObj, keys), _.pick(prevObj, keys));
-  }
+  };
 }

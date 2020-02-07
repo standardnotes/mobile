@@ -1,29 +1,23 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ThemedPureComponent from '@Components/ThemedPureComponent';
 import { SCREEN_SETTINGS } from '@Screens/screens';
-import {
-  ICON_USER,
-  ICON_FORWARD
-} from '@Style/icons';
+import { ICON_USER, ICON_FORWARD } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
-const NOT_BACKED_UP_TEXT = "Data not backed up";
-const SIGN_IN_TEXT = "Sign in or register to backup your notes";
+const NOT_BACKED_UP_TEXT = 'Data not backed up';
+const SIGN_IN_TEXT = 'Sign in or register to backup your notes';
 
 export class OfflineBanner extends ThemedPureComponent {
-
   _onPress = () => {
     this.props.navigation.navigate(SCREEN_SETTINGS);
-  }
+  };
 
   render() {
     return (
-      <TouchableWithoutFeedback
-        onPress={this._onPress}
-      >
+      <TouchableWithoutFeedback onPress={this._onPress}>
         <View style={this.styles.container}>
           <View style={{ justifyContent: 'center' }}>
             <Icon
@@ -45,7 +39,7 @@ export class OfflineBanner extends ThemedPureComponent {
           </View>
         </View>
       </TouchableWithoutFeedback>
-    )
+    );
   }
 
   loadStyles() {
@@ -68,7 +62,7 @@ export class OfflineBanner extends ThemedPureComponent {
       },
       textContainer: {
         flex: 1,
-        paddingLeft: padding,
+        paddingLeft: padding
       },
       boldText: {
         fontSize: 15,

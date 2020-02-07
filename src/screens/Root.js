@@ -1,15 +1,12 @@
-import React, { Component, Platform } from 'react';
-import { TouchableHighlight, View, Text } from 'react-native';
+import React from 'react';
+import { TouchableHighlight, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
 import Abstract from '@Screens/Abstract';
 import Compose from '@Screens/Compose';
 import Notes from '@Screens/Notes/Notes';
-import {
-  SCREEN_AUTHENTICATE
-} from '@Screens/screens';
+import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import AlertManager from '@SFJS/alertManager';
 import Auth from '@SFJS/authManager';
 import ModelManager from '@SFJS/modelManager';
@@ -18,7 +15,6 @@ import StyleKit from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
 
 export default class Root extends Abstract {
-
   constructor(props) {
     super(props);
     this.registerObservers();
@@ -29,11 +25,11 @@ export default class Root extends Abstract {
       const authProps = ApplicationState.get().getAuthenticationPropsForAppState(
         state
       );
-      if(authProps.sources.length > 0) {
+      if (authProps.sources.length > 0) {
         this.presentAuthenticationModal(authProps);
-      } else if(state === ApplicationState.GainingFocus) {
+      } else if (state === ApplicationState.GainingFocus) {
         // we only want to perform sync here if the app is resuming, not if it's a fresh start
-        if(this.dataLoaded) {
+        if (this.dataLoaded) {
           Sync.get().sync();
         }
       }
@@ -41,13 +37,15 @@ export default class Root extends Abstract {
 
     this.applicationStateEventHandler = ApplicationState.get().addEventHandler(
       (event, data) => {
-        if(event === ApplicationState.AppStateEventNoteSideMenuToggle) {
+        if (event === ApplicationState.AppStateEventNoteSideMenuToggle) {
           // update state to toggle Notes side menu if we triggered the collapse
-          this.setState({ notesListCollapsed: data.new_isNoteSideMenuCollapsed });
-        } else if(event === ApplicationState.KeyboardChangeEvent) {
+          this.setState({
+            notesListCollapsed: data.new_isNoteSideMenuCollapsed
+          });
+        } else if (event === ApplicationState.KeyboardChangeEvent) {
           // need to refresh the height of the keyboard when it opens so that we can change the position
           // of the sidebar collapse icon
-          if(ApplicationState.get().isInTabletMode) {
+          if (ApplicationState.get().isInTabletMode) {
             this.setState({
               keyboardHeight: ApplicationState.get().getKeyboardHeight()
             });
@@ -57,13 +55,13 @@ export default class Root extends Abstract {
     );
 
     this.syncEventHandler = Sync.get().addEventHandler(async (event, data) => {
-      if(event === 'sync-session-invalid') {
-        if(!this.didShowSessionInvalidAlert) {
+      if (event === 'sync-session-invalid') {
+        if (!this.didShowSessionInvalidAlert) {
           this.didShowSessionInvalidAlert = true;
           AlertManager.get().confirm({
-            title: "Session Expired",
-            text: "Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.",
-            confirmButtonText: "Sign Out",
+            title: 'Session Expired',
+            text: 'Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.',
+            confirmButtonText: 'Sign Out',
             onConfirm: () => {
               this.didShowSessionInvalidAlert = false;
               Auth.get().signout();
@@ -71,37 +69,37 @@ export default class Root extends Abstract {
             onCancel: () => {
               this.didShowSessionInvalidAlert = false;
             }
-          })
+          });
         }
       }
-    })
+    });
 
-    this.syncStatusObserver = Sync.get().registerSyncStatusObserver((status) => {
-      if(status.error) {
-        const text = `Unable to connect to sync server.`
+    this.syncStatusObserver = Sync.get().registerSyncStatusObserver(status => {
+      if (status.error) {
+        const text = 'Unable to connect to sync server.';
         this.showingErrorStatus = true;
-        setTimeout( () => {
+        setTimeout(() => {
           // need timeout for syncing on app launch
           this.setSubTitle(text, StyleKit.variables.stylekitWarningColor);
         }, 250);
-      } else if(status.retrievedCount > 20) {
+      } else if (status.retrievedCount > 20) {
         const text = `Downloading ${status.retrievedCount} items. Keep app open.`
         this.setSubTitle(text);
         this.showingDownloadStatus = true;
-      } else if(this.showingDownloadStatus) {
+      } else if (this.showingDownloadStatus) {
         this.showingDownloadStatus = false;
-        const text = "Download Complete.";
+        const text = 'Download Complete.';
         this.setSubTitle(text);
         setTimeout(() => {
           this.setSubTitle(null);
         }, 2000);
-      } else if(this.showingErrorStatus) {
+      } else if (this.showingErrorStatus) {
         this.setSubTitle(null);
       }
-    })
+    });
 
-    this.signoutObserver = Auth.get().addEventHandler(async (event) => {
-      if(event === SFAuthManager.DidSignOutEvent) {
+    this.signoutObserver = Auth.get().addEventHandler(async event => {
+      if (event === SFAuthManager.DidSignOutEvent) {
         this.setSubTitle(null);
         const notifyObservers = false;
         ApplicationState.getOptions().reset(notifyObservers);
@@ -115,7 +113,7 @@ export default class Root extends Abstract {
 
   reloadOptionsToDefault() {
     const options = ApplicationState.getOptions();
-    if(options.selectedTagIds.length === 0) {
+    if (options.selectedTagIds.length === 0) {
       // select default All notes smart tag
       options.setSelectedTagIds(ModelManager.get().defaultSmartTag().uuid);
     }
@@ -123,16 +121,18 @@ export default class Root extends Abstract {
 
   onUnlockPress = () => {
     const initialAppState = ApplicationState.Launching;
-    const authProps = ApplicationState.get().getAuthenticationPropsForAppState(initialAppState);
-    if(authProps.sources.length > 0) {
+    const authProps = ApplicationState.get().getAuthenticationPropsForAppState(
+      initialAppState
+    );
+    if (authProps.sources.length > 0) {
       this.presentAuthenticationModal(authProps);
     }
-  }
+  };
 
   componentDidMount() {
     super.componentDidMount();
 
-    if(this.authOnMount) {
+    if (this.authOnMount) {
       // Perform in timeout to avoid stutter when presenting modal on initial app start.
       setTimeout(() => {
         this.presentAuthenticationModal(this.authOnMount);
@@ -144,7 +144,9 @@ export default class Root extends Abstract {
   componentWillUnmount() {
     super.componentWillUnmount();
     ApplicationState.get().removeStateObserver(this.stateObserver);
-    ApplicationState.get().removeEventHandler(this.applicationStateEventHandler);
+    ApplicationState.get().removeEventHandler(
+      this.applicationStateEventHandler
+    );
     Sync.get().removeEventHandler(this.syncEventHandler);
     Sync.get().removeSyncStatusObserver(this.syncStatusObserver);
     clearInterval(this.syncTimer);
@@ -184,7 +186,7 @@ export default class Root extends Abstract {
 
   beginSyncTimer() {
     // Refresh every 30s
-    this.syncTimer = setInterval(function () {
+    this.syncTimer = setInterval(function() {
       Sync.get().sync(null);
     }, 30000);
   }
@@ -192,22 +194,24 @@ export default class Root extends Abstract {
   initializeData() {
     const encryptionEnabled = KeysManager.get().isOfflineEncryptionEnabled();
     this.setSubTitle(
-      encryptionEnabled ? "Decrypting items..." : "Loading items..."
+      encryptionEnabled ? 'Decrypting items...' : 'Loading items...'
     );
     const incrementalCallback = (current, total) => {
       const notesString = `${current}/${total} items...`;
       this.setSubTitle(
-        encryptionEnabled ? `Decrypting ${notesString}` : `Loading ${notesString}`
+        encryptionEnabled
+          ? `Decrypting ${notesString}`
+          : `Loading ${notesString}`
       );
       // Incremental Callback
-      if(!this.dataLoaded) {
+      if (!this.dataLoaded) {
         this.dataLoaded = true;
       }
       this.notesRef && this.notesRef.root_onIncrementalSync();
     };
 
-    const loadLocalCompletion = (items) => {
-      this.setSubTitle("Syncing...");
+    const loadLocalCompletion = items => {
+      this.setSubTitle('Syncing...');
       this.dataLoaded = true;
 
       // perform initial sync
@@ -218,8 +222,7 @@ export default class Root extends Abstract {
         });
     };
 
-
-    if(Sync.get().initialDataLoaded()) {
+    if (Sync.get().initialDataLoaded()) {
       // Data can be already loaded in the case of a theme change
       loadLocalCompletion();
     } else {
@@ -235,20 +238,22 @@ export default class Root extends Abstract {
   }
 
   presentAuthenticationModal(authProps) {
-    if(!this.isMounted()) {
-      console.log("Not yet mounted, not authing.");
+    if (!this.isMounted()) {
+      console.log('Not yet mounted, not authing.');
       this.authOnMount = authProps;
       return;
     }
 
-    if(this.authenticationInProgress) {
-      console.log("Not presenting auth modal because one is already presented.");
+    if (this.authenticationInProgress) {
+      console.log(
+        'Not presenting auth modal because one is already presented.'
+      );
       return;
     }
 
     this.authenticationInProgress = true;
 
-    if(this.pendingAuthProps) {
+    if (this.pendingAuthProps) {
       // Existing unvalidated auth props. Don't use input authProps.
       // This is to handle the case on Android where if a user has both
       // fingerprint (immediate) and passcode (on quit), they can press the
@@ -266,7 +271,7 @@ export default class Root extends Abstract {
         authProps.onAuthenticate();
         this.pendingAuthProps = null;
         this.authenticationInProgress = false;
-        if(this.dataLoaded) {
+        if (this.dataLoaded) {
           Sync.get().sync();
         }
       },
@@ -276,16 +281,16 @@ export default class Root extends Abstract {
     });
   }
 
-  onNoteSelect = (note) => {
+  onNoteSelect = note => {
     this.composeRef.setNote(note);
     this.setState({
       selectedTagId:
         this.notesRef.options.selectedTagIds.length &&
         this.notesRef.options.selectedTagIds[0]
     });
-  }
+  };
 
-  onLayout = (e) => {
+  onLayout = e => {
     const width = e.nativeEvent.layout.width;
     /**
       If you're in tablet mode, but on an iPad where this app is running side by
@@ -293,8 +298,8 @@ export default class Root extends Abstract {
       list, because there isn't enough space.
     */
     const MinWidthToSplit = 450;
-    if(ApplicationState.get().isTabletDevice) {
-      if(width < MinWidthToSplit) {
+    if (ApplicationState.get().isTabletDevice) {
+      if (width < MinWidthToSplit) {
         ApplicationState.get().setTabletModeEnabled(false);
       } else {
         ApplicationState.get().setTabletModeEnabled(true);
@@ -310,15 +315,17 @@ export default class Root extends Abstract {
       notesListCollapsed: ApplicationState.get().isNoteSideMenuCollapsed,
       keyboardHeight: ApplicationState.get().getKeyboardHeight()
     });
-  }
+  };
 
   toggleNoteSideMenu = () => {
-    if(!ApplicationState.get().isInTabletMode) {
+    if (!ApplicationState.get().isInTabletMode) {
       return;
     }
 
-    ApplicationState.get().setNoteSideMenuCollapsed(!ApplicationState.get().isNoteSideMenuCollapsed)
-  }
+    ApplicationState.get().setNoteSideMenuCollapsed(
+      !ApplicationState.get().isNoteSideMenuCollapsed
+    );
+  };
 
   render() {
     /* Don't render LockedView here since we need this.notesRef as soon as we can (for componentWillFocus callback) */
@@ -339,13 +346,12 @@ export default class Root extends Abstract {
     };
     const collapseIconName =
       collapseIconPrefix +
-      "-" +
+      '-' +
       iconNames[collapseIconPrefix][notesListCollapsed ? 0 : 1];
     const collapseIconBottomPosition =
       this.state.keyboardHeight > this.state.height / 2
         ? this.state.keyboardHeight
         : '50%';
-
 
     return (
       <View
@@ -359,7 +365,9 @@ export default class Root extends Abstract {
             }}
             onUnlockPress={this.onUnlockPress}
             navigation={this.props.navigation}
-            onNoteSelect={shouldSplitLayout && this.onNoteSelect /* tablet only */}
+            onNoteSelect={
+              shouldSplitLayout && this.onNoteSelect /* tablet only */
+            }
           />
         </View>
 
@@ -386,10 +394,7 @@ export default class Root extends Abstract {
                 <Icon
                   name={collapseIconName}
                   size={24}
-                  color={hexToRGBA(
-                    StyleKit.variables.stylekitInfoColor,
-                    0.85
-                  )}
+                  color={hexToRGBA(StyleKit.variables.stylekitInfoColor, 0.85)}
                 />
               </View>
             </TouchableHighlight>
@@ -409,11 +414,12 @@ export default class Root extends Abstract {
         borderRightColor: StyleKit.variables.stylekitBorderColor,
         borderRightWidth: 1
       },
-      right: {
-
-      },
+      right: {},
       toggleButtonContainer: {
-        backgroundColor: hexToRGBA(StyleKit.variables.stylekitContrastBackgroundColor, 0.5)
+        backgroundColor: hexToRGBA(
+          StyleKit.variables.stylekitContrastBackgroundColor,
+          0.5
+        )
       },
       toggleButton: {
         justifyContent: 'center',
@@ -424,7 +430,6 @@ export default class Root extends Abstract {
         borderBottomRightRadius: 4,
         marginTop: -12
       }
-    }
+    };
   }
-
 }

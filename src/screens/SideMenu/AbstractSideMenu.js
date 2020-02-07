@@ -1,9 +1,7 @@
-import React, { Component, Fragment } from 'react';
 import { Keyboard } from 'react-native';
-import Abstract from "@Screens/Abstract"
+import Abstract from '@Screens/Abstract';
 
 export default class AbstractSideMenu extends Abstract {
-
   shouldComponentUpdate(nextProps, nextState) {
     /*
       We had some performance issues with this component rendering too many times when
@@ -15,7 +13,7 @@ export default class AbstractSideMenu extends Abstract {
     const isDrawerGoingToBeOpen = nextProps.navigation.state.isDrawerOpen;
 
     // When the drawer is opening, we want to be sure to dismiss the keyboard if it's up
-    if(!isDrawerOpen && isDrawerGoingToBeOpen) {
+    if (!isDrawerOpen && isDrawerGoingToBeOpen) {
       this.psuedo_willFocus();
     }
 
@@ -29,6 +27,8 @@ export default class AbstractSideMenu extends Abstract {
     // if navigation state is about to change, and if so, we call this.
     Keyboard.dismiss();
 
-    this.handler && this.handler.onKeyboardDismiss && this.handler.onKeyboardDismiss();
+    this.handler &&
+      this.handler.onKeyboardDismiss &&
+      this.handler.onKeyboardDismiss();
   }
 }

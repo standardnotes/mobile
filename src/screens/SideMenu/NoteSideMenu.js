@@ -1,26 +1,17 @@
-import React, { Component, Fragment } from 'react';
-import { ScrollView, View, Text, FlatList, Linking } from 'react-native';
-import ActionSheet from 'react-native-actionsheet'
+import React, { Fragment } from 'react';
+import { View, FlatList } from 'react-native';
 import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
-import SectionHeader from '@Components/SectionHeader';
-import TableSection from '@Components/TableSection';
 import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
 import ItemActionManager from '@Lib/itemActionManager';
-import Abstract from '@Screens/Abstract';
-import {
-  SCREEN_INPUT_MODAL,
-  SCREEN_MANAGE_PRIVILEGES
-} from '@Screens/screens';
+import { SCREEN_INPUT_MODAL, SCREEN_MANAGE_PRIVILEGES } from '@Screens/screens';
 import ModelManager from '@SFJS/modelManager';
 import PrivilegesManager from '@SFJS/privilegesManager';
 import Sync from '@SFJS/syncManager';
 import AbstractSideMenu from '@SideMenu/AbstractSideMenu';
-import SideMenuCell from '@SideMenu/SideMenuCell';
-import SideMenuHero from '@SideMenu/SideMenuHero';
 import SideMenuManager from '@SideMenu/SideMenuManager';
 import SideMenuSection from '@SideMenu/SideMenuSection';
 import TagSelectionList from '@SideMenu/TagSelectionList';
@@ -38,7 +29,6 @@ import {
 import StyleKit from '@Style/StyleKit';
 
 export default class NoteSideMenu extends AbstractSideMenu {
-
   constructor(props) {
     super(props);
     this.constructState({});
@@ -48,86 +38,97 @@ export default class NoteSideMenu extends AbstractSideMenu {
     return SideMenuManager.get().getHandlerForRightSideMenu();
   }
 
-  onEditorSelect = (editor) => {
+  onEditorSelect = editor => {
     this.handler.onEditorSelect(editor);
     this.forceUpdate();
-  }
+  };
 
-  onTagSelect = (tag) => {
+  onTagSelect = tag => {
     this.handler.onTagSelect(tag);
     this.forceUpdate();
-  }
+  };
 
   get note() {
     return this.handler.getCurrentNote();
   }
 
-  onEditorLongPress = (editor) => {
-    let currentDefaultEditor = ComponentManager.get().getDefaultEditor();
+  onEditorLongPress = editor => {
+    const currentDefaultEditor = ComponentManager.get().getDefaultEditor();
 
     let isDefault = false;
-    if(!editor) {
+    if (!editor) {
       // System editor
-      if(currentDefaultEditor)  {
+      if (currentDefaultEditor) {
         isDefault = false;
       }
     } else {
       isDefault = editor.content.isMobileDefault;
     }
 
-    let action = isDefault ? "Remove as Mobile Default" : "Set as Mobile Default";
-    if(!editor && !currentDefaultEditor) {
+    let action = isDefault
+      ? 'Remove as Mobile Default'
+      : 'Set as Mobile Default';
+    if (!editor && !currentDefaultEditor) {
       // Long pressing on plain editor while it is default, no actions available
-      action = "Is Mobile Default";
+      action = 'Is Mobile Default';
     }
-    let sheet = new ActionSheetWrapper({
+    const sheet = new ActionSheetWrapper({
       title: editor && editor.name,
       options: [
-        ActionSheetWrapper.BuildOption({text: action, callback: () => {
-          if(!editor) {
-            // Default to plain
-            ComponentManager.get().setEditorAsMobileDefault(currentDefaultEditor, false);
-          } else {
-            ComponentManager.get().setEditorAsMobileDefault(editor, !isDefault);
+        ActionSheetWrapper.BuildOption({
+          text: action,
+          callback: () => {
+            if (!editor) {
+              // Default to plain
+              ComponentManager.get().setEditorAsMobileDefault(
+                currentDefaultEditor,
+                false
+              );
+            } else {
+              ComponentManager.get().setEditorAsMobileDefault(
+                editor,
+                !isDefault
+              );
+            }
+            this.forceUpdate();
           }
-          this.forceUpdate();
-        }}),
-      ], onCancel: () => {
-        this.setState({actionSheet: null});
+        })
+      ],
+      onCancel: () => {
+        this.setState({ actionSheet: null });
       }
     });
 
-    this.setState({actionSheet: sheet.actionSheetElement()});
+    this.setState({ actionSheet: sheet.actionSheetElement() });
     this.forceUpdate(); // required to get actionSheet ref
     sheet.show();
-  }
+  };
 
   presentNewTag = () => {
     this.props.navigation.navigate(SCREEN_INPUT_MODAL, {
       title: 'New Tag',
-      placeholder: "New tag name",
-      onSubmit: (text) => {
-        this.createTag(text, (tag) => {
-          if(this.note) {
+      placeholder: 'New tag name',
+      onSubmit: text => {
+        this.createTag(text, tag => {
+          if (this.note) {
             // select this tag
-            this.onTagSelect(tag)
+            this.onTagSelect(tag);
           }
         });
       }
-    })
-  }
+    });
+  };
 
   createTag(text, callback) {
-    var tag = new SNTag({content: {title: text}});
+    const tag = new SNTag({ content: { title: text } });
     tag.initUUID().then(() => {
       tag.setDirty(true);
       ModelManager.get().addItem(tag);
       Sync.get().sync();
       callback(tag);
       this.forceUpdate();
-    })
+    });
   }
-
 
   /*
   Render
@@ -136,97 +137,128 @@ export default class NoteSideMenu extends AbstractSideMenu {
   runAction(action) {
     let run = () => {
       ItemActionManager.handleEvent(action, this.note, async () => {
-        if(action == ItemActionManager.ArchiveEvent
-          || action == ItemActionManager.TrashEvent
-          || action == ItemActionManager.DeleteEvent
-          || action == ItemActionManager.EmptyTrashEvent) {
+        if (
+          action === ItemActionManager.ArchiveEvent ||
+          action === ItemActionManager.TrashEvent ||
+          action === ItemActionManager.DeleteEvent ||
+          action === ItemActionManager.EmptyTrashEvent
+        ) {
           this.popToRoot();
         } else {
           this.forceUpdate();
           this.handler.onPropertyChange();
 
-          if(action == ItemActionManager.ProtectEvent) {
+          if (action === ItemActionManager.ProtectEvent) {
             // Show Privileges management screen if protected notes privs are not set up yet
-            let configuredPrivs = await PrivilegesManager.get().grossCredentialsForAction(SFPrivilegesManager.ActionViewProtectedNotes);
-            if(configuredPrivs.length == 0) {
+            const configuredPrivs = await PrivilegesManager.get().grossCredentialsForAction(
+              SFPrivilegesManager.ActionViewProtectedNotes
+            );
+            if (configuredPrivs.length === 0) {
               this.props.navigation.navigate(SCREEN_MANAGE_PRIVILEGES);
             }
           }
         }
       });
-    }
-    if(action == ItemActionManager.TrashEvent || action == ItemActionManager.DeleteEvent) {
-      this.handlePrivilegedAction(true, SFPrivilegesManager.ActionDeleteNote, () => {
-        run();
-      })
+    };
+    if (
+      action === ItemActionManager.TrashEvent ||
+      action === ItemActionManager.DeleteEvent
+    ) {
+      this.handlePrivilegedAction(
+        true,
+        SFPrivilegesManager.ActionDeleteNote,
+        () => {
+          run();
+        }
+      );
     } else {
       run();
     }
   }
 
   buildOptionsForNoteManagement() {
-    var pinOption = this.note.pinned ? "Unpin" : "Pin";
-    let pinEvent = pinOption == "Pin" ? ItemActionManager.PinEvent : ItemActionManager.UnpinEvent;
+    const pinOption = this.note.pinned ? 'Unpin' : 'Pin';
+    const pinEvent =
+      pinOption === 'Pin'
+        ? ItemActionManager.PinEvent
+        : ItemActionManager.UnpinEvent;
 
-    var archiveOption = this.note.archived ? "Unarchive" : "Archive";
-    let archiveEvent = archiveOption == "Archive" ? ItemActionManager.ArchiveEvent : ItemActionManager.UnarchiveEvent;
+    const archiveOption = this.note.archived ? 'Unarchive' : 'Archive';
+    const archiveEvent =
+      archiveOption === 'Archive'
+        ? ItemActionManager.ArchiveEvent
+        : ItemActionManager.UnarchiveEvent;
 
-    var lockOption = this.note.locked ? "Unlock" : "Lock";
-    let lockEvent = lockOption == "Lock" ? ItemActionManager.LockEvent : ItemActionManager.UnlockEvent;
+    const lockOption = this.note.locked ? 'Unlock' : 'Lock';
+    const lockEvent =
+      lockOption === 'Lock'
+        ? ItemActionManager.LockEvent
+        : ItemActionManager.UnlockEvent;
 
-    var protectOption = this.note.content.protected ? "Unprotect" : "Protect";
-    let protectEvent = protectOption == "Protect" ? ItemActionManager.ProtectEvent : ItemActionManager.UnprotectEvent;
+    const protectOption = this.note.content.protected ? 'Unprotect' : 'Protect';
+    const protectEvent =
+      protectOption === 'Protect'
+        ? ItemActionManager.ProtectEvent
+        : ItemActionManager.UnprotectEvent;
 
-    let rawOptions = [
+    const rawOptions = [
       { text: pinOption, key: pinEvent, icon: ICON_BOOKMARK },
       { text: archiveOption, key: archiveEvent, icon: ICON_ARCHIVE },
       { text: lockOption, key: lockEvent, icon: ICON_LOCK },
       { text: protectOption, key: protectEvent, icon: ICON_FINGER_PRINT },
-      { text: "Share", key: ItemActionManager.ShareEvent, icon: ICON_SHARE },
+      { text: 'Share', key: ItemActionManager.ShareEvent, icon: ICON_SHARE }
     ];
 
-    if(!this.note.content.trashed) {
-      rawOptions.push({ text: "Move to Trash", key: ItemActionManager.TrashEvent, icon: ICON_TRASH });
+    if (!this.note.content.trashed) {
+      rawOptions.push({
+        text: 'Move to Trash',
+        key: ItemActionManager.TrashEvent,
+        icon: ICON_TRASH
+      });
     }
 
     let options = [];
-    for(let rawOption of rawOptions) {
+    for (const rawOption of rawOptions) {
       let option = SideMenuSection.BuildOption({
         text: rawOption.text,
         key: rawOption.key,
-        iconDesc: { type: "icon", side: "right", name: StyleKit.nameForIcon(rawOption.icon) },
+        iconDesc: {
+          type: 'icon',
+          side: 'right',
+          name: StyleKit.nameForIcon(rawOption.icon)
+        },
         onSelect: () => {
           this.runAction(rawOption.key);
-        },
-      })
+        }
+      });
       options.push(option);
     }
 
-    if(this.note.content.trashed) {
+    if (this.note.content.trashed) {
       options = options.concat([
         {
-          text: "Restore",
-          key: "restore-note",
+          text: 'Restore',
+          key: 'restore-note',
           onSelect: () => {
             this.runAction(ItemActionManager.RestoreEvent);
           }
         },
         {
-          text: "Delete Permanently",
-          textClass: "danger",
-          key: "delete-forever",
+          text: 'Delete Permanently',
+          textClass: 'danger',
+          key: 'delete-forever',
           onSelect: () => {
             this.runAction(ItemActionManager.DeleteEvent);
           }
         },
         {
-          text: "Empty Trash",
-          textClass: "danger",
-          key: "empty trash",
+          text: 'Empty Trash',
+          textClass: 'danger',
+          key: 'empty trash',
           onSelect: () => {
             this.runAction(ItemActionManager.EmptyTrashEvent);
           }
-        },
+        }
       ]);
     }
 
@@ -234,45 +266,63 @@ export default class NoteSideMenu extends AbstractSideMenu {
   }
 
   buildOptionsForEditors() {
-    let editors = ComponentManager.get().getEditors().sort((a, b) => {
-      if(!a.name || !b.name) { return -1; }
-      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-    });
-    let selectedEditor = ComponentManager.get().editorForNote(this.note);
-    let options = [{
-      text: "Plain Editor",
-      key: "plain-editor",
-      selected: !selectedEditor,
-      onSelect: () => {this.onEditorSelect(null)},
-      onLongPress: () => {this.onEditorLongPress(null)}
-    }];
+    const editors = ComponentManager.get()
+      .getEditors()
+      .sort((a, b) => {
+        if (!a.name || !b.name) {
+          return -1;
+        }
 
-    for(let editor of editors) {
-      let option = SideMenuSection.BuildOption({
+        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+      });
+    const selectedEditor = ComponentManager.get().editorForNote(this.note);
+    const options = [
+      {
+        text: 'Plain Editor',
+        key: 'plain-editor',
+        selected: !selectedEditor,
+        onSelect: () => {
+          this.onEditorSelect(null);
+        },
+        onLongPress: () => {
+          this.onEditorLongPress(null);
+        }
+      }
+    ];
+
+    for (const editor of editors) {
+      const option = SideMenuSection.BuildOption({
         text: editor.name,
-        subtext: editor.content.isMobileDefault ? "Mobile Default" : null,
+        subtext: editor.content.isMobileDefault ? 'Mobile Default' : null,
         key: editor.uuid || editor.name,
-        selected: editor == selectedEditor,
-        onSelect: () => {this.onEditorSelect(editor)},
-        onLongPress: () => {this.onEditorLongPress(editor)}
-      })
+        selected: editor === selectedEditor,
+        onSelect: () => {
+          this.onEditorSelect(editor);
+        },
+        onLongPress: () => {
+          this.onEditorLongPress(editor);
+        }
+      });
 
       options.push(option);
     }
 
     // Default
-    if(options.length == 1) {
+    if (options.length === 1) {
       options.push(SideMenuSection.BuildOption({
-        text: "Get More Editors",
-        key: "get-editors",
-        iconDesc: {
-          type: "icon",
-          name: StyleKit.nameForIcon(ICON_MEDICAL),
-          side: "right",
-          size: 17
-        },
-        onSelect: () => { ApplicationState.openURL("https://standardnotes.org/extensions")},
-      }));
+          text: 'Get More Editors',
+          key: 'get-editors',
+          iconDesc: {
+            type: 'icon',
+            name: StyleKit.nameForIcon(ICON_MEDICAL),
+            side: 'right',
+            size: 17
+          },
+          onSelect: () => {
+            ApplicationState.openURL('https://standardnotes.org/extensions');
+          }
+        })
+      );
     }
 
     return options;
@@ -281,11 +331,11 @@ export default class NoteSideMenu extends AbstractSideMenu {
   render() {
     const viewStyles = [StyleKit.styles.container, this.styles.sideMenu];
 
-    if(this.state.lockContent) {
-      return (<LockedView style={viewStyles} />);
+    if (this.state.lockContent) {
+      return <LockedView style={viewStyles} />;
     }
 
-    if(!this.handler || SideMenuManager.get().isRightSideMenuLocked()) {
+    if (!this.handler || SideMenuManager.get().isRightSideMenuLocked()) {
       return <View style={viewStyles} />;
     }
 
@@ -294,9 +344,18 @@ export default class NoteSideMenu extends AbstractSideMenu {
     const selectedTags = this.handler.getSelectedTags();
 
     const sideMenuComponents = [
-      <SideMenuSection title="Options" key="options-section" options={noteOptions} />,
+      <SideMenuSection
+        title="Options"
+        key="options-section"
+        options={noteOptions}
+      />,
 
-      <SideMenuSection title="Editors" key="editors-section" options={editorOptions} collapsed={true} />,
+      <SideMenuSection
+        title="Editors"
+        key="editors-section"
+        options={editorOptions}
+        collapsed={true}
+      />,
 
       <SideMenuSection title="Tags" key="tags-section">
         <TagSelectionList
@@ -305,28 +364,37 @@ export default class NoteSideMenu extends AbstractSideMenu {
           contentType="Tag"
           onTagSelect={this.onTagSelect}
           selectedTags={selectedTags}
-          emptyPlaceholder={"Create a new tag using the tag button in the bottom right corner."}
+          emptyPlaceholder={
+            'Create a new tag using the tag button in the bottom right corner.'
+          }
         />
       </SideMenuSection>
     ];
 
     return (
       <Fragment>
-        <SafeAreaView forceInset={{ left: 'never', bottom: 'always' }} style={[viewStyles, this.styles.safeArea]}>
+        <SafeAreaView
+          forceInset={{ left: 'never', bottom: 'always' }}
+          style={[viewStyles, this.styles.safeArea]}
+        >
           <FlatList
             style={this.styles.flatList}
             data={sideMenuComponents}
-            renderItem={({item}) => item}
+            renderItem={({ item }) => item}
           />
 
           <FAB
             buttonColor={StyleKit.variables.stylekitInfoColor}
             iconTextColor={StyleKit.variables.stylekitInfoContrastColor}
-            onClickAction={() => {this.presentNewTag()}}
+            onClickAction={() => {
+              this.presentNewTag();
+            }}
             visible={true}
             size={30}
             paddingTop={ApplicationState.isIOS ? 1 : 0}
-            iconTextComponent={<Icon name={StyleKit.nameForIcon(ICON_PRICE_TAG)}/>}
+            iconTextComponent={
+              <Icon name={StyleKit.nameForIcon(ICON_PRICE_TAG)} />
+            }
           />
         </SafeAreaView>
         {this.state.actionSheet && this.state.actionSheet}
@@ -339,19 +407,19 @@ export default class NoteSideMenu extends AbstractSideMenu {
       // We want top color to be different from bottom color of safe area.
       // See https://stackoverflow.com/questions/47725607/react-native-safeareaview-background-color-how-to-assign-two-different-backgro
       safeArea: {
-        flex:0,
+        flex: 0,
         backgroundColor: StyleKit.variables.stylekitBackgroundColor
       },
       sideMenu: {
         backgroundColor: StyleKit.variables.stylekitBackgroundColor,
         color: StyleKit.variables.stylekitForegroundColor,
         flex: 1,
-        flexDirection: "column"
+        flexDirection: 'column'
       },
       flatList: {
         padding: 15,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
       }
-    }
+    };
   }
 }

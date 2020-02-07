@@ -30,13 +30,13 @@ export default class Settings extends Abstract {
         title: ApplicationState.isIOS ? 'Done' : null,
         iconName: ApplicationState.isIOS
           ? null
-          : StyleKit.nameForIcon(ICON_CHECKMARK),
-      },
+          : StyleKit.nameForIcon(ICON_CHECKMARK)
+      }
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions,
+      templateOptions
     });
   };
 
@@ -51,8 +51,8 @@ export default class Settings extends Abstract {
           : StyleKit.nameForIcon(ICON_CHECKMARK),
         onPress: () => {
           this.dismiss();
-        },
-      },
+        }
+      }
     });
 
     if (__DEV__) {
@@ -63,15 +63,15 @@ export default class Settings extends Abstract {
             Storage.get().clear();
             Auth.get().signout();
             KeysManager.get().clearOfflineKeysAndData(true);
-          },
-        },
+          }
+        }
       });
     }
 
     this.sortOptions = [
       { key: 'created_at', label: 'Date Added' },
       { key: 'client_updated_at', label: 'Date Modified' },
-      { key: 'title', label: 'Title' },
+      { key: 'title', label: 'Title' }
     ];
 
     this.options = ApplicationState.getOptions();
@@ -91,7 +91,7 @@ export default class Settings extends Abstract {
     this.mergeState({
       hasPasscode: hasPasscode,
       hasBiometrics: hasBiometrics,
-      storageEncryption: encryptedStorage,
+      storageEncryption: encryptedStorage
     });
   }
 
@@ -128,7 +128,7 @@ export default class Settings extends Abstract {
           .then(() => {
             this.forceUpdate();
           });
-      },
+      }
     });
   };
 
@@ -146,7 +146,7 @@ export default class Settings extends Abstract {
             storageEncryptionLoading: false,
           });
         });
-      },
+      }
     });
   };
 
@@ -164,7 +164,7 @@ export default class Settings extends Abstract {
             storageEncryptionLoading: false,
           });
         });
-      },
+      }
     });
   };
 
@@ -202,7 +202,7 @@ export default class Settings extends Abstract {
               );
             }
           });
-      },
+      }
     });
   };
 
@@ -233,7 +233,7 @@ export default class Settings extends Abstract {
 
             this.mergeState({ hasPasscode: false });
             this.forceUpdate();
-          },
+          }
         });
       }
     );
@@ -297,7 +297,7 @@ export default class Settings extends Abstract {
       >
         <ScrollView
           style={{
-            backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+            backgroundColor: StyleKit.variables.stylekitBackgroundColor
           }}
           keyboardShouldPersistTaps={'always'}
           keyboardDismissMode={'interactive'}
@@ -335,8 +335,8 @@ export default class Settings extends Abstract {
                   }}
                   text={option.label}
                   key={option.key}
-                  first={i == 0}
-                  last={i == this.sortOptions.length - 1}
+                  first={i === 0}
+                  last={i === this.sortOptions.length - 1}
                   selected={() => {
                     return option.key === this.options.sortBy;
                   }}
