@@ -1,4 +1,4 @@
-import { Platform, Share } from 'react-native';
+import { Share } from 'react-native';
 import ApplicationState from '@Lib/ApplicationState';
 import AlertManager from '@SFJS/alertManager';
 import ModelManager from '@SFJS/modelManager';

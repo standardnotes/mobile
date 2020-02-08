@@ -3,11 +3,9 @@ import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
-import UserPrefsManager from '@Lib/userPrefsManager';
 import AlertManager from '@SFJS/alertManager';
 import Auth from '@SFJS/authManager';
 import ModelManager from '@SFJS/modelManager';
-import Storage from '@SFJS/storageManager';
 
 const Mailer = 'react-native-mail';
 const base64 = require('base-64');
@@ -52,7 +50,7 @@ export default class BackupsManager {
     if (keys) {
       const authParams = KeysManager.get().activeAuthParams();
       // auth params are only needed when encrypted with a standard file key
-      data["auth_params"] = authParams;
+      data['auth_params'] = authParams;
     }
 
     const jsonString = JSON.stringify(data, null, 2 /* pretty print */);

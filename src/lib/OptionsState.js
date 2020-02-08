@@ -58,7 +58,7 @@ export default class OptionsState {
   }
 
   addChangeObserver(callback) {
-    var observer = { key: Math.random, callback: callback };
+    const observer = { key: Math.random, callback: callback };
     this.changeObservers.push(observer);
     return observer;
   }

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { TouchableHighlight, Text, View } from 'react-native';
 import SectionedTableCell from '@Components/SectionedTableCell';
 import StyleKit from '@Style/StyleKit';

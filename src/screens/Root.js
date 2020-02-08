@@ -83,7 +83,9 @@ export default class Root extends Abstract {
           this.setSubTitle(text, StyleKit.variables.stylekitWarningColor);
         }, 250);
       } else if (status.retrievedCount > 20) {
-        const text = `Downloading ${status.retrievedCount} items. Keep app open.`
+        const text = `Downloading ${
+          status.retrievedCount
+        } items. Keep app open.`;
         this.setSubTitle(text);
         this.showingDownloadStatus = true;
       } else if (this.showingDownloadStatus) {

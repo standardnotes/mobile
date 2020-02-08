@@ -161,7 +161,7 @@ export default class Settings extends Abstract {
         this.resaveOfflineData(() => {
           this.mergeState({
             storageEncryption: false,
-            storageEncryptionLoading: false,
+            storageEncryptionLoading: false
           });
         });
       }

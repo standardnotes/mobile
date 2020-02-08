@@ -34,16 +34,26 @@ class SFReactNativeCrypto extends SFAbstractCrypto {
     return encrypted;
   }
 
-  async decryptText({ciphertextToAuth, contentCiphertext, encryptionKey, iv, authHash, authKey} = {}, requiresAuth) {
+  async decryptText(
+    {
+      ciphertextToAuth,
+      contentCiphertext,
+      encryptionKey,
+      iv,
+      authHash,
+      authKey
+    } = {},
+    requiresAuth
+  ) {
     if (requiresAuth && !authHash) {
-      console.log("Auth hash is required.");
+      console.log('Auth hash is required.');
       return;
     }
 
     if (authHash) {
       var localAuthHash = await Aes.hmac256(ciphertextToAuth, authKey);
       if (authHash !== localAuthHash) {
-        console.log("Auth hash does not match, returning null.");
+        console.log('Auth hash does not match, returning null.');
         return null;
       }
     }
@@ -58,7 +68,7 @@ class SFReactNativeCrypto extends SFAbstractCrypto {
   }
 
   async generateRandomKey(length) {
-    return Aes.randomKey(length/8);
+    return Aes.randomKey(length / 8);
   }
 
   async generateRandomEncryptionKey() {
@@ -80,5 +90,4 @@ class SFReactNativeCrypto extends SFAbstractCrypto {
   async hmac256(message, key) {
     return Aes.hmac256(message, key);
   }
-
 }

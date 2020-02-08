@@ -6,7 +6,6 @@ import SNReactNative from 'standard-notes-rn';
 import Keychain from '@Lib/keychain';
 import { isNullOrUndefined } from '@Lib/utils';
 import AlertManager from '@SFJS/alertManager';
-import ModelManager from '@SFJS/modelManager';
 import SF from '@SFJS/sfjs';
 import Storage from '@SFJS/storageManager';
 
@@ -186,7 +185,7 @@ export default class KeysManager {
     // or if fingerprint scanning isn't working. By deleting all data on first run, we allow the user to reset app
     // state after uninstall.
 
-    console.log("===Wiping Data===");
+    console.log('===Wiping Data===');
 
     return AlertManager.get().confirm({
       title: 'Previous Installation',

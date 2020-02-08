@@ -83,7 +83,7 @@ export default class PrivilegesManager extends SFPrivilegesManager {
       hasCancelOption: true,
       sessionLengthOptions: sessionLengthOptions,
       selectedSessionLength: selectedSessionLength,
-      onSuccess: (selectedSessionLength) => {
+      onSuccess: selectedSessionLength => {
         this.setSessionLength(selectedSessionLength);
         customSuccess();
       },

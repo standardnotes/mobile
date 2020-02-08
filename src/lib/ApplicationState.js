@@ -139,10 +139,10 @@ export default class ApplicationState {
   setTabletModeEnabled(enabled) {
     if (enabled !== this.tabletMode) {
       this.tabletMode = enabled;
-      this.notifyEvent(
-        ApplicationState.AppStateEventTabletModeChange,
-        {new_isInTabletMode: enabled, old_isInTabletMode: !enabled}
-      );
+      this.notifyEvent(ApplicationState.AppStateEventTabletModeChange, {
+        new_isInTabletMode: enabled,
+        old_isInTabletMode: !enabled
+      });
     }
   }
 
@@ -153,10 +153,10 @@ export default class ApplicationState {
   setNoteSideMenuCollapsed(collapsed) {
     if (collapsed !== this.noteSideMenuCollapsed) {
       this.noteSideMenuCollapsed = collapsed;
-      this.notifyEvent(
-        ApplicationState.AppStateEventNoteSideMenuToggle,
-        {new_isNoteSideMenuCollapsed: collapsed, old_isNoteSideMenuCollapsed: !collapsed}
-      );
+      this.notifyEvent(ApplicationState.AppStateEventNoteSideMenuToggle, {
+        new_isNoteSideMenuCollapsed: collapsed,
+        old_isNoteSideMenuCollapsed: !collapsed
+      });
     }
   }
 
@@ -170,7 +170,7 @@ export default class ApplicationState {
   }
 
   notifyEvent(event, data) {
-    for (let handler of this.eventSubscribers) {
+    for (const handler of this.eventSubscribers) {
       handler(event, data);
     }
   }
@@ -390,7 +390,12 @@ export default class ApplicationState {
         KeysManager.get().biometricPrefs.timing === 'immediately';
     }
 
-    const title = showPasscode && showBiometrics ? 'Authentication Required' : (showPasscode ? 'Passcode Required' : 'Fingerprint Required');
+    const title =
+      showPasscode && showBiometrics
+        ? 'Authentication Required'
+        : showPasscode
+        ? 'Passcode Required'
+        : 'Fingerprint Required';
 
     let sources = [];
     if (showPasscode) {
