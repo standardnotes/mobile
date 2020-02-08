@@ -85,7 +85,7 @@ const AppDrawerStack = createDrawerNavigator(
           /** We have to return something. */
           return NavigationActions.setParams({
             params: { dummy: true },
-            key: route.key,
+            key: route.key
           });
         }
       };
@@ -120,7 +120,7 @@ const AppDrawer = createStackNavigator(
     [SCREEN_INPUT_MODAL]: InputModalStack,
     [SCREEN_AUTHENTICATE]: AuthenticateModalStack,
     [SCREEN_MANAGE_PRIVILEGES]: ManagePrivilegesStack,
-    [SCREEN_KEY_RECOVERY]: KeyRecoveryStack,
+    [SCREEN_KEY_RECOVERY]: KeyRecoveryStack
   },
   {
     mode: 'modal',
