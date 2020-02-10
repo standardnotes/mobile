@@ -1,12 +1,5 @@
-import React, { Component } from 'react';
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  RefreshControl,
-  ScrollView,
-  Text
-} from 'react-native';
+import React from 'react';
+import { StyleSheet, View, FlatList, RefreshControl, Text } from 'react-native';
 import Search from 'react-native-search-box';
 import ThemedComponent from '@Components/ThemedComponent';
 import ApplicationState from '@Lib/ApplicationState';
@@ -16,7 +9,6 @@ import Auth from '@SFJS/authManager';
 import StyleKit from '@Style/StyleKit';
 
 export default class NoteList extends ThemedComponent {
-
   renderHeader = () => {
     const isOffline = Auth.get().offline();
 
@@ -39,13 +31,11 @@ export default class NoteList extends ThemedComponent {
           keyboardDismissMode={'interactive'}
           keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
           inputBorderRadius={4}
-          inputStyle={
-            {
-              backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
-              color: StyleKit.variables.stylekitForegroundColor,
-              height: 30
-            }
-          }
+          inputStyle={{
+            backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
+            color: StyleKit.variables.stylekitForegroundColor,
+            height: 30
+          }}
         />
 
         {isOffline && <OfflineBanner />}
@@ -58,7 +48,7 @@ export default class NoteList extends ThemedComponent {
    * Must pass title, text, and tags as props so that it re-renders when either
    * of those change.
    */
-  _renderItem = ({item}) => {
+  _renderItem = ({ item }) => {
     /**
      * On Android, only one tag is selected at a time. If it is selected, we
      * don't need to display the tags string above the note cell.
@@ -67,7 +57,7 @@ export default class NoteList extends ThemedComponent {
     const renderTags =
       ApplicationState.isIOS ||
       selectedTags.length === 0 ||
-      (!item.tags.includes(selectedTags[0]));
+      !item.tags.includes(selectedTags[0]);
 
     return (
       <NoteCell
@@ -80,9 +70,8 @@ export default class NoteList extends ThemedComponent {
         sortType={this.props.sortType}
         renderTags={renderTags}
         options={this.props.options}
-        highlighted={item.uuid == this.props.selectedNoteId}
+        highlighted={item.uuid === this.props.selectedNoteId}
         handleAction={this.props.handleAction}
-
         pinned={item.pinned /* extraData */}
         deleted={item.deleted /* extraData */}
         archived={item.archived /* extraData */}
@@ -91,43 +80,43 @@ export default class NoteList extends ThemedComponent {
         hidePreview={item.content.hidePreview /* extraData */}
         conflictOf={item.content.conflict_of /* extraData */}
       />
-    )
-  }
+    );
+  };
 
   render() {
-    let placeholderText = "";
-    if(this.props.decrypting) {
-      placeholderText = "Decrypting notes...";
-    } else if(this.props.loading) {
-      placeholderText = "Loading notes...";
-    } else if(this.props.notes.length == 0) {
-      placeholderText = "No notes.";
+    let placeholderText = '';
+    if (this.props.decrypting) {
+      placeholderText = 'Decrypting notes...';
+    } else if (this.props.loading) {
+      placeholderText = 'Loading notes...';
+    } else if (this.props.notes.length === 0) {
+      placeholderText = 'No notes.';
     }
 
     return (
       <View
-        style={{backgroundColor: StyleKit.variables.stylekitBackgroundColor}}
+        style={{ backgroundColor: StyleKit.variables.stylekitBackgroundColor }}
       >
-        {placeholderText.length > 0 &&
+        {placeholderText.length > 0 && (
           <View style={this.styles.loadingTextContainer}>
-            <Text style={this.styles.loadingText}>
-              {placeholderText}
-            </Text>
+            <Text style={this.styles.loadingText}>{placeholderText}</Text>
           </View>
-        }
+        )}
 
         <FlatList
-          style={{height: '100%'}}
+          style={{ height: '100%' }}
           initialNumToRender={6}
           windowSize={6}
           maxToRenderPerBatch={6}
           keyboardDismissMode={'interactive'}
           keyboardShouldPersistTaps={'always'}
-          refreshControl={!this.props.hasRefreshControl ? null :
-            <RefreshControl
-              refreshing={this.props.refreshing}
-              onRefresh={this.props.onRefresh}
-            />
+          refreshControl={
+            !this.props.hasRefreshControl ? null : (
+              <RefreshControl
+                refreshing={this.props.refreshing}
+                onRefresh={this.props.onRefresh}
+              />
+            )
           }
           data={this.props.notes}
           options={this.props.options}
@@ -135,13 +124,13 @@ export default class NoteList extends ThemedComponent {
           ListHeaderComponent={this.renderHeader}
         />
       </View>
-    )
+    );
   }
 
   loadStyles() {
     this.styles = StyleSheet.create({
       container: {
-        flex: 1,
+        flex: 1
       },
 
       loadingTextContainer: {

@@ -6,7 +6,7 @@ import ApplicationState from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
 import ModelManager from '@Lib/sfjs/modelManager';
 import UserPrefsManager, {
-  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
+  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY
 } from '@Lib/userPrefsManager';
 import { ICON_LOCK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
@@ -26,17 +26,17 @@ export default class ComponentView extends Component {
       areas: ['note-tags', 'editor-stack', 'editor-editor'],
       contextRequestHandler: () => {
         return this.note;
-      },
+      }
     });
 
     this.reloadData();
 
     if (!this.note) {
-      console.log("Unable to find note with ID", props.noteId);
+      console.log('Unable to find note with ID', props.noteId);
     }
 
     const url = ComponentManager.get().urlForComponent(this.editor);
-    console.log("Loading editor", url);
+    console.log('Loading editor', url);
 
     if (this.editor.offlineOnly) {
       Alert.alert(
@@ -64,7 +64,7 @@ export default class ComponentView extends Component {
        * https://github.com/facebook/react-native/issues/11594
        */
       const dontShowAgain = await UserPrefsManager.get().isPrefSet({
-        key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
+        key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY
       });
 
       if (!dontShowAgain) {
@@ -77,10 +77,10 @@ export default class ComponentView extends Component {
               onPress: () =>
                 UserPrefsManager.get().setPref({
                   key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
-                  value: true,
-                }),
+                  value: true
+                })
             },
-            { text: 'OK' },
+            { text: 'OK' }
           ]
         );
       }
@@ -121,7 +121,7 @@ export default class ComponentView extends Component {
     try {
       data = JSON.parse(message.nativeEvent.data);
     } catch (e) {
-      console.log("Message is not valid JSON, returning");
+      console.log('Message is not valid JSON, returning');
       return;
     }
 
@@ -216,10 +216,10 @@ export default class ComponentView extends Component {
       <View
         style={[
           StyleKit.styles.flexContainer,
-          { backgroundColor: StyleKit.variables.stylekitBackgroundColor },
+          { backgroundColor: StyleKit.variables.stylekitBackgroundColor }
         ]}
       >
-        {this.editor.readonly &&
+        {this.editor.readonly && (
           <View style={this.styles.lockedContainer}>
             <Icon
               name={StyleKit.nameForIcon(ICON_LOCK)}
@@ -231,7 +231,7 @@ export default class ComponentView extends Component {
               immediately, please switch to the Plain Editor.
             </Text>
           </View>
-        }
+        )}
         {url && (
           <WebView
             style={
@@ -277,15 +277,15 @@ export default class ComponentView extends Component {
         padding: padding,
         backgroundColor: StyleKit.variables.stylekitDangerColor,
         borderBottomColor: StyleKit.variables.stylekitBorderColor,
-        borderBottomWidth: 1,
+        borderBottomWidth: 1
       },
 
       lockedText: {
         fontWeight: 'bold',
         fontSize: 12,
         color: StyleKit.variables.stylekitBackgroundColor,
-        paddingLeft: 10,
-      },
+        paddingLeft: 10
+      }
     };
   }
 }

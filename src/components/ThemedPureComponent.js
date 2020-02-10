@@ -1,8 +1,7 @@
-import React, { PureComponent } from 'react';
-import StyleKit from "@Style/StyleKit"
+import { PureComponent } from 'react';
+import StyleKit from '@Style/StyleKit';
 
 export default class ThemedPureComponent extends PureComponent {
-
   constructor(props) {
     super(props);
 
@@ -24,12 +23,7 @@ export default class ThemedPureComponent extends PureComponent {
     this.updateStyles();
   }
 
-  loadStyles() {
+  loadStyles() {}
 
-  }
-
-  updateStyles() {
-
-  }
-
+  updateStyles() {}
 }

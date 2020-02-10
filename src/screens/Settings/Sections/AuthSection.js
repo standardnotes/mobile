@@ -1,23 +1,16 @@
 import React, { Component, Fragment } from 'react';
-import {
-  TextInput,
-  View,
-  Text,
-  Keyboard,
-  Alert
-} from 'react-native';
+import { TextInput, View, Text, Keyboard, Alert } from 'react-native';
 import ButtonCell from '@Components/ButtonCell';
 import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
 import SectionHeader from '@Components/SectionHeader';
 import TableSection from '@Components/TableSection';
 import SectionedTableCell from '@Components/SectionedTableCell';
 import Auth from '@SFJS/authManager';
-import SF from '@SFJS/sfjs';
 import Sync from '@SFJS/syncManager';
 import StyleKit from '@Style/StyleKit';
 
-const DEFAULT_SIGN_IN_TEXT = "Sign In";
-const DEFAULT_REGISTER_TEXT = "Register";
+const DEFAULT_SIGN_IN_TEXT = 'Sign In';
+const DEFAULT_REGISTER_TEXT = 'Register';
 
 export default class AuthSection extends Component {
   constructor(props) {
@@ -34,15 +27,15 @@ export default class AuthSection extends Component {
   }
 
   componentDidMount() {
-    this.setState({server: Auth.get().serverUrl()});
+    this.setState({ server: Auth.get().serverUrl() });
   }
 
   showAdvanced = () => {
-    this.setState({showAdvanced: true});
-  }
+    this.setState({ showAdvanced: true });
+  };
 
   onSignInPress = () => {
-    this.setState({signingIn: true, signInButtonText: "Generating Keys..."});
+    this.setState({ signingIn: true, signInButtonText: 'Generating Keys...' });
 
     Keyboard.dismiss();
 
@@ -59,13 +52,16 @@ export default class AuthSection extends Component {
     const email = this.state.email;
     const password = this.state.password;
 
-    if(!this.validate(email, password)) {
-      this.setState({signingIn: false, signInButtonText: DEFAULT_SIGN_IN_TEXT});
+    if (!this.validate(email, password)) {
+      this.setState({
+        signingIn: false,
+        signInButtonText: DEFAULT_SIGN_IN_TEXT
+      });
       return;
     }
 
     const extraParams = {};
-    if(this.state.mfa) {
+    if (this.state.mfa) {
       extraParams[this.state.mfa.payload.mfa_key] = this.state.mfa_token;
     }
 
@@ -81,35 +77,46 @@ export default class AuthSection extends Component {
      */
     Sync.get().lockSyncing();
 
-    Auth.get().login(this.state.server, email, password, strict, extraParams).then((response) => {
-      if(!response || response.error) {
-        const error = response ? response.error : {message: "An unknown error occured."}
+    Auth.get()
+      .login(this.state.server, email, password, strict, extraParams)
+      .then(response => {
+        if (!response || response.error) {
+          const error = response
+            ? response.error
+            : { message: 'An unknown error occured.' };
 
-        Sync.get().unlockSyncing();
+          Sync.get().unlockSyncing();
 
-        if(error.tag === 'mfa-required' || error.tag === 'mfa-invalid') {
-          this.setState({mfa: error});
-        } else if(error.message) {
-          Alert.alert("Oops", error.message, [{text: "OK"}])
+          if (error.tag === 'mfa-required' || error.tag === 'mfa-invalid') {
+            this.setState({ mfa: error });
+          } else if (error.message) {
+            Alert.alert('Oops', error.message, [{ text: 'OK' }]);
+          }
+          this.setState({
+            signingIn: false,
+            signInButtonText: DEFAULT_SIGN_IN_TEXT
+          });
+          return;
         }
-        this.setState({signingIn: false, signInButtonText: DEFAULT_SIGN_IN_TEXT});
-        return;
-      }
 
-      this.setState({email: null, password: null, mfa: null});
+        this.setState({ email: null, password: null, mfa: null });
 
-      this.onAuthSuccess();
-    });
-  }
+        this.onAuthSuccess();
+      });
+  };
 
   validate(email, password) {
-    if(!email) {
-      Alert.alert("Missing Email", "Please enter a valid email address.", [{text: "OK"}])
+    if (!email) {
+      Alert.alert('Missing Email', 'Please enter a valid email address.', [
+        { text: 'OK' }
+      ]);
       return false;
     }
 
-    if(!password) {
-      Alert.alert("Missing Password", "Please enter your password.", [{text: "OK"}])
+    if (!password) {
+      Alert.alert('Missing Password', 'Please enter your password.', [
+        { text: 'OK' }
+      ]);
       return false;
     }
 
@@ -122,7 +129,7 @@ export default class AuthSection extends Component {
     const email = this.state.email;
     const password = this.state.password;
 
-    if(!this.validate(email, password)) {
+    if (!this.validate(email, password)) {
       this.setState({
         registering: false,
         registerButtonText: DEFAULT_REGISTER_TEXT
@@ -130,59 +137,65 @@ export default class AuthSection extends Component {
       return;
     }
 
-    this.setState({confirmRegistration: true});
-  }
+    this.setState({ confirmRegistration: true });
+  };
 
   onRegisterConfirmCancel = () => {
-    this.setState({confirmRegistration: false});
-  }
+    this.setState({ confirmRegistration: false });
+  };
 
   onAuthSuccess = () => {
     AuthSection.emailInProgress = null;
     AuthSection.passwordInProgress = null;
-    Sync.get().markAllItemsDirtyAndSaveOffline(false).then(() => {
-      Sync.get().unlockSyncing();
-      Sync.get().sync();
-      this.props.onAuthSuccess();
-    });
-  }
+    Sync.get()
+      .markAllItemsDirtyAndSaveOffline(false)
+      .then(() => {
+        Sync.get().unlockSyncing();
+        Sync.get().sync();
+        this.props.onAuthSuccess();
+      });
+  };
 
   toggleStrictMode = () => {
-    this.setState((prevState) => {
-      return {strictSignIn: !prevState.strictSignIn};
-    })
-  }
+    this.setState(prevState => {
+      return { strictSignIn: !prevState.strictSignIn };
+    });
+  };
 
   onConfirmRegistrationPress = () => {
-    if(this.state.password !== this.state.passwordConfirmation) {
+    if (this.state.password !== this.state.passwordConfirmation) {
       Alert.alert(
         "Passwords Don't Match",
-        "The passwords you entered do not match. Please try again.",
-        [{text: "OK"}]
+        'The passwords you entered do not match. Please try again.',
+        [{ text: 'OK' }]
       );
     } else {
-      this.setState({registering: true});
+      this.setState({ registering: true });
 
-      Auth.get().register(this.state.server, this.state.email, this.state.password).then((response) => {
-        this.setState({registering: false, confirmRegistration: false});
+      Auth.get()
+        .register(this.state.server, this.state.email, this.state.password)
+        .then(response => {
+          this.setState({ registering: false, confirmRegistration: false });
 
-        if(!response || response.error) {
-          const error = response ? response.error : {message: "An unknown error occured."}
-          Alert.alert("Oops", error.message, [{text: "OK"}])
-          return;
-        }
+          if (!response || response.error) {
+            const error = response
+              ? response.error
+              : { message: 'An unknown error occured.' };
+            Alert.alert('Oops', error.message, [{ text: 'OK' }]);
+            return;
+          }
 
-        this.onAuthSuccess();
-      });
+          this.onAuthSuccess();
+        });
     }
-  }
+  };
 
   cancelMfa = () => {
-    this.setState({mfa: null});
-  }
+    this.setState({ mfa: null });
+  };
 
-  emailInputChanged = (text) => {
-    this.setState({email: text});
+  emailInputChanged = text => {
+    this.setState({ email: text });
     /**
      * If you have a local passcode with immediate timing, and you're trying to
      * sign in, and 2FA is prompted then by the time you come back from Auth,
@@ -190,23 +203,27 @@ export default class AuthSection extends Component {
      * LockedView), clearing any values. So we'll hang on to them here.
      */
     AuthSection.emailInProgress = text;
-  }
+  };
 
-  passwordInputChanged = (text) => {
-    this.setState({password: text});
+  passwordInputChanged = text => {
+    this.setState({ password: text });
     AuthSection.passwordInProgress = text;
-  }
+  };
 
   _renderRegistrationConfirm() {
     const padding = 14;
     return (
       <TableSection>
-        <SectionHeader title={"Confirm Password"} />
+        <SectionHeader title={'Confirm Password'} />
 
         <Text
           style={[
             StyleKit.styles.uiText,
-            { paddingLeft: padding, paddingRight: padding, marginBottom: padding }
+            {
+              paddingLeft: padding,
+              paddingRight: padding,
+              marginBottom: padding
+            }
           ]}
         >
           Due to the nature of our encryption, Standard Notes cannot offer password
@@ -217,7 +234,7 @@ export default class AuthSection extends Component {
         <SectionedTableCell first={true} textInputCell={true}>
           <TextInput
             style={StyleKit.styles.sectionedTableCellTextInput}
-            placeholder={"Password confirmation"}
+            placeholder={'Password confirmation'}
             onChangeText={text => this.setState({ passwordConfirmation: text })}
             value={this.state.passwordConfirmation}
             secureTextEntry={true}
@@ -229,15 +246,17 @@ export default class AuthSection extends Component {
 
         <ButtonCell
           disabled={this.state.registering}
-          title={this.state.registering ? "Generating Keys..." : "Register"}
+          title={this.state.registering ? 'Generating Keys...' : 'Register'}
           bold={true}
           onPress={() => this.onConfirmRegistrationPress()}
         />
 
-        <ButtonCell title="Cancel" onPress={() => this.onRegisterConfirmCancel()} />
+        <ButtonCell
+          title="Cancel"
+          onPress={() => this.onRegisterConfirmCancel()}
+        />
       </TableSection>
     );
-
   }
 
   _renderDefaultContent() {
@@ -261,7 +280,7 @@ export default class AuthSection extends Component {
             <TextInput
               style={StyleKit.styles.sectionedTableCellTextInput}
               placeholder=""
-              onChangeText={(text) => this.setState({mfa_token: text})}
+              onChangeText={text => this.setState({ mfa_token: text })}
               value={this.state.mfa_token}
               keyboardType={'numeric'}
               keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
@@ -272,8 +291,8 @@ export default class AuthSection extends Component {
             />
           </SectionedTableCell>
         </View>
-      )
-    }
+      );
+    };
 
     const renderNonMfaSubcontent = () => {
       return (
@@ -282,13 +301,13 @@ export default class AuthSection extends Component {
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
                 style={StyleKit.styles.sectionedTableCellTextInput}
-                placeholder={"Email"}
-                onChangeText={(text) => this.emailInputChanged(text)}
+                placeholder={'Email'}
+                onChangeText={text => this.emailInputChanged(text)}
                 value={this.state.email}
                 autoCorrect={false}
                 autoCapitalize={'none'}
                 keyboardType={'email-address'}
-                textContentType={"emailAddress"}
+                textContentType={'emailAddress'}
                 keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
@@ -298,10 +317,10 @@ export default class AuthSection extends Component {
             <SectionedTableCell textInputCell={true}>
               <TextInput
                 style={StyleKit.styles.sectionedTableCellTextInput}
-                placeholder={"Password"}
-                onChangeText={(text) => this.passwordInputChanged(text)}
+                placeholder={'Password'}
+                onChangeText={text => this.passwordInputChanged(text)}
                 value={this.state.password}
-                textContentType={"password"}
+                textContentType={'password'}
                 secureTextEntry={true}
                 keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
@@ -310,14 +329,14 @@ export default class AuthSection extends Component {
             </SectionedTableCell>
           </View>
 
-          {(this.state.showAdvanced || !this.state.server) &&
+          {(this.state.showAdvanced || !this.state.server) && (
             <View>
-              <SectionHeader title={"Advanced"} />
+              <SectionHeader title={'Advanced'} />
               <SectionedTableCell textInputCell={true} first={true}>
                 <TextInput
                   style={StyleKit.styles.sectionedTableCellTextInput}
-                  placeholder={"Sync Server"}
-                  onChangeText={(text) => this.setState({server: text})}
+                  placeholder={'Sync Server'}
+                  onChangeText={text => this.setState({ server: text })}
                   value={this.state.server}
                   autoCorrect={false}
                   autoCapitalize={'none'}
@@ -330,30 +349,26 @@ export default class AuthSection extends Component {
 
               <SectionedAccessoryTableCell
                 onPress={() => this.toggleStrictMode()}
-                text={"Use strict sign in"}
-                selected={() => {return this.state.strictSignIn}}
+                text={'Use strict sign in'}
+                selected={() => {
+                  return this.state.strictSignIn;
+                }}
                 first={false}
                 last={true}
               />
             </View>
-          }
+          )}
         </Fragment>
-      )
-    }
+      );
+    };
 
     return (
       <TableSection>
-        {this.props.title &&
-          <SectionHeader title={this.props.title} />
-        }
+        {this.props.title && <SectionHeader title={this.props.title} />}
 
-        {this.state.mfa &&
-          renderMfaSubcontent()
-        }
+        {this.state.mfa && renderMfaSubcontent()}
 
-        {!this.state.mfa &&
-          renderNonMfaSubcontent()
-        }
+        {!this.state.mfa && renderNonMfaSubcontent()}
 
         <ButtonCell
           title={this.state.signInButtonText}
@@ -362,16 +377,16 @@ export default class AuthSection extends Component {
           onPress={() => this.onSignInPress()}
         />
 
-        {this.state.mfa &&
+        {this.state.mfa && (
           <ButtonCell
             last={this.state.showAdvanced}
-            title={"Cancel"}
+            title={'Cancel'}
             disabled={this.state.signingIn}
             onPress={() => this.cancelMfa()}
           />
-        }
+        )}
 
-        {!this.state.mfa &&
+        {!this.state.mfa && (
           <ButtonCell
             last={this.state.showAdvanced}
             title={this.state.registerButtonText}
@@ -379,30 +394,25 @@ export default class AuthSection extends Component {
             bold={true}
             onPress={() => this.onRegisterPress()}
           />
-        }
+        )}
 
-        {!this.state.showAdvanced && !this.state.mfa &&
+        {!this.state.showAdvanced && !this.state.mfa && (
           <ButtonCell
             last={true}
-            title="Other
-            Options"
+            title="Other Options"
             onPress={() => this.showAdvanced()}
           />
-        }
+        )}
       </TableSection>
-    )
+    );
   }
 
   render() {
     return (
       <View>
-        {this.state.confirmRegistration &&
-          this._renderRegistrationConfirm()
-        }
+        {this.state.confirmRegistration && this._renderRegistrationConfirm()}
 
-        {!this.state.confirmRegistration &&
-          this._renderDefaultContent()
-        }
+        {!this.state.confirmRegistration && this._renderDefaultContent()}
       </View>
     );
   }

@@ -1,18 +1,15 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
-import ActionSheet from 'react-native-actionsheet'
-import Icon from 'react-native-vector-icons/Ionicons';
-import ThemedPureComponent from "@Components/ThemedPureComponent";
-import ItemActionManager from '@Lib/itemActionManager'
-import ActionSheetWrapper from "@Style/ActionSheetWrapper"
-import StyleKit from "@Style/StyleKit"
+import ThemedPureComponent from '@Components/ThemedPureComponent';
+import ItemActionManager from '@Lib/itemActionManager';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import StyleKit from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
 
 export default class NoteCell extends ThemedPureComponent {
-
   constructor(props) {
     super(props);
-    this.state = {selected: false, options: props.options || {}};
+    this.state = { selected: false, options: props.options || {} };
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -24,28 +21,28 @@ export default class NoteCell extends ThemedPureComponent {
   }
 
   _onPress = () => {
-    this.setState({selected: true});
+    this.setState({ selected: true });
     this.props.onPressItem(this.props.item);
-    this.setState({selected: false});
+    this.setState({ selected: false });
   };
 
   _onPressIn = () => {
     // Debounce
     const delay = 25;
     this.selectionTimeout = setTimeout(() => {
-      this.setState({selected: true});
+      this.setState({ selected: true });
     }, delay);
   };
 
   _onPressOut = () => {
-    if(this.selectionTimeout) {
+    if (this.selectionTimeout) {
       clearTimeout(this.selectionTimeout);
     }
-    this.setState({selected: false});
+    this.setState({ selected: false });
   };
 
   aggregateStyles(base, addition, condition) {
-    if(condition) {
+    if (condition) {
       return [base, addition];
     } else {
       return base;
@@ -53,132 +50,187 @@ export default class NoteCell extends ThemedPureComponent {
   }
 
   showActionSheet = () => {
-    if(this.props.item.errorDecrypting) {
+    if (this.props.item.errorDecrypting) {
       return;
     }
 
-    let callbackForAction = (action) => {
+    let callbackForAction = action => {
       this.props.handleAction(this.props.item, action.key, () => {
         this.forceUpdate();
       });
-    }
+    };
 
-    var pinLabel = this.props.item.pinned ? "Unpin" : "Pin";
-    let pinEvent = pinLabel == "Pin" ? ItemActionManager.PinEvent : ItemActionManager.UnpinEvent;
+    const pinLabel = this.props.item.pinned ? 'Unpin' : 'Pin';
+    const pinEvent =
+      pinLabel === 'Pin'
+        ? ItemActionManager.PinEvent
+        : ItemActionManager.UnpinEvent;
 
-    var archiveLabel = this.props.item.archived ? "Unarchive" : "Archive";
-    let archiveEvent = archiveLabel == "Archive" ? ItemActionManager.ArchiveEvent : ItemActionManager.UnarchiveEvent;
+    const archiveLabel = this.props.item.archived ? 'Unarchive' : 'Archive';
+    const archiveEvent =
+      archiveLabel === 'Archive'
+        ? ItemActionManager.ArchiveEvent
+        : ItemActionManager.UnarchiveEvent;
 
-    var lockLabel = this.props.item.locked ? "Unlock" : "Lock";
-    let lockEvent = lockLabel == "Lock" ? ItemActionManager.LockEvent : ItemActionManager.UnlockEvent;
+    const lockLabel = this.props.item.locked ? 'Unlock' : 'Lock';
+    const lockEvent =
+      lockLabel === 'Lock'
+        ? ItemActionManager.LockEvent
+        : ItemActionManager.UnlockEvent;
 
-    var protectLabel = this.props.item.content.protected ? "Unprotect" : "Protect";
-    let protectEvent = protectLabel == "Protect" ? ItemActionManager.ProtectEvent : ItemActionManager.UnprotectEvent;
+    const protectLabel = this.props.item.content.protected
+      ? 'Unprotect'
+      : 'Protect';
+    const protectEvent =
+      protectLabel === 'Protect'
+        ? ItemActionManager.ProtectEvent
+        : ItemActionManager.UnprotectEvent;
 
     let sheet;
-    if(this.props.item.content.protected) {
+    if (this.props.item.content.protected) {
       sheet = new ActionSheetWrapper({
-        title: "Note Protected",
+        title: 'Note Protected',
         options: [],
         onCancel: () => {
-          this.setState({actionSheet: null});
+          this.setState({ actionSheet: null });
         }
       });
     } else {
-      let options = [
-        ActionSheetWrapper.BuildOption({text: pinLabel, key: pinEvent, callback: callbackForAction}),
-        ActionSheetWrapper.BuildOption({text: archiveLabel, key: archiveEvent, callback: callbackForAction}),
-        ActionSheetWrapper.BuildOption({text: lockLabel, key: lockEvent, callback: callbackForAction}),
-        ActionSheetWrapper.BuildOption({text: protectLabel, key: protectEvent, callback: callbackForAction}),
-        ActionSheetWrapper.BuildOption({text: "Share", key: ItemActionManager.ShareEvent, callback: callbackForAction}),
-      ]
+      const options = [
+        ActionSheetWrapper.BuildOption({
+          text: pinLabel,
+          key: pinEvent,
+          callback: callbackForAction
+        }),
+        ActionSheetWrapper.BuildOption({
+          text: archiveLabel,
+          key: archiveEvent,
+          callback: callbackForAction
+        }),
+        ActionSheetWrapper.BuildOption({
+          text: lockLabel,
+          key: lockEvent,
+          callback: callbackForAction
+        }),
+        ActionSheetWrapper.BuildOption({
+          text: protectLabel,
+          key: protectEvent,
+          callback: callbackForAction
+        }),
+        ActionSheetWrapper.BuildOption({
+          text: 'Share',
+          key: ItemActionManager.ShareEvent,
+          callback: callbackForAction
+        })
+      ];
 
-      if(!this.props.item.content.trashed) {
-        options.push(ActionSheetWrapper.BuildOption({text: "Move to Trash", key: ItemActionManager.TrashEvent, destructive: true, callback: callbackForAction}));
+      if (!this.props.item.content.trashed) {
+        options.push(
+          ActionSheetWrapper.BuildOption({
+            text: 'Move to Trash',
+            key: ItemActionManager.TrashEvent,
+            destructive: true,
+            callback: callbackForAction
+          })
+        );
       } else {
-        options.push(ActionSheetWrapper.BuildOption({text: "Restore Note", key: ItemActionManager.RestoreEvent, destructive: false, callback: callbackForAction}));
-        options.push(ActionSheetWrapper.BuildOption({text: "Delete Permanently", key: ItemActionManager.DeleteEvent, destructive: true, callback: callbackForAction}));
+        options.push(
+          ActionSheetWrapper.BuildOption({
+            text: 'Restore Note',
+            key: ItemActionManager.RestoreEvent,
+            destructive: false,
+            callback: callbackForAction
+          })
+        );
+        options.push(
+          ActionSheetWrapper.BuildOption({
+            text: 'Delete Permanently',
+            key: ItemActionManager.DeleteEvent,
+            destructive: true,
+            callback: callbackForAction
+          })
+        );
       }
 
       sheet = new ActionSheetWrapper({
         title: this.props.item.safeTitle(),
         options: options,
         onCancel: () => {
-          this.setState({actionSheet: null});
+          this.setState({ actionSheet: null });
         }
       });
     }
 
-    this.setState({actionSheet: sheet.actionSheetElement()});
+    this.setState({ actionSheet: sheet.actionSheetElement() });
     sheet.show();
-  }
+  };
 
   getFlags(note) {
     let flags = [];
 
-    if(note.pinned) {
+    if (note.pinned) {
       flags.push({
-        text: "Pinned",
+        text: 'Pinned',
         color: StyleKit.variables.stylekitInfoColor
-      })
+      });
     }
 
-    if(note.archived) {
+    if (note.archived) {
       flags.push({
-        text: "Archived",
+        text: 'Archived',
         color: StyleKit.variables.stylekitWarningColor
-      })
+      });
     }
 
-    if(note.content.protected) {
+    if (note.content.protected) {
       flags.push({
-        text: "Protected",
+        text: 'Protected',
         color: StyleKit.variables.stylekitSuccessColor
-      })
+      });
     }
 
-    if(note.locked) {
+    if (note.locked) {
       flags.push({
-        text: "Locked",
+        text: 'Locked',
         color: StyleKit.variables.stylekitNeutralColor
-      })
+      });
     }
 
-    if(note.content.trashed) {
+    if (note.content.trashed) {
       flags.push({
-        text: "Deleted",
+        text: 'Deleted',
         color: StyleKit.variables.stylekitDangerColor
-      })
+      });
     }
 
-    if(note.errorDecrypting) {
+    if (note.errorDecrypting) {
       flags.push({
-        text: "Missing Keys",
+        text: 'Missing Keys',
         color: StyleKit.variables.stylekitDangerColor
-      })
+      });
     }
 
-    if(note.content.conflict_of) {
+    if (note.content.conflict_of) {
       flags.push({
-        text: "Conflicted Copy",
+        text: 'Conflicted Copy',
         color: StyleKit.variables.stylekitDangerColor
-      })
+      });
     }
 
-    if(note.deleted) {
+    if (note.deleted) {
       flags.push({
-        text: "Deletion Pending Sync",
+        text: 'Deletion Pending Sync',
         color: StyleKit.variables.stylekitDangerColor
-      })
+      });
     }
 
     return flags;
   }
 
-  flagElement = (flag) => {
+  flagElement = flag => {
     let bgColor = flag.color;
     let textColor = StyleKit.variables.stylekitInfoContrastColor;
-    if(this.state.selected || this.props.highlighted) {
+    if (this.state.selected || this.props.highlighted) {
       bgColor = StyleKit.variables.stylekitInfoContrastColor;
       textColor = StyleKit.variables.stylekitInfoColor;
     }
@@ -194,114 +246,175 @@ export default class NoteCell extends ThemedPureComponent {
       text: {
         color: textColor,
         fontSize: 10,
-        fontWeight: "bold"
+        fontWeight: 'bold'
       }
-    }
+    };
     return (
       <View key={flag.text} style={styles.background}>
         <Text style={styles.text}>{flag.text}</Text>
       </View>
-    )
-  }
+    );
+  };
 
   render() {
-    var note = this.props.item;
-    let showPreview = !this.state.options.hidePreviews && !note.content.protected && !note.content.hidePreview;
-    let flags = this.getFlags(note);
-    let showTagsString = this.props.renderTags && !this.state.options.hideTags && note.tags.length > 0 && !note.content.protected;
+    const note = this.props.item;
+    const showPreview =
+      !this.state.options.hidePreviews &&
+      !note.content.protected &&
+      !note.content.hidePreview;
+    const flags = this.getFlags(note);
+    const showTagsString =
+      this.props.renderTags &&
+      !this.state.options.hideTags &&
+      note.tags.length > 0 &&
+      !note.content.protected;
 
-    let highlight = this.state.selected || this.props.highlighted;
+    const highlight = this.state.selected || this.props.highlighted;
 
     return (
-       <TouchableWithoutFeedback onPress={this._onPress} onPressIn={this._onPressIn} onPressOut={this._onPressOut} onLongPress={this.showActionSheet}>
-          <View style={this.aggregateStyles(this.styles.noteCell, this.styles.noteCellSelected, highlight)} onPress={this._onPress}>
+      <TouchableWithoutFeedback
+        onPress={this._onPress}
+        onPressIn={this._onPressIn}
+        onPressOut={this._onPressOut}
+        onLongPress={this.showActionSheet}
+      >
+        <View
+          style={this.aggregateStyles(
+            this.styles.noteCell,
+            this.styles.noteCellSelected,
+            highlight
+          )}
+          onPress={this._onPress}
+        >
+          {note.deleted && (
+            <Text style={this.styles.deleting}>Deleting...</Text>
+          )}
 
-            {note.deleted &&
-              <Text style={this.styles.deleting}>Deleting...</Text>
-            }
+          {flags.length > 0 && (
+            <View style={this.styles.flagsContainer}>
+              {flags.map(flag => this.flagElement(flag))}
+            </View>
+          )}
 
-            {flags.length > 0 &&
-              <View style={this.styles.flagsContainer}>
-                {flags.map((flag) =>
-                  this.flagElement(flag)
+          {note.errorDecrypting && (
+            <View>
+              <Text
+                numberOfLines={2}
+                style={this.aggregateStyles(
+                  this.styles.noteText,
+                  this.styles.noteTextSelected,
+                  highlight
                 )}
-              </View>
-            }
-
-            {note.errorDecrypting &&
-              <View>
-                <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, highlight)}>
-                  {"Please sign in to restore your decryption keys and notes."}
-                </Text>
-              </View>
-            }
-
-            {note.safeTitle().length > 0 &&
-              <Text style={this.aggregateStyles(this.styles.noteTitle, this.styles.noteTitleSelected, highlight)}>
-                {note.title}
+              >
+                {'Please sign in to restore your decryption keys and notes.'}
               </Text>
-            }
+            </View>
+          )}
 
-            {(note.content.preview_plain != null && showPreview) &&
-              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, highlight)}>
-                {note.content.preview_plain}
-              </Text>
-            }
+          {note.safeTitle().length > 0 && (
+            <Text
+              style={this.aggregateStyles(
+                this.styles.noteTitle,
+                this.styles.noteTitleSelected,
+                highlight
+              )}
+            >
+              {note.title}
+            </Text>
+          )}
 
-            {(!note.content.preview_plain && showPreview && note.safeText().length > 0) &&
-              <Text numberOfLines={2} style={this.aggregateStyles(this.styles.noteText, this.styles.noteTextSelected, highlight)}>
+          {note.content.preview_plain != null && showPreview && (
+            <Text
+              numberOfLines={2}
+              style={this.aggregateStyles(
+                this.styles.noteText,
+                this.styles.noteTextSelected,
+                highlight
+              )}
+            >
+              {note.content.preview_plain}
+            </Text>
+          )}
+
+          {!note.content.preview_plain &&
+            showPreview &&
+            note.safeText().length > 0 && (
+              <Text
+                numberOfLines={2}
+                style={this.aggregateStyles(
+                  this.styles.noteText,
+                  this.styles.noteTextSelected,
+                  highlight
+                )}
+              >
                 {note.text}
               </Text>
-            }
+            )}
 
-            {!this.state.options.hideDates &&
+          {!this.state.options.hideDates && (
+            <Text
+              numberOfLines={1}
+              style={this.aggregateStyles(
+                this.styles.noteDate,
+                this.styles.noteDateSelected,
+                highlight
+              )}
+            >
+              {this.props.sortType === 'client_updated_at'
+                ? 'Modified ' + note.updatedAtString()
+                : note.createdAtString()}
+            </Text>
+          )}
+
+          {showTagsString && (
+            <View style={this.styles.noteTagsContainer}>
               <Text
                 numberOfLines={1}
-                style={this.aggregateStyles(this.styles.noteDate, this.styles.noteDateSelected, highlight)}>
-                {this.props.sortType == "client_updated_at" ? "Modified " + note.updatedAtString() : note.createdAtString()}
+                style={this.aggregateStyles(
+                  this.styles.noteTag,
+                  this.styles.noteTagSelected,
+                  highlight
+                )}
+              >
+                {this.props.tagsString}
               </Text>
-            }
+            </View>
+          )}
 
-            {showTagsString &&
-              <View style={this.styles.noteTagsContainer}>
-                <Text numberOfLines={1} style={this.aggregateStyles(this.styles.noteTag, this.styles.noteTagSelected, highlight)}>
-                  {this.props.tagsString}
-                </Text>
-              </View>
-            }
-
-            {this.state.actionSheet && this.state.actionSheet}
+          {this.state.actionSheet && this.state.actionSheet}
         </View>
       </TouchableWithoutFeedback>
-    )
+    );
   }
 
   loadStyles() {
     let padding = 14;
     this.styles = StyleSheet.create({
-
       noteCell: {
         padding: padding,
         paddingRight: padding * 2,
-        borderBottomColor: hexToRGBA(StyleKit.variables.stylekitBorderColor, 0.75),
+        borderBottomColor: hexToRGBA(
+          StyleKit.variables.stylekitBorderColor,
+          0.75
+        ),
         borderBottomWidth: 1,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
       },
 
       noteCellSelected: {
-        backgroundColor: StyleKit.variables.stylekitInfoColor,
+        backgroundColor: StyleKit.variables.stylekitInfoColor
       },
 
       noteTagsContainer: {
         flex: 1,
         flexDirection: 'row',
-        marginTop: 7,
+        marginTop: 7
       },
 
       pinnedView: {
         flex: 1,
         flexDirection: 'row',
-        marginBottom: 5,
+        marginBottom: 5
       },
 
       flagsContainer: {
@@ -314,7 +427,7 @@ export default class NoteCell extends ThemedPureComponent {
         marginRight: 2,
         fontSize: 12,
         color: StyleKit.variables.stylekitForegroundColor,
-        opacity: 0.5,
+        opacity: 0.5
       },
 
       noteTagSelected: {
@@ -323,7 +436,7 @@ export default class NoteCell extends ThemedPureComponent {
       },
 
       noteTitle: {
-        fontWeight: "bold",
+        fontWeight: 'bold',
         fontSize: 16,
         color: StyleKit.variables.stylekitForegroundColor
       },
@@ -358,7 +471,7 @@ export default class NoteCell extends ThemedPureComponent {
 
       deleting: {
         color: StyleKit.variables.stylekitInfoColor,
-        marginBottom: 5,
+        marginBottom: 5
       }
     });
   }

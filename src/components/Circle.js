@@ -1,10 +1,8 @@
-import React, { Component } from 'react';
-import {TouchableHighlight, Text, View} from 'react-native';
-import SectionedTableCell from './SectionedTableCell'
-import StyleKit from "@Style/StyleKit"
+import React from 'react';
+import { View } from 'react-native';
+import SectionedTableCell from '@Components/SectionedTableCell';
 
 export default class Circle extends SectionedTableCell {
-
   constructor(props) {
     super(props);
     this.size = props.size || 12;
@@ -12,9 +10,7 @@ export default class Circle extends SectionedTableCell {
   }
 
   render() {
-    return (
-      <View style={this.styles.circle} />
-    )
+    return <View style={this.styles.circle} />;
   }
 
   loadStyles() {
@@ -22,11 +18,11 @@ export default class Circle extends SectionedTableCell {
       circle: {
         width: this.size,
         height: this.size,
-        borderRadius: this.size/2.0,
+        borderRadius: this.size / 2.0,
         backgroundColor: this.props.backgroundColor,
         borderColor: this.props.borderColor,
         borderWidth: 1
       }
-    }
+    };
   }
 }

@@ -23,7 +23,7 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
   get headerButtonStyles() {
     return {
       color: StyleKit.variables.stylekitNeutralColor,
-      fontSize: StyleKit.constants.mainTextFontSize - 5,
+      fontSize: StyleKit.constants.mainTextFontSize - 5
     };
   }
 

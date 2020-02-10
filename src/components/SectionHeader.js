@@ -1,28 +1,51 @@
-import React, { Component } from 'react';
-import {Text, Platform, View, TouchableOpacity} from 'react-native';
-
-import StyleKit from "@Style/StyleKit"
-import ThemedComponent from "@Components/ThemedComponent"
+import React from 'react';
+import { Text, Platform, View, TouchableOpacity } from 'react-native';
+import ThemedComponent from '@Components/ThemedComponent';
+import StyleKit from '@Style/StyleKit';
 
 export default class SectionHeader extends ThemedComponent {
   render() {
-    var title = this.props.title;
-    if(Platform.OS == "ios") { title = title.toUpperCase(); }
+    let title = this.props.title;
+    if (Platform.OS === 'ios') {
+      title = title.toUpperCase();
+    }
     return (
-      <View style={[this.styles.container, {backgroundColor: this.props.backgroundColor, color: this.props.foregroundColor}]}>
-        <View>
-          <Text style={[this.styles.title, this.props.tinted ? {color: StyleKit.variables.stylekitInfoColor} : null]}>{title}</Text>
-          {this.props.subtitle &&
-            <Text style={this.styles.subtitle}>{this.props.subtitle}</Text>
+      <View
+        style={[
+          this.styles.container,
+          {
+            backgroundColor: this.props.backgroundColor,
+            color: this.props.foregroundColor
           }
+        ]}
+      >
+        <View>
+          <Text
+            style={[
+              this.styles.title,
+              this.props.tinted
+                ? { color: StyleKit.variables.stylekitInfoColor }
+                : null
+            ]}
+          >
+            {title}
+          </Text>
+          {this.props.subtitle && (
+            <Text style={this.styles.subtitle}>{this.props.subtitle}</Text>
+          )}
         </View>
-        {this.props.buttonText &&
-          <TouchableOpacity style={this.styles.buttonContainer} onPress={this.props.buttonAction}>
-            <Text style={[this.styles.button, this.props.buttonStyles]}>{this.props.buttonText}</Text>
+        {this.props.buttonText && (
+          <TouchableOpacity
+            style={this.styles.buttonContainer}
+            onPress={this.props.buttonAction}
+          >
+            <Text style={[this.styles.button, this.props.buttonStyles]}>
+              {this.props.buttonText}
+            </Text>
           </TouchableOpacity>
-        }
+        )}
       </View>
-    )
+    );
   }
 
   loadStyles() {
@@ -30,7 +53,7 @@ export default class SectionHeader extends ThemedComponent {
       container: {
         flex: 1,
         flexGrow: 0,
-        justifyContent: "space-between",
+        justifyContent: 'space-between',
         flexDirection: 'row',
         paddingRight: StyleKit.constants.paddingLeft,
         paddingBottom: 10,
@@ -43,7 +66,7 @@ export default class SectionHeader extends ThemedComponent {
         fontSize: StyleKit.constants.mainTextFontSize - 4,
         paddingLeft: StyleKit.constants.paddingLeft,
         color: StyleKit.variables.stylekitNeutralColor,
-        fontWeight: Platform.OS == "android" ? "bold" : "normal"
+        fontWeight: Platform.OS === 'android' ? 'bold' : 'normal'
       },
 
       subtitle: {
@@ -51,13 +74,13 @@ export default class SectionHeader extends ThemedComponent {
         fontSize: StyleKit.constants.mainTextFontSize - 5,
         marginTop: 4,
         paddingLeft: StyleKit.constants.paddingLeft,
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: StyleKit.variables.stylekitNeutralColor
       },
 
       buttonContainer: {
         flex: 1,
-        alignItems: "flex-end",
-        justifyContent: "center",
+        alignItems: 'flex-end',
+        justifyContent: 'center'
       },
 
       button: {
@@ -67,7 +90,7 @@ export default class SectionHeader extends ThemedComponent {
       titleAndroid: {
         fontSize: StyleKit.constants.mainTextFontSize - 2,
         color: StyleKit.variables.stylekitInfoColor
-      },
-    }
+      }
+    };
   }
 }

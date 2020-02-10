@@ -1,37 +1,35 @@
-import React, { Component } from 'react';
-import {
-  TextInput,
-  View,
-  Text,
-  Platform,
-  Alert
-} from 'react-native';
+import React from 'react';
+import { TextInput, Text } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import ButtonCell from '@Components/ButtonCell';
-import SectionHeader from '@Components/SectionHeader';
 import SectionedTableCell from '@Components/SectionedTableCell';
 import TableSection from '@Components/TableSection';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
+import Abstract from '@Screens/Abstract';
 import ModelManager from '@SFJS/modelManager';
 import SF from '@SFJS/sfjs';
 import Sync from '@SFJS/syncManager';
-import Abstract from '@Screens/Abstract';
 import AlertManager from '@SFJS/alertManager';
 import { ICON_CLOSE } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
 export default class KeyRecovery extends Abstract {
-
   static navigationOptions = ({ navigation, navigationOptions }) => {
     const templateOptions = {
-      title: "Key Recovery",
+      title: 'Key Recovery',
       leftButton: {
-        title: ApplicationState.isIOS ? "Cancel" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CLOSE),
+        title: ApplicationState.isIOS ? 'Cancel' : null,
+        iconName: ApplicationState.isIOS
+          ? null
+          : StyleKit.nameForIcon(ICON_CLOSE)
       }
-    }
-    return Abstract.getDefaultNavigationOptions({navigation, navigationOptions, templateOptions});
+    };
+    return Abstract.getDefaultNavigationOptions({
+      navigation,
+      navigationOptions,
+      templateOptions
+    });
   };
 
   constructor(props) {
@@ -39,15 +37,17 @@ export default class KeyRecovery extends Abstract {
 
     props.navigation.setParams({
       leftButton: {
-        title: ApplicationState.isIOS ? "Cancel" : null,
-        iconName: ApplicationState.isIOS ? null : StyleKit.nameForIcon(ICON_CLOSE),
+        title: ApplicationState.isIOS ? 'Cancel' : null,
+        iconName: ApplicationState.isIOS
+          ? null
+          : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
         }
       }
-    })
+    });
 
-    this.state = {text: ""}
+    this.state = { text: '' };
 
     this.reloadData();
   }
@@ -55,8 +55,8 @@ export default class KeyRecovery extends Abstract {
   reloadData() {
     this.items = ModelManager.get().allItems;
     this.encryptedCount = 0;
-    for(var item of this.items) {
-      if(item.errorDecrypting) {
+    for (const item of this.items) {
+      if (item.errorDecrypting) {
         this.encryptedCount++;
       }
     }
@@ -67,69 +67,79 @@ export default class KeyRecovery extends Abstract {
   }
 
   submit = async () => {
-    let authParams = KeysManager.get().offlineAuthParams;
-    let keys = await SF.get().crypto.computeEncryptionKeysForUser(this.state.text, authParams);
+    const authParams = KeysManager.get().offlineAuthParams;
+    const keys = await SF.get().crypto.computeEncryptionKeysForUser(
+      this.state.text,
+      authParams
+    );
     await SFJS.itemTransformer.decryptMultipleItems(this.items, keys);
 
     this.encryptedCount = 0;
-    for(var item of this.items) {
-      if(item.errorDecrypting) {
+    for (const item of this.items) {
+      if (item.errorDecrypting) {
         this.encryptedCount++;
       }
     }
 
-    let useKeys = async (confirm) => {
-      let run = async () => {
+    let useKeys = async confirm => {
+      const run = async () => {
         await KeysManager.get().persistOfflineKeys(keys);
-        await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(this.items, null, SFModelManager.MappingSourceLocalRetrieved);
+        await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
+          this.items,
+          null,
+          SFModelManager.MappingSourceLocalRetrieved
+        );
         await Sync.get().writeItemsToLocalStorage(this.items);
         this.dismiss();
-      }
+      };
 
-      if(confirm) {
+      if (confirm) {
         AlertManager.get().confirm({
-          title: "Use Keys?",
-          text: `Are you sure you want to use these keys? Not all items are decrypted, but if some have been, it may be an optimal solution.`,
-          cancelButtonText: "Cancel",
-          confirmButtonText: "Use",
+          title: 'Use Keys?',
+          text: 'Are you sure you want to use these keys? Not all items are decrypted, but if some have been, it may be an optimal solution.',
+          cancelButtonText: 'Cancel',
+          confirmButtonText: 'Use',
           onConfirm: () => {
             run();
           }
-        })
+        });
       } else {
         run();
       }
-    }
+    };
 
-    if(this.encryptedCount == 0) {
+    if (this.encryptedCount === 0) {
       // This is the correct passcode, automatically use it.
       useKeys();
     } else {
       AlertManager.get().confirm({
-        title: "Unable to Decrypt",
-        text: `The passcode you attempted still yields ${this.encryptedCount} un-decryptable items. It's most likely incorrect.`,
-        cancelButtonText: "Use Anyway",
-        confirmButtonText: "Try Again",
+        title: 'Unable to Decrypt',
+        text: `The passcode you attempted still yields ${
+          this.encryptedCount
+        } un-decryptable items. It's most likely incorrect.`,
+        cancelButtonText: 'Use Anyway',
+        confirmButtonText: 'Try Again',
         onConfirm: () => {
           // Try again
-          this.setState({text: ""});
+          this.setState({ text: '' });
         },
         onCancel: () => {
           // Use anyway
           useKeys(true);
         }
-      })
+      });
     }
-  }
+  };
 
-  onTextChange = (text) => {
-    this.setState({text: text})
-  }
+  onTextChange = text => {
+    this.setState({ text: text });
+  };
 
   render() {
-
     return (
-      <SafeAreaView style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}>
+      <SafeAreaView
+        style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}
+      >
         <TableSection extraStyles={[StyleKit.styles.container]}>
           <SectionedTableCell first={true}>
             <Text>
@@ -141,9 +151,11 @@ export default class KeyRecovery extends Abstract {
           </SectionedTableCell>
           <SectionedTableCell textInputCell={true} last={true}>
             <TextInput
-              ref={(ref) => {this.inputRef = ref}}
+              ref={ref => {
+                this.inputRef = ref;
+              }}
               style={[StyleKit.styles.sectionedTableCellTextInput]}
-              placeholder={"Enter Local Passcode"}
+              placeholder={'Enter Local Passcode'}
               onChangeText={this.onTextChange}
               value={this.state.text}
               secureTextEntry={true}
@@ -151,7 +163,7 @@ export default class KeyRecovery extends Abstract {
               autoCapitalize={'none'}
               keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
               autoFocus={true}
-              placeholderTextColor={StyleKit.variable("stylekitNeutralColor")}
+              placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
               underlineColorAndroid={'transparent'}
               onSubmitEditing={this.submit.bind(this)}
             />
@@ -159,8 +171,8 @@ export default class KeyRecovery extends Abstract {
 
           <ButtonCell
             maxHeight={45}
-            disabled={this.state.text.length == 0}
-            title={"Submit"}
+            disabled={this.state.text.length === 0}
+            title={'Submit'}
             bold={true}
             onPress={() => this.submit()}
           />
@@ -168,5 +180,4 @@ export default class KeyRecovery extends Abstract {
       </SafeAreaView>
     );
   }
-
 }

@@ -1,7 +1,6 @@
-import KeysManager from '@Lib/keysManager'
+import KeysManager from '@Lib/keysManager';
 
 export default class Server extends SFHttpManager {
-
   static instance = null;
 
   static get() {
@@ -17,6 +16,6 @@ export default class Server extends SFHttpManager {
 
     this.setJWTRequestHandler(async () => {
       return KeysManager.get().jwt();
-    })
+    });
   }
 }

@@ -26,7 +26,7 @@ import {
   SFPrivilegesManager
 } from 'standard-file-js';
 
-SFItem.AppDomain = "org.standardnotes.sn";
+SFItem.AppDomain = 'org.standardnotes.sn';
 
 global.SFItem = SFItem;
 global.SFItemParams = SFItemParams;
@@ -38,16 +38,10 @@ global.SFHttpManager = SFHttpManager;
 global.SFAuthManager = SFAuthManager;
 global.SFPrivilegesManager = SFPrivilegesManager;
 
-import SF from "./lib/sfjs/sfjs"
+import SF from './lib/sfjs/sfjs';
 global.SFJS = SF.get();
 
-import {
-  SNNote,
-  SNTag,
-  SNTheme,
-  SNComponent,
-  SNComponentManager
-} from 'snjs';
+import { SNNote, SNTag, SNTheme, SNComponent, SNComponentManager } from 'snjs';
 
 global.SNNote = SNNote;
 global.SNTag = SNTag;
