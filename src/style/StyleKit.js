@@ -49,12 +49,20 @@ export default class StyleKit {
             this.activeTheme.isSwapIn = false;
           }
         }
+
+        const activeUuid = this.activeTheme.uuid;
+        for (const theme of deletedItems) {
+          if (activeUuid === theme.uuid) {
+            this.resetToSystemTheme();
+            return;
+          }
+        }
       }
     );
 
     this.signoutObserver = Auth.get().addEventHandler(event => {
       if (event === SFAuthManager.DidSignOutEvent) {
-        this.activateTheme(this.systemThemes[0]);
+        this.resetToSystemTheme();
       }
     });
   }
@@ -92,10 +100,10 @@ export default class StyleKit {
 
     /**
      * If we're changing the theme for a specific mode and we're currently on
-     * that mode, then set this theme as active
+     * that mode, then activate this theme.
      */
     if (this.currentDarkMode === mode && this.activeTheme.uuid !== theme.uuid) {
-      this.setActiveTheme(theme);
+      this.activateTheme(theme);
     }
   }
 
@@ -147,6 +155,13 @@ export default class StyleKit {
 
       this.systemThemes.push(theme);
     }
+  }
+
+  /**
+   * @private
+   */
+  resetToSystemTheme() {
+    this.activateTheme(this.systemThemes[0]);
   }
 
   async resolveInitialTheme() {
@@ -275,6 +290,7 @@ export default class StyleKit {
 
   activateTheme(theme) {
     const performActivation = () => {
+      this.setActiveTheme(theme);
       this.assignThemeForMode({ theme: theme, mode: this.currentDarkMode });
     };
 

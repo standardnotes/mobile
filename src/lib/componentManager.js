@@ -131,7 +131,7 @@ export default class ComponentManager extends SNComponentManager {
     }
 
     if (editor) {
-      if (note.content.mobilePrefersPlainEditor == true) {
+      if (note.content.mobilePrefersPlainEditor === true) {
         note.content.mobilePrefersPlainEditor = false;
         note.setDirty(true);
       }
