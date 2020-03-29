@@ -63,6 +63,9 @@ class OptionsSection extends Abstract {
               });
             }
             this.setState({ loadingExport: false });
+          })
+          .catch(error => {
+            this.setState({ loadingExport: false });
           });
       },
       () => {
