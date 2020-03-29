@@ -336,7 +336,10 @@ export default class MainSideMenu extends AbstractSideMenu {
             size={29}
             paddingTop={ApplicationState.isIOS ? 2 : 0}
             iconTextComponent={
-              <Icon name={StyleKit.nameForIcon(ICON_SETTINGS)} />
+              <Icon
+                testID="settingsButton"
+                name={StyleKit.nameForIcon(ICON_SETTINGS)}
+              />
             }
           />
 

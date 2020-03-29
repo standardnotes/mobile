@@ -15,6 +15,7 @@ const IoniconsHeaderButton = passMeFurther => (
   // and it is important to pass those props to `HeaderButton`
   // then you may add some information like icon size or color (if you use icons)
   <HeaderButton
+    testID="headerButton"
     {...passMeFurther}
     IconComponent={Icon}
     iconSize={30}
