@@ -14,6 +14,7 @@ export default class NoteList extends ThemedComponent {
 
     return (
       <View
+        testID="noteListHeader"
         style={{
           paddingLeft: 5,
           paddingRight: 5,

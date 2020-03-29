@@ -90,7 +90,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     }
 
     const textWrapper = (
-      <Text key={1} style={textStyles}>
+      <Text testID={`${this.props.testID}-text`} key={1} style={textStyles}>
         {this.props.text}
       </Text>
     );
@@ -104,6 +104,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
     return (
       <TouchableHighlight
+        testID={this.props.testID}
         underlayColor={StyleKit.variables.stylekitBorderColor}
         style={this.rules()}
         onPress={this.onPress}

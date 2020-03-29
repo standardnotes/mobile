@@ -126,6 +126,7 @@ class OptionsSection extends Abstract {
         )}
 
         <SectionedOptionsTableCell
+          testID="exportData"
           last={!hasLastExportSection}
           first={false}
           disabled={this.state.loadingExport}
@@ -137,6 +138,7 @@ class OptionsSection extends Abstract {
 
         {hasLastExportSection && (
           <SectionedAccessoryTableCell
+            testID="lastExportDate"
             last={true}
             onPress={() => {
               (!this.state.lastExportDate || stale) &&

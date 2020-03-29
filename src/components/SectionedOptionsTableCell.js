@@ -31,8 +31,9 @@ export default class SectionedOptionsTableCell extends ThemedComponent {
 
   render() {
     return (
-      <View style={this.rules()}>
+      <View testID={this.props.testID} style={this.rules()}>
         <Text
+          testID={`${this.props.testID}-title`}
           style={[
             StyleKit.styles.sectionedAccessoryTableCellLabel,
             this.styles.titleStyles
@@ -48,6 +49,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent {
             }
             return (
               <TouchableHighlight
+                testID={`${this.props.testID}-option-${option.key}`}
                 underlayColor={StyleKit.variables.stylekitBorderColor}
                 key={option.title}
                 style={[
