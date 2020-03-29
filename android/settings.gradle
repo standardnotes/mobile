@@ -20,3 +20,6 @@ project(':RNMail').projectDir = new File(rootProject.projectDir, '../vendor/reac
 
 include ':react-native-flag-secure-android'
 project(':react-native-flag-secure-android').projectDir = new File(rootProject.projectDir, '../vendor/react-native-flag-secure-android/android/')
+
+include ':detox'
+project(':detox').projectDir = new File(rootProject.projectDir, '../node_modules/detox/android/detox')
