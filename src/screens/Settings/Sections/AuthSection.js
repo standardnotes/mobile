@@ -233,6 +233,7 @@ export default class AuthSection extends Component {
 
         <SectionedTableCell first={true} textInputCell={true}>
           <TextInput
+            testID="passwordConfirmationField"
             style={StyleKit.styles.sectionedTableCellTextInput}
             placeholder={'Password confirmation'}
             onChangeText={text => this.setState({ passwordConfirmation: text })}
@@ -245,6 +246,7 @@ export default class AuthSection extends Component {
         </SectionedTableCell>
 
         <ButtonCell
+          testID="registerConfirmButton"
           disabled={this.state.registering}
           title={this.state.registering ? 'Generating Keys...' : 'Register'}
           bold={true}
@@ -300,6 +302,7 @@ export default class AuthSection extends Component {
           <View>
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
+                testID="emailField"
                 style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={'Email'}
                 onChangeText={text => this.emailInputChanged(text)}
@@ -316,6 +319,7 @@ export default class AuthSection extends Component {
 
             <SectionedTableCell textInputCell={true}>
               <TextInput
+                testID="passwordField"
                 style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={'Password'}
                 onChangeText={text => this.passwordInputChanged(text)}
@@ -334,6 +338,7 @@ export default class AuthSection extends Component {
               <SectionHeader title={'Advanced'} />
               <SectionedTableCell textInputCell={true} first={true}>
                 <TextInput
+                  testID="syncServerField"
                   style={StyleKit.styles.sectionedTableCellTextInput}
                   placeholder={'Sync Server'}
                   onChangeText={text => this.setState({ server: text })}
@@ -371,6 +376,7 @@ export default class AuthSection extends Component {
         {!this.state.mfa && renderNonMfaSubcontent()}
 
         <ButtonCell
+          testID="signInButton"
           title={this.state.signInButtonText}
           disabled={this.state.signingIn}
           bold={true}
@@ -388,6 +394,7 @@ export default class AuthSection extends Component {
 
         {!this.state.mfa && (
           <ButtonCell
+            testID="registerButton"
             last={this.state.showAdvanced}
             title={this.state.registerButtonText}
             disabled={this.state.registering}
@@ -398,6 +405,7 @@ export default class AuthSection extends Component {
 
         {!this.state.showAdvanced && !this.state.mfa && (
           <ButtonCell
+            testID="otherOptionsButton"
             last={true}
             title="Other Options"
             onPress={() => this.showAdvanced()}

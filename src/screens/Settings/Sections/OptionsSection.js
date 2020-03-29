@@ -18,10 +18,12 @@ class OptionsSection extends Abstract {
     super(props);
     let encryptionAvailable = KeysManager.get().activeKeys() != null;
     let email = KeysManager.get().getUserEmail();
+    let isOffline = Auth.get().offline();
     this.state = {
       loadingExport: false,
       encryptionAvailable: encryptionAvailable,
-      email: email
+      email: email,
+      signedIn: !isOffline
     };
   }
 
@@ -93,6 +95,12 @@ class OptionsSection extends Abstract {
     );
   };
 
+  onSignOutPress = () => {
+    this.props.onSignOutPress().then(() => {
+      this.setState({ signedIn: false });
+    });
+  };
+
   render() {
     let lastExportString, stale;
     if (this.state.lastExportDate) {
@@ -106,7 +114,7 @@ class OptionsSection extends Abstract {
       lastExportString = 'Your data has not yet been backed up.';
     }
 
-    const signedIn = !Auth.get().offline();
+    const signedIn = this.state.signedIn;
     const hasLastExportSection = !signedIn;
 
     return (
@@ -122,9 +130,10 @@ class OptionsSection extends Abstract {
 
         {signedIn && (
           <ButtonCell
+            testID="signOutButton"
             leftAligned={true}
             title={`Sign out (${this.state.email})`}
-            onPress={this.props.onSignOutPress}
+            onPress={this.onSignOutPress}
           />
         )}
 

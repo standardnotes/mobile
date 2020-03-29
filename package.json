@@ -52,6 +52,7 @@
     "babel-jest": "^24.9.0",
     "detox": "^16.0.1",
     "eslint": "^6.7.2",
+    "faker": "^4.1.0",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.57.0",
     "mocha": "^7.1.1",

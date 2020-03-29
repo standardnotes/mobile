@@ -32,6 +32,7 @@ export default class ButtonCell extends SectionedTableCell {
   render() {
     return (
       <TouchableHighlight
+        testID={this.props.testID}
         underlayColor={StyleKit.variables.stylekitBorderColor}
         style={[
           StyleKit.styles.flexContainer,
