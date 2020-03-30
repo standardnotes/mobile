@@ -556,6 +556,7 @@ export default class Compose extends Abstract {
         )}
 
         <TextInput
+          testID="noteTitleField"
           style={this.styles.noteTitle}
           onChangeText={this.onTitleChange}
           value={this.state.title}
@@ -599,6 +600,7 @@ export default class Compose extends Abstract {
         {!shouldDisplayEditor && Platform.OS === 'android' && (
           <View style={[this.styles.noteTextContainer]}>
             <TextView
+              testID="noteContentField"
               style={[
                 StyleKit.stylesForKey('noteText'),
                 this.styles.textContentAndroid

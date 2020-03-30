@@ -499,6 +499,7 @@ export default class Notes extends Abstract {
           paddingTop={ApplicationState.isIOS ? 1 : 0}
           iconTextComponent={
             <Icon
+              testID="newNoteButton"
               style={{ textAlignVertical: 'center' }}
               name={StyleKit.nameForIcon(ICON_ADD)}
             />
