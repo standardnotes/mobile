@@ -1,6 +1,6 @@
-const helpers = require('./../../helpers');
+const helpers = require('../../helpers');
 
-describe('Options', () => {
+describe('Options section', () => {
   before(async () => {
     await helpers.openSettingsScreen();
   });

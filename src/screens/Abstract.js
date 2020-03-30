@@ -15,7 +15,6 @@ const IoniconsHeaderButton = passMeFurther => (
   // and it is important to pass those props to `HeaderButton`
   // then you may add some information like icon size or color (if you use icons)
   <HeaderButton
-    testID="headerButton"
     {...passMeFurther}
     IconComponent={Icon}
     iconSize={30}
@@ -57,6 +56,7 @@ export default class Abstract extends ThemedComponent {
       headerLeft = (
         <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
           <Item
+            testID="headerButton"
             disabled={leftButton.disabled}
             title={leftButton.title}
             iconName={leftButton.iconName}
