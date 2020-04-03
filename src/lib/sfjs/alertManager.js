@@ -33,7 +33,8 @@ export default class AlertManager extends SFAlertManager {
     confirmButtonText = 'OK',
     cancelButtonText = 'Cancel',
     onConfirm,
-    onCancel
+    onCancel,
+    onDismiss
   } = {}) {
     return new Promise((resolve, reject) => {
       // On iOS, confirm should go first. On Android, cancel should go first.
@@ -53,7 +54,13 @@ export default class AlertManager extends SFAlertManager {
           }
         }
       ];
-      Alert.alert(title, text, buttons, { cancelable: true });
+      Alert.alert(title, text, buttons, {
+        cancelable: true,
+        onDismiss: async () => {
+          onDismiss && (await onDismiss());
+          reject();
+        }
+      });
     });
   }
 }

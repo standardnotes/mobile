@@ -67,3 +67,6 @@ ios-release.bundle.map
 # CocoaPods
 /ios/Pods/
 /ios/StandardNotes.xcodeproj/project.xcworkspace
+
+# HProf
+/android/*.hprof

@@ -56,6 +56,7 @@ export default class Abstract extends ThemedComponent {
       headerLeft = (
         <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
           <Item
+            testID="headerButton"
             disabled={leftButton.disabled}
             title={leftButton.title}
             iconName={leftButton.iconName}

@@ -118,7 +118,7 @@ export default class Settings extends Abstract {
   }
 
   onSignOutPress = () => {
-    AlertManager.get().confirm({
+    return AlertManager.get().confirm({
       title: 'Sign Out?',
       text: 'Signing out will remove all data from this device, including notes and tags. Make sure your data is synced before proceeding.',
       confirmButtonText: 'Sign Out',

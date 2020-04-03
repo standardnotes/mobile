@@ -357,6 +357,7 @@ export default class Root extends Abstract {
 
     return (
       <View
+        testID='rootView'
         onLayout={this.onLayout}
         style={[StyleKit.styles.container, this.styles.root]}
       >
