@@ -1,0 +1,11 @@
+.watchmanconfig
+
+# Android
+*.iml
+.gradle
+local.properties
+.idea/
+gradle/
+.DS_Store
+build/
+captures/

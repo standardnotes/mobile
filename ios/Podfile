@@ -97,10 +97,14 @@ target 'StandardNotes' do
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable these next few lines.
-  # add_flipper_pods!
+  add_flipper_pods!
   post_install do |installer|
-    # flipper_post_install(installer)
+    flipper_post_install(installer)
     installer.pods_project.targets.each do |target|
+      # this is needed to avoid including multiple references to react.
+      if target.name == "React"
+        target.remove_from_project
+      end
       # this is needed to rollback TrustKit to deployment target 9.0 so that iOS 9
       # is still allowed to run the App
       if target.name == "TrustKit"

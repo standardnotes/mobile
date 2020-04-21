@@ -1,0 +1,13 @@
+{
+  "name": "standard-notes-rn",
+  "version": "1.0.0",
+  "description": "React Native utilities for Standard Notes",
+  "homepage": "https://github.com/standardnotes/standard-notes-rn",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/standardnotes/standard-notes-rn"
+  },
+  "author": "Standard Notes",
+  "license": "GPLv3"
+}

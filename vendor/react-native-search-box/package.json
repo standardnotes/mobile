@@ -1,0 +1,21 @@
+{
+  "name": "react-native-search-box",
+  "version": "0.0.19",
+  "description":
+    "A simple search box with animation, inspired from ios search bar. Lightweight, fast, flexible, customizable. Support both iOS/Android devices",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agiletechvn/react-native-search-box.git"
+  },
+  "author":
+    "Anh Tuan Nguyen <anhtuank7c@hotmail.com> (https://github.com/anhtuank7c)",
+  "license": "MIT",
+  "keywords": ["react-native", "ios", "android", "anhtuank7c", "agiletechvn"],
+  "dependencies": {
+    "prop-types": "^15.5.10"
+  }
+}
