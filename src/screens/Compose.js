@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   Platform,
   Text,
-  Alert
+  Alert,
 } from 'react-native';
 import TextView from 'sn-textview';
+import { SFAuthManager } from 'standard-file-js';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
@@ -29,13 +30,13 @@ export default class Compose extends Abstract {
     const templateOptions = {
       rightButton: {
         title: null,
-        iconName: StyleKit.nameForIcon(ICON_MENU)
-      }
+        iconName: StyleKit.nameForIcon(ICON_MENU),
+      },
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions
+      templateOptions,
     });
   };
 
@@ -55,7 +56,7 @@ export default class Compose extends Abstract {
       title: this.note.title,
       noteLocked: this.note.locked
         ? true
-        : false /* required to re-render on change */
+        : false /* required to re-render on change */,
     });
 
     this.configureHeaderBar();
@@ -115,7 +116,7 @@ export default class Compose extends Abstract {
 
           let newState = {
             title: this.note.title,
-            noteLocked: this.note.locked ? true : false
+            noteLocked: this.note.locked ? true : false,
           };
 
           // only include `text` if this item is coming back from retrieved, as this will cause text view cursor to reset to top
@@ -149,7 +150,7 @@ export default class Compose extends Abstract {
             this.showSavingStatus();
           }
         }
-      }
+      },
     });
 
     this.signoutObserver = Auth.get().addEventHandler(event => {
@@ -195,7 +196,7 @@ export default class Compose extends Abstract {
       note = ModelManager.get().createItem({
         content_type: 'Note',
         dummy: true,
-        text: ''
+        text: '',
       });
       note.dummy = true;
       // Editors need a valid note with uuid and modelmanager mapped in order to interact with it
@@ -223,8 +224,8 @@ export default class Compose extends Abstract {
         iconName: StyleKit.nameForIcon(ICON_MENU),
         onPress: () => {
           this.props.navigation.openRightDrawer();
-        }
-      }
+        },
+      },
     });
   }
 
@@ -315,7 +316,7 @@ export default class Compose extends Abstract {
       onKeyboardDismiss: () => {
         // Keyboard.dismiss() does not work for native views, which our text input is
         this.input && this.input.blur();
-      }
+      },
     });
   }
 
@@ -522,7 +523,7 @@ export default class Compose extends Abstract {
         style={[
           this.styles.container,
           StyleKit.styles.container,
-          StyleKit.styles.baseBackground
+          StyleKit.styles.baseBackground,
         ]}
       >
         {this.note.locked && (
@@ -603,7 +604,7 @@ export default class Compose extends Abstract {
               testID="noteContentField"
               style={[
                 StyleKit.stylesForKey('noteText'),
-                this.styles.textContentAndroid
+                this.styles.textContentAndroid,
               ]}
               ref={ref => (this.input = ref)}
               autoFocus={this.note.dummy}
@@ -642,7 +643,7 @@ export default class Compose extends Abstract {
       container: {
         flex: 1,
         flexDirection: 'column',
-        height: '100%'
+        height: '100%',
       },
 
       noteTitle: {
@@ -655,7 +656,7 @@ export default class Compose extends Abstract {
         borderBottomWidth: 1,
         paddingTop: Platform.OS === 'ios' ? 5 : 12,
         paddingLeft: padding,
-        paddingRight: padding
+        paddingRight: padding,
       },
 
       lockedContainer: {
@@ -668,14 +669,14 @@ export default class Compose extends Abstract {
         paddingLeft: padding,
         backgroundColor: StyleKit.variables.stylekitNeutralColor,
         borderBottomColor: StyleKit.variables.stylekitBorderColor,
-        borderBottomWidth: 1
+        borderBottomWidth: 1,
       },
 
       lockedText: {
         fontWeight: 'bold',
         fontSize: 12,
         color: StyleKit.variables.stylekitBackgroundColor,
-        paddingLeft: 10
+        paddingLeft: 10,
       },
 
       loadingWebViewContainer: {
@@ -688,7 +689,7 @@ export default class Compose extends Abstract {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       },
 
       loadingWebViewText: {
@@ -696,14 +697,14 @@ export default class Compose extends Abstract {
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.7,
         fontSize: 22,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       },
 
       loadingWebViewSubtitle: {
         paddingLeft: 0,
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.7,
-        marginTop: 5
+        marginTop: 5,
       },
 
       webviewReloadButton: {
@@ -713,28 +714,28 @@ export default class Compose extends Abstract {
         flex: 1,
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       },
 
       webviewReloadButtonText: {
         color: StyleKit.variables.stylekitBackgroundColor,
         fontSize: 12,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       },
 
       textContentAndroid: {
         flexGrow: 1,
-        flex: 1
+        flex: 1,
       },
 
       contentContainer: {
-        flexGrow: 1
+        flexGrow: 1,
       },
 
       noteTextContainer: {
         flexGrow: 1,
-        flex: 1
-      }
+        flex: 1,
+      },
     };
 
     this.styles = StyleSheet.create(this.rawStyles);

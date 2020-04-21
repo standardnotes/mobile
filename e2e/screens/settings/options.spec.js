@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const helpers = require('../../helpers');
 
 describe('Options section', () => {
@@ -8,14 +9,18 @@ describe('Options section', () => {
   describe('Export Data', () => {
     it('should have the option visible', async () => {
       await expect(element(by.id('exportData'))).toBeVisible();
-      await expect(element(by.id('exportData-title'))).toHaveText('Export Data');
+      await expect(element(by.id('exportData-title'))).toHaveText(
+        'Export Data'
+      );
     });
 
     it('should restore to "Export Data" if dialog is dismissed', async () => {
       await expect(element(by.id('exportData-option-decrypted'))).toBeVisible();
       await element(by.id('exportData-option-decrypted')).tap();
       await device.pressBack();
-      await expect(element(by.id('exportData-title'))).toHaveText('Export Data');
+      await expect(element(by.id('exportData-title'))).toHaveText(
+        'Export Data'
+      );
     });
 
     it('should export decrypted notes', async () => {
@@ -23,7 +28,9 @@ describe('Options section', () => {
       await element(by.id('exportData-option-decrypted')).tap();
       await element(by.text('SAVE TO DISK')).tap();
       await element(by.text('DONE')).tap();
-      await expect(element(by.id('exportData-title'))).toHaveText('Export Data');
+      await expect(element(by.id('exportData-title'))).toHaveText(
+        'Export Data'
+      );
     });
   });
 });

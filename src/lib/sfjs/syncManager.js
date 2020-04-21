@@ -5,6 +5,8 @@ import Server from '@SFJS/httpManager';
 import ModelManager from '@SFJS/modelManager';
 import Storage from '@SFJS/storageManager';
 
+import { SFSyncManager } from 'standard-file-js';
+
 export default class Sync extends SFSyncManager {
   static instance = null;
 
@@ -20,7 +22,7 @@ export default class Sync extends SFSyncManager {
     super(ModelManager.get(), Storage.get(), Server.get());
     KeysManager.get().registerAccountRelatedStorageKeys([
       'syncToken',
-      'cursorToken'
+      'cursorToken',
     ]);
 
     this.setKeyRequestHandler(request => {
@@ -48,7 +50,7 @@ export default class Sync extends SFSyncManager {
       'SN|UserPreferences',
       'SN|Privileges',
       'SN|Component',
-      'SN|Theme'
+      'SN|Theme',
     ];
   }
 

@@ -4,20 +4,20 @@ export default class Keychain {
   static async setKeys(keys) {
     const options = {
       /* iOS only */
-      accessible: RCTKeychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+      accessible: RCTKeychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     };
     return RCTKeychain.setGenericPassword(
       'sn',
       JSON.stringify(keys),
       options
-    ).then(function() {
+    ).then(function () {
       console.log('Credentials saved successfully!');
     });
   }
 
   static async getKeys() {
     return RCTKeychain.getGenericPassword()
-      .then(function(credentials) {
+      .then(function (credentials) {
         if (!credentials || !credentials.password) {
           console.log('===Keychain value missing===');
           return null;
@@ -26,7 +26,7 @@ export default class Keychain {
           return keys;
         }
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(
           "Keychain couldn't be accessed! Maybe no value set?",
           error
@@ -35,7 +35,7 @@ export default class Keychain {
   }
 
   static async clearKeys() {
-    return RCTKeychain.resetGenericPassword().then(function() {
+    return RCTKeychain.resetGenericPassword().then(function () {
       console.log('Credentials successfully deleted');
     });
   }

@@ -13,6 +13,7 @@ import Sync from '@SFJS/syncManager';
 import AlertManager from '@SFJS/alertManager';
 import { ICON_CLOSE } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
+import { SFModelManager } from 'standard-file-js';
 
 export default class KeyRecovery extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -22,13 +23,13 @@ export default class KeyRecovery extends Abstract {
         title: ApplicationState.isIOS ? 'Cancel' : null,
         iconName: ApplicationState.isIOS
           ? null
-          : StyleKit.nameForIcon(ICON_CLOSE)
-      }
+          : StyleKit.nameForIcon(ICON_CLOSE),
+      },
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions
+      templateOptions,
     });
   };
 
@@ -43,8 +44,8 @@ export default class KeyRecovery extends Abstract {
           : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
-        }
-      }
+        },
+      },
     });
 
     this.state = { text: '' };
@@ -72,7 +73,7 @@ export default class KeyRecovery extends Abstract {
       this.state.text,
       authParams
     );
-    await SFJS.itemTransformer.decryptMultipleItems(this.items, keys);
+    await SF.get().itemTransformer.decryptMultipleItems(this.items, keys);
 
     this.encryptedCount = 0;
     for (const item of this.items) {
@@ -96,12 +97,13 @@ export default class KeyRecovery extends Abstract {
       if (confirm) {
         AlertManager.get().confirm({
           title: 'Use Keys?',
-          text: 'Are you sure you want to use these keys? Not all items are decrypted, but if some have been, it may be an optimal solution.',
+          text:
+            'Are you sure you want to use these keys? Not all items are decrypted, but if some have been, it may be an optimal solution.',
           cancelButtonText: 'Cancel',
           confirmButtonText: 'Use',
           onConfirm: () => {
             run();
-          }
+          },
         });
       } else {
         run();
@@ -110,13 +112,12 @@ export default class KeyRecovery extends Abstract {
 
     if (this.encryptedCount === 0) {
       // This is the correct passcode, automatically use it.
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useKeys();
     } else {
       AlertManager.get().confirm({
         title: 'Unable to Decrypt',
-        text: `The passcode you attempted still yields ${
-          this.encryptedCount
-        } un-decryptable items. It's most likely incorrect.`,
+        text: `The passcode you attempted still yields ${this.encryptedCount} un-decryptable items. It's most likely incorrect.`,
         cancelButtonText: 'Use Anyway',
         confirmButtonText: 'Try Again',
         onConfirm: () => {
@@ -125,8 +126,9 @@ export default class KeyRecovery extends Abstract {
         },
         onCancel: () => {
           // Use anyway
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           useKeys(true);
-        }
+        },
       });
     }
   };
@@ -143,10 +145,11 @@ export default class KeyRecovery extends Abstract {
         <TableSection extraStyles={[StyleKit.styles.container]}>
           <SectionedTableCell first={true}>
             <Text>
-              {this.encryptedCount} items are encrypted and missing keys.
-              This can occur as a result of a device cloud restore.
-              Please enter the value of your local passcode as it was before the restore.
-              We'll be able to determine if it is correct based on its ability to decrypt your items.
+              {this.encryptedCount} items are encrypted and missing keys. This
+              can occur as a result of a device cloud restore. Please enter the
+              value of your local passcode as it was before the restore. We'll
+              be able to determine if it is correct based on its ability to
+              decrypt your items.
             </Text>
           </SectionedTableCell>
           <SectionedTableCell textInputCell={true} last={true}>

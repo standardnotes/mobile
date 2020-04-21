@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const detox = require('detox');
 const config = require('../package.json').detox;
 const adapter = require('detox/runners/mocha/adapter');

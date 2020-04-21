@@ -14,6 +14,8 @@ import Sync from '@SFJS/syncManager';
 import StyleKit from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
 
+import { SFAuthManager } from 'standard-file-js';
+
 export default class Root extends Abstract {
   constructor(props) {
     super(props);
@@ -40,14 +42,14 @@ export default class Root extends Abstract {
         if (event === ApplicationState.AppStateEventNoteSideMenuToggle) {
           // update state to toggle Notes side menu if we triggered the collapse
           this.setState({
-            notesListCollapsed: data.new_isNoteSideMenuCollapsed
+            notesListCollapsed: data.new_isNoteSideMenuCollapsed,
           });
         } else if (event === ApplicationState.KeyboardChangeEvent) {
           // need to refresh the height of the keyboard when it opens so that we can change the position
           // of the sidebar collapse icon
           if (ApplicationState.get().isInTabletMode) {
             this.setState({
-              keyboardHeight: ApplicationState.get().getKeyboardHeight()
+              keyboardHeight: ApplicationState.get().getKeyboardHeight(),
             });
           }
         }
@@ -60,7 +62,8 @@ export default class Root extends Abstract {
           this.didShowSessionInvalidAlert = true;
           AlertManager.get().confirm({
             title: 'Session Expired',
-            text: 'Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.',
+            text:
+              'Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.',
             confirmButtonText: 'Sign Out',
             onConfirm: () => {
               this.didShowSessionInvalidAlert = false;
@@ -68,7 +71,7 @@ export default class Root extends Abstract {
             },
             onCancel: () => {
               this.didShowSessionInvalidAlert = false;
-            }
+            },
           });
         }
       }
@@ -83,9 +86,7 @@ export default class Root extends Abstract {
           this.setSubTitle(text, StyleKit.variables.stylekitWarningColor);
         }, 250);
       } else if (status.retrievedCount > 20) {
-        const text = `Downloading ${
-          status.retrievedCount
-        } items. Keep app open.`;
+        const text = `Downloading ${status.retrievedCount} items. Keep app open.`;
         this.setSubTitle(text);
         this.showingDownloadStatus = true;
       } else if (this.showingDownloadStatus) {
@@ -188,7 +189,7 @@ export default class Root extends Abstract {
 
   beginSyncTimer() {
     // Refresh every 30s
-    this.syncTimer = setInterval(function() {
+    this.syncTimer = setInterval(function () {
       Sync.get().sync(null);
     }, 30000);
   }
@@ -279,7 +280,7 @@ export default class Root extends Abstract {
       },
       onUnmount: () => {
         this.authenticationInProgress = false;
-      }
+      },
     });
   }
 
@@ -288,7 +289,7 @@ export default class Root extends Abstract {
     this.setState({
       selectedTagId:
         this.notesRef.options.selectedTagIds.length &&
-        this.notesRef.options.selectedTagIds[0]
+        this.notesRef.options.selectedTagIds[0],
     });
   };
 
@@ -315,7 +316,7 @@ export default class Root extends Abstract {
       y: e.nativeEvent.layout.y,
       shouldSplitLayout: ApplicationState.get().isInTabletMode,
       notesListCollapsed: ApplicationState.get().isNoteSideMenuCollapsed,
-      keyboardHeight: ApplicationState.get().getKeyboardHeight()
+      keyboardHeight: ApplicationState.get().getKeyboardHeight(),
     });
   };
 
@@ -344,7 +345,7 @@ export default class Root extends Abstract {
     const collapseIconPrefix = StyleKit.platformIconPrefix();
     const iconNames = {
       md: ['arrow-dropright', 'arrow-dropleft'],
-      ios: ['arrow-forward', 'arrow-back']
+      ios: ['arrow-forward', 'arrow-back'],
     };
     const collapseIconName =
       collapseIconPrefix +
@@ -357,7 +358,7 @@ export default class Root extends Abstract {
 
     return (
       <View
-        testID='rootView'
+        testID="rootView"
         onLayout={this.onLayout}
         style={[StyleKit.styles.container, this.styles.root]}
       >
@@ -389,7 +390,7 @@ export default class Root extends Abstract {
               style={[
                 this.styles.toggleButtonContainer,
                 this.styles.toggleButton,
-                { bottom: collapseIconBottomPosition }
+                { bottom: collapseIconBottomPosition },
               ]}
               onPress={this.toggleNoteSideMenu}
             >
@@ -411,18 +412,18 @@ export default class Root extends Abstract {
     this.styles = {
       root: {
         flex: 1,
-        flexDirection: 'row'
+        flexDirection: 'row',
       },
       left: {
         borderRightColor: StyleKit.variables.stylekitBorderColor,
-        borderRightWidth: 1
+        borderRightWidth: 1,
       },
       right: {},
       toggleButtonContainer: {
         backgroundColor: hexToRGBA(
           StyleKit.variables.stylekitContrastBackgroundColor,
           0.5
-        )
+        ),
       },
       toggleButton: {
         justifyContent: 'center',
@@ -431,8 +432,8 @@ export default class Root extends Abstract {
         padding: 7,
         borderTopRightRadius: 4,
         borderBottomRightRadius: 4,
-        marginTop: -12
-      }
+        marginTop: -12,
+      },
     };
   }
 }

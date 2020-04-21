@@ -12,7 +12,7 @@ export default class PasscodeSection extends Component {
     super(props);
 
     this.state = {
-      items: ModelManager.get().allItemsMatchingTypes(['Note', 'Tag'])
+      items: ModelManager.get().allItemsMatchingTypes(['Note', 'Tag']),
     };
   }
 
@@ -42,13 +42,13 @@ export default class PasscodeSection extends Component {
     const titleStyles = {
       color: StyleKit.variables.stylekitForegroundColor,
       fontSize: 16,
-      fontWeight: 'bold'
+      fontWeight: 'bold',
     };
 
     const subtitleStyles = {
       color: StyleKit.variables.stylekitNeutralColor,
       fontSize: 14,
-      marginTop: 4
+      marginTop: 4,
     };
 
     const containerStyles = {};

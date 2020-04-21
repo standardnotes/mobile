@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const helpers = require('../../helpers');
 
 describe('Account section', () => {
@@ -35,11 +36,17 @@ describe('Account section', () => {
     });
 
     it('should work when valid data is provided', async () => {
-      await element(by.id('emailField')).typeText(helpers.randomCredentials.email);
-      await element(by.id('passwordField')).typeText(helpers.randomCredentials.password);
+      await element(by.id('emailField')).typeText(
+        helpers.randomCredentials.email
+      );
+      await element(by.id('passwordField')).typeText(
+        helpers.randomCredentials.password
+      );
       await element(by.id('otherOptionsButton')).tap();
       await element(by.id('syncServerField')).clearText();
-      await element(by.id('syncServerField')).typeText(helpers.randomCredentials.syncServerUrl);
+      await element(by.id('syncServerField')).typeText(
+        helpers.randomCredentials.syncServerUrl
+      );
       await element(by.id('registerButton')).tap();
 
       // A confirmation screen is shown after we click the register button...
@@ -47,7 +54,9 @@ describe('Account section', () => {
       await expect(element(by.id('registerConfirmButton'))).toBeVisible();
 
       // Password confirmation is required...
-      await element(by.id('passwordConfirmationField')).typeText(helpers.randomCredentials.password);
+      await element(by.id('passwordConfirmationField')).typeText(
+        helpers.randomCredentials.password
+      );
       await element(by.id('registerConfirmButton')).tap();
     });
 
@@ -70,11 +79,17 @@ describe('Account section', () => {
     });
 
     it('should work when valid data is provided', async () => {
-      await element(by.id('emailField')).typeText(helpers.randomCredentials.email);
-      await element(by.id('passwordField')).typeText(helpers.randomCredentials.password);
+      await element(by.id('emailField')).typeText(
+        helpers.randomCredentials.email
+      );
+      await element(by.id('passwordField')).typeText(
+        helpers.randomCredentials.password
+      );
       await element(by.id('otherOptionsButton')).tap();
       await element(by.id('syncServerField')).clearText();
-      await element(by.id('syncServerField')).typeText(helpers.randomCredentials.syncServerUrl);
+      await element(by.id('syncServerField')).typeText(
+        helpers.randomCredentials.syncServerUrl
+      );
       await element(by.id('signInButton')).tap();
     });
   });

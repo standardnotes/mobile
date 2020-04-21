@@ -1,8 +1,9 @@
 import React from 'react';
 import HeaderButtons, {
   HeaderButton,
-  Item
+  Item,
 } from 'react-navigation-header-buttons';
+import _ from 'lodash';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HeaderTitleView from '@Components/HeaderTitleView';
 import ThemedComponent from '@Components/ThemedComponent';
@@ -26,7 +27,7 @@ export default class Abstract extends ThemedComponent {
   static getDefaultNavigationOptions = ({
     navigation,
     navigationOptions,
-    templateOptions
+    templateOptions,
   }) => {
     // templateOptions allow subclasses to specifiy things they want to display in nav bar before it actually loads.
     // this way, things like title and the Done button in the top left are visible during transition
@@ -44,9 +45,9 @@ export default class Abstract extends ThemedComponent {
       headerStyle: {
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
-        borderBottomWidth: 1
+        borderBottomWidth: 1,
       },
-      headerTintColor: StyleKit.variables.stylekitInfoColor
+      headerTintColor: StyleKit.variables.stylekitInfoColor,
     };
 
     let headerLeft, headerRight;
@@ -91,7 +92,7 @@ export default class Abstract extends ThemedComponent {
   static navigationOptions = ({ navigation, navigationOptions }) => {
     return Abstract.getDefaultNavigationOptions({
       navigation,
-      navigationOptions
+      navigationOptions,
     });
   };
 
@@ -112,7 +113,7 @@ export default class Abstract extends ThemedComponent {
       }),
       this.props.navigation.addListener('didBlur', payload => {
         this.componentDidBlur();
-      })
+      }),
     ];
 
     this._stateObserver = ApplicationState.get().addStateObserver(state => {
@@ -143,7 +144,7 @@ export default class Abstract extends ThemedComponent {
       // Navigator doesnt really use activeTheme. We pass it here just as a way to trigger
       // navigationOptions to reload.
       this.props.navigation.setParams({
-        activeTheme: StyleKit.get().activeTheme
+        activeTheme: StyleKit.get().activeTheme,
       });
     } catch {}
   }

@@ -6,7 +6,7 @@ import ApplicationState from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
 import ModelManager from '@Lib/sfjs/modelManager';
 import UserPrefsManager, {
-  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY
+  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
 } from '@Lib/userPrefsManager';
 import { ICON_LOCK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
@@ -26,7 +26,7 @@ export default class ComponentView extends Component {
       areas: ['note-tags', 'editor-stack', 'editor-editor'],
       contextRequestHandler: () => {
         return this.note;
-      }
+      },
     });
 
     this.reloadData();
@@ -41,17 +41,13 @@ export default class ComponentView extends Component {
     if (this.editor.offlineOnly) {
       Alert.alert(
         'Offline Only',
-        `You've marked ${
-          this.editor.name
-        } as 'offline only', which means it can only be accessed via the desktop app. To use this editor on mobile, please use the web or desktop app and check 'Use hosted when local is unavailable' in the editor's extension settings. Otherwise, please change to another editor to edit this note.`,
+        `You've marked ${this.editor.name} as 'offline only', which means it can only be accessed via the desktop app. To use this editor on mobile, please use the web or desktop app and check 'Use hosted when local is unavailable' in the editor's extension settings. Otherwise, please change to another editor to edit this note.`,
         [{ text: 'OK' }]
       );
     } else if (!url) {
       Alert.alert(
         'Re-install Extension',
-        `This extension is not installed correctly. Please use the web or desktop application to reinstall ${
-          this.editor.name
-        }, then try again.`,
+        `This extension is not installed correctly. Please use the web or desktop application to reinstall ${this.editor.name}, then try again.`,
         [{ text: 'OK' }]
       );
     }
@@ -64,7 +60,7 @@ export default class ComponentView extends Component {
        * https://github.com/facebook/react-native/issues/11594
        */
       const dontShowAgain = await UserPrefsManager.get().isPrefSet({
-        key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY
+        key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
       });
 
       if (!dontShowAgain) {
@@ -77,10 +73,10 @@ export default class ComponentView extends Component {
               onPress: () =>
                 UserPrefsManager.get().setPref({
                   key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
-                  value: true
-                })
+                  value: true,
+                }),
             },
-            { text: 'OK' }
+            { text: 'OK' },
           ]
         );
       }
@@ -216,7 +212,7 @@ export default class ComponentView extends Component {
       <View
         style={[
           StyleKit.styles.flexContainer,
-          { backgroundColor: StyleKit.variables.stylekitBackgroundColor }
+          { backgroundColor: StyleKit.variables.stylekitBackgroundColor },
         ]}
       >
         {this.editor.readonly && (
@@ -277,15 +273,15 @@ export default class ComponentView extends Component {
         padding: padding,
         backgroundColor: StyleKit.variables.stylekitDangerColor,
         borderBottomColor: StyleKit.variables.stylekitBorderColor,
-        borderBottomWidth: 1
+        borderBottomWidth: 1,
       },
 
       lockedText: {
         fontWeight: 'bold',
         fontSize: 12,
         color: StyleKit.variables.stylekitBackgroundColor,
-        paddingLeft: 10
-      }
+        paddingLeft: 10,
+      },
     };
   }
 }

@@ -57,15 +57,19 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/runtime": "^7.9.2",
-    "@react-native-community/eslint-config": "^0.0.5",
+    "@react-native-community/eslint-config": "^1.1.0",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
     "babel-jest": "^24.9.0",
     "detox": "^16.0.1",
-    "eslint": "^6.7.2",
+    "eslint": "^6.8.0",
     "faker": "^4.1.0",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.58.0",
     "mocha": "^7.1.1",
-    "react-test-renderer": "16.11.0"
+    "prettier": "^2.0.4",
+    "react-test-renderer": "16.11.0",
+    "typescript": "^3.8.3"
   },
   "jest": {
     "preset": "react-native"

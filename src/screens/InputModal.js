@@ -18,13 +18,13 @@ export default class InputModal extends Abstract {
         title: ApplicationState.isIOS ? 'Cancel' : null,
         iconName: ApplicationState.isIOS
           ? null
-          : StyleKit.nameForIcon(ICON_CLOSE)
-      }
+          : StyleKit.nameForIcon(ICON_CLOSE),
+      },
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions
+      templateOptions,
     });
   };
 
@@ -39,8 +39,8 @@ export default class InputModal extends Abstract {
           : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
-        }
-      }
+        },
+      },
     });
 
     this.requireConfirm = this.getProp('requireConfirm');
@@ -120,13 +120,13 @@ export default class InputModal extends Abstract {
       {
         title: 'General',
         key: 'default',
-        selected: this.keyboardType === 'default'
+        selected: this.keyboardType === 'default',
       },
       {
         title: 'Numeric',
         key: 'numeric',
-        selected: this.keyboardType === 'numeric'
-      }
+        selected: this.keyboardType === 'numeric',
+      },
     ];
 
     const keyboardOptionsCell = (

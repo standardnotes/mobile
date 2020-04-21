@@ -12,7 +12,7 @@ export default class LockedView extends Component {
     const color = StyleKit.variables.stylekitInfoColor;
     const styles = [
       StyleKit.styles.centeredContainer,
-      { backgroundColor: StyleKit.variables.stylekitBackgroundColor }
+      { backgroundColor: StyleKit.variables.stylekitBackgroundColor },
     ];
     if (this.props.style) {
       styles.push(this.props.style);
@@ -48,14 +48,14 @@ export default class LockedView extends Component {
         paddingLeft: 20,
         paddingRight: 20,
         borderRadius: 3,
-        backgroundColor: StyleKit.variables.stylekitInfoColor
+        backgroundColor: StyleKit.variables.stylekitInfoColor,
       },
 
       unlockButtonText: {
         color: StyleKit.variables.stylekitInfoContrastColor,
         textAlign: 'center',
-        fontWeight: 'bold'
-      }
+        fontWeight: 'bold',
+      },
     };
   };
 }

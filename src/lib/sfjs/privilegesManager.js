@@ -48,7 +48,7 @@ export default class PrivilegesManager extends SFPrivilegesManager {
       },
       getFromStorage: async key => {
         return Storage.get().getItem(key);
-      }
+      },
     });
   }
 
@@ -77,7 +77,7 @@ export default class PrivilegesManager extends SFPrivilegesManager {
       leftButton: {
         title: Platform.OS === 'ios' ? 'Cancel' : null,
         iconName:
-          Platform.OS === 'ios' ? null : StyleKit.nameForIcon(ICON_CLOSE)
+          Platform.OS === 'ios' ? null : StyleKit.nameForIcon(ICON_CLOSE),
       },
       authenticationSources: sources,
       hasCancelOption: true,
@@ -89,7 +89,7 @@ export default class PrivilegesManager extends SFPrivilegesManager {
       },
       onCancel: () => {
         customCancel();
-      }
+      },
     });
 
     this.authInProgress = true;

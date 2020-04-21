@@ -22,13 +22,13 @@ export default class ManagePrivileges extends Abstract {
         title: ApplicationState.isIOS ? 'Done' : null,
         iconName: ApplicationState.isIOS
           ? null
-          : StyleKit.nameForIcon(ICON_CHECKMARK)
-      }
+          : StyleKit.nameForIcon(ICON_CHECKMARK),
+      },
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions
+      templateOptions,
     });
   };
 
@@ -37,7 +37,7 @@ export default class ManagePrivileges extends Abstract {
 
     this.state = {
       availableActions: [],
-      availableCredentials: []
+      availableCredentials: [],
     };
 
     props.navigation.setParams({
@@ -48,8 +48,8 @@ export default class ManagePrivileges extends Abstract {
           : StyleKit.nameForIcon(ICON_CHECKMARK),
         onPress: () => {
           this.dismiss();
-        }
-      }
+        },
+      },
     });
 
     this.hasPasscode = KeysManager.get().hasOfflinePasscode();
@@ -116,7 +116,7 @@ export default class ManagePrivileges extends Abstract {
       availableCredentials: availableCredentials,
       notConfiguredCredentials: notConfiguredCredentials,
       sessionExpirey: sessionEndDate.toLocaleString(),
-      sessionExpired: new Date() >= sessionEndDate
+      sessionExpired: new Date() >= sessionEndDate,
     });
   }
 
@@ -144,10 +144,16 @@ export default class ManagePrivileges extends Abstract {
             <SectionHeader title={'About Privileges'} />
             <SectionedTableCell first={true} last={true}>
               <Text style={[this.styles.aboutText, this.styles.cellText]}>
-                Privileges represent interface level authentication for accessing certain items and features. Privileges are meant to protect against unwanted access in the event of an unlocked application, but do not affect data encryption state.
+                Privileges represent interface level authentication for
+                accessing certain items and features. Privileges are meant to
+                protect against unwanted access in the event of an unlocked
+                application, but do not affect data encryption state.
               </Text>
               <Text style={[this.styles.aboutText, this.styles.cellText]}>
-                Privileges sync across your other devices—however, note that if you require a "Local Passcode" privilege, and another device does not have a local passcode set up, the local passcode requirement will be ignored on that device.
+                Privileges sync across your other devices—however, note that if
+                you require a "Local Passcode" privilege, and another device
+                does not have a local passcode set up, the local passcode
+                requirement will be ignored on that device.
               </Text>
             </SectionedTableCell>
           </View>
@@ -157,7 +163,8 @@ export default class ManagePrivileges extends Abstract {
               <SectionHeader title={'Current Session'} />
               <SectionedTableCell first={true}>
                 <Text style={[this.styles.cellText]}>
-                  You will not be asked to authenticate until {this.state.sessionExpirey}.
+                  You will not be asked to authenticate until{' '}
+                  {this.state.sessionExpirey}.
                 </Text>
               </SectionedTableCell>
               <ButtonCell
@@ -208,16 +215,16 @@ export default class ManagePrivileges extends Abstract {
   loadStyles() {
     this.styles = {
       section: {
-        marginBottom: 8
+        marginBottom: 8,
       },
       cellText: {
         lineHeight: 19,
         fontSize: 16,
-        color: StyleKit.variables.stylekitForegroundColor
+        color: StyleKit.variables.stylekitForegroundColor,
       },
       aboutText: {
-        marginBottom: 8
-      }
+        marginBottom: 8,
+      },
     };
   }
 }

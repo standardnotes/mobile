@@ -4,6 +4,8 @@ import ModelManager from '@SFJS/modelManager';
 import Sync from '@SFJS/syncManager';
 import StyleKit from '@Style/StyleKit';
 
+import { SNComponentManager } from 'snjs';
+
 export default class ComponentManager extends SNComponentManager {
   static instance = null;
 
@@ -14,7 +16,7 @@ export default class ComponentManager extends SNComponentManager {
         syncManager: Sync.get(),
         alertManager: AlertManager.get(),
         environment: 'mobile',
-        platform: Platform.OS
+        platform: Platform.OS,
       });
     }
 
@@ -29,7 +31,7 @@ export default class ComponentManager extends SNComponentManager {
     alertManager,
     $uiRunner,
     platform,
-    environment
+    environment,
   }) {
     super({
       modelManager,
@@ -39,7 +41,7 @@ export default class ComponentManager extends SNComponentManager {
       alertManager,
       $uiRunner,
       platform,
-      environment
+      environment,
     });
   }
 
@@ -64,9 +66,7 @@ export default class ComponentManager extends SNComponentManager {
   */
 
   presentPermissionsDialog(dialog) {
-    let text = `${dialog.component.name} would like to interact with your ${
-      dialog.permissionsString
-    }`;
+    let text = `${dialog.component.name} would like to interact with your ${dialog.permissionsString}`;
     this.alertManager.confirm({
       title: 'Grant Permissions',
       text: text,
@@ -77,7 +77,7 @@ export default class ComponentManager extends SNComponentManager {
       },
       onCancel: () => {
         dialog.callback(false);
-      }
+      },
     });
   }
 

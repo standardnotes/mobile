@@ -16,11 +16,13 @@ import NoteList from '@Screens/Notes/NoteList';
 import {
   SCREEN_SETTINGS,
   SCREEN_KEY_RECOVERY,
-  SCREEN_COMPOSE
+  SCREEN_COMPOSE,
 } from '@Screens/screens';
 import SideMenuManager from '@SideMenu/SideMenuManager';
 import { ICON_MENU, ICON_ADD } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
+
+import { SFAuthManager, SFPrivilegesManager } from 'standard-file-js';
 
 export default class Notes extends Abstract {
   constructor(props) {
@@ -37,8 +39,8 @@ export default class Notes extends Abstract {
         iconName: StyleKit.nameForIcon(ICON_MENU),
         onPress: () => {
           this.props.navigation.openLeftDrawer();
-        }
-      }
+        },
+      },
     });
   }
 
@@ -50,7 +52,7 @@ export default class Notes extends Abstract {
       refreshing: false,
       decrypting: !initialDataLoaded && encryptionEnabled,
       loading: !initialDataLoaded && !encryptionEnabled,
-      notes: []
+      notes: [],
     });
 
     super.loadInitialState();
@@ -241,7 +243,7 @@ export default class Notes extends Abstract {
           if (!data.new_isInTabletMode) {
             this.setState({ selectedNoteId: null });
             this.props.navigation.setParams({
-              rightButton: null
+              rightButton: null,
             });
           }
         }
@@ -311,7 +313,7 @@ export default class Notes extends Abstract {
       getSelectedTags: () => {
         let ids = this.options.getSelectedTagIds();
         return ModelManager.get().getTagsWithIds(ids);
-      }
+      },
     });
   }
 
@@ -320,7 +322,7 @@ export default class Notes extends Abstract {
       title: note ? 'Note' : 'Compose',
       noteId: note && note.uuid,
       selectedTagId:
-        this.options.selectedTagIds.length && this.options.selectedTagIds[0]
+        this.options.selectedTagIds.length && this.options.selectedTagIds[0],
     });
   }
 

@@ -1,4 +1,5 @@
 import { SFItemParams } from 'standard-file-js';
+import _ from 'lodash';
 import UserPrefsManager from '@Lib/userPrefsManager';
 import { isNullOrUndefined } from '@Lib/utils';
 import Storage from '@SFJS/storageManager';
@@ -51,7 +52,7 @@ export default class ThemeManager {
       themeData = JSON.parse(savedTheme);
     } else if (systemThemeId) {
       const systemTheme = _.find(StyleKit.get().systemThemes, {
-        uuid: systemThemeId
+        uuid: systemThemeId,
       });
       themeData = this.buildThemeDataForTheme(systemTheme);
     }
@@ -61,13 +62,13 @@ export default class ThemeManager {
     } else {
       this.data = {
         [LIGHT_THEME_KEY]: themeData,
-        [DARK_THEME_KEY]: themeData
+        [DARK_THEME_KEY]: themeData,
       };
     }
 
     await UserPrefsManager.get().setPref({
       key: THEME_PREFERENCES_KEY,
-      value: this.data
+      value: this.data,
     });
 
     await UserPrefsManager.get().clearPref({ key: savedSystemThemeIdKey });
@@ -99,7 +100,7 @@ export default class ThemeManager {
     const themeData = await this.buildThemeDataForTheme(theme);
     return {
       [LIGHT_THEME_KEY]: themeData,
-      [DARK_THEME_KEY]: themeData
+      [DARK_THEME_KEY]: themeData,
     };
   }
 
@@ -110,7 +111,7 @@ export default class ThemeManager {
 
   async loadFromStorage() {
     this.data = await UserPrefsManager.get().getPref({
-      key: THEME_PREFERENCES_KEY
+      key: THEME_PREFERENCES_KEY,
     });
     if (!this.data) {
       this.data = await this.buildDefaultPreferences();
@@ -125,7 +126,7 @@ export default class ThemeManager {
     this.saveAction = setTimeout(async () => {
       await UserPrefsManager.get().setPref({
         key: THEME_PREFERENCES_KEY,
-        value: this.data
+        value: this.data,
       });
     }, 250);
   }

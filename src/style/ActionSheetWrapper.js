@@ -10,7 +10,7 @@ export default class ActionSheetWrapper {
       text,
       key,
       callback,
-      destructive
+      destructive,
     };
   }
 
@@ -71,7 +71,7 @@ export default class ActionSheetWrapper {
 
       cancelButtonWrapperStyle: StyleKit.styles.actionSheetCancelButtonWrapper,
       cancelButtonTitleStyle: StyleKit.styles.actionSheetCancelButtonTitle,
-      cancelMargin: StyleSheet.hairlineWidth
+      cancelMargin: StyleSheet.hairlineWidth,
     };
   }
 }

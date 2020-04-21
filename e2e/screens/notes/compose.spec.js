@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const helpers = require('../../helpers');
 const faker = require('faker');
 
@@ -21,7 +22,9 @@ describe('Compose', () => {
     it('should be created with only the "Title"', async () => {
       const noteTitle = faker.random.word();
       await element(by.id('noteTitleField')).typeText(noteTitle);
-      await waitFor(element(by.id('noteTitleField'))).toHaveText(noteTitle).withTimeout(2000);
+      await waitFor(element(by.id('noteTitleField')))
+        .toHaveText(noteTitle)
+        .withTimeout(2000);
     });
 
     afterEach(async () => {

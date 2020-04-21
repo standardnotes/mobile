@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Storage from '@SFJS/storageManager';
 
 export default class OptionsState {
@@ -51,7 +52,7 @@ export default class OptionsState {
       {
         sortBy: this.sortBy,
         sortReverse: this.sortReverse,
-        selectedTagIds: this.selectedTagIds
+        selectedTagIds: this.selectedTagIds,
       },
       this.getDisplayOptionValues()
     );
@@ -69,7 +70,7 @@ export default class OptionsState {
 
   notifyObservers(event) {
     this.changeObservers.forEach(
-      function(observer) {
+      function (observer) {
         observer.callback(this, event);
       }.bind(this)
     );
@@ -117,7 +118,7 @@ export default class OptionsState {
     this.displayOptions = {
       hidePreviews: this.getDisplayOptionValue('hidePreviews'),
       hideTags: this.getDisplayOptionValue('hideTags'),
-      hideDates: this.getDisplayOptionValue('hideDates')
+      hideDates: this.getDisplayOptionValue('hideDates'),
     };
   }
 

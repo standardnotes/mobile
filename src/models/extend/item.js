@@ -1,10 +1,12 @@
 import moment from '@Lib/moment';
 
+import { SFItem } from 'standard-file-js';
+
 // Override Item instance methods without overriding actual class, since we'd then need
 // to override all individual classes, like Note and Tag.
 
 const original_updateFromJSON = SFItem.prototype.updateFromJSON;
-SFItem.prototype.updateFromJSON = function(json) {
+SFItem.prototype.updateFromJSON = function (json) {
   original_updateFromJSON.apply(this, [json]);
 
   if (this.created_at) {
@@ -16,11 +18,11 @@ SFItem.prototype.updateFromJSON = function(json) {
   }
 };
 
-SFItem.prototype.dateToLocalizedString = function(date) {
+SFItem.prototype.dateToLocalizedString = function (date) {
   return moment(date).format('llll');
 };
 
-SFItem.prototype.updatedAtTimestamp = function() {
+SFItem.prototype.updatedAtTimestamp = function () {
   // date is a moment date
   // in the base class we do date.getTime(), but that doesn't work with moment dates.
   return this.updated_at.valueOf();
@@ -30,5 +32,5 @@ SFItem.prototype.updatedAtTimestamp = function() {
 Object.defineProperty(SFItem.prototype, 'key', {
   get: function key() {
     return this.uuid;
-  }
+  },
 });
