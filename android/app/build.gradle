@@ -233,9 +233,6 @@ dependencies {
 
     androidTestImplementation('com.wix:detox:+')
 
-    implementation project(':standard-notes-rn')
-    implementation project(':react-native-flag-secure-android')
-
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")
