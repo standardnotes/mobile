@@ -6,7 +6,6 @@
 #import <WebKit/WKWebsiteDataStore.h>
 #import <TrustKit/TrustKit.h>
 
-//  [client addPlugin:[[FKUserDefaultsPlugin alloc] initWithSuiteName:nil]];
 #if DEBUG
 #import <FlipperKit/FlipperClient.h>
 #import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
@@ -32,6 +31,7 @@ static void InitializeFlipper(UIApplication *application) {
 {
 #if DEBUG
   InitializeFlipper(application);
+#endif
 
   [BugsnagReactNative start];
 
