@@ -1,5 +1,7 @@
 import KeysManager from '@Lib/keysManager';
 
+import { SFHttpManager } from 'standard-file-js';
+
 export default class Server extends SFHttpManager {
   static instance = null;
 

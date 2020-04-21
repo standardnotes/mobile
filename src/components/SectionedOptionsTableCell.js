@@ -24,7 +24,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent {
       paddingTop: 0,
       paddingBottom: 0,
       paddingRight: 5,
-      maxHeight: 45
+      maxHeight: 45,
     });
     return rules;
   }
@@ -36,7 +36,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent {
           testID={`${this.props.testID}-title`}
           style={[
             StyleKit.styles.sectionedAccessoryTableCellLabel,
-            this.styles.titleStyles
+            this.styles.titleStyles,
           ]}
         >
           {this.props.title}
@@ -54,7 +54,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent {
                 key={option.title}
                 style={[
                   StyleKit.styles.view,
-                  this.styles.buttonContainerStyles
+                  this.styles.buttonContainerStyles,
                 ]}
                 onPress={() => {
                   this.props.onPress(option);
@@ -73,7 +73,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent {
     this.styles = {
       titleStyles: {
         width: '42%',
-        minWidth: 0
+        minWidth: 0,
       },
 
       optionsContainerStyle: {
@@ -82,7 +82,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       },
 
       buttonContainerStyles: {
@@ -91,19 +91,19 @@ export default class SectionedOptionsTableCell extends ThemedComponent {
         height: '100%',
         flexGrow: 1,
         padding: 10,
-        paddingTop: 12
+        paddingTop: 12,
       },
 
       buttonStyles: {
         color: StyleKit.variables.stylekitNeutralColor,
         fontSize: 16,
         textAlign: 'center',
-        width: '100%'
+        width: '100%',
       },
 
       selectedButtonStyles: {
-        color: StyleKit.variables.stylekitInfoColor
-      }
+        color: StyleKit.variables.stylekitInfoColor,
+      },
     };
   }
 }

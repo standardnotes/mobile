@@ -22,7 +22,7 @@ export default class AuthSection extends Component {
       registering: false,
       strictSignIn: false,
       signInButtonText: DEFAULT_SIGN_IN_TEXT,
-      registerButtonText: DEFAULT_REGISTER_TEXT
+      registerButtonText: DEFAULT_REGISTER_TEXT,
     };
   }
 
@@ -55,7 +55,7 @@ export default class AuthSection extends Component {
     if (!this.validate(email, password)) {
       this.setState({
         signingIn: false,
-        signInButtonText: DEFAULT_SIGN_IN_TEXT
+        signInButtonText: DEFAULT_SIGN_IN_TEXT,
       });
       return;
     }
@@ -94,7 +94,7 @@ export default class AuthSection extends Component {
           }
           this.setState({
             signingIn: false,
-            signInButtonText: DEFAULT_SIGN_IN_TEXT
+            signInButtonText: DEFAULT_SIGN_IN_TEXT,
           });
           return;
         }
@@ -108,14 +108,14 @@ export default class AuthSection extends Component {
   validate(email, password) {
     if (!email) {
       Alert.alert('Missing Email', 'Please enter a valid email address.', [
-        { text: 'OK' }
+        { text: 'OK' },
       ]);
       return false;
     }
 
     if (!password) {
       Alert.alert('Missing Password', 'Please enter your password.', [
-        { text: 'OK' }
+        { text: 'OK' },
       ]);
       return false;
     }
@@ -132,7 +132,7 @@ export default class AuthSection extends Component {
     if (!this.validate(email, password)) {
       this.setState({
         registering: false,
-        registerButtonText: DEFAULT_REGISTER_TEXT
+        registerButtonText: DEFAULT_REGISTER_TEXT,
       });
       return;
     }
@@ -222,13 +222,13 @@ export default class AuthSection extends Component {
             {
               paddingLeft: padding,
               paddingRight: padding,
-              marginBottom: padding
-            }
+              marginBottom: padding,
+            },
           ]}
         >
-          Due to the nature of our encryption, Standard Notes cannot offer password
-          reset functionality. If you forget your password, you will permanently
-          lose access to your data.
+          Due to the nature of our encryption, Standard Notes cannot offer
+          password reset functionality. If you forget your password, you will
+          permanently lose access to your data.
         </Text>
 
         <SectionedTableCell first={true} textInputCell={true}>
@@ -272,8 +272,8 @@ export default class AuthSection extends Component {
               {
                 paddingLeft: textPadding,
                 paddingRight: textPadding,
-                marginBottom: textPadding
-              }
+                marginBottom: textPadding,
+              },
             ]}
           >
             {this.state.mfa.message}

@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import { ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import SectionHeader from '@Components/SectionHeader';
@@ -22,6 +23,8 @@ import PasscodeSection from '@Screens/Settings/Sections/PasscodeSection';
 import { ICON_CHECKMARK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
+import { SFPrivilegesManager } from 'standard-file-js';
+
 export default class Settings extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {
     const templateOptions = {
@@ -30,13 +33,13 @@ export default class Settings extends Abstract {
         title: ApplicationState.isIOS ? 'Done' : null,
         iconName: ApplicationState.isIOS
           ? null
-          : StyleKit.nameForIcon(ICON_CHECKMARK)
-      }
+          : StyleKit.nameForIcon(ICON_CHECKMARK),
+      },
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions
+      templateOptions,
     });
   };
 
@@ -51,8 +54,8 @@ export default class Settings extends Abstract {
           : StyleKit.nameForIcon(ICON_CHECKMARK),
         onPress: () => {
           this.dismiss();
-        }
-      }
+        },
+      },
     });
 
     if (__DEV__) {
@@ -63,15 +66,15 @@ export default class Settings extends Abstract {
             Storage.get().clear();
             Auth.get().signout();
             KeysManager.get().clearOfflineKeysAndData(true);
-          }
-        }
+          },
+        },
       });
     }
 
     this.sortOptions = [
       { key: 'created_at', label: 'Date Added' },
       { key: 'client_updated_at', label: 'Date Modified' },
-      { key: 'title', label: 'Title' }
+      { key: 'title', label: 'Title' },
     ];
 
     this.options = ApplicationState.getOptions();
@@ -91,7 +94,7 @@ export default class Settings extends Abstract {
     this.mergeState({
       hasPasscode: hasPasscode,
       hasBiometrics: hasBiometrics,
-      storageEncryption: encryptedStorage
+      storageEncryption: encryptedStorage,
     });
   }
 
@@ -120,7 +123,8 @@ export default class Settings extends Abstract {
   onSignOutPress = () => {
     return AlertManager.get().confirm({
       title: 'Sign Out?',
-      text: 'Signing out will remove all data from this device, including notes and tags. Make sure your data is synced before proceeding.',
+      text:
+        'Signing out will remove all data from this device, including notes and tags. Make sure your data is synced before proceeding.',
       confirmButtonText: 'Sign Out',
       onConfirm: () => {
         Auth.get()
@@ -128,14 +132,15 @@ export default class Settings extends Abstract {
           .then(() => {
             this.forceUpdate();
           });
-      }
+      },
     });
   };
 
   onStorageEncryptionEnable = () => {
     AlertManager.get().confirm({
       title: 'Enable Storage Encryption?',
-      text: 'Storage encryption improves your security by encrypting your data on your device. It may increase app start-up time.',
+      text:
+        'Storage encryption improves your security by encrypting your data on your device. It may increase app start-up time.',
       confirmButtonText: 'Enable',
       onConfirm: () => {
         this.mergeState({ storageEncryptionLoading: true });
@@ -146,14 +151,15 @@ export default class Settings extends Abstract {
             storageEncryptionLoading: false,
           });
         });
-      }
+      },
     });
   };
 
   onStorageEncryptionDisable = () => {
     AlertManager.get().confirm({
       title: 'Disable Storage Encryption?',
-      text: 'Storage encryption improves your security by encrypting your data on your device. Disabling it can improve app start-up speed.',
+      text:
+        'Storage encryption improves your security by encrypting your data on your device. Disabling it can improve app start-up speed.',
       confirmButtonText: 'Disable',
       onConfirm: () => {
         this.mergeState({ storageEncryptionLoading: true });
@@ -161,10 +167,10 @@ export default class Settings extends Abstract {
         this.resaveOfflineData(() => {
           this.mergeState({
             storageEncryption: false,
-            storageEncryptionLoading: false
+            storageEncryptionLoading: false,
           });
         });
-      }
+      },
     });
   };
 
@@ -202,7 +208,7 @@ export default class Settings extends Abstract {
               );
             }
           });
-      }
+      },
     });
   };
 
@@ -214,9 +220,11 @@ export default class Settings extends Abstract {
         const encryptionSource = KeysManager.get().encryptionSource();
         let message;
         if (encryptionSource === 'account') {
-          message = 'Are you sure you want to disable your local passcode? This will not affect your encryption status, as your data is currently being encrypted through your sync account keys.';
+          message =
+            'Are you sure you want to disable your local passcode? This will not affect your encryption status, as your data is currently being encrypted through your sync account keys.';
         } else if (encryptionSource === 'offline') {
-          message = 'Are you sure you want to disable your local passcode? This will disable encryption on your data.';
+          message =
+            'Are you sure you want to disable your local passcode? This will disable encryption on your data.';
         }
 
         AlertManager.get().confirm({
@@ -233,7 +241,7 @@ export default class Settings extends Abstract {
 
             this.mergeState({ hasPasscode: false });
             this.forceUpdate();
-          }
+          },
         });
       }
     );
@@ -297,7 +305,7 @@ export default class Settings extends Abstract {
       >
         <ScrollView
           style={{
-            backgroundColor: StyleKit.variables.stylekitBackgroundColor
+            backgroundColor: StyleKit.variables.stylekitBackgroundColor,
           }}
           keyboardShouldPersistTaps={'always'}
           keyboardDismissMode={'interactive'}

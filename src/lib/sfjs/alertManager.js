@@ -1,5 +1,7 @@
 import { Alert } from 'react-native';
 
+import { SFAlertManager } from 'standard-file-js';
+
 export default class AlertManager extends SFAlertManager {
   static instance = null;
 
@@ -20,8 +22,8 @@ export default class AlertManager extends SFAlertManager {
           onPress: async () => {
             onClose && (await onClose());
             resolve();
-          }
-        }
+          },
+        },
       ];
       Alert.alert(title, text, buttons, { cancelable: true });
     });
@@ -34,7 +36,7 @@ export default class AlertManager extends SFAlertManager {
     cancelButtonText = 'Cancel',
     onConfirm,
     onCancel,
-    onDismiss
+    onDismiss,
   } = {}) {
     return new Promise((resolve, reject) => {
       // On iOS, confirm should go first. On Android, cancel should go first.
@@ -44,22 +46,22 @@ export default class AlertManager extends SFAlertManager {
           onPress: async () => {
             onCancel && (await onCancel());
             reject();
-          }
+          },
         },
         {
           text: confirmButtonText,
           onPress: async () => {
             onConfirm && (await onConfirm());
             resolve();
-          }
-        }
+          },
+        },
       ];
       Alert.alert(title, text, buttons, {
         cancelable: true,
         onDismiss: async () => {
           onDismiss && (await onDismiss());
           reject();
-        }
+        },
       });
     });
   }

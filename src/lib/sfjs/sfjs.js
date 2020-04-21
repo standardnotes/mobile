@@ -41,7 +41,7 @@ class SFReactNativeCrypto extends SFAbstractCrypto {
       encryptionKey,
       iv,
       authHash,
-      authKey
+      authKey,
     } = {},
     requiresAuth
   ) {

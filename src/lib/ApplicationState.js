@@ -4,8 +4,9 @@ import {
   NativeModules,
   Linking,
   Alert,
-  Keyboard
+  Keyboard,
 } from 'react-native';
+import _ from 'lodash';
 import KeysManager from '@Lib/keysManager';
 import OptionsState from '@Lib/OptionsState';
 import PrivilegesManager from '@SFJS/privilegesManager';
@@ -141,7 +142,7 @@ export default class ApplicationState {
       this.tabletMode = enabled;
       this.notifyEvent(ApplicationState.AppStateEventTabletModeChange, {
         new_isInTabletMode: enabled,
-        old_isInTabletMode: !enabled
+        old_isInTabletMode: !enabled,
       });
     }
   }
@@ -155,7 +156,7 @@ export default class ApplicationState {
       this.noteSideMenuCollapsed = collapsed;
       this.notifyEvent(ApplicationState.AppStateEventNoteSideMenuToggle, {
         new_isNoteSideMenuCollapsed: collapsed,
-        old_isNoteSideMenuCollapsed: !collapsed
+        old_isNoteSideMenuCollapsed: !collapsed,
       });
     }
   }
@@ -240,7 +241,7 @@ export default class ApplicationState {
       ApplicationState.LosingFocus,
       ApplicationState.Backgrounding,
       ApplicationState.GainingFocus,
-      ApplicationState.ResumingFromBackground
+      ApplicationState.ResumingFromBackground,
     ].includes(state);
   }
 
@@ -408,7 +409,7 @@ export default class ApplicationState {
     return {
       title: title,
       sources: sources,
-      onAuthenticate: this.unlockApplication.bind(this)
+      onAuthenticate: this.unlockApplication.bind(this),
     };
   }
 

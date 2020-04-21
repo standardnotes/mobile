@@ -13,7 +13,7 @@ export default class ReviewManager {
     this.getRunCount().then(runCount => {
       this.setRunCount(runCount + 1);
       if (RUN_COUNTS_BEFORE_REVIEW.includes(runCount)) {
-        setTimeout(function() {
+        setTimeout(function () {
           StoreReview.requestReview();
         }, 1000);
       }

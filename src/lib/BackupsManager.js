@@ -1,6 +1,7 @@
 import { Share, Alert } from 'react-native';
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
+import { SFItemParams } from 'standard-file-js';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
 import AlertManager from '@SFJS/alertManager';
@@ -50,7 +51,7 @@ export default class BackupsManager {
     if (keys) {
       const authParams = KeysManager.get().activeAuthParams();
       // auth params are only needed when encrypted with a standard file key
-      data['auth_params'] = authParams;
+      data.auth_params = authParams;
     }
 
     const jsonString = JSON.stringify(data, null, 2 /* pretty print */);
@@ -76,7 +77,7 @@ export default class BackupsManager {
       .confirm({
         title: 'Choose Export Method',
         cancelButtonText: 'Email',
-        confirmButtonText: 'Save to Disk'
+        confirmButtonText: 'Save to Disk',
       })
       .then(() => {
         return 'save';
@@ -91,7 +92,7 @@ export default class BackupsManager {
       ApplicationState.get().performActionWithoutStateChangeImpact(async () => {
         Share.share({
           title: filename,
-          message: data
+          message: data,
         })
           .then(result => {
             resolve(result !== Share.dismissedAction);
@@ -131,7 +132,7 @@ export default class BackupsManager {
         confirmButtonText: 'Open File',
         onConfirm: () => {
           this._openFileAndroid(filepath);
-        }
+        },
       })
       .then(() => {
         return true;
@@ -158,7 +159,7 @@ export default class BackupsManager {
           recipients: [''],
           body: '',
           isHTML: true,
-          attachment: { data: stringData, type: fileType, name: filename }
+          attachment: { data: stringData, type: fileType, name: filename },
         },
         (error, event) => {
           if (error) {
@@ -170,7 +171,7 @@ export default class BackupsManager {
       );
 
       // On Android the Mailer callback event isn't always triggered.
-      setTimeout(function() {
+      setTimeout(function () {
         if (!resolved) {
           resolve();
         }

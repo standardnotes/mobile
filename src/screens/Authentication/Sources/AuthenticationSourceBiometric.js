@@ -84,8 +84,9 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
       return {
         success: false,
         error: {
-          message: 'This device either does not have a biometric sensor or it may not configured.'
-        }
+          message:
+            'This device either does not have a biometric sensor or it may not configured.',
+        },
       };
     }
 
@@ -94,7 +95,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
     if (Platform.OS === 'android') {
       return FingerprintScanner.authenticate({
         deviceCredentialAllowed: true,
-        description: 'Biometrics are required to access your notes.'
+        description: 'Biometrics are required to access your notes.',
       })
         .then(() => {
           return this._success();
@@ -116,7 +117,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
       // iOS
       return FingerprintScanner.authenticate({
         fallbackEnabled: true,
-        description: 'This is required to access your notes.'
+        description: 'This is required to access your notes.',
       })
         .then(() => {
           return this._success();

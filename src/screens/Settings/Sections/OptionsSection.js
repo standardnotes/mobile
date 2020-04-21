@@ -13,6 +13,8 @@ import UserPrefsManager, { LAST_EXPORT_DATE_KEY } from '@Lib/userPrefsManager';
 import Auth from '@SFJS/authManager';
 import Abstract from '@Screens/Abstract';
 
+import { SFPrivilegesManager } from 'standard-file-js';
+
 class OptionsSection extends Abstract {
   constructor(props) {
     super(props);
@@ -23,7 +25,7 @@ class OptionsSection extends Abstract {
       loadingExport: false,
       encryptionAvailable: encryptionAvailable,
       email: email,
-      signedIn: !isOffline
+      signedIn: !isOffline,
     };
   }
 
@@ -61,7 +63,7 @@ class OptionsSection extends Abstract {
               this.setState({ lastExportDate: date });
               UserPrefsManager.get().setPref({
                 key: LAST_EXPORT_DATE_KEY,
-                value: date
+                value: date,
               });
             }
             this.setState({ loadingExport: false });
@@ -81,9 +83,9 @@ class OptionsSection extends Abstract {
       {
         title: 'Encrypted',
         key: 'encrypted',
-        selected: this.state.encryptionAvailable
+        selected: this.state.encryptionAvailable,
       },
-      { title: 'Decrypted', key: 'decrypted', selected: true }
+      { title: 'Decrypted', key: 'decrypted', selected: true },
     ];
   };
 
@@ -109,7 +111,7 @@ class OptionsSection extends Abstract {
 
       // Date is stale if more than 7 days ago
       let staleThreshold = 7 * 86400;
-      stale = ((new Date() - this.state.lastExportDate) / 1000) > staleThreshold;
+      stale = (new Date() - this.state.lastExportDate) / 1000 > staleThreshold;
     } else {
       lastExportString = 'Your data has not yet been backed up.';
     }

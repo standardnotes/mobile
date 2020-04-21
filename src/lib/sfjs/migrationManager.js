@@ -4,6 +4,8 @@ import PrivilegesManager from '@SFJS/privilegesManager';
 import Storage from '@SFJS/storageManager';
 import Sync from '@SFJS/syncManager';
 
+import { SFModelManager, SFMigrationManager } from 'standard-file-js';
+
 const base64 = require('base-64');
 
 export default class MigrationManager extends SFMigrationManager {
@@ -69,7 +71,7 @@ export default class MigrationManager extends SFMigrationManager {
             // but since we're manually mapping, we have to make it manually resolve singletons
             PrivilegesManager.get().singletonManager.resolveSingletons(mapped);
           });
-      }
+      },
     };
   }
 
@@ -103,7 +105,7 @@ export default class MigrationManager extends SFMigrationManager {
               SFModelManager.MappingSourceRemoteRetrieved
             );
           });
-      }
+      },
     };
   }
 

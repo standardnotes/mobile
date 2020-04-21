@@ -11,9 +11,7 @@ export default class CompanySection extends Component {
     if (action === 'feedback') {
       const platformString = Platform.OS === 'android' ? 'Android' : 'iOS';
       ApplicationState.openURL(
-        `mailto:help@standardnotes.org?subject=${platformString} app feedback (v${
-          ApplicationState.version
-        })`
+        `mailto:help@standardnotes.org?subject=${platformString} app feedback (v${ApplicationState.version})`
       );
     } else if (action === 'learn_more') {
       ApplicationState.openURL('https://standardnotes.org');
@@ -72,7 +70,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             https://standardnotes.org/help
@@ -88,7 +86,7 @@ export default class CompanySection extends Component {
             <Text
               style={{
                 color: StyleKit.variables.stylekitNeutralColor,
-                marginTop: 3
+                marginTop: 3,
               }}
             >
               help@standardnotes.org
@@ -104,7 +102,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             Share the unexpected benefits of encrypted writing.
@@ -119,7 +117,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             Share Standard Notes with a friend.
@@ -134,7 +132,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             https://standardnotes.org
@@ -149,7 +147,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             https://standardnotes.org/privacy
@@ -166,7 +164,7 @@ export default class CompanySection extends Component {
             <Text
               style={{
                 color: StyleKit.variables.stylekitNeutralColor,
-                marginTop: 3
+                marginTop: 3,
               }}
             >
               Version {ApplicationState.version}
@@ -174,7 +172,7 @@ export default class CompanySection extends Component {
             <Text
               style={{
                 color: StyleKit.variables.stylekitNeutralColor,
-                marginTop: 3
+                marginTop: 3,
               }}
             >
               Help support us with a review on the {storeName}.

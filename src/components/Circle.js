@@ -21,8 +21,8 @@ export default class Circle extends SectionedTableCell {
         borderRadius: this.size / 2.0,
         backgroundColor: this.props.backgroundColor,
         borderColor: this.props.borderColor,
-        borderWidth: 1
-      }
+        borderWidth: 1,
+      },
     };
   }
 }

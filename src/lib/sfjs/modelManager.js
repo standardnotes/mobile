@@ -1,19 +1,21 @@
 import { SNMfa, SNServerExtension, SNExtension, SNEditor } from 'snjs';
-import { SFPredicate, SFPrivileges } from 'standard-file-js';
+import _ from 'lodash';
+import { SFPredicate, SFPrivileges, SFModelManager } from 'standard-file-js';
+import { SNNote, SNTag, SNTheme, SNComponent, SNSmartTag } from 'snjs';
 import Storage from '@SFJS/storageManager';
 import '../../models/extend/item.js';
 
 SFModelManager.ContentTypeClassMapping = {
-  "Note" : SNNote,
-  "Tag" : SNTag,
-  "SN|SmartTag" : SNSmartTag,
-  "Extension" : SNExtension,
-  "SN|Editor" : SNEditor,
-  "SN|Theme" : SNTheme,
-  "SN|Component" : SNComponent,
-  "SF|Extension" : SNServerExtension,
-  "SF|MFA" : SNMfa,
-  "SN|Privileges" : SFPrivileges
+  Note: SNNote,
+  Tag: SNTag,
+  'SN|SmartTag': SNSmartTag,
+  Extension: SNExtension,
+  'SN|Editor': SNEditor,
+  'SN|Theme': SNTheme,
+  'SN|Component': SNComponent,
+  'SF|Extension': SNServerExtension,
+  'SF|MFA': SNMfa,
+  'SN|Privileges': SFPrivileges,
 };
 
 export default class ModelManager extends SFModelManager {
@@ -54,7 +56,7 @@ export default class ModelManager extends SFModelManager {
         if (item.content_type === 'Tag') {
           if (!_.find(this.tags, { uuid: item.uuid })) {
             this.tags.splice(
-              _.sortedIndexBy(this.tags, item, function(item) {
+              _.sortedIndexBy(this.tags, item, function (item) {
                 if (item.title) {
                   return item.title.toLowerCase();
                 } else {
@@ -203,16 +205,10 @@ export default class ModelManager extends SFModelManager {
     let searchTerm = options.searchTerm;
     if (searchTerm) {
       searchTerm = searchTerm.toLowerCase();
-      notes = notes.filter(function(note) {
+      notes = notes.filter(function (note) {
         return (
-          note
-            .safeTitle()
-            .toLowerCase()
-            .includes(searchTerm) ||
-          note
-            .safeText()
-            .toLowerCase()
-            .includes(searchTerm)
+          note.safeTitle().toLowerCase().includes(searchTerm) ||
+          note.safeText().toLowerCase().includes(searchTerm)
         );
       });
     }
@@ -285,7 +281,7 @@ export default class ModelManager extends SFModelManager {
       return 0;
     };
 
-    notes = notes.sort(function(a, b) {
+    notes = notes.sort(function (a, b) {
       return sortValueFn(a, b);
     });
 
@@ -298,18 +294,18 @@ export default class ModelManager extends SFModelManager {
 
   humanReadableDisplayForContentType(contentType) {
     return {
-      "Note" : 'note',
-      "Tag" : 'tag',
-      "SN|SmartTag": 'smart tag',
-      "Extension" : 'action-based extension',
-      "SN|Component" : 'component',
-      "SN|Editor" : 'editor',
-      "SN|Theme" : 'theme',
-      "SF|Extension" : 'server extension',
-      "SF|MFA" : 'two-factor authentication setting',
-      "SN|FileSafe|Credentials": 'FileSafe credential',
-      "SN|FileSafe|FileMetadata": 'FileSafe file',
-      "SN|FileSafe|Integration": 'FileSafe integration'
+      Note: 'note',
+      Tag: 'tag',
+      'SN|SmartTag': 'smart tag',
+      Extension: 'action-based extension',
+      'SN|Component': 'component',
+      'SN|Editor': 'editor',
+      'SN|Theme': 'theme',
+      'SF|Extension': 'server extension',
+      'SF|MFA': 'two-factor authentication setting',
+      'SN|FileSafe|Credentials': 'FileSafe credential',
+      'SN|FileSafe|FileMetadata': 'FileSafe file',
+      'SN|FileSafe|Integration': 'FileSafe integration',
     }[contentType];
   }
 }

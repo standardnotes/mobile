@@ -2,6 +2,8 @@ import { Platform } from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import SNReactNative from 'standard-notes-rn';
+import { SFItemParams, SFItem } from 'standard-file-js';
+import _ from 'lodash';
 
 import Keychain from '@Lib/keychain';
 import { isNullOrUndefined } from '@Lib/utils';
@@ -86,7 +88,7 @@ export default class KeysManager {
       EncryptedAccountKeysKey,
       FirstRunKey,
       StorageEncryptionKey,
-      BiometricsPrefs
+      BiometricsPrefs,
     ];
 
     /*
@@ -154,7 +156,7 @@ export default class KeysManager {
           } else {
             this.user = {};
           }
-        })
+        }),
     ]).then(async () => {
       // We only want to run migrations in unlocked app state. If account keys are present, run now,
       // otherwise wait until offline keys have been set so that account keys are decrypted.
@@ -189,7 +191,8 @@ export default class KeysManager {
 
     return AlertManager.get().confirm({
       title: 'Previous Installation',
-      text: "We've detected a previous installation of Standard Notes based on your keychain data. You must wipe all data from previous installation to continue.\n\nIf you're seeing this message in error, it might mean we're having issues loading your local database. Please restart the app and try again.",
+      text:
+        "We've detected a previous installation of Standard Notes based on your keychain data. You must wipe all data from previous installation to continue.\n\nIf you're seeing this message in error, it might mean we're having issues loading your local database. Please restart the app and try again.",
       confirmButtonText: 'Delete Local Data',
       cancelButtonText: 'Quit App',
       onConfirm: async () => {
@@ -201,7 +204,7 @@ export default class KeysManager {
       },
       onCancel: () => {
         SNReactNative.exitApp();
-      }
+      },
     });
   }
 
@@ -282,7 +285,7 @@ export default class KeysManager {
 
     if (this.offlineKeys) {
       _.merge(value, {
-        offline: { pw: this.offlineKeys.pw, timing: this.passcodeTiming }
+        offline: { pw: this.offlineKeys.pw, timing: this.passcodeTiming },
       });
     }
 
@@ -501,7 +504,7 @@ export default class KeysManager {
     // Check to see if encryptedAccountKeys need decrypting
     if (this.encryptedAccountKeys) {
       // Decrypt and set
-      await SFJS.itemTransformer.decryptItem(
+      await SF.get().itemTransformer.decryptItem(
         this.encryptedAccountKeys,
         this.offlineKeys
       );
@@ -564,13 +567,13 @@ export default class KeysManager {
       {
         title: 'Immediately',
         key: 'immediately',
-        selected: this.passcodeTiming === 'immediately'
+        selected: this.passcodeTiming === 'immediately',
       },
       {
         title: 'On Quit',
         key: 'on-quit',
-        selected: this.passcodeTiming === 'on-quit'
-      }
+        selected: this.passcodeTiming === 'on-quit',
+      },
     ];
   }
 
@@ -579,13 +582,13 @@ export default class KeysManager {
       {
         title: 'Immediately',
         key: 'immediately',
-        selected: this.biometricPrefs.timing === 'immediately'
+        selected: this.biometricPrefs.timing === 'immediately',
       },
       {
         title: 'On Quit',
         key: 'on-quit',
-        selected: this.biometricPrefs.timing === 'on-quit'
-      }
+        selected: this.biometricPrefs.timing === 'on-quit',
+      },
     ];
   }
 

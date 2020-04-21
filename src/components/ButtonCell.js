@@ -37,7 +37,7 @@ export default class ButtonCell extends SectionedTableCell {
         style={[
           StyleKit.styles.flexContainer,
           StyleKit.styles.buttonCell,
-          ...this.rules()
+          ...this.rules(),
         ]}
         disabled={this.props.disabled}
         onPress={this.props.onPress}

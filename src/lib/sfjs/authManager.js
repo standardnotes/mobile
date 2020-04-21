@@ -1,8 +1,11 @@
 import { Platform } from 'react-native';
+import _ from 'lodash';
+import { SFAuthManager } from 'standard-file-js';
 import KeysManager from '@Lib/keysManager';
 import AlertManager from '@SFJS/alertManager';
 import Server from '@SFJS/httpManager';
 import Storage from '@SFJS/storageManager';
+import SFJS from './sfjs';
 
 export default class Auth extends SFAuthManager {
   static instance = null;
@@ -69,7 +72,7 @@ export default class Auth extends SFAuthManager {
           _.merge(keys, { jwt: response.token })
         ),
         KeysManager.get().setAccountAuthParams(authParams),
-        KeysManager.get().saveUser({ server: url, email: email })
+        KeysManager.get().saveUser({ server: url, email: email }),
       ]);
     } catch (e) {
       console.log('Error saving auth paramters', e);
@@ -79,7 +82,7 @@ export default class Auth extends SFAuthManager {
 
   async verifyAccountPassword(password) {
     const authParams = await this.getAuthParams();
-    const keys = await SFJS.crypto.computeEncryptionKeysForUser(
+    const keys = await SFJS.get().crypto.computeEncryptionKeysForUser(
       password,
       authParams
     );

@@ -11,6 +11,8 @@ import SideMenuCell from '@SideMenu/SideMenuCell';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
 import StyleKit from '@Style/StyleKit';
 
+import { SFAuthManager } from 'standard-file-js';
+
 class TagSelectionList extends ThemedComponent {
   /*
     @param props.selectedTags
@@ -103,9 +105,9 @@ class TagSelectionList extends ThemedComponent {
                   Sync.get().sync();
                   this.forceUpdate();
                 }
-              }
+              },
             });
-          }
+          },
         }),
         ActionSheetWrapper.BuildOption({
           text: 'Delete',
@@ -118,12 +120,12 @@ class TagSelectionList extends ThemedComponent {
                 this.reload();
               }
             );
-          }
-        })
+          },
+        }),
       ],
       onCancel: () => {
         this.setState({ actionSheet: null });
-      }
+      },
     });
 
     this.setState({ actionSheet: sheet.actionSheetElement() });
@@ -134,7 +136,7 @@ class TagSelectionList extends ThemedComponent {
   iconDescriptorForTag = tag => {
     return {
       type: 'ascii',
-      value: '#'
+      value: '#',
     };
   };
 
@@ -190,14 +192,14 @@ class TagSelectionList extends ThemedComponent {
   loadStyles() {
     this.styles = {
       list: {
-        paddingBottom: this.props.hasBottomPadding ? 30 : 0
+        paddingBottom: this.props.hasBottomPadding ? 30 : 0,
       },
       emptyPlaceholderText: {
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.6,
         paddingRight: 30,
-        lineHeight: 18
-      }
+        lineHeight: 18,
+      },
     };
   }
 }

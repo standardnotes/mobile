@@ -14,7 +14,7 @@ export default class SideMenuSection extends ThemedComponent {
     dimmed,
     selected,
     onSelect,
-    onLongPress
+    onLongPress,
   }) {
     return {
       text,
@@ -25,7 +25,7 @@ export default class SideMenuSection extends ThemedComponent {
       dimmed,
       selected,
       onSelect,
-      onLongPress
+      onLongPress,
     };
   }
 
@@ -49,7 +49,7 @@ export default class SideMenuSection extends ThemedComponent {
         <TouchableOpacity
           style={[
             this.styles.header,
-            this.state.collapsed ? this.styles.collapsedHeader : null
+            this.state.collapsed ? this.styles.collapsedHeader : null,
           ]}
           underlayColor={StyleKit.variables.stylekitBorderColor}
           onPress={this.toggleCollapse}
@@ -90,26 +90,26 @@ export default class SideMenuSection extends ThemedComponent {
   loadStyles() {
     this.styles = {
       root: {
-        paddingBottom: 6
+        paddingBottom: 6,
       },
       header: {
-        height: 22
+        height: 22,
       },
       collapsedHeader: {
-        height: 50
+        height: 50,
       },
       title: {
         color: StyleKit.variables.stylekitInfoColor,
         fontSize: 13,
-        fontWeight: '700'
+        fontWeight: '700',
       },
 
       collapsedLabel: {
         fontSize: 12,
         opacity: 0.7,
         marginTop: 3,
-        color: StyleKit.variables.stylekitContrastForegroundColor
-      }
+        color: StyleKit.variables.stylekitContrastForegroundColor,
+      },
     };
   }
 }
