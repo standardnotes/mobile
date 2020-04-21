@@ -1,32 +1,29 @@
 package com.standardnotes;
 
-import com.bugsnag.BugsnagReactNative;
-import com.chirag.RNMail.RNMail;
-import com.facebook.react.PackageList;
-import com.facebook.react.modules.network.OkHttpClientProvider;
-
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
-import android.view.WindowManager;
-
+import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import com.kristiansorens.flagsecure.FlagSecure;
-import com.kristiansorens.flagsecure.FlagSecurePackage;
+import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
-import com.standardnotes.sntextview.SNTextViewPackage;
-import com.tectiv3.aes.RCTAesPackage;
+import com.bugsnag.BugsnagReactNative;
+import com.facebook.react.modules.network.OkHttpClientProvider;
 
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.view.WindowManager;
+
+import com.kristiansorens.flagsecure.FlagSecure;
 
 import org.standardnotes.SNReactNative.SNReactNativePackage;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -40,12 +37,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       @SuppressWarnings("UnnecessaryLocalVariable")
       List<ReactPackage> packages = new PackageList(this).getPackages();
-
-      packages.add(new RCTAesPackage());
-      packages.add(new RNMail());
-      packages.add(new SNTextViewPackage());
-      packages.add(new FlagSecurePackage());
-      packages.add(new SNReactNativePackage());
 
       return packages;
     }
@@ -70,7 +61,7 @@ public class MainApplication extends Application implements ReactApplication {
 
     SoLoader.init(this, /* native exopackage */ false);
 
-    initializeFlipper(this); // Remove this line if you don't want Flipper enabled
+    initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
 
     registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
       @Override
@@ -118,20 +109,25 @@ public class MainApplication extends Application implements ReactApplication {
     OkHttpClientProvider.setOkHttpClientFactory(new CustomClientFactory());
   }
 
-  /**
-   * Loads Flipper in React Native templates.
+   /**
+   * Loads Flipper in React Native templates. Call this in the onCreate method with something like
+   * initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
    *
    * @param context
+   * @param reactInstanceManager
    */
-  private static void initializeFlipper(Context context) {
+  private static void initializeFlipper(
+      Context context, ReactInstanceManager reactInstanceManager) {
     if (BuildConfig.DEBUG) {
       try {
         /*
          We use reflection here to pick up the class that initializes Flipper,
         since Flipper library is not available in release mode
         */
-        Class<?> aClass = Class.forName("com.facebook.flipper.ReactNativeFlipper");
-        aClass.getMethod("initializeFlipper", Context.class).invoke(null, context);
+        Class<?> aClass = Class.forName("com.rndiffapp.ReactNativeFlipper");
+        aClass
+            .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
+            .invoke(null, context, reactInstanceManager);
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
       } catch (NoSuchMethodException e) {
