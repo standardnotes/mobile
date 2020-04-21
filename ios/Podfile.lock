@@ -5,8 +5,6 @@ PODS:
     - React
   - BugsnagReactNative/Core (2.23.2):
     - React
-  - CocoaAsyncSocket (7.6.4)
-  - CocoaLibEvent (1.0.0)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.62.2)
   - FBReactNativeSpec (0.62.2):
@@ -16,52 +14,6 @@ PODS:
     - React-Core (= 0.62.2)
     - React-jsi (= 0.62.2)
     - ReactCommon/turbomodule/core (= 0.62.2)
-  - Flipper (0.33.1):
-    - Flipper-Folly (~> 2.1)
-    - Flipper-RSocket (~> 1.0)
-  - Flipper-DoubleConversion (1.1.7)
-  - Flipper-Folly (2.2.0):
-    - boost-for-react-native
-    - CocoaLibEvent (~> 1.0)
-    - Flipper-DoubleConversion
-    - Flipper-Glog
-    - OpenSSL-Universal (= 1.0.2.19)
-  - Flipper-Glog (0.3.6)
-  - Flipper-PeerTalk (0.0.4)
-  - Flipper-RSocket (1.1.0):
-    - Flipper-Folly (~> 2.2)
-  - FlipperKit (0.33.1):
-    - FlipperKit/Core (= 0.33.1)
-  - FlipperKit/Core (0.33.1):
-    - Flipper (~> 0.33.1)
-    - FlipperKit/CppBridge
-    - FlipperKit/FBCxxFollyDynamicConvert
-    - FlipperKit/FBDefines
-    - FlipperKit/FKPortForwarding
-  - FlipperKit/CppBridge (0.33.1):
-    - Flipper (~> 0.33.1)
-  - FlipperKit/FBCxxFollyDynamicConvert (0.33.1):
-    - Flipper-Folly (~> 2.1)
-  - FlipperKit/FBDefines (0.33.1)
-  - FlipperKit/FKPortForwarding (0.33.1):
-    - CocoaAsyncSocket (~> 7.6)
-    - Flipper-PeerTalk (~> 0.0.4)
-  - FlipperKit/FlipperKitHighlightOverlay (0.33.1)
-  - FlipperKit/FlipperKitLayoutPlugin (0.33.1):
-    - FlipperKit/Core
-    - FlipperKit/FlipperKitHighlightOverlay
-    - FlipperKit/FlipperKitLayoutTextSearchable
-    - YogaKit (~> 1.18)
-  - FlipperKit/FlipperKitLayoutTextSearchable (0.33.1)
-  - FlipperKit/FlipperKitNetworkPlugin (0.33.1):
-    - FlipperKit/Core
-  - FlipperKit/FlipperKitReactPlugin (0.33.1):
-    - FlipperKit/Core
-  - FlipperKit/FlipperKitUserDefaultsPlugin (0.33.1):
-    - FlipperKit/Core
-  - FlipperKit/SKIOSNetworkPlugin (0.33.1):
-    - FlipperKit/Core
-    - FlipperKit/FlipperKitNetworkPlugin
   - Folly (2018.10.22.00):
     - boost-for-react-native
     - DoubleConversion
@@ -72,9 +24,6 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - OpenSSL-Universal (1.0.2.19):
-    - OpenSSL-Universal/Static (= 1.0.2.19)
-  - OpenSSL-Universal/Static (1.0.2.19)
   - RCTRequired (0.62.2)
   - RCTTypeSafety (0.62.2):
     - FBLazyVector (= 0.62.2)
@@ -238,7 +187,7 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
   - React-jsinspector (0.62.2)
-  - react-native-aes (1.3.6):
+  - react-native-aes (1.3.8):
     - React
   - react-native-fingerprint-scanner (4.0.0):
     - React
@@ -327,37 +276,18 @@ PODS:
     - React
   - RNVectorIcons (6.6.0):
     - React
+  - sn-textview (1.0.0):
+    - React
   - SNReactNative (1.0.0):
     - React
   - TrustKit (1.6.3)
   - Yoga (1.14.0)
-  - YogaKit (1.18.1):
-    - Yoga (~> 1.14)
 
 DEPENDENCIES:
   - BugsnagReactNative (from `../node_modules/bugsnag-react-native`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/Libraries/FBReactNativeSpec`)
-  - Flipper (~> 0.33.1)
-  - Flipper-DoubleConversion (= 1.1.7)
-  - Flipper-Folly (~> 2.1)
-  - Flipper-Glog (= 0.3.6)
-  - Flipper-PeerTalk (~> 0.0.4)
-  - Flipper-RSocket (~> 1.0)
-  - FlipperKit (~> 0.33.1)
-  - FlipperKit/Core (~> 0.33.1)
-  - FlipperKit/CppBridge (~> 0.33.1)
-  - FlipperKit/FBCxxFollyDynamicConvert (~> 0.33.1)
-  - FlipperKit/FBDefines (~> 0.33.1)
-  - FlipperKit/FKPortForwarding (~> 0.33.1)
-  - FlipperKit/FlipperKitHighlightOverlay (~> 0.33.1)
-  - FlipperKit/FlipperKitLayoutPlugin (~> 0.33.1)
-  - FlipperKit/FlipperKitLayoutTextSearchable (~> 0.33.1)
-  - FlipperKit/FlipperKitNetworkPlugin (~> 0.33.1)
-  - FlipperKit/FlipperKitReactPlugin (~> 0.33.1)
-  - FlipperKit/FlipperKitUserDefaultsPlugin (~> 0.33.1)
-  - FlipperKit/SKIOSNetworkPlugin (~> 0.33.1)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
@@ -371,9 +301,9 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
-  - react-native-aes (from `../vendor/react-native-aes`)
+  - react-native-aes (from `../node_modules/react-native-aes`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
-  - react-native-mail (from `../vendor/react-native-mail`)
+  - react-native-mail (from `../node_modules/react-native-mail`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -386,7 +316,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/callinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - ReactNativeAlternateIcons (from `../vendor/react-native-alternate-icons`)
+  - ReactNativeAlternateIcons (from `../node_modules/react-native-alternate-icons`)
   - ReactNativeDarkMode (from `../node_modules/react-native-dark-mode`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - RNFileViewer (from `../node_modules/react-native-file-viewer/ios`)
@@ -397,25 +327,15 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
-  - SNReactNative (from `../vendor/standard-notes-rn`)
+  - sn-textview (from `../node_modules/sn-textview`)
+  - SNReactNative (from `../node_modules/standard-notes-rn`)
   - TrustKit (= 1.6.3)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - boost-for-react-native
-    - CocoaAsyncSocket
-    - CocoaLibEvent
-    - Flipper
-    - Flipper-DoubleConversion
-    - Flipper-Folly
-    - Flipper-Glog
-    - Flipper-PeerTalk
-    - Flipper-RSocket
-    - FlipperKit
-    - OpenSSL-Universal
     - TrustKit
-    - YogaKit
 
 EXTERNAL SOURCES:
   BugsnagReactNative:
@@ -449,11 +369,11 @@ EXTERNAL SOURCES:
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-aes:
-    :path: "../vendor/react-native-aes"
+    :path: "../node_modules/react-native-aes"
   react-native-fingerprint-scanner:
     :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-mail:
-    :path: "../vendor/react-native-mail"
+    :path: "../node_modules/react-native-mail"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -477,7 +397,7 @@ EXTERNAL SOURCES:
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
   ReactNativeAlternateIcons:
-    :path: "../vendor/react-native-alternate-icons"
+    :path: "../node_modules/react-native-alternate-icons"
   ReactNativeDarkMode:
     :path: "../node_modules/react-native-dark-mode"
   RNCAsyncStorage:
@@ -498,29 +418,21 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-store-review/ios"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
+  sn-textview:
+    :path: "../node_modules/sn-textview"
   SNReactNative:
-    :path: "../vendor/standard-notes-rn"
+    :path: "../node_modules/standard-notes-rn"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   BugsnagReactNative: 0a24a1dd2cac88862d67b938f809bec8274130a9
-  CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
-  CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   FBLazyVector: 4aab18c93cd9546e4bfed752b4084585eca8b245
   FBReactNativeSpec: 5465d51ccfeecb7faa12f9ae0024f2044ce4044e
-  Flipper: 6c1f484f9a88d30ab3e272800d53688439e50f69
-  Flipper-DoubleConversion: 38631e41ef4f9b12861c67d17cb5518d06badc41
-  Flipper-Folly: c12092ea368353b58e992843a990a3225d4533c3
-  Flipper-Glog: 1dfd6abf1e922806c52ceb8701a3599a79a200a6
-  Flipper-PeerTalk: 116d8f857dc6ef55c7a5a75ea3ceaafe878aadc9
-  Flipper-RSocket: 64e7431a55835eb953b0bf984ef3b90ae9fdddd7
-  FlipperKit: 6dc9b8f4ef60d9e5ded7f0264db299c91f18832e
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
   RCTRequired: cec6a34b3ac8a9915c37e7e4ad3aa74726ce4035
   RCTTypeSafety: 93006131180074cffa227a1075802c89a49dd4ce
   React: 29a8b1a02bd764fb7644ef04019270849b9a7ac3
@@ -530,7 +442,7 @@ SPEC CHECKSUMS:
   React-jsi: b6dc94a6a12ff98e8877287a0b7620d365201161
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
-  react-native-aes: 30cdabac81ff8461d2a838d4fd042bb3df74e23d
+  react-native-aes: 6bbed31e8767d0ce1c6af07d255475fa79920c3c
   react-native-fingerprint-scanner: bfcf11a00eee4bb68e6d4e5cdd67d69bed687ea6
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-webview: b1ea98894c474b27c4080779939959e1f3653147
@@ -544,7 +456,7 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  ReactNativeAlternateIcons: b2a8a729d9d9756ed0652c352694f190407f297f
+  ReactNativeAlternateIcons: 7a221624d877fa40218e582d495ba1536584eb12
   ReactNativeDarkMode: 0178ffca3b10f6a7c9f49d6f9810232b328fa949
   RNCAsyncStorage: 6b57de0f6cb0dcfd17521af1681fa39001d3efff
   RNFileViewer: 5047ecf40477339723cc08abd55b5ebcefcef4b5
@@ -555,11 +467,11 @@ SPEC CHECKSUMS:
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
-  SNReactNative: c47c4fd6d310eea152cc52e23f4fd306491efee3
+  sn-textview: f478ee79531da2c7b129c4ea3b20c665e75e1f4b
+  SNReactNative: 6b8a090bf4d64cec59327556941595ed5a7de487
   TrustKit: a2f0c3a926f0a3ce3c082db9a39f1f540dbb04cb
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
-  YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 447973529962eaa6129548a69887c43ae952ca06
+PODFILE CHECKSUM: 1a13e73f7979899ae67dc79c6e66cd2df7b4f4c3
 
 COCOAPODS: 1.9.1

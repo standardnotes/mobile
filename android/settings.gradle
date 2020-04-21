@@ -6,20 +6,5 @@ applyNativeModulesSettingsGradle(settings)
 
 include ':app'
 
-include ':SNTextView'
-project(':SNTextView').projectDir = new File(rootProject.projectDir, '../vendor/sn-textview/android/')
-
-include ':standard-notes-rn'
-project(':standard-notes-rn').projectDir = new File(rootProject.projectDir, '../vendor/standard-notes-rn/android/')
-
-include ':react-native-aes-crypto'
-project(':react-native-aes-crypto').projectDir = new File(rootProject.projectDir, '../vendor/react-native-aes/android/')
-
-include ':RNMail'
-project(':RNMail').projectDir = new File(rootProject.projectDir, '../vendor/react-native-mail/android/')
-
-include ':react-native-flag-secure-android'
-project(':react-native-flag-secure-android').projectDir = new File(rootProject.projectDir, '../vendor/react-native-flag-secure-android/android/')
-
 include ':detox'
 project(':detox').projectDir = new File(rootProject.projectDir, '../node_modules/detox/android/detox')

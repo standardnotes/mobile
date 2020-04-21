@@ -13,7 +13,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import com.bugsnag.BugsnagReactNative;
-import com.chirag.RNMail.RNMail;
 import com.facebook.react.modules.network.OkHttpClientProvider;
 
 import android.annotation.SuppressLint;
@@ -21,11 +20,6 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.kristiansorens.flagsecure.FlagSecure;
-import com.kristiansorens.flagsecure.FlagSecurePackage;
-
-import com.standardnotes.sntextview.SNTextViewPackage;
-import com.tectiv3.aes.RCTAesPackage;
-
 
 import org.standardnotes.SNReactNative.SNReactNativePackage;
 
@@ -43,12 +37,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       @SuppressWarnings("UnnecessaryLocalVariable")
       List<ReactPackage> packages = new PackageList(this).getPackages();
-
-      packages.add(new RCTAesPackage());
-      packages.add(new RNMail());
-      packages.add(new SNTextViewPackage());
-      packages.add(new FlagSecurePackage());
-      packages.add(new SNReactNativePackage());
 
       return packages;
     }

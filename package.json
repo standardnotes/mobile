@@ -31,7 +31,6 @@
     "react-native-flag-secure-android": "standardnotes/react-native-flag-secure-android#d0cbae0",
     "react-native-mail": "standardnotes/react-native-mail#9862c76",
     "react-native-search-box": "standardnotes/react-native-search-box#210b036",
-    "standard-notes-rn": "standardnotes/standard-notes-rn",
     "react-native-fab": "standardnotes/react-native-fab#113661d",
     "react-native-dark-mode": "^0.2.2",
     "react-native-file-viewer": "^2.0.0",
@@ -50,9 +49,10 @@
     "react-navigation-stack": "^1.10.3",
     "regenerator": "^0.14.2",
     "snjs": "0.2.9",
-    "sn-textview": "standardnotes/sn-textview",
+    "sn-textview": "standardnotes/sn-textview#8b62cb2",
     "stacktrace-parser": "0.1.8",
-    "standard-file-js": "0.3.71"
+    "standard-file-js": "0.3.71",
+    "standard-notes-rn": "standardnotes/standard-notes-rn"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

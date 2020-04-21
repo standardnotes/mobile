@@ -18,7 +18,6 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* StandardNotesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* StandardNotesTests.m */; };
 		4353FFFBD4C5814F249789F5 /* libPods-StandardNotes-StandardNotesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FBFB8ED183AAE19A5E4F106 /* libPods-StandardNotes-StandardNotesTests.a */; };
-		93F22E59238EF65D00BAE012 /* libSNTextView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CD1766781F795AE500165C83 /* libSNTextView.a */; };
 		CD399CE321E181C7006106AE /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE021E181C6006106AE /* Red.png */; };
 		CD399CE421E181C7006106AE /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE121E181C7006106AE /* Red@3x.png */; };
 		CD399CE521E181C7006106AE /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CD399CE221E181C7006106AE /* Red@2x.png */; };
@@ -41,20 +40,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 2D02E47A1E0B4A5D006451C7;
 			remoteInfo = "StandardNotes-tvOS";
-		};
-		93230DA9238D98BF00E0B7F5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = CD2830C01F795AB7002B9529;
-			remoteInfo = SNTextView;
-		};
-		CD1766771F795AE500165C83 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CD2830C11F795AB7002B9529;
-			remoteInfo = SNTextView;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -95,7 +80,6 @@
 		B411BD3D257ED3190240AD79 /* libPods-StandardNotes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StandardNotes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB91926496A455FC0FAEE1E8 /* Pods-StandardNotes-StandardNotesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes-StandardNotesTests.release.xcconfig"; path = "Target Support Files/Pods-StandardNotes-StandardNotesTests/Pods-StandardNotes-StandardNotesTests.release.xcconfig"; sourceTree = "<group>"; };
 		BEB7310A8E3A4930A2AAA7F7 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
-		CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SNTextView.xcodeproj; path = "../vendor/sn-textview/ios/SNTextView.xcodeproj"; sourceTree = "<group>"; };
 		CD399CE021E181C6006106AE /* Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red.png; sourceTree = "<group>"; };
 		CD399CE121E181C7006106AE /* Red@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@3x.png"; sourceTree = "<group>"; };
 		CD399CE221E181C7006106AE /* Red@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@2x.png"; sourceTree = "<group>"; };
@@ -120,7 +104,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				93F22E59238EF65D00BAE012 /* libSNTextView.a in Frameworks */,
 				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
 				0C09B7906943111F8E21F6E7 /* libPods-StandardNotes.a in Frameworks */,
 			);
@@ -220,7 +203,6 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -260,14 +242,6 @@
 				4FBFB8ED183AAE19A5E4F106 /* libPods-StandardNotes-StandardNotesTests.a */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		CD17664D1F795AE500165C83 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				CD1766781F795AE500165C83 /* libSNTextView.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		CDD38E0A1F6DCEBB00740780 /* Recovered References */ = {
@@ -315,7 +289,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				93230DAA238D98BF00E0B7F5 /* PBXTargetDependency */,
 			);
 			name = StandardNotes;
 			productName = "Hello World";
@@ -411,12 +384,6 @@
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = CD17664D1F795AE500165C83 /* Products */;
-					ProjectRef = CD17664C1F795AE500165C83 /* SNTextView.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* StandardNotes */,
@@ -426,16 +393,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		CD1766781F795AE500165C83 /* libSNTextView.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSNTextView.a;
-			remoteRef = CD1766771F795AE500165C83 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		00E356EC1AD99517003FC87E /* Resources */ = {
@@ -693,11 +650,6 @@
 			target = 2D02E47A1E0B4A5D006451C7 /* StandardNotes-tvOS */;
 			targetProxy = 2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */;
 		};
-		93230DAA238D98BF00E0B7F5 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = SNTextView;
-			targetProxy = 93230DA9238D98BF00E0B7F5 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -777,7 +729,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 03E9F0DC65CA150221A8657A /* Pods-StandardNotes.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = Blue;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = StandardNotes/StandardNotes.entitlements;
@@ -816,7 +767,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CF1E9E5814845F54A55F3A8D /* Pods-StandardNotes.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = Blue;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = StandardNotes/StandardNotes.entitlements;

@@ -233,10 +233,7 @@ dependencies {
 
     androidTestImplementation('com.wix:detox:+')
 
-    implementation project(':RNMail')
-    implementation project(':SNTextView')
     implementation project(':standard-notes-rn')
-    implementation project(':react-native-aes-crypto')
     implementation project(':react-native-flag-secure-android')
 
     if (enableHermes) {
