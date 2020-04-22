@@ -1,9 +1,9 @@
 PODS:
   - boost-for-react-native (1.63.0)
-  - BugsnagReactNative (2.23.2):
-    - BugsnagReactNative/Core (= 2.23.2)
+  - BugsnagReactNative (2.23.7):
+    - BugsnagReactNative/Core (= 2.23.7)
     - React
-  - BugsnagReactNative/Core (2.23.2):
+  - BugsnagReactNative/Core (2.23.7):
     - React
   - CocoaAsyncSocket (7.6.4)
   - CocoaLibEvent (1.0.0)
@@ -244,7 +244,9 @@ PODS:
     - React
   - react-native-mail (4.1.0):
     - React
-  - react-native-webview (8.0.1):
+  - react-native-safe-area-context (0.7.3):
+    - React
+  - react-native-webview (9.2.2):
     - React
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
@@ -311,17 +313,19 @@ PODS:
     - React
   - RNCAsyncStorage (1.6.3):
     - React
-  - RNFileViewer (1.0.1):
+  - RNCMaskedView (0.1.9):
     - React
-  - RNFS (2.16.2):
+  - RNFileViewer (2.0.2):
+    - React
+  - RNFS (2.16.6):
     - React
   - RNGestureHandler (1.6.1):
     - React
-  - RNKeychain (4.0.1):
+  - RNKeychain (4.0.5):
     - React
-  - RNReanimated (1.4.0):
+  - RNReanimated (1.8.0):
     - React
-  - RNScreens (1.0.0-alpha.23):
+  - RNScreens (2.5.0):
     - React
   - RNStoreReview (0.1.5):
     - React
@@ -362,6 +366,7 @@ DEPENDENCIES:
   - react-native-aes (from `../node_modules/react-native-aes`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-mail (from `../node_modules/react-native-mail`)
+  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -377,7 +382,8 @@ DEPENDENCIES:
   - ReactNativeAlternateIcons (from `../node_modules/react-native-alternate-icons`)
   - ReactNativeDarkMode (from `../node_modules/react-native-dark-mode`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
-  - RNFileViewer (from `../node_modules/react-native-file-viewer/ios`)
+  - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
+  - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
@@ -443,6 +449,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-mail:
     :path: "../node_modules/react-native-mail"
+  react-native-safe-area-context:
+    :path: "../node_modules/react-native-safe-area-context"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -471,8 +479,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-dark-mode"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
+  RNCMaskedView:
+    :path: "../node_modules/@react-native-community/masked-view"
   RNFileViewer:
-    :path: "../node_modules/react-native-file-viewer/ios"
+    :path: "../node_modules/react-native-file-viewer"
   RNFS:
     :path: "../node_modules/react-native-fs"
   RNGestureHandler:
@@ -496,7 +506,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BugsnagReactNative: 0a24a1dd2cac88862d67b938f809bec8274130a9
+  BugsnagReactNative: 14c1b59cfbf34fd5591b734bfec65a277b677ef8
   CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
@@ -522,9 +532,10 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
   react-native-aes: 6bbed31e8767d0ce1c6af07d255475fa79920c3c
-  react-native-fingerprint-scanner: bfcf11a00eee4bb68e6d4e5cdd67d69bed687ea6
+  react-native-fingerprint-scanner: f0d8190ceaf0b9e1893e3379d78724375b8f6ea7
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-webview: b1ea98894c474b27c4080779939959e1f3653147
+  react-native-safe-area-context: e200d4433aba6b7e60b52da5f37af11f7a0b0392
+  react-native-webview: 881baa70f381b838964574f48153a2d453402922
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
@@ -535,19 +546,20 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  ReactNativeAlternateIcons: 7a221624d877fa40218e582d495ba1536584eb12
+  ReactNativeAlternateIcons: b2a8a729d9d9756ed0652c352694f190407f297f
   ReactNativeDarkMode: 0178ffca3b10f6a7c9f49d6f9810232b328fa949
-  RNCAsyncStorage: 6b57de0f6cb0dcfd17521af1681fa39001d3efff
-  RNFileViewer: 5047ecf40477339723cc08abd55b5ebcefcef4b5
-  RNFS: 0d4191b1052bef9ce70deff00a5b4169c62bbd9b
+  RNCAsyncStorage: 3c304d1adfaea02ec732ac218801cb13897aa8c0
+  RNCMaskedView: 71fc32d971f03b7f03d6ab6b86b730c4ee64f5b6
+  RNFileViewer: b815b353fdc08552766c6325e5b66ff52bb6b7af
+  RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
-  RNKeychain: 45dbd50d1ac4bd42c3740f76ffb135abf05746d0
-  RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
-  RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
+  RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
+  RNReanimated: 955cf4068714003d2f1a6e2bae3fb1118f359aff
+  RNScreens: ac02d0e4529f08ced69f5580d416f968a6ec3a1d
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   sn-textview: f478ee79531da2c7b129c4ea3b20c665e75e1f4b
-  SNReactNative: 6b8a090bf4d64cec59327556941595ed5a7de487
+  SNReactNative: c47c4fd6d310eea152cc52e23f4fd306491efee3
   TrustKit: a2f0c3a926f0a3ce3c082db9a39f1f540dbb04cb
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
