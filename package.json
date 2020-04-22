@@ -12,7 +12,9 @@
     "clear-cache": "watchman watch-del-all && rm -rf $TMPDIR/react-native-packager-cache-* && rm -rf $TMPDIR/metro-bundler-cache-*",
     "init": "yarn && cd ios && pod install",
     "ios": "react-native run-ios",
-    "lint": "eslint .",
+    "lint": "npm-run-all --parallel lint:*",
+    "lint:eslint": "yarn eslint . --ext .ts,.tsx --fix",
+    "lint:ts": "tsc --noEmit",
     "start": "react-native start",
     "test": "jest",
     "postinstall": "patch-package"
@@ -61,6 +63,9 @@
     "@babel/core": "^7.9.0",
     "@babel/runtime": "^7.9.2",
     "@react-native-community/eslint-config": "^1.1.0",
+    "@types/jest": "^25.2.1",
+    "@types/lodash": "^4.14.150",
+    "@types/react-native": "^0.62.2",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
     "babel-jest": "^24.9.0",
@@ -73,6 +78,7 @@
     "patch-package": "^6.2.2",
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.0.5",
+    "npm-run-all": "^4.1.5",
     "react-test-renderer": "16.11.0",
     "typescript": "^3.8.3"
   },
