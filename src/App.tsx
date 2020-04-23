@@ -32,10 +32,10 @@ import InputModal from 'screens/InputModal';
 import KeyRecovery from 'screens/KeyRecovery';
 import MainSideMenu from 'screens/SideMenu/MainSideMenu';
 import ManagePrivileges from 'screens/ManagePrivileges';
-import NoteSideMenu from '@SideMenu/NoteSideMenu';
+import NoteSideMenu from 'screens/SideMenu/NoteSideMenu';
 import Root from 'screens/Root';
 import Settings from 'screens/Settings/Settings';
-import SideMenuManager from '@SideMenu/SideMenuManager';
+import SideMenuManager from 'screens/SideMenu/SideMenuManager';
 import StyleKit from 'style/StyleKit';
 
 import { SFAuthManager } from 'standard-file-js';

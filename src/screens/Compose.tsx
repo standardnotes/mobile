@@ -20,7 +20,7 @@ import ModelManager from 'lib/sfjs/modelManager';
 import Sync from 'lib/sfjs/syncManager';
 import Abstract from 'screens/Abstract';
 import ComponentView from 'screens/ComponentView';
-import SideMenuManager from '@SideMenu/SideMenuManager';
+import SideMenuManager from 'screens/SideMenu/SideMenuManager';
 import { ICON_ALERT, ICON_LOCK, ICON_MENU } from 'style/icons';
 import StyleKit from 'style/StyleKit';
 import { lighten } from 'style/utils';

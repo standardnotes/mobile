@@ -7,10 +7,10 @@ import LockedView from 'containers/LockedView';
 import Auth from 'SFJS/authManager';
 import ModelManager from 'SFJS/modelManager';
 import Sync from 'SFJS/syncManager';
-import ApplicationState from '@Lib/ApplicationState';
-import ItemActionManager from '@Lib/itemActionManager';
-import KeysManager from '@Lib/keysManager';
-import OptionsState from '@Lib/OptionsState';
+import ApplicationState from 'lib/ApplicationState';
+import ItemActionManager from 'lib/itemActionManager';
+import KeysManager from 'lib/keysManager';
+import OptionsState from 'lib/OptionsState';
 import Abstract from 'screens/Abstract';
 import NoteList from 'screens/Notes/NoteList';
 import {
@@ -18,7 +18,7 @@ import {
   SCREEN_KEY_RECOVERY,
   SCREEN_COMPOSE,
 } from 'screens/screens';
-import SideMenuManager from '@SideMenu/SideMenuManager';
+import SideMenuManager from 'screens/SideMenu/SideMenuManager';
 import { ICON_MENU, ICON_ADD } from 'style/icons';
 import StyleKit from 'style/StyleKit';
 

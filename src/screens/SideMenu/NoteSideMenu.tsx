@@ -11,10 +11,10 @@ import { SCREEN_INPUT_MODAL, SCREEN_MANAGE_PRIVILEGES } from 'screens/screens';
 import ModelManager from 'SFJS/modelManager';
 import PrivilegesManager from 'SFJS/privilegesManager';
 import Sync from 'SFJS/syncManager';
-import AbstractSideMenu from '@SideMenu/AbstractSideMenu';
-import SideMenuManager from '@SideMenu/SideMenuManager';
-import SideMenuSection from '@SideMenu/SideMenuSection';
-import TagSelectionList from '@SideMenu/TagSelectionList';
+import AbstractSideMenu from 'screens/SideMenu/AbstractSideMenu';
+import SideMenuManager from 'screens/SideMenu/SideMenuManager';
+import SideMenuSection from 'screens/SideMenu/SideMenuSection';
+import TagSelectionList from 'screens/SideMenu/TagSelectionList';
 import ActionSheetWrapper from 'style/ActionSheetWrapper';
 import {
   ICON_BOOKMARK,

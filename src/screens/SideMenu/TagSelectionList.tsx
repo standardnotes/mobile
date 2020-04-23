@@ -7,7 +7,7 @@ import { SCREEN_INPUT_MODAL } from 'screens/screens';
 import Auth from 'SFJS/authManager';
 import ModelManager from 'SFJS/modelManager';
 import Sync from 'SFJS/syncManager';
-import SideMenuCell from '@SideMenu/SideMenuCell';
+import SideMenuCell from 'screens/SideMenu/SideMenuCell';
 import ActionSheetWrapper from 'style/ActionSheetWrapper';
 import StyleKit from 'style/StyleKit';
 

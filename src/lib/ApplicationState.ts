@@ -7,8 +7,8 @@ import {
   Keyboard,
 } from 'react-native';
 import _ from 'lodash';
-import KeysManager from '@Lib/keysManager';
-import OptionsState from '@Lib/OptionsState';
+import KeysManager from 'lib/keysManager';
+import OptionsState from 'lib/OptionsState';
 import PrivilegesManager from 'SFJS/privilegesManager';
 import AuthenticationSourceLocalPasscode from 'screens/Authentication/Sources/AuthenticationSourceLocalPasscode';
 import AuthenticationSourceBiometric from 'screens/Authentication/Sources/AuthenticationSourceBiometric';
