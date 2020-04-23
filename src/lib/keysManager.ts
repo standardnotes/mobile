@@ -5,8 +5,8 @@ import SNReactNative from 'standard-notes-rn';
 import { SFItemParams, SFItem } from 'standard-file-js';
 import _ from 'lodash';
 
-import Keychain from '@Lib/keychain';
-import { isNullOrUndefined } from '@Lib/utils';
+import Keychain from 'lib/keychain';
+import { isNullOrUndefined } from 'lib/utils';
 import AlertManager from 'SFJS/alertManager';
 import SF from 'SFJS/sfjs';
 import Storage from 'SFJS/storageManager';

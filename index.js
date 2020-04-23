@@ -4,7 +4,7 @@ import 'react-native-gesture-handler';
 import { AppRegistry, YellowBox } from 'react-native';
 import App from './src/App';
 import { name as appName } from './app.json';
-import 'style/AndroidTextFix';
+// import 'style/AndroidTextFix';
 import { SFItem } from 'standard-file-js';
 
 SFItem.AppDomain = 'org.standardnotes.sn';
