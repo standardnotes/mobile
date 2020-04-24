@@ -1,10 +1,10 @@
-import Auth from 'SFJS/authManager';
-import ModelManager from 'SFJS/modelManager';
-import PrivilegesManager from 'SFJS/privilegesManager';
-import Storage from 'SFJS/storageManager';
-import Sync from 'SFJS/syncManager';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import PrivilegesManager from '@Lib/snjs/privilegesManager';
+import Storage from '@Lib/snjs/storageManager';
+import Sync from '@Lib/snjs/syncManager';
 
-import { SFModelManager, SFMigrationManager } from 'standard-file-js';
+import { SFModelManager, SFMigrationManager } from 'snjs';
 
 const base64 = require('base-64');
 

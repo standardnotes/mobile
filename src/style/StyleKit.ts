@@ -2,20 +2,19 @@ import { StatusBar, Alert, Platform } from 'react-native';
 import IconChanger from 'react-native-alternate-icons';
 import { supportsDarkMode } from 'react-native-dark-mode';
 import _ from 'lodash';
-import Auth from 'lib/sfjs/authManager';
-import ModelManager from 'lib/sfjs/modelManager';
-import Sync from 'lib/sfjs/syncManager';
-import ThemeManager from 'style/ThemeManager';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import Sync from '@Lib/snjs/syncManager';
+import ThemeManager from '@Style/ThemeManager';
 import {
   statusBarColorForTheme,
   keyboardColorForTheme,
   LIGHT_CONTENT,
   DARK_CONTENT,
   LIGHT_MODE_KEY,
-} from 'style/utils';
-import ThemeDownloader from 'style/Util/ThemeDownloader';
-import { SFAuthManager } from 'standard-file-js';
-import { SNTheme } from 'snjs';
+} from '@Style/utils';
+import ThemeDownloader from '@Style/Util/ThemeDownloader';
+import { SFAuthManager, SNTheme } from 'snjs';
 
 import THEME_RED_JSON from './Themes/red.json';
 import THEME_BLUE_JSON from './Themes/blue.json';

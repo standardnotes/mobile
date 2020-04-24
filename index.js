@@ -5,7 +5,7 @@ import { AppRegistry, YellowBox } from 'react-native';
 import App from './src/App';
 import { name as appName } from './app.json';
 // import 'style/AndroidTextFix';
-import { SFItem } from 'standard-file-js';
+import { SFItem } from 'snjs';
 
 SFItem.AppDomain = 'org.standardnotes.sn';
 

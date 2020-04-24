@@ -6551,10 +6551,11 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-snjs@0.2.9:
-  version "0.2.9"
-  resolved "https://registry.yarnpkg.com/snjs/-/snjs-0.2.9.tgz#1bed1a8ae392bac9e9bda1a9783b07bbdca42615"
-  integrity sha512-lJcwbHup3oRzwhcRmeu56WPyNT2R3s3CS8889hW3SfPIvDYK1526949exT69J+q0eIFe6J9orldeKFN8JEgIoQ==
+snjs@standardnotes/snjs#a4f0dfc:
+  version "1.0.7"
+  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/a4f0dfc409f725b54098996ed1820f6f6952ccbc"
+  dependencies:
+    lodash "^4.17.15"
 
 source-map-resolve@^0.5.0:
   version "0.5.3"
@@ -6666,11 +6667,6 @@ stacktrace-parser@^0.1.3:
   integrity sha512-DRy03ljj0367Ud3OAJHD6eVS/+CvMK2u/djVYuU37fHYcYHoZ8tkFyhbRf7PNG1h3bWLsw+SNTSXrPFe07A7aQ==
   dependencies:
     type-fest "^0.7.1"
-
-standard-file-js@0.3.71:
-  version "0.3.71"
-  resolved "https://registry.yarnpkg.com/standard-file-js/-/standard-file-js-0.3.71.tgz#8883c923d27078af8d5c11a1c456e7375f5f0082"
-  integrity sha512-gd64jcjaVNZqjWxjPJRoa3lBmMtL2HshKjXt4S1ETFLwEdPpEj9If2iVHQOE02Idf2x/LfCyBxH4kPupiqfEig==
 
 standard-notes-rn@standardnotes/standard-notes-rn:
   version "1.0.0"

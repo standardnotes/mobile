@@ -5,11 +5,11 @@ import HeaderButtons, {
 } from 'react-navigation-header-buttons';
 import _ from 'lodash';
 import Icon from 'react-native-vector-icons/Ionicons';
-import HeaderTitleView from 'components/HeaderTitleView';
-import ThemedComponent from 'components/ThemedComponent';
-import ApplicationState from 'lib/ApplicationState';
-import PrivilegesManager from 'SFJS/privilegesManager';
-import StyleKit from 'style/StyleKit';
+import HeaderTitleView from '@Components/HeaderTitleView';
+import ThemedComponent from '@Components/ThemedComponent';
+import ApplicationState from '@Lib/ApplicationState';
+import PrivilegesManager from '@Lib/snjs/privilegesManager';
+import StyleKit from '@Style/StyleKit';
 
 const IoniconsHeaderButton = passMeFurther => (
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />

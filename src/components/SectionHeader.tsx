@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, Platform, View, TouchableOpacity } from 'react-native';
-import ThemedComponent from 'components/ThemedComponent';
-import StyleKit from 'style/StyleKit';
+import ThemedComponent from '@Components/ThemedComponent';
+import StyleKit from '@Style/StyleKit';
 
 export default class SectionHeader extends ThemedComponent {
   render() {

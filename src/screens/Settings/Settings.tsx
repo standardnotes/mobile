@@ -2,28 +2,27 @@ import React from 'react';
 import _ from 'lodash';
 import { ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import SectionHeader from 'components/SectionHeader';
-import SectionedAccessoryTableCell from 'components/SectionedAccessoryTableCell';
-import TableSection from 'components/TableSection';
-import LockedView from 'containers/LockedView';
-import ApplicationState from 'lib/ApplicationState';
-import KeysManager from 'lib/keysManager';
-import AlertManager from 'SFJS/alertManager';
-import Auth from 'SFJS/authManager';
-import SF from 'SFJS/sfjs';
-import Storage from 'SFJS/storageManager';
-import Sync from 'SFJS/syncManager';
-import Abstract from 'screens/Abstract';
-import { SCREEN_INPUT_MODAL, SCREEN_MANAGE_PRIVILEGES } from 'screens/screens';
-import AuthSection from 'screens/Settings/Sections/AuthSection';
-import CompanySection from 'screens/Settings/Sections/CompanySection';
-import EncryptionSection from 'screens/Settings/Sections/EncryptionSection';
-import OptionsSection from 'screens/Settings/Sections/OptionsSection';
-import PasscodeSection from 'screens/Settings/Sections/PasscodeSection';
-import { ICON_CHECKMARK } from 'style/icons';
-import StyleKit from 'style/StyleKit';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import TableSection from '@Components/TableSection';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import AlertManager from '@Lib/snjs/alertManager';
+import Auth from '@Lib/snjs/authManager';
+import Storage from '@Lib/snjs/storageManager';
+import Sync from '@Lib/snjs/syncManager';
+import Abstract from '@Screens/Abstract';
+import { SCREEN_INPUT_MODAL, SCREEN_MANAGE_PRIVILEGES } from '@Screens/screens';
+import AuthSection from '@Screens/Settings/Sections/AuthSection';
+import CompanySection from '@Screens/Settings/Sections/CompanySection';
+import EncryptionSection from '@Screens/Settings/Sections/EncryptionSection';
+import OptionsSection from '@Screens/Settings/Sections/OptionsSection';
+import PasscodeSection from '@Screens/Settings/Sections/PasscodeSection';
+import { ICON_CHECKMARK } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
-import { SFPrivilegesManager } from 'standard-file-js';
+import { SFPrivilegesManager, protocolManager } from 'snjs';
 
 export default class Settings extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -185,10 +184,10 @@ export default class Settings extends Abstract {
       onSubmit: async (value, keyboardType) => {
         Storage.get().setItem('passcodeKeyboardType', keyboardType);
 
-        let identifier = await SF.get().crypto.generateUUID();
+        let identifier = await protocolManager.crypto.generateUUID();
 
-        SF.get()
-          .crypto.generateInitialKeysAndAuthParamsForUser(identifier, value)
+        protocolManager
+          .generateInitialKeysAndAuthParamsForUser(identifier, value)
           .then(results => {
             let keys = results.keys;
             let authParams = results.authParams;

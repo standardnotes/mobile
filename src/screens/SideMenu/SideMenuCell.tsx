@@ -2,11 +2,11 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
-import Circle from 'components/Circle';
-import ThemedComponent from 'components/ThemedComponent';
-import ApplicationState from 'lib/ApplicationState';
-import StyleKit from 'style/StyleKit';
-import { hexToRGBA } from 'style/utils';
+import Circle from '@Components/Circle';
+import ThemedComponent from '@Components/ThemedComponent';
+import ApplicationState from '@Lib/ApplicationState';
+import StyleKit from '@Style/StyleKit';
+import { hexToRGBA } from '@Style/utils';
 
 export default class SideMenuCell extends ThemedComponent {
   componentDidUpdate() {

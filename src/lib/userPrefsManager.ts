@@ -1,5 +1,5 @@
-import { dateFromJsonString, isNullOrUndefined } from 'lib/utils';
-import Storage from 'SFJS/storageManager';
+import { dateFromJsonString, isNullOrUndefined } from '@Lib/utils';
+import Storage from '@Lib/snjs/storageManager';
 
 export const LAST_EXPORT_DATE_KEY = 'LastExportDateKey';
 export const DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY =

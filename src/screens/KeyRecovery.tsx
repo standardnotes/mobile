@@ -1,19 +1,18 @@
 import React from 'react';
 import { TextInput, Text } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import ButtonCell from 'components/ButtonCell';
-import SectionedTableCell from 'components/SectionedTableCell';
-import TableSection from 'components/TableSection';
-import ApplicationState from 'lib/ApplicationState';
-import KeysManager from 'lib/keysManager';
-import Abstract from 'screens/Abstract';
-import ModelManager from 'SFJS/modelManager';
-import SF from 'SFJS/sfjs';
-import Sync from 'SFJS/syncManager';
-import AlertManager from 'SFJS/alertManager';
-import { ICON_CLOSE } from 'style/icons';
-import StyleKit from 'style/StyleKit';
-import { SFModelManager } from 'standard-file-js';
+import ButtonCell from '@Components/ButtonCell';
+import { SFModelManager, protocolManager } from 'snjs';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import TableSection from '@Components/TableSection';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import Abstract from '@Screens/Abstract';
+import ModelManager from '@Lib/snjs/modelManager';
+import Sync from '@Lib/snjs/syncManager';
+import AlertManager from '@Lib/snjs/alertManager';
+import { ICON_CLOSE } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class KeyRecovery extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -69,7 +68,7 @@ export default class KeyRecovery extends Abstract {
 
   submit = async () => {
     const authParams = KeysManager.get().offlineAuthParams;
-    const keys = await SF.get().crypto.computeEncryptionKeysForUser(
+    const keys = await protocolManager.computeEncryptionKeysForUser(
       this.state.text,
       authParams
     );

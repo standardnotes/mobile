@@ -1,8 +1,8 @@
-import KeysManager from 'lib/keysManager';
-import SF from 'SFJS/sfjs';
-import Storage from 'SFJS/storageManager';
-import AuthenticationSource from 'screens/Authentication/Sources/AuthenticationSource';
-import StyleKit from 'style/StyleKit';
+import KeysManager from '@Lib/keysManager';
+import { protocolManager } from 'snjs';
+import Storage from '@Lib/snjs/storageManager';
+import AuthenticationSource from '@Screens/Authentication/Sources/AuthenticationSource';
+import StyleKit from '@Style/StyleKit';
 
 export default class AuthenticationSourceLocalPasscode extends AuthenticationSource {
   constructor() {
@@ -76,7 +76,7 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
   async authenticate() {
     this.didBegin();
     const authParams = KeysManager.get().offlineAuthParams;
-    const keys = await SF.get().crypto.computeEncryptionKeysForUser(
+    const keys = await protocolManager.computeEncryptionKeysForUser(
       this.authenticationValue,
       authParams
     );

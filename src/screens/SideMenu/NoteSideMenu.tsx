@@ -1,21 +1,22 @@
 import React, { Fragment } from 'react';
 import { View, FlatList } from 'react-native';
 import FAB from 'react-native-fab';
+import { SFPrivilegesManager, SNTag } from 'snjs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
-import LockedView from 'containers/LockedView';
-import ApplicationState from 'lib/ApplicationState';
-import ComponentManager from 'lib/componentManager';
-import ItemActionManager from 'lib/itemActionManager';
-import { SCREEN_INPUT_MODAL, SCREEN_MANAGE_PRIVILEGES } from 'screens/screens';
-import ModelManager from 'SFJS/modelManager';
-import PrivilegesManager from 'SFJS/privilegesManager';
-import Sync from 'SFJS/syncManager';
-import AbstractSideMenu from 'screens/SideMenu/AbstractSideMenu';
-import SideMenuManager from 'screens/SideMenu/SideMenuManager';
-import SideMenuSection from 'screens/SideMenu/SideMenuSection';
-import TagSelectionList from 'screens/SideMenu/TagSelectionList';
-import ActionSheetWrapper from 'style/ActionSheetWrapper';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import ComponentManager from '@Lib/componentManager';
+import ItemActionManager from '@Lib/itemActionManager';
+import { SCREEN_INPUT_MODAL, SCREEN_MANAGE_PRIVILEGES } from '@Screens/screens';
+import ModelManager from '@Lib/snjs/modelManager';
+import PrivilegesManager from '@Lib/snjs/privilegesManager';
+import Sync from '@Lib/snjs/syncManager';
+import AbstractSideMenu from '@Screens/SideMenu/AbstractSideMenu';
+import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
+import SideMenuSection from '@Screens/SideMenu/SideMenuSection';
+import TagSelectionList from '@Screens/SideMenu/TagSelectionList';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
 import {
   ICON_BOOKMARK,
   ICON_ARCHIVE,
@@ -25,12 +26,8 @@ import {
   ICON_TRASH,
   ICON_MEDICAL,
   ICON_PRICE_TAG,
-} from 'style/icons';
-import StyleKit from 'style/StyleKit';
-
-import { SFPrivilegesManager } from 'standard-file-js';
-
-import { SNTag } from 'snjs';
+} from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class NoteSideMenu extends AbstractSideMenu {
   constructor(props) {

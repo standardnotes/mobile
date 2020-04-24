@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Text, View } from 'react-native';
-import SectionHeader from 'components/SectionHeader';
-import SectionedTableCell from 'components/SectionedTableCell';
-import TableSection from 'components/TableSection';
-import KeysManager from 'lib/keysManager';
-import ModelManager from 'lib/sfjs/modelManager';
-import StyleKit from 'style/StyleKit';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import TableSection from '@Components/TableSection';
+import KeysManager from '@Lib/keysManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import StyleKit from '@Style/StyleKit';
 
 export default class PasscodeSection extends Component {
   constructor(props) {

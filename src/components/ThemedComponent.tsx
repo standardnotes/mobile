@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import StyleKit from 'style/StyleKit';
+import StyleKit from '@Style/StyleKit';
 
 export default class ThemedComponent extends Component {
   constructor(props) {

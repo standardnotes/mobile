@@ -1,12 +1,12 @@
 import { Share, Alert } from 'react-native';
 import RNFS from 'react-native-fs';
 import FileViewer from 'react-native-file-viewer';
-import { SFItemParams } from 'standard-file-js';
-import ApplicationState from 'lib/ApplicationState';
-import KeysManager from 'lib/keysManager';
-import AlertManager from 'SFJS/alertManager';
-import Auth from 'SFJS/authManager';
-import ModelManager from 'SFJS/modelManager';
+import { SFItemParams } from 'snjs';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import AlertManager from '@Lib/snjs/alertManager';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
 
 const Mailer = 'react-native-mail';
 const base64 = require('base-64');

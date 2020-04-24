@@ -1,13 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import { TextInput, View, Text, Keyboard, Alert } from 'react-native';
-import ButtonCell from 'components/ButtonCell';
-import SectionedAccessoryTableCell from 'components/SectionedAccessoryTableCell';
-import SectionHeader from 'components/SectionHeader';
-import TableSection from 'components/TableSection';
-import SectionedTableCell from 'components/SectionedTableCell';
-import Auth from 'SFJS/authManager';
-import Sync from 'SFJS/syncManager';
-import StyleKit from 'style/StyleKit';
+import ButtonCell from '@Components/ButtonCell';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import SectionHeader from '@Components/SectionHeader';
+import TableSection from '@Components/TableSection';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import Auth from '@Lib/snjs/authManager';
+import Sync from '@Lib/snjs/syncManager';
+import StyleKit from '@Style/StyleKit';
 
 const DEFAULT_SIGN_IN_TEXT = 'Sign In';
 const DEFAULT_REGISTER_TEXT = 'Register';

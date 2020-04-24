@@ -1,19 +1,19 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
-import ButtonCell from 'components/ButtonCell';
-import SectionHeader from 'components/SectionHeader';
-import SectionedAccessoryTableCell from 'components/SectionedAccessoryTableCell';
-import SectionedOptionsTableCell from 'components/SectionedOptionsTableCell';
-import TableSection from 'components/TableSection';
-import BackupsManager from 'lib/BackupsManager';
-import KeysManager from 'lib/keysManager';
-import moment from 'lib/moment';
-import UserPrefsManager, { LAST_EXPORT_DATE_KEY } from 'lib/userPrefsManager';
-import Auth from 'SFJS/authManager';
-import Abstract from 'screens/Abstract';
+import ButtonCell from '@Components/ButtonCell';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
+import TableSection from '@Components/TableSection';
+import BackupsManager from '@Lib/BackupsManager';
+import KeysManager from '@Lib/keysManager';
+import moment from '@Lib/moment';
+import UserPrefsManager, { LAST_EXPORT_DATE_KEY } from '@Lib/userPrefsManager';
+import Auth from '@Lib/snjs/authManager';
+import Abstract from '@Screens/Abstract';
 
-import { SFPrivilegesManager } from 'standard-file-js';
+import { SFPrivilegesManager } from 'snjs';
 
 class OptionsSection extends Abstract {
   constructor(props) {

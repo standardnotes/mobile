@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableHighlight } from 'react-native';
-import ThemedComponent from 'components/ThemedComponent';
-import StyleKit from 'style/StyleKit';
+import ThemedComponent from '@Components/ThemedComponent';
+import StyleKit from '@Style/StyleKit';
 
 export default class SectionedOptionsTableCell extends ThemedComponent {
   rules() {

@@ -1,10 +1,9 @@
 import { Platform } from 'react-native';
-import AlertManager from 'SFJS/alertManager';
-import ModelManager from 'SFJS/modelManager';
-import Sync from 'SFJS/syncManager';
-import StyleKit from 'style/StyleKit';
-
 import { SNComponentManager } from 'snjs';
+import AlertManager from '@Lib/snjs/alertManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import Sync from '@Lib/snjs/syncManager';
+import StyleKit from '@Style/StyleKit';
 
 export default class ComponentManager extends SNComponentManager {
   static instance = null;

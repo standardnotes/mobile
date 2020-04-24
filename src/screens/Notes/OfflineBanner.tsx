@@ -2,10 +2,10 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
-import ThemedPureComponent from 'components/ThemedPureComponent';
-import { SCREEN_SETTINGS } from 'screens/screens';
-import { ICON_USER, ICON_FORWARD } from 'style/icons';
-import StyleKit from 'style/StyleKit';
+import ThemedPureComponent from '@Components/ThemedPureComponent';
+import { SCREEN_SETTINGS } from '@Screens/screens';
+import { ICON_USER, ICON_FORWARD } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 const NOT_BACKED_UP_TEXT = 'Data not backed up';
 const SIGN_IN_TEXT = 'Sign in or register to backup your notes';

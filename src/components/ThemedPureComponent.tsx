@@ -1,5 +1,5 @@
 import { PureComponent } from 'react';
-import StyleKit from 'style/StyleKit';
+import StyleKit from '@Style/StyleKit';
 
 export default class ThemedPureComponent extends PureComponent {
   constructor(props) {

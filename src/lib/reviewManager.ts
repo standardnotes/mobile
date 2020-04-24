@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import * as StoreReview from 'react-native-store-review';
-import Storage from 'SFJS/storageManager';
+import Storage from '@Lib/snjs/storageManager';
 
 const RUN_COUNTS_BEFORE_REVIEW = [18, 45, 105];
 

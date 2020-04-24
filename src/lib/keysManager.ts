@@ -2,14 +2,13 @@ import { Platform } from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import SNReactNative from 'standard-notes-rn';
-import { SFItemParams, SFItem } from 'standard-file-js';
+import { SFItemParams, SFItem, protocolManager } from 'snjs';
 import _ from 'lodash';
 
-import Keychain from 'lib/keychain';
-import { isNullOrUndefined } from 'lib/utils';
-import AlertManager from 'SFJS/alertManager';
-import SF from 'SFJS/sfjs';
-import Storage from 'SFJS/storageManager';
+import Keychain from '@Lib/keychain';
+import { isNullOrUndefined } from '@Lib/utils';
+import AlertManager from '@Lib/snjs/alertManager';
+import Storage from '@Lib/snjs/storageManager';
 
 const OfflineParamsKey = 'pc_params';
 const EncryptedAccountKeysKey = 'encrypted_account_keys';
@@ -300,7 +299,7 @@ export default class KeysManager {
       // If offline local passcode keys are available, use that to encrypt account keys
       // Don't encrypt offline pw because then we don't be able to verify passcode
       const encryptedKeys = new SFItem();
-      encryptedKeys.uuid = await SF.get().crypto.generateUUID();
+      encryptedKeys.uuid = await protocolManager.crypto.generateUUID();
       encryptedKeys.content_type = 'SN|Mobile|EncryptedKeys';
       encryptedKeys.content.accountKeys = this.accountKeys;
       const params = new SFItemParams(

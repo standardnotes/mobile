@@ -1,11 +1,10 @@
 import { Platform } from 'react-native';
 import _ from 'lodash';
-import { SFAuthManager } from 'standard-file-js';
-import KeysManager from 'lib/keysManager';
-import AlertManager from 'SFJS/alertManager';
-import Server from 'SFJS/httpManager';
-import Storage from 'SFJS/storageManager';
-import SFJS from './sfjs';
+import { SFAuthManager, protocolManager } from 'snjs';
+import KeysManager from '@Lib/keysManager';
+import AlertManager from '@Lib/snjs/alertManager';
+import Server from '@Lib/snjs/httpManager';
+import Storage from '@Lib/snjs/storageManager';
 
 export default class Auth extends SFAuthManager {
   static instance = null;
@@ -82,7 +81,7 @@ export default class Auth extends SFAuthManager {
 
   async verifyAccountPassword(password) {
     const authParams = await this.getAuthParams();
-    const keys = await SFJS.get().crypto.computeEncryptionKeysForUser(
+    const keys = await protocolManager.computeEncryptionKeysForUser(
       password,
       authParams
     );

@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import ApplicationState from 'lib/ApplicationState';
-import StyleKit from 'style/StyleKit';
+import ApplicationState from '@Lib/ApplicationState';
+import StyleKit from '@Style/StyleKit';
 
 export default class ActionSheetWrapper {
   static BuildOption({ text, key, callback, destructive }) {

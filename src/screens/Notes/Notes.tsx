@@ -3,26 +3,26 @@ import { Alert, Keyboard } from 'react-native';
 import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
-import LockedView from 'containers/LockedView';
-import Auth from 'SFJS/authManager';
-import ModelManager from 'SFJS/modelManager';
-import Sync from 'SFJS/syncManager';
-import ApplicationState from 'lib/ApplicationState';
-import ItemActionManager from 'lib/itemActionManager';
-import KeysManager from 'lib/keysManager';
-import OptionsState from 'lib/OptionsState';
-import Abstract from 'screens/Abstract';
-import NoteList from 'screens/Notes/NoteList';
+import LockedView from '@Containers/LockedView';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import Sync from '@Lib/snjs/syncManager';
+import ApplicationState from '@Lib/ApplicationState';
+import ItemActionManager from '@Lib/itemActionManager';
+import KeysManager from '@Lib/keysManager';
+import OptionsState from '@Lib/OptionsState';
+import Abstract from '@Screens/Abstract';
+import NoteList from '@Screens/Notes/NoteList';
 import {
   SCREEN_SETTINGS,
   SCREEN_KEY_RECOVERY,
   SCREEN_COMPOSE,
-} from 'screens/screens';
-import SideMenuManager from 'screens/SideMenu/SideMenuManager';
-import { ICON_MENU, ICON_ADD } from 'style/icons';
-import StyleKit from 'style/StyleKit';
+} from '@Screens/screens';
+import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
+import { ICON_MENU, ICON_ADD } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
-import { SFAuthManager, SFPrivilegesManager } from 'standard-file-js';
+import { SFAuthManager, SFPrivilegesManager } from 'snjs';
 
 export default class Notes extends Abstract {
   constructor(props) {

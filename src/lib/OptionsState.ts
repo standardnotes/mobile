@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Storage from 'SFJS/storageManager';
+import Storage from '@Lib/snjs/storageManager';
 
 export default class OptionsState {
   static OptionsStateChangeEventSearch = 'OptionsStateChangeEventSearch';

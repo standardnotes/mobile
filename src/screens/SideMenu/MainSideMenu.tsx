@@ -4,24 +4,24 @@ import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
 import { SafeAreaView } from 'react-navigation';
-import LockedView from 'containers/LockedView';
-import ApplicationState from 'lib/ApplicationState';
-import { SCREEN_SETTINGS } from 'screens/screens';
-import AbstractSideMenu from 'screens/SideMenu/AbstractSideMenu';
-import SideMenuHero from 'screens/SideMenu/SideMenuHero';
-import SideMenuManager from 'screens/SideMenu/SideMenuManager';
-import SideMenuSection from 'screens/SideMenu/SideMenuSection';
-import TagSelectionList from 'screens/SideMenu/TagSelectionList';
-import AlertManager from 'SFJS/alertManager';
-import Auth from 'SFJS/authManager';
-import Sync from 'SFJS/syncManager';
-import { ICON_BRUSH, ICON_SETTINGS } from 'style/icons';
-import ActionSheetWrapper from 'style/ActionSheetWrapper';
-import StyleKit from 'style/StyleKit';
-import ThemeManager from 'style/ThemeManager';
-import { LIGHT_MODE_KEY, DARK_MODE_KEY } from 'style/utils';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import { SCREEN_SETTINGS } from '@Screens/screens';
+import AbstractSideMenu from '@Screens/SideMenu/AbstractSideMenu';
+import SideMenuHero from '@Screens/SideMenu/SideMenuHero';
+import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
+import SideMenuSection from '@Screens/SideMenu/SideMenuSection';
+import TagSelectionList from '@Screens/SideMenu/TagSelectionList';
+import AlertManager from '@Lib/snjs/alertManager';
+import Auth from '@Lib/snjs/authManager';
+import Sync from '@Lib/snjs/syncManager';
+import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import StyleKit from '@Style/StyleKit';
+import ThemeManager from '@Style/ThemeManager';
+import { LIGHT_MODE_KEY, DARK_MODE_KEY } from '@Style/utils';
 
-import { SFAuthManager } from 'standard-file-js';
+import { SFAuthManager } from 'snjs';
 
 export default class MainSideMenu extends AbstractSideMenu {
   constructor(props) {

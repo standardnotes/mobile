@@ -9,21 +9,21 @@ import {
   Alert,
 } from 'react-native';
 import TextView from 'sn-textview';
-import { SFAuthManager } from 'standard-file-js';
+import { SFAuthManager } from 'snjs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
-import LockedView from 'containers/LockedView';
-import ApplicationState from 'lib/ApplicationState';
-import ComponentManager from 'lib/componentManager';
-import Auth from 'lib/sfjs/authManager';
-import ModelManager from 'lib/sfjs/modelManager';
-import Sync from 'lib/sfjs/syncManager';
-import Abstract from 'screens/Abstract';
-import ComponentView from 'screens/ComponentView';
-import SideMenuManager from 'screens/SideMenu/SideMenuManager';
-import { ICON_ALERT, ICON_LOCK, ICON_MENU } from 'style/icons';
-import StyleKit from 'style/StyleKit';
-import { lighten } from 'style/utils';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import ComponentManager from '@Lib/componentManager';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import Sync from '@Lib/snjs/syncManager';
+import Abstract from '@Screens/Abstract';
+import ComponentView from '@Screens/ComponentView';
+import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
+import { ICON_ALERT, ICON_LOCK, ICON_MENU } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
+import { lighten } from '@Style/utils';
 
 export default class Compose extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {

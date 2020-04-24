@@ -1,5 +1,5 @@
 import { Keyboard } from 'react-native';
-import Abstract from 'screens/Abstract';
+import Abstract from '@Screens/Abstract';
 
 export default class AbstractSideMenu extends Abstract {
   shouldComponentUpdate(nextProps, nextState) {

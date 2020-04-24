@@ -1,9 +1,8 @@
 import { Platform } from 'react-native';
+import { SFStorageManager } from 'snjs';
 import AsyncStorage from '@react-native-community/async-storage';
-import AlertManager from 'lib/sfjs/alertManager';
-import { isNullOrUndefined } from 'lib/utils';
-
-import { SFStorageManager } from 'standard-file-js';
+import AlertManager from '@Lib/snjs/alertManager';
+import { isNullOrUndefined } from '@Lib/utils';
 
 export default class Storage extends SFStorageManager {
   static instance = null;

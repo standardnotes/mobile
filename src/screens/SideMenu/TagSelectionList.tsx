@@ -1,17 +1,17 @@
 import React, { Fragment } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { withNavigation } from 'react-navigation';
-import ThemedComponent from 'components/ThemedComponent';
-import ItemActionManager from 'lib/itemActionManager';
-import { SCREEN_INPUT_MODAL } from 'screens/screens';
-import Auth from 'SFJS/authManager';
-import ModelManager from 'SFJS/modelManager';
-import Sync from 'SFJS/syncManager';
-import SideMenuCell from 'screens/SideMenu/SideMenuCell';
-import ActionSheetWrapper from 'style/ActionSheetWrapper';
-import StyleKit from 'style/StyleKit';
+import ThemedComponent from '@Components/ThemedComponent';
+import ItemActionManager from '@Lib/itemActionManager';
+import { SCREEN_INPUT_MODAL } from '@Screens/screens';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import Sync from '@Lib/snjs/syncManager';
+import SideMenuCell from '@Screens/SideMenu/SideMenuCell';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import StyleKit from '@Style/StyleKit';
 
-import { SFAuthManager } from 'standard-file-js';
+import { SFAuthManager } from 'snjs';
 
 class TagSelectionList extends ThemedComponent {
   /*

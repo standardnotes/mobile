@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
-import Server from 'SFJS/httpManager';
-import CSSParser from 'style/Util/CSSParser';
+import Server from '@Lib/snjs/httpManager';
+import CSSParser from '@Style/Util/CSSParser';
 
 export default class ThemeDownloader {
   static instance = null;

@@ -1,18 +1,18 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import ButtonCell from 'components/ButtonCell';
-import SectionHeader from 'components/SectionHeader';
-import SectionedAccessoryTableCell from 'components/SectionedAccessoryTableCell';
-import SectionedTableCell from 'components/SectionedTableCell';
-import LockedView from 'containers/LockedView';
-import ApplicationState from 'lib/ApplicationState';
-import KeysManager from 'lib/keysManager';
-import Auth from 'SFJS/authManager';
-import PrivilegesManager from 'SFJS/privilegesManager';
-import Abstract from 'screens/Abstract';
-import { ICON_CHECKMARK } from 'style/icons';
-import StyleKit from 'style/StyleKit';
+import ButtonCell from '@Components/ButtonCell';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import Auth from '@Lib/snjs/authManager';
+import PrivilegesManager from '@Lib/snjs/privilegesManager';
+import Abstract from '@Screens/Abstract';
+import { ICON_CHECKMARK } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class ManagePrivileges extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {

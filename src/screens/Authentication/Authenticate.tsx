@@ -1,14 +1,14 @@
 import React from 'react';
 import { TextInput, View, Alert, ScrollView } from 'react-native';
 import _ from 'lodash';
-import ButtonCell from 'components/ButtonCell';
-import SectionHeader from 'components/SectionHeader';
-import SectionedAccessoryTableCell from 'components/SectionedAccessoryTableCell';
-import SectionedTableCell from 'components/SectionedTableCell';
-import ApplicationState from 'lib/ApplicationState';
-import Abstract from 'screens/Abstract';
-import { ICON_CLOSE } from 'style/icons';
-import StyleKit from 'style/StyleKit';
+import ButtonCell from '@Components/ButtonCell';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import ApplicationState from '@Lib/ApplicationState';
+import Abstract from '@Screens/Abstract';
+import { ICON_CLOSE } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class Authenticate extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {

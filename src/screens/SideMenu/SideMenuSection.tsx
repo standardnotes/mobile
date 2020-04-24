@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import ThemedComponent from 'components/ThemedComponent';
-import SideMenuCell from 'screens/SideMenu/SideMenuCell';
-import StyleKit from 'style/StyleKit';
+import ThemedComponent from '@Components/ThemedComponent';
+import SideMenuCell from '@Screens/SideMenu/SideMenuCell';
+import StyleKit from '@Style/StyleKit';
 
 export default class SideMenuSection extends ThemedComponent {
   static BuildOption({

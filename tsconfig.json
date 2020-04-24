@@ -21,7 +21,13 @@
       "esModuleInterop": true,                   /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
       // "preserveSymlinks": true,              /* Do not resolve the real path of symlinks. */
       "paths": {
-        "SFJS/*": ["./lib/sfjs/*"],
+        "@Components/*": ["./components/*"],
+        "@Containers/*": ["./containers/*"],
+        "@Models/*": ["./models/*"],
+        "@Lib/*": ["./lib/*"],
+        "@Screens/*": ["./screens/*"],
+        "@Style/*": ["./style/*"],
+
       },
       /* Source Map Options */
       // "sourceRoot": "./",                    /* Specify the location where debugger should locate TypeScript files instead of source locations. */

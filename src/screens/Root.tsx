@@ -1,20 +1,19 @@
 import React from 'react';
 import { TouchableHighlight, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import ApplicationState from 'lib/ApplicationState';
-import KeysManager from 'lib/keysManager';
-import Abstract from 'screens/Abstract';
-import Compose from 'screens/Compose';
-import Notes from 'screens/Notes/Notes';
-import { SCREEN_AUTHENTICATE } from 'screens/screens';
-import AlertManager from 'SFJS/alertManager';
-import Auth from 'SFJS/authManager';
-import ModelManager from 'SFJS/modelManager';
-import Sync from 'SFJS/syncManager';
-import StyleKit from 'style/StyleKit';
-import { hexToRGBA } from 'style/utils';
-
-import { SFAuthManager } from 'standard-file-js';
+import { SFAuthManager } from 'snjs';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import Abstract from '@Screens/Abstract';
+import Compose from '@Screens/Compose';
+import Notes from '@Screens/Notes/Notes';
+import { SCREEN_AUTHENTICATE } from '@Screens/screens';
+import AlertManager from '@Lib/snjs/alertManager';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import Sync from '@Lib/snjs/syncManager';
+import StyleKit from '@Style/StyleKit';
+import { hexToRGBA } from '@Style/utils';
 
 export default class Root extends Abstract {
   constructor(props) {

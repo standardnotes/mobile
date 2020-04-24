@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Alert, Text } from 'react-native';
-import ButtonCell from 'components/ButtonCell';
-import SectionHeader from 'components/SectionHeader';
-import SectionedOptionsTableCell from 'components/SectionedOptionsTableCell';
-import TableSection from 'components/TableSection';
-import ApplicationState from 'lib/ApplicationState';
-import KeysManager from 'lib/keysManager';
-import StyleKit from 'style/StyleKit';
+import ButtonCell from '@Components/ButtonCell';
+import SectionHeader from '@Components/SectionHeader';
+import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
+import TableSection from '@Components/TableSection';
+import ApplicationState from '@Lib/ApplicationState';
+import KeysManager from '@Lib/keysManager';
+import StyleKit from '@Style/StyleKit';
 
 export default class PasscodeSection extends Component {
   constructor(props) {

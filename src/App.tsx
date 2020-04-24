@@ -8,16 +8,16 @@ import {
 import { createAppContainer, NavigationActions } from 'react-navigation';
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
-import KeysManager from 'lib/keysManager';
-import ApplicationState from 'lib/ApplicationState';
-import Auth from 'lib/sfjs/authManager';
-import ModelManager from 'lib/sfjs/modelManager';
-import PrivilegesManager from 'SFJS/privilegesManager';
-import MigrationManager from 'SFJS/migrationManager';
-import Sync from 'lib/sfjs/syncManager';
-import ReviewManager from 'lib/reviewManager';
-import Authenticate from 'screens/Authentication/Authenticate';
-import Compose from 'screens/Compose';
+import KeysManager from '@Lib/keysManager';
+import ApplicationState from '@Lib/ApplicationState';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import PrivilegesManager from '@Lib/snjs/privilegesManager';
+import MigrationManager from '@Lib/snjs/migrationManager';
+import Sync from '@Lib/snjs/syncManager';
+import ReviewManager from '@Lib/reviewManager';
+import Authenticate from '@Screens/Authentication/Authenticate';
+import Compose from '@Screens/Compose';
 import {
   SCREEN_AUTHENTICATE,
   SCREEN_HOME,
@@ -27,18 +27,24 @@ import {
   SCREEN_SETTINGS,
   SCREEN_MANAGE_PRIVILEGES,
   SCREEN_KEY_RECOVERY,
-} from 'screens/screens';
-import InputModal from 'screens/InputModal';
-import KeyRecovery from 'screens/KeyRecovery';
-import MainSideMenu from 'screens/SideMenu/MainSideMenu';
-import ManagePrivileges from 'screens/ManagePrivileges';
-import NoteSideMenu from 'screens/SideMenu/NoteSideMenu';
-import Root from 'screens/Root';
-import Settings from 'screens/Settings/Settings';
-import SideMenuManager from 'screens/SideMenu/SideMenuManager';
-import StyleKit from 'style/StyleKit';
+} from '@Screens/screens';
+import InputModal from '@Screens/InputModal';
+import KeyRecovery from '@Screens/KeyRecovery';
+import MainSideMenu from '@Screens/SideMenu/MainSideMenu';
+import ManagePrivileges from '@Screens/ManagePrivileges';
+import NoteSideMenu from '@Screens/SideMenu/NoteSideMenu';
+import Root from '@Screens/Root';
+import Settings from '@Screens/Settings/Settings';
+import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
+import StyleKit from '@Style/StyleKit';
 
-import { SFAuthManager } from 'standard-file-js';
+import { NativeModules } from 'react-native';
+import { SFAuthManager, protocolManager } from 'snjs';
+
+const base64 = require('base-64');
+const aes = NativeModules.Aes;
+console.log(protocolManager, protocolManager.crypto);
+protocolManager.crypto.setNativeModules({ base64, aes });
 
 if (__DEV__ === false) {
   const bugsnag = new Client();

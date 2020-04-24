@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import Circle from 'components/Circle';
-import ThemedComponent from 'components/ThemedComponent';
-import KeysManager from 'lib/keysManager';
-import Auth from 'SFJS/authManager';
-import ModelManager from 'SFJS/modelManager';
-import StyleKit from 'style/StyleKit';
+import Circle from '@Components/Circle';
+import ThemedComponent from '@Components/ThemedComponent';
+import KeysManager from '@Lib/keysManager';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import StyleKit from '@Style/StyleKit';
 
 export default class SideMenuHero extends ThemedComponent {
   getText() {

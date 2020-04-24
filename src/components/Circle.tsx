@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import SectionedTableCell from 'components/SectionedTableCell';
+import SectionedTableCell from '@Components/SectionedTableCell';
 
 export default class Circle extends SectionedTableCell {
   constructor(props) {

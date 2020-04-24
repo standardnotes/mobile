@@ -1,16 +1,16 @@
 import { Platform } from 'react-native';
-import { SFPrivilegesManager, SFSingletonManager } from 'standard-file-js';
-import KeysManager from 'lib/keysManager';
-import { SCREEN_AUTHENTICATE } from 'screens/screens';
-import AuthenticationSourceAccountPassword from 'screens/Authentication/Sources/AuthenticationSourceAccountPassword';
-import AuthenticationSourceBiometric from 'screens/Authentication/Sources/AuthenticationSourceBiometric';
-import AuthenticationSourceLocalPasscode from 'screens/Authentication/Sources/AuthenticationSourceLocalPasscode';
-import Auth from 'SFJS/authManager';
-import ModelManager from 'SFJS/modelManager';
-import Sync from 'SFJS/syncManager';
-import Storage from 'SFJS/storageManager';
-import { ICON_CLOSE } from 'style/icons';
-import StyleKit from 'style/StyleKit';
+import { SFPrivilegesManager, SFSingletonManager } from 'snjs';
+import KeysManager from '@Lib/keysManager';
+import { SCREEN_AUTHENTICATE } from '@Screens/screens';
+import AuthenticationSourceAccountPassword from '@Screens/Authentication/Sources/AuthenticationSourceAccountPassword';
+import AuthenticationSourceBiometric from '@Screens/Authentication/Sources/AuthenticationSourceBiometric';
+import AuthenticationSourceLocalPasscode from '@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode';
+import Auth from '@Lib/snjs/authManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import Sync from '@Lib/snjs/syncManager';
+import Storage from '@Lib/snjs/storageManager';
+import { ICON_CLOSE } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class PrivilegesManager extends SFPrivilegesManager {
   static instance = null;

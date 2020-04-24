@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
-import PlatformStyles from 'models/PlatformStyles';
-import StyleKit from 'style/StyleKit';
+import PlatformStyles from '@Models/PlatformStyles';
+import StyleKit from '@Style/StyleKit';
 
 export default class HeaderTitleView extends Component {
   constructor(props) {

@@ -1,10 +1,10 @@
-import { SFItemParams } from 'standard-file-js';
+import { SFItemParams } from 'snjs';
 import _ from 'lodash';
-import UserPrefsManager from 'lib/userPrefsManager';
-import { isNullOrUndefined } from 'lib/utils';
-import Storage from 'SFJS/storageManager';
-import StyleKit from 'style/StyleKit';
-import { LIGHT_MODE_KEY } from 'style/utils';
+import UserPrefsManager from '@Lib/userPrefsManager';
+import { isNullOrUndefined } from '@Lib/utils';
+import Storage from '@Lib/snjs/storageManager';
+import StyleKit from '@Style/StyleKit';
+import { LIGHT_MODE_KEY } from '@Style/utils';
 
 const THEME_PREFERENCES_KEY = 'ThemePreferencesKey';
 const LIGHT_THEME_KEY = 'lightTheme';

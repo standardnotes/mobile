@@ -1,8 +1,19 @@
-import { SNMfa, SNServerExtension, SNExtension, SNEditor } from 'snjs';
+import {
+  SNMfa,
+  SNServerExtension,
+  SNExtension,
+  SNEditor,
+  SFPredicate,
+  SFPrivileges,
+  SFModelManager,
+  SNNote,
+  SNTag,
+  SNTheme,
+  SNComponent,
+  SNSmartTag,
+} from 'snjs';
 import _ from 'lodash';
-import { SFPredicate, SFPrivileges, SFModelManager } from 'standard-file-js';
-import { SNNote, SNTag, SNTheme, SNComponent, SNSmartTag } from 'snjs';
-import Storage from 'SFJS/storageManager';
+import Storage from '@Lib/snjs/storageManager';
 import '../../models/extend/item';
 
 SFModelManager.ContentTypeClassMapping = {

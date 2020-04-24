@@ -54,9 +54,8 @@
     "react-navigation-stack": "^1.10.3",
     "regenerator": "^0.14.2",
     "sn-textview": "standardnotes/sn-textview#8b62cb2",
-    "snjs": "0.2.9",
+    "snjs": "standardnotes/snjs#a4f0dfc",
     "stacktrace-parser": "0.1.8",
-    "standard-file-js": "0.3.71",
     "standard-notes-rn": "standardnotes/standard-notes-rn"
   },
   "devDependencies": {

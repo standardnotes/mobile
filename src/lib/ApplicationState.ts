@@ -7,11 +7,11 @@ import {
   Keyboard,
 } from 'react-native';
 import _ from 'lodash';
-import KeysManager from 'lib/keysManager';
-import OptionsState from 'lib/OptionsState';
-import PrivilegesManager from 'SFJS/privilegesManager';
-import AuthenticationSourceLocalPasscode from 'screens/Authentication/Sources/AuthenticationSourceLocalPasscode';
-import AuthenticationSourceBiometric from 'screens/Authentication/Sources/AuthenticationSourceBiometric';
+import KeysManager from '@Lib/keysManager';
+import OptionsState from '@Lib/OptionsState';
+import PrivilegesManager from '@Lib/snjs/privilegesManager';
+import AuthenticationSourceLocalPasscode from '@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode';
+import AuthenticationSourceBiometric from '@Screens/Authentication/Sources/AuthenticationSourceBiometric';
 
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;

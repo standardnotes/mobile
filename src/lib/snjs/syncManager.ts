@@ -1,11 +1,9 @@
-import SF from './sfjs';
-import KeysManager from 'lib/keysManager';
-import Auth from 'SFJS/authManager';
-import Server from 'SFJS/httpManager';
-import ModelManager from 'SFJS/modelManager';
-import Storage from 'SFJS/storageManager';
-
-import { SFSyncManager } from 'standard-file-js';
+import { SFSyncManager } from 'snjs';
+import KeysManager from '@Lib/keysManager';
+import Auth from '@Lib/snjs/authManager';
+import Server from '@Lib/snjs/httpManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import Storage from '@Lib/snjs/storageManager';
 
 export default class Sync extends SFSyncManager {
   static instance = null;

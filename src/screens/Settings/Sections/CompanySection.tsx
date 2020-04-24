@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { View, Text, Platform, Share } from 'react-native';
-import ButtonCell from 'components/ButtonCell';
-import SectionHeader from 'components/SectionHeader';
-import TableSection from 'components/TableSection';
-import ApplicationState from 'lib/ApplicationState';
-import StyleKit from 'style/StyleKit';
+import ButtonCell from '@Components/ButtonCell';
+import SectionHeader from '@Components/SectionHeader';
+import TableSection from '@Components/TableSection';
+import ApplicationState from '@Lib/ApplicationState';
+import StyleKit from '@Style/StyleKit';
 
 export default class CompanySection extends Component {
   onAction = action => {

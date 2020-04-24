@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, Text } from 'react-native';
 import Search from 'react-native-search-box';
-import ThemedComponent from 'components/ThemedComponent';
-import ApplicationState from 'lib/ApplicationState';
-import NoteCell from 'screens/Notes/NoteCell';
-import OfflineBanner from 'screens/Notes/OfflineBanner';
-import Auth from 'SFJS/authManager';
-import StyleKit from 'style/StyleKit';
+import ThemedComponent from '@Components/ThemedComponent';
+import ApplicationState from '@Lib/ApplicationState';
+import NoteCell from '@Screens/Notes/NoteCell';
+import OfflineBanner from '@Screens/Notes/OfflineBanner';
+import Auth from '@Lib/snjs/authManager';
+import StyleKit from '@Style/StyleKit';
 
 export default class NoteList extends ThemedComponent {
   renderHeader = () => {

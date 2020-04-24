@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 
-import { SFAlertManager } from 'standard-file-js';
+import { SFAlertManager } from 'snjs';
 
 export default class AlertManager extends SFAlertManager {
   static instance = null;

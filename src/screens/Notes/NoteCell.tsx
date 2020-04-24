@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
-import ThemedPureComponent from 'components/ThemedPureComponent';
-import ItemActionManager from 'lib/itemActionManager';
-import ActionSheetWrapper from 'style/ActionSheetWrapper';
-import StyleKit from 'style/StyleKit';
-import { hexToRGBA } from 'style/utils';
+import ThemedPureComponent from '@Components/ThemedPureComponent';
+import ItemActionManager from '@Lib/itemActionManager';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import StyleKit from '@Style/StyleKit';
+import { hexToRGBA } from '@Style/utils';
 
 export default class NoteCell extends ThemedPureComponent {
   constructor(props) {

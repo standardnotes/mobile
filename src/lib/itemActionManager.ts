@@ -1,8 +1,8 @@
 import { Share } from 'react-native';
-import ApplicationState from 'lib/ApplicationState';
-import AlertManager from 'SFJS/alertManager';
-import ModelManager from 'SFJS/modelManager';
-import Sync from 'SFJS/syncManager';
+import ApplicationState from '@Lib/ApplicationState';
+import AlertManager from '@Lib/snjs/alertManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import Sync from '@Lib/snjs/syncManager';
 
 export default class ItemActionManager {
   static DeleteEvent = 'DeleteEvent';

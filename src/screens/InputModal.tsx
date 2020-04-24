@@ -1,15 +1,15 @@
 import React from 'react';
 import { TextInput, Keyboard, Alert } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import ButtonCell from 'components/ButtonCell';
-import SectionedTableCell from 'components/SectionedTableCell';
-import SectionedOptionsTableCell from 'components/SectionedOptionsTableCell';
-import TableSection from 'components/TableSection';
-import LockedView from 'containers/LockedView';
-import ApplicationState from 'lib/ApplicationState';
-import Abstract from 'screens/Abstract';
-import { ICON_CLOSE } from 'style/icons';
-import StyleKit from 'style/StyleKit';
+import ButtonCell from '@Components/ButtonCell';
+import SectionedTableCell from '@Components/SectionedTableCell';
+import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
+import TableSection from '@Components/TableSection';
+import LockedView from '@Containers/LockedView';
+import ApplicationState from '@Lib/ApplicationState';
+import Abstract from '@Screens/Abstract';
+import { ICON_CLOSE } from '@Style/icons';
+import StyleKit from '@Style/StyleKit';
 
 export default class InputModal extends Abstract {
   static navigationOptions = ({ navigation, navigationOptions }) => {

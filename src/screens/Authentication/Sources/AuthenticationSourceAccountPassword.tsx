@@ -1,5 +1,5 @@
-import AuthenticationSource from 'screens/Authentication/Sources/AuthenticationSource';
-import Auth from 'SFJS/authManager';
+import AuthenticationSource from '@Screens/Authentication/Sources/AuthenticationSource';
+import Auth from '@Lib/snjs/authManager';
 
 export default class AuthenticationSourceAccountPassword extends AuthenticationSource {
   constructor() {
