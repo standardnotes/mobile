@@ -299,7 +299,7 @@ export default class KeysManager {
       // If offline local passcode keys are available, use that to encrypt account keys
       // Don't encrypt offline pw because then we don't be able to verify passcode
       const encryptedKeys = new SFItem();
-      encryptedKeys.uuid = await protocolManager.crypto.generateUUID();
+      encryptedKeys.initUUID();
       encryptedKeys.content_type = 'SN|Mobile|EncryptedKeys';
       encryptedKeys.content.accountKeys = this.accountKeys;
       const params = new SFItemParams(
