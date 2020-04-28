@@ -363,7 +363,7 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
-  - react-native-aes (from `../node_modules/react-native-aes`)
+  - react-native-aes (from `../node_modules/react-native-aes-crypto`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-mail (from `../node_modules/react-native-mail`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -444,7 +444,7 @@ EXTERNAL SOURCES:
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-aes:
-    :path: "../node_modules/react-native-aes"
+    :path: "../node_modules/react-native-aes-crypto"
   react-native-fingerprint-scanner:
     :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-mail:

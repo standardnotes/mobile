@@ -41,10 +41,10 @@ import StyleKit from '@Style/StyleKit';
 import { NativeModules } from 'react-native';
 import { SFAuthManager, protocolManager } from 'snjs';
 
-const base64 = require('base-64');
-const aes = NativeModules.Aes;
-console.log(protocolManager, protocolManager.crypto);
-protocolManager.crypto.setNativeModules({ base64, aes });
+protocolManager.crypto.setNativeModules({
+  base64: require('base-64'),
+  aes: NativeModules.Aes,
+});
 
 if (__DEV__ === false) {
   const bugsnag = new Client();

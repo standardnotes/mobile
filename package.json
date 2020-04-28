@@ -30,7 +30,7 @@
     "react": "16.11.0",
     "react-native": "0.62.2",
     "react-native-actionsheet": "standardnotes/react-native-actionsheet#6846f21",
-    "react-native-aes": "standardnotes/react-native-aes#3480f65",
+    "react-native-aes-crypto": "1.3.8",
     "react-native-alternate-icons": "standardnotes/react-native-alternate-icons#3154f8d",
     "react-native-dark-mode": "^0.2.2",
     "react-native-fab": "standardnotes/react-native-fab#113661d",
@@ -54,7 +54,7 @@
     "react-navigation-stack": "^1.10.3",
     "regenerator": "^0.14.2",
     "sn-textview": "standardnotes/sn-textview#8b62cb2",
-    "snjs": "standardnotes/snjs#a4f0dfc",
+    "snjs": "standardnotes/snjs#af298d5",
     "stacktrace-parser": "0.1.8",
     "standard-notes-rn": "standardnotes/standard-notes-rn"
   },
