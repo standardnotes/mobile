@@ -1,6 +1,6 @@
-import { StatusBar, Alert, Platform } from 'react-native';
+import { StatusBar, Alert, Platform, ViewStyle, TextStyle } from 'react-native';
 import IconChanger from 'react-native-alternate-icons';
-import { supportsDarkMode } from 'react-native-dark-mode';
+import { supportsDarkMode, Mode } from 'react-native-dark-mode';
 import _ from 'lodash';
 import Auth from '@Lib/snjs/authManager';
 import ModelManager from '@Lib/snjs/modelManager';
@@ -11,19 +11,29 @@ import {
   keyboardColorForTheme,
   LIGHT_CONTENT,
   DARK_CONTENT,
-  LIGHT_MODE_KEY,
+  LIGHT_MODE_KEY
 } from '@Style/utils';
 import ThemeDownloader from '@Style/Util/ThemeDownloader';
-import { SFAuthManager, SNTheme } from 'snjs';
+import { SFAuthManager, SNTheme as SNJSTheme } from 'snjs';
 
 import THEME_RED_JSON from './Themes/red.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 
+type SNTheme = typeof SNJSTheme;
+
 export default class StyleKit {
-  static instance = null;
+  private static instance: StyleKit;
+  themeChangeObservers: Array<() => void>;
+  activeTheme: SNTheme;
+  mode?: Mode;
+  currentDarkMode!: Mode;
+  systemThemes: Array<SNTheme>;
+  constants: { mainTextFontSize: number; paddingLeft: number };
+  styles: Record<string, ViewStyle | TextStyle> = {};
+  signoutObserver: any;
 
   static get() {
-    if (this.instance === null) {
+    if (!this.instance) {
       this.instance = new StyleKit();
     }
 
@@ -32,14 +42,19 @@ export default class StyleKit {
 
   constructor() {
     this.themeChangeObservers = [];
+    this.systemThemes = [];
 
-    this.buildConstants();
+    this.constants = {
+      mainTextFontSize: 16,
+      paddingLeft: 14
+    };
+
     this.buildDefaultThemes();
 
     ModelManager.get().addItemSyncObserver(
       'themes',
       'SN|Theme',
-      (allItems, validItems, deletedItems, source) => {
+      (_allItems: any, _validItems: any, deletedItems: any, _source: any) => {
         if (
           this.activeTheme &&
           !this.activeTheme.isSystemTheme &&
@@ -62,7 +77,7 @@ export default class StyleKit {
       }
     );
 
-    this.signoutObserver = Auth.get().addEventHandler(event => {
+    this.signoutObserver = Auth.get().addEventHandler((event: any) => {
       if (event === SFAuthManager.DidSignOutEvent) {
         this.resetToSystemTheme();
       }
@@ -74,16 +89,16 @@ export default class StyleKit {
     await this.resolveInitialTheme();
   }
 
-  setModeTo(mode) {
+  setModeTo(mode: Mode) {
     this.currentDarkMode = mode;
   }
 
-  addThemeChangeObserver(observer) {
+  addThemeChangeObserver(observer: () => void) {
     this.themeChangeObservers.push(observer);
     return observer;
   }
 
-  removeThemeChangeObserver(observer) {
+  removeThemeChangeObserver(observer: () => void) {
     _.pull(this.themeChangeObservers, observer);
   }
 
@@ -93,7 +108,7 @@ export default class StyleKit {
     }
   }
 
-  assignThemeForMode({ theme, mode }) {
+  assignThemeForMode({ theme, mode }: { theme: SNTheme; mode: Mode }) {
     if (!StyleKit.doesDeviceSupportDarkMode()) {
       mode = LIGHT_MODE_KEY;
     }
@@ -125,12 +140,12 @@ export default class StyleKit {
       {
         variables: THEME_BLUE_JSON,
         name: 'Blue',
-        isInitial: true,
+        isInitial: true
       },
       {
         variables: THEME_RED_JSON,
-        name: 'Red',
-      },
+        name: 'Red'
+      }
     ];
 
     for (const option of options) {
@@ -138,7 +153,7 @@ export default class StyleKit {
       variables.statusBar =
         Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
 
-      const theme = new SNTheme({
+      const theme = new SNJSTheme({
         uuid: option.name,
         content: {
           isSystemTheme: true,
@@ -149,10 +164,10 @@ export default class StyleKit {
             dock_icon: {
               type: 'circle',
               background_color: variables.stylekitInfoColor,
-              border_color: variables.stylekitInfoColor,
-            },
-          },
-        },
+              border_color: variables.stylekitInfoColor
+            }
+          }
+        }
       });
 
       this.systemThemes.push(theme);
@@ -173,7 +188,7 @@ export default class StyleKit {
 
       ThemeManager.get().setThemeForMode({
         mode: currentMode,
-        theme: defaultTheme,
+        theme: defaultTheme
       });
 
       this.setActiveTheme(defaultTheme);
@@ -194,7 +209,7 @@ export default class StyleKit {
       if (matchingTheme) {
         newTheme = matchingTheme;
       } else {
-        newTheme = new SNTheme(themeData);
+        newTheme = new SNJSTheme(themeData);
         newTheme.isSwapIn = true;
       }
 
@@ -210,20 +225,25 @@ export default class StyleKit {
   }
 
   themes() {
-    const themes = ModelManager.get().themes.sort((a, b) => {
-      if (!a.name || !b.name) {
-        return -1;
+    const themes = ModelManager.get().themes.sort(
+      (
+        a: { name: { toLowerCase: () => number } },
+        b: { name: { toLowerCase: () => number } }
+      ) => {
+        if (!a.name || !b.name) {
+          return -1;
+        }
+        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
       }
-      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-    });
+    );
     return this.systemThemes.concat(themes);
   }
 
-  isThemeActive(theme) {
+  isThemeActive(theme: SNTheme) {
     return this.activeTheme && theme.uuid === this.activeTheme.uuid;
   }
 
-  setActiveTheme(theme) {
+  setActiveTheme(theme: SNTheme) {
     /** Merge default variables to ensure this theme has all the variables. */
     const variables = theme.content.variables;
     theme.content.variables = _.merge(this.templateVariables(), variables);
@@ -244,7 +264,7 @@ export default class StyleKit {
    *     - Status Bar color
    *     - Local App Icon color
    */
-  updateDeviceForTheme(theme) {
+  updateDeviceForTheme(theme: SNTheme) {
     const isAndroid = Platform.OS === 'android';
 
     /** On Android, a time out is required, especially during app startup. */
@@ -272,9 +292,9 @@ export default class StyleKit {
     );
 
     if (theme.content.isSystemTheme && !isAndroid) {
-      IconChanger.supportDevice(supported => {
+      IconChanger.supportDevice((supported) => {
         if (supported) {
-          IconChanger.getIconName(currentName => {
+          IconChanger.getIconName((currentName) => {
             if (theme.content.isInitial && currentName !== 'default') {
               /** Clear the icon to default. */
               IconChanger.setIconName(null);
@@ -290,7 +310,12 @@ export default class StyleKit {
     }
   }
 
-  activateTheme(theme) {
+  activateTheme(theme: {
+    content: { variables: { stylekitInfoColor: any } };
+    setDirty: (arg0: boolean) => void;
+    getNotAvailOnMobile: () => any;
+    setNotAvailOnMobile: (arg0: boolean) => void;
+  }) {
     const performActivation = () => {
       this.setActiveTheme(theme);
       this.assignThemeForMode({ theme: theme, mode: this.currentDarkMode });
@@ -305,7 +330,7 @@ export default class StyleKit {
     if (!hasValidInfoColor) {
       ThemeDownloader.get()
         .downloadTheme(theme)
-        .then(variables => {
+        .then((variables: any) => {
           if (!variables) {
             Alert.alert(
               'Not Available',
@@ -348,12 +373,21 @@ export default class StyleKit {
       /** No matching theme found, set currently active theme as the default. */
       this.assignThemeForMode({
         theme: this.activeTheme,
-        mode: this.currentDarkMode,
+        mode: this.currentDarkMode
       });
     }
   }
 
-  async downloadThemeAndReload(theme) {
+  async downloadThemeAndReload(theme: {
+    content: {
+      package_info: { no_mobile: any };
+      isSystemTheme: any;
+      variables: any;
+    };
+    name?: any;
+    setDirty: (arg0: boolean) => void;
+    uuid?: any;
+  }) {
     const updatedVariables = await ThemeDownloader.get().downloadTheme(theme);
 
     /** Merge default variables to ensure this theme has all the variables. */
@@ -376,35 +410,35 @@ export default class StyleKit {
     const { mainTextFontSize, paddingLeft } = this.constants;
     this.styles = {
       baseBackground: {
-        backgroundColor: variables.stylekitBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor
       },
       contrastBackground: {
-        backgroundColor: variables.stylekitContrastBackgroundColor,
+        backgroundColor: variables.stylekitContrastBackgroundColor
       },
       container: {
         flex: 1,
-        height: '100%',
+        height: '100%'
       },
 
       flexContainer: {
         flex: 1,
-        flexDirection: 'column',
+        flexDirection: 'column'
       },
 
       centeredContainer: {
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
       },
 
       flexedItem: {
-        flexGrow: 1,
+        flexGrow: 1
       },
 
       uiText: {
         color: variables.stylekitForegroundColor,
-        fontSize: mainTextFontSize,
+        fontSize: mainTextFontSize
       },
 
       view: {},
@@ -414,7 +448,7 @@ export default class StyleKit {
       tableSection: {
         marginTop: 10,
         marginBottom: 10,
-        backgroundColor: variables.stylekitBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor
       },
 
       sectionedTableCell: {
@@ -424,25 +458,25 @@ export default class StyleKit {
         paddingRight: paddingLeft,
         paddingTop: 13,
         paddingBottom: 12,
-        backgroundColor: variables.stylekitBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor
       },
 
       textInputCell: {
         maxHeight: 50,
         paddingTop: 0,
-        paddingBottom: 0,
+        paddingBottom: 0
       },
 
       sectionedTableCellTextInput: {
         fontSize: mainTextFontSize,
         padding: 0,
         color: variables.stylekitForegroundColor,
-        height: '100%',
+        height: '100%'
       },
 
       sectionedTableCellFirst: {
         borderTopColor: variables.stylekitBorderColor,
-        borderTopWidth: 1,
+        borderTopWidth: 1
       },
 
       sectionedTableCellLast: {},
@@ -451,20 +485,20 @@ export default class StyleKit {
         paddingTop: 0,
         paddingBottom: 0,
         minHeight: 47,
-        backgroundColor: 'transparent',
+        backgroundColor: 'transparent'
       },
 
       sectionedAccessoryTableCellLabel: {
         fontSize: mainTextFontSize,
         color: variables.stylekitForegroundColor,
-        minWidth: '80%',
+        minWidth: '80%'
       },
 
       buttonCell: {
         paddingTop: 0,
         paddingBottom: 0,
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'center'
       },
 
       buttonCellButton: {
@@ -474,11 +508,11 @@ export default class StyleKit {
           Platform.OS === 'android'
             ? variables.stylekitForegroundColor
             : variables.stylekitInfoColor,
-        fontSize: mainTextFontSize,
+        fontSize: mainTextFontSize
       },
 
       buttonCellButtonLeft: {
-        textAlign: 'left',
+        textAlign: 'left'
       },
 
       noteText: {
@@ -489,17 +523,17 @@ export default class StyleKit {
         paddingLeft: paddingLeft,
         paddingRight: paddingLeft,
         paddingBottom: 10,
-        backgroundColor: variables.stylekitBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor
       },
 
       noteTextIOS: {
         paddingLeft: paddingLeft - 5,
-        paddingRight: paddingLeft - 5,
+        paddingRight: paddingLeft - 5
       },
 
       noteTextNoPadding: {
         paddingLeft: 0,
-        paddingRight: 0,
+        paddingRight: 0
       },
 
       actionSheetWrapper: {},
@@ -514,47 +548,40 @@ export default class StyleKit {
          * This will also set button border bottoms, since margin is used
          * instead of borders
          */
-        backgroundColor: variables.stylekitBorderColor,
+        backgroundColor: variables.stylekitBorderColor
       },
 
       actionSheetTitleWrapper: {
         backgroundColor: variables.stylekitBackgroundColor,
-        marginBottom: 1,
+        marginBottom: 1
       },
 
       actionSheetTitleText: {
         color: variables.stylekitForegroundColor,
-        opacity: 0.5,
+        opacity: 0.5
       },
 
       actionSheetButtonWrapper: {
         backgroundColor: variables.stylekitBackgroundColor,
-        marginTop: 0,
+        marginTop: 0
       },
 
       actionSheetButtonTitle: {
-        color: variables.stylekitForegroundColor,
+        color: variables.stylekitForegroundColor
       },
 
       actionSheetCancelButtonWrapper: {
-        marginTop: 0,
+        marginTop: 0
       },
 
       actionSheetCancelButtonTitle: {
         color: variables.stylekitInfoColor,
-        fontWeight: 'normal',
+        fontWeight: 'normal'
       },
 
       bold: {
-        fontWeight: 'bold',
-      },
-    };
-  }
-
-  buildConstants() {
-    this.constants = {
-      mainTextFontSize: 16,
-      paddingLeft: 14,
+        fontWeight: 'bold'
+      }
     };
   }
 
@@ -573,7 +600,7 @@ export default class StyleKit {
     return supportsDarkMode;
   }
 
-  static variable(name) {
+  static variable(name: string) {
     return this.get().activeTheme.content.variables[name];
   }
 
@@ -589,7 +616,7 @@ export default class StyleKit {
     return this.get().styles;
   }
 
-  static stylesForKey(key) {
+  static stylesForKey(key: string) {
     const allStyles = this.styles;
     const styles = [allStyles[key]];
     const platform = Platform.OS === 'android' ? 'Android' : 'IOS';
@@ -604,7 +631,7 @@ export default class StyleKit {
     return Platform.OS === 'android' ? 'md' : 'ios';
   }
 
-  static nameForIcon(iconName) {
+  static nameForIcon(iconName: string) {
     return StyleKit.platformIconPrefix() + '-' + iconName;
   }
 }

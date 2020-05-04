@@ -1,7 +1,7 @@
 import { Platform, NativeModules } from 'react-native';
 
 // moment.js
-const moment = require('moment/min/moment-with-locales.min.js');
+import moment from 'moment';
 const locale =
   Platform.OS === 'android'
     ? NativeModules.I18nManager.localeIdentifier

@@ -5,6 +5,9 @@ import {
   Linking,
   Alert,
   Keyboard,
+  AppStateStatus,
+  KeyboardEventListener,
+  EmitterSubscription
 } from 'react-native';
 import _ from 'lodash';
 import KeysManager from '@Lib/keysManager';
@@ -16,36 +19,96 @@ import AuthenticationSourceBiometric from '@Screens/Authentication/Sources/Authe
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;
 
+export type AppStateType =
+  | typeof ApplicationState.Launching
+  | typeof ApplicationState.LosingFocus
+  | typeof ApplicationState.Backgrounding
+  | typeof ApplicationState.GainingFocus
+  | typeof ApplicationState.ResumingFromBackground
+  | typeof ApplicationState.Locking
+  | typeof ApplicationState.Unlocking;
+
+// AppStateEvents
+export type AppStateEventType =
+  | typeof ApplicationState.KeyboardChangeEvent
+  | typeof ApplicationState.AppStateEventTabletModeChange
+  | typeof ApplicationState.AppStateEventNoteSideMenuToggle;
+export type TabletModeChangeData = {
+  new_isInTabletMode: boolean;
+  old_isInTabletMode: boolean;
+};
+export type NoteSideMenuToggleChange = {
+  new_isNoteSideMenuCollapsed: boolean;
+  old_isNoteSideMenuCollapsed: boolean;
+};
+
+type KeyboardChangeEventHandler = (
+  event: typeof ApplicationState.KeyboardChangeEvent,
+  data: undefined
+) => void;
+type SideMenuToogleEvent = (
+  event: typeof ApplicationState.AppStateEventNoteSideMenuToggle,
+  data: NoteSideMenuToggleChange
+) => void;
+type TableModeChageEvent = (
+  event: typeof ApplicationState.AppStateEventTabletModeChange,
+  data: TabletModeChangeData
+) => void;
+export type AppStateEventHandler =
+  | KeyboardChangeEventHandler
+  | SideMenuToogleEvent
+  | TableModeChageEvent;
+
+type Observer = {
+  key: () => number;
+  callback: (state: AppStateType) => void;
+};
+
 export default class ApplicationState {
   // When the app first launches
-  static Launching = 'Launching';
+  static Launching = 'Launching' as 'Launching';
 
   // When the app enters into multitasking view, or control/notification center for iOS
-  static LosingFocus = 'LosingFocus';
+  static LosingFocus = 'LosingFocus' as 'LosingFocus';
 
   // When the app enters the background completely
-  static Backgrounding = 'Backgrounding';
+  static Backgrounding = 'Backgrounding' as 'Backgrounding';
 
   // When the app resumes from either the background or from multitasking switcher or notification center
-  static GainingFocus = 'GainingFocus';
+  static GainingFocus = 'GainingFocus' as 'GainingFocus';
 
   // When the app resumes from the background
-  static ResumingFromBackground = 'ResumingFromBackground';
+  static ResumingFromBackground = 'ResumingFromBackground' as 'ResumingFromBackground';
 
   // When the user enters their local passcode and/or fingerprint
-  static Locking = 'Locking';
+  static Locking = 'Locking' as 'Locking';
 
   // When the user enters their local passcode and/or fingerprint
-  static Unlocking = 'Unlocking';
+  static Unlocking = 'Unlocking' as 'Unlocking';
 
   /* Seperate events, unrelated to app state notifications */
-  static AppStateEventTabletModeChange = 'AppStateEventTabletModeChange';
-  static AppStateEventNoteSideMenuToggle = 'AppStateEventNoteSideMenuToggle';
-  static KeyboardChangeEvent = 'KeyboardChangeEvent';
+  static AppStateEventTabletModeChange = 'AppStateEventTabletModeChange' as 'AppStateEventTabletModeChange';
+  static AppStateEventNoteSideMenuToggle = 'AppStateEventNoteSideMenuToggle' as 'AppStateEventNoteSideMenuToggle';
+  static KeyboardChangeEvent = 'KeyboardChangeEvent' as 'KeyboardChangeEvent';
 
-  static instance = null;
+  private static instance: ApplicationState;
+  _isAndroid: boolean;
+  observers: Observer[];
+  eventSubscribers: AppStateEventHandler[];
+  locked: boolean;
+  keyboardDidShowListener: EmitterSubscription;
+  keyboardDidHideListener: EmitterSubscription;
+  keyboardHeight?: number;
+  optionsState?: OptionsState;
+  loading: boolean = false;
+  tabletMode: boolean = false;
+  noteSideMenuCollapsed: boolean = false;
+  ignoreStateChanges: boolean = false;
+  mostRecentState?: AppStateType;
+  didHandleApplicationStart: boolean = false;
+  authenticationInProgress: boolean = false;
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new ApplicationState();
     }
 
@@ -74,12 +137,12 @@ export default class ApplicationState {
     );
   }
 
-  keyboardDidShow = e => {
+  keyboardDidShow: KeyboardEventListener = (e) => {
     this.keyboardHeight = e.endCoordinates.height;
     this.notifyEvent(ApplicationState.KeyboardChangeEvent);
   };
 
-  keyboardDidHide = e => {
+  keyboardDidHide: KeyboardEventListener = () => {
     this.keyboardHeight = 0;
     this.notifyEvent(ApplicationState.KeyboardChangeEvent);
   };
@@ -91,7 +154,7 @@ export default class ApplicationState {
   initializeOptions() {
     // Initialize Options (sort by, filter, selected tags, etc)
     this.optionsState = new OptionsState();
-    this.optionsState.addChangeObserver(options => {
+    this.optionsState.addChangeObserver((options) => {
       if (!this.loading) {
         options.persist();
       }
@@ -137,12 +200,12 @@ export default class ApplicationState {
     return this.tabletMode;
   }
 
-  setTabletModeEnabled(enabled) {
+  setTabletModeEnabled(enabled: boolean) {
     if (enabled !== this.tabletMode) {
       this.tabletMode = enabled;
       this.notifyEvent(ApplicationState.AppStateEventTabletModeChange, {
         new_isInTabletMode: enabled,
-        old_isInTabletMode: !enabled,
+        old_isInTabletMode: !enabled
       });
     }
   }
@@ -151,32 +214,36 @@ export default class ApplicationState {
     return this.noteSideMenuCollapsed;
   }
 
-  setNoteSideMenuCollapsed(collapsed) {
+  setNoteSideMenuCollapsed(collapsed: boolean) {
     if (collapsed !== this.noteSideMenuCollapsed) {
       this.noteSideMenuCollapsed = collapsed;
       this.notifyEvent(ApplicationState.AppStateEventNoteSideMenuToggle, {
         new_isNoteSideMenuCollapsed: collapsed,
-        old_isNoteSideMenuCollapsed: !collapsed,
+        old_isNoteSideMenuCollapsed: !collapsed
       });
     }
   }
 
-  addEventHandler(handler) {
+  addEventHandler(handler: AppStateEventHandler) {
     this.eventSubscribers.push(handler);
     return handler;
   }
 
-  removeEventHandler(handler) {
+  removeEventHandler(handler: AppStateEventHandler) {
     _.pull(this.eventSubscribers, handler);
   }
 
-  notifyEvent(event, data) {
+  notifyEvent(
+    event: AppStateEventType,
+    data?: TabletModeChangeData | NoteSideMenuToggleChange
+  ) {
     for (const handler of this.eventSubscribers) {
+      // @ts-ignore not working type
       handler(event, data);
     }
   }
 
-  handleAppStateChange = nextAppState => {
+  handleAppStateChange = (nextAppState: AppStateStatus) => {
     if (this.ignoreStateChanges) {
       return;
     }
@@ -235,14 +302,14 @@ export default class ApplicationState {
   // Visibility change events are like active, inactive, background,
   // while non-app cycle events are custom events like locking and unlocking
 
-  isAppVisibilityChange(state) {
-    return [
+  isAppVisibilityChange(state: AppStateType) {
+    return ([
       ApplicationState.Launching,
       ApplicationState.LosingFocus,
       ApplicationState.Backgrounding,
       ApplicationState.GainingFocus,
-      ApplicationState.ResumingFromBackground,
-    ].includes(state);
+      ApplicationState.ResumingFromBackground
+    ] as Array<AppStateType>).includes(state);
   }
 
   /* State Changes */
@@ -265,7 +332,7 @@ export default class ApplicationState {
     this.notifyOfState(ApplicationState.Launching);
   }
 
-  notifyOfState(state) {
+  notifyOfState(state: AppStateType) {
     if (this.ignoreStateChanges) {
       return;
     }
@@ -284,7 +351,7 @@ export default class ApplicationState {
   Allows other parts of the code to perform external actions without triggering state change notifications.
   This is useful on Android when you present a share sheet and dont want immediate authentication to appear.
   */
-  performActionWithoutStateChangeImpact(block) {
+  performActionWithoutStateChangeImpact(block: () => void) {
     this.ignoreStateChanges = true;
     block();
     setTimeout(() => {
@@ -296,8 +363,8 @@ export default class ApplicationState {
     return this.mostRecentState;
   }
 
-  addStateObserver(callback) {
-    const observer = { key: Math.random, callback: callback };
+  addStateObserver(callback: Observer['callback']) {
+    const observer = { key: Math.random, callback };
     this.observers.push(observer);
 
     if (this.mostRecentState) {
@@ -311,7 +378,7 @@ export default class ApplicationState {
   //   this.previousEvents = [];
   // }
 
-  removeStateObserver(observer) {
+  removeStateObserver(observer: Observer) {
     _.pull(this.observers, observer);
   }
 
@@ -347,7 +414,7 @@ export default class ApplicationState {
     this.locked = false;
   }
 
-  setAuthenticationInProgress(inProgress) {
+  setAuthenticationInProgress(inProgress: boolean) {
     this.authenticationInProgress = inProgress;
   }
 
@@ -355,7 +422,7 @@ export default class ApplicationState {
     return this.authenticationInProgress;
   }
 
-  getAuthenticationPropsForAppState(state) {
+  getAuthenticationPropsForAppState(state: AppStateType) {
     // We don't want to do anything on gaining focus, since that may be called extraenously,
     // when you come back from notification center, etc. Any immediate locking should be handled
     // LosingFocus anyway.
@@ -409,17 +476,17 @@ export default class ApplicationState {
     return {
       title: title,
       sources: sources,
-      onAuthenticate: this.unlockApplication.bind(this),
+      onAuthenticate: this.unlockApplication.bind(this)
     };
   }
 
-  static openURL(url) {
+  static openURL(url: string) {
     const showAlert = () => {
       Alert.alert('Unable to Open', `Unable to open URL ${url}.`);
     };
 
     Linking.canOpenURL(url)
-      .then(supported => {
+      .then((supported) => {
         if (!supported) {
           showAlert();
         } else {

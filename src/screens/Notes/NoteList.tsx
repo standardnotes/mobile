@@ -18,7 +18,7 @@ export default class NoteList extends ThemedComponent {
           paddingLeft: 5,
           paddingRight: 5,
           paddingTop: 5,
-          backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+          backgroundColor: StyleKit.variables.stylekitBackgroundColor
         }}
       >
         <Search
@@ -34,7 +34,7 @@ export default class NoteList extends ThemedComponent {
           inputStyle={{
             backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
             color: StyleKit.variables.stylekitForegroundColor,
-            height: 30,
+            height: 30
           }}
         />
 
@@ -130,7 +130,7 @@ export default class NoteList extends ThemedComponent {
   loadStyles() {
     this.styles = StyleSheet.create({
       container: {
-        flex: 1,
+        flex: 1
       },
 
       loadingTextContainer: {
@@ -140,14 +140,14 @@ export default class NoteList extends ThemedComponent {
         zIndex: -1,
         position: 'absolute',
         height: '100%',
-        width: '100%',
+        width: '100%'
       },
 
       loadingText: {
         position: 'absolute',
         opacity: 0.5,
-        color: StyleKit.variables.stylekitForegroundColor,
-      },
+        color: StyleKit.variables.stylekitForegroundColor
+      }
     });
   }
 }

@@ -1,14 +1,23 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
 import Circle from '@Components/Circle';
 import ThemedComponent from '@Components/ThemedComponent';
 import ApplicationState from '@Lib/ApplicationState';
 import StyleKit from '@Style/StyleKit';
-import { hexToRGBA } from '@Style/utils';
+import { SideMenuOption } from './SideMenuSection';
 
-export default class SideMenuCell extends ThemedComponent {
+type Props = SideMenuOption;
+
+export default class SideMenuCell extends ThemedComponent<Props> {
+  styles!: Record<string, ViewStyle | TextStyle>;
   componentDidUpdate() {
     this.updateStyles();
   }
@@ -24,7 +33,7 @@ export default class SideMenuCell extends ThemedComponent {
   }
 
   onPress = () => {
-    this.props.onSelect();
+    this.props.onSelect && this.props.onSelect();
   };
 
   onLongPress = () => {
@@ -37,13 +46,13 @@ export default class SideMenuCell extends ThemedComponent {
       return null;
     }
 
-    if (desc.type === 'icon') {
+    if (desc.type === 'icon' && desc.name) {
       return (
         <View style={this.styles.iconGraphic}>
           <Icon
             name={desc.name}
             size={desc.size || 20}
-            color={this.styles.iconColor}
+            color={StyleKit.variables.stylekitInfoColor}
           />
         </View>
       );
@@ -63,7 +72,7 @@ export default class SideMenuCell extends ThemedComponent {
     }
   }
 
-  aggregateStyles(base, addition, condition) {
+  aggregateStyles(base: ViewStyle, addition: ViewStyle, condition?: boolean) {
     if (condition) {
       return [base, addition];
     } else {
@@ -71,7 +80,7 @@ export default class SideMenuCell extends ThemedComponent {
     }
   }
 
-  colorForTextClass = textClass => {
+  colorForTextClass = (textClass: Props['textClass']) => {
     if (!textClass) {
       return null;
     }
@@ -79,14 +88,14 @@ export default class SideMenuCell extends ThemedComponent {
     return {
       info: StyleKit.variables.stylekitInfoColor,
       danger: StyleKit.variables.stylekitDangerColor,
-      warning: StyleKit.variables.stylekitWarningColor,
+      warning: StyleKit.variables.stylekitWarningColor
     }[textClass];
   };
 
   render() {
     const hasIcon = this.props.iconDesc;
     const iconSide =
-      hasIcon && this.props.iconDesc.side
+      hasIcon && this.props.iconDesc?.side
         ? this.props.iconDesc.side
         : hasIcon
         ? 'left'
@@ -146,7 +155,7 @@ export default class SideMenuCell extends ThemedComponent {
                   this.styles.textSelected,
                   this.props.selected
                 ),
-                textColor ? { color: textColor } : null,
+                textColor ? { color: textColor } : null
               ]}
             >
               {this.props.text}
@@ -159,7 +168,7 @@ export default class SideMenuCell extends ThemedComponent {
             <View
               style={[
                 this.styles.iconContainer,
-                this.styles.iconContainerRight,
+                this.styles.iconContainerRight
               ]}
             >
               {this.getIconElement()}
@@ -172,44 +181,41 @@ export default class SideMenuCell extends ThemedComponent {
 
   loadStyles() {
     this.styles = {
-      iconColor: StyleKit.variables.stylekitInfoColor,
-      selectionBgColor: hexToRGBA(StyleKit.variables.stylekitInfoColor, 0.1),
-
       cell: {
-        minHeight: this.props.subtext ? 52 : 42,
+        minHeight: this.props.subtext ? 52 : 42
       },
 
       cellContent: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'center'
       },
 
       iconContainer: {
         flex: 0,
         justifyContent: 'center',
-        flexDirection: 'column',
+        flexDirection: 'column'
       },
 
       iconContainerLeft: {
         marginRight: 6,
-        height: '100%',
+        height: '100%'
       },
 
       iconContainerRight: {
         marginLeft: 6,
         marginRight: 4,
-        height: '100%',
+        height: '100%'
       },
 
       textContainer: {
         minHeight: this.props.subtext ? 38 : 24,
-        marginLeft: 6,
+        marginLeft: 6
       },
 
       textContainerSelected: {
         borderBottomColor: StyleKit.variables.stylekitInfoColor,
-        borderBottomWidth: 2,
+        borderBottomWidth: 2
       },
 
       text: {
@@ -217,7 +223,7 @@ export default class SideMenuCell extends ThemedComponent {
         fontWeight: 'bold',
         fontSize: 15,
         paddingBottom: 0,
-        fontFamily: ApplicationState.isAndroid ? 'Roboto' : null, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       subtext: {
@@ -226,7 +232,7 @@ export default class SideMenuCell extends ThemedComponent {
         fontSize: 12,
         marginTop: -5,
         marginBottom: 3,
-        fontFamily: ApplicationState.isAndroid ? 'Roboto' : null, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       iconGraphic: {
@@ -234,7 +240,7 @@ export default class SideMenuCell extends ThemedComponent {
         width: 20,
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
       },
 
       iconCircle: {
@@ -242,7 +248,7 @@ export default class SideMenuCell extends ThemedComponent {
         width: 20,
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
       },
 
       iconAscii: {
@@ -250,8 +256,8 @@ export default class SideMenuCell extends ThemedComponent {
         fontWeight: 'bold',
         color: StyleKit.variables.stylekitNeutralColor,
         opacity: 0.6,
-        marginTop: -4,
-      },
+        marginTop: -4
+      }
     };
   }
 }

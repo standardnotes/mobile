@@ -1,6 +1,15 @@
 const DEFAULT_LOCK_TIMEOUT = 30 * 1000;
 
 export default class AuthenticationSource {
+  status:
+    | 'waiting-input'
+    | 'locked'
+    | 'processing'
+    | 'waiting-turn'
+    | 'did-fail'
+    | 'did-succeed';
+  authenticationValue?: string;
+  onRequiresInterfaceReload?: () => void;
   constructor() {
     this.status = 'waiting-turn';
   }
@@ -63,15 +72,15 @@ export default class AuthenticationSource {
     return this.status === 'processing';
   }
 
-  setAuthenticationValue(value) {
+  setAuthenticationValue(value: string) {
     this.authenticationValue = value;
   }
 
-  getAuthenticationValue(value) {
+  getAuthenticationValue() {
     return this.authenticationValue;
   }
 
-  async authenticate() {}
+  async authenticate(): Promise<any> {}
 
   cancel() {}
 

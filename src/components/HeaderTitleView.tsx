@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TextStyle } from 'react-native';
 import PlatformStyles from '@Models/PlatformStyles';
 import StyleKit from '@Style/StyleKit';
 
-export default class HeaderTitleView extends Component {
-  constructor(props) {
+type Props = {
+  subtitleColor?: TextStyle['color'];
+  title: string;
+  subtitle?: string;
+};
+
+export default class HeaderTitleView extends Component<Props> {
+  constructor(props: Readonly<Props>) {
     super(props);
   }
 
@@ -40,33 +46,33 @@ export default class HeaderTitleView extends Component {
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         flex: 1,
         justifyContent: 'flex-start',
-        flexDirection: 'column',
+        flexDirection: 'column'
       },
 
       headerContainerAndroid: {
-        alignItems: 'flex-start',
+        alignItems: 'flex-start'
       },
 
       headerTitle: {
         color: StyleKit.variables.stylekitForegroundColor,
         fontWeight: 'bold',
         fontSize: 18,
-        textAlign: 'center',
+        textAlign: 'center'
       },
 
       headerSubtitle: {
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.6,
-        fontSize: 12,
+        fontSize: 12
       },
 
       headerSubtitleIOS: {
-        textAlign: 'center',
+        textAlign: 'center'
       },
 
       headerSubtitleAndroid: {
-        fontSize: 13,
-      },
+        fontSize: 13
+      }
     });
   }
 }

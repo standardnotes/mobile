@@ -6,10 +6,10 @@ import ModelManager from '@Lib/snjs/modelManager';
 import Storage from '@Lib/snjs/storageManager';
 
 export default class Sync extends SFSyncManager {
-  static instance = null;
+  private static instance: Sync;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new Sync();
     }
 
@@ -20,10 +20,10 @@ export default class Sync extends SFSyncManager {
     super(ModelManager.get(), Storage.get(), Server.get());
     KeysManager.get().registerAccountRelatedStorageKeys([
       'syncToken',
-      'cursorToken',
+      'cursorToken'
     ]);
 
-    this.setKeyRequestHandler(request => {
+    this.setKeyRequestHandler((request: any) => {
       let keys;
       if (
         request === SFSyncManager.KeyRequestLoadSaveAccount ||
@@ -48,7 +48,7 @@ export default class Sync extends SFSyncManager {
       'SN|UserPreferences',
       'SN|Privileges',
       'SN|Component',
-      'SN|Theme',
+      'SN|Theme'
     ];
   }
 

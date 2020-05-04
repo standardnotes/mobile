@@ -1,8 +1,9 @@
 import { Component } from 'react';
 import StyleKit from '@Style/StyleKit';
 
-export default class ThemedComponent extends Component {
-  constructor(props) {
+export default class ThemedComponent<P = {}, S = any> extends Component<P, S> {
+  themeChangeObserver: () => void;
+  constructor(props: Readonly<P>) {
     super(props);
 
     this.loadStyles();

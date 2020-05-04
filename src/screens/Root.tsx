@@ -22,7 +22,7 @@ export default class Root extends Abstract {
   }
 
   registerObservers() {
-    this.stateObserver = ApplicationState.get().addStateObserver(state => {
+    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
       const authProps = ApplicationState.get().getAuthenticationPropsForAppState(
         state
       );
@@ -41,14 +41,14 @@ export default class Root extends Abstract {
         if (event === ApplicationState.AppStateEventNoteSideMenuToggle) {
           // update state to toggle Notes side menu if we triggered the collapse
           this.setState({
-            notesListCollapsed: data.new_isNoteSideMenuCollapsed,
+            notesListCollapsed: data.new_isNoteSideMenuCollapsed
           });
         } else if (event === ApplicationState.KeyboardChangeEvent) {
           // need to refresh the height of the keyboard when it opens so that we can change the position
           // of the sidebar collapse icon
           if (ApplicationState.get().isInTabletMode) {
             this.setState({
-              keyboardHeight: ApplicationState.get().getKeyboardHeight(),
+              keyboardHeight: ApplicationState.get().getKeyboardHeight()
             });
           }
         }
@@ -70,37 +70,39 @@ export default class Root extends Abstract {
             },
             onCancel: () => {
               this.didShowSessionInvalidAlert = false;
-            },
+            }
           });
         }
       }
     });
 
-    this.syncStatusObserver = Sync.get().registerSyncStatusObserver(status => {
-      if (status.error) {
-        const text = 'Unable to connect to sync server.';
-        this.showingErrorStatus = true;
-        setTimeout(() => {
-          // need timeout for syncing on app launch
-          this.setSubTitle(text, StyleKit.variables.stylekitWarningColor);
-        }, 250);
-      } else if (status.retrievedCount > 20) {
-        const text = `Downloading ${status.retrievedCount} items. Keep app open.`;
-        this.setSubTitle(text);
-        this.showingDownloadStatus = true;
-      } else if (this.showingDownloadStatus) {
-        this.showingDownloadStatus = false;
-        const text = 'Download Complete.';
-        this.setSubTitle(text);
-        setTimeout(() => {
+    this.syncStatusObserver = Sync.get().registerSyncStatusObserver(
+      (status) => {
+        if (status.error) {
+          const text = 'Unable to connect to sync server.';
+          this.showingErrorStatus = true;
+          setTimeout(() => {
+            // need timeout for syncing on app launch
+            this.setSubTitle(text, StyleKit.variables.stylekitWarningColor);
+          }, 250);
+        } else if (status.retrievedCount > 20) {
+          const text = `Downloading ${status.retrievedCount} items. Keep app open.`;
+          this.setSubTitle(text);
+          this.showingDownloadStatus = true;
+        } else if (this.showingDownloadStatus) {
+          this.showingDownloadStatus = false;
+          const text = 'Download Complete.';
+          this.setSubTitle(text);
+          setTimeout(() => {
+            this.setSubTitle(null);
+          }, 2000);
+        } else if (this.showingErrorStatus) {
           this.setSubTitle(null);
-        }, 2000);
-      } else if (this.showingErrorStatus) {
-        this.setSubTitle(null);
+        }
       }
-    });
+    );
 
-    this.signoutObserver = Auth.get().addEventHandler(async event => {
+    this.signoutObserver = Auth.get().addEventHandler(async (event) => {
       if (event === SFAuthManager.DidSignOutEvent) {
         this.setSubTitle(null);
         const notifyObservers = false;
@@ -212,7 +214,7 @@ export default class Root extends Abstract {
       this.notesRef && this.notesRef.root_onIncrementalSync();
     };
 
-    const loadLocalCompletion = items => {
+    const loadLocalCompletion = (items) => {
       this.setSubTitle('Syncing...');
       this.dataLoaded = true;
 
@@ -231,7 +233,7 @@ export default class Root extends Abstract {
       const batchSize = 100;
       Sync.get()
         .loadLocalItems({ incrementalCallback, batchSize })
-        .then(items => {
+        .then((items) => {
           setTimeout(() => {
             loadLocalCompletion(items);
           });
@@ -279,20 +281,20 @@ export default class Root extends Abstract {
       },
       onUnmount: () => {
         this.authenticationInProgress = false;
-      },
+      }
     });
   }
 
-  onNoteSelect = note => {
+  onNoteSelect = (note) => {
     this.composeRef.setNote(note);
     this.setState({
       selectedTagId:
         this.notesRef.options.selectedTagIds.length &&
-        this.notesRef.options.selectedTagIds[0],
+        this.notesRef.options.selectedTagIds[0]
     });
   };
 
-  onLayout = e => {
+  onLayout = (e) => {
     const width = e.nativeEvent.layout.width;
     /**
       If you're in tablet mode, but on an iPad where this app is running side by
@@ -315,7 +317,7 @@ export default class Root extends Abstract {
       y: e.nativeEvent.layout.y,
       shouldSplitLayout: ApplicationState.get().isInTabletMode,
       notesListCollapsed: ApplicationState.get().isNoteSideMenuCollapsed,
-      keyboardHeight: ApplicationState.get().getKeyboardHeight(),
+      keyboardHeight: ApplicationState.get().getKeyboardHeight()
     });
   };
 
@@ -344,7 +346,7 @@ export default class Root extends Abstract {
     const collapseIconPrefix = StyleKit.platformIconPrefix();
     const iconNames = {
       md: ['arrow-dropright', 'arrow-dropleft'],
-      ios: ['arrow-forward', 'arrow-back'],
+      ios: ['arrow-forward', 'arrow-back']
     };
     const collapseIconName =
       collapseIconPrefix +
@@ -363,7 +365,7 @@ export default class Root extends Abstract {
       >
         <View style={notesStyles}>
           <Notes
-            ref={ref => {
+            ref={(ref) => {
               this.notesRef = ref;
             }}
             onUnlockPress={this.onUnlockPress}
@@ -377,7 +379,7 @@ export default class Root extends Abstract {
         {shouldSplitLayout && (
           <View style={composeStyles}>
             <Compose
-              ref={ref => {
+              ref={(ref) => {
                 this.composeRef = ref;
               }}
               selectedTagId={this.state.selectedTagId}
@@ -389,7 +391,7 @@ export default class Root extends Abstract {
               style={[
                 this.styles.toggleButtonContainer,
                 this.styles.toggleButton,
-                { bottom: collapseIconBottomPosition },
+                { bottom: collapseIconBottomPosition }
               ]}
               onPress={this.toggleNoteSideMenu}
             >
@@ -411,18 +413,18 @@ export default class Root extends Abstract {
     this.styles = {
       root: {
         flex: 1,
-        flexDirection: 'row',
+        flexDirection: 'row'
       },
       left: {
         borderRightColor: StyleKit.variables.stylekitBorderColor,
-        borderRightWidth: 1,
+        borderRightWidth: 1
       },
       right: {},
       toggleButtonContainer: {
         backgroundColor: hexToRGBA(
           StyleKit.variables.stylekitContrastBackgroundColor,
           0.5
-        ),
+        )
       },
       toggleButton: {
         justifyContent: 'center',
@@ -431,8 +433,8 @@ export default class Root extends Abstract {
         padding: 7,
         borderTopRightRadius: 4,
         borderBottomRightRadius: 4,
-        marginTop: -12,
-      },
+        marginTop: -12
+      }
     };
   }
 }

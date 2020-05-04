@@ -5,14 +5,30 @@ import StyleKit from '@Style/StyleKit';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
-export default class SectionedAccessoryTableCell extends SectionedTableCell {
+type Props = {
+  disabled: boolean;
+  onPress: () => void;
+  onLongPress: () => void;
+  iconName?: string;
+  selected?: () => void;
+  leftAlignIcon: boolean;
+  color: string;
+  bold: boolean;
+  tinted: boolean;
+  dimmed: boolean;
+  text: string;
+};
+
+export default class SectionedAccessoryTableCell extends SectionedTableCell<
+  Props
+> {
   rules() {
     const rules = super
       .rules()
       .concat([
         StyleKit.styles.view,
         StyleKit.styles.flexContainer,
-        ...StyleKit.stylesForKey('sectionedAccessoryTableCell'),
+        ...StyleKit.stylesForKey('sectionedAccessoryTableCell')
       ]);
     return rules;
   }
@@ -47,7 +63,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
 
     const iconStyles = {
       width: 30,
-      maxWidth: 30,
+      maxWidth: 30
     };
 
     const left = this.props.leftAlignIcon;
@@ -63,15 +79,14 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
     if (this.props.color) {
       color = this.props.color;
     }
+    let icon = null;
 
-    var icon = (
-      <View key={0} style={iconStyles}>
-        <Icon name={iconName} size={iconSize} color={color} />
-      </View>
-    );
-
-    if (!iconName) {
-      icon = null;
+    if (iconName) {
+      icon = (
+        <View key={0} style={iconStyles}>
+          <Icon name={iconName} size={iconSize} color={color} />
+        </View>
+      );
     }
 
     var textStyles = [StyleKit.styles.sectionedAccessoryTableCellLabel];
@@ -95,13 +110,6 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
       </Text>
     );
 
-    const containerStyles = {
-      flex: 1,
-      justifyContent: left ? 'flex-start' : 'space-between',
-      flexDirection: 'row',
-      alignItems: 'center',
-    };
-
     return (
       <TouchableHighlight
         testID={this.props.testID}
@@ -110,7 +118,14 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell {
         onPress={this.onPress}
         onLongPress={this.onLongPress}
       >
-        <View style={containerStyles}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: left ? 'flex-start' : 'space-between',
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}
+        >
           {this.props.leftAlignIcon ? [icon, textWrapper] : [textWrapper, icon]}
         </View>
       </TouchableHighlight>

@@ -1,21 +1,41 @@
 import React, { Component } from 'react';
-import { Alert, View, Platform, Text } from 'react-native';
+import {
+  Alert,
+  View,
+  Platform,
+  Text,
+  ViewStyle,
+  TextStyle
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { WebView } from 'react-native-webview';
 import ApplicationState from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
 import ModelManager from '@Lib/snjs/modelManager';
 import UserPrefsManager, {
-  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
+  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY
 } from '@Lib/userPrefsManager';
 import { ICON_LOCK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
-export default class ComponentView extends Component {
-  constructor(props) {
-    super(props);
+type Props = {
+  noteId: string;
+  editorId: string;
+  onLoadEnd: () => void;
+  onLoadStart: () => void;
+  onLoadError: () => void;
+};
 
-    this.state = {};
+export default class ComponentView extends Component<Props> {
+  styles!: Record<string, ViewStyle | TextStyle>;
+  identifier: string;
+  editor: any;
+  note: any;
+  registrationTimeout: any;
+  webView: WebView | null = null;
+  alreadyTriggeredLoad: boolean = false;
+  constructor(props: Readonly<Props>) {
+    super(props);
 
     this.loadStyles();
 
@@ -26,7 +46,7 @@ export default class ComponentView extends Component {
       areas: ['note-tags', 'editor-stack', 'editor-editor'],
       contextRequestHandler: () => {
         return this.note;
-      },
+      }
     });
 
     this.reloadData();
@@ -60,7 +80,7 @@ export default class ComponentView extends Component {
        * https://github.com/facebook/react-native/issues/11594
        */
       const dontShowAgain = await UserPrefsManager.get().isPrefSet({
-        key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
+        key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY
       });
 
       if (!dontShowAgain) {
@@ -73,17 +93,17 @@ export default class ComponentView extends Component {
               onPress: () =>
                 UserPrefsManager.get().setPref({
                   key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
-                  value: true,
-                }),
+                  value: true
+                })
             },
-            { text: 'OK' },
+            { text: 'OK' }
           ]
         );
       }
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: Props) {
     if (
       prevProps.noteId !== this.props.noteId ||
       prevProps.editorId !== this.props.editorId
@@ -107,7 +127,7 @@ export default class ComponentView extends Component {
     ComponentManager.get().deactivateComponent(this.editor);
   }
 
-  onMessage = message => {
+  onMessage = (message: { nativeEvent: { data: string } }) => {
     if (!this.note) {
       /** May be the case in tablet mode on app launch */
       return;
@@ -124,7 +144,7 @@ export default class ComponentView extends Component {
     ComponentManager.get().handleMessage(this.editor, data);
   };
 
-  onFrameLoad = syntheticEvent => {
+  onFrameLoad = () => {
     /**
      * We have no way of knowing if the webview load is successful or not. We
      * have to wait to see if the error event is fired. Looking at the code,
@@ -165,12 +185,15 @@ export default class ComponentView extends Component {
     }
   };
 
-  onLoadError = syntheticEvent => {
+  onLoadError = () => {
     clearTimeout(this.registrationTimeout);
     this.props.onLoadError();
   };
 
-  onShouldStartLoadWithRequest = request => {
+  onShouldStartLoadWithRequest = (request: {
+    navigationType: string;
+    url: string;
+  }) => {
     /**
      * We want to handle link clicks within an editor by opening the browser
      * instead of loading inline. On iOS, onShouldStartLoadWithRequest is
@@ -212,7 +235,7 @@ export default class ComponentView extends Component {
       <View
         style={[
           StyleKit.styles.flexContainer,
-          { backgroundColor: StyleKit.variables.stylekitBackgroundColor },
+          { backgroundColor: StyleKit.variables.stylekitBackgroundColor }
         ]}
       >
         {this.editor.readonly && (
@@ -236,7 +259,7 @@ export default class ComponentView extends Component {
             }
             source={{ uri: url }}
             key={this.editor.uuid}
-            ref={webView => (this.webView = webView)}
+            ref={(webView) => (this.webView = webView)}
             /**
              * onLoad and onLoadEnd seem to be the same exact thing, except
              * that when an error occurs, onLoadEnd is called twice, whereas
@@ -246,13 +269,13 @@ export default class ComponentView extends Component {
             onLoadStart={this.onLoadStart}
             onError={this.onLoadError}
             onMessage={this.onMessage}
-            useWebKit={true}
             hideKeyboardAccessoryView={true}
             onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
             cacheEnabled={true}
             scalesPageToFit={
               true /* Android only, not available with WKWebView */
             }
+            // @ts-ignore this is patched
             autoManageStatusBarEnabled={
               false /* To prevent StatusBar from changing colors when focusing */
             }
@@ -273,15 +296,15 @@ export default class ComponentView extends Component {
         padding: padding,
         backgroundColor: StyleKit.variables.stylekitDangerColor,
         borderBottomColor: StyleKit.variables.stylekitBorderColor,
-        borderBottomWidth: 1,
+        borderBottomWidth: 1
       },
 
       lockedText: {
         fontWeight: 'bold',
         fontSize: 12,
         color: StyleKit.variables.stylekitBackgroundColor,
-        paddingLeft: 10,
-      },
+        paddingLeft: 10
+      }
     };
   }
 }

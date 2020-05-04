@@ -11,6 +11,7 @@
       "isolatedModules": false,                  /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
       "strict": true,                           /* Enable all strict type-checking options. */
       "skipLibCheck": true,
+      // "noImplicitAny": false,
       "moduleResolution": "node",               /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
       "baseUrl": "src",                          /* Base directory to resolve non-absolute module names. */
       // "paths": {},                           /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
@@ -28,9 +29,10 @@
         "@Style/*": ["./style/*"],
 
       },
+      "typeRoots": ["./src/types"],
       "resolveJsonModule": true,
     },
     "exclude": [
-      "node_modules", "babel.config.js", "metro.config.js", "jest.config.js"
+      "node_modules", "babel.config.js", "metro.config.js", "jest.config.js", "types"
     ]
   }

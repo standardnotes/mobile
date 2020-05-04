@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle
+} from 'react-native';
 import Circle from '@Components/Circle';
 import ThemedComponent from '@Components/ThemedComponent';
 import KeysManager from '@Lib/keysManager';
@@ -7,7 +13,14 @@ import Auth from '@Lib/snjs/authManager';
 import ModelManager from '@Lib/snjs/modelManager';
 import StyleKit from '@Style/StyleKit';
 
-export default class SideMenuHero extends ThemedComponent {
+type Props = {
+  onPress: () => void;
+  outOfSync: boolean;
+  onOutOfSyncPress: () => void;
+};
+
+export default class SideMenuHero extends ThemedComponent<Props> {
+  styles!: Record<string, ViewStyle | TextStyle>;
   getText() {
     const offline = Auth.get().offline();
     const hasEncryption =
@@ -17,7 +30,7 @@ export default class SideMenuHero extends ThemedComponent {
         title: 'Data Not Backed Up',
         text: hasEncryption
           ? 'Sign in or register to enable sync to your other devices.'
-          : 'Sign in or register to add encryption and enable sync to your other devices.',
+          : 'Sign in or register to add encryption and enable sync to your other devices.'
       };
     } else {
       const email = KeysManager.get().getUserEmail();
@@ -26,7 +39,7 @@ export default class SideMenuHero extends ThemedComponent {
         items.length + '/' + items.length + ' notes and tags encrypted';
       return {
         title: email,
-        text: itemsStatus,
+        text: itemsStatus
       };
     }
   }
@@ -71,39 +84,39 @@ export default class SideMenuHero extends ThemedComponent {
         padding: 15,
         paddingTop: 10,
         paddingBottom: 12,
-        paddingRight: 25,
+        paddingRight: 25
       },
 
       title: {
         fontWeight: 'bold',
         fontSize: 16,
         color: StyleKit.variables.stylekitContrastForegroundColor,
-        marginBottom: 3,
+        marginBottom: 3
       },
 
       subtitle: {
         fontSize: 13,
         color: StyleKit.variables.stylekitContrastForegroundColor,
-        opacity: 0.6,
+        opacity: 0.6
       },
 
       outOfSyncContainer: {
         flex: 0,
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'center'
       },
 
       iconCircle: {
         marginTop: 10,
-        width: 15,
+        width: 15
       },
 
       outOfSync: {
         marginTop: 10,
         fontSize: 13,
         color: StyleKit.variables.stylekitWarningColor,
-        fontWeight: 'bold',
-      },
+        fontWeight: 'bold'
+      }
     };
   }
 }

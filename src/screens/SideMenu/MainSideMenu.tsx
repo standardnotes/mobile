@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, ViewStyle, TextStyle } from 'react-native';
 import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
@@ -21,21 +21,37 @@ import StyleKit from '@Style/StyleKit';
 import ThemeManager from '@Style/ThemeManager';
 import { LIGHT_MODE_KEY, DARK_MODE_KEY } from '@Style/utils';
 
-import { SFAuthManager } from 'snjs';
+import { SFAuthManager, SNTheme as SNJSTheme } from 'snjs';
+import { Mode } from 'react-native-dark-mode';
+import { AbstractProps, AbstractState } from '@Screens/Abstract';
 
-export default class MainSideMenu extends AbstractSideMenu {
-  constructor(props) {
+type SNTheme = typeof SNJSTheme;
+
+type State = {
+  outOfSync: boolean;
+  actionSheet: JSX.Element | null;
+} & AbstractState;
+
+export default class MainSideMenu extends AbstractSideMenu<
+  AbstractProps,
+  State
+> {
+  styles!: Record<string, ViewStyle | TextStyle>;
+  signoutObserver: any;
+  syncEventHandler: any;
+
+  constructor(props: Readonly<{ navigation: any }>) {
     super(props);
     this.constructState({});
 
-    this.signoutObserver = Auth.get().addEventHandler(event => {
+    this.signoutObserver = Auth.get().addEventHandler((event: any) => {
       if (event === SFAuthManager.DidSignOutEvent) {
         this.setState({ outOfSync: false });
         this.forceUpdate();
       }
     });
 
-    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+    this.syncEventHandler = Sync.get().addEventHandler((event: string) => {
       if (event === 'enter-out-of-sync') {
         this.setState({ outOfSync: true });
       } else if (event === 'exit-out-of-sync') {
@@ -62,7 +78,7 @@ export default class MainSideMenu extends AbstractSideMenu {
       confirmButtonText: 'Open Settings',
       onConfirm: () => {
         this.presentSettings();
-      },
+      }
     });
   }
 
@@ -70,17 +86,17 @@ export default class MainSideMenu extends AbstractSideMenu {
     return SideMenuManager.get().getHandlerForLeftSideMenu();
   }
 
-  onTagSelect = tag => {
-    this.handler.onTagSelect(tag);
+  onTagSelect = (tag: any) => {
+    this.handler?.onTagSelect(tag);
     this.forceUpdate();
   };
 
-  onThemeSelect = theme => {
+  onThemeSelect = (theme: SNTheme) => {
     /** Prevent themes that aren't meant for mobile from being activated. */
     if (theme.content.package_info && theme.content.package_info.no_mobile) {
       AlertManager.get().alert({
         title: 'Not Available',
-        text: 'This theme is not available on mobile.',
+        text: 'This theme is not available on mobile.'
       });
 
       return;
@@ -94,7 +110,7 @@ export default class MainSideMenu extends AbstractSideMenu {
     this.forceUpdate();
   };
 
-  onThemeLongPress = theme => {
+  onThemeLongPress = (theme: SNTheme) => {
     const actionSheetOptions = [];
 
     /**
@@ -104,7 +120,7 @@ export default class MainSideMenu extends AbstractSideMenu {
     if (theme.content.package_info && !theme.content.package_info.no_mobile) {
       const lightThemeAction = this.getModeActionForTheme({
         theme: theme,
-        mode: LIGHT_MODE_KEY,
+        mode: LIGHT_MODE_KEY
       });
       const lightName = StyleKit.doesDeviceSupportDarkMode()
         ? 'Light'
@@ -117,9 +133,9 @@ export default class MainSideMenu extends AbstractSideMenu {
           callback: () => {
             StyleKit.get().assignThemeForMode({
               theme: theme,
-              mode: LIGHT_MODE_KEY,
+              mode: LIGHT_MODE_KEY
             });
-          },
+          }
         })
       );
 
@@ -127,7 +143,7 @@ export default class MainSideMenu extends AbstractSideMenu {
       if (StyleKit.doesDeviceSupportDarkMode()) {
         const darkText = `${this.getModeActionForTheme({
           theme: theme,
-          mode: DARK_MODE_KEY,
+          mode: DARK_MODE_KEY
         })} Dark Theme`;
 
         actionSheetOptions.push(
@@ -136,9 +152,9 @@ export default class MainSideMenu extends AbstractSideMenu {
             callback: () => {
               StyleKit.get().assignThemeForMode({
                 theme: theme,
-                mode: DARK_MODE_KEY,
+                mode: DARK_MODE_KEY
               });
-            },
+            }
           })
         );
       }
@@ -151,7 +167,7 @@ export default class MainSideMenu extends AbstractSideMenu {
           text: 'Redownload',
           callback: () => {
             this.onThemeRedownload(theme);
-          },
+          }
         })
       );
     }
@@ -161,7 +177,7 @@ export default class MainSideMenu extends AbstractSideMenu {
       options: actionSheetOptions,
       onCancel: () => {
         this.setState({ actionSheet: null });
-      },
+      }
     });
 
     this.setState({ actionSheet: sheet.actionSheetElement() });
@@ -169,7 +185,7 @@ export default class MainSideMenu extends AbstractSideMenu {
     sheet.show();
   };
 
-  onThemeRedownload(theme) {
+  onThemeRedownload(theme: SNTheme) {
     AlertManager.get().confirm({
       title: 'Redownload Theme',
       text:
@@ -177,23 +193,23 @@ export default class MainSideMenu extends AbstractSideMenu {
       confirmButtonText: 'Redownload',
       onConfirm: () => {
         StyleKit.get().downloadThemeAndReload(theme);
-      },
+      }
     });
   }
 
-  getModeActionForTheme({ theme, mode }) {
+  getModeActionForTheme({ theme, mode }: { theme: SNTheme; mode: Mode }) {
     return ThemeManager.get().isThemeEnabledForMode({
       mode: mode,
-      theme: theme,
+      theme: theme
     })
       ? 'Current'
       : 'Set as';
   }
 
-  iconDescriptorForTheme = theme => {
+  iconDescriptorForTheme = (theme: SNTheme) => {
     const desc = {
       type: 'circle',
-      side: 'right',
+      side: 'right' as 'right'
     };
 
     const dockIcon =
@@ -202,12 +218,12 @@ export default class MainSideMenu extends AbstractSideMenu {
     if (dockIcon && dockIcon.type === 'circle') {
       _.merge(desc, {
         backgroundColor: dockIcon.background_color,
-        borderColor: dockIcon.border_color,
+        borderColor: dockIcon.border_color
       });
     } else {
       _.merge(desc, {
         backgroundColor: StyleKit.variables.stylekitInfoColor,
-        borderColor: StyleKit.variables.stylekitInfoColor,
+        borderColor: StyleKit.variables.stylekitInfoColor
       });
     }
 
@@ -232,7 +248,7 @@ export default class MainSideMenu extends AbstractSideMenu {
         },
         onLongPress: () => {
           this.onThemeLongPress(theme);
-        },
+        }
       });
 
       options.push(option);
@@ -247,11 +263,11 @@ export default class MainSideMenu extends AbstractSideMenu {
             type: 'icon',
             name: StyleKit.nameForIcon(ICON_BRUSH),
             side: 'right',
-            size: 17,
+            size: 17
           },
           onSelect: () => {
             ApplicationState.openURL('https://standardnotes.org/extensions');
-          },
+          }
         })
       );
     }
@@ -300,7 +316,7 @@ export default class MainSideMenu extends AbstractSideMenu {
           onTagSelect={this.onTagSelect}
           selectedTags={selectedTags}
         />
-      </SideMenuSection>,
+      </SideMenuSection>
     ];
 
     return (
@@ -311,7 +327,7 @@ export default class MainSideMenu extends AbstractSideMenu {
             top: 'never',
             bottom: 'always',
             left: 'always',
-            right: 'never',
+            right: 'never'
           }}
           style={[viewStyles, this.styles.secondSafeArea]}
         >
@@ -360,11 +376,11 @@ export default class MainSideMenu extends AbstractSideMenu {
       // See https://stackoverflow.com/questions/47725607/react-native-safeareaview-background-color-how-to-assign-two-different-backgro
       firstSafeArea: {
         flex: 0,
-        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
+        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor
       },
       secondSafeArea: {
         flex: 1,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
       },
       sideMenu: {
         // We want the header to be totally contrast, but content to be main
@@ -372,13 +388,13 @@ export default class MainSideMenu extends AbstractSideMenu {
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         color: StyleKit.variables.stylekitForegroundColor,
         flex: 1,
-        flexDirection: 'column',
+        flexDirection: 'column'
       },
       flatList: {
         padding: 15,
         flex: 1,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
-      },
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
+      }
     };
   }
 }

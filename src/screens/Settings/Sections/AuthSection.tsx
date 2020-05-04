@@ -22,7 +22,7 @@ export default class AuthSection extends Component {
       registering: false,
       strictSignIn: false,
       signInButtonText: DEFAULT_SIGN_IN_TEXT,
-      registerButtonText: DEFAULT_REGISTER_TEXT,
+      registerButtonText: DEFAULT_REGISTER_TEXT
     };
   }
 
@@ -55,7 +55,7 @@ export default class AuthSection extends Component {
     if (!this.validate(email, password)) {
       this.setState({
         signingIn: false,
-        signInButtonText: DEFAULT_SIGN_IN_TEXT,
+        signInButtonText: DEFAULT_SIGN_IN_TEXT
       });
       return;
     }
@@ -79,7 +79,7 @@ export default class AuthSection extends Component {
 
     Auth.get()
       .login(this.state.server, email, password, strict, extraParams)
-      .then(response => {
+      .then((response) => {
         if (!response || response.error) {
           const error = response
             ? response.error
@@ -94,7 +94,7 @@ export default class AuthSection extends Component {
           }
           this.setState({
             signingIn: false,
-            signInButtonText: DEFAULT_SIGN_IN_TEXT,
+            signInButtonText: DEFAULT_SIGN_IN_TEXT
           });
           return;
         }
@@ -108,14 +108,14 @@ export default class AuthSection extends Component {
   validate(email, password) {
     if (!email) {
       Alert.alert('Missing Email', 'Please enter a valid email address.', [
-        { text: 'OK' },
+        { text: 'OK' }
       ]);
       return false;
     }
 
     if (!password) {
       Alert.alert('Missing Password', 'Please enter your password.', [
-        { text: 'OK' },
+        { text: 'OK' }
       ]);
       return false;
     }
@@ -132,7 +132,7 @@ export default class AuthSection extends Component {
     if (!this.validate(email, password)) {
       this.setState({
         registering: false,
-        registerButtonText: DEFAULT_REGISTER_TEXT,
+        registerButtonText: DEFAULT_REGISTER_TEXT
       });
       return;
     }
@@ -157,7 +157,7 @@ export default class AuthSection extends Component {
   };
 
   toggleStrictMode = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return { strictSignIn: !prevState.strictSignIn };
     });
   };
@@ -174,7 +174,7 @@ export default class AuthSection extends Component {
 
       Auth.get()
         .register(this.state.server, this.state.email, this.state.password)
-        .then(response => {
+        .then((response) => {
           this.setState({ registering: false, confirmRegistration: false });
 
           if (!response || response.error) {
@@ -194,7 +194,7 @@ export default class AuthSection extends Component {
     this.setState({ mfa: null });
   };
 
-  emailInputChanged = text => {
+  emailInputChanged = (text) => {
     this.setState({ email: text });
     /**
      * If you have a local passcode with immediate timing, and you're trying to
@@ -205,7 +205,7 @@ export default class AuthSection extends Component {
     AuthSection.emailInProgress = text;
   };
 
-  passwordInputChanged = text => {
+  passwordInputChanged = (text) => {
     this.setState({ password: text });
     AuthSection.passwordInProgress = text;
   };
@@ -222,8 +222,8 @@ export default class AuthSection extends Component {
             {
               paddingLeft: padding,
               paddingRight: padding,
-              marginBottom: padding,
-            },
+              marginBottom: padding
+            }
           ]}
         >
           Due to the nature of our encryption, Standard Notes cannot offer
@@ -236,7 +236,9 @@ export default class AuthSection extends Component {
             testID="passwordConfirmationField"
             style={StyleKit.styles.sectionedTableCellTextInput}
             placeholder={'Password confirmation'}
-            onChangeText={text => this.setState({ passwordConfirmation: text })}
+            onChangeText={(text) =>
+              this.setState({ passwordConfirmation: text })
+            }
             value={this.state.passwordConfirmation}
             secureTextEntry={true}
             autoFocus={true}
@@ -272,8 +274,8 @@ export default class AuthSection extends Component {
               {
                 paddingLeft: textPadding,
                 paddingRight: textPadding,
-                marginBottom: textPadding,
-              },
+                marginBottom: textPadding
+              }
             ]}
           >
             {this.state.mfa.message}
@@ -282,7 +284,7 @@ export default class AuthSection extends Component {
             <TextInput
               style={StyleKit.styles.sectionedTableCellTextInput}
               placeholder=""
-              onChangeText={text => this.setState({ mfa_token: text })}
+              onChangeText={(text) => this.setState({ mfa_token: text })}
               value={this.state.mfa_token}
               keyboardType={'numeric'}
               keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
@@ -305,7 +307,7 @@ export default class AuthSection extends Component {
                 testID="emailField"
                 style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={'Email'}
-                onChangeText={text => this.emailInputChanged(text)}
+                onChangeText={(text) => this.emailInputChanged(text)}
                 value={this.state.email}
                 autoCorrect={false}
                 autoCapitalize={'none'}
@@ -322,7 +324,7 @@ export default class AuthSection extends Component {
                 testID="passwordField"
                 style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={'Password'}
-                onChangeText={text => this.passwordInputChanged(text)}
+                onChangeText={(text) => this.passwordInputChanged(text)}
                 value={this.state.password}
                 textContentType={'password'}
                 secureTextEntry={true}
@@ -341,7 +343,7 @@ export default class AuthSection extends Component {
                   testID="syncServerField"
                   style={StyleKit.styles.sectionedTableCellTextInput}
                   placeholder={'Sync Server'}
-                  onChangeText={text => this.setState({ server: text })}
+                  onChangeText={(text) => this.setState({ server: text })}
                   value={this.state.server}
                   autoCorrect={false}
                   autoCapitalize={'none'}

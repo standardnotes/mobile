@@ -1,10 +1,47 @@
 import React, { Fragment } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextStyle,
+  ViewStyle
+} from 'react-native';
 import ThemedComponent from '@Components/ThemedComponent';
 import SideMenuCell from '@Screens/SideMenu/SideMenuCell';
 import StyleKit from '@Style/StyleKit';
 
-export default class SideMenuSection extends ThemedComponent {
+type Props = {
+  title: string;
+  collapsed?: boolean;
+  options?: any[];
+};
+
+type State = {
+  collapsed: boolean;
+};
+
+export type SideMenuOption = {
+  text: string;
+  subtext?: string;
+  textClass?: 'info' | 'danger' | 'warning';
+  key?: string;
+  iconDesc?: {
+    type: string;
+    side?: 'left' | 'right';
+    name?: string;
+    value?: string;
+    backgroundColor?: string;
+    borderColor?: string;
+    size?: number;
+  };
+  dimmed?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
+  onLongPress?: () => void;
+};
+
+export default class SideMenuSection extends ThemedComponent<Props, State> {
+  styles!: Record<string, ViewStyle | TextStyle>;
   static BuildOption({
     text,
     subtext,
@@ -14,8 +51,8 @@ export default class SideMenuSection extends ThemedComponent {
     dimmed,
     selected,
     onSelect,
-    onLongPress,
-  }) {
+    onLongPress
+  }: SideMenuOption) {
     return {
       text,
       subtext,
@@ -25,17 +62,17 @@ export default class SideMenuSection extends ThemedComponent {
       dimmed,
       selected,
       onSelect,
-      onLongPress,
+      onLongPress
     };
   }
 
-  constructor(props) {
+  constructor(props: Readonly<Props>) {
     super(props);
-    this.state = { collapsed: props.collapsed };
+    this.state = { collapsed: props.collapsed ?? false };
   }
 
   toggleCollapse = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return { collapsed: !prevState.collapsed };
     });
   };
@@ -49,9 +86,10 @@ export default class SideMenuSection extends ThemedComponent {
         <TouchableOpacity
           style={[
             this.styles.header,
-            this.state.collapsed ? this.styles.collapsedHeader : null,
+            this.state.collapsed ? this.styles.collapsedHeader : null
           ]}
-          underlayColor={StyleKit.variables.stylekitBorderColor}
+          // TODO: removed prop
+          // underlayColor={StyleKit.variables.stylekitBorderColor}
           onPress={this.toggleCollapse}
         >
           <Fragment>
@@ -64,7 +102,7 @@ export default class SideMenuSection extends ThemedComponent {
 
         {!this.state.collapsed && (
           <Fragment>
-            {options.map(option => {
+            {options.map((option) => {
               return (
                 <SideMenuCell
                   text={option.text}
@@ -90,26 +128,26 @@ export default class SideMenuSection extends ThemedComponent {
   loadStyles() {
     this.styles = {
       root: {
-        paddingBottom: 6,
+        paddingBottom: 6
       },
       header: {
-        height: 22,
+        height: 22
       },
       collapsedHeader: {
-        height: 50,
+        height: 50
       },
       title: {
         color: StyleKit.variables.stylekitInfoColor,
         fontSize: 13,
-        fontWeight: '700',
+        fontWeight: '700'
       },
 
       collapsedLabel: {
         fontSize: 12,
         opacity: 0.7,
         marginTop: 3,
-        color: StyleKit.variables.stylekitContrastForegroundColor,
-      },
+        color: StyleKit.variables.stylekitContrastForegroundColor
+      }
     };
   }
 }

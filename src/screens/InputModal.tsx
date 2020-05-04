@@ -18,13 +18,13 @@ export default class InputModal extends Abstract {
         title: ApplicationState.isIOS ? 'Cancel' : null,
         iconName: ApplicationState.isIOS
           ? null
-          : StyleKit.nameForIcon(ICON_CLOSE),
-      },
+          : StyleKit.nameForIcon(ICON_CLOSE)
+      }
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions,
+      templateOptions
     });
   };
 
@@ -39,8 +39,8 @@ export default class InputModal extends Abstract {
           : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
-        },
-      },
+        }
+      }
     });
 
     this.requireConfirm = this.getProp('requireConfirm');
@@ -87,11 +87,11 @@ export default class InputModal extends Abstract {
     this.dismiss();
   };
 
-  onTextChange = text => {
+  onTextChange = (text) => {
     this.setState({ text: text });
   };
 
-  onConfirmTextChange = text => {
+  onConfirmTextChange = (text) => {
     this.setState({ confirmText: text });
   };
 
@@ -105,7 +105,7 @@ export default class InputModal extends Abstract {
     }
   }
 
-  onKeyboardOptionsSelect = option => {
+  onKeyboardOptionsSelect = (option) => {
     this.keyboardType = option.key;
     this.forceUpdate();
     this.refreshKeyboard();
@@ -120,13 +120,13 @@ export default class InputModal extends Abstract {
       {
         title: 'General',
         key: 'default',
-        selected: this.keyboardType === 'default',
+        selected: this.keyboardType === 'default'
       },
       {
         title: 'Numeric',
         key: 'numeric',
-        selected: this.keyboardType === 'numeric',
-      },
+        selected: this.keyboardType === 'numeric'
+      }
     ];
 
     const keyboardOptionsCell = (
@@ -144,7 +144,7 @@ export default class InputModal extends Abstract {
         <TableSection extraStyles={[StyleKit.styles.container]}>
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
-              ref={ref => {
+              ref={(ref) => {
                 this.inputRef = ref;
               }}
               style={[StyleKit.styles.sectionedTableCellTextInput]}
@@ -166,7 +166,7 @@ export default class InputModal extends Abstract {
           {this.requireConfirm && (
             <SectionedTableCell textInputCell={true} first={false}>
               <TextInput
-                ref={ref => {
+                ref={(ref) => {
                   this.confirmInputRef = ref;
                 }}
                 style={[StyleKit.styles.sectionedTableCellTextInput]}

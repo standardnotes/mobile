@@ -25,7 +25,7 @@ class OptionsSection extends Abstract {
       loadingExport: false,
       encryptionAvailable: encryptionAvailable,
       email: email,
-      signedIn: !isOffline,
+      signedIn: !isOffline
     };
   }
 
@@ -33,12 +33,12 @@ class OptionsSection extends Abstract {
     super.componentDidMount();
     UserPrefsManager.get()
       .getPrefAsDate({ key: LAST_EXPORT_DATE_KEY })
-      .then(date => {
+      .then((date) => {
         this.setState({ lastExportDate: date });
       });
   }
 
-  onExportPress = option => {
+  onExportPress = (option) => {
     let encrypted = option.key === 'encrypted';
     if (encrypted && !this.state.encryptionAvailable) {
       Alert.alert(
@@ -57,18 +57,18 @@ class OptionsSection extends Abstract {
       async () => {
         BackupsManager.get()
           .export(encrypted)
-          .then(success => {
+          .then((success) => {
             if (success) {
               const date = new Date();
               this.setState({ lastExportDate: date });
               UserPrefsManager.get().setPref({
                 key: LAST_EXPORT_DATE_KEY,
-                value: date,
+                value: date
               });
             }
             this.setState({ loadingExport: false });
           })
-          .catch(error => {
+          .catch((error) => {
             this.setState({ loadingExport: false });
           });
       },
@@ -83,9 +83,9 @@ class OptionsSection extends Abstract {
       {
         title: 'Encrypted',
         key: 'encrypted',
-        selected: this.state.encryptionAvailable,
+        selected: this.state.encryptionAvailable
       },
-      { title: 'Decrypted', key: 'decrypted', selected: true },
+      { title: 'Decrypted', key: 'decrypted', selected: true }
     ];
   };
 

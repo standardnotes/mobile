@@ -1,3 +1,6 @@
+import MainSideMenu from './MainSideMenu';
+import NoteSideMenu from './NoteSideMenu';
+
 /**
  * Because SideMenus (SideMenu and NoteSideMenu) are rendering by React
  * Navigation as drawer components on app startup, we can't give them params at
@@ -8,16 +11,32 @@
  * This object will handle state for both side menus.
  */
 export default class SideMenuManager {
-  static instance = null;
+  private static instance: SideMenuManager;
+  leftSideMenu?: MainSideMenu;
+  rightSideMenu?: NoteSideMenu;
+  leftSideMenuHandler: {
+    onTagSelect: (tag: any) => void;
+    getSelectedTags: () => any;
+  } | null = null;
+  rightSideMenuHandler: {
+    getCurrentNote: () => any;
+    onEditorSelect: (editor: any) => void;
+    onPropertyChange: () => void;
+    onTagSelect: (tag: any) => void;
+    getSelectedTags: () => any;
+    onKeyboardDismiss: () => void;
+  } | null = null;
+  leftSideMenuLocked?: boolean;
+  rightSideMenuLocked?: boolean;
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new SideMenuManager();
     }
 
     return this.instance;
   }
 
-  setLeftSideMenuReference(ref) {
+  setLeftSideMenuReference(ref: MainSideMenu) {
     /**
      * The ref handler of the main component sometimes passes null, then passes
      * the correct reference
@@ -27,7 +46,7 @@ export default class SideMenuManager {
     }
   }
 
-  setRightSideMenuReference(ref) {
+  setRightSideMenuReference(ref: NoteSideMenu) {
     /**
      * The ref handler of the main component sometimes passes null, then passes
      * the correct reference
@@ -42,7 +61,7 @@ export default class SideMenuManager {
    * @param handler.onTagSelect
    * @param handler.getSelectedTags
    */
-  setHandlerForLeftSideMenu(handler) {
+  setHandlerForLeftSideMenu(handler: SideMenuManager['leftSideMenuHandler']) {
     this.leftSideMenuHandler = handler;
 
     return handler;
@@ -53,8 +72,8 @@ export default class SideMenuManager {
    * @param handler.getSelectedTags
    * @param handler.getCurrentNote
    */
-  setHandlerForRightSideMenu(handler) {
-    this.rightSideMenuHandler = handler;
+  setHandlerForRightSideMenu(handler: SideMenuManager['rightSideMenuHandler']) {
+    this.leftSideMenuHandler = handler;
 
     this.rightSideMenu && this.rightSideMenu.forceUpdate();
 
@@ -69,7 +88,9 @@ export default class SideMenuManager {
     return this.rightSideMenuHandler;
   }
 
-  removeHandlerForRightSideMenu(handler) {
+  removeHandlerForRightSideMenu(
+    handler: SideMenuManager['rightSideMenuHandler']
+  ) {
     // In tablet switching mode, a new Compose window may be created before the first one unmounts.
     // If an old instance asks us to remove handler, we want to make sure it's not the new one
     if (handler === this.rightSideMenuHandler) {
@@ -77,11 +98,11 @@ export default class SideMenuManager {
     }
   }
 
-  setLockedForLeftSideMenu(locked) {
+  setLockedForLeftSideMenu(locked: boolean) {
     this.leftSideMenuLocked = locked;
   }
 
-  setLockedForRightSideMenu(locked) {
+  setLockedForRightSideMenu(locked: boolean) {
     this.rightSideMenuLocked = locked;
   }
 

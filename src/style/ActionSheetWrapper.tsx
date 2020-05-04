@@ -4,34 +4,60 @@ import ActionSheet from 'react-native-actionsheet';
 import ApplicationState from '@Lib/ApplicationState';
 import StyleKit from '@Style/StyleKit';
 
+type Option =
+  | {
+      text: string;
+      key?: string;
+      callback: () => void;
+      destructive?: boolean;
+    }
+  | {
+      text: string;
+      key?: string;
+      callback: (option: Option) => void;
+      destructive?: boolean;
+    };
+
 export default class ActionSheetWrapper {
-  static BuildOption({ text, key, callback, destructive }) {
+  options: Option[];
+  destructiveIndex?: number;
+  cancelIndex: number;
+  title: string;
+  actionSheet = React.createRef<ActionSheet>();
+  static BuildOption({ text, key, callback, destructive }: Option) {
     return {
       text,
       key,
       callback,
-      destructive,
+      destructive
     };
   }
 
-  constructor({ title, options, onCancel }) {
-    options.push({ text: 'Cancel', callback: onCancel });
-    this.options = options;
+  constructor(props: {
+    title: string;
+    options: Option[];
+    onCancel: () => void;
+  }) {
+    const cancelOption: Option[] = [
+      {
+        text: 'Cancel',
+        callback: props.onCancel,
+        key: 'CancelItem',
+        destructive: false
+      }
+    ];
+    this.options = props.options.concat(cancelOption);
 
-    this.destructiveIndex = this.options.indexOf(
-      this.options.find(candidate => {
-        return candidate.destructive;
-      })
-    );
+    this.destructiveIndex = this.options.findIndex((item) => item.destructive);
     this.cancelIndex = this.options.length - 1;
-    this.title = title;
+    this.title = props.title;
   }
 
   show() {
-    this.actionSheet.show();
+    this.actionSheet.current?.show();
   }
 
-  handleActionSheetPress = index => {
+  handleActionSheetPress = (index: number) => {
     let option = this.options[index];
     option.callback && option.callback(option);
   };
@@ -39,9 +65,9 @@ export default class ActionSheetWrapper {
   actionSheetElement() {
     return (
       <ActionSheet
-        ref={o => (this.actionSheet = o)}
+        ref={this.actionSheet}
         title={this.title}
-        options={this.options.map(option => {
+        options={this.options.map((option) => {
           return option.text;
         })}
         cancelButtonIndex={this.cancelIndex}
@@ -71,7 +97,7 @@ export default class ActionSheetWrapper {
 
       cancelButtonWrapperStyle: StyleKit.styles.actionSheetCancelButtonWrapper,
       cancelButtonTitleStyle: StyleKit.styles.actionSheetCancelButtonTitle,
-      cancelMargin: StyleSheet.hairlineWidth,
+      cancelMargin: StyleSheet.hairlineWidth
     };
   }
 }

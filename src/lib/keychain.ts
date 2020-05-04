@@ -1,10 +1,10 @@
 import * as RCTKeychain from 'react-native-keychain';
 
 export default class Keychain {
-  static async setKeys(keys) {
+  static async setKeys(keys: string) {
     const options = {
       /* iOS only */
-      accessible: RCTKeychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+      accessible: RCTKeychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY
     };
     return RCTKeychain.setGenericPassword(
       'sn',

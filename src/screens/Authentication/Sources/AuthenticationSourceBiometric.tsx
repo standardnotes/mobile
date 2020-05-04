@@ -4,6 +4,10 @@ import KeysManager from '@Lib/keysManager';
 import AuthenticationSource from '@Screens/Authentication/Sources/AuthenticationSource';
 
 export default class AuthenticationSourceBiometric extends AuthenticationSource {
+  isReady: boolean = true;
+  isAvailable: boolean = false;
+  biometricsType: string | undefined;
+  biometricsNoun: string | undefined;
   constructor() {
     super();
   }
@@ -85,8 +89,8 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
         success: false,
         error: {
           message:
-            'This device either does not have a biometric sensor or it may not configured.',
-        },
+            'This device either does not have a biometric sensor or it may not configured.'
+        }
       };
     }
 
@@ -94,13 +98,14 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
 
     if (Platform.OS === 'android') {
       return FingerprintScanner.authenticate({
+        // @ts-ignore TODO: check deviceCredentialAllowed
         deviceCredentialAllowed: true,
-        description: 'Biometrics are required to access your notes.',
+        description: 'Biometrics are required to access your notes.'
       })
         .then(() => {
           return this._success();
         })
-        .catch(error => {
+        .catch((error: { name: string }) => {
           console.log('Biometrics error', error);
 
           if (error.name === 'DeviceLocked') {
@@ -117,12 +122,12 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
       // iOS
       return FingerprintScanner.authenticate({
         fallbackEnabled: true,
-        description: 'This is required to access your notes.',
+        description: 'This is required to access your notes.'
       })
         .then(() => {
           return this._success();
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.name === 'UserCancel') {
             return this._fail();
           } else {
@@ -143,7 +148,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
     return { success: true };
   }
 
-  _fail(message) {
+  _fail(message?: string) {
     if (!this.isLocked()) {
       this.didFail();
     }

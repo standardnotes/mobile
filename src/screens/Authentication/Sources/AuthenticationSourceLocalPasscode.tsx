@@ -5,12 +5,13 @@ import AuthenticationSource from '@Screens/Authentication/Sources/Authentication
 import StyleKit from '@Style/StyleKit';
 
 export default class AuthenticationSourceLocalPasscode extends AuthenticationSource {
+  keyboardType: string = 'default';
   constructor() {
     super();
 
     Storage.get()
       .getItem('passcodeKeyboardType')
-      .then(result => {
+      .then((result) => {
         this.keyboardType = result || 'default';
         this.requiresInterfaceReload();
       });
@@ -23,7 +24,7 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
   get headerButtonStyles() {
     return {
       color: StyleKit.variables.stylekitNeutralColor,
-      fontSize: StyleKit.constants.mainTextFontSize - 5,
+      fontSize: StyleKit.constants.mainTextFontSize - 5
     };
   }
 
@@ -93,7 +94,7 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
     return { success: true };
   }
 
-  _fail(message) {
+  _fail(message: string) {
     this.didFail();
     return { success: false, error: { message: message } };
   }

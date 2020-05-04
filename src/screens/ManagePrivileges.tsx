@@ -22,13 +22,13 @@ export default class ManagePrivileges extends Abstract {
         title: ApplicationState.isIOS ? 'Done' : null,
         iconName: ApplicationState.isIOS
           ? null
-          : StyleKit.nameForIcon(ICON_CHECKMARK),
-      },
+          : StyleKit.nameForIcon(ICON_CHECKMARK)
+      }
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions,
+      templateOptions
     });
   };
 
@@ -37,7 +37,7 @@ export default class ManagePrivileges extends Abstract {
 
     this.state = {
       availableActions: [],
-      availableCredentials: [],
+      availableCredentials: []
     };
 
     props.navigation.setParams({
@@ -48,8 +48,8 @@ export default class ManagePrivileges extends Abstract {
           : StyleKit.nameForIcon(ICON_CHECKMARK),
         onPress: () => {
           this.dismiss();
-        },
-      },
+        }
+      }
     });
 
     this.hasPasscode = KeysManager.get().hasOfflinePasscode();
@@ -116,7 +116,7 @@ export default class ManagePrivileges extends Abstract {
       availableCredentials: availableCredentials,
       notConfiguredCredentials: notConfiguredCredentials,
       sessionExpirey: sessionEndDate.toLocaleString(),
-      sessionExpired: new Date() >= sessionEndDate,
+      sessionExpired: new Date() >= sessionEndDate
     });
   }
 
@@ -126,7 +126,7 @@ export default class ManagePrivileges extends Abstract {
     this.forceUpdate();
   }
 
-  credentialUnavailable = credential => {
+  credentialUnavailable = (credential) => {
     return this.state.notConfiguredCredentials.includes(credential);
   };
 
@@ -215,16 +215,16 @@ export default class ManagePrivileges extends Abstract {
   loadStyles() {
     this.styles = {
       section: {
-        marginBottom: 8,
+        marginBottom: 8
       },
       cellText: {
         lineHeight: 19,
         fontSize: 16,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: StyleKit.variables.stylekitForegroundColor
       },
       aboutText: {
-        marginBottom: 8,
-      },
+        marginBottom: 8
+      }
     };
   }
 }

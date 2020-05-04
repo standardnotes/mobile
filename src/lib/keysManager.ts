@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import SNReactNative from 'standard-notes-rn';
@@ -16,11 +16,42 @@ const BiometricsPrefs = 'biometrics_prefs';
 const FirstRunKey = 'first_run';
 const StorageEncryptionKey = 'storage_encryption';
 
+type AccountKeys = {
+  fingerprint: {
+    enabled: boolean;
+    timing: any;
+  };
+  encryptedAccountKeys: any;
+  mk?: string;
+  ak?: string;
+} | null;
+
+type User = { server?: string; email?: string; jwt?: string | null } | null;
+
+export type BiometricsType =
+  | 'Fingerprint'
+  | 'Face ID'
+  | 'Biometrics'
+  | 'Touch ID';
+
 export default class KeysManager {
-  static instance = null;
+  private static instance: KeysManager;
+  passcodeTiming: string | null = null;
+  biometricPrefs: any;
+  accountRelatedStorageKeys: string[];
+  legacy_fingerprint: any;
+  encryptedAccountKeys: any;
+  accountKeys: AccountKeys = null;
+  loadInitialDataPromise: Promise<void | unknown> | undefined;
+  user: User = null;
+  missingFirstRunKey: boolean = false;
+  accountAuthParams: any;
+  offlineAuthParams: any;
+  _storageEncryptionEnabled: boolean = false;
+  offlineKeys: any;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new KeysManager();
     }
 
@@ -73,6 +104,7 @@ export default class KeysManager {
       return;
     }
 
+    this.user = this.user ? this.user : {};
     this.user.jwt = null;
     this.activeKeys().jwt = jwt;
     await this.saveUser(this.user);
@@ -87,7 +119,7 @@ export default class KeysManager {
       EncryptedAccountKeysKey,
       FirstRunKey,
       StorageEncryptionKey,
-      BiometricsPrefs,
+      BiometricsPrefs
     ];
 
     /*
@@ -100,7 +132,7 @@ export default class KeysManager {
     }
 
     this.loadInitialDataPromise = Promise.all([
-      Keychain.getKeys().then(keys => {
+      Keychain.getKeys().then((keys) => {
         if (keys) {
           this.parseKeychainValue(keys);
         }
@@ -108,7 +140,7 @@ export default class KeysManager {
 
       Storage.get()
         .getMultiItems(storageKeys)
-        .then(async items => {
+        .then(async (items) => {
           this.missingFirstRunKey =
             items[FirstRunKey] === null || items[FirstRunKey] === undefined;
 
@@ -155,7 +187,7 @@ export default class KeysManager {
           } else {
             this.user = {};
           }
-        }),
+        })
     ]).then(async () => {
       // We only want to run migrations in unlocked app state. If account keys are present, run now,
       // otherwise wait until offline keys have been set so that account keys are decrypted.
@@ -203,7 +235,7 @@ export default class KeysManager {
       },
       onCancel: () => {
         SNReactNative.exitApp();
-      },
+      }
     });
   }
 
@@ -233,13 +265,19 @@ export default class KeysManager {
     clear internal keys, like first_run. (If you accidentally delete the first_run key when you sign out,
     then the next time you sign in and refresh, it will treat it as a new run, and delete all data.)
   */
-  registerAccountRelatedStorageKeys(storageKeys) {
+  registerAccountRelatedStorageKeys(storageKeys: ConcatArray<string>) {
     this.accountRelatedStorageKeys = _.uniq(
       this.accountRelatedStorageKeys.concat(storageKeys)
     );
   }
 
-  parseKeychainValue(keys) {
+  parseKeychainValue(
+    keys: {
+      offline: boolean;
+      fingerprint: { enabled: boolean; timing: any };
+      encryptedAccountKeys: any;
+    } | null
+  ) {
     if (keys) {
       this.offlineKeys = keys.offline;
       if (this.offlineKeys) {
@@ -274,7 +312,9 @@ export default class KeysManager {
   }
 
   // what we should write to keychain
-  async generateKeychainStoreValue() {
+  async generateKeychainStoreValue(): Promise<
+    {} | AccountKeys | { offline: { pw: any; timing: string | null } }
+  > {
     let value = {};
 
     // If no offline keys, store account keys directly. Otherwise we'll encrypt account keys and store in storage.
@@ -284,7 +324,7 @@ export default class KeysManager {
 
     if (this.offlineKeys) {
       _.merge(value, {
-        offline: { pw: this.offlineKeys.pw, timing: this.passcodeTiming },
+        offline: { pw: this.offlineKeys.pw, timing: this.passcodeTiming }
       });
     }
 
@@ -317,6 +357,8 @@ export default class KeysManager {
     }
 
     let value = await this.generateKeychainStoreValue();
+    // TODO: check keychain
+    // @ts-ignore don't want to change that
     return Keychain.setKeys(value);
   }
 
@@ -338,12 +380,12 @@ export default class KeysManager {
     }
   }
 
-  async persistAccountKeys(keys) {
+  async persistAccountKeys(keys: AccountKeys) {
     this.accountKeys = keys;
     return this.persistKeys();
   }
 
-  async saveUser(user) {
+  async saveUser(user: User) {
     this.user = user;
     return Storage.get().setItem('user', JSON.stringify(user));
   }
@@ -416,7 +458,7 @@ export default class KeysManager {
 
   // Auth Params
 
-  async setAccountAuthParams(authParams) {
+  async setAccountAuthParams(authParams: any) {
     this.accountAuthParams = authParams;
     await Storage.get().setItem('auth_params', JSON.stringify(authParams));
 
@@ -435,12 +477,12 @@ export default class KeysManager {
     }
   }
 
-  async setOfflineAuthParams(authParams) {
+  async setOfflineAuthParams(authParams: any) {
     this.offlineAuthParams = authParams;
     return Storage.get().setItem(OfflineParamsKey, JSON.stringify(authParams));
   }
 
-  defaultProtocolVersionForKeys(keys) {
+  defaultProtocolVersionForKeys(keys: AccountKeys) {
     if (keys && keys.ak) {
       // If there's no version stored, and there's an ak, it has to be 002. Newer versions would have thier version stored in authParams.
       return '002';
@@ -476,8 +518,7 @@ export default class KeysManager {
   async clearOfflineKeysAndData(force = false) {
     // make sure user is authenticated before performing this step
     if (this.offlineKeys && !this.offlineKeys.mk && !force) {
-      // eslint-disable-next-line no-alert
-      alert(
+      Alert.alert(
         'Unable to remove passcode. Make sure you are properly authenticated and try again.'
       );
       return false;
@@ -488,7 +529,7 @@ export default class KeysManager {
     return this.persistKeys();
   }
 
-  async persistOfflineKeys(keys) {
+  async persistOfflineKeys(keys: any) {
     this.setOfflineKeys(keys);
     if (!this.passcodeTiming) {
       this.passcodeTiming = 'on-quit';
@@ -496,14 +537,14 @@ export default class KeysManager {
     return this.persistKeys();
   }
 
-  async setOfflineKeys(keys) {
+  async setOfflineKeys(keys: any) {
     // offline keys are ephemeral and should not be stored anywhere
     this.offlineKeys = keys;
 
     // Check to see if encryptedAccountKeys need decrypting
     if (this.encryptedAccountKeys) {
       // Decrypt and set
-      await SF.get().itemTransformer.decryptItem(
+      await protocolManager.itemTransformer.decryptItem(
         this.encryptedAccountKeys,
         this.offlineKeys
       );
@@ -531,12 +572,12 @@ export default class KeysManager {
     return this.biometricPrefs.enabled;
   }
 
-  async setPasscodeTiming(timing) {
+  async setPasscodeTiming(timing: string | null) {
     this.passcodeTiming = timing;
     return this.persistKeys();
   }
 
-  async setBiometricsTiming(timing) {
+  async setBiometricsTiming(timing: { key: any }) {
     this.biometricPrefs.timing = timing;
     return this.saveBiometricPrefs();
   }
@@ -566,13 +607,13 @@ export default class KeysManager {
       {
         title: 'Immediately',
         key: 'immediately',
-        selected: this.passcodeTiming === 'immediately',
+        selected: this.passcodeTiming === 'immediately'
       },
       {
         title: 'On Quit',
         key: 'on-quit',
-        selected: this.passcodeTiming === 'on-quit',
-      },
+        selected: this.passcodeTiming === 'on-quit'
+      }
     ];
   }
 
@@ -581,17 +622,19 @@ export default class KeysManager {
       {
         title: 'Immediately',
         key: 'immediately',
-        selected: this.biometricPrefs.timing === 'immediately',
+        selected: this.biometricPrefs.timing === 'immediately'
       },
       {
         title: 'On Quit',
         key: 'on-quit',
-        selected: this.biometricPrefs.timing === 'on-quit',
-      },
+        selected: this.biometricPrefs.timing === 'on-quit'
+      }
     ];
   }
 
-  static getDeviceBiometricsAvailability(callback) {
+  static getDeviceBiometricsAvailability(
+    callback: (available: boolean, type?: BiometricsType, noun?: string) => void
+  ) {
     if (__DEV__) {
       const isAndroid = Platform.OS === 'android';
       if (isAndroid && Platform.Version < 23) {
@@ -604,12 +647,11 @@ export default class KeysManager {
       return;
     }
     FingerprintScanner.isSensorAvailable()
-      .then(type => {
-        const noun =
-          type === 'Touch ID' || type === 'Fingerprint' ? 'Fingerprint' : type;
+      .then((type) => {
+        const noun = type === 'Touch ID' ? 'Fingerprint' : type;
         callback(true, type, noun);
       })
-      .catch(error => {
+      .catch(() => {
         callback(false);
       });
   }

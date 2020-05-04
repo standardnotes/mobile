@@ -12,9 +12,9 @@ const Mailer = 'react-native-mail';
 const base64 = require('base-64');
 
 export default class BackupsManager {
-  static instance = null;
+  private static instance: BackupsManager;
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new BackupsManager();
     }
     return this.instance;
@@ -29,7 +29,7 @@ export default class BackupsManager {
     the path the file was saved to.
    */
 
-  async export(encrypted) {
+  async export(encrypted: boolean) {
     const auth_params = await Auth.get().getAuthParams();
     const keys = encrypted ? KeysManager.get().activeKeys() : null;
 
@@ -46,7 +46,7 @@ export default class BackupsManager {
       return false;
     }
 
-    const data = { items: items };
+    const data: { items: any; auth_params?: any } = { items };
 
     if (keys) {
       const authParams = KeysManager.get().activeAuthParams();
@@ -61,7 +61,7 @@ export default class BackupsManager {
     if (ApplicationState.isIOS) {
       return this._exportIOS(filename, jsonString);
     } else {
-      return this._showAndroidEmailOrSaveOption().then(async result => {
+      return this._showAndroidEmailOrSaveOption().then(async (result) => {
         if (result === 'email') {
           return this._exportViaEmailAndroid(data, filename);
         } else {
@@ -77,7 +77,7 @@ export default class BackupsManager {
       .confirm({
         title: 'Choose Export Method',
         cancelButtonText: 'Email',
-        confirmButtonText: 'Save to Disk',
+        confirmButtonText: 'Save to Disk'
       })
       .then(() => {
         return 'save';
@@ -87,43 +87,43 @@ export default class BackupsManager {
       });
   }
 
-  async _exportIOS(filename, data) {
-    return new Promise((resolve, reject) => {
+  async _exportIOS(filename: string, data: string) {
+    return new Promise((resolve) => {
       ApplicationState.get().performActionWithoutStateChangeImpact(async () => {
         Share.share({
           title: filename,
-          message: data,
+          message: data
         })
-          .then(result => {
-            resolve(result !== Share.dismissedAction);
+          .then((result) => {
+            resolve(result.action !== Share.dismissedAction);
           })
-          .catch(error => {
+          .catch(() => {
             resolve(false);
           });
       });
     });
   }
 
-  async _exportAndroid(filename, data) {
+  async _exportAndroid(filename: string, data: string) {
     const filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
     return RNFS.writeFile(filepath, data).then(() => {
       return filepath;
     });
   }
 
-  async _openFileAndroid(filepath) {
+  async _openFileAndroid(filepath: string) {
     return FileViewer.open(filepath)
       .then(() => {
         // success
         return true;
       })
-      .catch(error => {
+      .catch((error) => {
         console.log('Error opening file', error);
         return false;
       });
   }
 
-  async _showFileSavePromptAndroid(filepath) {
+  async _showFileSavePromptAndroid(filepath: string) {
     return AlertManager.get()
       .confirm({
         title: 'Backup Saved',
@@ -132,7 +132,7 @@ export default class BackupsManager {
         confirmButtonText: 'Open File',
         onConfirm: () => {
           this._openFileAndroid(filepath);
-        },
+        }
       })
       .then(() => {
         return true;
@@ -143,8 +143,8 @@ export default class BackupsManager {
       });
   }
 
-  async _exportViaEmailAndroid(data, filename) {
-    return new Promise((resolve, reject) => {
+  async _exportViaEmailAndroid(data: { items: any[] }, filename: string) {
+    return new Promise((resolve) => {
       const jsonString = JSON.stringify(data, null, 2 /* pretty print */);
       const stringData = base64.encode(
         unescape(encodeURIComponent(jsonString))
@@ -152,16 +152,17 @@ export default class BackupsManager {
       const fileType = '.json'; // Android creates a tmp file and expects dot with extension
 
       let resolved = false;
-
+      // TODO: fix mail types
+      // @ts-ignore
       Mailer.mail(
         {
           subject: 'Standard Notes Backup',
           recipients: [''],
           body: '',
           isHTML: true,
-          attachment: { data: stringData, type: fileType, name: filename },
+          attachment: { data: stringData, type: fileType, name: filename }
         },
-        (error, event) => {
+        (error: any) => {
           if (error) {
             Alert.alert('Error', 'Unable to send email.');
           }

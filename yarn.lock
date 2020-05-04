@@ -1017,10 +1017,10 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/eslint-plugin/-/eslint-plugin-1.1.0.tgz#e42b1bef12d2415411519fd528e64b593b1363dc"
   integrity sha512-W/J0fNYVO01tioHjvYWQ9m6RgndVtbElzYozBq1ZPrHO/iCzlqoySHl4gO/fpCl9QEFjvJfjPgtPMTMlsoq5DQ==
 
-"@react-native-community/masked-view@^0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.9.tgz#383aca2fb053e3e14405c99cce2d5805df730821"
-  integrity sha512-nUtzbiLeXU0K9oVed6rc/WVrjGJwDSL4q1RTDkpZYU4j0FeovfuzcNUIDesD2r728LYfIop+uAgQdm+6qBOCug==
+"@react-native-community/masked-view@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.10.tgz#5dda643e19e587793bc2034dd9bf7398ad43d401"
+  integrity sha512-rk4sWFsmtOw8oyx8SD3KSvawwaK7gRBSEIy2TAwURyGt+3TizssXP1r8nx3zY+R7v2vYYHXZ+k2/GULAT/bcaQ==
 
 "@react-navigation/core@^3.7.5":
   version "3.7.5"
@@ -1032,13 +1032,13 @@
     query-string "^6.11.1"
     react-is "^16.13.0"
 
-"@react-navigation/native@^3.7.11":
-  version "3.7.11"
-  resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-3.7.11.tgz#00aa5d8187b346b16a5d2e9d1e32413c78bc4ad4"
-  integrity sha512-FlnGsLsAVPB9CZ+A0H6Xdv1qTi1Gg39tdXA85Oz0eijb/ilWwvk3x+IKTt/Rex3CU3oEl0ZKwtYC5aSy4CIO7Q==
+"@react-navigation/native@^3.7.12":
+  version "3.7.12"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-3.7.12.tgz#f1c2a1b8b2db647c239acaf966360cb72d7b71e6"
+  integrity sha512-StECfhxtEJvFehh16Wc9jnepy5gYKovzynVW+jr/+jKa7xlKskSCvASDnIwLHoFcWom084afKbqpVoVLEsE3lg==
   dependencies:
     hoist-non-react-statics "^3.3.2"
-    react-native-safe-area-view "^0.14.8"
+    react-native-safe-area-view "^0.14.9"
 
 "@types/babel__core@^7.1.0":
   version "7.1.7"
@@ -2304,11 +2304,6 @@ dayjs@^1.8.15:
   version "1.8.25"
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.25.tgz#d09a8696cee7191bc1289e739f96626391b9c73c"
   integrity sha512-Pk36juDfQQGDCgr0Lqd1kw15w3OS6xt21JaLPE3lCfsEf8KrERGwDNwvK1tRjrjqFC0uZBJncT4smZQ4F+uV5g==
-
-debounce@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/debounce/-/debounce-1.2.0.tgz#44a540abc0ea9943018dc0eaa95cce87f65cd131"
-  integrity sha512-mYtLl1xfZLi1m4RtQYlZgJUNQjl4ZxVnHzIR8nLLgi4q1YT8o/WM+MK/f8yfcc9s5Ir5zRaPZyZU6xs1Syoocg==
 
 debug@2.6.9, debug@^2.2.0, debug@^2.3.3:
   version "2.6.9"
@@ -5759,18 +5754,18 @@ react-is@^16.12.0, react-is@^16.13.0, react-is@^16.7.0, react-is@^16.8.1, react-
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-native-actionsheet@standardnotes/react-native-actionsheet#6846f21:
-  version "2.3.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-actionsheet/tar.gz/6846f2165a3b178b04a1489ba49f3bbca47522cc"
+react-native-actionsheet@standardnotes/react-native-actionsheet#9cb323f:
+  version "2.4.2"
+  resolved "https://codeload.github.com/standardnotes/react-native-actionsheet/tar.gz/9cb323f2fd5ca9687395354b88c5ae3c1a92c43e"
 
 react-native-aes-crypto@1.3.8:
   version "1.3.8"
   resolved "https://registry.yarnpkg.com/react-native-aes-crypto/-/react-native-aes-crypto-1.3.8.tgz#883017f03ac1c23c7ab8bc3879dbd7ee89737cab"
   integrity sha512-uL6aEk7qor6MQ1m+wctgGznjL/khGgt3jfXD6TLNfgqm+glyIcQIqRAK6RpHqXJXpNGoCSC3fdliy/dmBUNs9g==
 
-react-native-alternate-icons@standardnotes/react-native-alternate-icons#3154f8d:
+react-native-alternate-icons@standardnotes/react-native-alternate-icons#1d335d:
   version "0.3.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-alternate-icons/tar.gz/3154f8de477e8dd6358a88fc5795e73730e4b744"
+  resolved "https://codeload.github.com/standardnotes/react-native-alternate-icons/tar.gz/1d335d13bb518ed4d26cb00bcd1f6b1c4d60a052"
 
 react-native-dark-mode@^0.2.2:
   version "0.2.2"
@@ -5783,9 +5778,9 @@ react-native-dark-mode@^0.2.2:
     events "^3.0.0"
     toolkit.ts "^0.0.2"
 
-react-native-fab@standardnotes/react-native-fab#113661d:
+react-native-fab@standardnotes/react-native-fab#cb60e00:
   version "1.0.8"
-  resolved "https://codeload.github.com/standardnotes/react-native-fab/tar.gz/113661db797296295f5ab92b9c55e4b1ce82f8f4"
+  resolved "https://codeload.github.com/standardnotes/react-native-fab/tar.gz/cb60e0067bbd938df5e85838760d8ff87f0cddda"
   dependencies:
     prop-types "^15.5.10"
 
@@ -5798,9 +5793,9 @@ react-native-fingerprint-scanner@standardnotes/react-native-fingerprint-scanner#
   version "4.0.0"
   resolved "https://codeload.github.com/standardnotes/react-native-fingerprint-scanner/tar.gz/5984941f452e978da9d18f8ad324a16b0b459580"
 
-react-native-flag-secure-android@standardnotes/react-native-flag-secure-android#d0cbae0:
+react-native-flag-secure-android@standardnotes/react-native-flag-secure-android#3d59055:
   version "1.0.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-flag-secure-android/tar.gz/d0cbae0c10ad2ed990a66ee9a4dc5c433ee75a9e"
+  resolved "https://codeload.github.com/standardnotes/react-native-flag-secure-android/tar.gz/3d5905538fedd356e2fb59917a667279b1ce4313"
 
 react-native-fs@^2.16.6:
   version "2.16.6"
@@ -5846,19 +5841,17 @@ react-native-safe-area-context@^0.7.3:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-0.7.3.tgz#ad6bd4abbabe195332c53810e4ce5851eb21aa2a"
   integrity sha512-9Uqu1vlXPi+2cKW/CW6OnHxA76mWC4kF3wvlqzq4DY8hn37AeiXtLFs2WkxH4yXQRrnJdP6ivc65Lz+MqwRZAA==
 
-react-native-safe-area-view@^0.14.8:
+react-native-safe-area-view@^0.14.9:
   version "0.14.9"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.14.9.tgz#90ee8383037010d9a5055a97cf97e4c1da1f0c3d"
   integrity sha512-WII/ulhpVyL/qbYb7vydq7dJAfZRBcEhg4/UWt6F6nAKpLa3gAceMOxBxI914ppwSP/TdUsandFy6lkJQE0z4A==
   dependencies:
     hoist-non-react-statics "^2.3.1"
 
-react-native-screens@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.5.0.tgz#2c5b5a56d3b8be64d459d53da154bde926021a50"
-  integrity sha512-5Ak/J41eZzvU2zvik8YH825ppFdKR4cootbAq9ETwdQoN0fu4GBdOpX7paKW2jFCTsh3OOoyRRW2xYvLczZqVw==
-  dependencies:
-    debounce "^1.2.0"
+react-native-screens@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.7.0.tgz#2d3cf3c39a665e9ca1c774264fccdb90e7944047"
+  integrity sha512-n/23IBOkrTKCfuUd6tFeRkn3lB2QZ3cmvoubRscR0JU/Zl4/ZyKmwnFmUv1/Fr+2GH/H8UTX59kEKDYYg3dMgA==
 
 react-native-search-box@standardnotes/react-native-search-box#210b036:
   version "0.0.19"
@@ -5926,9 +5919,9 @@ react-native@0.62.2:
     whatwg-fetch "^3.0.0"
 
 react-navigation-drawer@^2.3.3:
-  version "2.4.11"
-  resolved "https://registry.yarnpkg.com/react-navigation-drawer/-/react-navigation-drawer-2.4.11.tgz#3202d1f90e01da838b092c53ac043a567cef5ba7"
-  integrity sha512-DBA5rKYyjxPzzrB0m5ZApZ+pJpl6aueEcz4TSDzoh/10wjifSaaDwDhZxM0Tz9mwd/wn5rgzMq8EYt2eZhjPYA==
+  version "2.4.12"
+  resolved "https://registry.yarnpkg.com/react-navigation-drawer/-/react-navigation-drawer-2.4.12.tgz#35eb1c34749119f5089e50fa1c374028413cda47"
+  integrity sha512-3fv5+YbhWsu4RRDIUetXEniZtQ02frZuQp42zbkvZWk+uLApbEYpW5Aw/MNjNWA1BKoOjtmLCz2qyriZD6uQxQ==
 
 react-navigation-header-buttons@^2.1.1:
   version "2.3.1"
@@ -5945,12 +5938,12 @@ react-navigation-stack@^1.10.3:
     prop-types "^15.7.2"
 
 react-navigation@^4.0.10:
-  version "4.3.7"
-  resolved "https://registry.yarnpkg.com/react-navigation/-/react-navigation-4.3.7.tgz#33809fdfd7922c503d454c6367fae45dd67cb08a"
-  integrity sha512-mFElgGxjAoCPGjOedEOYyORN0IdubyCSTWf5/mcWWHiigakXSs0XRuC8pe5d+d0sqES10Gy5BYRb5KrdVJg2Lw==
+  version "4.3.8"
+  resolved "https://registry.yarnpkg.com/react-navigation/-/react-navigation-4.3.8.tgz#7eacd186fbaa849355341046d9c5c95dec97d3bf"
+  integrity sha512-Hxb6VkGu38x4r8nysAJutFkZ1yax29H6BrcdsqxlfGO2pCd821JkRL9h1Zqxn7qLm5JM6+7h0Yx3AS+YKDU5nw==
   dependencies:
     "@react-navigation/core" "^3.7.5"
-    "@react-navigation/native" "^3.7.11"
+    "@react-navigation/native" "^3.7.12"
 
 react-refresh@^0.4.0:
   version "0.4.2"
@@ -6561,9 +6554,9 @@ slide@^1.1.5:
   resolved "https://registry.yarnpkg.com/slide/-/slide-1.1.6.tgz#56eb027d65b4d2dce6cb2e2d32c4d4afc9e1d707"
   integrity sha1-VusCfWW00tzmyy4tMsTUr8nh1wc=
 
-sn-textview@standardnotes/sn-textview#8b62cb2:
+sn-textview@standardnotes/sn-textview#f42f0bf:
   version "1.0.0"
-  resolved "https://codeload.github.com/standardnotes/sn-textview/tar.gz/8b62cb2d61facbd7b4799c3d9f5efe19542d13b4"
+  resolved "https://codeload.github.com/standardnotes/sn-textview/tar.gz/f42f0bffa8942080c829ea9f699e400ab95ac90a"
 
 snapdragon-node@^2.0.1:
   version "2.1.1"

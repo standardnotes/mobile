@@ -54,7 +54,7 @@ export default class NoteCell extends ThemedPureComponent {
       return;
     }
 
-    let callbackForAction = action => {
+    let callbackForAction = (action) => {
       this.props.handleAction(this.props.item, action.key, () => {
         this.forceUpdate();
       });
@@ -93,35 +93,35 @@ export default class NoteCell extends ThemedPureComponent {
         options: [],
         onCancel: () => {
           this.setState({ actionSheet: null });
-        },
+        }
       });
     } else {
       const options = [
         ActionSheetWrapper.BuildOption({
           text: pinLabel,
           key: pinEvent,
-          callback: callbackForAction,
+          callback: callbackForAction
         }),
         ActionSheetWrapper.BuildOption({
           text: archiveLabel,
           key: archiveEvent,
-          callback: callbackForAction,
+          callback: callbackForAction
         }),
         ActionSheetWrapper.BuildOption({
           text: lockLabel,
           key: lockEvent,
-          callback: callbackForAction,
+          callback: callbackForAction
         }),
         ActionSheetWrapper.BuildOption({
           text: protectLabel,
           key: protectEvent,
-          callback: callbackForAction,
+          callback: callbackForAction
         }),
         ActionSheetWrapper.BuildOption({
           text: 'Share',
           key: ItemActionManager.ShareEvent,
-          callback: callbackForAction,
-        }),
+          callback: callbackForAction
+        })
       ];
 
       if (!this.props.item.content.trashed) {
@@ -130,7 +130,7 @@ export default class NoteCell extends ThemedPureComponent {
             text: 'Move to Trash',
             key: ItemActionManager.TrashEvent,
             destructive: true,
-            callback: callbackForAction,
+            callback: callbackForAction
           })
         );
       } else {
@@ -139,7 +139,7 @@ export default class NoteCell extends ThemedPureComponent {
             text: 'Restore Note',
             key: ItemActionManager.RestoreEvent,
             destructive: false,
-            callback: callbackForAction,
+            callback: callbackForAction
           })
         );
         options.push(
@@ -147,7 +147,7 @@ export default class NoteCell extends ThemedPureComponent {
             text: 'Delete Permanently',
             key: ItemActionManager.DeleteEvent,
             destructive: true,
-            callback: callbackForAction,
+            callback: callbackForAction
           })
         );
       }
@@ -157,7 +157,7 @@ export default class NoteCell extends ThemedPureComponent {
         options: options,
         onCancel: () => {
           this.setState({ actionSheet: null });
-        },
+        }
       });
     }
 
@@ -171,63 +171,63 @@ export default class NoteCell extends ThemedPureComponent {
     if (note.pinned) {
       flags.push({
         text: 'Pinned',
-        color: StyleKit.variables.stylekitInfoColor,
+        color: StyleKit.variables.stylekitInfoColor
       });
     }
 
     if (note.archived) {
       flags.push({
         text: 'Archived',
-        color: StyleKit.variables.stylekitWarningColor,
+        color: StyleKit.variables.stylekitWarningColor
       });
     }
 
     if (note.content.protected) {
       flags.push({
         text: 'Protected',
-        color: StyleKit.variables.stylekitSuccessColor,
+        color: StyleKit.variables.stylekitSuccessColor
       });
     }
 
     if (note.locked) {
       flags.push({
         text: 'Locked',
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: StyleKit.variables.stylekitNeutralColor
       });
     }
 
     if (note.content.trashed) {
       flags.push({
         text: 'Deleted',
-        color: StyleKit.variables.stylekitDangerColor,
+        color: StyleKit.variables.stylekitDangerColor
       });
     }
 
     if (note.errorDecrypting) {
       flags.push({
         text: 'Missing Keys',
-        color: StyleKit.variables.stylekitDangerColor,
+        color: StyleKit.variables.stylekitDangerColor
       });
     }
 
     if (note.content.conflict_of) {
       flags.push({
         text: 'Conflicted Copy',
-        color: StyleKit.variables.stylekitDangerColor,
+        color: StyleKit.variables.stylekitDangerColor
       });
     }
 
     if (note.deleted) {
       flags.push({
         text: 'Deletion Pending Sync',
-        color: StyleKit.variables.stylekitDangerColor,
+        color: StyleKit.variables.stylekitDangerColor
       });
     }
 
     return flags;
   }
 
-  flagElement = flag => {
+  flagElement = (flag) => {
     let bgColor = flag.color;
     let textColor = StyleKit.variables.stylekitInfoContrastColor;
     if (this.state.selected || this.props.highlighted) {
@@ -241,13 +241,13 @@ export default class NoteCell extends ThemedPureComponent {
         paddingLeft: 6,
         paddingRight: 6,
         borderRadius: 3,
-        marginRight: 4,
+        marginRight: 4
       },
       text: {
         color: textColor,
         fontSize: 10,
-        fontWeight: 'bold',
-      },
+        fontWeight: 'bold'
+      }
     };
     return (
       <View key={flag.text} style={styles.background}>
@@ -292,7 +292,7 @@ export default class NoteCell extends ThemedPureComponent {
 
           {flags.length > 0 && (
             <View style={this.styles.flagsContainer}>
-              {flags.map(flag => this.flagElement(flag))}
+              {flags.map((flag) => this.flagElement(flag))}
             </View>
           )}
 
@@ -398,51 +398,51 @@ export default class NoteCell extends ThemedPureComponent {
           0.75
         ),
         borderBottomWidth: 1,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
       },
 
       noteCellSelected: {
-        backgroundColor: StyleKit.variables.stylekitInfoColor,
+        backgroundColor: StyleKit.variables.stylekitInfoColor
       },
 
       noteTagsContainer: {
         flex: 1,
         flexDirection: 'row',
-        marginTop: 7,
+        marginTop: 7
       },
 
       pinnedView: {
         flex: 1,
         flexDirection: 'row',
-        marginBottom: 5,
+        marginBottom: 5
       },
 
       flagsContainer: {
         flex: 1,
         flexDirection: 'row',
-        marginBottom: 8,
+        marginBottom: 8
       },
 
       noteTag: {
         marginRight: 2,
         fontSize: 12,
         color: StyleKit.variables.stylekitForegroundColor,
-        opacity: 0.5,
+        opacity: 0.5
       },
 
       noteTagSelected: {
         color: StyleKit.variables.stylekitInfoContrastColor,
-        opacity: 0.8,
+        opacity: 0.8
       },
 
       noteTitle: {
         fontWeight: 'bold',
         fontSize: 16,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: StyleKit.variables.stylekitForegroundColor
       },
 
       noteTitleSelected: {
-        color: StyleKit.variables.stylekitInfoContrastColor,
+        color: StyleKit.variables.stylekitInfoContrastColor
       },
 
       noteText: {
@@ -450,29 +450,29 @@ export default class NoteCell extends ThemedPureComponent {
         marginTop: 4,
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.8,
-        lineHeight: 21,
+        lineHeight: 21
       },
 
       noteTextSelected: {
-        color: StyleKit.variables.stylekitInfoContrastColor,
+        color: StyleKit.variables.stylekitInfoContrastColor
       },
 
       noteDate: {
         marginTop: 5,
         fontSize: 12,
         color: StyleKit.variables.stylekitForegroundColor,
-        opacity: 0.5,
+        opacity: 0.5
       },
 
       noteDateSelected: {
         color: StyleKit.variables.stylekitInfoContrastColor,
-        opacity: 0.8,
+        opacity: 0.8
       },
 
       deleting: {
         color: StyleKit.variables.stylekitInfoColor,
-        marginBottom: 5,
-      },
+        marginBottom: 5
+      }
     });
   }
 }

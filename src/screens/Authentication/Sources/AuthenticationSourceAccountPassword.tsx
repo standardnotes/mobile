@@ -60,7 +60,7 @@ export default class AuthenticationSourceAccountPassword extends AuthenticationS
     return { success: true };
   }
 
-  _fail(message) {
+  _fail(message: string) {
     this.didFail();
     return { success: false, error: { message: message } };
   }

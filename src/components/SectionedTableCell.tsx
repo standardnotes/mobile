@@ -3,14 +3,25 @@ import { View } from 'react-native';
 
 import StyleKit from '@Style/StyleKit';
 
-export default class SectionedTableCell extends Component {
+export type Props = {
+  first?: boolean;
+  last?: boolean;
+  textInputCell?: any;
+  height?: number;
+  extraStyles?: any;
+  testID?: string;
+};
+
+export default class SectionedTableCell<AdditionalProps = {}> extends Component<
+  Props & AdditionalProps
+> {
   rules() {
     let rules = [StyleKit.styles.sectionedTableCell];
     if (this.props.first) {
-      rules.push(StyleKit.stylesForKey('sectionedTableCellFirst'));
+      rules.concat(StyleKit.stylesForKey('sectionedTableCellFirst'));
     }
     if (this.props.last) {
-      rules.push(StyleKit.stylesForKey('sectionedTableCellLast'));
+      rules.concat(StyleKit.stylesForKey('sectionedTableCellLast'));
     }
     if (this.props.textInputCell) {
       rules.push(StyleKit.styles.textInputCell);

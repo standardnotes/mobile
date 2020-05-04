@@ -22,13 +22,13 @@ export default class KeyRecovery extends Abstract {
         title: ApplicationState.isIOS ? 'Cancel' : null,
         iconName: ApplicationState.isIOS
           ? null
-          : StyleKit.nameForIcon(ICON_CLOSE),
-      },
+          : StyleKit.nameForIcon(ICON_CLOSE)
+      }
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions,
+      templateOptions
     });
   };
 
@@ -43,8 +43,8 @@ export default class KeyRecovery extends Abstract {
           : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
-        },
-      },
+        }
+      }
     });
 
     this.state = { text: '' };
@@ -72,7 +72,7 @@ export default class KeyRecovery extends Abstract {
       this.state.text,
       authParams
     );
-    await SF.get().itemTransformer.decryptMultipleItems(this.items, keys);
+    await protocolManager.decryptMultipleItems(this.items, keys);
 
     this.encryptedCount = 0;
     for (const item of this.items) {
@@ -81,7 +81,7 @@ export default class KeyRecovery extends Abstract {
       }
     }
 
-    let useKeys = async confirm => {
+    let useKeys = async (confirm) => {
       const run = async () => {
         await KeysManager.get().persistOfflineKeys(keys);
         await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
@@ -102,7 +102,7 @@ export default class KeyRecovery extends Abstract {
           confirmButtonText: 'Use',
           onConfirm: () => {
             run();
-          },
+          }
         });
       } else {
         run();
@@ -127,12 +127,12 @@ export default class KeyRecovery extends Abstract {
           // Use anyway
           // eslint-disable-next-line react-hooks/rules-of-hooks
           useKeys(true);
-        },
+        }
       });
     }
   };
 
-  onTextChange = text => {
+  onTextChange = (text) => {
     this.setState({ text: text });
   };
 
@@ -153,7 +153,7 @@ export default class KeyRecovery extends Abstract {
           </SectionedTableCell>
           <SectionedTableCell textInputCell={true} last={true}>
             <TextInput
-              ref={ref => {
+              ref={(ref) => {
                 this.inputRef = ref;
               }}
               style={[StyleKit.styles.sectionedTableCellTextInput]}

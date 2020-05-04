@@ -6,7 +6,7 @@ import { SFItem } from 'snjs';
 // to override all individual classes, like Note and Tag.
 
 const original_updateFromJSON = SFItem.prototype.updateFromJSON;
-SFItem.prototype.updateFromJSON = function (json) {
+SFItem.prototype.updateFromJSON = function (json: unknown) {
   original_updateFromJSON.apply(this, [json]);
 
   if (this.created_at) {
@@ -18,7 +18,7 @@ SFItem.prototype.updateFromJSON = function (json) {
   }
 };
 
-SFItem.prototype.dateToLocalizedString = function (date) {
+SFItem.prototype.dateToLocalizedString = function (date: string) {
   return moment(date).format('llll');
 };
 
@@ -32,5 +32,5 @@ SFItem.prototype.updatedAtTimestamp = function () {
 Object.defineProperty(SFItem.prototype, 'key', {
   get: function key() {
     return this.uuid;
-  },
+  }
 });

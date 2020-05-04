@@ -54,29 +54,29 @@ export class OfflineBanner extends ThemedPureComponent {
         padding: padding,
         borderWidth: 1,
         borderRadius: 4,
-        borderColor: StyleKit.variables.stylekitBorderColor,
+        borderColor: StyleKit.variables.stylekitBorderColor
       },
       icon: {
         fontSize: 24,
-        color: StyleKit.variables.stylekitInfoColor,
+        color: StyleKit.variables.stylekitInfoColor
       },
       textContainer: {
         flex: 1,
-        paddingLeft: padding,
+        paddingLeft: padding
       },
       boldText: {
         fontSize: 15,
         fontWeight: '600',
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: StyleKit.variables.stylekitForegroundColor
       },
       subText: {
         marginTop: 2,
         fontSize: 11,
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: StyleKit.variables.stylekitNeutralColor
       },
       forward: {
-        color: StyleKit.variables.stylekitNeutralColor,
-      },
+        color: StyleKit.variables.stylekitNeutralColor
+      }
     });
   }
 }

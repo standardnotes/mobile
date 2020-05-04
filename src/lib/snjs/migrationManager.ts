@@ -9,17 +9,17 @@ import { SFModelManager, SFMigrationManager } from 'snjs';
 const base64 = require('base-64');
 
 export default class MigrationManager extends SFMigrationManager {
-  static instance = null;
+  private static instance: MigrationManager;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new MigrationManager();
     }
 
     return this.instance;
   }
 
-  constructor(modelManager, syncManager, storageManager, authManager) {
+  constructor() {
     super(ModelManager.get(), Sync.get(), Storage.get(), Auth.get());
   }
 
@@ -53,8 +53,8 @@ export default class MigrationManager extends SFMigrationManager {
         // The user is signed in
         Sync.get()
           .stateless_downloadAllItems(options)
-          .then(async items => {
-            const matchingPrivs = items.filter(candidate => {
+          .then(async (items: any[]) => {
+            const matchingPrivs = items.filter((candidate) => {
               return candidate.content_type === contentType;
             });
 
@@ -71,7 +71,7 @@ export default class MigrationManager extends SFMigrationManager {
             // but since we're manually mapping, we have to make it manually resolve singletons
             PrivilegesManager.get().singletonManager.resolveSingletons(mapped);
           });
-      },
+      }
     };
   }
 
@@ -90,8 +90,8 @@ export default class MigrationManager extends SFMigrationManager {
         // The user is signed in
         Sync.get()
           .stateless_downloadAllItems(options)
-          .then(async items => {
-            let matchingTags = items.filter(candidate => {
+          .then(async (items: any[]) => {
+            let matchingTags = items.filter((candidate) => {
               return candidate.content_type === contentType;
             });
 
@@ -105,17 +105,17 @@ export default class MigrationManager extends SFMigrationManager {
               SFModelManager.MappingSourceRemoteRetrieved
             );
           });
-      },
+      }
     };
   }
 
   /* Overrides */
 
-  async encode(text) {
+  async encode(text: string) {
     return base64.encode(text);
   }
 
-  async decode(base64String) {
+  async decode(base64String: string) {
     return base64.decode(base64String);
   }
 }

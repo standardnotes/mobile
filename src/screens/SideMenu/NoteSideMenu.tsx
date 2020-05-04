@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, ViewStyle, TextStyle } from 'react-native';
 import FAB from 'react-native-fab';
 import { SFPrivilegesManager, SNTag } from 'snjs';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -7,16 +7,19 @@ import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
-import ItemActionManager from '@Lib/itemActionManager';
+import ItemActionManager, { EventType } from '@Lib/itemActionManager';
 import { SCREEN_INPUT_MODAL, SCREEN_MANAGE_PRIVILEGES } from '@Screens/screens';
 import ModelManager from '@Lib/snjs/modelManager';
 import PrivilegesManager from '@Lib/snjs/privilegesManager';
 import Sync from '@Lib/snjs/syncManager';
 import AbstractSideMenu from '@Screens/SideMenu/AbstractSideMenu';
 import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
-import SideMenuSection from '@Screens/SideMenu/SideMenuSection';
+import SideMenuSection, {
+  SideMenuOption
+} from '@Screens/SideMenu/SideMenuSection';
 import TagSelectionList from '@Screens/SideMenu/TagSelectionList';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import type { AbstractProps } from '@Screens/Abstract';
 import {
   ICON_BOOKMARK,
   ICON_ARCHIVE,
@@ -25,12 +28,22 @@ import {
   ICON_SHARE,
   ICON_TRASH,
   ICON_MEDICAL,
-  ICON_PRICE_TAG,
+  ICON_PRICE_TAG
 } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
-export default class NoteSideMenu extends AbstractSideMenu {
-  constructor(props) {
+type State = {
+  lockContent: boolean;
+  outOfSync: boolean;
+  actionSheet: JSX.Element | null;
+};
+
+export default class NoteSideMenu extends AbstractSideMenu<
+  AbstractProps,
+  State
+> {
+  styles!: Record<string, ViewStyle | TextStyle>;
+  constructor(props: Readonly<AbstractProps>) {
     super(props);
     this.constructState({});
   }
@@ -39,12 +52,12 @@ export default class NoteSideMenu extends AbstractSideMenu {
     return SideMenuManager.get().getHandlerForRightSideMenu();
   }
 
-  onEditorSelect = editor => {
+  onEditorSelect = (editor: any) => {
     this.handler.onEditorSelect(editor);
     this.forceUpdate();
   };
 
-  onTagSelect = tag => {
+  onTagSelect = (tag: any) => {
     this.handler.onTagSelect(tag);
     this.forceUpdate();
   };
@@ -53,7 +66,13 @@ export default class NoteSideMenu extends AbstractSideMenu {
     return this.handler.getCurrentNote();
   }
 
-  onEditorLongPress = editor => {
+  onEditorLongPress = (
+    editor: {
+      content: any;
+      name?: any;
+      setDirty?: (arg0: boolean) => void;
+    } | null
+  ) => {
     const currentDefaultEditor = ComponentManager.get().getDefaultEditor();
 
     let isDefault = false;
@@ -92,12 +111,12 @@ export default class NoteSideMenu extends AbstractSideMenu {
               );
             }
             this.forceUpdate();
-          },
-        }),
+          }
+        })
       ],
       onCancel: () => {
         this.setState({ actionSheet: null });
-      },
+      }
     });
 
     this.setState({ actionSheet: sheet.actionSheetElement() });
@@ -109,18 +128,18 @@ export default class NoteSideMenu extends AbstractSideMenu {
     this.props.navigation.navigate(SCREEN_INPUT_MODAL, {
       title: 'New Tag',
       placeholder: 'New tag name',
-      onSubmit: text => {
-        this.createTag(text, tag => {
+      onSubmit: (text: string) => {
+        this.createTag(text, (tag: any) => {
           if (this.note) {
             // select this tag
             this.onTagSelect(tag);
           }
         });
-      },
+      }
     });
   };
 
-  createTag(text, callback) {
+  createTag(text: string, callback: (tag: any) => void) {
     const tag = new SNTag({ content: { title: text } });
     tag.initUUID().then(() => {
       tag.setDirty(true);
@@ -135,7 +154,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
   Render
   */
 
-  runAction(action) {
+  runAction(action: EventType) {
     let run = () => {
       ItemActionManager.handleEvent(action, this.note, async () => {
         if (
@@ -207,18 +226,18 @@ export default class NoteSideMenu extends AbstractSideMenu {
       { text: archiveOption, key: archiveEvent, icon: ICON_ARCHIVE },
       { text: lockOption, key: lockEvent, icon: ICON_LOCK },
       { text: protectOption, key: protectEvent, icon: ICON_FINGER_PRINT },
-      { text: 'Share', key: ItemActionManager.ShareEvent, icon: ICON_SHARE },
-    ];
+      { text: 'Share', key: ItemActionManager.ShareEvent, icon: ICON_SHARE }
+    ] as { text: string; key: EventType; icon: string }[];
 
     if (!this.note.content.trashed) {
       rawOptions.push({
         text: 'Move to Trash',
         key: ItemActionManager.TrashEvent,
-        icon: ICON_TRASH,
+        icon: ICON_TRASH
       });
     }
 
-    let options = [];
+    let options: SideMenuOption[] = [];
     for (const rawOption of rawOptions) {
       let option = SideMenuSection.BuildOption({
         text: rawOption.text,
@@ -226,11 +245,11 @@ export default class NoteSideMenu extends AbstractSideMenu {
         iconDesc: {
           type: 'icon',
           side: 'right',
-          name: StyleKit.nameForIcon(rawOption.icon),
+          name: StyleKit.nameForIcon(rawOption.icon)
         },
         onSelect: () => {
           this.runAction(rawOption.key);
-        },
+        }
       });
       options.push(option);
     }
@@ -242,24 +261,24 @@ export default class NoteSideMenu extends AbstractSideMenu {
           key: 'restore-note',
           onSelect: () => {
             this.runAction(ItemActionManager.RestoreEvent);
-          },
+          }
         },
         {
           text: 'Delete Permanently',
-          textClass: 'danger',
+          textClass: 'danger' as 'danger',
           key: 'delete-forever',
           onSelect: () => {
             this.runAction(ItemActionManager.DeleteEvent);
-          },
+          }
         },
         {
           text: 'Empty Trash',
-          textClass: 'danger',
+          textClass: 'danger' as 'danger',
           key: 'empty trash',
           onSelect: () => {
             this.runAction(ItemActionManager.EmptyTrashEvent);
-          },
-        },
+          }
+        }
       ]);
     }
 
@@ -269,7 +288,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
   buildOptionsForEditors() {
     const editors = ComponentManager.get()
       .getEditors()
-      .sort((a, b) => {
+      .sort((a: { name: string }, b: { name: string }) => {
         if (!a.name || !b.name) {
           return -1;
         }
@@ -277,7 +296,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
       });
     const selectedEditor = ComponentManager.get().editorForNote(this.note);
-    const options = [
+    const options: SideMenuOption[] = [
       {
         text: 'Plain Editor',
         key: 'plain-editor',
@@ -287,14 +306,14 @@ export default class NoteSideMenu extends AbstractSideMenu {
         },
         onLongPress: () => {
           this.onEditorLongPress(null);
-        },
-      },
+        }
+      }
     ];
 
     for (const editor of editors) {
       const option = SideMenuSection.BuildOption({
         text: editor.name,
-        subtext: editor.content.isMobileDefault ? 'Mobile Default' : null,
+        subtext: editor.content.isMobileDefault ? 'Mobile Default' : undefined,
         key: editor.uuid || editor.name,
         selected: editor === selectedEditor,
         onSelect: () => {
@@ -302,7 +321,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         },
         onLongPress: () => {
           this.onEditorLongPress(editor);
-        },
+        }
       });
 
       options.push(option);
@@ -318,11 +337,11 @@ export default class NoteSideMenu extends AbstractSideMenu {
             type: 'icon',
             name: StyleKit.nameForIcon(ICON_MEDICAL),
             side: 'right',
-            size: 17,
+            size: 17
           },
           onSelect: () => {
             ApplicationState.openURL('https://standardnotes.org/extensions');
-          },
+          }
         })
       );
     }
@@ -370,7 +389,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
             'Create a new tag using the tag button in the bottom right corner.'
           }
         />
-      </SideMenuSection>,
+      </SideMenuSection>
     ];
 
     return (
@@ -410,18 +429,18 @@ export default class NoteSideMenu extends AbstractSideMenu {
       // See https://stackoverflow.com/questions/47725607/react-native-safeareaview-background-color-how-to-assign-two-different-backgro
       safeArea: {
         flex: 0,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
       },
       sideMenu: {
         backgroundColor: StyleKit.variables.stylekitBackgroundColor,
         color: StyleKit.variables.stylekitForegroundColor,
         flex: 1,
-        flexDirection: 'column',
+        flexDirection: 'column'
       },
       flatList: {
         padding: 15,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
-      },
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
+      }
     };
   }
 }

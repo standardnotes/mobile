@@ -32,13 +32,13 @@ export default class Settings extends Abstract {
         title: ApplicationState.isIOS ? 'Done' : null,
         iconName: ApplicationState.isIOS
           ? null
-          : StyleKit.nameForIcon(ICON_CHECKMARK),
-      },
+          : StyleKit.nameForIcon(ICON_CHECKMARK)
+      }
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions,
+      templateOptions
     });
   };
 
@@ -53,8 +53,8 @@ export default class Settings extends Abstract {
           : StyleKit.nameForIcon(ICON_CHECKMARK),
         onPress: () => {
           this.dismiss();
-        },
-      },
+        }
+      }
     });
 
     if (__DEV__) {
@@ -65,15 +65,15 @@ export default class Settings extends Abstract {
             Storage.get().clear();
             Auth.get().signout();
             KeysManager.get().clearOfflineKeysAndData(true);
-          },
-        },
+          }
+        }
       });
     }
 
     this.sortOptions = [
       { key: 'created_at', label: 'Date Added' },
       { key: 'client_updated_at', label: 'Date Modified' },
-      { key: 'title', label: 'Title' },
+      { key: 'title', label: 'Title' }
     ];
 
     this.options = ApplicationState.getOptions();
@@ -93,7 +93,7 @@ export default class Settings extends Abstract {
     this.mergeState({
       hasPasscode: hasPasscode,
       hasBiometrics: hasBiometrics,
-      storageEncryption: encryptedStorage,
+      storageEncryption: encryptedStorage
     });
   }
 
@@ -131,7 +131,7 @@ export default class Settings extends Abstract {
           .then(() => {
             this.forceUpdate();
           });
-      },
+      }
     });
   };
 
@@ -147,10 +147,10 @@ export default class Settings extends Abstract {
         this.resaveOfflineData(() => {
           this.mergeState({
             storageEncryption: true,
-            storageEncryptionLoading: false,
+            storageEncryptionLoading: false
           });
         });
-      },
+      }
     });
   };
 
@@ -166,10 +166,10 @@ export default class Settings extends Abstract {
         this.resaveOfflineData(() => {
           this.mergeState({
             storageEncryption: false,
-            storageEncryptionLoading: false,
+            storageEncryptionLoading: false
           });
         });
-      },
+      }
     });
   };
 
@@ -188,7 +188,7 @@ export default class Settings extends Abstract {
 
         protocolManager
           .generateInitialKeysAndAuthParamsForUser(identifier, value)
-          .then(results => {
+          .then((results) => {
             let keys = results.keys;
             let authParams = results.authParams;
 
@@ -207,7 +207,7 @@ export default class Settings extends Abstract {
               );
             }
           });
-      },
+      }
     });
   };
 
@@ -240,7 +240,7 @@ export default class Settings extends Abstract {
 
             this.mergeState({ hasPasscode: false });
             this.forceUpdate();
-          },
+          }
         });
       }
     );
@@ -262,12 +262,12 @@ export default class Settings extends Abstract {
     );
   };
 
-  onSortChange = key => {
+  onSortChange = (key) => {
     this.options.setSortBy(key);
     this.forceUpdate();
   };
 
-  onOptionSelect = option => {
+  onOptionSelect = (option) => {
     this.options.setDisplayOptionKeyValue(
       option,
       !this.options.getDisplayOptionValue(option)
@@ -304,7 +304,7 @@ export default class Settings extends Abstract {
       >
         <ScrollView
           style={{
-            backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+            backgroundColor: StyleKit.variables.stylekitBackgroundColor
           }}
           keyboardShouldPersistTaps={'always'}
           keyboardDismissMode={'interactive'}

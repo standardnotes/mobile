@@ -7,40 +7,82 @@ import {
   Platform,
   Text,
   Alert,
+  ViewStyle,
+  TextStyle
 } from 'react-native';
 import TextView from 'sn-textview';
 import { SFAuthManager } from 'snjs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
-import ApplicationState from '@Lib/ApplicationState';
+import ApplicationState, {
+  AppStateEventHandler,
+  AppStateEventType,
+  TabletModeChangeData,
+  NoteSideMenuToggleChange
+} from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
 import Auth from '@Lib/snjs/authManager';
 import ModelManager from '@Lib/snjs/modelManager';
 import Sync from '@Lib/snjs/syncManager';
-import Abstract from '@Screens/Abstract';
+import Abstract, { AbstractState, AbstractProps } from '@Screens/Abstract';
 import ComponentView from '@Screens/ComponentView';
 import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
 import { ICON_ALERT, ICON_LOCK, ICON_MENU } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 import { lighten } from '@Style/utils';
 
-export default class Compose extends Abstract {
-  static navigationOptions = ({ navigation, navigationOptions }) => {
+type State = {
+  webViewError: any;
+  loadingWebView: boolean;
+  title: string;
+  text: string;
+  noteLocked: boolean;
+};
+
+type Props = {
+  selectedTagId?: string;
+};
+
+export default class Compose extends Abstract<
+  Props & AbstractProps,
+  State & AbstractState
+> {
+  static navigationOptions = ({
+    navigation,
+    navigationOptions
+  }: {
+    navigation: any;
+    navigationOptions: any;
+  }) => {
     const templateOptions = {
       rightButton: {
         title: null,
-        iconName: StyleKit.nameForIcon(ICON_MENU),
-      },
+        iconName: StyleKit.nameForIcon(ICON_MENU)
+      }
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
-      navigationOptions,
-      templateOptions,
+      _navigationOptions: navigationOptions,
+      templateOptions
     });
   };
+  styles!: Record<string, ViewStyle | TextStyle>;
+  rawStyles!: Record<string, ViewStyle | TextStyle>;
+  note: any;
+  syncObserver: any;
+  componentHandler: any;
+  signoutObserver: any;
+  tabletModeChangeHandler?: AppStateEventHandler;
+  didShowErrorAlert?: boolean;
+  rightMenuHandler: SideMenuManager['rightSideMenuHandler'] = null;
+  input: TextView | null = null;
+  saveError?: boolean;
+  statusTimeout?: ReturnType<typeof setTimeout>;
+  syncTakingTooLong: boolean = false;
+  saveTimeout?: ReturnType<typeof setTimeout>;
 
-  constructor(props) {
+  constructor(props: Readonly<Props & AbstractProps>) {
     super(props);
 
     let note,
@@ -56,7 +98,7 @@ export default class Compose extends Abstract {
       title: this.note.title,
       noteLocked: this.note.locked
         ? true
-        : false /* required to re-render on change */,
+        : false /* required to re-render on change */
     });
 
     this.configureHeaderBar();
@@ -73,35 +115,36 @@ export default class Compose extends Abstract {
   }
 
   registerObservers() {
-    this.syncObserver = Sync.get().addEventHandler((event, data) => {
-      if (event === 'sync:error') {
-        this.showSavedStatus(false);
-      } else if (event === 'sync:completed') {
-        let isInRetrieved =
-          data.retrievedItems &&
-          data.retrievedItems.map(i => i.uuid).includes(this.note.uuid);
-        let isInSaved =
-          data.savedItems &&
-          data.savedItems.map(i => i.uuid).includes(this.note.uuid);
-        if (this.note.deleted || this.note.content.trashed) {
-          let clearNote = this.note.deleted === true;
-          // if Trashed, and we're in the Trash view, don't clear note.
-          if (!this.note.deleted) {
-            let selectedTag = this.getSelectedTag();
-            let isTrashTag =
-              selectedTag != null && selectedTag.content.isTrashTag === true;
-            if (this.note.content.trashed) {
-              // clear the note if this is not the trash tag. Otherwise, keep it in view.
-              clearNote = !isTrashTag;
+    this.syncObserver = Sync.get().addEventHandler(
+      (event: string, data: { retrievedItems: any[]; savedItems: any[] }) => {
+        if (event === 'sync:error') {
+          this.showSavedStatus(false);
+        } else if (event === 'sync:completed') {
+          let isInRetrieved =
+            data.retrievedItems &&
+            data.retrievedItems.map((i) => i.uuid).includes(this.note.uuid);
+          let isInSaved =
+            data.savedItems &&
+            data.savedItems.map((i) => i.uuid).includes(this.note.uuid);
+          if (this.note.deleted || this.note.content.trashed) {
+            let clearNote = this.note.deleted === true;
+            // if Trashed, and we're in the Trash view, don't clear note.
+            if (!this.note.deleted) {
+              let selectedTag = this.getSelectedTag();
+              let isTrashTag =
+                selectedTag != null && selectedTag.content.isTrashTag === true;
+              if (this.note.content.trashed) {
+                // clear the note if this is not the trash tag. Otherwise, keep it in view.
+                clearNote = !isTrashTag;
+              }
             }
-          }
 
-          if (clearNote) {
-            this.props.navigation.closeRightDrawer();
-            this.setNote(null);
-          }
-        } else if (this.note.uuid && (isInRetrieved || isInSaved)) {
-          /*
+            if (clearNote) {
+              this.props.navigation.closeRightDrawer();
+              this.setNote(null);
+            }
+          } else if (this.note.uuid && (isInRetrieved || isInSaved)) {
+            /*
           You have to be careful about when you render inside this component. Rendering with the native SNTextView component
           can cause the cursor to go to the end of the input, both on iOS and Android. We want to force an update only if retrievedItems includes this item
 
@@ -114,35 +157,40 @@ export default class Compose extends Abstract {
           Do not make text part of the state, otherwise that would cause a re-render on every keystroke.
           */
 
-          let newState = {
-            title: this.note.title,
-            noteLocked: this.note.locked ? true : false,
-          };
+            let newState = {
+              title: this.note.title,
+              noteLocked: this.note.locked ? true : false
+            };
 
-          // only include `text` if this item is coming back from retrieved, as this will cause text view cursor to reset to top
-          if (isInRetrieved) {
-            newState.text = this.note.text;
+            // only include `text` if this item is coming back from retrieved, as this will cause text view cursor to reset to top
+            if (isInRetrieved) {
+              newState = Object.assign(newState, { text: this.note.text });
+            }
+
+            // Use true/false for note.locked as we don't want values of null or undefined, which may cause
+            // unnecessary renders. (on constructor it was undefined, and here, it was null, causing a re-render to occur on android, causing textview to reset cursor)
+            this.setState(newState);
           }
 
-          // Use true/false for note.locked as we don't want values of null or undefined, which may cause
-          // unnecessary renders. (on constructor it was undefined, and here, it was null, causing a re-render to occur on android, causing textview to reset cursor)
-          this.setState(newState);
-        }
-
-        if ((isInSaved && !this.note.dirty) || this.saveError) {
-          this.showSavedStatus(true);
+          if ((isInSaved && !this.note.dirty) || this.saveError) {
+            this.showSavedStatus(true);
+          }
         }
       }
-    });
+    );
 
     this.componentHandler = ComponentManager.get().registerHandler({
       identifier: 'composer',
       areas: ['editor-editor'],
-      actionHandler: (component, action, data) => {
+      actionHandler: (
+        _component: any,
+        action: string,
+        data: { items: any[] }
+      ) => {
         if (action === 'save-items') {
           if (
             data.items
-              .map(item => {
+              .map((item) => {
                 return item.uuid;
               })
               .includes(this.note.uuid)
@@ -150,20 +198,27 @@ export default class Compose extends Abstract {
             this.showSavingStatus();
           }
         }
-      },
+      }
     });
 
-    this.signoutObserver = Auth.get().addEventHandler(event => {
+    this.signoutObserver = Auth.get().addEventHandler((event: any) => {
       if (event === SFAuthManager.DidSignOutEvent) {
         this.setNote(null);
       }
     });
 
     this.tabletModeChangeHandler = ApplicationState.get().addEventHandler(
-      (event, data) => {
+      (
+        event: AppStateEventType,
+        data: TabletModeChangeData | NoteSideMenuToggleChange | undefined
+      ) => {
         if (event === ApplicationState.AppStateEventTabletModeChange) {
           // If we are now in tablet mode after not being in tablet mode
-          if (data.new_isInTabletMode && !data.old_isInTabletMode) {
+          if (
+            data &&
+            (data as TabletModeChangeData).new_isInTabletMode &&
+            !(data as TabletModeChangeData).old_isInTabletMode
+          ) {
             this.setSideMenuHandler();
           }
         }
@@ -185,7 +240,10 @@ export default class Compose extends Abstract {
     2. In setNote(null), if the current note is already a dummy, don't do anything.
   */
 
-  setNote(note, isConstructor = false) {
+  setNote(
+    note: { dummy: boolean; initUUID: () => Promise<any>; title: any } | null,
+    isConstructor = false
+  ) {
     if (!note) {
       if (this.note && this.note.dummy) {
         // This method can be called if the + button is pressed. On Tablet, it can be pressed even while we're
@@ -196,14 +254,14 @@ export default class Compose extends Abstract {
       note = ModelManager.get().createItem({
         content_type: 'Note',
         dummy: true,
-        text: '',
+        text: ''
       });
-      note.dummy = true;
+      note!.dummy = true;
       // Editors need a valid note with uuid and modelmanager mapped in order to interact with it
       // Note that this can create dummy notes that aren't deleted automatically.
       // Also useful to keep right menu enabled at all times. If the note has a uuid and is a dummy,
       // it will be removed locally on blur
-      note.initUUID().then(() => {
+      note!.initUUID().then(() => {
         ModelManager.get().addItem(note);
         this.forceUpdate();
       });
@@ -212,7 +270,7 @@ export default class Compose extends Abstract {
     this.note = note;
 
     if (!isConstructor) {
-      this.setState({ title: note.title });
+      this.setState({ title: note!.title });
       this.forceUpdate();
     }
   }
@@ -224,8 +282,8 @@ export default class Compose extends Abstract {
         iconName: StyleKit.nameForIcon(ICON_MENU),
         onPress: () => {
           this.props.navigation.openRightDrawer();
-        },
-      },
+        }
+      }
     });
   }
 
@@ -237,7 +295,9 @@ export default class Compose extends Abstract {
     // we ignore render events. This will cause the screen to be white when you save the new tag.
     SideMenuManager.get().removeHandlerForRightSideMenu(this.rightMenuHandler);
     Auth.get().removeEventHandler(this.signoutObserver);
-    ApplicationState.get().removeEventHandler(this.tabletModeChangeHandler);
+    if (this.tabletModeChangeHandler) {
+      ApplicationState.get().removeEventHandler(this.tabletModeChangeHandler);
+    }
     Sync.get().removeEventHandler(this.syncObserver);
     ComponentManager.get().deregisterHandler(this.componentHandler);
   }
@@ -267,6 +327,7 @@ export default class Compose extends Abstract {
 
     if (this.note.dummy) {
       if (this.refs.input) {
+        // @ts-ignore ignore wrong focus type
         this.refs.input.focus();
       }
     }
@@ -283,7 +344,7 @@ export default class Compose extends Abstract {
       getCurrentNote: () => {
         return this.note;
       },
-      onEditorSelect: editor => {
+      onEditorSelect: (editor) => {
         if (editor) {
           ComponentManager.get().associateEditorWithNote(editor, this.note);
         } else {
@@ -296,7 +357,7 @@ export default class Compose extends Abstract {
       onPropertyChange: () => {
         this.forceUpdate();
       },
-      onTagSelect: tag => {
+      onTagSelect: (tag) => {
         let selectedTags = this.note.tags.slice();
         var selected = selectedTags.includes(tag);
         if (selected) {
@@ -316,7 +377,7 @@ export default class Compose extends Abstract {
       onKeyboardDismiss: () => {
         // Keyboard.dismiss() does not work for native views, which our text input is
         this.input && this.input.blur();
-      },
+      }
     });
   }
 
@@ -335,7 +396,7 @@ export default class Compose extends Abstract {
     }
   }
 
-  replaceTagsForNote(newTags) {
+  replaceTagsForNote(newTags: string | any[]) {
     let note = this.note;
 
     var oldTags = note.tags.slice(); // original array will be modified in the for loop so we make a copy
@@ -356,13 +417,13 @@ export default class Compose extends Abstract {
     }
   }
 
-  onTitleChange = text => {
+  onTitleChange = (text: string) => {
     this.setState({ title: text });
     this.note.title = text;
     this.changesMade();
   };
 
-  onTextChange = text => {
+  onTextChange = (text: string) => {
     if (this.note.locked) {
       // On Android, we don't disable the text view if the note is locked, as that also disables selection.
       Alert.alert(
@@ -389,7 +450,7 @@ export default class Compose extends Abstract {
     this.setSubTitle('Saving...');
   }
 
-  showSavedStatus(success) {
+  showSavedStatus(success: boolean) {
     const debouceMs = 300; // minimum time message is shown
     if (success) {
       if (this.statusTimeout) {
@@ -457,12 +518,18 @@ export default class Compose extends Abstract {
     }, 325);
   }
 
-  sync(note, callback) {
+  sync(
+    note: {
+      setDirty: (arg0: boolean, arg1: boolean) => void;
+      hasChanges: boolean;
+    },
+    callback?: (arg0: boolean) => void
+  ) {
     note.setDirty(true, true);
 
     Sync.get()
       .sync()
-      .then(response => {
+      .then((response: { error: any }) => {
         if (response && response.error) {
           if (!this.didShowErrorAlert) {
             this.didShowErrorAlert = true;
@@ -523,7 +590,7 @@ export default class Compose extends Abstract {
         style={[
           this.styles.container,
           StyleKit.styles.container,
-          StyleKit.styles.baseBackground,
+          StyleKit.styles.baseBackground
         ]}
       >
         {this.note.locked && (
@@ -604,9 +671,9 @@ export default class Compose extends Abstract {
               testID="noteContentField"
               style={[
                 StyleKit.stylesForKey('noteText'),
-                this.styles.textContentAndroid,
+                this.styles.textContentAndroid
               ]}
-              ref={ref => (this.input = ref)}
+              ref={(ref) => (this.input = ref)}
               autoFocus={this.note.dummy}
               value={this.note.text}
               selectionColor={lighten(
@@ -622,7 +689,7 @@ export default class Compose extends Abstract {
         {!shouldDisplayEditor && Platform.OS === 'ios' && (
           <TextView
             style={[StyleKit.stylesForKey('noteText'), { paddingBottom: 10 }]}
-            ref={ref => (this.input = ref)}
+            ref={(ref) => (this.input = ref)}
             autoFocus={false}
             value={this.note.text}
             keyboardDismissMode={'interactive'}
@@ -643,7 +710,7 @@ export default class Compose extends Abstract {
       container: {
         flex: 1,
         flexDirection: 'column',
-        height: '100%',
+        height: '100%'
       },
 
       noteTitle: {
@@ -656,7 +723,7 @@ export default class Compose extends Abstract {
         borderBottomWidth: 1,
         paddingTop: Platform.OS === 'ios' ? 5 : 12,
         paddingLeft: padding,
-        paddingRight: padding,
+        paddingRight: padding
       },
 
       lockedContainer: {
@@ -669,14 +736,14 @@ export default class Compose extends Abstract {
         paddingLeft: padding,
         backgroundColor: StyleKit.variables.stylekitNeutralColor,
         borderBottomColor: StyleKit.variables.stylekitBorderColor,
-        borderBottomWidth: 1,
+        borderBottomWidth: 1
       },
 
       lockedText: {
         fontWeight: 'bold',
         fontSize: 12,
         color: StyleKit.variables.stylekitBackgroundColor,
-        paddingLeft: 10,
+        paddingLeft: 10
       },
 
       loadingWebViewContainer: {
@@ -689,7 +756,7 @@ export default class Compose extends Abstract {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor
       },
 
       loadingWebViewText: {
@@ -697,14 +764,14 @@ export default class Compose extends Abstract {
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.7,
         fontSize: 22,
-        fontWeight: 'bold',
+        fontWeight: 'bold'
       },
 
       loadingWebViewSubtitle: {
         paddingLeft: 0,
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.7,
-        marginTop: 5,
+        marginTop: 5
       },
 
       webviewReloadButton: {
@@ -714,28 +781,28 @@ export default class Compose extends Abstract {
         flex: 1,
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'center'
       },
 
       webviewReloadButtonText: {
         color: StyleKit.variables.stylekitBackgroundColor,
         fontSize: 12,
-        fontWeight: 'bold',
+        fontWeight: 'bold'
       },
 
       textContentAndroid: {
         flexGrow: 1,
-        flex: 1,
+        flex: 1
       },
 
       contentContainer: {
-        flexGrow: 1,
+        flexGrow: 1
       },
 
       noteTextContainer: {
         flexGrow: 1,
-        flex: 1,
-      },
+        flex: 1
+      }
     };
 
     this.styles = StyleSheet.create(this.rawStyles);
