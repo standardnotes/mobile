@@ -60,7 +60,7 @@ export default class OptionsState {
   async loadSaved() {
     return Storage.get()
       .getItem('options')
-      .then((result) => {
+      .then(result => {
         if (result) {
           _.merge(this, _.omit(JSON.parse(result), ['changeObservers']));
         }
@@ -78,7 +78,7 @@ export default class OptionsState {
       {
         sortBy: this.sortBy,
         sortReverse: this.sortReverse,
-        selectedTagIds: this.selectedTagIds
+        selectedTagIds: this.selectedTagIds,
       },
       this.getDisplayOptionValues()
     );
@@ -139,7 +139,7 @@ export default class OptionsState {
     this.displayOptions = {
       hidePreviews: this.getDisplayOptionValue('hidePreviews'),
       hideTags: this.getDisplayOptionValue('hideTags'),
-      hideDates: this.getDisplayOptionValue('hideDates')
+      hideDates: this.getDisplayOptionValue('hideDates'),
     };
   }
 

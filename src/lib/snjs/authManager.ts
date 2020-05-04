@@ -78,7 +78,7 @@ export default class Auth extends SFAuthManager {
           _.merge(keys, { jwt: response.token })
         ),
         KeysManager.get().setAccountAuthParams(authParams),
-        KeysManager.get().saveUser({ server: url, email: email })
+        KeysManager.get().saveUser({ server: url, email: email }),
       ]);
     } catch (e) {
       console.log('Error saving auth paramters', e);

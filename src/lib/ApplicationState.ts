@@ -7,7 +7,7 @@ import {
   Keyboard,
   AppStateStatus,
   KeyboardEventListener,
-  EmitterSubscription
+  EmitterSubscription,
 } from 'react-native';
 import _ from 'lodash';
 import KeysManager from '@Lib/keysManager';
@@ -137,7 +137,7 @@ export default class ApplicationState {
     );
   }
 
-  keyboardDidShow: KeyboardEventListener = (e) => {
+  keyboardDidShow: KeyboardEventListener = e => {
     this.keyboardHeight = e.endCoordinates.height;
     this.notifyEvent(ApplicationState.KeyboardChangeEvent);
   };
@@ -154,7 +154,7 @@ export default class ApplicationState {
   initializeOptions() {
     // Initialize Options (sort by, filter, selected tags, etc)
     this.optionsState = new OptionsState();
-    this.optionsState.addChangeObserver((options) => {
+    this.optionsState.addChangeObserver(options => {
       if (!this.loading) {
         options.persist();
       }
@@ -205,7 +205,7 @@ export default class ApplicationState {
       this.tabletMode = enabled;
       this.notifyEvent(ApplicationState.AppStateEventTabletModeChange, {
         new_isInTabletMode: enabled,
-        old_isInTabletMode: !enabled
+        old_isInTabletMode: !enabled,
       });
     }
   }
@@ -219,7 +219,7 @@ export default class ApplicationState {
       this.noteSideMenuCollapsed = collapsed;
       this.notifyEvent(ApplicationState.AppStateEventNoteSideMenuToggle, {
         new_isNoteSideMenuCollapsed: collapsed,
-        old_isNoteSideMenuCollapsed: !collapsed
+        old_isNoteSideMenuCollapsed: !collapsed,
       });
     }
   }
@@ -308,7 +308,7 @@ export default class ApplicationState {
       ApplicationState.LosingFocus,
       ApplicationState.Backgrounding,
       ApplicationState.GainingFocus,
-      ApplicationState.ResumingFromBackground
+      ApplicationState.ResumingFromBackground,
     ] as Array<AppStateType>).includes(state);
   }
 
@@ -476,7 +476,7 @@ export default class ApplicationState {
     return {
       title: title,
       sources: sources,
-      onAuthenticate: this.unlockApplication.bind(this)
+      onAuthenticate: this.unlockApplication.bind(this),
     };
   }
 
@@ -486,7 +486,7 @@ export default class ApplicationState {
     };
 
     Linking.canOpenURL(url)
-      .then((supported) => {
+      .then(supported => {
         if (!supported) {
           showAlert();
         } else {

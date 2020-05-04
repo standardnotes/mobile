@@ -20,7 +20,7 @@ export default class Sync extends SFSyncManager {
     super(ModelManager.get(), Storage.get(), Server.get());
     KeysManager.get().registerAccountRelatedStorageKeys([
       'syncToken',
-      'cursorToken'
+      'cursorToken',
     ]);
 
     this.setKeyRequestHandler((request: any) => {
@@ -48,7 +48,7 @@ export default class Sync extends SFSyncManager {
       'SN|UserPreferences',
       'SN|Privileges',
       'SN|Component',
-      'SN|Theme'
+      'SN|Theme',
     ];
   }
 

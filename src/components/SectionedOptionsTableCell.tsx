@@ -4,7 +4,7 @@ import {
   Text,
   TouchableHighlight,
   ViewStyle,
-  TextStyle
+  TextStyle,
 } from 'react-native';
 import ThemedComponent from '@Components/ThemedComponent';
 import StyleKit from '@Style/StyleKit';
@@ -43,7 +43,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
       paddingTop: 0,
       paddingBottom: 0,
       paddingRight: 5,
-      maxHeight: 45
+      maxHeight: 45,
     });
     return rules;
   }
@@ -55,13 +55,13 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
           testID={`${this.props.testID}-title`}
           style={[
             StyleKit.styles.sectionedAccessoryTableCellLabel,
-            this.styles.titleStyles
+            this.styles.titleStyles,
           ]}
         >
           {this.props.title}
         </Text>
         <View style={this.styles.optionsContainerStyle}>
-          {this.props.options.map((option) => {
+          {this.props.options.map(option => {
             const buttonStyles = [this.styles.buttonStyles];
             if (option.selected) {
               buttonStyles.push(this.styles.selectedButtonStyles);
@@ -73,7 +73,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
                 key={option.title}
                 style={[
                   StyleKit.styles.view,
-                  this.styles.buttonContainerStyles
+                  this.styles.buttonContainerStyles,
                 ]}
                 onPress={() => {
                   this.props.onPress(option);
@@ -92,7 +92,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
     this.styles = {
       titleStyles: {
         width: '42%',
-        minWidth: 0
+        minWidth: 0,
       },
 
       optionsContainerStyle: {
@@ -101,7 +101,7 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       },
 
       buttonContainerStyles: {
@@ -110,19 +110,19 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
         height: '100%',
         flexGrow: 1,
         padding: 10,
-        paddingTop: 12
+        paddingTop: 12,
       },
 
       buttonStyles: {
         color: StyleKit.variables.stylekitNeutralColor,
         fontSize: 16,
         textAlign: 'center',
-        width: '100%'
+        width: '100%',
       },
 
       selectedButtonStyles: {
-        color: StyleKit.variables.stylekitInfoColor
-      }
+        color: StyleKit.variables.stylekitInfoColor,
+      },
     };
   }
 }

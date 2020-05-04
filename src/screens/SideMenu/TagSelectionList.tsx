@@ -131,9 +131,9 @@ class TagSelectionList extends ThemedComponent<Props, State> {
                   Sync.get().sync();
                   this.forceUpdate();
                 }
-              }
+              },
             });
-          }
+          },
         }),
         ActionSheetWrapper.BuildOption({
           text: 'Delete',
@@ -146,12 +146,12 @@ class TagSelectionList extends ThemedComponent<Props, State> {
                 this.reload();
               }
             );
-          }
-        })
+          },
+        }),
       ],
       onCancel: () => {
         this.setState({ actionSheet: null });
-      }
+      },
     });
 
     this.setState({ actionSheet: sheet.actionSheetElement() });
@@ -162,7 +162,7 @@ class TagSelectionList extends ThemedComponent<Props, State> {
   iconDescriptorForTag = () => {
     return {
       type: 'ascii',
-      value: '#'
+      value: '#',
     };
   };
 
@@ -218,14 +218,14 @@ class TagSelectionList extends ThemedComponent<Props, State> {
   loadStyles() {
     this.styles = {
       list: {
-        paddingBottom: this.props.hasBottomPadding ? 30 : 0
+        paddingBottom: this.props.hasBottomPadding ? 30 : 0,
       },
       emptyPlaceholderText: {
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.6,
         paddingRight: 30,
-        lineHeight: 18
-      }
+        lineHeight: 18,
+      },
     };
   }
 }

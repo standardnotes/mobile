@@ -5,7 +5,7 @@ import {
   View,
   TouchableOpacity,
   ViewStyle,
-  TextStyle
+  TextStyle,
 } from 'react-native';
 import ThemedComponent from '@Components/ThemedComponent';
 import StyleKit from '@Style/StyleKit';
@@ -34,8 +34,8 @@ export default class SectionHeader extends ThemedComponent<Props> {
           this.styles.container,
           {
             backgroundColor: this.props.backgroundColor,
-            color: this.props.foregroundColor
-          }
+            color: this.props.foregroundColor,
+          },
         ]}
       >
         <View>
@@ -44,7 +44,7 @@ export default class SectionHeader extends ThemedComponent<Props> {
               this.styles.title,
               this.props.tinted
                 ? { color: StyleKit.variables.stylekitInfoColor }
-                : null
+                : null,
             ]}
           >
             {title}
@@ -77,7 +77,7 @@ export default class SectionHeader extends ThemedComponent<Props> {
         paddingRight: StyleKit.constants.paddingLeft,
         paddingBottom: 10,
         paddingTop: 10,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       },
 
       title: {
@@ -85,7 +85,7 @@ export default class SectionHeader extends ThemedComponent<Props> {
         fontSize: StyleKit.constants.mainTextFontSize - 4,
         paddingLeft: StyleKit.constants.paddingLeft,
         color: StyleKit.variables.stylekitNeutralColor,
-        fontWeight: Platform.OS === 'android' ? 'bold' : 'normal'
+        fontWeight: Platform.OS === 'android' ? 'bold' : 'normal',
       },
 
       subtitle: {
@@ -93,23 +93,23 @@ export default class SectionHeader extends ThemedComponent<Props> {
         fontSize: StyleKit.constants.mainTextFontSize - 5,
         marginTop: 4,
         paddingLeft: StyleKit.constants.paddingLeft,
-        color: StyleKit.variables.stylekitNeutralColor
+        color: StyleKit.variables.stylekitNeutralColor,
       },
 
       buttonContainer: {
         flex: 1,
         alignItems: 'flex-end',
-        justifyContent: 'center'
+        justifyContent: 'center',
       },
 
       button: {
-        color: StyleKit.variables.stylekitInfoColor
+        color: StyleKit.variables.stylekitInfoColor,
       },
 
       titleAndroid: {
         fontSize: StyleKit.constants.mainTextFontSize - 2,
-        color: StyleKit.variables.stylekitInfoColor
-      }
+        color: StyleKit.variables.stylekitInfoColor,
+      },
     };
   }
 }

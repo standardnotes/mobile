@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
   ViewStyle,
-  TextStyle
+  TextStyle,
 } from 'react-native';
 import StyleKit from '@Style/StyleKit';
 import { isArray } from 'lodash';
@@ -28,7 +28,7 @@ export default class LockedView extends Component<Props> {
     const color = StyleKit.variables.stylekitInfoColor;
     let styles = [
       StyleKit.styles.centeredContainer,
-      { backgroundColor: StyleKit.variables.stylekitBackgroundColor }
+      { backgroundColor: StyleKit.variables.stylekitBackgroundColor },
     ];
     if (this.props.style) {
       if (isArray(this.props.style)) {
@@ -68,14 +68,14 @@ export default class LockedView extends Component<Props> {
         paddingLeft: 20,
         paddingRight: 20,
         borderRadius: 3,
-        backgroundColor: StyleKit.variables.stylekitInfoColor
+        backgroundColor: StyleKit.variables.stylekitInfoColor,
       },
 
       unlockButtonText: {
         color: StyleKit.variables.stylekitInfoContrastColor,
         textAlign: 'center',
-        fontWeight: 'bold'
-      }
+        fontWeight: 'bold',
+      },
     };
   };
 }

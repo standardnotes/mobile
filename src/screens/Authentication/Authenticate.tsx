@@ -17,12 +17,12 @@ export default class Authenticate extends Abstract {
        * On Android, not having a left button will make the title appear all
        * the way at the edge. Below will add some padding
        */
-      title: ApplicationState.isAndroid ? '  Authenticate' : 'Authenticate'
+      title: ApplicationState.isAndroid ? '  Authenticate' : 'Authenticate',
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       navigationOptions,
-      templateOptions
+      templateOptions,
     });
   };
 
@@ -36,7 +36,7 @@ export default class Authenticate extends Abstract {
       source.initializeForInterface();
     }
 
-    this.stateObserver = ApplicationState.get().addStateObserver((state) => {
+    this.stateObserver = ApplicationState.get().addStateObserver(state => {
       if (state === ApplicationState.GainingFocus) {
         if (!this.state.activeSource) {
           this.begin();
@@ -58,8 +58,8 @@ export default class Authenticate extends Abstract {
           onPress: () => {
             this.getProp('onCancel')();
             this.dismiss();
-          }
-        }
+          },
+        },
       });
     }
 
@@ -300,11 +300,11 @@ export default class Authenticate extends Abstract {
   _renderAuthenticationSoure = (source, index) => {
     const isLast = index === this.sources.length - 1;
 
-    const inputAuthenticationSource = (source) => (
+    const inputAuthenticationSource = source => (
       <View
         style={[
           this.styles.authSourceSection,
-          !isLast ? this.styles.authSourceSectionNotLast : undefined
+          !isLast ? this.styles.authSourceSectionNotLast : undefined,
         ]}
       >
         <SectionedTableCell
@@ -313,12 +313,12 @@ export default class Authenticate extends Abstract {
           onPress={() => {}}
         >
           <TextInput
-            ref={(ref) => {
+            ref={ref => {
               source.inputRef = ref;
             }}
             style={StyleKit.styles.sectionedTableCellTextInput}
             placeholder={source.inputPlaceholder}
-            onChangeText={(text) => {
+            onChangeText={text => {
               this.inputTextChanged(text, source);
             }}
             value={source.getAuthenticationValue()}
@@ -338,11 +338,11 @@ export default class Authenticate extends Abstract {
       </View>
     );
 
-    const biometricAuthenticationSource = (source) => (
+    const biometricAuthenticationSource = source => (
       <View
         style={[
           this.styles.authSourceSection,
-          !isLast ? this.styles.authSourceSectionNotLast : undefined
+          !isLast ? this.styles.authSourceSectionNotLast : undefined,
         ]}
       >
         <SectionedAccessoryTableCell
@@ -386,7 +386,7 @@ export default class Authenticate extends Abstract {
       <View style={StyleKit.styles.container}>
         <ScrollView
           style={{
-            backgroundColor: StyleKit.variables.stylekitBackgroundColor
+            backgroundColor: StyleKit.variables.stylekitBackgroundColor,
           }}
           keyboardShouldPersistTaps={'always'}
           keyboardDismissMode={'interactive'}
@@ -431,11 +431,11 @@ export default class Authenticate extends Abstract {
   loadStyles() {
     this.styles = {
       authSourceSectionNotLast: {
-        marginBottom: 10
+        marginBottom: 10,
       },
       rememberForSection: {
-        marginTop: 10
-      }
+        marginTop: 10,
+      },
     };
   }
 }

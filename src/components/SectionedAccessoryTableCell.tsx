@@ -28,7 +28,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell<
       .concat([
         StyleKit.styles.view,
         StyleKit.styles.flexContainer,
-        ...StyleKit.stylesForKey('sectionedAccessoryTableCell')
+        ...StyleKit.stylesForKey('sectionedAccessoryTableCell'),
       ]);
     return rules;
   }
@@ -63,7 +63,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell<
 
     const iconStyles = {
       width: 30,
-      maxWidth: 30
+      maxWidth: 30,
     };
 
     const left = this.props.leftAlignIcon;
@@ -123,7 +123,7 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell<
             flex: 1,
             justifyContent: left ? 'flex-start' : 'space-between',
             flexDirection: 'row',
-            alignItems: 'center'
+            alignItems: 'center',
           }}
         >
           {this.props.leftAlignIcon ? [icon, textWrapper] : [textWrapper, icon]}

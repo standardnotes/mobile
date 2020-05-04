@@ -32,5 +32,5 @@ SFItem.prototype.updatedAtTimestamp = function () {
 Object.defineProperty(SFItem.prototype, 'key', {
   get: function key() {
     return this.uuid;
-  }
+  },
 });

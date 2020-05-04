@@ -46,33 +46,33 @@ export default class HeaderTitleView extends Component<Props> {
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         flex: 1,
         justifyContent: 'flex-start',
-        flexDirection: 'column'
+        flexDirection: 'column',
       },
 
       headerContainerAndroid: {
-        alignItems: 'flex-start'
+        alignItems: 'flex-start',
       },
 
       headerTitle: {
         color: StyleKit.variables.stylekitForegroundColor,
         fontWeight: 'bold',
         fontSize: 18,
-        textAlign: 'center'
+        textAlign: 'center',
       },
 
       headerSubtitle: {
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.6,
-        fontSize: 12
+        fontSize: 12,
       },
 
       headerSubtitleIOS: {
-        textAlign: 'center'
+        textAlign: 'center',
       },
 
       headerSubtitleAndroid: {
-        fontSize: 13
-      }
+        fontSize: 13,
+      },
     });
   }
 }

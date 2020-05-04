@@ -19,7 +19,7 @@ export default class AlertManager extends SFAlertManager {
     closeButtonText?: string;
     onClose?: () => void | Promise<any>;
   }) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       // On iOS, confirm should go first. On Android, cancel should go first.
       let buttons = [
         {
@@ -27,11 +27,11 @@ export default class AlertManager extends SFAlertManager {
           onPress: async () => {
             alertdata.onClose && (await alertdata.onClose());
             resolve();
-          }
-        }
+          },
+        },
       ];
       Alert.alert(alertdata.title, alertdata.text, buttons, {
-        cancelable: true
+        cancelable: true,
       });
     });
   }
@@ -53,22 +53,22 @@ export default class AlertManager extends SFAlertManager {
           onPress: async () => {
             confirmData.onCancel && (await confirmData.onCancel());
             reject();
-          }
+          },
         },
         {
           text: confirmData.confirmButtonText,
           onPress: async () => {
             confirmData.onConfirm && (await confirmData.onConfirm());
             resolve();
-          }
-        }
+          },
+        },
       ];
       Alert.alert(confirmData.title, confirmData.text, buttons, {
         cancelable: true,
         onDismiss: async () => {
           confirmData.onDismiss && (await confirmData.onDismiss());
           reject();
-        }
+        },
       });
     });
   }

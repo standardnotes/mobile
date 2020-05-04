@@ -119,7 +119,7 @@ export default class KeysManager {
       EncryptedAccountKeysKey,
       FirstRunKey,
       StorageEncryptionKey,
-      BiometricsPrefs
+      BiometricsPrefs,
     ];
 
     /*
@@ -132,7 +132,7 @@ export default class KeysManager {
     }
 
     this.loadInitialDataPromise = Promise.all([
-      Keychain.getKeys().then((keys) => {
+      Keychain.getKeys().then(keys => {
         if (keys) {
           this.parseKeychainValue(keys);
         }
@@ -140,7 +140,7 @@ export default class KeysManager {
 
       Storage.get()
         .getMultiItems(storageKeys)
-        .then(async (items) => {
+        .then(async items => {
           this.missingFirstRunKey =
             items[FirstRunKey] === null || items[FirstRunKey] === undefined;
 
@@ -187,7 +187,7 @@ export default class KeysManager {
           } else {
             this.user = {};
           }
-        })
+        }),
     ]).then(async () => {
       // We only want to run migrations in unlocked app state. If account keys are present, run now,
       // otherwise wait until offline keys have been set so that account keys are decrypted.
@@ -235,7 +235,7 @@ export default class KeysManager {
       },
       onCancel: () => {
         SNReactNative.exitApp();
-      }
+      },
     });
   }
 
@@ -324,7 +324,7 @@ export default class KeysManager {
 
     if (this.offlineKeys) {
       _.merge(value, {
-        offline: { pw: this.offlineKeys.pw, timing: this.passcodeTiming }
+        offline: { pw: this.offlineKeys.pw, timing: this.passcodeTiming },
       });
     }
 
@@ -607,13 +607,13 @@ export default class KeysManager {
       {
         title: 'Immediately',
         key: 'immediately',
-        selected: this.passcodeTiming === 'immediately'
+        selected: this.passcodeTiming === 'immediately',
       },
       {
         title: 'On Quit',
         key: 'on-quit',
-        selected: this.passcodeTiming === 'on-quit'
-      }
+        selected: this.passcodeTiming === 'on-quit',
+      },
     ];
   }
 
@@ -622,13 +622,13 @@ export default class KeysManager {
       {
         title: 'Immediately',
         key: 'immediately',
-        selected: this.biometricPrefs.timing === 'immediately'
+        selected: this.biometricPrefs.timing === 'immediately',
       },
       {
         title: 'On Quit',
         key: 'on-quit',
-        selected: this.biometricPrefs.timing === 'on-quit'
-      }
+        selected: this.biometricPrefs.timing === 'on-quit',
+      },
     ];
   }
 
@@ -647,7 +647,7 @@ export default class KeysManager {
       return;
     }
     FingerprintScanner.isSensorAvailable()
-      .then((type) => {
+      .then(type => {
         const noun = type === 'Touch ID' ? 'Fingerprint' : type;
         callback(true, type, noun);
       })

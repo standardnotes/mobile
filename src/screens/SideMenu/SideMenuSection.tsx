@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
   TextStyle,
-  ViewStyle
+  ViewStyle,
 } from 'react-native';
 import ThemedComponent from '@Components/ThemedComponent';
 import SideMenuCell from '@Screens/SideMenu/SideMenuCell';
@@ -51,7 +51,7 @@ export default class SideMenuSection extends ThemedComponent<Props, State> {
     dimmed,
     selected,
     onSelect,
-    onLongPress
+    onLongPress,
   }: SideMenuOption) {
     return {
       text,
@@ -62,7 +62,7 @@ export default class SideMenuSection extends ThemedComponent<Props, State> {
       dimmed,
       selected,
       onSelect,
-      onLongPress
+      onLongPress,
     };
   }
 
@@ -72,7 +72,7 @@ export default class SideMenuSection extends ThemedComponent<Props, State> {
   }
 
   toggleCollapse = () => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return { collapsed: !prevState.collapsed };
     });
   };
@@ -86,7 +86,7 @@ export default class SideMenuSection extends ThemedComponent<Props, State> {
         <TouchableOpacity
           style={[
             this.styles.header,
-            this.state.collapsed ? this.styles.collapsedHeader : null
+            this.state.collapsed ? this.styles.collapsedHeader : null,
           ]}
           // TODO: removed prop
           // underlayColor={StyleKit.variables.stylekitBorderColor}
@@ -102,7 +102,7 @@ export default class SideMenuSection extends ThemedComponent<Props, State> {
 
         {!this.state.collapsed && (
           <Fragment>
-            {options.map((option) => {
+            {options.map(option => {
               return (
                 <SideMenuCell
                   text={option.text}
@@ -128,26 +128,26 @@ export default class SideMenuSection extends ThemedComponent<Props, State> {
   loadStyles() {
     this.styles = {
       root: {
-        paddingBottom: 6
+        paddingBottom: 6,
       },
       header: {
-        height: 22
+        height: 22,
       },
       collapsedHeader: {
-        height: 50
+        height: 50,
       },
       title: {
         color: StyleKit.variables.stylekitInfoColor,
         fontSize: 13,
-        fontWeight: '700'
+        fontWeight: '700',
       },
 
       collapsedLabel: {
         fontSize: 12,
         opacity: 0.7,
         marginTop: 3,
-        color: StyleKit.variables.stylekitContrastForegroundColor
-      }
+        color: StyleKit.variables.stylekitContrastForegroundColor,
+      },
     };
   }
 }

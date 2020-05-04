@@ -29,7 +29,7 @@ export default class ActionSheetWrapper {
       text,
       key,
       callback,
-      destructive
+      destructive,
     };
   }
 
@@ -43,12 +43,12 @@ export default class ActionSheetWrapper {
         text: 'Cancel',
         callback: props.onCancel,
         key: 'CancelItem',
-        destructive: false
-      }
+        destructive: false,
+      },
     ];
     this.options = props.options.concat(cancelOption);
 
-    this.destructiveIndex = this.options.findIndex((item) => item.destructive);
+    this.destructiveIndex = this.options.findIndex(item => item.destructive);
     this.cancelIndex = this.options.length - 1;
     this.title = props.title;
   }
@@ -67,7 +67,7 @@ export default class ActionSheetWrapper {
       <ActionSheet
         ref={this.actionSheet}
         title={this.title}
-        options={this.options.map((option) => {
+        options={this.options.map(option => {
           return option.text;
         })}
         cancelButtonIndex={this.cancelIndex}
@@ -97,7 +97,7 @@ export default class ActionSheetWrapper {
 
       cancelButtonWrapperStyle: StyleKit.styles.actionSheetCancelButtonWrapper,
       cancelButtonTitleStyle: StyleKit.styles.actionSheetCancelButtonTitle,
-      cancelMargin: StyleSheet.hairlineWidth
+      cancelMargin: StyleSheet.hairlineWidth,
     };
   }
 }

@@ -11,7 +11,7 @@ import {
   SNTheme,
   SNComponent,
   SNSmartTag,
-  SFItem as SNJSItem
+  SFItem as SNJSItem,
 } from 'snjs';
 import _ from 'lodash';
 import Storage from '@Lib/snjs/storageManager';
@@ -29,7 +29,7 @@ SFModelManager.ContentTypeClassMapping = {
   'SN|Component': SNComponent,
   'SF|Extension': SNServerExtension,
   'SF|MFA': SNMfa,
-  'SN|Privileges': SFPrivileges
+  'SN|Privileges': SFPrivileges,
 };
 
 export default class ModelManager extends SFModelManager {
@@ -360,7 +360,7 @@ export default class ModelManager extends SFModelManager {
       'SF|MFA': 'two-factor authentication setting',
       'SN|FileSafe|Credentials': 'FileSafe credential',
       'SN|FileSafe|FileMetadata': 'FileSafe file',
-      'SN|FileSafe|Integration': 'FileSafe integration'
+      'SN|FileSafe|Integration': 'FileSafe integration',
     }[contentType];
   }
 }

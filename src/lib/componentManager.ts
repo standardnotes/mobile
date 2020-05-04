@@ -26,7 +26,7 @@ export default class ComponentManager extends SNComponentManager {
         syncManager: Sync.get(),
         alertManager: AlertManager.get(),
         environment: 'mobile',
-        platform: Platform.OS
+        platform: Platform.OS,
       });
     }
 
@@ -41,7 +41,7 @@ export default class ComponentManager extends SNComponentManager {
     alertManager,
     $uiRunner,
     platform,
-    environment
+    environment,
   }: ComponentManagerInstance) {
     super({
       modelManager,
@@ -51,7 +51,7 @@ export default class ComponentManager extends SNComponentManager {
       alertManager,
       $uiRunner,
       platform,
-      environment
+      environment,
     });
   }
 
@@ -91,7 +91,7 @@ export default class ComponentManager extends SNComponentManager {
       },
       onCancel: () => {
         dialog.callback(false);
-      }
+      },
     });
   }
 
@@ -169,7 +169,7 @@ export default class ComponentManager extends SNComponentManager {
         note.setDirty(true);
       }
 
-      editor.disassociatedItemIds = editor.disassociatedItemIds.filter((id) => {
+      editor.disassociatedItemIds = editor.disassociatedItemIds.filter(id => {
         return id !== note.uuid;
       });
 

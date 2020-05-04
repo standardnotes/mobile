@@ -1,7 +1,7 @@
 import React from 'react';
 import HeaderButtons, {
   HeaderButton,
-  HeaderButtonProps
+  HeaderButtonProps,
 } from 'react-navigation-header-buttons';
 import _ from 'lodash';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -38,7 +38,7 @@ export default class Abstract<
   static getDefaultNavigationOptions = ({
     navigation,
     _navigationOptions,
-    templateOptions
+    templateOptions,
   }: {
     navigation: {
       getParam: (arg0: string) => string | undefined;
@@ -67,9 +67,9 @@ export default class Abstract<
       headerStyle: {
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
-        borderBottomWidth: 1
+        borderBottomWidth: 1,
       },
-      headerTintColor: StyleKit.variables.stylekitInfoColor
+      headerTintColor: StyleKit.variables.stylekitInfoColor,
     };
 
     let headerLeft, headerRight;
@@ -119,7 +119,7 @@ export default class Abstract<
   }) => {
     return Abstract.getDefaultNavigationOptions({
       navigation: navigationProps.navigation,
-      _navigationOptions: navigationProps.navigationOptions
+      _navigationOptions: navigationProps.navigationOptions,
     });
   };
   listeners: any[];
@@ -152,10 +152,10 @@ export default class Abstract<
       }),
       this.props.navigation.addListener('didBlur', () => {
         this.componentDidBlur();
-      })
+      }),
     ];
 
-    this._stateObserver = ApplicationState.get().addStateObserver((state) => {
+    this._stateObserver = ApplicationState.get().addStateObserver(state => {
       if (!this.isMounted()) {
         return;
       }
@@ -183,7 +183,7 @@ export default class Abstract<
       // Navigator doesnt really use activeTheme. We pass it here just as a way to trigger
       // navigationOptions to reload.
       this.props.navigation.setParams({
-        activeTheme: StyleKit.get().activeTheme
+        activeTheme: StyleKit.get().activeTheme,
       });
     } catch {}
   }

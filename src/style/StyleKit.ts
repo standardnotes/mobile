@@ -11,7 +11,7 @@ import {
   keyboardColorForTheme,
   LIGHT_CONTENT,
   DARK_CONTENT,
-  LIGHT_MODE_KEY
+  LIGHT_MODE_KEY,
 } from '@Style/utils';
 import ThemeDownloader from '@Style/Util/ThemeDownloader';
 import { SFAuthManager, SNTheme as SNJSTheme } from 'snjs';
@@ -46,7 +46,7 @@ export default class StyleKit {
 
     this.constants = {
       mainTextFontSize: 16,
-      paddingLeft: 14
+      paddingLeft: 14,
     };
 
     this.buildDefaultThemes();
@@ -140,12 +140,12 @@ export default class StyleKit {
       {
         variables: THEME_BLUE_JSON,
         name: 'Blue',
-        isInitial: true
+        isInitial: true,
       },
       {
         variables: THEME_RED_JSON,
-        name: 'Red'
-      }
+        name: 'Red',
+      },
     ];
 
     for (const option of options) {
@@ -164,10 +164,10 @@ export default class StyleKit {
             dock_icon: {
               type: 'circle',
               background_color: variables.stylekitInfoColor,
-              border_color: variables.stylekitInfoColor
-            }
-          }
-        }
+              border_color: variables.stylekitInfoColor,
+            },
+          },
+        },
       });
 
       this.systemThemes.push(theme);
@@ -188,7 +188,7 @@ export default class StyleKit {
 
       ThemeManager.get().setThemeForMode({
         mode: currentMode,
-        theme: defaultTheme
+        theme: defaultTheme,
       });
 
       this.setActiveTheme(defaultTheme);
@@ -292,9 +292,9 @@ export default class StyleKit {
     );
 
     if (theme.content.isSystemTheme && !isAndroid) {
-      IconChanger.supportDevice((supported) => {
+      IconChanger.supportDevice(supported => {
         if (supported) {
-          IconChanger.getIconName((currentName) => {
+          IconChanger.getIconName(currentName => {
             if (theme.content.isInitial && currentName !== 'default') {
               /** Clear the icon to default. */
               IconChanger.setIconName(null);
@@ -373,7 +373,7 @@ export default class StyleKit {
       /** No matching theme found, set currently active theme as the default. */
       this.assignThemeForMode({
         theme: this.activeTheme,
-        mode: this.currentDarkMode
+        mode: this.currentDarkMode,
       });
     }
   }
@@ -410,35 +410,35 @@ export default class StyleKit {
     const { mainTextFontSize, paddingLeft } = this.constants;
     this.styles = {
       baseBackground: {
-        backgroundColor: variables.stylekitBackgroundColor
+        backgroundColor: variables.stylekitBackgroundColor,
       },
       contrastBackground: {
-        backgroundColor: variables.stylekitContrastBackgroundColor
+        backgroundColor: variables.stylekitContrastBackgroundColor,
       },
       container: {
         flex: 1,
-        height: '100%'
+        height: '100%',
       },
 
       flexContainer: {
         flex: 1,
-        flexDirection: 'column'
+        flexDirection: 'column',
       },
 
       centeredContainer: {
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
       },
 
       flexedItem: {
-        flexGrow: 1
+        flexGrow: 1,
       },
 
       uiText: {
         color: variables.stylekitForegroundColor,
-        fontSize: mainTextFontSize
+        fontSize: mainTextFontSize,
       },
 
       view: {},
@@ -448,7 +448,7 @@ export default class StyleKit {
       tableSection: {
         marginTop: 10,
         marginBottom: 10,
-        backgroundColor: variables.stylekitBackgroundColor
+        backgroundColor: variables.stylekitBackgroundColor,
       },
 
       sectionedTableCell: {
@@ -458,25 +458,25 @@ export default class StyleKit {
         paddingRight: paddingLeft,
         paddingTop: 13,
         paddingBottom: 12,
-        backgroundColor: variables.stylekitBackgroundColor
+        backgroundColor: variables.stylekitBackgroundColor,
       },
 
       textInputCell: {
         maxHeight: 50,
         paddingTop: 0,
-        paddingBottom: 0
+        paddingBottom: 0,
       },
 
       sectionedTableCellTextInput: {
         fontSize: mainTextFontSize,
         padding: 0,
         color: variables.stylekitForegroundColor,
-        height: '100%'
+        height: '100%',
       },
 
       sectionedTableCellFirst: {
         borderTopColor: variables.stylekitBorderColor,
-        borderTopWidth: 1
+        borderTopWidth: 1,
       },
 
       sectionedTableCellLast: {},
@@ -485,20 +485,20 @@ export default class StyleKit {
         paddingTop: 0,
         paddingBottom: 0,
         minHeight: 47,
-        backgroundColor: 'transparent'
+        backgroundColor: 'transparent',
       },
 
       sectionedAccessoryTableCellLabel: {
         fontSize: mainTextFontSize,
         color: variables.stylekitForegroundColor,
-        minWidth: '80%'
+        minWidth: '80%',
       },
 
       buttonCell: {
         paddingTop: 0,
         paddingBottom: 0,
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
       },
 
       buttonCellButton: {
@@ -508,11 +508,11 @@ export default class StyleKit {
           Platform.OS === 'android'
             ? variables.stylekitForegroundColor
             : variables.stylekitInfoColor,
-        fontSize: mainTextFontSize
+        fontSize: mainTextFontSize,
       },
 
       buttonCellButtonLeft: {
-        textAlign: 'left'
+        textAlign: 'left',
       },
 
       noteText: {
@@ -523,17 +523,17 @@ export default class StyleKit {
         paddingLeft: paddingLeft,
         paddingRight: paddingLeft,
         paddingBottom: 10,
-        backgroundColor: variables.stylekitBackgroundColor
+        backgroundColor: variables.stylekitBackgroundColor,
       },
 
       noteTextIOS: {
         paddingLeft: paddingLeft - 5,
-        paddingRight: paddingLeft - 5
+        paddingRight: paddingLeft - 5,
       },
 
       noteTextNoPadding: {
         paddingLeft: 0,
-        paddingRight: 0
+        paddingRight: 0,
       },
 
       actionSheetWrapper: {},
@@ -548,40 +548,40 @@ export default class StyleKit {
          * This will also set button border bottoms, since margin is used
          * instead of borders
          */
-        backgroundColor: variables.stylekitBorderColor
+        backgroundColor: variables.stylekitBorderColor,
       },
 
       actionSheetTitleWrapper: {
         backgroundColor: variables.stylekitBackgroundColor,
-        marginBottom: 1
+        marginBottom: 1,
       },
 
       actionSheetTitleText: {
         color: variables.stylekitForegroundColor,
-        opacity: 0.5
+        opacity: 0.5,
       },
 
       actionSheetButtonWrapper: {
         backgroundColor: variables.stylekitBackgroundColor,
-        marginTop: 0
+        marginTop: 0,
       },
 
       actionSheetButtonTitle: {
-        color: variables.stylekitForegroundColor
+        color: variables.stylekitForegroundColor,
       },
 
       actionSheetCancelButtonWrapper: {
-        marginTop: 0
+        marginTop: 0,
       },
 
       actionSheetCancelButtonTitle: {
         color: variables.stylekitInfoColor,
-        fontWeight: 'normal'
+        fontWeight: 'normal',
       },
 
       bold: {
-        fontWeight: 'bold'
-      }
+        fontWeight: 'bold',
+      },
     };
   }
 

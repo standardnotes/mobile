@@ -61,7 +61,7 @@ export default class BackupsManager {
     if (ApplicationState.isIOS) {
       return this._exportIOS(filename, jsonString);
     } else {
-      return this._showAndroidEmailOrSaveOption().then(async (result) => {
+      return this._showAndroidEmailOrSaveOption().then(async result => {
         if (result === 'email') {
           return this._exportViaEmailAndroid(data, filename);
         } else {
@@ -77,7 +77,7 @@ export default class BackupsManager {
       .confirm({
         title: 'Choose Export Method',
         cancelButtonText: 'Email',
-        confirmButtonText: 'Save to Disk'
+        confirmButtonText: 'Save to Disk',
       })
       .then(() => {
         return 'save';
@@ -88,13 +88,13 @@ export default class BackupsManager {
   }
 
   async _exportIOS(filename: string, data: string) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       ApplicationState.get().performActionWithoutStateChangeImpact(async () => {
         Share.share({
           title: filename,
-          message: data
+          message: data,
         })
-          .then((result) => {
+          .then(result => {
             resolve(result.action !== Share.dismissedAction);
           })
           .catch(() => {
@@ -117,7 +117,7 @@ export default class BackupsManager {
         // success
         return true;
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('Error opening file', error);
         return false;
       });
@@ -132,7 +132,7 @@ export default class BackupsManager {
         confirmButtonText: 'Open File',
         onConfirm: () => {
           this._openFileAndroid(filepath);
-        }
+        },
       })
       .then(() => {
         return true;
@@ -144,7 +144,7 @@ export default class BackupsManager {
   }
 
   async _exportViaEmailAndroid(data: { items: any[] }, filename: string) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const jsonString = JSON.stringify(data, null, 2 /* pretty print */);
       const stringData = base64.encode(
         unescape(encodeURIComponent(jsonString))
@@ -160,7 +160,7 @@ export default class BackupsManager {
           recipients: [''],
           body: '',
           isHTML: true,
-          attachment: { data: stringData, type: fileType, name: filename }
+          attachment: { data: stringData, type: fileType, name: filename },
         },
         (error: any) => {
           if (error) {

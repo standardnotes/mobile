@@ -49,7 +49,7 @@ export default class PasscodeSection extends Component<Props, State> {
       this.setState({
         biometricsAvailable: available,
         biometricsType: type,
-        biometricsNoun: noun
+        biometricsNoun: noun,
       });
     });
   }
@@ -134,7 +134,7 @@ export default class PasscodeSection extends Component<Props, State> {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 2
+              marginTop: 2,
             }}
           >
             {storageSubText}

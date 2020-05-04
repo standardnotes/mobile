@@ -16,7 +16,7 @@ import NoteList from '@Screens/Notes/NoteList';
 import {
   SCREEN_SETTINGS,
   SCREEN_KEY_RECOVERY,
-  SCREEN_COMPOSE
+  SCREEN_COMPOSE,
 } from '@Screens/screens';
 import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
 import { ICON_MENU, ICON_ADD } from '@Style/icons';
@@ -39,8 +39,8 @@ export default class Notes extends Abstract {
         iconName: StyleKit.nameForIcon(ICON_MENU),
         onPress: () => {
           this.props.navigation.openLeftDrawer();
-        }
-      }
+        },
+      },
     });
   }
 
@@ -52,7 +52,7 @@ export default class Notes extends Abstract {
       refreshing: false,
       decrypting: !initialDataLoaded && encryptionEnabled,
       loading: !initialDataLoaded && !encryptionEnabled,
-      notes: []
+      notes: [],
     });
 
     super.loadInitialState();
@@ -164,7 +164,7 @@ export default class Notes extends Abstract {
       'notes-screen',
       ['Tag', 'Note'],
       (allRelevantItems, validItems, deletedItems) => {
-        if (deletedItems.find((item) => item.content_type === 'Tag')) {
+        if (deletedItems.find(item => item.content_type === 'Tag')) {
           // If a tag was deleted, let's check to see if we should reload our selected tags list
           var tags = ModelManager.get().getTagsWithIds(
             this.options.selectedTagIds
@@ -201,7 +201,7 @@ export default class Notes extends Abstract {
       }
     });
 
-    this.signoutObserver = Auth.get().addEventHandler((event) => {
+    this.signoutObserver = Auth.get().addEventHandler(event => {
       if (event === SFAuthManager.DidSignOutEvent) {
         this.reloadList();
       } else if (event === SFAuthManager.WillSignInEvent) {
@@ -243,7 +243,7 @@ export default class Notes extends Abstract {
           if (!data.new_isInTabletMode) {
             this.setState({ selectedNoteId: null });
             this.props.navigation.setParams({
-              rightButton: null
+              rightButton: null,
             });
           }
         }
@@ -305,7 +305,7 @@ export default class Notes extends Abstract {
 
   setSideMenuHandler() {
     SideMenuManager.get().setHandlerForLeftSideMenu({
-      onTagSelect: (tag) => {
+      onTagSelect: tag => {
         // Single tag at a time only
         this.options.setSelectedTagIds([tag.uuid]);
         this.props.navigation.closeLeftDrawer();
@@ -313,7 +313,7 @@ export default class Notes extends Abstract {
       getSelectedTags: () => {
         let ids = this.options.getSelectedTagIds();
         return ModelManager.get().getTagsWithIds(ids);
-      }
+      },
     });
   }
 
@@ -322,7 +322,7 @@ export default class Notes extends Abstract {
       title: note ? 'Note' : 'Compose',
       noteId: note && note.uuid,
       selectedTagId:
-        this.options.selectedTagIds.length && this.options.selectedTagIds[0]
+        this.options.selectedTagIds.length && this.options.selectedTagIds[0],
     });
   }
 
@@ -367,7 +367,7 @@ export default class Notes extends Abstract {
       });
   }
 
-  selectNote = (note) => {
+  selectNote = note => {
     this.handlePrivilegedAction(
       note && note.content.protected,
       SFPrivilegesManager.ActionViewProtectedNotes,
@@ -408,7 +408,7 @@ export default class Notes extends Abstract {
     }
   };
 
-  onSearchTextChange = (text) => {
+  onSearchTextChange = text => {
     this.searching = true;
     this.options.setSearchTerm(text);
   };

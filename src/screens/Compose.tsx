@@ -8,7 +8,7 @@ import {
   Text,
   Alert,
   ViewStyle,
-  TextStyle
+  TextStyle,
 } from 'react-native';
 import TextView from 'sn-textview';
 import { SFAuthManager } from 'snjs';
@@ -19,7 +19,7 @@ import ApplicationState, {
   AppStateEventHandler,
   AppStateEventType,
   TabletModeChangeData,
-  NoteSideMenuToggleChange
+  NoteSideMenuToggleChange,
 } from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
 import Auth from '@Lib/snjs/authManager';
@@ -50,7 +50,7 @@ export default class Compose extends Abstract<
 > {
   static navigationOptions = ({
     navigation,
-    navigationOptions
+    navigationOptions,
   }: {
     navigation: any;
     navigationOptions: any;
@@ -58,13 +58,13 @@ export default class Compose extends Abstract<
     const templateOptions = {
       rightButton: {
         title: null,
-        iconName: StyleKit.nameForIcon(ICON_MENU)
-      }
+        iconName: StyleKit.nameForIcon(ICON_MENU),
+      },
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
       _navigationOptions: navigationOptions,
-      templateOptions
+      templateOptions,
     });
   };
   styles!: Record<string, ViewStyle | TextStyle>;
@@ -98,7 +98,7 @@ export default class Compose extends Abstract<
       title: this.note.title,
       noteLocked: this.note.locked
         ? true
-        : false /* required to re-render on change */
+        : false /* required to re-render on change */,
     });
 
     this.configureHeaderBar();
@@ -122,10 +122,10 @@ export default class Compose extends Abstract<
         } else if (event === 'sync:completed') {
           let isInRetrieved =
             data.retrievedItems &&
-            data.retrievedItems.map((i) => i.uuid).includes(this.note.uuid);
+            data.retrievedItems.map(i => i.uuid).includes(this.note.uuid);
           let isInSaved =
             data.savedItems &&
-            data.savedItems.map((i) => i.uuid).includes(this.note.uuid);
+            data.savedItems.map(i => i.uuid).includes(this.note.uuid);
           if (this.note.deleted || this.note.content.trashed) {
             let clearNote = this.note.deleted === true;
             // if Trashed, and we're in the Trash view, don't clear note.
@@ -159,7 +159,7 @@ export default class Compose extends Abstract<
 
             let newState = {
               title: this.note.title,
-              noteLocked: this.note.locked ? true : false
+              noteLocked: this.note.locked ? true : false,
             };
 
             // only include `text` if this item is coming back from retrieved, as this will cause text view cursor to reset to top
@@ -190,7 +190,7 @@ export default class Compose extends Abstract<
         if (action === 'save-items') {
           if (
             data.items
-              .map((item) => {
+              .map(item => {
                 return item.uuid;
               })
               .includes(this.note.uuid)
@@ -198,7 +198,7 @@ export default class Compose extends Abstract<
             this.showSavingStatus();
           }
         }
-      }
+      },
     });
 
     this.signoutObserver = Auth.get().addEventHandler((event: any) => {
@@ -254,7 +254,7 @@ export default class Compose extends Abstract<
       note = ModelManager.get().createItem({
         content_type: 'Note',
         dummy: true,
-        text: ''
+        text: '',
       });
       note!.dummy = true;
       // Editors need a valid note with uuid and modelmanager mapped in order to interact with it
@@ -282,8 +282,8 @@ export default class Compose extends Abstract<
         iconName: StyleKit.nameForIcon(ICON_MENU),
         onPress: () => {
           this.props.navigation.openRightDrawer();
-        }
-      }
+        },
+      },
     });
   }
 
@@ -344,7 +344,7 @@ export default class Compose extends Abstract<
       getCurrentNote: () => {
         return this.note;
       },
-      onEditorSelect: (editor) => {
+      onEditorSelect: editor => {
         if (editor) {
           ComponentManager.get().associateEditorWithNote(editor, this.note);
         } else {
@@ -357,7 +357,7 @@ export default class Compose extends Abstract<
       onPropertyChange: () => {
         this.forceUpdate();
       },
-      onTagSelect: (tag) => {
+      onTagSelect: tag => {
         let selectedTags = this.note.tags.slice();
         var selected = selectedTags.includes(tag);
         if (selected) {
@@ -377,7 +377,7 @@ export default class Compose extends Abstract<
       onKeyboardDismiss: () => {
         // Keyboard.dismiss() does not work for native views, which our text input is
         this.input && this.input.blur();
-      }
+      },
     });
   }
 
@@ -590,7 +590,7 @@ export default class Compose extends Abstract<
         style={[
           this.styles.container,
           StyleKit.styles.container,
-          StyleKit.styles.baseBackground
+          StyleKit.styles.baseBackground,
         ]}
       >
         {this.note.locked && (
@@ -671,9 +671,9 @@ export default class Compose extends Abstract<
               testID="noteContentField"
               style={[
                 StyleKit.stylesForKey('noteText'),
-                this.styles.textContentAndroid
+                this.styles.textContentAndroid,
               ]}
-              ref={(ref) => (this.input = ref)}
+              ref={ref => (this.input = ref)}
               autoFocus={this.note.dummy}
               value={this.note.text}
               selectionColor={lighten(
@@ -689,7 +689,7 @@ export default class Compose extends Abstract<
         {!shouldDisplayEditor && Platform.OS === 'ios' && (
           <TextView
             style={[StyleKit.stylesForKey('noteText'), { paddingBottom: 10 }]}
-            ref={(ref) => (this.input = ref)}
+            ref={ref => (this.input = ref)}
             autoFocus={false}
             value={this.note.text}
             keyboardDismissMode={'interactive'}
@@ -710,7 +710,7 @@ export default class Compose extends Abstract<
       container: {
         flex: 1,
         flexDirection: 'column',
-        height: '100%'
+        height: '100%',
       },
 
       noteTitle: {
@@ -723,7 +723,7 @@ export default class Compose extends Abstract<
         borderBottomWidth: 1,
         paddingTop: Platform.OS === 'ios' ? 5 : 12,
         paddingLeft: padding,
-        paddingRight: padding
+        paddingRight: padding,
       },
 
       lockedContainer: {
@@ -736,14 +736,14 @@ export default class Compose extends Abstract<
         paddingLeft: padding,
         backgroundColor: StyleKit.variables.stylekitNeutralColor,
         borderBottomColor: StyleKit.variables.stylekitBorderColor,
-        borderBottomWidth: 1
+        borderBottomWidth: 1,
       },
 
       lockedText: {
         fontWeight: 'bold',
         fontSize: 12,
         color: StyleKit.variables.stylekitBackgroundColor,
-        paddingLeft: 10
+        paddingLeft: 10,
       },
 
       loadingWebViewContainer: {
@@ -756,7 +756,7 @@ export default class Compose extends Abstract<
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       },
 
       loadingWebViewText: {
@@ -764,14 +764,14 @@ export default class Compose extends Abstract<
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.7,
         fontSize: 22,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       },
 
       loadingWebViewSubtitle: {
         paddingLeft: 0,
         color: StyleKit.variables.stylekitForegroundColor,
         opacity: 0.7,
-        marginTop: 5
+        marginTop: 5,
       },
 
       webviewReloadButton: {
@@ -781,28 +781,28 @@ export default class Compose extends Abstract<
         flex: 1,
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       },
 
       webviewReloadButtonText: {
         color: StyleKit.variables.stylekitBackgroundColor,
         fontSize: 12,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       },
 
       textContentAndroid: {
         flexGrow: 1,
-        flex: 1
+        flex: 1,
       },
 
       contentContainer: {
-        flexGrow: 1
+        flexGrow: 1,
       },
 
       noteTextContainer: {
         flexGrow: 1,
-        flex: 1
-      }
+        flex: 1,
+      },
     };
 
     this.styles = StyleSheet.create(this.rawStyles);

@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
   ViewStyle,
-  TextStyle
+  TextStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
@@ -88,7 +88,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
     return {
       info: StyleKit.variables.stylekitInfoColor,
       danger: StyleKit.variables.stylekitDangerColor,
-      warning: StyleKit.variables.stylekitWarningColor
+      warning: StyleKit.variables.stylekitWarningColor,
     }[textClass];
   };
 
@@ -155,7 +155,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
                   this.styles.textSelected,
                   this.props.selected
                 ),
-                textColor ? { color: textColor } : null
+                textColor ? { color: textColor } : null,
               ]}
             >
               {this.props.text}
@@ -168,7 +168,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
             <View
               style={[
                 this.styles.iconContainer,
-                this.styles.iconContainerRight
+                this.styles.iconContainerRight,
               ]}
             >
               {this.getIconElement()}
@@ -182,40 +182,40 @@ export default class SideMenuCell extends ThemedComponent<Props> {
   loadStyles() {
     this.styles = {
       cell: {
-        minHeight: this.props.subtext ? 52 : 42
+        minHeight: this.props.subtext ? 52 : 42,
       },
 
       cellContent: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
       },
 
       iconContainer: {
         flex: 0,
         justifyContent: 'center',
-        flexDirection: 'column'
+        flexDirection: 'column',
       },
 
       iconContainerLeft: {
         marginRight: 6,
-        height: '100%'
+        height: '100%',
       },
 
       iconContainerRight: {
         marginLeft: 6,
         marginRight: 4,
-        height: '100%'
+        height: '100%',
       },
 
       textContainer: {
         minHeight: this.props.subtext ? 38 : 24,
-        marginLeft: 6
+        marginLeft: 6,
       },
 
       textContainerSelected: {
         borderBottomColor: StyleKit.variables.stylekitInfoColor,
-        borderBottomWidth: 2
+        borderBottomWidth: 2,
       },
 
       text: {
@@ -223,7 +223,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
         fontWeight: 'bold',
         fontSize: 15,
         paddingBottom: 0,
-        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       subtext: {
@@ -232,7 +232,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
         fontSize: 12,
         marginTop: -5,
         marginBottom: 3,
-        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       iconGraphic: {
@@ -240,7 +240,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
         width: 20,
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
       },
 
       iconCircle: {
@@ -248,7 +248,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
         width: 20,
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
       },
 
       iconAscii: {
@@ -256,8 +256,8 @@ export default class SideMenuCell extends ThemedComponent<Props> {
         fontWeight: 'bold',
         color: StyleKit.variables.stylekitNeutralColor,
         opacity: 0.6,
-        marginTop: -4
-      }
+        marginTop: -4,
+      },
     };
   }
 }

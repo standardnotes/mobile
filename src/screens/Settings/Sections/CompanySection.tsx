@@ -7,7 +7,7 @@ import ApplicationState from '@Lib/ApplicationState';
 import StyleKit from '@Style/StyleKit';
 
 export default class CompanySection extends Component {
-  onAction = (action) => {
+  onAction = action => {
     if (action === 'feedback') {
       const platformString = Platform.OS === 'android' ? 'Android' : 'iOS';
       ApplicationState.openURL(
@@ -70,7 +70,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             https://standardnotes.org/help
@@ -86,7 +86,7 @@ export default class CompanySection extends Component {
             <Text
               style={{
                 color: StyleKit.variables.stylekitNeutralColor,
-                marginTop: 3
+                marginTop: 3,
               }}
             >
               help@standardnotes.org
@@ -102,7 +102,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             Share the unexpected benefits of encrypted writing.
@@ -117,7 +117,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             Share Standard Notes with a friend.
@@ -132,7 +132,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             https://standardnotes.org
@@ -147,7 +147,7 @@ export default class CompanySection extends Component {
           <Text
             style={{
               color: StyleKit.variables.stylekitNeutralColor,
-              marginTop: 3
+              marginTop: 3,
             }}
           >
             https://standardnotes.org/privacy
@@ -164,7 +164,7 @@ export default class CompanySection extends Component {
             <Text
               style={{
                 color: StyleKit.variables.stylekitNeutralColor,
-                marginTop: 3
+                marginTop: 3,
               }}
             >
               Version {ApplicationState.version}
@@ -172,7 +172,7 @@ export default class CompanySection extends Component {
             <Text
               style={{
                 color: StyleKit.variables.stylekitNeutralColor,
-                marginTop: 3
+                marginTop: 3,
               }}
             >
               Help support us with a review on the {storeName}.

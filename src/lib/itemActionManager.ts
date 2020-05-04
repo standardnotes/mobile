@@ -67,7 +67,7 @@ export default class ItemActionManager {
           item.setDirty(true);
           Sync.get().sync();
           callback && callback();
-        }
+        },
       });
     } else if (event === this.EmptyTrashEvent) {
       let deletedCount = ModelManager.get().trashedItems().length;
@@ -79,7 +79,7 @@ export default class ItemActionManager {
           ModelManager.get().emptyTrash();
           Sync.get().sync();
           callback && callback();
-        }
+        },
       });
     } else if (event === this.DeleteEvent) {
       var title = `Delete ${item.displayName}`;
@@ -99,7 +99,7 @@ export default class ItemActionManager {
             .then(() => {
               callback && callback();
             });
-        }
+        },
       });
     } else if (event === this.RestoreEvent) {
       item.content.trashed = false;
@@ -130,7 +130,7 @@ export default class ItemActionManager {
       ApplicationState.get().performActionWithoutStateChangeImpact(() => {
         Share.share({
           title: item.title,
-          message: item.text
+          message: item.text,
         });
       });
       callback && callback();

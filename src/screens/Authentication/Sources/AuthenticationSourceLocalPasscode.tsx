@@ -11,7 +11,7 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
 
     Storage.get()
       .getItem('passcodeKeyboardType')
-      .then((result) => {
+      .then(result => {
         this.keyboardType = result || 'default';
         this.requiresInterfaceReload();
       });
@@ -24,7 +24,7 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
   get headerButtonStyles() {
     return {
       color: StyleKit.variables.stylekitNeutralColor,
-      fontSize: StyleKit.constants.mainTextFontSize - 5
+      fontSize: StyleKit.constants.mainTextFontSize - 5,
     };
   }
 

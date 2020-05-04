@@ -78,7 +78,7 @@ export default class MainSideMenu extends AbstractSideMenu<
       confirmButtonText: 'Open Settings',
       onConfirm: () => {
         this.presentSettings();
-      }
+      },
     });
   }
 
@@ -96,7 +96,7 @@ export default class MainSideMenu extends AbstractSideMenu<
     if (theme.content.package_info && theme.content.package_info.no_mobile) {
       AlertManager.get().alert({
         title: 'Not Available',
-        text: 'This theme is not available on mobile.'
+        text: 'This theme is not available on mobile.',
       });
 
       return;
@@ -120,7 +120,7 @@ export default class MainSideMenu extends AbstractSideMenu<
     if (theme.content.package_info && !theme.content.package_info.no_mobile) {
       const lightThemeAction = this.getModeActionForTheme({
         theme: theme,
-        mode: LIGHT_MODE_KEY
+        mode: LIGHT_MODE_KEY,
       });
       const lightName = StyleKit.doesDeviceSupportDarkMode()
         ? 'Light'
@@ -133,9 +133,9 @@ export default class MainSideMenu extends AbstractSideMenu<
           callback: () => {
             StyleKit.get().assignThemeForMode({
               theme: theme,
-              mode: LIGHT_MODE_KEY
+              mode: LIGHT_MODE_KEY,
             });
-          }
+          },
         })
       );
 
@@ -143,7 +143,7 @@ export default class MainSideMenu extends AbstractSideMenu<
       if (StyleKit.doesDeviceSupportDarkMode()) {
         const darkText = `${this.getModeActionForTheme({
           theme: theme,
-          mode: DARK_MODE_KEY
+          mode: DARK_MODE_KEY,
         })} Dark Theme`;
 
         actionSheetOptions.push(
@@ -152,9 +152,9 @@ export default class MainSideMenu extends AbstractSideMenu<
             callback: () => {
               StyleKit.get().assignThemeForMode({
                 theme: theme,
-                mode: DARK_MODE_KEY
+                mode: DARK_MODE_KEY,
               });
-            }
+            },
           })
         );
       }
@@ -167,7 +167,7 @@ export default class MainSideMenu extends AbstractSideMenu<
           text: 'Redownload',
           callback: () => {
             this.onThemeRedownload(theme);
-          }
+          },
         })
       );
     }
@@ -177,7 +177,7 @@ export default class MainSideMenu extends AbstractSideMenu<
       options: actionSheetOptions,
       onCancel: () => {
         this.setState({ actionSheet: null });
-      }
+      },
     });
 
     this.setState({ actionSheet: sheet.actionSheetElement() });
@@ -193,14 +193,14 @@ export default class MainSideMenu extends AbstractSideMenu<
       confirmButtonText: 'Redownload',
       onConfirm: () => {
         StyleKit.get().downloadThemeAndReload(theme);
-      }
+      },
     });
   }
 
   getModeActionForTheme({ theme, mode }: { theme: SNTheme; mode: Mode }) {
     return ThemeManager.get().isThemeEnabledForMode({
       mode: mode,
-      theme: theme
+      theme: theme,
     })
       ? 'Current'
       : 'Set as';
@@ -209,7 +209,7 @@ export default class MainSideMenu extends AbstractSideMenu<
   iconDescriptorForTheme = (theme: SNTheme) => {
     const desc = {
       type: 'circle',
-      side: 'right' as 'right'
+      side: 'right' as 'right',
     };
 
     const dockIcon =
@@ -218,12 +218,12 @@ export default class MainSideMenu extends AbstractSideMenu<
     if (dockIcon && dockIcon.type === 'circle') {
       _.merge(desc, {
         backgroundColor: dockIcon.background_color,
-        borderColor: dockIcon.border_color
+        borderColor: dockIcon.border_color,
       });
     } else {
       _.merge(desc, {
         backgroundColor: StyleKit.variables.stylekitInfoColor,
-        borderColor: StyleKit.variables.stylekitInfoColor
+        borderColor: StyleKit.variables.stylekitInfoColor,
       });
     }
 
@@ -248,7 +248,7 @@ export default class MainSideMenu extends AbstractSideMenu<
         },
         onLongPress: () => {
           this.onThemeLongPress(theme);
-        }
+        },
       });
 
       options.push(option);
@@ -263,11 +263,11 @@ export default class MainSideMenu extends AbstractSideMenu<
             type: 'icon',
             name: StyleKit.nameForIcon(ICON_BRUSH),
             side: 'right',
-            size: 17
+            size: 17,
           },
           onSelect: () => {
             ApplicationState.openURL('https://standardnotes.org/extensions');
-          }
+          },
         })
       );
     }
@@ -316,7 +316,7 @@ export default class MainSideMenu extends AbstractSideMenu<
           onTagSelect={this.onTagSelect}
           selectedTags={selectedTags}
         />
-      </SideMenuSection>
+      </SideMenuSection>,
     ];
 
     return (
@@ -327,7 +327,7 @@ export default class MainSideMenu extends AbstractSideMenu<
             top: 'never',
             bottom: 'always',
             left: 'always',
-            right: 'never'
+            right: 'never',
           }}
           style={[viewStyles, this.styles.secondSafeArea]}
         >
@@ -376,11 +376,11 @@ export default class MainSideMenu extends AbstractSideMenu<
       // See https://stackoverflow.com/questions/47725607/react-native-safeareaview-background-color-how-to-assign-two-different-backgro
       firstSafeArea: {
         flex: 0,
-        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor
+        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
       },
       secondSafeArea: {
         flex: 1,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
       },
       sideMenu: {
         // We want the header to be totally contrast, but content to be main
@@ -388,13 +388,13 @@ export default class MainSideMenu extends AbstractSideMenu<
         backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
         color: StyleKit.variables.stylekitForegroundColor,
         flex: 1,
-        flexDirection: 'column'
+        flexDirection: 'column',
       },
       flatList: {
         padding: 15,
         flex: 1,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor
-      }
+        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+      },
     };
   }
 }

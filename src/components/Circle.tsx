@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ViewStyle } from 'react-native';
 import SectionedTableCell, {
-  Props as SectionTableCellProps
+  Props as SectionTableCellProps,
 } from '@Components/SectionedTableCell';
 
 type Props = {
@@ -31,8 +31,8 @@ export default class Circle extends SectionedTableCell<Props> {
         borderRadius: this.size / 2.0,
         backgroundColor: this.props.backgroundColor,
         borderColor: this.props.borderColor,
-        borderWidth: 1
-      }
+        borderWidth: 1,
+      },
     };
   }
 }

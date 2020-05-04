@@ -10,7 +10,7 @@ export default class ReviewManager {
       return;
     }
 
-    this.getRunCount().then((runCount) => {
+    this.getRunCount().then(runCount => {
       this.setRunCount(runCount + 1);
       if (RUN_COUNTS_BEFORE_REVIEW.includes(runCount)) {
         setTimeout(function () {
@@ -23,7 +23,7 @@ export default class ReviewManager {
   static async getRunCount() {
     return Storage.get()
       .getItem('runCount')
-      .then((runCount) => {
+      .then(runCount => {
         if (runCount) {
           return JSON.parse(runCount);
         }

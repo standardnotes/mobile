@@ -37,7 +37,7 @@ export default class ThemeDownloader {
       url = url.replace('localhost', '10.0.2.2');
     }
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       Server.get().getAbsolute(
         url,
         {},

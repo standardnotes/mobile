@@ -5,7 +5,7 @@ import {
   Platform,
   Text,
   ViewStyle,
-  TextStyle
+  TextStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { WebView } from 'react-native-webview';
@@ -13,7 +13,7 @@ import ApplicationState from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
 import ModelManager from '@Lib/snjs/modelManager';
 import UserPrefsManager, {
-  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY
+  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
 } from '@Lib/userPrefsManager';
 import { ICON_LOCK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
@@ -46,7 +46,7 @@ export default class ComponentView extends Component<Props> {
       areas: ['note-tags', 'editor-stack', 'editor-editor'],
       contextRequestHandler: () => {
         return this.note;
-      }
+      },
     });
 
     this.reloadData();
@@ -80,7 +80,7 @@ export default class ComponentView extends Component<Props> {
        * https://github.com/facebook/react-native/issues/11594
        */
       const dontShowAgain = await UserPrefsManager.get().isPrefSet({
-        key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY
+        key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
       });
 
       if (!dontShowAgain) {
@@ -93,10 +93,10 @@ export default class ComponentView extends Component<Props> {
               onPress: () =>
                 UserPrefsManager.get().setPref({
                   key: DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
-                  value: true
-                })
+                  value: true,
+                }),
             },
-            { text: 'OK' }
+            { text: 'OK' },
           ]
         );
       }
@@ -235,7 +235,7 @@ export default class ComponentView extends Component<Props> {
       <View
         style={[
           StyleKit.styles.flexContainer,
-          { backgroundColor: StyleKit.variables.stylekitBackgroundColor }
+          { backgroundColor: StyleKit.variables.stylekitBackgroundColor },
         ]}
       >
         {this.editor.readonly && (
@@ -259,7 +259,7 @@ export default class ComponentView extends Component<Props> {
             }
             source={{ uri: url }}
             key={this.editor.uuid}
-            ref={(webView) => (this.webView = webView)}
+            ref={webView => (this.webView = webView)}
             /**
              * onLoad and onLoadEnd seem to be the same exact thing, except
              * that when an error occurs, onLoadEnd is called twice, whereas
@@ -296,15 +296,15 @@ export default class ComponentView extends Component<Props> {
         padding: padding,
         backgroundColor: StyleKit.variables.stylekitDangerColor,
         borderBottomColor: StyleKit.variables.stylekitBorderColor,
-        borderBottomWidth: 1
+        borderBottomWidth: 1,
       },
 
       lockedText: {
         fontWeight: 'bold',
         fontSize: 12,
         color: StyleKit.variables.stylekitBackgroundColor,
-        paddingLeft: 10
-      }
+        paddingLeft: 10,
+      },
     };
   }
 }

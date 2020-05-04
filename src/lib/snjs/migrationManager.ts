@@ -54,7 +54,7 @@ export default class MigrationManager extends SFMigrationManager {
         Sync.get()
           .stateless_downloadAllItems(options)
           .then(async (items: any[]) => {
-            const matchingPrivs = items.filter((candidate) => {
+            const matchingPrivs = items.filter(candidate => {
               return candidate.content_type === contentType;
             });
 
@@ -71,7 +71,7 @@ export default class MigrationManager extends SFMigrationManager {
             // but since we're manually mapping, we have to make it manually resolve singletons
             PrivilegesManager.get().singletonManager.resolveSingletons(mapped);
           });
-      }
+      },
     };
   }
 
@@ -91,7 +91,7 @@ export default class MigrationManager extends SFMigrationManager {
         Sync.get()
           .stateless_downloadAllItems(options)
           .then(async (items: any[]) => {
-            let matchingTags = items.filter((candidate) => {
+            let matchingTags = items.filter(candidate => {
               return candidate.content_type === contentType;
             });
 
@@ -105,7 +105,7 @@ export default class MigrationManager extends SFMigrationManager {
               SFModelManager.MappingSourceRemoteRetrieved
             );
           });
-      }
+      },
     };
   }
 
