@@ -1,3 +1,5 @@
+import { TextInput } from 'react-native';
+
 const DEFAULT_LOCK_TIMEOUT = 30 * 1000;
 
 export default class AuthenticationSource {
@@ -10,6 +12,7 @@ export default class AuthenticationSource {
     | 'did-succeed';
   authenticationValue?: string;
   onRequiresInterfaceReload?: () => void;
+  inputRef: TextInput | null = null;
   constructor() {
     this.status = 'waiting-turn';
   }

@@ -15,7 +15,7 @@ type Props = {
   subtitle?: string;
   buttonText?: string;
   buttonAction?: () => void;
-  buttonStyles?: ViewStyle;
+  buttonStyles?: ViewStyle | TextStyle;
   tinted?: boolean;
   backgroundColor?: ViewStyle['backgroundColor'];
   foregroundColor?: string;

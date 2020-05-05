@@ -6,16 +6,16 @@ import StyleKit from '@Style/StyleKit';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 type Props = {
-  disabled: boolean;
+  disabled?: boolean;
   onPress: () => void;
-  onLongPress: () => void;
+  onLongPress?: () => void;
   iconName?: string;
   selected?: () => void;
-  leftAlignIcon: boolean;
-  color: string;
-  bold: boolean;
-  tinted: boolean;
-  dimmed: boolean;
+  leftAlignIcon?: boolean;
+  color?: string;
+  bold?: boolean;
+  tinted?: boolean;
+  dimmed?: boolean;
   text: string;
 };
 

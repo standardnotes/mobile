@@ -3,22 +3,23 @@ import { protocolManager } from 'snjs';
 import Storage from '@Lib/snjs/storageManager';
 import AuthenticationSource from '@Screens/Authentication/Sources/AuthenticationSource';
 import StyleKit from '@Style/StyleKit';
+import { KeyboardTypeOptions } from 'react-native';
 
 export default class AuthenticationSourceLocalPasscode extends AuthenticationSource {
-  keyboardType: string = 'default';
+  keyboardType: KeyboardTypeOptions | null = 'default';
   constructor() {
     super();
 
     Storage.get()
       .getItem('passcodeKeyboardType')
       .then(result => {
-        this.keyboardType = result || 'default';
+        this.keyboardType = (result as KeyboardTypeOptions) || 'default';
         this.requiresInterfaceReload();
       });
   }
 
   get headerButtonText() {
-    return this.isWaitingForInput() && 'Change Keyboard';
+    return this.isWaitingForInput() ? 'Change Keyboard' : undefined;
   }
 
   get headerButtonStyles() {
