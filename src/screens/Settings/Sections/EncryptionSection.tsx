@@ -7,8 +7,16 @@ import KeysManager from '@Lib/keysManager';
 import ModelManager from '@Lib/snjs/modelManager';
 import StyleKit from '@Style/StyleKit';
 
-export default class PasscodeSection extends Component {
-  constructor(props) {
+type Props = {
+  title: string;
+};
+
+type State = {
+  items: any[];
+};
+
+export default class PasscodeSection extends Component<Props, State> {
+  constructor(props: Readonly<Props>) {
     super(props);
 
     this.state = {
@@ -42,7 +50,7 @@ export default class PasscodeSection extends Component {
     const titleStyles = {
       color: StyleKit.variables.stylekitForegroundColor,
       fontSize: 16,
-      fontWeight: 'bold',
+      fontWeight: 'bold' as 'bold',
     };
 
     const subtitleStyles = {

@@ -28,7 +28,7 @@ export type AbstractProps = {
 };
 
 export type AbstractState = {
-  lockContent: boolean;
+  lockContent?: boolean;
 };
 
 export default class Abstract<
@@ -287,7 +287,7 @@ export default class Abstract<
     state:
       | {}
       | ((
-          prevState: Readonly<{}>,
+          prevState: Readonly<TState>,
           props: Readonly<TProps>
         ) => {} | Pick<{}, never> | null)
       | null

@@ -3,7 +3,7 @@ import { View, ViewStyle } from 'react-native';
 import StyleKit from '@Style/StyleKit';
 
 type Props = {
-  extraStyles?: ViewStyle;
+  extraStyles?: ViewStyle | ViewStyle[];
 };
 
 export default class TableSection extends Component<Props> {
