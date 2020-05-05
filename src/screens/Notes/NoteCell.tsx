@@ -1,18 +1,49 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableWithoutFeedback,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 import ThemedPureComponent from '@Components/ThemedPureComponent';
-import ItemActionManager from '@Lib/itemActionManager';
+import ItemActionManager, { EventType } from '@Lib/itemActionManager';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
 import StyleKit from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
+import OptionsState from '@Lib/OptionsState';
 
-export default class NoteCell extends ThemedPureComponent {
-  constructor(props) {
+type Props = {
+  item: any;
+  options: OptionsState;
+  highlighted?: boolean;
+  onPressItem: (item: any) => void;
+  handleAction: (item: any, key: EventType, callback: () => void) => void;
+  renderTags: boolean;
+  sortType: string;
+  tagsString: string;
+};
+
+type State = {
+  selected: boolean;
+  options: OptionsState;
+  actionSheet: JSX.Element | null;
+};
+
+export default class NoteCell extends ThemedPureComponent<Props, State> {
+  styles!: Record<string, ViewStyle | TextStyle>;
+  selectionTimeout?: number;
+  constructor(props: Readonly<Props>) {
     super(props);
-    this.state = { selected: false, options: props.options || {} };
+    this.state = {
+      selected: false,
+      options: props.options || {},
+      actionSheet: null,
+    };
   }
 
-  static getDerivedStateFromProps(props, state) {
+  static getDerivedStateFromProps(props: Props, state: State) {
     if (props.options !== state.options) {
       return { options: props.options };
     }
@@ -41,7 +72,7 @@ export default class NoteCell extends ThemedPureComponent {
     this.setState({ selected: false });
   };
 
-  aggregateStyles(base, addition, condition) {
+  aggregateStyles(base: ViewStyle, addition: ViewStyle, condition: boolean) {
     if (condition) {
       return [base, addition];
     } else {
@@ -54,7 +85,7 @@ export default class NoteCell extends ThemedPureComponent {
       return;
     }
 
-    let callbackForAction = action => {
+    let callbackForAction = (action: any) => {
       this.props.handleAction(this.props.item, action.key, () => {
         this.forceUpdate();
       });
@@ -165,7 +196,14 @@ export default class NoteCell extends ThemedPureComponent {
     sheet.show();
   };
 
-  getFlags(note) {
+  getFlags(note: {
+    pinned: boolean;
+    archived: boolean;
+    content: { protected: boolean; trashed: boolean; conflict_of: any };
+    locked: boolean;
+    errorDecrypting: any;
+    deleted: boolean;
+  }) {
     let flags = [];
 
     if (note.pinned) {
@@ -227,7 +265,7 @@ export default class NoteCell extends ThemedPureComponent {
     return flags;
   }
 
-  flagElement = flag => {
+  flagElement = (flag: { color: any; text: any }) => {
     let bgColor = flag.color;
     let textColor = StyleKit.variables.stylekitInfoContrastColor;
     if (this.state.selected || this.props.highlighted) {
@@ -246,7 +284,7 @@ export default class NoteCell extends ThemedPureComponent {
       text: {
         color: textColor,
         fontSize: 10,
-        fontWeight: 'bold',
+        fontWeight: 'bold' as 'bold',
       },
     };
     return (
@@ -269,7 +307,7 @@ export default class NoteCell extends ThemedPureComponent {
       note.tags.length > 0 &&
       !note.content.protected;
 
-    const highlight = this.state.selected || this.props.highlighted;
+    const highlight = Boolean(this.state.selected || this.props.highlighted);
 
     return (
       <TouchableWithoutFeedback
@@ -284,7 +322,8 @@ export default class NoteCell extends ThemedPureComponent {
             this.styles.noteCellSelected,
             highlight
           )}
-          onPress={this._onPress}
+          // TODO: onPreess does not exist on view
+          // onPress={this._onPress}
         >
           {note.deleted && (
             <Text style={this.styles.deleting}>Deleting...</Text>
@@ -389,6 +428,7 @@ export default class NoteCell extends ThemedPureComponent {
 
   loadStyles() {
     let padding = 14;
+    // @ts-ignore ignore null return from hexToRGBA
     this.styles = StyleSheet.create({
       noteCell: {
         padding: padding,

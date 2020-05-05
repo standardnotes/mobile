@@ -1,5 +1,13 @@
 import React from 'react';
-import { StyleSheet, View, FlatList, RefreshControl, Text } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  RefreshControl,
+  Text,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import Search from 'react-native-search-box';
 import ThemedComponent from '@Components/ThemedComponent';
 import ApplicationState from '@Lib/ApplicationState';
@@ -7,8 +15,27 @@ import NoteCell from '@Screens/Notes/NoteCell';
 import OfflineBanner from '@Screens/Notes/OfflineBanner';
 import Auth from '@Lib/snjs/authManager';
 import StyleKit from '@Style/StyleKit';
+import { EventType } from '@Lib/itemActionManager';
 
-export default class NoteList extends ThemedComponent {
+type Props = {
+  onSearchChange: (text: string) => void;
+  onSearchCancel: () => void;
+  onPressItem: (item: any) => void;
+  selectedTags: any[];
+  selectedNoteId: string | null;
+  handleAction: (item: any, key: EventType, callback: () => void) => void;
+  sortType: string;
+  options: any;
+  decrypting: boolean;
+  loading: boolean;
+  hasRefreshControl: boolean;
+  notes: any[];
+  refreshing: boolean;
+  onRefresh: () => void;
+};
+
+export default class NoteList extends ThemedComponent<Props> {
+  styles!: Record<string, ViewStyle | TextStyle>;
   renderHeader = () => {
     const isOffline = Auth.get().offline();
 
@@ -48,7 +75,7 @@ export default class NoteList extends ThemedComponent {
    * Must pass title, text, and tags as props so that it re-renders when either
    * of those change.
    */
-  _renderItem = ({ item }) => {
+  _renderItem = ({ item }: any) => {
     /**
      * On Android, only one tag is selected at a time. If it is selected, we
      * don't need to display the tags string above the note cell.
@@ -63,6 +90,7 @@ export default class NoteList extends ThemedComponent {
       <NoteCell
         item={item}
         onPressItem={this.props.onPressItem}
+        // @ts-ignore TODO: not used props for extra data
         title={item.title}
         text={item.text}
         tags={item.tags}
@@ -72,6 +100,7 @@ export default class NoteList extends ThemedComponent {
         options={this.props.options}
         highlighted={item.uuid === this.props.selectedNoteId}
         handleAction={this.props.handleAction}
+        // @ts-ignore TODO: not used props for extra data
         pinned={item.pinned /* extraData */}
         deleted={item.deleted /* extraData */}
         archived={item.archived /* extraData */}
@@ -111,7 +140,7 @@ export default class NoteList extends ThemedComponent {
           keyboardDismissMode={'interactive'}
           keyboardShouldPersistTaps={'always'}
           refreshControl={
-            !this.props.hasRefreshControl ? null : (
+            !this.props.hasRefreshControl ? undefined : (
               <RefreshControl
                 refreshing={this.props.refreshing}
                 onRefresh={this.props.onRefresh}
@@ -119,7 +148,7 @@ export default class NoteList extends ThemedComponent {
             )
           }
           data={this.props.notes}
-          options={this.props.options}
+          // options={this.props.options} no options prop
           renderItem={this._renderItem}
           ListHeaderComponent={this.renderHeader}
         />

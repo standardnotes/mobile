@@ -16,6 +16,7 @@ import {
 import _ from 'lodash';
 import Storage from '@Lib/snjs/storageManager';
 import '../../models/extend/item';
+import OptionsState from '@Lib/OptionsState';
 
 type SFItem = typeof SNJSItem;
 
@@ -195,14 +196,7 @@ export default class ModelManager extends SFModelManager {
     return this.itemsMatchingPredicates(predicates);
   }
 
-  getNotes(
-    options: {
-      selectedTagIds?: string[];
-      searchTerm?: string;
-      sortBy?: any;
-      sortReverse?: any;
-    } = {}
-  ) {
+  getNotes(options: OptionsState) {
     let notes,
       tags = [],
       selectedSmartTag: { content: any };
@@ -246,8 +240,14 @@ export default class ModelManager extends SFModelManager {
         };
       }) {
         return (
-          note.safeTitle().toLowerCase().includes(searchTerm) ||
-          note.safeText().toLowerCase().includes(searchTerm)
+          note
+            .safeTitle()
+            .toLowerCase()
+            .includes(searchTerm ?? '') ||
+          note
+            .safeText()
+            .toLowerCase()
+            .includes(searchTerm ?? '')
         );
       });
     }
@@ -300,9 +300,12 @@ export default class ModelManager extends SFModelManager {
           return 1;
         }
       }
-
-      let aValue = a[sortBy] || '';
-      let bValue = b[sortBy] || '';
+      let aValue = '';
+      let bValue = '';
+      if (sortBy) {
+        aValue = a[sortBy] || '';
+        bValue = b[sortBy] || '';
+      }
 
       let vector = 1;
 

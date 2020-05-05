@@ -99,7 +99,7 @@ export default class ApplicationState {
   keyboardDidShowListener: EmitterSubscription;
   keyboardDidHideListener: EmitterSubscription;
   keyboardHeight?: number;
-  optionsState?: OptionsState;
+  optionsState: OptionsState;
   loading: boolean = false;
   tabletMode: boolean = false;
   noteSideMenuCollapsed: boolean = false;
@@ -117,6 +117,7 @@ export default class ApplicationState {
 
   constructor() {
     this.observers = [];
+    this.optionsState = new OptionsState();
     this.eventSubscribers = [];
     this.locked = true;
     this._isAndroid = Platform.OS === 'android';
@@ -153,7 +154,6 @@ export default class ApplicationState {
 
   initializeOptions() {
     // Initialize Options (sort by, filter, selected tags, etc)
-    this.optionsState = new OptionsState();
     this.optionsState.addChangeObserver(options => {
       if (!this.loading) {
         options.persist();

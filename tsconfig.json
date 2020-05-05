@@ -29,7 +29,7 @@
         "@Style/*": ["./style/*"],
 
       },
-      "typeRoots": ["./src/types"],
+      "typeRoots": ["./src/types/*"],
       "resolveJsonModule": true,
     },
     "exclude": [

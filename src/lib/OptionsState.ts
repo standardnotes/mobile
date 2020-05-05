@@ -7,7 +7,7 @@ type OptionsStateStateType =
   | typeof OptionsState.OptionsStateChangeEventViews
   | typeof OptionsState.OptionsStateChangeEventSort;
 
-type Observer = {
+export type Observer = {
   key: () => number;
   callback: (state: OptionsState, newState?: OptionsStateStateType) => void;
 };
@@ -18,10 +18,10 @@ export default class OptionsState {
   static OptionsStateChangeEventViews = 'OptionsStateChangeEventViews' as 'OptionsStateChangeEventViews';
   static OptionsStateChangeEventSort = 'OptionsStateChangeEventSort' as 'OptionsStateChangeEventSort';
   changeObservers: Observer[];
-  sortBy?: string;
-  selectedTagIds?: string[];
-  sortReverse?: boolean;
-  searchTerm?: string;
+  sortBy: string;
+  selectedTagIds: string[];
+  sortReverse: boolean;
+  searchTerm: string | null = null;
   displayOptions?: {
     hidePreviews: boolean;
     hideTags: boolean;
@@ -32,7 +32,11 @@ export default class OptionsState {
   hideTags: boolean = false;
 
   constructor() {
-    this.init();
+    this.searchTerm = '';
+    this.selectedTagIds = [];
+    this.sortBy = 'created_at';
+    this.sortReverse = false;
+
     // TODO: not used
     // _.merge(this, _.omit(json, ['changeObservers']));
     this.changeObservers = [];
@@ -104,7 +108,7 @@ export default class OptionsState {
   }
 
   // Interface
-  setSearchTerm(term: string) {
+  setSearchTerm(term: string | null) {
     this.searchTerm = term;
     this.notifyObservers(OptionsState.OptionsStateChangeEventSearch);
   }

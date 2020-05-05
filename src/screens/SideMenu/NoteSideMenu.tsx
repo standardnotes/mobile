@@ -53,17 +53,17 @@ export default class NoteSideMenu extends AbstractSideMenu<
   }
 
   onEditorSelect = (editor: any) => {
-    this.handler.onEditorSelect(editor);
+    this.handler?.onEditorSelect(editor);
     this.forceUpdate();
   };
 
   onTagSelect = (tag: any) => {
-    this.handler.onTagSelect(tag);
+    this.handler?.onTagSelect(tag);
     this.forceUpdate();
   };
 
   get note() {
-    return this.handler.getCurrentNote();
+    return this.handler?.getCurrentNote();
   }
 
   onEditorLongPress = (
@@ -166,7 +166,7 @@ export default class NoteSideMenu extends AbstractSideMenu<
           this.popToRoot();
         } else {
           this.forceUpdate();
-          this.handler.onPropertyChange();
+          this.handler?.onPropertyChange();
 
           if (action === ItemActionManager.ProtectEvent) {
             // Show Privileges management screen if protected notes privs are not set up yet
