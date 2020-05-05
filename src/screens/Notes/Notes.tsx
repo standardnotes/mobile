@@ -30,7 +30,7 @@ import StyleKit from '@Style/StyleKit';
 import { SFAuthManager, SFPrivilegesManager } from 'snjs';
 
 type Props = {
-  onNoteSelect: (note: any) => void;
+  onNoteSelect?: (note: any) => void;
   onUnlockPress: () => void;
 };
 

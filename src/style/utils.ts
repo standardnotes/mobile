@@ -98,7 +98,7 @@ export function lighten(color: string, value = 0.25) {
 
 export function hexToRGBA(hex: string, alpha: number) {
   if (!hex || !hex.startsWith('#')) {
-    return null;
+    return '';
   }
   let c: any;
   if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {

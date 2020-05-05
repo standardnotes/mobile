@@ -12,8 +12,8 @@ import NoteSideMenu from './NoteSideMenu';
  */
 export default class SideMenuManager {
   private static instance: SideMenuManager;
-  leftSideMenu?: MainSideMenu;
-  rightSideMenu?: NoteSideMenu;
+  leftSideMenu: MainSideMenu | null = null;
+  rightSideMenu: NoteSideMenu | null = null;
   leftSideMenuHandler: {
     onTagSelect: (tag: any) => void;
     getSelectedTags: () => any;
@@ -36,7 +36,7 @@ export default class SideMenuManager {
     return this.instance;
   }
 
-  setLeftSideMenuReference(ref: MainSideMenu) {
+  setLeftSideMenuReference(ref: MainSideMenu | null) {
     /**
      * The ref handler of the main component sometimes passes null, then passes
      * the correct reference
@@ -46,7 +46,7 @@ export default class SideMenuManager {
     }
   }
 
-  setRightSideMenuReference(ref: NoteSideMenu) {
+  setRightSideMenuReference(ref: NoteSideMenu | null) {
     /**
      * The ref handler of the main component sometimes passes null, then passes
      * the correct reference

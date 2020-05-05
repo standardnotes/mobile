@@ -1,10 +1,16 @@
 import React from 'react';
-import { TouchableHighlight, View } from 'react-native';
+import { TouchableHighlight, View, ViewStyle, TextStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SFAuthManager } from 'snjs';
-import ApplicationState from '@Lib/ApplicationState';
+import ApplicationState, {
+  AppStateEventHandler,
+  AppStateEventType,
+  TabletModeChangeData,
+  NoteSideMenuToggleChange,
+  AppStateType,
+} from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
-import Abstract from '@Screens/Abstract';
+import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 import Compose from '@Screens/Compose';
 import Notes from '@Screens/Notes/Notes';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
@@ -14,9 +20,40 @@ import ModelManager from '@Lib/snjs/modelManager';
 import Sync from '@Lib/snjs/syncManager';
 import StyleKit from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
+import AuthenticationSource from './Authentication/Sources/AuthenticationSource';
 
-export default class Root extends Abstract {
-  constructor(props) {
+type State = {
+  shouldSplitLayout?: boolean;
+  notesListCollapsed?: boolean;
+  keyboardHeight?: number;
+  selectedTagId?: string;
+  width?: number;
+  height?: number;
+  x?: number;
+  y?: number;
+} & AbstractState;
+
+export default class Root extends Abstract<AbstractProps, State> {
+  styles!: Record<string, ViewStyle | TextStyle>;
+  applicationStateEventHandler?: AppStateEventHandler;
+  stateObserver?: {
+    key: () => number;
+    callback: (state: AppStateType) => void;
+  };
+  dataLoaded?: boolean;
+  syncEventHandler?: any;
+  didShowSessionInvalidAlert?: boolean;
+  syncStatusObserver?: any;
+  showingErrorStatus?: boolean;
+  showingDownloadStatus?: boolean;
+  signoutObserver?: any;
+  authOnMount: any;
+  authenticationInProgress: any;
+  pendingAuthProps: any;
+  syncTimer?: number;
+  notesRef: any;
+  composeRef: any;
+  constructor(props: Readonly<AbstractProps>) {
     super(props);
     this.registerObservers();
   }
@@ -37,11 +74,15 @@ export default class Root extends Abstract {
     });
 
     this.applicationStateEventHandler = ApplicationState.get().addEventHandler(
-      (event, data) => {
+      (
+        event: AppStateEventType,
+        data: TabletModeChangeData | NoteSideMenuToggleChange | undefined
+      ) => {
         if (event === ApplicationState.AppStateEventNoteSideMenuToggle) {
           // update state to toggle Notes side menu if we triggered the collapse
           this.setState({
-            notesListCollapsed: data.new_isNoteSideMenuCollapsed,
+            notesListCollapsed: (data as NoteSideMenuToggleChange)
+              .new_isNoteSideMenuCollapsed,
           });
         } else if (event === ApplicationState.KeyboardChangeEvent) {
           // need to refresh the height of the keyboard when it opens so that we can change the position
@@ -55,52 +96,56 @@ export default class Root extends Abstract {
       }
     );
 
-    this.syncEventHandler = Sync.get().addEventHandler(async event => {
-      if (event === 'sync-session-invalid') {
-        if (!this.didShowSessionInvalidAlert) {
-          this.didShowSessionInvalidAlert = true;
-          AlertManager.get().confirm({
-            title: 'Session Expired',
-            text:
-              'Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.',
-            confirmButtonText: 'Sign Out',
-            onConfirm: () => {
-              this.didShowSessionInvalidAlert = false;
-              Auth.get().signout();
-            },
-            onCancel: () => {
-              this.didShowSessionInvalidAlert = false;
-            },
-          });
+    this.syncEventHandler = Sync.get().addEventHandler(
+      async (event: string) => {
+        if (event === 'sync-session-invalid') {
+          if (!this.didShowSessionInvalidAlert) {
+            this.didShowSessionInvalidAlert = true;
+            AlertManager.get().confirm({
+              title: 'Session Expired',
+              text:
+                'Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.',
+              confirmButtonText: 'Sign Out',
+              onConfirm: () => {
+                this.didShowSessionInvalidAlert = false;
+                Auth.get().signout();
+              },
+              onCancel: () => {
+                this.didShowSessionInvalidAlert = false;
+              },
+            });
+          }
         }
       }
-    });
+    );
 
-    this.syncStatusObserver = Sync.get().registerSyncStatusObserver(status => {
-      if (status.error) {
-        const text = 'Unable to connect to sync server.';
-        this.showingErrorStatus = true;
-        setTimeout(() => {
-          // need timeout for syncing on app launch
-          this.setSubTitle(text, StyleKit.variables.stylekitWarningColor);
-        }, 250);
-      } else if (status.retrievedCount > 20) {
-        const text = `Downloading ${status.retrievedCount} items. Keep app open.`;
-        this.setSubTitle(text);
-        this.showingDownloadStatus = true;
-      } else if (this.showingDownloadStatus) {
-        this.showingDownloadStatus = false;
-        const text = 'Download Complete.';
-        this.setSubTitle(text);
-        setTimeout(() => {
+    this.syncStatusObserver = Sync.get().registerSyncStatusObserver(
+      (status: { error: any; retrievedCount: number }) => {
+        if (status.error) {
+          const text = 'Unable to connect to sync server.';
+          this.showingErrorStatus = true;
+          setTimeout(() => {
+            // need timeout for syncing on app launch
+            this.setSubTitle(text, StyleKit.variables.stylekitWarningColor);
+          }, 250);
+        } else if (status.retrievedCount > 20) {
+          const text = `Downloading ${status.retrievedCount} items. Keep app open.`;
+          this.setSubTitle(text);
+          this.showingDownloadStatus = true;
+        } else if (this.showingDownloadStatus) {
+          this.showingDownloadStatus = false;
+          const text = 'Download Complete.';
+          this.setSubTitle(text);
+          setTimeout(() => {
+            this.setSubTitle(null);
+          }, 2000);
+        } else if (this.showingErrorStatus) {
           this.setSubTitle(null);
-        }, 2000);
-      } else if (this.showingErrorStatus) {
-        this.setSubTitle(null);
+        }
       }
-    });
+    );
 
-    this.signoutObserver = Auth.get().addEventHandler(async event => {
+    this.signoutObserver = Auth.get().addEventHandler(async (event: any) => {
       if (event === SFAuthManager.DidSignOutEvent) {
         this.setSubTitle(null);
         const notifyObservers = false;
@@ -145,13 +190,20 @@ export default class Root extends Abstract {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    ApplicationState.get().removeStateObserver(this.stateObserver);
-    ApplicationState.get().removeEventHandler(
-      this.applicationStateEventHandler
-    );
+    if (this.stateObserver) {
+      ApplicationState.get().removeStateObserver(this.stateObserver);
+    }
+    if (this.applicationStateEventHandler) {
+      ApplicationState.get().removeEventHandler(
+        this.applicationStateEventHandler
+      );
+    }
+
     Sync.get().removeEventHandler(this.syncEventHandler);
     Sync.get().removeSyncStatusObserver(this.syncStatusObserver);
-    clearInterval(this.syncTimer);
+    if (this.syncTimer !== undefined) {
+      clearInterval(this.syncTimer);
+    }
   }
 
   /* Forward React Navigation lifecycle events to notes */
@@ -198,7 +250,7 @@ export default class Root extends Abstract {
     this.setSubTitle(
       encryptionEnabled ? 'Decrypting items...' : 'Loading items...'
     );
-    const incrementalCallback = (current, total) => {
+    const incrementalCallback = (current: any, total: any) => {
       const notesString = `${current}/${total} items...`;
       this.setSubTitle(
         encryptionEnabled
@@ -231,15 +283,27 @@ export default class Root extends Abstract {
       const batchSize = 100;
       Sync.get()
         .loadLocalItems({ incrementalCallback, batchSize })
-        .then(items => {
+        .then(() => {
           setTimeout(() => {
-            loadLocalCompletion(items);
+            loadLocalCompletion();
           });
         });
     }
   }
 
-  presentAuthenticationModal(authProps) {
+  presentAuthenticationModal(
+    authProps:
+      | {
+          sources: AuthenticationSource[];
+          title?: undefined;
+          onAuthenticate?: undefined;
+        }
+      | {
+          title: string;
+          sources: AuthenticationSource[];
+          onAuthenticate: () => void;
+        }
+  ) {
     if (!this.isMounted()) {
       console.log('Not yet mounted, not authing.');
       this.authOnMount = authProps;
@@ -270,7 +334,7 @@ export default class Root extends Abstract {
     this.props.navigation.navigate(SCREEN_AUTHENTICATE, {
       authenticationSources: authProps.sources,
       onSuccess: () => {
-        authProps.onAuthenticate();
+        authProps.onAuthenticate && authProps.onAuthenticate();
         this.pendingAuthProps = null;
         this.authenticationInProgress = false;
         if (this.dataLoaded) {
@@ -283,7 +347,7 @@ export default class Root extends Abstract {
     });
   }
 
-  onNoteSelect = note => {
+  onNoteSelect = (note: any) => {
     this.composeRef.setNote(note);
     this.setState({
       selectedTagId:
@@ -292,7 +356,9 @@ export default class Root extends Abstract {
     });
   };
 
-  onLayout = e => {
+  onLayout = (e: {
+    nativeEvent: { layout: { width: any; height: any; x: any; y: any } };
+  }) => {
     const width = e.nativeEvent.layout.width;
     /**
       If you're in tablet mode, but on an iPad where this app is running side by
@@ -351,7 +417,7 @@ export default class Root extends Abstract {
       '-' +
       iconNames[collapseIconPrefix][notesListCollapsed ? 0 : 1];
     const collapseIconBottomPosition =
-      this.state.keyboardHeight > this.state.height / 2
+      (this.state.keyboardHeight ?? 0) > (this.state.height ?? 0) / 2
         ? this.state.keyboardHeight
         : '50%';
 
@@ -369,7 +435,9 @@ export default class Root extends Abstract {
             onUnlockPress={this.onUnlockPress}
             navigation={this.props.navigation}
             onNoteSelect={
-              shouldSplitLayout && this.onNoteSelect /* tablet only */
+              shouldSplitLayout
+                ? this.onNoteSelect
+                : undefined /* tablet only */
             }
           />
         </View>

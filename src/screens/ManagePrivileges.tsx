@@ -10,12 +10,20 @@ import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
 import Auth from '@Lib/snjs/authManager';
 import PrivilegesManager from '@Lib/snjs/privilegesManager';
-import Abstract from '@Screens/Abstract';
+import Abstract, { AbstractState, AbstractProps } from '@Screens/Abstract';
 import { ICON_CHECKMARK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
-export default class ManagePrivileges extends Abstract {
-  static navigationOptions = ({ navigation, navigationOptions }) => {
+type State = {
+  availableActions: any[];
+  availableCredentials: any[];
+  notConfiguredCredentials?: any[];
+  sessionExpirey?: string;
+  sessionExpired?: boolean;
+} & AbstractState;
+
+export default class ManagePrivileges extends Abstract<AbstractProps, State> {
+  static navigationOptions = ({ navigation, navigationOptions }: any) => {
     const templateOptions = {
       title: 'Privileges',
       leftButton: {
@@ -27,12 +35,17 @@ export default class ManagePrivileges extends Abstract {
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
-      navigationOptions,
+      _navigationOptions: navigationOptions,
       templateOptions,
     });
   };
+  hasPasscode: boolean;
+  hasAccount: boolean;
+  privileges: any;
+  credentialDisplayInfo: Record<string, string> = {};
+  styles: any;
 
-  constructor(props) {
+  constructor(props: Readonly<AbstractProps>) {
     super(props);
 
     this.state = {
@@ -58,15 +71,15 @@ export default class ManagePrivileges extends Abstract {
     this.reloadPrivileges();
   }
 
-  displayInfoForCredential(credential) {
+  displayInfoForCredential(credential: any) {
     return PrivilegesManager.get().displayInfoForCredential(credential).label;
   }
 
-  displayInfoForAction(action) {
+  displayInfoForAction(action: any) {
     return PrivilegesManager.get().displayInfoForAction(action).label;
   }
 
-  isCredentialRequiredForAction(action, credential) {
+  isCredentialRequiredForAction(action: any, credential: any) {
     if (!this.privileges) {
       return false;
     }
@@ -120,14 +133,14 @@ export default class ManagePrivileges extends Abstract {
     });
   }
 
-  valueChanged(action, credential) {
+  valueChanged(action: any, credential: any) {
     this.privileges.toggleCredentialForAction(action, credential);
     PrivilegesManager.get().savePrivileges();
     this.forceUpdate();
   }
 
-  credentialUnavailable = credential => {
-    return this.state.notConfiguredCredentials.includes(credential);
+  credentialUnavailable = (credential: any) => {
+    return this.state.notConfiguredCredentials?.includes(credential);
   };
 
   render() {

@@ -13,4 +13,5 @@
 // require('core-js/fn/array/find');
 
 // TODO: still crashes without this
+// @ts-ignore
 global._ = require('lodash');

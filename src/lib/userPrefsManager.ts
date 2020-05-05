@@ -31,7 +31,8 @@ export default class UserPrefsManager {
 
   async getPref({ key }: { key: string }) {
     if (isNullOrUndefined(this.data[key])) {
-      this.data[key] = JSON.parse(await Storage.get().getItem(key));
+      const item = await Storage.get().getItem(key);
+      this.data[key] = JSON.parse(item ?? '');
     }
 
     return this.data[key];
@@ -39,7 +40,8 @@ export default class UserPrefsManager {
 
   async getPrefAsDate({ key }: { key: string }) {
     if (isNullOrUndefined(this.data[key])) {
-      this.data[key] = dateFromJsonString(await Storage.get().getItem(key));
+      const item = await Storage.get().getItem(key);
+      this.data[key] = dateFromJsonString(item ?? '');
     }
 
     return this.data[key];

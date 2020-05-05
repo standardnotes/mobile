@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Keyboard, Alert } from 'react-native';
+import { TextInput, Keyboard, Alert, KeyboardTypeOptions } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import ButtonCell from '@Components/ButtonCell';
 import SectionedTableCell from '@Components/SectionedTableCell';
@@ -7,12 +7,17 @@ import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
 import TableSection from '@Components/TableSection';
 import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';
-import Abstract from '@Screens/Abstract';
+import Abstract, { AbstractState, AbstractProps } from '@Screens/Abstract';
 import { ICON_CLOSE } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
-export default class InputModal extends Abstract {
-  static navigationOptions = ({ navigation, navigationOptions }) => {
+type State = {
+  text: string;
+  confirmText: string;
+} & AbstractState;
+
+export default class InputModal extends Abstract<AbstractProps, State> {
+  static navigationOptions = ({ navigation, navigationOptions }: any) => {
     const templateOptions = {
       leftButton: {
         title: ApplicationState.isIOS ? 'Cancel' : null,
@@ -23,12 +28,17 @@ export default class InputModal extends Abstract {
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
-      navigationOptions,
+      _navigationOptions: navigationOptions,
       templateOptions,
     });
   };
+  requireConfirm: boolean;
+  showKeyboardChooser: boolean;
+  keyboardType: KeyboardTypeOptions;
+  confirmInputRef: TextInput | null = null;
+  inputRef: TextInput | null = null;
 
-  constructor(props) {
+  constructor(props: Readonly<AbstractProps>) {
     super(props);
 
     props.navigation.setParams({
@@ -56,7 +66,7 @@ export default class InputModal extends Abstract {
 
   onTextSubmit = () => {
     if (this.requireConfirm && !this.state.confirmText) {
-      this.confirmInputRef.focus();
+      this.confirmInputRef?.focus();
     } else {
       this.submit();
     }
@@ -87,11 +97,11 @@ export default class InputModal extends Abstract {
     this.dismiss();
   };
 
-  onTextChange = text => {
+  onTextChange = (text: string) => {
     this.setState({ text: text });
   };
 
-  onConfirmTextChange = text => {
+  onConfirmTextChange = (text: string) => {
     this.setState({ confirmText: text });
   };
 
@@ -105,7 +115,7 @@ export default class InputModal extends Abstract {
     }
   }
 
-  onKeyboardOptionsSelect = option => {
+  onKeyboardOptionsSelect = (option: { key: any }) => {
     this.keyboardType = option.key;
     this.forceUpdate();
     this.refreshKeyboard();
