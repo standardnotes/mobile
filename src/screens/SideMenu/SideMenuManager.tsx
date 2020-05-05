@@ -73,7 +73,7 @@ export default class SideMenuManager {
    * @param handler.getCurrentNote
    */
   setHandlerForRightSideMenu(handler: SideMenuManager['rightSideMenuHandler']) {
-    this.leftSideMenuHandler = handler;
+    this.rightSideMenuHandler = handler;
 
     this.rightSideMenu && this.rightSideMenu.forceUpdate();
 
