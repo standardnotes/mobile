@@ -50,7 +50,8 @@ jobs:
         $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
         $ANDROID_HOME/platform-tools/adb devices
         echo "Emulator started"
-    - name: Android e2e tests
+    - name: Run tests
+      run: yarn detox test --configuration android.emu.debug
 
   ios:
     runs-on: macos-latest
@@ -59,8 +60,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
 
     - name: Cache node modules
       uses: actions/cache@v1
@@ -95,4 +94,3 @@ jobs:
       run: yarn detox build --configuration ios.sim.release
     - name: Run tests
       run: yarn detox test --configuration ios.sim.release --cleanup --debug-synchronization 200
-- name: iOS e2e tests
