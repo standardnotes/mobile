@@ -8,8 +8,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-        fetch-depth: 1
       - name: Install dependencies
         run: yarn install
       - name: Lint code
