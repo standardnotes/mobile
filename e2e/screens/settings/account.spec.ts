@@ -1,9 +1,9 @@
-/* eslint-disable no-undef */
 const helpers = require('../../helpers');
+import { element, by, device, expect } from 'detox';
 
 describe('Account section', () => {
   describe('Form', () => {
-    before(async () => {
+    beforeAll(async () => {
       await helpers.openSettingsScreen();
     });
 
@@ -31,7 +31,7 @@ describe('Account section', () => {
   });
 
   describe('Register', () => {
-    before(async () => {
+    beforeAll(async () => {
       await helpers.openSettingsScreen();
     });
 
@@ -60,7 +60,7 @@ describe('Account section', () => {
       await element(by.id('registerConfirmButton')).tap();
     });
 
-    after(async () => {
+    afterAll(async () => {
       await helpers.openSettingsScreen();
 
       // Account is created and we now proceed to sign out...
@@ -68,13 +68,19 @@ describe('Account section', () => {
       await element(by.id('signOutButton')).tap();
 
       // Confirmation button in the dialog...
-      await expect(element(by.text('SIGN OUT'))).toBeVisible();
-      await element(by.text('SIGN OUT')).tap();
+      if (device.getPlatform() === 'ios') {
+        await element(
+          by.label('Sign Out').and(by.type('_UIAlertControllerActionView'))
+        ).tap();
+      } else {
+        await expect(element(by.text('SIGN OUT'))).toBeVisible();
+        await element(by.text('SIGN OUT')).tap();
+      }
     });
   });
 
   describe('Sign In', () => {
-    before(async () => {
+    beforeAll(async () => {
       await helpers.openSettingsScreen();
     });
 

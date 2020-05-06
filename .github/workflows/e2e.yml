@@ -1,0 +1,100 @@
+name: e2e
+
+on: [push]
+
+jobs:
+  android:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Download Android Emulator Image
+         run: |
+          echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-29;google_apis;x86"
+          echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name emu --device "Nexus 5X" -k 'system-images;android-29;google_apis;x86'
+          $ANDROID_HOME/emulator/emulator -list-avds
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+     - name: Rebuild detox
+       if: steps.cache.outputs.cache-hit == 'true'
+       run: yarn detox clean-framework-cache && yarn detox build-framework-cache
+
+    - name: Use specific Java version for sdkmanager to work
+      uses: joschi/setup-jdk@v1
+      with:
+        java-version: 'openjdk8'
+        architecture: 'x64'
+
+    - name: Build for detox
+      run: yarn detox build --configuration android.emu.debug
+    - name: Run tests
+      run: yarn detox test --configuration android.emu.debug
+    - name: Android Emulator
+      timeout-minutes: 10
+      continue-on-error: true
+      run: |
+        echo "Starting emulator"
+        nohup $ANDROID_HOME/emulator/emulator -avd emu -no-audio -no-snapshot -no-window &
+        $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
+        $ANDROID_HOME/platform-tools/adb devices
+        echo "Emulator started"
+    - name: Android e2e tests
+
+  ios:
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - name: Cache node modules
+      uses: actions/cache@v1
+      id: cache
+      with:
+        path: node_modules
+        key: node-modules-${{ hashFiles('**/yarn.lock') }}
+
+    - name: Rebuild detox
+      if: steps.cache.outputs.cache-hit == 'true'
+      run: yarn detox clean-framework-cache && yarn detox build-framework-cache
+
+    - name: Install Dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: yarn install
+
+    - name: Cache Pods
+      uses: actions/cache@v1
+      id: podcache
+      with:
+        path: ios/Pods
+        key: pods-${{ hashFiles('**/Podfile.lock') }}
+
+    - name: Install Pods
+      run: npx pod-install ios
+
+    - name: Install detox dependencies
+      run: brew tap wix/brew
+    - name: Install simulator utils
+      run: brew install applesimutils
+    - name: Build for detox
+      run: yarn detox build --configuration ios.sim.release
+    - name: Run tests
+      run: yarn detox test --configuration ios.sim.release --cleanup --debug-synchronization 200
+- name: iOS e2e tests

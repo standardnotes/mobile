@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ViewStyle,
   TextStyle,
+  ViewProps,
 } from 'react-native';
 import Circle from '@Components/Circle';
 import ThemedComponent from '@Components/ThemedComponent';
@@ -17,6 +18,7 @@ type Props = {
   onPress: () => void;
   outOfSync: boolean;
   onOutOfSyncPress: () => void;
+  testID: ViewProps['testID'];
 };
 
 export default class SideMenuHero extends ThemedComponent<Props> {
@@ -48,7 +50,10 @@ export default class SideMenuHero extends ThemedComponent<Props> {
     const textData = this.getText();
     return (
       <View style={[this.styles.cell]}>
-        <TouchableOpacity onPress={this.props.onPress}>
+        <TouchableOpacity
+          testID={this.props.testID}
+          onPress={this.props.onPress}
+        >
           <Text style={this.styles.title}>{textData.title}</Text>
         </TouchableOpacity>
 

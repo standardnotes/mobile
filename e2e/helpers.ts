@@ -1,7 +1,7 @@
-/* eslint-disable no-undef */
 const faker = require('faker');
+import { device, waitFor, element, by } from 'detox';
 
-module.exports.openSettingsScreen = async () => {
+export const openSettingsScreen = async () => {
   await device.reloadReactNative();
 
   // Opens the settings screen
@@ -12,18 +12,22 @@ module.exports.openSettingsScreen = async () => {
   await element(by.id('settingsButton')).tap();
 };
 
-module.exports.openComposeNewNoteScreen = async () => {
+export const openComposeNewNoteScreen = async () => {
   await device.reloadReactNative();
 
   // Opens the screen to compose a new note
   await waitFor(element(by.id('rootView')))
     .toBeVisible()
     .withTimeout(2000);
+  await waitFor(element(by.id('newNoteButton')))
+    .toBeVisible()
+    .withTimeout(2000);
+  console.log(element(by.id('newNoteButton')));
   await element(by.id('newNoteButton')).tap();
 };
 
-module.exports.randomCredentials = {
+export const randomCredentials = {
   email: faker.internet.exampleEmail(),
   password: faker.internet.password(),
-  syncServerUrl: 'http://syncing-server.dev:3000',
+  syncServerUrl: 'http://127.0.0.1:3000/',
 };
