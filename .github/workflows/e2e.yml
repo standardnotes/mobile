@@ -18,20 +18,9 @@ jobs:
           $ANDROID_HOME/tools/bin/avdmanager create avd -n pixel -d "Nexus 5X" --package "system-images;android-28;default;x86_64"
           $ANDROID_HOME/emulator/emulator -list-avds
 
-      - name: Cache node modules
-        uses: actions/cache@v1
-        id: cache
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('**/yarn.lock') }}
-
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
-
-      - name: Rebuild detox
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: yarn detox clean-framework-cache && yarn detox build-framework-cache
 
       - name: Use specific Java version for sdkmanager to work
         uses: joschi/setup-jdk@v1
@@ -64,27 +53,9 @@ jobs:
       with:
           fetch-depth: 1
 
-    - name: Cache node modules
-      uses: actions/cache@v1
-      id: cache
-      with:
-        path: node_modules
-        key: node-modules-${{ hashFiles('**/yarn.lock') }}
-
-    - name: Rebuild detox
-      if: steps.cache.outputs.cache-hit == 'true'
-      run: yarn detox clean-framework-cache && yarn detox build-framework-cache
-
     - name: Install Dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: yarn install
-
-    - name: Cache Pods
-      uses: actions/cache@v1
-      id: podcache
-      with:
-        path: ios/Pods
-        key: pods-${{ hashFiles('**/Podfile.lock') }}
 
     - name: Install Pods
       run: npx pod-install ios
