@@ -13,7 +13,7 @@ jobs:
       - name: Download Android Emulator Image
         run: |
           $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-28;default;x86_64"
-          $ANDROID_HOME/tools/bin/avdmanager create avd -n pixel -d "Pixel_API_28_AOSP" --package "system-images;android-28;default;x86_64"
+          $ANDROID_HOME/tools/bin/avdmanager create avd -n pixel -d "Nexus 5X" --package "system-images;android-28;default;x86_64"
           $ANDROID_HOME/emulator/emulator -list-avds
 
       - name: Cache node modules
