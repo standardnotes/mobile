@@ -10,8 +10,6 @@ import { SFItem } from 'snjs';
 
 SFItem.AppDomain = 'org.standardnotes.sn';
 
-require('react-native').unstable_enableLogBox();
-
 YellowBox.ignoreWarnings([
   'The scalesPageToFit property is not supported when useWebKit = true', // we still want to use this property for Android
   'Remote debugger is in',
