@@ -12,10 +12,33 @@ import StyleKit from '@Style/StyleKit';
 const DEFAULT_SIGN_IN_TEXT = 'Sign In';
 const DEFAULT_REGISTER_TEXT = 'Register';
 
-export default class AuthSection extends Component {
-  constructor(props) {
+type Props = {
+  onAuthSuccess: () => void;
+  title: string;
+};
+type State = {
+  server?: string;
+  showAdvanced: boolean;
+  signingIn: boolean;
+  signInButtonText: string;
+  registerButtonText: string;
+  password: string | null;
+  email: string | null;
+  registering: boolean;
+  strictSignIn: boolean;
+  mfa?: any;
+  mfa_token?: string;
+  confirmRegistration?: boolean;
+  passwordConfirmation?: string;
+};
+
+export default class AuthSection extends Component<Props, State> {
+  static emailInProgress: any;
+  static passwordInProgress: any;
+  constructor(props: Readonly<Props>) {
     super(props);
     this.state = {
+      showAdvanced: false,
       email: AuthSection.emailInProgress,
       password: AuthSection.passwordInProgress,
       signingIn: false,
@@ -60,9 +83,9 @@ export default class AuthSection extends Component {
       return;
     }
 
-    const extraParams = {};
+    const extraParams: Record<string, string | undefined> = {};
     if (this.state.mfa) {
-      extraParams[this.state.mfa.payload.mfa_key] = this.state.mfa_token;
+      extraParams[this.state.mfa?.payload.mfa_key] = this.state.mfa_token;
     }
 
     const strict = this.state.strictSignIn;
@@ -79,7 +102,7 @@ export default class AuthSection extends Component {
 
     Auth.get()
       .login(this.state.server, email, password, strict, extraParams)
-      .then(response => {
+      .then((response: { error: any }) => {
         if (!response || response.error) {
           const error = response
             ? response.error
@@ -105,7 +128,7 @@ export default class AuthSection extends Component {
       });
   };
 
-  validate(email, password) {
+  validate(email: string | null, password: string | null) {
     if (!email) {
       Alert.alert('Missing Email', 'Please enter a valid email address.', [
         { text: 'OK' },
@@ -174,7 +197,7 @@ export default class AuthSection extends Component {
 
       Auth.get()
         .register(this.state.server, this.state.email, this.state.password)
-        .then(response => {
+        .then((response: { error: any }) => {
           this.setState({ registering: false, confirmRegistration: false });
 
           if (!response || response.error) {
@@ -194,7 +217,7 @@ export default class AuthSection extends Component {
     this.setState({ mfa: null });
   };
 
-  emailInputChanged = text => {
+  emailInputChanged = (text: string) => {
     this.setState({ email: text });
     /**
      * If you have a local passcode with immediate timing, and you're trying to
@@ -205,7 +228,7 @@ export default class AuthSection extends Component {
     AuthSection.emailInProgress = text;
   };
 
-  passwordInputChanged = text => {
+  passwordInputChanged = (text: string) => {
     this.setState({ password: text });
     AuthSection.passwordInProgress = text;
   };
@@ -306,7 +329,7 @@ export default class AuthSection extends Component {
                 style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={'Email'}
                 onChangeText={text => this.emailInputChanged(text)}
-                value={this.state.email}
+                value={this.state.email ?? undefined}
                 autoCorrect={false}
                 autoCapitalize={'none'}
                 keyboardType={'email-address'}
@@ -323,7 +346,7 @@ export default class AuthSection extends Component {
                 style={StyleKit.styles.sectionedTableCellTextInput}
                 placeholder={'Password'}
                 onChangeText={text => this.passwordInputChanged(text)}
-                value={this.state.password}
+                value={this.state.password ?? undefined}
                 textContentType={'password'}
                 secureTextEntry={true}
                 keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}

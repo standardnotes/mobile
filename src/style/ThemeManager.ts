@@ -1,21 +1,31 @@
-import { SFItemParams } from 'snjs';
+import { SFItemParams, SNTheme as SNJSTheme } from 'snjs';
 import _ from 'lodash';
 import UserPrefsManager from '@Lib/userPrefsManager';
 import { isNullOrUndefined } from '@Lib/utils';
 import Storage from '@Lib/snjs/storageManager';
 import StyleKit from '@Style/StyleKit';
 import { LIGHT_MODE_KEY } from '@Style/utils';
+import { Mode } from 'react-native-dark-mode';
 
 const THEME_PREFERENCES_KEY = 'ThemePreferencesKey';
 const LIGHT_THEME_KEY = 'lightTheme';
 const DARK_THEME_KEY = 'darkTheme';
 
-function getThemeKeyForMode(mode) {
+function getThemeKeyForMode(mode: Mode) {
   return mode === LIGHT_MODE_KEY ? LIGHT_THEME_KEY : DARK_THEME_KEY;
 }
 
+type SNTheme = typeof SNJSTheme;
+
+type ThemeManagerData = {
+  [LIGHT_THEME_KEY]: any;
+  [DARK_THEME_KEY]: any;
+};
+
 export default class ThemeManager {
-  static instance = null;
+  private static instance: ThemeManager;
+  data: ThemeManagerData | null = null;
+  saveAction: any;
 
   static get() {
     if (isNullOrUndefined(this.instance)) {
@@ -25,8 +35,6 @@ export default class ThemeManager {
   }
 
   async initialize() {
-    this.data = null;
-
     await this.runPendingMigrations();
   }
 
@@ -75,23 +83,23 @@ export default class ThemeManager {
     await UserPrefsManager.get().clearPref({ key: savedThemeKey });
   }
 
-  getThemeUuidForMode(mode) {
+  getThemeUuidForMode(mode: Mode) {
     const pref = this.getThemeForMode(mode);
     return pref && pref.uuid;
   }
 
-  isThemeEnabledForMode({ mode, theme }) {
+  isThemeEnabledForMode({ mode, theme }: { mode: Mode; theme: SNTheme }) {
     const pref = this.getThemeForMode(mode);
     return pref.uuid === theme.uuid;
   }
 
-  getThemeForMode(mode) {
-    return this.data[getThemeKeyForMode(mode)];
+  getThemeForMode(mode: Mode) {
+    return this.data![getThemeKeyForMode(mode)];
   }
 
-  async setThemeForMode({ mode, theme }) {
+  async setThemeForMode({ mode, theme }: { mode: Mode; theme: SNTheme }) {
     const themeData = await this.buildThemeDataForTheme(theme);
-    this.data[getThemeKeyForMode(mode)] = themeData;
+    this.data![getThemeKeyForMode(mode)] = themeData;
     this.saveToStorage();
   }
 
@@ -104,7 +112,7 @@ export default class ThemeManager {
     };
   }
 
-  async buildThemeDataForTheme(theme) {
+  async buildThemeDataForTheme(theme: SNTheme) {
     const transformer = new SFItemParams(theme);
     return transformer.paramsForLocalStorage();
   }

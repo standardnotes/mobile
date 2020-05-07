@@ -7,9 +7,10 @@ import Server from '@Lib/snjs/httpManager';
 import Storage from '@Lib/snjs/storageManager';
 
 export default class Auth extends SFAuthManager {
-  static instance = null;
+  private static instance: Auth;
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
+      // @ts-ignore underlying Authe manager handlers 3 agruments
       this.instance = new Auth(Storage.get(), Server.get(), AlertManager.get());
     }
     return this.instance;
@@ -37,7 +38,7 @@ export default class Auth extends SFAuthManager {
     return !keys.jwt;
   }
 
-  async signout(clearAllData) {
+  async signout() {
     await Storage.get().clearAllModels();
     await KeysManager.get().clearAccountKeysAndData();
     this._keys = null;
@@ -60,7 +61,13 @@ export default class Auth extends SFAuthManager {
     return KeysManager.get().activeAuthParams();
   }
 
-  async handleAuthResponse(response, email, url, authParams, keys) {
+  async handleAuthResponse(
+    response: { token: any },
+    email: string,
+    url: string,
+    authParams: any,
+    keys: any
+  ) {
     // We don't want to call super, as the super implementation is meant for web credentials
     // super will save keys to storage, which we don't want.
     // await super.handleAuthResponse(response, email, url, authParams, keys);
@@ -79,7 +86,7 @@ export default class Auth extends SFAuthManager {
     }
   }
 
-  async verifyAccountPassword(password) {
+  async verifyAccountPassword(password: string | undefined) {
     const authParams = await this.getAuthParams();
     const keys = await protocolManager.computeEncryptionKeysForUser(
       password,

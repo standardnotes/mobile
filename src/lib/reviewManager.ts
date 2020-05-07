@@ -30,7 +30,7 @@ export default class ReviewManager {
       });
   }
 
-  static async setRunCount(runCount) {
+  static async setRunCount(runCount: number) {
     return Storage.get().setItem('runCount', JSON.stringify(runCount));
   }
 }

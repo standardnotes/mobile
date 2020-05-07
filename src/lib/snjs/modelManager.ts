@@ -11,10 +11,14 @@ import {
   SNTheme,
   SNComponent,
   SNSmartTag,
+  SFItem as SNJSItem,
 } from 'snjs';
 import _ from 'lodash';
 import Storage from '@Lib/snjs/storageManager';
 import '../../models/extend/item';
+import OptionsState from '@Lib/OptionsState';
+
+type SFItem = typeof SNJSItem;
 
 SFModelManager.ContentTypeClassMapping = {
   Note: SNNote,
@@ -30,10 +34,10 @@ SFModelManager.ContentTypeClassMapping = {
 };
 
 export default class ModelManager extends SFModelManager {
-  static instance = null;
+  private static instance: ModelManager;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new ModelManager();
     }
 
@@ -57,19 +61,19 @@ export default class ModelManager extends SFModelManager {
     this.themes.length = 0;
   }
 
-  addItems(items, globalOnly = false) {
+  addItems(items: SFItem, globalOnly = false) {
     super.addItems(items, globalOnly);
 
-    items.forEach(item => {
+    items.forEach((item: SFItem) => {
       // In some cases, you just want to add the item to this.items, and not to the individual arrays
       // This applies when you want to keep an item syncable, but not display it via the individual arrays
       if (!globalOnly) {
         if (item.content_type === 'Tag') {
           if (!_.find(this.tags, { uuid: item.uuid })) {
             this.tags.splice(
-              _.sortedIndexBy(this.tags, item, function (item) {
-                if (item.title) {
-                  return item.title.toLowerCase();
+              _.sortedIndexBy(this.tags, item, function (arrayItem) {
+                if (arrayItem.title) {
+                  return arrayItem.title.toLowerCase();
                 } else {
                   return '';
                 }
@@ -91,7 +95,7 @@ export default class ModelManager extends SFModelManager {
     });
   }
 
-  async removeItemLocally(item) {
+  async removeItemLocally(item: SFItem) {
     await super.removeItemLocally(item);
 
     if (item.content_type === 'Tag') {
@@ -106,17 +110,17 @@ export default class ModelManager extends SFModelManager {
   }
 
   noteCount() {
-    return this.notes.filter(n => !n.dummy).length;
+    return this.notes.filter((n: { dummy: any }) => !n.dummy).length;
   }
 
   /* Be sure not to use just findItems in your views, because those won't find system smart tags */
-  getTagsWithIds(ids) {
+  getTagsWithIds(ids: string[]) {
     let tagMatches = ModelManager.get().findItems(ids);
     let smartMatches = this.getSmartTagsWithIds(ids);
     return tagMatches.concat(smartMatches);
   }
 
-  getTagWithId(id) {
+  getTagWithId(id: string) {
     let tags = this.getTagsWithIds([id]);
     if (tags.length > 0) {
       return tags[0];
@@ -132,24 +136,29 @@ export default class ModelManager extends SFModelManager {
   }
 
   systemSmartTagIds() {
-    return this.systemSmartTags.map(tag => {
+    return this.systemSmartTags.map((tag: { uuid: any }) => {
       return tag.uuid;
     });
   }
 
-  getSmartTagWithId(id) {
-    return this.getSmartTags().find(candidate => candidate.uuid === id);
+  getSmartTagWithId(id: string) {
+    return this.getSmartTags().find(
+      (candidate: { uuid: string }) => candidate.uuid === id
+    );
   }
 
-  getSmartTagsWithIds(ids) {
-    return this.getSmartTags().filter(candidate =>
+  getSmartTagsWithIds(ids: string[]) {
+    return this.getSmartTags().filter((candidate: { uuid: string }) =>
       ids.includes(candidate.uuid)
     );
   }
 
   getSmartTags() {
     const userTags = this.validItemsForContentType('SN|SmartTag').sort(
-      (a, b) => {
+      (
+        a: { content: { title: number } },
+        b: { content: { title: number } }
+      ) => {
         return a.content.title < b.content.title ? -1 : 1;
       }
     );
@@ -157,7 +166,9 @@ export default class ModelManager extends SFModelManager {
   }
 
   trashSmartTag() {
-    return this.systemSmartTags.find(tag => tag.content.isTrashTag);
+    return this.systemSmartTags.find(
+      (tag: { content: { isTrashTag: any } }) => tag.content.isTrashTag
+    );
   }
 
   trashedItems() {
@@ -171,7 +182,7 @@ export default class ModelManager extends SFModelManager {
     }
   }
 
-  notesMatchingSmartTag(tag) {
+  notesMatchingSmartTag(tag: { content: { predicate: any; isTrashTag: any } }) {
     const contentTypePredicate = new SFPredicate('content_type', '=', 'Note');
     const predicates = [contentTypePredicate, tag.content.predicate];
     if (!tag.content.isTrashTag) {
@@ -185,10 +196,10 @@ export default class ModelManager extends SFModelManager {
     return this.itemsMatchingPredicates(predicates);
   }
 
-  getNotes(options = {}) {
+  getNotes(options: OptionsState) {
     let notes,
       tags = [],
-      selectedSmartTag;
+      selectedSmartTag: { content: any };
     // if (options.selectedTagIds && options.selectedTagIds.length > 0 && options.selectedTagIds[0].key !== "all") {
     let selectedTagIds = options.selectedTagIds;
     if (selectedTagIds && selectedTagIds.length > 0) {
@@ -216,10 +227,27 @@ export default class ModelManager extends SFModelManager {
     let searchTerm = options.searchTerm;
     if (searchTerm) {
       searchTerm = searchTerm.toLowerCase();
-      notes = notes.filter(function (note) {
+      notes = notes.filter(function (note: {
+        safeTitle: () => {
+          (): any;
+          new (): any;
+          toLowerCase: { (): (string | undefined)[]; new (): any };
+        };
+        safeText: () => {
+          (): any;
+          new (): any;
+          toLowerCase: { (): (string | undefined)[]; new (): any };
+        };
+      }) {
         return (
-          note.safeTitle().toLowerCase().includes(searchTerm) ||
-          note.safeText().toLowerCase().includes(searchTerm)
+          note
+            .safeTitle()
+            .toLowerCase()
+            .includes(searchTerm ?? '') ||
+          note
+            .safeText()
+            .toLowerCase()
+            .includes(searchTerm ?? '')
         );
       });
     }
@@ -227,27 +255,40 @@ export default class ModelManager extends SFModelManager {
     const sortBy = options.sortBy;
     const sortReverse = options.sortReverse;
 
-    notes = notes.filter(note => {
-      if (note.deleted || note.dummy) {
-        return false;
+    notes = notes.filter(
+      (note: {
+        deleted: any;
+        dummy: any;
+        content: { trashed: any };
+        archived: any;
+      }) => {
+        if (note.deleted || note.dummy) {
+          return false;
+        }
+
+        const isTrash = selectedSmartTag && selectedSmartTag.content.isTrashTag;
+        const canShowArchived =
+          (selectedSmartTag && selectedSmartTag.content.isArchiveTag) ||
+          isTrash;
+
+        if (!isTrash && note.content.trashed) {
+          return false;
+        }
+
+        if (note.archived && !canShowArchived) {
+          return false;
+        }
+
+        return true;
       }
+    );
 
-      const isTrash = selectedSmartTag && selectedSmartTag.content.isTrashTag;
-      const canShowArchived =
-        (selectedSmartTag && selectedSmartTag.content.isArchiveTag) || isTrash;
-
-      if (!isTrash && note.content.trashed) {
-        return false;
-      }
-
-      if (note.archived && !canShowArchived) {
-        return false;
-      }
-
-      return true;
-    });
-
-    const sortValueFn = (a, b, pinCheck = false) => {
+    // @ts-ignore function invokes itself
+    const sortValueFn = (
+      a: { [x: string]: string; pinned: any },
+      b: { [x: string]: string; pinned: any },
+      pinCheck = false
+    ) => {
       if (!pinCheck) {
         if (a.pinned && b.pinned) {
           return sortValueFn(a, b, true);
@@ -259,9 +300,12 @@ export default class ModelManager extends SFModelManager {
           return 1;
         }
       }
-
-      let aValue = a[sortBy] || '';
-      let bValue = b[sortBy] || '';
+      let aValue = '';
+      let bValue = '';
+      if (sortBy) {
+        aValue = a[sortBy] || '';
+        bValue = b[sortBy] || '';
+      }
 
       let vector = 1;
 
@@ -292,7 +336,10 @@ export default class ModelManager extends SFModelManager {
       return 0;
     };
 
-    notes = notes.sort(function (a, b) {
+    notes = notes.sort(function (
+      a: { [x: string]: string; pinned: any },
+      b: { [x: string]: string; pinned: any }
+    ) {
       return sortValueFn(a, b);
     });
 
@@ -302,8 +349,8 @@ export default class ModelManager extends SFModelManager {
   /*
   Misc
   */
-
-  humanReadableDisplayForContentType(contentType) {
+  humanReadableDisplayForContentType(contentType: string) {
+    // @ts-ignore cannot index this object trough uknown value
     return {
       Note: 'note',
       Tag: 'tag',

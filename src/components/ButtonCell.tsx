@@ -3,7 +3,17 @@ import { TouchableHighlight, Text, View } from 'react-native';
 import SectionedTableCell from '@Components/SectionedTableCell';
 import StyleKit from '@Style/StyleKit';
 
-export default class ButtonCell extends SectionedTableCell {
+type Props = {
+  maxHeight?: number;
+  leftAligned?: boolean;
+  bold?: boolean;
+  disabled?: boolean;
+  important?: boolean;
+  onPress: () => void;
+  title?: string;
+};
+
+export default class ButtonCell extends SectionedTableCell<Props> {
   rules() {
     const rules = super.rules();
     if (this.props.maxHeight) {
@@ -13,7 +23,7 @@ export default class ButtonCell extends SectionedTableCell {
   }
 
   buttonRules() {
-    const rules = [StyleKit.stylesForKey('buttonCellButton')];
+    let rules = StyleKit.stylesForKey('buttonCellButton');
     if (this.props.leftAligned) {
       rules.push(StyleKit.styles.buttonCellButtonLeft);
     }

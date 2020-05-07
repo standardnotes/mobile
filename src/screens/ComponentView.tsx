@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { Alert, View, Platform, Text } from 'react-native';
+import {
+  Alert,
+  View,
+  Platform,
+  Text,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { WebView } from 'react-native-webview';
 import ApplicationState from '@Lib/ApplicationState';
@@ -11,11 +18,24 @@ import UserPrefsManager, {
 import { ICON_LOCK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
-export default class ComponentView extends Component {
-  constructor(props) {
-    super(props);
+type Props = {
+  noteId: string;
+  editorId: string;
+  onLoadEnd: () => void;
+  onLoadStart: () => void;
+  onLoadError: () => void;
+};
 
-    this.state = {};
+export default class ComponentView extends Component<Props> {
+  styles!: Record<string, ViewStyle | TextStyle>;
+  identifier: string;
+  editor: any;
+  note: any;
+  registrationTimeout: any;
+  webView: WebView | null = null;
+  alreadyTriggeredLoad: boolean = false;
+  constructor(props: Readonly<Props>) {
+    super(props);
 
     this.loadStyles();
 
@@ -83,7 +103,7 @@ export default class ComponentView extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: Props) {
     if (
       prevProps.noteId !== this.props.noteId ||
       prevProps.editorId !== this.props.editorId
@@ -107,7 +127,7 @@ export default class ComponentView extends Component {
     ComponentManager.get().deactivateComponent(this.editor);
   }
 
-  onMessage = message => {
+  onMessage = (message: { nativeEvent: { data: string } }) => {
     if (!this.note) {
       /** May be the case in tablet mode on app launch */
       return;
@@ -124,7 +144,7 @@ export default class ComponentView extends Component {
     ComponentManager.get().handleMessage(this.editor, data);
   };
 
-  onFrameLoad = syntheticEvent => {
+  onFrameLoad = () => {
     /**
      * We have no way of knowing if the webview load is successful or not. We
      * have to wait to see if the error event is fired. Looking at the code,
@@ -165,12 +185,15 @@ export default class ComponentView extends Component {
     }
   };
 
-  onLoadError = syntheticEvent => {
+  onLoadError = () => {
     clearTimeout(this.registrationTimeout);
     this.props.onLoadError();
   };
 
-  onShouldStartLoadWithRequest = request => {
+  onShouldStartLoadWithRequest = (request: {
+    navigationType: string;
+    url: string;
+  }) => {
     /**
      * We want to handle link clicks within an editor by opening the browser
      * instead of loading inline. On iOS, onShouldStartLoadWithRequest is
@@ -246,13 +269,13 @@ export default class ComponentView extends Component {
             onLoadStart={this.onLoadStart}
             onError={this.onLoadError}
             onMessage={this.onMessage}
-            useWebKit={true}
             hideKeyboardAccessoryView={true}
             onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
             cacheEnabled={true}
             scalesPageToFit={
               true /* Android only, not available with WKWebView */
             }
+            // @ts-ignore this is patched
             autoManageStatusBarEnabled={
               false /* To prevent StatusBar from changing colors when focusing */
             }

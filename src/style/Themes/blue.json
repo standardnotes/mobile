@@ -36,5 +36,6 @@
 	"stylekitInputPlaceholderColor": "rgb(168, 168, 168)",
 	"stylekitInputBorderColor": "#e3e3e3",
 	"stylekitScrollbarThumbColor": "#dfdfdf",
-	"stylekitScrollbarTrackBorderColor": "#E7E7E7"
+	"stylekitScrollbarTrackBorderColor": "#E7E7E7",
+	"statusBar": ""
 }

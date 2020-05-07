@@ -13,10 +13,10 @@ import { ICON_CLOSE } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
 export default class PrivilegesManager extends SFPrivilegesManager {
-  static instance = null;
+  private static instance: PrivilegesManager;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       let singletonManager = new SFSingletonManager(
         ModelManager.get(),
         Sync.get()
@@ -31,7 +31,11 @@ export default class PrivilegesManager extends SFPrivilegesManager {
     return this.instance;
   }
 
-  constructor(modelManager, syncManager, singletonManager) {
+  constructor(
+    modelManager: ModelManager,
+    syncManager: Sync,
+    singletonManager: any
+  ) {
     super(modelManager, syncManager, singletonManager);
 
     this.setDelegate({
@@ -43,16 +47,34 @@ export default class PrivilegesManager extends SFPrivilegesManager {
         const hasBiometrics = KeysManager.get().hasBiometrics();
         return hasPasscode || hasBiometrics;
       },
-      saveToStorage: async (key, value) => {
+      saveToStorage: async (key: string, value: string | null | undefined) => {
         return Storage.get().setItem(key, value);
       },
-      getFromStorage: async key => {
+      getFromStorage: async (key: string) => {
         return Storage.get().getItem(key);
       },
     });
   }
 
-  async presentPrivilegesModal(action, navigation, onSuccess, onCancel) {
+  async presentPrivilegesModal(
+    action: any,
+    navigation: {
+      navigate: (
+        arg0: string,
+        arg1: {
+          leftButton: { title: string | null; iconName: string | null };
+          authenticationSources: any[];
+          hasCancelOption: boolean;
+          sessionLengthOptions: any;
+          selectedSessionLength: any;
+          onSuccess: (selectedSessionLength: any) => void;
+          onCancel: () => void;
+        }
+      ) => void;
+    },
+    onSuccess: { (): void; (): any },
+    onCancel?: () => any
+  ) {
     if (this.authenticationInProgress()) {
       onCancel && onCancel();
       return;
@@ -83,7 +105,7 @@ export default class PrivilegesManager extends SFPrivilegesManager {
       hasCancelOption: true,
       sessionLengthOptions: sessionLengthOptions,
       selectedSessionLength: selectedSessionLength,
-      onSuccess: selectedSessionLength => {
+      onSuccess: (selectedSessionLength: any) => {
         this.setSessionLength(selectedSessionLength);
         customSuccess();
       },
@@ -99,8 +121,8 @@ export default class PrivilegesManager extends SFPrivilegesManager {
     return this.authInProgress;
   }
 
-  async sourcesForAction(action) {
-    const sourcesForCredential = credential => {
+  async sourcesForAction(action: any) {
+    const sourcesForCredential = (credential: any) => {
       if (credential === SFPrivilegesManager.CredentialAccountPassword) {
         return [new AuthenticationSourceAccountPassword()];
       } else if (credential === SFPrivilegesManager.CredentialLocalPasscode) {
@@ -118,7 +140,7 @@ export default class PrivilegesManager extends SFPrivilegesManager {
     };
 
     const credentials = await this.netCredentialsForAction(action);
-    let sources = [];
+    let sources: any[] = [];
     for (const credential of credentials) {
       sources = sources
         .concat(sourcesForCredential(credential))
@@ -130,7 +152,7 @@ export default class PrivilegesManager extends SFPrivilegesManager {
     return sources;
   }
 
-  async grossCredentialsForAction(action) {
+  async grossCredentialsForAction(action: any) {
     const privs = await this.getPrivileges();
     const creds = privs.getCredentialsForAction(action);
     return creds;

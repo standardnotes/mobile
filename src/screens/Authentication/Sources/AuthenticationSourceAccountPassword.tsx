@@ -1,7 +1,9 @@
 import AuthenticationSource from '@Screens/Authentication/Sources/AuthenticationSource';
 import Auth from '@Lib/snjs/authManager';
+import { KeyboardTypeOptions } from 'react-native';
 
 export default class AuthenticationSourceAccountPassword extends AuthenticationSource {
+  keyboardType: KeyboardTypeOptions = 'default';
   constructor() {
     super();
   }
@@ -16,6 +18,18 @@ export default class AuthenticationSourceAccountPassword extends AuthenticationS
 
   get title() {
     return 'Account Password';
+  }
+
+  get headerButtonText() {
+    return undefined;
+  }
+
+  headerButtonAction = () => {
+    return undefined;
+  };
+
+  get headerButtonStyles() {
+    return undefined;
   }
 
   get label() {
@@ -60,7 +74,7 @@ export default class AuthenticationSourceAccountPassword extends AuthenticationS
     return { success: true };
   }
 
-  _fail(message) {
+  _fail(message: string) {
     this.didFail();
     return { success: false, error: { message: message } };
   }

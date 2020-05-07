@@ -6,8 +6,12 @@ import TableSection from '@Components/TableSection';
 import ApplicationState from '@Lib/ApplicationState';
 import StyleKit from '@Style/StyleKit';
 
-export default class CompanySection extends Component {
-  onAction = action => {
+type Props = {
+  title: string;
+};
+
+export default class CompanySection extends Component<Props> {
+  onAction = (action: string) => {
     if (action === 'feedback') {
       const platformString = Platform.OS === 'android' ? 'Android' : 'iOS';
       ApplicationState.openURL(

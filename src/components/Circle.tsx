@@ -1,9 +1,19 @@
 import React from 'react';
-import { View } from 'react-native';
-import SectionedTableCell from '@Components/SectionedTableCell';
+import { View, ViewStyle } from 'react-native';
+import SectionedTableCell, {
+  Props as SectionTableCellProps,
+} from '@Components/SectionedTableCell';
 
-export default class Circle extends SectionedTableCell {
-  constructor(props) {
+type Props = {
+  size?: number;
+  backgroundColor: ViewStyle['backgroundColor'];
+  borderColor: ViewStyle['borderColor'];
+};
+
+export default class Circle extends SectionedTableCell<Props> {
+  styles!: Record<string, ViewStyle>;
+  size: number;
+  constructor(props: Readonly<SectionTableCellProps & Props>) {
     super(props);
     this.size = props.size || 12;
     this.loadStyles();

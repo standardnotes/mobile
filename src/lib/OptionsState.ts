@@ -1,15 +1,44 @@
 import _ from 'lodash';
 import Storage from '@Lib/snjs/storageManager';
 
-export default class OptionsState {
-  static OptionsStateChangeEventSearch = 'OptionsStateChangeEventSearch';
-  static OptionsStateChangeEventTags = 'OptionsStateChangeEventTags';
-  static OptionsStateChangeEventViews = 'OptionsStateChangeEventViews';
-  static OptionsStateChangeEventTags = 'OptionsStateChangeEventSort';
+type OptionsStateStateType =
+  | typeof OptionsState.OptionsStateChangeEventSearch
+  | typeof OptionsState.OptionsStateChangeEventTags
+  | typeof OptionsState.OptionsStateChangeEventViews
+  | typeof OptionsState.OptionsStateChangeEventSort;
 
-  constructor(json) {
-    this.init();
-    _.merge(this, _.omit(json, ['changeObservers']));
+export type Observer = {
+  key: () => number;
+  callback: (state: OptionsState, newState?: OptionsStateStateType) => void;
+};
+
+export default class OptionsState {
+  static OptionsStateChangeEventSearch = 'OptionsStateChangeEventSearch' as 'OptionsStateChangeEventSearch';
+  static OptionsStateChangeEventTags = 'OptionsStateChangeEventTags' as 'OptionsStateChangeEventTags';
+  static OptionsStateChangeEventViews = 'OptionsStateChangeEventViews' as 'OptionsStateChangeEventViews';
+  static OptionsStateChangeEventSort = 'OptionsStateChangeEventSort' as 'OptionsStateChangeEventSort';
+  changeObservers: Observer[];
+  sortBy: string;
+  selectedTagIds: string[];
+  sortReverse: boolean;
+  searchTerm: string | null = null;
+  displayOptions?: {
+    hidePreviews: boolean;
+    hideTags: boolean;
+    hideDates: boolean;
+  };
+  hidePreviews: boolean = false;
+  hideDates: boolean = false;
+  hideTags: boolean = false;
+
+  constructor() {
+    this.searchTerm = '';
+    this.selectedTagIds = [];
+    this.sortBy = 'created_at';
+    this.sortReverse = false;
+
+    // TODO: not used
+    // _.merge(this, _.omit(json, ['changeObservers']));
     this.changeObservers = [];
 
     if (this.sortBy === 'updated_at') {
@@ -19,6 +48,7 @@ export default class OptionsState {
   }
 
   init() {
+    this.searchTerm = '';
     this.selectedTagIds = [];
     this.sortBy = 'created_at';
     this.sortReverse = false;
@@ -58,47 +88,42 @@ export default class OptionsState {
     );
   }
 
-  addChangeObserver(callback) {
-    const observer = { key: Math.random, callback: callback };
+  addChangeObserver(callback: Observer['callback']) {
+    const observer = { key: Math.random, callback };
     this.changeObservers.push(observer);
     return observer;
   }
 
-  removeChangeObserver(observer) {
+  removeChangeObserver(observer: Observer) {
     _.pull(this.changeObservers, observer);
   }
 
-  notifyObservers(event) {
+  notifyObservers(newOption?: OptionsStateStateType) {
     this.changeObservers.forEach(
-      function (observer) {
-        observer.callback(this, event);
+      function (observer: Observer) {
+        // @ts-ignore
+        observer.callback(this as OptionsState, newOption);
       }.bind(this)
     );
   }
 
   // Interface
-
-  mergeWith(options) {
-    _.extend(this, _.omit(options, ['changeObservers']));
-    this.notifyObservers();
-  }
-
-  setSearchTerm(term) {
+  setSearchTerm(term: string | null) {
     this.searchTerm = term;
     this.notifyObservers(OptionsState.OptionsStateChangeEventSearch);
   }
 
-  setSortReverse(reverse) {
+  setSortReverse(reverse: boolean) {
     this.sortReverse = reverse;
     this.notifyObservers(OptionsState.OptionsStateChangeEventSort);
   }
 
-  setSortBy(sortBy) {
+  setSortBy(sortBy: string) {
     this.sortBy = sortBy;
     this.notifyObservers(OptionsState.OptionsStateChangeEventSort);
   }
 
-  setSelectedTagIds(selectedTagIds) {
+  setSelectedTagIds(selectedTagIds: string[]) {
     this.selectedTagIds = selectedTagIds;
     this.notifyObservers(OptionsState.OptionsStateChangeEventTags);
   }
@@ -122,7 +147,7 @@ export default class OptionsState {
     };
   }
 
-  getDisplayOptionValue(key) {
+  getDisplayOptionValue(key: string) {
     if (key === 'hidePreviews') {
       return this.hidePreviews;
     } else if (key === 'hideDates') {
@@ -130,9 +155,10 @@ export default class OptionsState {
     } else if (key === 'hideTags') {
       return this.hideTags;
     }
+    return false;
   }
 
-  setDisplayOptionKeyValue(key, value) {
+  setDisplayOptionKeyValue(key: string, value: any) {
     if (key === 'hidePreviews') {
       this.hidePreviews = value;
     } else if (key === 'hideDates') {

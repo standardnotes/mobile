@@ -1,8 +1,12 @@
 import { PureComponent } from 'react';
 import StyleKit from '@Style/StyleKit';
 
-export default class ThemedPureComponent extends PureComponent {
-  constructor(props) {
+export default class ThemedPureComponent<P = {}, S = {}> extends PureComponent<
+  P,
+  S
+> {
+  themeChangeObserver: () => void;
+  constructor(props: Readonly<P>) {
     super(props);
 
     this.loadStyles();

@@ -1,20 +1,23 @@
 import { Platform } from 'react-native';
 import Server from '@Lib/snjs/httpManager';
 import CSSParser from '@Style/Util/CSSParser';
+import { SNTheme as SNJSTheme } from 'snjs';
+
+type SNTheme = typeof SNJSTheme;
 
 export default class ThemeDownloader {
-  static instance = null;
+  private static instance: ThemeDownloader;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new ThemeDownloader();
     }
 
     return this.instance;
   }
 
-  async downloadTheme(theme) {
-    let errorBlock = error => {
+  async downloadTheme(theme: SNTheme) {
+    let errorBlock = (error: null) => {
       if (!theme.getNotAvailOnMobile()) {
         theme.setNotAvailOnMobile(true);
         theme.setDirty(true);
@@ -38,7 +41,7 @@ export default class ThemeDownloader {
       Server.get().getAbsolute(
         url,
         {},
-        response => {
+        (response: any) => {
           let variables = CSSParser.cssToObject(response);
           resolve(variables);
         },

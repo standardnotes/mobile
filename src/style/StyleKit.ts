@@ -1,6 +1,6 @@
-import { StatusBar, Alert, Platform } from 'react-native';
+import { StatusBar, Alert, Platform, ViewStyle, TextStyle } from 'react-native';
 import IconChanger from 'react-native-alternate-icons';
-import { supportsDarkMode } from 'react-native-dark-mode';
+import { supportsDarkMode, Mode } from 'react-native-dark-mode';
 import _ from 'lodash';
 import Auth from '@Lib/snjs/authManager';
 import ModelManager from '@Lib/snjs/modelManager';
@@ -14,16 +14,26 @@ import {
   LIGHT_MODE_KEY,
 } from '@Style/utils';
 import ThemeDownloader from '@Style/Util/ThemeDownloader';
-import { SFAuthManager, SNTheme } from 'snjs';
+import { SFAuthManager, SNTheme as SNJSTheme } from 'snjs';
 
 import THEME_RED_JSON from './Themes/red.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 
+type SNTheme = typeof SNJSTheme;
+
 export default class StyleKit {
-  static instance = null;
+  private static instance: StyleKit;
+  themeChangeObservers: Array<() => void>;
+  activeTheme: SNTheme;
+  mode?: Mode;
+  currentDarkMode!: Mode;
+  systemThemes: Array<SNTheme>;
+  constants: { mainTextFontSize: number; paddingLeft: number };
+  styles: Record<string, ViewStyle | TextStyle> = {};
+  signoutObserver: any;
 
   static get() {
-    if (this.instance === null) {
+    if (!this.instance) {
       this.instance = new StyleKit();
     }
 
@@ -32,14 +42,19 @@ export default class StyleKit {
 
   constructor() {
     this.themeChangeObservers = [];
+    this.systemThemes = [];
 
-    this.buildConstants();
+    this.constants = {
+      mainTextFontSize: 16,
+      paddingLeft: 14,
+    };
+
     this.buildDefaultThemes();
 
     ModelManager.get().addItemSyncObserver(
       'themes',
       'SN|Theme',
-      (allItems, validItems, deletedItems, source) => {
+      (_allItems: any, _validItems: any, deletedItems: any, _source: any) => {
         if (
           this.activeTheme &&
           !this.activeTheme.isSystemTheme &&
@@ -62,7 +77,7 @@ export default class StyleKit {
       }
     );
 
-    this.signoutObserver = Auth.get().addEventHandler(event => {
+    this.signoutObserver = Auth.get().addEventHandler((event: any) => {
       if (event === SFAuthManager.DidSignOutEvent) {
         this.resetToSystemTheme();
       }
@@ -74,16 +89,16 @@ export default class StyleKit {
     await this.resolveInitialTheme();
   }
 
-  setModeTo(mode) {
+  setModeTo(mode: Mode) {
     this.currentDarkMode = mode;
   }
 
-  addThemeChangeObserver(observer) {
+  addThemeChangeObserver(observer: () => void) {
     this.themeChangeObservers.push(observer);
     return observer;
   }
 
-  removeThemeChangeObserver(observer) {
+  removeThemeChangeObserver(observer: () => void) {
     _.pull(this.themeChangeObservers, observer);
   }
 
@@ -93,7 +108,7 @@ export default class StyleKit {
     }
   }
 
-  assignThemeForMode({ theme, mode }) {
+  assignThemeForMode({ theme, mode }: { theme: SNTheme; mode: Mode }) {
     if (!StyleKit.doesDeviceSupportDarkMode()) {
       mode = LIGHT_MODE_KEY;
     }
@@ -138,7 +153,7 @@ export default class StyleKit {
       variables.statusBar =
         Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
 
-      const theme = new SNTheme({
+      const theme = new SNJSTheme({
         uuid: option.name,
         content: {
           isSystemTheme: true,
@@ -194,7 +209,7 @@ export default class StyleKit {
       if (matchingTheme) {
         newTheme = matchingTheme;
       } else {
-        newTheme = new SNTheme(themeData);
+        newTheme = new SNJSTheme(themeData);
         newTheme.isSwapIn = true;
       }
 
@@ -210,20 +225,25 @@ export default class StyleKit {
   }
 
   themes() {
-    const themes = ModelManager.get().themes.sort((a, b) => {
-      if (!a.name || !b.name) {
-        return -1;
+    const themes = ModelManager.get().themes.sort(
+      (
+        a: { name: { toLowerCase: () => number } },
+        b: { name: { toLowerCase: () => number } }
+      ) => {
+        if (!a.name || !b.name) {
+          return -1;
+        }
+        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
       }
-      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-    });
+    );
     return this.systemThemes.concat(themes);
   }
 
-  isThemeActive(theme) {
+  isThemeActive(theme: SNTheme) {
     return this.activeTheme && theme.uuid === this.activeTheme.uuid;
   }
 
-  setActiveTheme(theme) {
+  setActiveTheme(theme: SNTheme) {
     /** Merge default variables to ensure this theme has all the variables. */
     const variables = theme.content.variables;
     theme.content.variables = _.merge(this.templateVariables(), variables);
@@ -244,7 +264,7 @@ export default class StyleKit {
    *     - Status Bar color
    *     - Local App Icon color
    */
-  updateDeviceForTheme(theme) {
+  updateDeviceForTheme(theme: SNTheme) {
     const isAndroid = Platform.OS === 'android';
 
     /** On Android, a time out is required, especially during app startup. */
@@ -290,7 +310,12 @@ export default class StyleKit {
     }
   }
 
-  activateTheme(theme) {
+  activateTheme(theme: {
+    content: { variables: { stylekitInfoColor: any } };
+    setDirty: (arg0: boolean) => void;
+    getNotAvailOnMobile: () => any;
+    setNotAvailOnMobile: (arg0: boolean) => void;
+  }) {
     const performActivation = () => {
       this.setActiveTheme(theme);
       this.assignThemeForMode({ theme: theme, mode: this.currentDarkMode });
@@ -305,7 +330,7 @@ export default class StyleKit {
     if (!hasValidInfoColor) {
       ThemeDownloader.get()
         .downloadTheme(theme)
-        .then(variables => {
+        .then((variables: any) => {
           if (!variables) {
             Alert.alert(
               'Not Available',
@@ -353,7 +378,16 @@ export default class StyleKit {
     }
   }
 
-  async downloadThemeAndReload(theme) {
+  async downloadThemeAndReload(theme: {
+    content: {
+      package_info: { no_mobile: any };
+      isSystemTheme: any;
+      variables: any;
+    };
+    name?: any;
+    setDirty: (arg0: boolean) => void;
+    uuid?: any;
+  }) {
     const updatedVariables = await ThemeDownloader.get().downloadTheme(theme);
 
     /** Merge default variables to ensure this theme has all the variables. */
@@ -551,13 +585,6 @@ export default class StyleKit {
     };
   }
 
-  buildConstants() {
-    this.constants = {
-      mainTextFontSize: 16,
-      paddingLeft: 14,
-    };
-  }
-
   static doesDeviceSupportDarkMode() {
     const isAndroid = Platform.OS === 'android';
 
@@ -573,7 +600,7 @@ export default class StyleKit {
     return supportsDarkMode;
   }
 
-  static variable(name) {
+  static variable(name: string) {
     return this.get().activeTheme.content.variables[name];
   }
 
@@ -589,7 +616,7 @@ export default class StyleKit {
     return this.get().styles;
   }
 
-  static stylesForKey(key) {
+  static stylesForKey(key: string) {
     const allStyles = this.styles;
     const styles = [allStyles[key]];
     const platform = Platform.OS === 'android' ? 'Android' : 'IOS';
@@ -604,7 +631,7 @@ export default class StyleKit {
     return Platform.OS === 'android' ? 'md' : 'ios';
   }
 
-  static nameForIcon(iconName) {
+  static nameForIcon(iconName: string) {
     return StyleKit.platformIconPrefix() + '-' + iconName;
   }
 }

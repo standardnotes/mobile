@@ -5,13 +5,33 @@ import SectionHeader from '@Components/SectionHeader';
 import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
 import TableSection from '@Components/TableSection';
 import ApplicationState from '@Lib/ApplicationState';
-import KeysManager from '@Lib/keysManager';
+import KeysManager, { BiometricsType } from '@Lib/keysManager';
 import StyleKit from '@Style/StyleKit';
 
-export default class PasscodeSection extends Component {
-  constructor(props) {
+type Props = {
+  hasBiometrics: boolean;
+  hasPasscode: boolean;
+  title: string;
+  onDisable: () => void;
+  onEnable: () => void;
+  storageEncryption: boolean | null;
+  onStorageEncryptionDisable: () => void;
+  onStorageEncryptionEnable: () => void;
+  storageEncryptionLoading: boolean;
+  onFingerprintDisable: () => void;
+  onFingerprintEnable: () => void;
+};
+
+type State = {
+  biometricsAvailable?: boolean;
+  biometricsType?: BiometricsType;
+  biometricsNoun?: string;
+};
+
+export default class PasscodeSection extends Component<Props, State> {
+  constructor(props: Readonly<Props>) {
     super(props);
-    let state = { biometricsAvailable: false || __DEV__ };
+    let state: State = { biometricsAvailable: false || __DEV__ };
     if (__DEV__) {
       state.biometricsType = ApplicationState.isAndroid
         ? 'Fingerprint'
@@ -34,12 +54,12 @@ export default class PasscodeSection extends Component {
     });
   }
 
-  onPasscodeOptionPress = option => {
+  onPasscodeOptionPress = (option: { key: string | null }) => {
     KeysManager.get().setPasscodeTiming(option.key);
     this.forceUpdate();
   };
 
-  onBiometricsOptionPress = option => {
+  onBiometricsOptionPress = (option: { key: any }) => {
     KeysManager.get().setBiometricsTiming(option.key);
     this.forceUpdate();
   };
@@ -53,7 +73,7 @@ export default class PasscodeSection extends Component {
         ? 'Disable Storage Encryption'
         : 'Enable Storage Encryption'
       : 'Storage Encryption';
-    let storageOnPress = this.props.storageEncryption
+    let storageOnPress: (() => void) | null = this.props.storageEncryption
       ? this.props.onStorageEncryptionDisable
       : this.props.onStorageEncryptionEnable;
     let storageSubText =
@@ -109,7 +129,7 @@ export default class PasscodeSection extends Component {
           first={true}
           leftAligned={true}
           title={storageEncryptionTitle}
-          onPress={storageOnPress}
+          onPress={storageOnPress !== null ? storageOnPress : () => undefined}
         >
           <Text
             style={{
@@ -137,7 +157,6 @@ export default class PasscodeSection extends Component {
 
         {this.props.hasPasscode && (
           <SectionedOptionsTableCell
-            last={!this.props.hasBiometrics}
             title={'Require Passcode'}
             options={passcodeOptions}
             onPress={this.onPasscodeOptionPress}
@@ -146,7 +165,6 @@ export default class PasscodeSection extends Component {
 
         {this.props.hasBiometrics && (
           <SectionedOptionsTableCell
-            last={true}
             title={`Require ${biometricsNoun}`}
             options={biometricOptions}
             onPress={this.onBiometricsOptionPress}

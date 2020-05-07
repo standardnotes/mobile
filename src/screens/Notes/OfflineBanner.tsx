@@ -1,5 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableWithoutFeedback,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import { withNavigation } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ThemedPureComponent from '@Components/ThemedPureComponent';
@@ -10,7 +17,12 @@ import StyleKit from '@Style/StyleKit';
 const NOT_BACKED_UP_TEXT = 'Data not backed up';
 const SIGN_IN_TEXT = 'Sign in or register to backup your notes';
 
-export class OfflineBanner extends ThemedPureComponent {
+type Props = {
+  navigation: any;
+};
+
+export class OfflineBanner extends ThemedPureComponent<Props> {
+  styles!: Record<string, ViewStyle | TextStyle>;
   _onPress = () => {
     this.props.navigation.navigate(SCREEN_SETTINGS);
   };

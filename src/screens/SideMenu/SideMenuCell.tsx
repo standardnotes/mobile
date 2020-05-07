@@ -1,14 +1,23 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
 import Circle from '@Components/Circle';
 import ThemedComponent from '@Components/ThemedComponent';
 import ApplicationState from '@Lib/ApplicationState';
 import StyleKit from '@Style/StyleKit';
-import { hexToRGBA } from '@Style/utils';
+import { SideMenuOption } from './SideMenuSection';
 
-export default class SideMenuCell extends ThemedComponent {
+type Props = SideMenuOption;
+
+export default class SideMenuCell extends ThemedComponent<Props> {
+  styles!: Record<string, ViewStyle | TextStyle>;
   componentDidUpdate() {
     this.updateStyles();
   }
@@ -24,7 +33,7 @@ export default class SideMenuCell extends ThemedComponent {
   }
 
   onPress = () => {
-    this.props.onSelect();
+    this.props.onSelect && this.props.onSelect();
   };
 
   onLongPress = () => {
@@ -37,13 +46,13 @@ export default class SideMenuCell extends ThemedComponent {
       return null;
     }
 
-    if (desc.type === 'icon') {
+    if (desc.type === 'icon' && desc.name) {
       return (
         <View style={this.styles.iconGraphic}>
           <Icon
             name={desc.name}
             size={desc.size || 20}
-            color={this.styles.iconColor}
+            color={StyleKit.variables.stylekitInfoColor}
           />
         </View>
       );
@@ -63,7 +72,7 @@ export default class SideMenuCell extends ThemedComponent {
     }
   }
 
-  aggregateStyles(base, addition, condition) {
+  aggregateStyles(base: ViewStyle, addition: ViewStyle, condition?: boolean) {
     if (condition) {
       return [base, addition];
     } else {
@@ -71,7 +80,7 @@ export default class SideMenuCell extends ThemedComponent {
     }
   }
 
-  colorForTextClass = textClass => {
+  colorForTextClass = (textClass: Props['textClass']) => {
     if (!textClass) {
       return null;
     }
@@ -86,7 +95,7 @@ export default class SideMenuCell extends ThemedComponent {
   render() {
     const hasIcon = this.props.iconDesc;
     const iconSide =
-      hasIcon && this.props.iconDesc.side
+      hasIcon && this.props.iconDesc?.side
         ? this.props.iconDesc.side
         : hasIcon
         ? 'left'
@@ -172,9 +181,6 @@ export default class SideMenuCell extends ThemedComponent {
 
   loadStyles() {
     this.styles = {
-      iconColor: StyleKit.variables.stylekitInfoColor,
-      selectionBgColor: hexToRGBA(StyleKit.variables.stylekitInfoColor, 0.1),
-
       cell: {
         minHeight: this.props.subtext ? 52 : 42,
       },
@@ -217,7 +223,7 @@ export default class SideMenuCell extends ThemedComponent {
         fontWeight: 'bold',
         fontSize: 15,
         paddingBottom: 0,
-        fontFamily: ApplicationState.isAndroid ? 'Roboto' : null, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       subtext: {
@@ -226,7 +232,7 @@ export default class SideMenuCell extends ThemedComponent {
         fontSize: 12,
         marginTop: -5,
         marginBottom: 3,
-        fontFamily: ApplicationState.isAndroid ? 'Roboto' : null, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       iconGraphic: {

@@ -1,14 +1,16 @@
 import { Platform } from 'react-native';
-import { SFStorageManager } from 'snjs';
+import { SFStorageManager, SFItem as SNJSItem } from 'snjs';
 import AsyncStorage from '@react-native-community/async-storage';
 import AlertManager from '@Lib/snjs/alertManager';
 import { isNullOrUndefined } from '@Lib/utils';
 
+type SFItem = typeof SNJSItem;
+
 export default class Storage extends SFStorageManager {
-  static instance = null;
+  private static instance: Storage;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new Storage();
     }
 
@@ -21,7 +23,7 @@ export default class Storage extends SFStorageManager {
     this.platformString = this.isAndroid ? 'Android' : 'iOS';
   }
 
-  async getItem(key) {
+  async getItem(key: string) {
     try {
       return AsyncStorage.getItem(key);
     } catch (error) {
@@ -30,10 +32,10 @@ export default class Storage extends SFStorageManager {
     }
   }
 
-  async getMultiItems(keys) {
+  async getMultiItems(keys: string[]) {
     return AsyncStorage.multiGet(keys).then(stores => {
-      var items = {};
-      stores.map((result, i, store) => {
+      const items: Record<string, any> = {};
+      stores.map((_result, i, store) => {
         let key = store[i][0];
         let value = store[i][1];
         items[key] = value;
@@ -42,8 +44,8 @@ export default class Storage extends SFStorageManager {
     });
   }
 
-  async setItem(key, value) {
-    if (isNullOrUndefined(value) || isNullOrUndefined(key)) {
+  async setItem(key: string, value: string | undefined | null) {
+    if (value === null || value === undefined || isNullOrUndefined(key)) {
       return;
     }
     try {
@@ -54,11 +56,11 @@ export default class Storage extends SFStorageManager {
     }
   }
 
-  async removeItem(key) {
+  async removeItem(key: string) {
     return AsyncStorage.removeItem(key);
   }
 
-  async clearKeys(keys) {
+  async clearKeys(keys: string[]) {
     return AsyncStorage.multiRemove(keys);
   }
 
@@ -68,10 +70,10 @@ export default class Storage extends SFStorageManager {
 
   // Models
   async getAllModels() {
-    const itemsFromStores = stores => {
-      const items = [];
-      stores.map((result, i, store) => {
-        const key = store[i][0];
+    const itemsFromStores = (stores: any[]) => {
+      const items: any[] = [];
+      stores.map((_result, i, store) => {
+        // const key = store[i][0];
         const value = store[i][1];
         if (value) {
           items.push(JSON.parse(value));
@@ -124,7 +126,7 @@ export default class Storage extends SFStorageManager {
     */
 
     const keys = await this.getAllModelKeys();
-    let items = [];
+    let items: any[] = [];
     const failedItemIds = [];
     if (this.isAndroid) {
       for (const key of keys) {
@@ -155,7 +157,7 @@ export default class Storage extends SFStorageManager {
     return items;
   }
 
-  showLoadFailForItemIds(failedItemIds) {
+  showLoadFailForItemIds(failedItemIds: string[]) {
     let text = `The following items could not be loaded. This may happen if you are in low-memory conditions, or if the note is very large in size. For compatibility with ${this.platformString}, we recommend breaking up large notes into smaller chunks using the desktop or web app.\n\nItems:\n`;
     let index = 0;
     text += failedItemIds.map(id => {
@@ -169,7 +171,7 @@ export default class Storage extends SFStorageManager {
     AlertManager.get().alert({ title: 'Unable to load item', text: text });
   }
 
-  keyForItem(item) {
+  keyForItem(item: SFItem) {
     return 'Item-' + item.uuid;
   }
 
@@ -181,7 +183,9 @@ export default class Storage extends SFStorageManager {
     return filtered;
   }
 
-  async saveModel(item) {
+  // TODO: Not sure about this
+  // @ts-ignore
+  async saveModel(item: SFItem) {
     return this.saveModel([item]);
   }
 
@@ -190,7 +194,7 @@ export default class Storage extends SFStorageManager {
     AsyncStorage.multiSet(data, function(error){ callback(); })
     Each item is saved individually.
   */
-  async saveModels(items) {
+  async saveModels(items?: SFItem[]) {
     if (!items || items.length === 0) {
       return;
     }
@@ -205,11 +209,11 @@ export default class Storage extends SFStorageManager {
     );
   }
 
-  async deleteModel(item) {
+  async deleteModel(item: SFItem) {
     return AsyncStorage.removeItem(this.keyForItem(item));
   }
 
-  async clearAllModels(callback) {
+  async clearAllModels() {
     const itemKeys = await this.getAllModelKeys();
     return AsyncStorage.multiRemove(itemKeys);
   }

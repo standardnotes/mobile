@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TextStyle } from 'react-native';
 import PlatformStyles from '@Models/PlatformStyles';
 import StyleKit from '@Style/StyleKit';
 
-export default class HeaderTitleView extends Component {
-  constructor(props) {
+type Props = {
+  subtitleColor?: TextStyle['color'];
+  title: string;
+  subtitle?: string;
+};
+
+export default class HeaderTitleView extends Component<Props> {
+  constructor(props: Readonly<Props>) {
     super(props);
   }
 

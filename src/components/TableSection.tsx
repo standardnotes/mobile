@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { View, ViewStyle } from 'react-native';
 import StyleKit from '@Style/StyleKit';
 
-export default class TableSection extends Component {
+type Props = {
+  extraStyles?: ViewStyle | ViewStyle[];
+};
+
+export default class TableSection extends Component<Props> {
   rules() {
     let rules = [StyleKit.styles.tableSection];
     if (this.props.extraStyles) {

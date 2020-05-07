@@ -1,10 +1,13 @@
+import { SNTheme as SNJSTheme } from 'snjs';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';
 export const DARK_MODE_KEY = 'dark';
 export const LIGHT_CONTENT = 'light-content';
 export const DARK_CONTENT = 'dark-content';
 
-export function statusBarColorForTheme(theme) {
+type SNTheme = typeof SNJSTheme;
+
+export function statusBarColorForTheme(theme: SNTheme) {
   // The main nav bar uses contrast background color
   if (!theme.luminosity) {
     theme.luminosity = getColorLuminosity(
@@ -20,7 +23,7 @@ export function statusBarColorForTheme(theme) {
   }
 }
 
-export function keyboardColorForTheme(theme) {
+export function keyboardColorForTheme(theme: SNTheme) {
   if (!theme.luminosity) {
     theme.luminosity = getColorLuminosity(
       theme.content.variables.stylekitContrastBackgroundColor
@@ -35,7 +38,7 @@ export function keyboardColorForTheme(theme) {
   }
 }
 
-export function getColorLuminosity(hexCode) {
+export function getColorLuminosity(hexCode: string) {
   let c = hexCode;
   c = c.substring(1); // strip #
   const rgb = parseInt(c, 16); // convert rrggbb to decimal
@@ -46,12 +49,12 @@ export function getColorLuminosity(hexCode) {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
 }
 
-export function shadeBlend(p, c0, c1) {
-  var n = p < 0 ? p * -1 : p,
+export function shadeBlend(p: number, c0: string, c1?: string) {
+  let n = p < 0 ? p * -1 : p,
     u = Math.round,
     w = parseInt;
   if (c0.length > 7) {
-    var f = c0.split(','),
+    const f = c0.split(','),
       t = (c1 ? c1 : p < 0 ? 'rgb(0,0,0)' : 'rgb(255,255,255)').split(','),
       R = w(f[0].slice(4)),
       G = w(f[1]),
@@ -66,7 +69,7 @@ export function shadeBlend(p, c0, c1) {
       ')'
     );
   } else {
-    var f = w(c0.slice(1), 16),
+    const f = w(c0.slice(1), 16),
       t = w((c1 ? c1 : p < 0 ? '#000000' : '#FFFFFF').slice(1), 16),
       R1 = f >> 16,
       G1 = (f >> 8) & 0x00ff,
@@ -85,19 +88,19 @@ export function shadeBlend(p, c0, c1) {
   }
 }
 
-export function darken(color, value = -0.15) {
+export function darken(color: string, value = -0.15) {
   return shadeBlend(value, color);
 }
 
-export function lighten(color, value = 0.25) {
+export function lighten(color: string, value = 0.25) {
   return shadeBlend(value, color);
 }
 
-export function hexToRGBA(hex, alpha) {
+export function hexToRGBA(hex: string, alpha: number) {
   if (!hex || !hex.startsWith('#')) {
-    return null;
+    return '';
   }
-  var c;
+  let c: any;
   if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
     c = hex.substring(1).split('');
     if (c.length === 3) {

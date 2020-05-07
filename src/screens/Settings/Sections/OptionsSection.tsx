@@ -11,12 +11,26 @@ import KeysManager from '@Lib/keysManager';
 import moment from '@Lib/moment';
 import UserPrefsManager, { LAST_EXPORT_DATE_KEY } from '@Lib/userPrefsManager';
 import Auth from '@Lib/snjs/authManager';
-import Abstract from '@Screens/Abstract';
+import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 
 import { SFPrivilegesManager } from 'snjs';
 
-class OptionsSection extends Abstract {
-  constructor(props) {
+type Props = {
+  title: string;
+  onSignOutPress: () => Promise<any>;
+  onManagePrivileges: () => void;
+} & AbstractProps;
+
+type State = {
+  loadingExport: boolean;
+  encryptionAvailable: boolean;
+  email?: string | null;
+  signedIn: boolean;
+  lastExportDate?: Date;
+} & AbstractState;
+
+class OptionsSection extends Abstract<Props, State> {
+  constructor(props: Readonly<Props>) {
     super(props);
     let encryptionAvailable = KeysManager.get().activeKeys() != null;
     let email = KeysManager.get().getUserEmail();
@@ -38,7 +52,7 @@ class OptionsSection extends Abstract {
       });
   }
 
-  onExportPress = option => {
+  onExportPress = (option: { key: string }) => {
     let encrypted = option.key === 'encrypted';
     if (encrypted && !this.state.encryptionAvailable) {
       Alert.alert(
@@ -68,7 +82,7 @@ class OptionsSection extends Abstract {
             }
             this.setState({ loadingExport: false });
           })
-          .catch(error => {
+          .catch(() => {
             this.setState({ loadingExport: false });
           });
       },
@@ -104,13 +118,15 @@ class OptionsSection extends Abstract {
   };
 
   render() {
-    let lastExportString, stale;
+    let lastExportString;
+    let stale: boolean = false;
     if (this.state.lastExportDate) {
       let formattedDate = moment(this.state.lastExportDate).format('lll');
       lastExportString = `Last exported on ${formattedDate}`;
 
       // Date is stale if more than 7 days ago
       let staleThreshold = 7 * 86400;
+      // @ts-ignore date type issue
       stale = (new Date() - this.state.lastExportDate) / 1000 > staleThreshold;
     } else {
       lastExportString = 'Your data has not yet been backed up.';
@@ -138,13 +154,13 @@ class OptionsSection extends Abstract {
             onPress={this.onSignOutPress}
           />
         )}
-
+        {/* some types don't exist on component */}
         <SectionedOptionsTableCell
           testID="exportData"
-          last={!hasLastExportSection}
+          // last={!hasLastExportSection}
           first={false}
-          disabled={this.state.loadingExport}
-          leftAligned={true}
+          // disabled={this.state.loadingExport}
+          // leftAligned={true}
           options={this.exportOptions()}
           title={this.state.loadingExport ? 'Processing...' : 'Export Data'}
           onPress={this.onExportPress}

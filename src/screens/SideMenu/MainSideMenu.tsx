@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, ViewStyle, TextStyle } from 'react-native';
 import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
@@ -21,21 +21,37 @@ import StyleKit from '@Style/StyleKit';
 import ThemeManager from '@Style/ThemeManager';
 import { LIGHT_MODE_KEY, DARK_MODE_KEY } from '@Style/utils';
 
-import { SFAuthManager } from 'snjs';
+import { SFAuthManager, SNTheme as SNJSTheme } from 'snjs';
+import { Mode } from 'react-native-dark-mode';
+import { AbstractProps, AbstractState } from '@Screens/Abstract';
 
-export default class MainSideMenu extends AbstractSideMenu {
-  constructor(props) {
+type SNTheme = typeof SNJSTheme;
+
+type State = {
+  outOfSync: boolean;
+  actionSheet: JSX.Element | null;
+} & AbstractState;
+
+export default class MainSideMenu extends AbstractSideMenu<
+  AbstractProps,
+  State
+> {
+  styles!: Record<string, ViewStyle | TextStyle>;
+  signoutObserver: any;
+  syncEventHandler: any;
+
+  constructor(props: Readonly<{ navigation: any }>) {
     super(props);
     this.constructState({});
 
-    this.signoutObserver = Auth.get().addEventHandler(event => {
+    this.signoutObserver = Auth.get().addEventHandler((event: any) => {
       if (event === SFAuthManager.DidSignOutEvent) {
         this.setState({ outOfSync: false });
         this.forceUpdate();
       }
     });
 
-    this.syncEventHandler = Sync.get().addEventHandler((event, data) => {
+    this.syncEventHandler = Sync.get().addEventHandler((event: string) => {
       if (event === 'enter-out-of-sync') {
         this.setState({ outOfSync: true });
       } else if (event === 'exit-out-of-sync') {
@@ -70,12 +86,12 @@ export default class MainSideMenu extends AbstractSideMenu {
     return SideMenuManager.get().getHandlerForLeftSideMenu();
   }
 
-  onTagSelect = tag => {
-    this.handler.onTagSelect(tag);
+  onTagSelect = (tag: any) => {
+    this.handler?.onTagSelect(tag);
     this.forceUpdate();
   };
 
-  onThemeSelect = theme => {
+  onThemeSelect = (theme: SNTheme) => {
     /** Prevent themes that aren't meant for mobile from being activated. */
     if (theme.content.package_info && theme.content.package_info.no_mobile) {
       AlertManager.get().alert({
@@ -94,7 +110,7 @@ export default class MainSideMenu extends AbstractSideMenu {
     this.forceUpdate();
   };
 
-  onThemeLongPress = theme => {
+  onThemeLongPress = (theme: SNTheme) => {
     const actionSheetOptions = [];
 
     /**
@@ -169,7 +185,7 @@ export default class MainSideMenu extends AbstractSideMenu {
     sheet.show();
   };
 
-  onThemeRedownload(theme) {
+  onThemeRedownload(theme: SNTheme) {
     AlertManager.get().confirm({
       title: 'Redownload Theme',
       text:
@@ -181,7 +197,7 @@ export default class MainSideMenu extends AbstractSideMenu {
     });
   }
 
-  getModeActionForTheme({ theme, mode }) {
+  getModeActionForTheme({ theme, mode }: { theme: SNTheme; mode: Mode }) {
     return ThemeManager.get().isThemeEnabledForMode({
       mode: mode,
       theme: theme,
@@ -190,10 +206,10 @@ export default class MainSideMenu extends AbstractSideMenu {
       : 'Set as';
   }
 
-  iconDescriptorForTheme = theme => {
+  iconDescriptorForTheme = (theme: SNTheme) => {
     const desc = {
       type: 'circle',
-      side: 'right',
+      side: 'right' as 'right',
     };
 
     const dockIcon =

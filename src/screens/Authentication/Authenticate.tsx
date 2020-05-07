@@ -1,17 +1,38 @@
 import React from 'react';
-import { TextInput, View, Alert, ScrollView } from 'react-native';
+import {
+  TextInput,
+  View,
+  Alert,
+  ScrollView,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import _ from 'lodash';
 import ButtonCell from '@Components/ButtonCell';
 import SectionHeader from '@Components/SectionHeader';
 import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
 import SectionedTableCell from '@Components/SectionedTableCell';
-import ApplicationState from '@Lib/ApplicationState';
-import Abstract from '@Screens/Abstract';
+import ApplicationState, { AppStateType } from '@Lib/ApplicationState';
+import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 import { ICON_CLOSE } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
+import AuthenticationSourceAccountPassword from './Sources/AuthenticationSourceAccountPassword';
+import AuthenticationSourceBiometric from './Sources/AuthenticationSourceBiometric';
+import AuthenticationSourceLocalPasscode from './Sources/AuthenticationSourceLocalPasscode';
 
-export default class Authenticate extends Abstract {
-  static navigationOptions = ({ navigation, navigationOptions }) => {
+type Source =
+  | AuthenticationSourceAccountPassword
+  | AuthenticationSourceBiometric
+  | AuthenticationSourceLocalPasscode;
+
+type State = {
+  activeSource: any | null;
+  submitDisabled: boolean;
+  sourceLocked: boolean;
+} & AbstractState;
+
+export default class Authenticate extends Abstract<AbstractProps, State> {
+  static navigationOptions = ({ navigation, navigationOptions }: any) => {
     const templateOptions = {
       /**
        * On Android, not having a left button will make the title appear all
@@ -21,12 +42,22 @@ export default class Authenticate extends Abstract {
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
-      navigationOptions,
+      _navigationOptions: navigationOptions,
       templateOptions,
     });
   };
+  styles!: Record<string, ViewStyle | TextStyle>;
+  stateObserver: {
+    key: () => number;
+    callback: (state: AppStateType) => void;
+  };
+  pendingSources: Source[];
+  _sessionLength: number;
+  successfulSources: Source[];
+  activeSource: Source | null = null;
+  needsSuccessCallback: any;
 
-  constructor(props) {
+  constructor(props: Readonly<AbstractProps>) {
     super(props);
 
     for (const source of this.sources) {
@@ -67,7 +98,7 @@ export default class Authenticate extends Abstract {
     this.successfulSources = [];
   }
 
-  get sources() {
+  get sources(): Source[] {
     return this.getProp('authenticationSources');
   }
 
@@ -134,7 +165,7 @@ export default class Authenticate extends Abstract {
     }
   }
 
-  async beginAuthenticationForSource(source) {
+  async beginAuthenticationForSource(source: Source) {
     /**
      * Authentication modal may be displayed on lose focus just before the app
      * is closing. In this state however, we don't want to begin auth. We'll
@@ -158,7 +189,7 @@ export default class Authenticate extends Abstract {
     this.forceUpdate();
   }
 
-  successfulSourcesIncludesSource(source) {
+  successfulSourcesIncludesSource(source: Source) {
     for (const candidate of this.successfulSources) {
       if (candidate.identifier === source.identifier) {
         return true;
@@ -178,7 +209,7 @@ export default class Authenticate extends Abstract {
     return true;
   }
 
-  async validateAuthentication(source) {
+  async validateAuthentication(source: Source) {
     if (this.state.sourceLocked) {
       return;
     }
@@ -219,7 +250,7 @@ export default class Authenticate extends Abstract {
     }
   }
 
-  async onBiometricDirectPress(source) {
+  async onBiometricDirectPress(source: Source) {
     if (source.isLocked()) {
       return;
     }
@@ -237,7 +268,7 @@ export default class Authenticate extends Abstract {
    * When a source returns in a locked status we create a timeout for the lock
    * period. This will auto reprompt the user for auth after the period is up.
    */
-  onSourceLocked(source) {
+  onSourceLocked(source: Source) {
     this.setState({ sourceLocked: true, submitDisabled: true });
 
     setTimeout(() => {
@@ -283,7 +314,7 @@ export default class Authenticate extends Abstract {
     this.needsSuccessCallback = false;
   }
 
-  inputTextChanged(text, source) {
+  inputTextChanged(text: string, source: Source) {
     source.setAuthenticationValue(text);
     this.forceUpdate();
   }
@@ -292,15 +323,19 @@ export default class Authenticate extends Abstract {
     return this.getProp('sessionLengthOptions');
   }
 
-  setSessionLength(length) {
+  setSessionLength(length: number) {
     this._sessionLength = length;
     this.forceUpdate();
   }
 
-  _renderAuthenticationSoure = (source, index) => {
+  _renderAuthenticationSoure = (source: Source, index: number) => {
     const isLast = index === this.sources.length - 1;
 
-    const inputAuthenticationSource = source => (
+    const inputAuthenticationSource = (
+      inputSource:
+        | AuthenticationSourceAccountPassword
+        | AuthenticationSourceLocalPasscode
+    ) => (
       <View
         style={[
           this.styles.authSourceSection,
@@ -314,31 +349,33 @@ export default class Authenticate extends Abstract {
         >
           <TextInput
             ref={ref => {
-              source.inputRef = ref;
+              inputSource.inputRef = ref;
             }}
             style={StyleKit.styles.sectionedTableCellTextInput}
-            placeholder={source.inputPlaceholder}
+            placeholder={inputSource.inputPlaceholder}
             onChangeText={text => {
-              this.inputTextChanged(text, source);
+              this.inputTextChanged(text, inputSource);
             }}
-            value={source.getAuthenticationValue()}
+            value={inputSource.getAuthenticationValue()}
             autoCorrect={false}
             autoFocus={false}
             autoCapitalize={'none'}
             secureTextEntry={true}
-            keyboardType={source.keyboardType || 'default'}
+            keyboardType={inputSource.keyboardType || 'default'}
             keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
             placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
             onSubmitEditing={() => {
-              this.validateAuthentication(source);
+              this.validateAuthentication(inputSource);
             }}
           />
         </SectionedTableCell>
       </View>
     );
 
-    const biometricAuthenticationSource = source => (
+    const biometricAuthenticationSource = (
+      biometricSource: AuthenticationSourceBiometric
+    ) => (
       <View
         style={[
           this.styles.authSourceSection,
@@ -347,11 +384,11 @@ export default class Authenticate extends Abstract {
       >
         <SectionedAccessoryTableCell
           first={true}
-          dimmed={source !== this.state.activeSource}
-          tinted={source === this.state.activeSource}
-          text={source.label}
+          dimmed={biometricSource !== this.state.activeSource}
+          tinted={biometricSource === this.state.activeSource}
+          text={biometricSource.label}
           onPress={() => {
-            this.onBiometricDirectPress(source);
+            this.onBiometricDirectPress(biometricSource);
           }}
         />
       </View>
@@ -369,14 +406,40 @@ export default class Authenticate extends Abstract {
       <View key={source.identifier}>
         <SectionHeader
           title={sourceTitle}
-          subtitle={hasHeaderSubtitle && source.label}
+          subtitle={hasHeaderSubtitle ? source.label : undefined}
           tinted={source === this.state.activeSource}
-          buttonText={source.headerButtonText}
-          buttonAction={source.headerButtonAction}
-          buttonStyles={source.headerButtonStyles}
+          buttonText={
+            source.type === 'input'
+              ? (source as
+                  | AuthenticationSourceAccountPassword
+                  | AuthenticationSourceLocalPasscode).headerButtonText
+              : undefined
+          }
+          buttonAction={
+            source.type === 'input'
+              ? (source as
+                  | AuthenticationSourceAccountPassword
+                  | AuthenticationSourceLocalPasscode).headerButtonAction
+              : undefined
+          }
+          buttonStyles={
+            source.type === 'input'
+              ? (source as
+                  | AuthenticationSourceAccountPassword
+                  | AuthenticationSourceLocalPasscode).headerButtonStyles
+              : undefined
+          }
         />
-        {source.type === 'input' && inputAuthenticationSource(source)}
-        {source.type === 'biometric' && biometricAuthenticationSource(source)}
+        {source.type === 'input' &&
+          inputAuthenticationSource(
+            source as
+              | AuthenticationSourceAccountPassword
+              | AuthenticationSourceLocalPasscode
+          )}
+        {source.type === 'biometric' &&
+          biometricAuthenticationSource(
+            source as AuthenticationSourceBiometric
+          )}
       </View>
     );
   };
@@ -396,7 +459,8 @@ export default class Authenticate extends Abstract {
           })}
 
           <ButtonCell
-            style={this.styles.submitButtonCell}
+            // TODO: there is no style prop
+            // style={this.styles.submitButtonCell}
             maxHeight={45}
             disabled={this.state.submitDisabled}
             title={this.pendingSources.length > 1 ? 'Next' : 'Submit'}
@@ -407,20 +471,22 @@ export default class Authenticate extends Abstract {
           {this.sessionLengthOptions && this.sessionLengthOptions.length > 0 && (
             <View style={this.styles.rememberForSection}>
               <SectionHeader title={'Remember For'} />
-              {this.sessionLengthOptions.map((option, index) => (
-                <SectionedAccessoryTableCell
-                  text={option.label}
-                  key={`${index}`}
-                  first={index === 0}
-                  last={index === this.sessionLengthOptions.length - 1}
-                  selected={() => {
-                    return option.value === this._sessionLength;
-                  }}
-                  onPress={() => {
-                    this.setSessionLength(option.value);
-                  }}
-                />
-              ))}
+              {this.sessionLengthOptions.map(
+                (option: { label: string; value: number }, index: number) => (
+                  <SectionedAccessoryTableCell
+                    text={option.label}
+                    key={`${index}`}
+                    first={index === 0}
+                    last={index === this.sessionLengthOptions.length - 1}
+                    selected={() => {
+                      return option.value === this._sessionLength;
+                    }}
+                    onPress={() => {
+                      this.setSessionLength(option.value);
+                    }}
+                  />
+                )
+              )}
             </View>
           )}
         </ScrollView>

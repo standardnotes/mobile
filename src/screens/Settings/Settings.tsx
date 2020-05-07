@@ -12,7 +12,7 @@ import AlertManager from '@Lib/snjs/alertManager';
 import Auth from '@Lib/snjs/authManager';
 import Storage from '@Lib/snjs/storageManager';
 import Sync from '@Lib/snjs/syncManager';
-import Abstract from '@Screens/Abstract';
+import Abstract, { AbstractState, AbstractProps } from '@Screens/Abstract';
 import { SCREEN_INPUT_MODAL, SCREEN_MANAGE_PRIVILEGES } from '@Screens/screens';
 import AuthSection from '@Screens/Settings/Sections/AuthSection';
 import CompanySection from '@Screens/Settings/Sections/CompanySection';
@@ -23,9 +23,18 @@ import { ICON_CHECKMARK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
 import { SFPrivilegesManager, protocolManager } from 'snjs';
+import OptionsState from '@Lib/OptionsState';
 
-export default class Settings extends Abstract {
-  static navigationOptions = ({ navigation, navigationOptions }) => {
+type State = {
+  confirmRegistration: boolean;
+  hasPasscode: boolean;
+  storageEncryption: any;
+  storageEncryptionLoading: boolean;
+  hasBiometrics: boolean;
+} & AbstractState;
+
+export default class Settings extends Abstract<AbstractProps, State> {
+  static navigationOptions = ({ navigation, navigationOptions }: any) => {
     const templateOptions = {
       title: 'Settings',
       leftButton: {
@@ -37,12 +46,15 @@ export default class Settings extends Abstract {
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
-      navigationOptions,
+      _navigationOptions: navigationOptions,
       templateOptions,
     });
   };
+  sortOptions: { key: string; label: string }[];
+  options: OptionsState;
+  syncEventHandler: any;
 
-  constructor(props) {
+  constructor(props: Readonly<AbstractProps>) {
     super(props);
 
     props.navigation.setParams({
@@ -108,7 +120,7 @@ export default class Settings extends Abstract {
     this.forceUpdate();
   }
 
-  resaveOfflineData(callback, updateAfter = false) {
+  resaveOfflineData(callback: { (): void } | null, updateAfter = false) {
     Sync.get()
       .resaveOfflineData()
       .then(() => {
@@ -181,14 +193,14 @@ export default class Settings extends Abstract {
       secureTextEntry: true,
       requireConfirm: true,
       showKeyboardChooser: true,
-      onSubmit: async (value, keyboardType) => {
+      onSubmit: async (value: any, keyboardType: string | null | undefined) => {
         Storage.get().setItem('passcodeKeyboardType', keyboardType);
 
         let identifier = await protocolManager.crypto.generateUUID();
 
         protocolManager
           .generateInitialKeysAndAuthParamsForUser(identifier, value)
-          .then(results => {
+          .then((results: { keys: any; authParams: any }) => {
             let keys = results.keys;
             let authParams = results.authParams;
 
@@ -262,12 +274,12 @@ export default class Settings extends Abstract {
     );
   };
 
-  onSortChange = key => {
+  onSortChange = (key: string) => {
     this.options.setSortBy(key);
     this.forceUpdate();
   };
 
-  onOptionSelect = option => {
+  onOptionSelect = (option: string) => {
     this.options.setDisplayOptionKeyValue(
       option,
       !this.options.getDisplayOptionValue(option)

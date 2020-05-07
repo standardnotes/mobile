@@ -21,8 +21,6 @@ Clone the project, then initialize the project with required files:
 1. `yarn init`
 3. `react-native run-ios` or `react-native run-android`
 
-Note: You may need to set up an SSH key on GitHub to pull in submodules. Please follow [these instructions](https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/) to do so.
-
 If upon building Android you see the error "Could not get unknown property 'repositoryUrl' for project ':ReactAndroid'", please edit the file in `node_modules/react-native/ReactAndroid/release.gradle` according to [these instructions](https://stackoverflow.com/questions/43967489/could-not-get-unknown-property-repositoryurl-for-project).
 
 ### Running on Device

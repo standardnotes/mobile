@@ -1,9 +1,28 @@
 import React from 'react';
-import { View, Text, TouchableHighlight } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableHighlight,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import ThemedComponent from '@Components/ThemedComponent';
 import StyleKit from '@Style/StyleKit';
 
-export default class SectionedOptionsTableCell extends ThemedComponent {
+type Option = { selected: boolean; key: string; title: string };
+
+type Props = {
+  title: string;
+  first?: boolean;
+  height?: number;
+  extraStyles?: ViewStyle;
+  testID?: string;
+  onPress: (option: Option) => void;
+  options: Option[];
+};
+
+export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
+  styles!: Record<string, ViewStyle | TextStyle>;
   rules() {
     let rules = [StyleKit.styles.sectionedTableCell];
     if (this.props.first) {

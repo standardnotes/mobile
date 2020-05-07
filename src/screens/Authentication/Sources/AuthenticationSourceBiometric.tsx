@@ -4,6 +4,10 @@ import KeysManager from '@Lib/keysManager';
 import AuthenticationSource from '@Screens/Authentication/Sources/AuthenticationSource';
 
 export default class AuthenticationSourceBiometric extends AuthenticationSource {
+  isReady: boolean = true;
+  isAvailable: boolean = false;
+  biometricsType: string | undefined;
+  biometricsNoun: string | undefined;
   constructor() {
     super();
   }
@@ -94,13 +98,14 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
 
     if (Platform.OS === 'android') {
       return FingerprintScanner.authenticate({
+        // @ts-ignore TODO: check deviceCredentialAllowed
         deviceCredentialAllowed: true,
         description: 'Biometrics are required to access your notes.',
       })
         .then(() => {
           return this._success();
         })
-        .catch(error => {
+        .catch((error: { name: string }) => {
           console.log('Biometrics error', error);
 
           if (error.name === 'DeviceLocked') {
@@ -143,7 +148,7 @@ export default class AuthenticationSourceBiometric extends AuthenticationSource 
     return { success: true };
   }
 
-  _fail(message) {
+  _fail(message?: string) {
     if (!this.isLocked()) {
       this.didFail();
     }

@@ -1,10 +1,47 @@
 import React, { Fragment } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 import ThemedComponent from '@Components/ThemedComponent';
 import SideMenuCell from '@Screens/SideMenu/SideMenuCell';
 import StyleKit from '@Style/StyleKit';
 
-export default class SideMenuSection extends ThemedComponent {
+type Props = {
+  title: string;
+  collapsed?: boolean;
+  options?: any[];
+};
+
+type State = {
+  collapsed: boolean;
+};
+
+export type SideMenuOption = {
+  text: string;
+  subtext?: string;
+  textClass?: 'info' | 'danger' | 'warning';
+  key?: string;
+  iconDesc?: {
+    type: string;
+    side?: 'left' | 'right';
+    name?: string;
+    value?: string;
+    backgroundColor?: string;
+    borderColor?: string;
+    size?: number;
+  };
+  dimmed?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
+  onLongPress?: () => void;
+};
+
+export default class SideMenuSection extends ThemedComponent<Props, State> {
+  styles!: Record<string, ViewStyle | TextStyle>;
   static BuildOption({
     text,
     subtext,
@@ -15,7 +52,7 @@ export default class SideMenuSection extends ThemedComponent {
     selected,
     onSelect,
     onLongPress,
-  }) {
+  }: SideMenuOption) {
     return {
       text,
       subtext,
@@ -29,9 +66,9 @@ export default class SideMenuSection extends ThemedComponent {
     };
   }
 
-  constructor(props) {
+  constructor(props: Readonly<Props>) {
     super(props);
-    this.state = { collapsed: props.collapsed };
+    this.state = { collapsed: props.collapsed ?? false };
   }
 
   toggleCollapse = () => {
@@ -51,7 +88,8 @@ export default class SideMenuSection extends ThemedComponent {
             this.styles.header,
             this.state.collapsed ? this.styles.collapsedHeader : null,
           ]}
-          underlayColor={StyleKit.variables.stylekitBorderColor}
+          // TODO: removed prop
+          // underlayColor={StyleKit.variables.stylekitBorderColor}
           onPress={this.toggleCollapse}
         >
           <Fragment>

@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import Circle from '@Components/Circle';
 import ThemedComponent from '@Components/ThemedComponent';
 import KeysManager from '@Lib/keysManager';
@@ -7,7 +13,14 @@ import Auth from '@Lib/snjs/authManager';
 import ModelManager from '@Lib/snjs/modelManager';
 import StyleKit from '@Style/StyleKit';
 
-export default class SideMenuHero extends ThemedComponent {
+type Props = {
+  onPress: () => void;
+  outOfSync: boolean;
+  onOutOfSyncPress: () => void;
+};
+
+export default class SideMenuHero extends ThemedComponent<Props> {
+  styles!: Record<string, ViewStyle | TextStyle>;
   getText() {
     const offline = Auth.get().offline();
     const hasEncryption =

@@ -3,10 +3,10 @@ import KeysManager from '@Lib/keysManager';
 import { SFHttpManager } from 'snjs';
 
 export default class Server extends SFHttpManager {
-  static instance = null;
+  private static instance: Server;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new Server();
     }
 

@@ -7,15 +7,19 @@ import SectionedTableCell from '@Components/SectionedTableCell';
 import TableSection from '@Components/TableSection';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
-import Abstract from '@Screens/Abstract';
+import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 import ModelManager from '@Lib/snjs/modelManager';
 import Sync from '@Lib/snjs/syncManager';
 import AlertManager from '@Lib/snjs/alertManager';
 import { ICON_CLOSE } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
-export default class KeyRecovery extends Abstract {
-  static navigationOptions = ({ navigation, navigationOptions }) => {
+type State = {
+  text: string;
+} & AbstractState;
+
+export default class KeyRecovery extends Abstract<AbstractProps, State> {
+  static navigationOptions = ({ navigation, navigationOptions }: any) => {
     const templateOptions = {
       title: 'Key Recovery',
       leftButton: {
@@ -27,12 +31,15 @@ export default class KeyRecovery extends Abstract {
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
-      navigationOptions,
+      _navigationOptions: navigationOptions,
       templateOptions,
     });
   };
+  items: any;
+  encryptedCount: number = 0;
+  inputRef: TextInput | null = null;
 
-  constructor(props) {
+  constructor(props: Readonly<AbstractProps>) {
     super(props);
 
     props.navigation.setParams({
@@ -48,7 +55,6 @@ export default class KeyRecovery extends Abstract {
     });
 
     this.state = { text: '' };
-
     this.reloadData();
   }
 
@@ -72,7 +78,7 @@ export default class KeyRecovery extends Abstract {
       this.state.text,
       authParams
     );
-    await SF.get().itemTransformer.decryptMultipleItems(this.items, keys);
+    await protocolManager.decryptMultipleItems(this.items, keys);
 
     this.encryptedCount = 0;
     for (const item of this.items) {
@@ -81,7 +87,7 @@ export default class KeyRecovery extends Abstract {
       }
     }
 
-    let useKeys = async confirm => {
+    let useKeys = async (confirm?: boolean) => {
       const run = async () => {
         await KeysManager.get().persistOfflineKeys(keys);
         await ModelManager.get().mapResponseItemsToLocalModelsOmittingFields(
@@ -132,7 +138,7 @@ export default class KeyRecovery extends Abstract {
     }
   };
 
-  onTextChange = text => {
+  onTextChange = (text: string) => {
     this.setState({ text: text });
   };
 

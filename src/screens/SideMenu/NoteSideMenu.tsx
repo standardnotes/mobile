@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, ViewStyle, TextStyle } from 'react-native';
 import FAB from 'react-native-fab';
 import { SFPrivilegesManager, SNTag } from 'snjs';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -7,16 +7,19 @@ import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
-import ItemActionManager from '@Lib/itemActionManager';
+import ItemActionManager, { EventType } from '@Lib/itemActionManager';
 import { SCREEN_INPUT_MODAL, SCREEN_MANAGE_PRIVILEGES } from '@Screens/screens';
 import ModelManager from '@Lib/snjs/modelManager';
 import PrivilegesManager from '@Lib/snjs/privilegesManager';
 import Sync from '@Lib/snjs/syncManager';
 import AbstractSideMenu from '@Screens/SideMenu/AbstractSideMenu';
 import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
-import SideMenuSection from '@Screens/SideMenu/SideMenuSection';
+import SideMenuSection, {
+  SideMenuOption,
+} from '@Screens/SideMenu/SideMenuSection';
 import TagSelectionList from '@Screens/SideMenu/TagSelectionList';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import type { AbstractProps } from '@Screens/Abstract';
 import {
   ICON_BOOKMARK,
   ICON_ARCHIVE,
@@ -29,8 +32,18 @@ import {
 } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 
-export default class NoteSideMenu extends AbstractSideMenu {
-  constructor(props) {
+type State = {
+  lockContent: boolean;
+  outOfSync: boolean;
+  actionSheet: JSX.Element | null;
+};
+
+export default class NoteSideMenu extends AbstractSideMenu<
+  AbstractProps,
+  State
+> {
+  styles!: Record<string, ViewStyle | TextStyle>;
+  constructor(props: Readonly<AbstractProps>) {
     super(props);
     this.constructState({});
   }
@@ -39,21 +52,27 @@ export default class NoteSideMenu extends AbstractSideMenu {
     return SideMenuManager.get().getHandlerForRightSideMenu();
   }
 
-  onEditorSelect = editor => {
-    this.handler.onEditorSelect(editor);
+  onEditorSelect = (editor: any) => {
+    this.handler?.onEditorSelect(editor);
     this.forceUpdate();
   };
 
-  onTagSelect = tag => {
-    this.handler.onTagSelect(tag);
+  onTagSelect = (tag: any) => {
+    this.handler?.onTagSelect(tag);
     this.forceUpdate();
   };
 
   get note() {
-    return this.handler.getCurrentNote();
+    return this.handler?.getCurrentNote();
   }
 
-  onEditorLongPress = editor => {
+  onEditorLongPress = (
+    editor: {
+      content: any;
+      name?: any;
+      setDirty?: (arg0: boolean) => void;
+    } | null
+  ) => {
     const currentDefaultEditor = ComponentManager.get().getDefaultEditor();
 
     let isDefault = false;
@@ -109,8 +128,8 @@ export default class NoteSideMenu extends AbstractSideMenu {
     this.props.navigation.navigate(SCREEN_INPUT_MODAL, {
       title: 'New Tag',
       placeholder: 'New tag name',
-      onSubmit: text => {
-        this.createTag(text, tag => {
+      onSubmit: (text: string) => {
+        this.createTag(text, (tag: any) => {
           if (this.note) {
             // select this tag
             this.onTagSelect(tag);
@@ -120,7 +139,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
     });
   };
 
-  createTag(text, callback) {
+  createTag(text: string, callback: (tag: any) => void) {
     const tag = new SNTag({ content: { title: text } });
     tag.initUUID().then(() => {
       tag.setDirty(true);
@@ -135,7 +154,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
   Render
   */
 
-  runAction(action) {
+  runAction(action: EventType) {
     let run = () => {
       ItemActionManager.handleEvent(action, this.note, async () => {
         if (
@@ -147,7 +166,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
           this.popToRoot();
         } else {
           this.forceUpdate();
-          this.handler.onPropertyChange();
+          this.handler?.onPropertyChange();
 
           if (action === ItemActionManager.ProtectEvent) {
             // Show Privileges management screen if protected notes privs are not set up yet
@@ -208,7 +227,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
       { text: lockOption, key: lockEvent, icon: ICON_LOCK },
       { text: protectOption, key: protectEvent, icon: ICON_FINGER_PRINT },
       { text: 'Share', key: ItemActionManager.ShareEvent, icon: ICON_SHARE },
-    ];
+    ] as { text: string; key: EventType; icon: string }[];
 
     if (!this.note.content.trashed) {
       rawOptions.push({
@@ -218,7 +237,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
       });
     }
 
-    let options = [];
+    let options: SideMenuOption[] = [];
     for (const rawOption of rawOptions) {
       let option = SideMenuSection.BuildOption({
         text: rawOption.text,
@@ -246,7 +265,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         },
         {
           text: 'Delete Permanently',
-          textClass: 'danger',
+          textClass: 'danger' as 'danger',
           key: 'delete-forever',
           onSelect: () => {
             this.runAction(ItemActionManager.DeleteEvent);
@@ -254,7 +273,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         },
         {
           text: 'Empty Trash',
-          textClass: 'danger',
+          textClass: 'danger' as 'danger',
           key: 'empty trash',
           onSelect: () => {
             this.runAction(ItemActionManager.EmptyTrashEvent);
@@ -269,7 +288,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
   buildOptionsForEditors() {
     const editors = ComponentManager.get()
       .getEditors()
-      .sort((a, b) => {
+      .sort((a: { name: string }, b: { name: string }) => {
         if (!a.name || !b.name) {
           return -1;
         }
@@ -277,7 +296,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
         return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
       });
     const selectedEditor = ComponentManager.get().editorForNote(this.note);
-    const options = [
+    const options: SideMenuOption[] = [
       {
         text: 'Plain Editor',
         key: 'plain-editor',
@@ -294,7 +313,7 @@ export default class NoteSideMenu extends AbstractSideMenu {
     for (const editor of editors) {
       const option = SideMenuSection.BuildOption({
         text: editor.name,
-        subtext: editor.content.isMobileDefault ? 'Mobile Default' : null,
+        subtext: editor.content.isMobileDefault ? 'Mobile Default' : undefined,
         key: editor.uuid || editor.name,
         selected: editor === selectedEditor,
         onSelect: () => {

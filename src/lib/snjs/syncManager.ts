@@ -6,10 +6,10 @@ import ModelManager from '@Lib/snjs/modelManager';
 import Storage from '@Lib/snjs/storageManager';
 
 export default class Sync extends SFSyncManager {
-  static instance = null;
+  private static instance: Sync;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new Sync();
     }
 
@@ -23,7 +23,7 @@ export default class Sync extends SFSyncManager {
       'cursorToken',
     ]);
 
-    this.setKeyRequestHandler(request => {
+    this.setKeyRequestHandler((request: any) => {
       let keys;
       if (
         request === SFSyncManager.KeyRequestLoadSaveAccount ||

@@ -5,11 +5,22 @@ import ModelManager from '@Lib/snjs/modelManager';
 import Sync from '@Lib/snjs/syncManager';
 import StyleKit from '@Style/StyleKit';
 
+type ComponentManagerInstance = {
+  modelManager: ModelManager;
+  syncManager: Sync;
+  alertManager: AlertManager;
+  environment: 'mobile';
+  platform: typeof Platform.OS;
+  desktopManager?: any;
+  nativeExtManager?: any;
+  $uiRunner?: any;
+};
+
 export default class ComponentManager extends SNComponentManager {
-  static instance = null;
+  private static instance: ComponentManager;
 
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new ComponentManager({
         modelManager: ModelManager.get(),
         syncManager: Sync.get(),
@@ -31,7 +42,7 @@ export default class ComponentManager extends SNComponentManager {
     $uiRunner,
     platform,
     environment,
-  }) {
+  }: ComponentManagerInstance) {
     super({
       modelManager,
       syncManager,
@@ -64,7 +75,11 @@ export default class ComponentManager extends SNComponentManager {
     @param {object} dialog: {permissions, String, component, callback}
   */
 
-  presentPermissionsDialog(dialog) {
+  presentPermissionsDialog(dialog: {
+    component: { name: any };
+    permissionsString: any;
+    callback: (arg0: boolean) => void;
+  }) {
     let text = `${dialog.component.name} would like to interact with your ${dialog.permissionsString}`;
     this.alertManager.confirm({
       title: 'Grant Permissions',
@@ -89,12 +104,20 @@ export default class ComponentManager extends SNComponentManager {
   }
 
   getDefaultEditor() {
-    return this.getEditors().filter(e => {
-      return e.content.isMobileDefault;
-    })[0];
+    return this.getEditors().filter(
+      (e: { content: { isMobileDefault: any } }) => {
+        return e.content.isMobileDefault;
+      }
+    )[0];
   }
 
-  setEditorAsMobileDefault(editor, isDefault) {
+  setEditorAsMobileDefault(
+    editor: {
+      content: { isMobileDefault: any };
+      setDirty?: (arg0: boolean) => void;
+    },
+    isDefault: boolean
+  ) {
     if (isDefault) {
       // Remove current default
       const currentDefault = this.getDefaultEditor();
@@ -107,17 +130,28 @@ export default class ComponentManager extends SNComponentManager {
     // Could be null if plain editor
     if (editor) {
       editor.content.isMobileDefault = isDefault;
-      editor.setDirty(true);
+      editor.setDirty && editor.setDirty(true);
     }
     Sync.get().sync();
   }
 
-  associateEditorWithNote(editor, note) {
+  associateEditorWithNote(
+    editor: {
+      disassociatedItemIds: any[];
+      associatedItemIds: any[];
+      setDirty: (arg0: boolean) => void;
+    } | null,
+    note: {
+      uuid: any;
+      content: { mobilePrefersPlainEditor: boolean };
+      setDirty: (arg0: boolean) => void;
+    }
+  ) {
     const currentEditor = this.editorForNote(note);
     if (currentEditor && currentEditor !== editor) {
       // Disassociate currentEditor with note
       currentEditor.associatedItemIds = currentEditor.associatedItemIds.filter(
-        id => {
+        (id: any) => {
           return id !== note.uuid;
         }
       );
@@ -155,7 +189,11 @@ export default class ComponentManager extends SNComponentManager {
     Sync.get().sync();
   }
 
-  clearEditorForNote(note) {
+  clearEditorForNote(note: {
+    uuid: any;
+    content: { mobilePrefersPlainEditor: boolean };
+    setDirty: (arg0: boolean) => void;
+  }) {
     this.associateEditorWithNote(null, note);
   }
 }

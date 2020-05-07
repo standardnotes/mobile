@@ -4,6 +4,7 @@ import { Animated } from 'react-native';
 import {
   initialMode,
   eventEmitter as darkModeEventEmitter,
+  Mode,
 } from 'react-native-dark-mode';
 import { createAppContainer, NavigationActions } from 'react-navigation';
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
@@ -47,7 +48,9 @@ protocolManager.crypto.setNativeModules({
 });
 
 if (__DEV__ === false) {
-  const bugsnag = new Client();
+  // bugsnag
+  // eslint-disable-next-line no-new
+  new Client();
 
   /** Disable console.log for non-dev builds */
   console.log = () => {};
@@ -60,7 +63,7 @@ const AppStack = createStackNavigator(
   },
   {
     initialRouteName: SCREEN_NOTES,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: () => ({
       drawerLockMode: SideMenuManager.get().isRightSideMenuLocked()
         ? 'locked-closed'
         : null,
@@ -78,16 +81,18 @@ const AppDrawerStack = createDrawerNavigator(
         ref={ref => {
           SideMenuManager.get().setRightSideMenuReference(ref);
         }}
+        // @ts-ignore navigation is ignored
         navigation={navigation}
       />
     ),
     drawerPosition: 'right',
     drawerType: 'slide',
+    // @ts-ignore navigation is ignored
     getCustomActionCreators: (route, stateKey) => {
       return {
         openRightDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
         closeRightDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
-        lockRightDrawer: lock => {
+        lockRightDrawer: (lock: any) => {
           /** This is the key part */
           SideMenuManager.get().setLockedForRightSideMenu(lock);
           /** We have to return something. */
@@ -133,13 +138,14 @@ const AppDrawer = createStackNavigator(
   {
     mode: 'modal',
     headerMode: 'none',
+    // @ts-ignore navigation is ignored
     transitionConfig: () => ({
       transitionSpec: {
         duration: 300,
         timing: Animated.timing,
       },
     }),
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: () => ({
       drawerLockMode: SideMenuManager.get().isLeftSideMenuLocked()
         ? 'locked-closed'
         : null,
@@ -157,16 +163,18 @@ const DrawerStack = createDrawerNavigator(
         ref={ref => {
           SideMenuManager.get().setLeftSideMenuReference(ref);
         }}
+        // @ts-ignore navigation is ignored
         navigation={navigation}
       />
     ),
     drawerPosition: 'left',
     drawerType: 'slide',
+    // @ts-ignore navigation is ignored
     getCustomActionCreators: (route, stateKey) => {
       return {
         openLeftDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
         closeLeftDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
-        lockLeftDrawer: lock => {
+        lockLeftDrawer: (lock: any) => {
           /** This is the key part. */
           SideMenuManager.get().setLockedForLeftSideMenu(lock);
           /** We have to return something. */
@@ -182,10 +190,14 @@ const DrawerStack = createDrawerNavigator(
 
 const AppContainer = createAppContainer(DrawerStack);
 
-export default class App extends Component {
-  constructor(props) {
-    super(props);
+type State = {
+  ready: boolean;
+};
 
+export default class App extends Component<{}, State> {
+  authEventHandler: any;
+  constructor(props: Readonly<{}>) {
+    super(props);
     StyleKit.get().setModeTo(initialMode);
     darkModeEventEmitter.on('currentModeChanged', this.onChangeCurrentMode);
 
@@ -201,10 +213,10 @@ export default class App extends Component {
     MigrationManager.get().load();
 
     /** Listen to sign out event */
-    this.authEventHandler = Auth.get().addEventHandler(async event => {
+    this.authEventHandler = Auth.get().addEventHandler(async (event: any) => {
       if (event === SFAuthManager.DidSignOutEvent) {
         ModelManager.get().handleSignout();
-        await Sync.get().handleSignout();
+        Sync.get().handleSignout();
       }
     });
 
@@ -244,7 +256,7 @@ export default class App extends Component {
   }
 
   /** @private */
-  onChangeCurrentMode(mode) {
+  onChangeCurrentMode(mode: Mode) {
     StyleKit.get().setModeTo(mode);
     StyleKit.get().activatePreferredTheme();
   }

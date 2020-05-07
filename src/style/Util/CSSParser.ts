@@ -6,8 +6,8 @@ export default class CSSParser {
   /**
    * @param css: CSS file contents in string format
    */
-  static cssToObject(css) {
-    const object = {};
+  static cssToObject(css: string) {
+    const object: Record<string, string> = {};
     const lines = css.split('\n');
 
     for (let line of lines) {
@@ -36,7 +36,10 @@ export default class CSSParser {
     return object;
   }
 
-  static resolveVariablesThatReferenceOtherVariables(object, round = 0) {
+  static resolveVariablesThatReferenceOtherVariables(
+    object: Record<string, any>,
+    round = 0
+  ) {
     for (const key of Object.keys(object)) {
       const value = object[key];
       const stripValue = 'var(';
@@ -67,7 +70,7 @@ export default class CSSParser {
     }
   }
 
-  static hyphenatedStringToCamelCase(string) {
+  static hyphenatedStringToCamelCase(string: string) {
     const comps = string.split('-');
     let result = '';
     for (let i = 0; i < comps.length; i++) {
@@ -82,7 +85,7 @@ export default class CSSParser {
     return result;
   }
 
-  static capitalizeFirstLetter(string) {
+  static capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 }

@@ -1,8 +1,12 @@
 import { Keyboard } from 'react-native';
-import Abstract from '@Screens/Abstract';
+import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 
-export default class AbstractSideMenu extends Abstract {
-  shouldComponentUpdate(nextProps, nextState) {
+export default class AbstractSideMenu<
+  AdditionalProps extends AbstractProps,
+  AdditionalState extends AbstractState
+> extends Abstract<AdditionalProps, AdditionalState> {
+  handler: any;
+  shouldComponentUpdate(nextProps: Readonly<AbstractProps & AdditionalProps>) {
     /*
       We had some performance issues with this component rendering too many times when
       navigating to unrelated routes, like pushing Compose. It would render 6 times or so,

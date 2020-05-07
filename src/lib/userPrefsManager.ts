@@ -6,9 +6,10 @@ export const DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY =
   'DoNotShowAgainUnsupportedEditorsKey';
 
 export default class UserPrefsManager {
-  static instance = null;
+  private static instance: UserPrefsManager;
+  data: Record<string, any>;
   static get() {
-    if (this.instance == null) {
+    if (!this.instance) {
       this.instance = new UserPrefsManager();
     }
     return this.instance;
@@ -18,37 +19,39 @@ export default class UserPrefsManager {
     this.data = {};
   }
 
-  async clearPref({ key }) {
+  async clearPref({ key }: { key: string }) {
     this.data[key] = null;
     return Storage.get().clearKeys([key]);
   }
 
-  async setPref({ key, value }) {
+  async setPref({ key, value }: { key: string; value: unknown }) {
     await Storage.get().setItem(key, JSON.stringify(value));
     this.data[key] = value;
   }
 
-  async getPref({ key }) {
+  async getPref({ key }: { key: string }) {
     if (isNullOrUndefined(this.data[key])) {
-      this.data[key] = JSON.parse(await Storage.get().getItem(key));
+      const item = await Storage.get().getItem(key);
+      this.data[key] = JSON.parse(item ?? '');
     }
 
     return this.data[key];
   }
 
-  async getPrefAsDate({ key }) {
+  async getPrefAsDate({ key }: { key: string }) {
     if (isNullOrUndefined(this.data[key])) {
-      this.data[key] = dateFromJsonString(await Storage.get().getItem(key));
+      const item = await Storage.get().getItem(key);
+      this.data[key] = dateFromJsonString(item ?? '');
     }
 
     return this.data[key];
   }
 
-  async isPrefSet({ key }) {
+  async isPrefSet({ key }: { key: string }) {
     return (await this.getPref({ key: key })) !== null;
   }
 
-  async isPrefEqualTo({ key, value }) {
+  async isPrefEqualTo({ key, value }: { key: string; value: unknown }) {
     return (await this.getPref({ key: key })) === value;
   }
 }

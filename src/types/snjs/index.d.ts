@@ -1,0 +1,37 @@
+declare module 'snjs' {
+  export const SNTheme: any;
+  export const SNProtocolManager: any;
+  export const protocolManager: any;
+  export const SFItem: any;
+  export const SFItemParams: any;
+  export const SFPredicate: any;
+  export const SNNote: any;
+  export const SNTag: any;
+  export const SNSmartTag: any;
+  export const SNMfa: any;
+  export const SNServerExtension: any;
+  export const SNComponent: any;
+  export const SNEditor: any;
+  export const Action: any;
+  export const SNExtension: any;
+  export const SNEncryptedStorage: any;
+  export const SFHistorySession: any;
+  export const SFItemHistory: any;
+  export const SFPrivileges: any;
+  export const SNWebCrypto: any;
+  export const SNCryptoJS: any;
+  export const SNReactNativeCrypto: any;
+  export const findInArray: any;
+  export const SFModelManager: any;
+  export const SFHttpManager: any;
+  export const SFStorageManager: any;
+  export const SFSyncManager: any;
+  export const SFAuthManager: any;
+  export const SFAlertManager: any;
+  export const SFSessionHistoryManager: any;
+  export const SFPrivilegesManager: any;
+  export const SFSingletonManager: any;
+  export const SNEncryptedStorage: any;
+  export const SNComponentManager: any;
+  export const SFMigrationManager: any;
+}
