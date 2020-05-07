@@ -97,7 +97,7 @@
           "type": "iPhone SE (2nd generation)"
         }
       },
-      "ios.sim.relese": {
+      "ios.sim.release": {
         "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/StandardNotes.app",
         "build": "xcodebuild -workspace ios/StandardNotes.xcworkspace -scheme StandardNotes -configuration Release -sdk iphonesimulator -derivedDataPath ios/build",
         "type": "ios.simulator",
@@ -110,7 +110,7 @@
         "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
         "type": "android.emulator",
         "device": {
-          "avdName": "Pixel_3_XL_API_29"
+          "avdName": "emu"
         }
       },
       "android.emu.release": {
