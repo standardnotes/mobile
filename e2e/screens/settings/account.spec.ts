@@ -47,6 +47,9 @@ describe('Account section', () => {
       await element(by.id('syncServerField')).typeText(
         helpers.randomCredentials.syncServerUrl
       );
+      if (!helpers.expectToBeVisible(element(by.id('registerButton')))) {
+        await element(by.id('registerButton')).scrollTo('bottom');
+      }
       await element(by.id('registerButton')).tap();
 
       // A confirmation screen is shown after we click the register button...
@@ -96,6 +99,9 @@ describe('Account section', () => {
       await element(by.id('syncServerField')).typeText(
         helpers.randomCredentials.syncServerUrl
       );
+      if (!helpers.expectToBeVisible(element(by.id('signInButton')))) {
+        await element(by.id('signInButton')).scrollTo('bottom');
+      }
       await element(by.id('signInButton')).tap();
     });
   });
