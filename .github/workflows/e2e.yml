@@ -22,6 +22,8 @@ jobs:
         run: yarn install
 
       - name: Build for detox
+        env:
+          DETOX_CI: true
         run: yarn detox build --configuration android.emu.release
 
       - name: Android Emulator
@@ -33,8 +35,6 @@ jobs:
           $ANDROID_HOME/platform-tools/adb devices
           echo "Emulator started"
       - name: Run tests
-        env:
-          DETOX_CI: true
         run: yarn detox test --configuration android.emu.release
 
   ios:
