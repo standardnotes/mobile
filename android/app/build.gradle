@@ -154,7 +154,7 @@ android {
             keyPassword 'android'
         }
         release {
-            if (System.getenv('DETOX_CI')) { // if running on CI sing with debug key
+            if (System.getenv('DETOX_CI')) { // if running on e2e CI sign with a debug key
                 storeFile file('debug.keystore')
                 storePassword 'android'
                 keyAlias 'androiddebugkey'

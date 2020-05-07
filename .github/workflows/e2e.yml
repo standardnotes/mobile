@@ -12,11 +12,7 @@ jobs:
         with:
           fetch-depth: 1
       - name: Add usesCleartextTraffic to release AndroidManifest.xml
-        uses: shitiomatic/str-replace@v1.0.2
-        with:
-          find: "<application"
-          replace: '<application android:usesCleartextTraffic="true"'
-          include: "android/app/src/main"
+        run: yarn replace-in-file '<application' '<application android:usesCleartextTraffic="true"' ./android/app/src/main/AndroidManifest.xml
 
       - name: Download Android Emulator Image
         run: |
@@ -30,7 +26,7 @@ jobs:
         env:
           DETOX_CI: true
         run: yarn detox build --configuration android.emu.release
-        
+
       - name: Run tests
         run: yarn detox test --configuration android.emu.release
 
