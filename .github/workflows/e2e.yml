@@ -49,7 +49,7 @@ jobs:
           $ANDROID_HOME/platform-tools/adb devices
           echo "Emulator started"
       - name: Run tests
-        run: yarn detox test --configuration android.emu.debug
+        run: yarn start && yarn detox test --configuration android.emu.debug
 
   ios:
     runs-on: macos-latest
