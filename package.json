@@ -102,7 +102,7 @@
         "build": "xcodebuild -workspace ios/StandardNotes.xcworkspace -scheme StandardNotes -configuration Release -sdk iphonesimulator -derivedDataPath ios/build",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone SE 11 Pro"
+          "type": "iPhone 11 Pro"
         }
       },
       "android.emu.debug": {
