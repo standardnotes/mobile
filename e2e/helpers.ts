@@ -29,5 +29,5 @@ export const openComposeNewNoteScreen = async () => {
 export const randomCredentials = {
   email: faker.internet.exampleEmail(),
   password: faker.internet.password(),
-  syncServerUrl: 'http://127.0.0.1:3000/',
+  syncServerUrl: 'https://testapi.standardnotes.org/',
 };
