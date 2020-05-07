@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
 
       - name: Download Android Emulator Image
         run: |
@@ -48,7 +50,9 @@ jobs:
           $ANDROID_HOME/platform-tools/adb devices
           echo "Emulator started"
       - name: Run tests
-        run: yarn concurrently --kill-others --success last "yarn start" "yarn detox test --configuration android.emu.debug"
+        env:
+          DETOX_CI: true
+        run: yarn detox test --configuration android.emu.release
 
   ios:
     runs-on: macos-latest
@@ -57,6 +61,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+          fetch-depth: 1
 
     - name: Cache node modules
       uses: actions/cache@v1
