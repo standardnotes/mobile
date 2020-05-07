@@ -1,7 +1,36 @@
 const faker = require('faker');
-import { device, waitFor, element, by } from 'detox';
+import { device, waitFor, element, by, expect } from 'detox';
+
+const expectToBeVisible = async (testedElement: Detox.DetoxAny) => {
+  try {
+    await expect(testedElement).toBeVisible();
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+const checkAfterReinstall = async () => {
+  if (device.getPlatform() === 'ios') {
+    let alertVisible = await expectToBeVisible(
+      element(
+        by
+          .label('Delete Local Data')
+          .and(by.type('_UIAlertControllerActionView'))
+      )
+    );
+    if (alertVisible) {
+      await element(
+        by
+          .label('Delete Local Data')
+          .and(by.type('_UIAlertControllerActionView'))
+      ).tap();
+    }
+  }
+};
 
 export const openSettingsScreen = async () => {
+  await checkAfterReinstall();
   await device.reloadReactNative();
 
   // Opens the settings screen

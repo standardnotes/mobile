@@ -90,4 +90,4 @@ jobs:
     - name: Build for detox
       run: yarn detox build --configuration ios.sim.release
     - name: Run tests
-      run: yarn detox test --configuration ios.sim.release --cleanup --debug-synchronization 200
+      run: yarn detox test --configuration ios.sim.release
