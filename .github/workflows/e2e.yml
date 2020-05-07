@@ -19,17 +19,11 @@ jobs:
           $ANDROID_HOME/emulator/emulator -list-avds
 
       - name: Install Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install
 
-      - name: Use specific Java version for sdkmanager to work
-        uses: joschi/setup-jdk@v1
-        with:
-          java-version: 'openjdk8'
-          architecture: 'x64'
-
       - name: Build for detox
-        run: yarn detox build --configuration android.emu.debug
+        run: yarn detox build --configuration android.emu.release
+
       - name: Android Emulator
         timeout-minutes: 10
         run: |
@@ -54,7 +48,6 @@ jobs:
           fetch-depth: 1
 
     - name: Install Dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
       run: yarn install
 
     - name: Install Pods
