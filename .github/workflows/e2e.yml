@@ -39,8 +39,6 @@ jobs:
 
       - name: Build for detox
         run: yarn detox build --configuration android.emu.debug
-      - name: Run tests
-        run: yarn detox test --configuration android.emu.debug
       - name: Android Emulator
         timeout-minutes: 10
         continue-on-error: true
