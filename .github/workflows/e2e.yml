@@ -48,7 +48,7 @@ jobs:
           $ANDROID_HOME/platform-tools/adb devices
           echo "Emulator started"
       - name: Run tests
-        run: yarn concurrently ----success "last" yarn start" "yarn detox test --configuration android.emu.debug"
+        run: yarn concurrently --kill-others --success last "yarn start" "yarn detox test --configuration android.emu.debug"
 
   ios:
     runs-on: macos-latest
