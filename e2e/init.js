@@ -14,7 +14,7 @@ detoxCircus.getEnv().addEventsListener(assignReporter);
 
 beforeAll(async () => {
   await detox.init(config);
-}, 300000);
+}, 600000);
 
 // beforeEach(async () => {
 //   try {
