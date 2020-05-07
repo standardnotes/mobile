@@ -415,7 +415,6 @@ export default class Notes extends Abstract<
   }
 
   selectNote = (note?: { content: { protected: any }; uuid: any } | null) => {
-    console.log('selectedNote');
     this.handlePrivilegedAction(
       note && note.content.protected,
       SFPrivilegesManager.ActionViewProtectedNotes,

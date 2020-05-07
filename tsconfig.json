@@ -24,11 +24,7 @@
         "@Screens/*": ["./screens/*"],
         "@Style/*": ["./style/*"],
       },
-      "types": ["jest"],
       "typeRoots": ["./src/types/*", "node_modules/@types"],
-      "resolveJsonModule": true,
-    },
-    "exclude": [
-      "node_modules", "babel.config.js", "metro.config.js", "jest.config.js", "types"
-    ]
+      "resolveJsonModule": true
   }
+}
