@@ -11,8 +11,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - name: Add usesCleartextTraffic to release AndroidManifest.xml
-        run: yarn replace-in-file '<application' '<application android:usesCleartextTraffic="true"' ./android/app/src/main/AndroidManifest.xml
 
       - name: Download Android Emulator Image
         run: |
@@ -21,6 +19,9 @@ jobs:
 
       - name: Install Dependencies
         run: yarn install
+
+      - name: Add usesCleartextTraffic to release AndroidManifest.xml
+        run: yarn replace-in-file '<application' '<application android:usesCleartextTraffic="true"' ./android/app/src/main/AndroidManifest.xml
 
       - name: Build for detox
         env:
