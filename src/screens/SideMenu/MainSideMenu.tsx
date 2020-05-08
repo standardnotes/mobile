@@ -333,6 +333,7 @@ export default class MainSideMenu extends AbstractSideMenu<
         >
           <SideMenuHero
             outOfSync={this.state.outOfSync}
+            testID="settingsButton"
             onPress={() => {
               this.presentSettings();
             }}
@@ -357,10 +358,7 @@ export default class MainSideMenu extends AbstractSideMenu<
             size={29}
             paddingTop={ApplicationState.isIOS ? 2 : 0}
             iconTextComponent={
-              <Icon
-                testID="settingsButton"
-                name={StyleKit.nameForIcon(ICON_SETTINGS)}
-              />
+              <Icon name={StyleKit.nameForIcon(ICON_SETTINGS)} />
             }
           />
 

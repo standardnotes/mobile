@@ -1,9 +1,9 @@
-/* eslint-disable no-undef */
 const helpers = require('../../helpers');
+import { element, by, device, expect, waitFor } from 'detox';
 
 describe('Account section', () => {
   describe('Form', () => {
-    before(async () => {
+    beforeAll(async () => {
       await helpers.openSettingsScreen();
     });
 
@@ -31,7 +31,7 @@ describe('Account section', () => {
   });
 
   describe('Register', () => {
-    before(async () => {
+    beforeAll(async () => {
       await helpers.openSettingsScreen();
     });
 
@@ -45,8 +45,12 @@ describe('Account section', () => {
       await element(by.id('otherOptionsButton')).tap();
       await element(by.id('syncServerField')).clearText();
       await element(by.id('syncServerField')).typeText(
-        helpers.randomCredentials.syncServerUrl
+        helpers.randomCredentials.syncServerUrl + '\n'
       );
+      // wait for buttons to be visible after closing keyboard on smaller devices
+      await waitFor(element(by.id('registerButton')))
+        .toBeVisible()
+        .withTimeout(1000);
       await element(by.id('registerButton')).tap();
 
       // A confirmation screen is shown after we click the register button...
@@ -60,7 +64,7 @@ describe('Account section', () => {
       await element(by.id('registerConfirmButton')).tap();
     });
 
-    after(async () => {
+    afterAll(async () => {
       await helpers.openSettingsScreen();
 
       // Account is created and we now proceed to sign out...
@@ -68,13 +72,19 @@ describe('Account section', () => {
       await element(by.id('signOutButton')).tap();
 
       // Confirmation button in the dialog...
-      await expect(element(by.text('SIGN OUT'))).toBeVisible();
-      await element(by.text('SIGN OUT')).tap();
+      if (device.getPlatform() === 'ios') {
+        await element(
+          by.label('Sign Out').and(by.type('_UIAlertControllerActionView'))
+        ).tap();
+      } else {
+        await expect(element(by.text('SIGN OUT'))).toBeVisible();
+        await element(by.text('SIGN OUT')).tap();
+      }
     });
   });
 
   describe('Sign In', () => {
-    before(async () => {
+    beforeAll(async () => {
       await helpers.openSettingsScreen();
     });
 
@@ -88,8 +98,12 @@ describe('Account section', () => {
       await element(by.id('otherOptionsButton')).tap();
       await element(by.id('syncServerField')).clearText();
       await element(by.id('syncServerField')).typeText(
-        helpers.randomCredentials.syncServerUrl
+        helpers.randomCredentials.syncServerUrl + '\n'
       );
+      // wait for button to be visible after keyboard close
+      await waitFor(element(by.id('signInButton')))
+        .toBeVisible()
+        .withTimeout(1000);
       await element(by.id('signInButton')).tap();
     });
   });

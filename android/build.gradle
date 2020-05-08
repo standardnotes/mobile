@@ -37,6 +37,10 @@ allprojects {
         }
         google()
         jcenter()
+        maven {
+            // All of Detox' artifacts are provided via the npm module
+            url "$rootDir/../node_modules/detox/Detox-android"
+        }
         maven { url 'https://www.jitpack.io' }
     }
 }

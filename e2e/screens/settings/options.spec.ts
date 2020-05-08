@@ -1,8 +1,8 @@
-/* eslint-disable no-undef */
 const helpers = require('../../helpers');
+import { expect, element, by, device } from 'detox';
 
 describe('Options section', () => {
-  before(async () => {
+  beforeAll(async () => {
     await helpers.openSettingsScreen();
   });
 
@@ -16,21 +16,26 @@ describe('Options section', () => {
 
     it('should restore to "Export Data" if dialog is dismissed', async () => {
       await expect(element(by.id('exportData-option-decrypted'))).toBeVisible();
-      await element(by.id('exportData-option-decrypted')).tap();
-      await device.pressBack();
-      await expect(element(by.id('exportData-title'))).toHaveText(
-        'Export Data'
-      );
+      if (device.getPlatform() === 'android') {
+        await element(by.id('exportData-option-decrypted')).tap();
+        await device.pressBack();
+        await expect(element(by.id('exportData-title'))).toHaveText(
+          'Export Data'
+        );
+      }
     });
 
     it('should export decrypted notes', async () => {
       await expect(element(by.id('exportData-option-decrypted'))).toBeVisible();
-      await element(by.id('exportData-option-decrypted')).tap();
-      await element(by.text('SAVE TO DISK')).tap();
-      await element(by.text('DONE')).tap();
-      await expect(element(by.id('exportData-title'))).toHaveText(
-        'Export Data'
-      );
+      if (device.getPlatform() === 'android') {
+        await element(by.id('exportData-option-decrypted')).tap();
+        await element(by.text('SAVE TO DISK')).tap();
+
+        await element(by.text('DONE')).tap();
+        await expect(element(by.id('exportData-title'))).toHaveText(
+          'Export Data'
+        );
+      }
     });
   });
 });

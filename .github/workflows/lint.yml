@@ -1,7 +1,6 @@
-name: Lint & test
+name: lint & typescript check
 
-on:
-  push:
+on: [push]
 
 jobs:
   lint:
