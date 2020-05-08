@@ -1,5 +1,5 @@
 const helpers = require('../../helpers');
-import { element, by, device, expect } from 'detox';
+import { element, by, device, expect, waitFor } from 'detox';
 
 describe('Account section', () => {
   describe('Form', () => {
@@ -47,6 +47,10 @@ describe('Account section', () => {
       await element(by.id('syncServerField')).typeText(
         helpers.randomCredentials.syncServerUrl + '\n'
       );
+      // wait for buttons to be visible after closing keyboard on smaller devices
+      await waitFor(element(by.id('registerButton')))
+        .toBeVisible()
+        .withTimeout(1000);
       await element(by.id('registerButton')).tap();
 
       // A confirmation screen is shown after we click the register button...
@@ -96,6 +100,10 @@ describe('Account section', () => {
       await element(by.id('syncServerField')).typeText(
         helpers.randomCredentials.syncServerUrl + '\n'
       );
+      // wait for button to be visible after keyboard close
+      await waitFor(element(by.id('signInButton')))
+        .toBeVisible()
+        .withTimeout(1000);
       await element(by.id('signInButton')).tap();
     });
   });

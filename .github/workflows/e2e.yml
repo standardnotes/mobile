@@ -32,7 +32,7 @@ jobs:
         timeout-minutes: 10
         run: |
           echo "Starting emulator"
-          nohup $ANDROID_HOME/emulator/emulator -avd pixel -no-audio -no-snapshot -no-window -verbose -gpu swiftshader_indirect &
+          nohup $ANDROID_HOME/emulator/emulator -avd pixel -no-audio -no-snapshot -no-window -gpu swiftshader_indirect &
           $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
           $ANDROID_HOME/platform-tools/adb shell settings put global window_animation_scale 0 &
           $ANDROID_HOME/platform-tools/adb shell settings put global transition_animation_scale 0 &
