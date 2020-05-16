@@ -9,12 +9,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { WebView } from 'react-native-webview';
-import ApplicationState from '@Lib/ApplicationState';
-import ComponentManager from '@Lib/componentManager';
-import ModelManager from '@Lib/snjs/modelManager';
-import UserPrefsManager, {
-  DONT_SHOW_AGAIN_UNSUPPORTED_EDITORS_KEY,
-} from '@Lib/userPrefsManager';
 import { ICON_LOCK } from '@Style/icons';
 import StyleKit from '@Style/StyleKit';
 

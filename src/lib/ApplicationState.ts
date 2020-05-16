@@ -9,30 +9,42 @@ import {
   KeyboardEventListener,
   EmitterSubscription,
 } from 'react-native';
-import _ from 'lodash';
-import KeysManager from '@Lib/keysManager';
-import OptionsState from '@Lib/OptionsState';
-import PrivilegesManager from '@Lib/snjs/privilegesManager';
-import AuthenticationSourceLocalPasscode from '@Screens/Authentication/Sources/AuthenticationSourceLocalPasscode';
-import AuthenticationSourceBiometric from '@Screens/Authentication/Sources/AuthenticationSourceBiometric';
+import { pull } from 'lodash';
+import { MobileApplication } from './application';
+import { Editor } from './editor';
+import {
+  SNNote,
+  ContentType,
+  PayloadSource,
+  SNUserPrefs,
+  SNTag,
+  ApplicationEvent,
+  SNSmartTag,
+} from 'snjs';
 
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;
 
-export type AppStateType =
-  | typeof ApplicationState.Launching
-  | typeof ApplicationState.LosingFocus
-  | typeof ApplicationState.Backgrounding
-  | typeof ApplicationState.GainingFocus
-  | typeof ApplicationState.ResumingFromBackground
-  | typeof ApplicationState.Locking
-  | typeof ApplicationState.Unlocking;
+export enum AppStateType {
+  Launching = 1,
+  LosingFocus = 2,
+  EnteringBackground = 3,
+  GainingFocus = 4,
+  EditorFocused = 5,
+  ResumingFromBackground = 6,
+  Locking = 7,
+  Unlocking = 8,
+  TagChanged = 9,
+  ActiveEditorChanged = 10,
+  PreferencesChanged = 11,
+}
 
-// AppStateEvents
-export type AppStateEventType =
-  | typeof ApplicationState.KeyboardChangeEvent
-  | typeof ApplicationState.AppStateEventTabletModeChange
-  | typeof ApplicationState.AppStateEventNoteSideMenuToggle;
+export enum AppStateEventType {
+  KeyboardChangeEvent = 1,
+  AppStateEventTabletModeChange = 2,
+  AppStateEventNoteSideMenuToggle = 3,
+}
+
 export type TabletModeChangeData = {
   new_isInTabletMode: boolean;
   old_isInTabletMode: boolean;
@@ -42,91 +54,36 @@ export type NoteSideMenuToggleChange = {
   old_isNoteSideMenuCollapsed: boolean;
 };
 
-type KeyboardChangeEventHandler = (
-  event: typeof ApplicationState.KeyboardChangeEvent,
-  data: undefined
-) => void;
-type SideMenuToogleEvent = (
-  event: typeof ApplicationState.AppStateEventNoteSideMenuToggle,
-  data: NoteSideMenuToggleChange
-) => void;
-type TableModeChageEvent = (
-  event: typeof ApplicationState.AppStateEventTabletModeChange,
-  data: TabletModeChangeData
-) => void;
-export type AppStateEventHandler =
-  | KeyboardChangeEventHandler
-  | SideMenuToogleEvent
-  | TableModeChageEvent;
+type EventObserverCallback = (
+  event: AppStateEventType,
+  data?: TabletModeChangeData | NoteSideMenuToggleChange
+) => Promise<void>;
+type ObserverCallback = (event: AppStateType, data?: any) => Promise<void>;
 
-type Observer = {
-  key: () => number;
-  callback: (state: AppStateType) => void;
-};
-
-export default class ApplicationState {
-  // When the app first launches
-  static Launching = 'Launching' as 'Launching';
-
-  // When the app enters into multitasking view, or control/notification center for iOS
-  static LosingFocus = 'LosingFocus' as 'LosingFocus';
-
-  // When the app enters the background completely
-  static Backgrounding = 'Backgrounding' as 'Backgrounding';
-
-  // When the app resumes from either the background or from multitasking switcher or notification center
-  static GainingFocus = 'GainingFocus' as 'GainingFocus';
-
-  // When the app resumes from the background
-  static ResumingFromBackground = 'ResumingFromBackground' as 'ResumingFromBackground';
-
-  // When the user enters their local passcode and/or fingerprint
-  static Locking = 'Locking' as 'Locking';
-
-  // When the user enters their local passcode and/or fingerprint
-  static Unlocking = 'Unlocking' as 'Unlocking';
-
-  /* Seperate events, unrelated to app state notifications */
-  static AppStateEventTabletModeChange = 'AppStateEventTabletModeChange' as 'AppStateEventTabletModeChange';
-  static AppStateEventNoteSideMenuToggle = 'AppStateEventNoteSideMenuToggle' as 'AppStateEventNoteSideMenuToggle';
-  static KeyboardChangeEvent = 'KeyboardChangeEvent' as 'KeyboardChangeEvent';
-
-  private static instance: ApplicationState;
-  _isAndroid: boolean;
-  observers: Observer[];
-  eventSubscribers: AppStateEventHandler[];
-  locked: boolean;
-  keyboardDidShowListener: EmitterSubscription;
-  keyboardDidHideListener: EmitterSubscription;
+export class ApplicationState {
+  application: MobileApplication;
+  observers: ObserverCallback[] = [];
+  eventObservers: EventObserverCallback[] = [];
+  locked = true;
+  keyboardDidShowListener?: EmitterSubscription;
+  keyboardDidHideListener?: EmitterSubscription;
   keyboardHeight?: number;
-  optionsState: OptionsState;
-  loading: boolean = false;
+  appEventObersever: any;
+  selectedTag?: SNTag;
+  userPreferences?: SNUserPrefs;
   tabletMode: boolean = false;
   noteSideMenuCollapsed: boolean = false;
   ignoreStateChanges: boolean = false;
   mostRecentState?: AppStateType;
-  didHandleApplicationStart: boolean = false;
   authenticationInProgress: boolean = false;
-  static get() {
-    if (!this.instance) {
-      this.instance = new ApplicationState();
-    }
+  multiEditorEnabled = false;
 
-    return this.instance;
-  }
-
-  constructor() {
-    this.observers = [];
-    this.optionsState = new OptionsState();
-    this.eventSubscribers = [];
-    this.locked = true;
-    this._isAndroid = Platform.OS === 'android';
-
+  constructor(application: MobileApplication) {
+    this.application = application;
     this.setTabletModeEnabled(this.isTabletDevice);
-    this.initializeOptions();
-
-    AppState.addEventListener('change', this.handleAppStateChange);
-    this.didLaunch();
+    this.handleApplicationEvents();
+    this.handleItemsChanges();
+    AppState.addEventListener('change', this.handleReactNativeAppStateChange);
 
     this.keyboardDidShowListener = Keyboard.addListener(
       'keyboardWillShow',
@@ -138,57 +95,226 @@ export default class ApplicationState {
     );
   }
 
-  keyboardDidShow: KeyboardEventListener = e => {
+  deinit() {
+    this.appEventObersever();
+    this.appEventObersever = undefined;
+    this.observers.length = 0;
+    this.keyboardDidShowListener = undefined;
+    this.keyboardDidHideListener = undefined;
+  }
+
+  /**
+   * Registers an observer for App State change
+   * @returns function that unregisters this observer
+   */
+  public addStateChangeObserver(callback: ObserverCallback) {
+    this.observers.push(callback);
+    return () => {
+      pull(this.observers, callback);
+    };
+  }
+
+  /**
+   * Registers an observer for App State Event change
+   * @returns function that unregisters this observer
+   */
+  public addStateEventObserver(callback: EventObserverCallback) {
+    this.eventObservers.push(callback);
+    return () => {
+      pull(this.eventObservers, callback);
+    };
+  }
+
+  /**
+   * Notify observers of ApplicationState change
+   */
+  private notifyOfStateChange(state: AppStateType, data?: any) {
+    if (this.ignoreStateChanges) {
+      return;
+    }
+
+    // Set most recent state before notifying observers, in case they need to query this value.
+    this.mostRecentState = state;
+
+    for (const observer of this.observers) {
+      observer(state, data);
+    }
+  }
+
+  /**
+   * Notify observers of ApplicationState Events
+   */
+  private notifyEventObservers(
+    event: AppStateEventType,
+    data?: TabletModeChangeData | NoteSideMenuToggleChange
+  ) {
+    for (const observer of this.eventObservers) {
+      observer(event, data);
+    }
+  }
+
+  /**
+   * Creates a new editor if one doesn't exist. If one does, we'll replace the
+   * editor's note with an empty one.
+   */
+  createEditor(title?: string) {
+    const activeEditor = this.getActiveEditor();
+    if (!activeEditor || this.multiEditorEnabled) {
+      this.application.editorGroup.createEditor(undefined, title);
+    } else {
+      activeEditor.reset(title);
+    }
+  }
+
+  getActiveEditor() {
+    return this.application.editorGroup.editors[0];
+  }
+
+  getEditors() {
+    return this.application.editorGroup.editors;
+  }
+
+  closeEditor(editor: Editor) {
+    this.application.editorGroup.closeEditor(editor);
+  }
+
+  closeActiveEditor() {
+    this.application.editorGroup.closeActiveEditor();
+  }
+
+  closeAllEditors() {
+    this.application.editorGroup.closeAllEditors();
+  }
+
+  editorForNote(note: SNNote) {
+    for (const editor of this.getEditors()) {
+      if (editor.note.uuid === note.uuid) {
+        return editor;
+      }
+    }
+  }
+
+  private keyboardDidShow: KeyboardEventListener = e => {
     this.keyboardHeight = e.endCoordinates.height;
-    this.notifyEvent(ApplicationState.KeyboardChangeEvent);
+    this.notifyEventObservers(AppStateEventType.KeyboardChangeEvent);
   };
 
-  keyboardDidHide: KeyboardEventListener = () => {
+  private keyboardDidHide: KeyboardEventListener = () => {
     this.keyboardHeight = 0;
-    this.notifyEvent(ApplicationState.KeyboardChangeEvent);
+    this.notifyEventObservers(AppStateEventType.KeyboardChangeEvent);
   };
 
+  /**
+   * @returns Returns keybord height
+   */
   getKeyboardHeight() {
     return this.keyboardHeight;
   }
 
-  initializeOptions() {
-    // Initialize Options (sort by, filter, selected tags, etc)
-    this.optionsState.addChangeObserver(options => {
-      if (!this.loading) {
-        options.persist();
+  /**
+   * Reacts to @SNNote and @SNTag Changes
+   */
+  private handleItemsChanges() {
+    this.application!.streamItems(
+      [ContentType.Note, ContentType.Tag],
+      async (items, source) => {
+        /** Close any editors for deleted/trashed/archived notes */
+        if (source === PayloadSource.PreSyncSave) {
+          const notes = items.filter(
+            candidate => candidate.content_type === ContentType.Note
+          ) as SNNote[];
+          for (const note of notes) {
+            const editor = this.editorForNote(note);
+            if (!editor) {
+              continue;
+            }
+            if (note.deleted) {
+              this.closeEditor(editor);
+            } else if (note.trashed && !this.selectedTag?.isTrashTag) {
+              this.closeEditor(editor);
+            } else if (note.archived && !this.selectedTag?.isArchiveTag) {
+              this.closeEditor(editor);
+            }
+          }
+        }
+        if (this.selectedTag) {
+          const matchingTag = items.find(
+            candidate => candidate.uuid === this.selectedTag!.uuid
+          );
+          if (matchingTag) {
+            this.selectedTag = matchingTag as SNTag;
+          }
+        }
       }
+    );
+  }
+
+  /**
+   * Registers for MobileApplication events
+   */
+  private handleApplicationEvents() {
+    this.appEventObersever = this.application.addEventObserver(
+      async eventName => {
+        if (eventName === ApplicationEvent.Started) {
+          this.locked = true;
+        } else if (eventName === ApplicationEvent.Launched) {
+          this.locked = false;
+        }
+      }
+    );
+  }
+
+  /**
+   * Set selected @SNTag
+   */
+  setSelectedTag(tag: SNTag) {
+    if (this.selectedTag === tag) {
+      return;
+    }
+    const previousTag = this.selectedTag;
+    this.selectedTag = tag;
+    this.notifyOfStateChange(AppStateType.TagChanged, {
+      tag: tag,
+      previousTag: previousTag,
     });
-
-    this.optionsState.loadSaved();
   }
 
-  getOptions() {
-    return this.optionsState;
+  /**
+   * @returns tags that are referencing note
+   */
+  public getNoteTags(note: SNNote) {
+    return this.application.referencingForItem(note).filter(ref => {
+      return ref.content_type === ContentType.Tag;
+    }) as SNTag[];
   }
 
-  static getOptions() {
-    return this.get().getOptions();
+  /**
+   * @returns notes this tag references
+   */
+  public getTagNotes(tag: SNTag) {
+    if (tag.isSmartTag()) {
+      return this.application.notesMatchingSmartTag(tag as SNSmartTag);
+    } else {
+      return this.application.referencesForItem(tag).filter(ref => {
+        return ref.content_type === ContentType.Note;
+      }) as SNNote[];
+    }
   }
 
-  static get isAndroid() {
-    return this.get().isAndroid;
+  public getSelectedTag() {
+    return this.selectedTag;
   }
 
-  static get isIOS() {
-    return this.get().isIOS;
+  setUserPreferences(preferences: SNUserPrefs) {
+    this.userPreferences = preferences;
+    this.notifyOfStateChange(AppStateType.PreferencesChanged);
   }
 
   static get version() {
-    return this.isAndroid ? pjson.versionAndroid : pjson.versionIOS;
-  }
-
-  get isAndroid() {
-    return this._isAndroid;
-  }
-
-  get isIOS() {
-    return !this._isAndroid;
+    return Platform.select({
+      ios: pjson.versionIOS,
+      android: pjson.versionAndroid,
+    });
   }
 
   get isTabletDevice() {
@@ -200,13 +326,16 @@ export default class ApplicationState {
     return this.tabletMode;
   }
 
-  setTabletModeEnabled(enabled: boolean) {
+  private setTabletModeEnabled(enabled: boolean) {
     if (enabled !== this.tabletMode) {
       this.tabletMode = enabled;
-      this.notifyEvent(ApplicationState.AppStateEventTabletModeChange, {
-        new_isInTabletMode: enabled,
-        old_isInTabletMode: !enabled,
-      });
+      this.notifyEventObservers(
+        AppStateEventType.AppStateEventTabletModeChange,
+        {
+          new_isInTabletMode: enabled,
+          old_isInTabletMode: !enabled,
+        }
+      );
     }
   }
 
@@ -217,33 +346,20 @@ export default class ApplicationState {
   setNoteSideMenuCollapsed(collapsed: boolean) {
     if (collapsed !== this.noteSideMenuCollapsed) {
       this.noteSideMenuCollapsed = collapsed;
-      this.notifyEvent(ApplicationState.AppStateEventNoteSideMenuToggle, {
-        new_isNoteSideMenuCollapsed: collapsed,
-        old_isNoteSideMenuCollapsed: !collapsed,
-      });
+      this.notifyEventObservers(
+        AppStateEventType.AppStateEventNoteSideMenuToggle,
+        {
+          new_isNoteSideMenuCollapsed: collapsed,
+          old_isNoteSideMenuCollapsed: !collapsed,
+        }
+      );
     }
   }
 
-  addEventHandler(handler: AppStateEventHandler) {
-    this.eventSubscribers.push(handler);
-    return handler;
-  }
-
-  removeEventHandler(handler: AppStateEventHandler) {
-    _.pull(this.eventSubscribers, handler);
-  }
-
-  notifyEvent(
-    event: AppStateEventType,
-    data?: TabletModeChangeData | NoteSideMenuToggleChange
-  ) {
-    for (const handler of this.eventSubscribers) {
-      // @ts-ignore not working type
-      handler(event, data);
-    }
-  }
-
-  handleAppStateChange = (nextAppState: AppStateStatus) => {
+  /**
+   * handles App State change from React Native
+   */
+  private handleReactNativeAppStateChange = (nextAppState: AppStateStatus) => {
     if (this.ignoreStateChanges) {
       return;
     }
@@ -253,40 +369,42 @@ export default class ApplicationState {
     // notification center in iOS down then back up. We don't want to lock on this state change.
     const isResuming = nextAppState === 'active';
     const isResumingFromBackground =
-      isResuming && this.mostRecentState === ApplicationState.Backgrounding;
+      isResuming && this.mostRecentState === AppStateType.EnteringBackground;
     const isEnteringBackground = nextAppState === 'background';
     const isLosingFocus = nextAppState === 'inactive';
 
     if (isEnteringBackground) {
-      this.notifyOfState(ApplicationState.Backgrounding);
+      this.notifyOfStateChange(AppStateType.EnteringBackground);
 
-      if (this.shouldLockApplication()) {
-        this.lockApplication();
+      if (true) {
+        // TODO: add lockManager
+        this.application.lock();
       }
     }
 
     if (isResumingFromBackground || isResuming) {
       if (isResumingFromBackground) {
-        this.notifyOfState(ApplicationState.ResumingFromBackground);
+        this.notifyOfStateChange(AppStateType.ResumingFromBackground);
       }
 
       // Notify of GainingFocus even if resuming from background
-      this.notifyOfState(ApplicationState.GainingFocus);
+      this.notifyOfStateChange(AppStateType.GainingFocus);
     }
 
     if (isLosingFocus) {
-      this.notifyOfState(ApplicationState.LosingFocus);
+      this.notifyOfStateChange(AppStateType.LosingFocus);
 
       // If a privileges authentication session is in progress, we don't want to lock the application
       // or return any sources. That's because while authenticating, Face ID prompts may trigger losing focus
       // notifications, causing the app to lock. If the user backgrouds the app during privilege authentication,
       // it will still be locked via the Backgrounding event.
-      if (
-        this.shouldLockApplication() &&
-        !PrivilegesManager.get().authenticationInProgress()
-      ) {
-        this.lockApplication();
-      }
+      // TODO: check this
+      // if (
+      //   this.shouldLockApplication() &&
+      //   !PrivilegesManager.get().authenticationInProgress()
+      // ) {
+      //   this.lockApplication();
+      // }
     }
 
     /*
@@ -304,48 +422,13 @@ export default class ApplicationState {
 
   isAppVisibilityChange(state: AppStateType) {
     return ([
-      ApplicationState.Launching,
-      ApplicationState.LosingFocus,
-      ApplicationState.Backgrounding,
-      ApplicationState.GainingFocus,
-      ApplicationState.ResumingFromBackground,
+      AppStateType.Launching,
+      AppStateType.LosingFocus,
+      AppStateType.EnteringBackground,
+      AppStateType.GainingFocus,
+      AppStateType.ResumingFromBackground,
     ] as Array<AppStateType>).includes(state);
   }
-
-  /* State Changes */
-
-  // Sent from App.tsx
-  receiveApplicationStartEvent() {
-    if (this.didHandleApplicationStart) {
-      return;
-    }
-    this.didHandleApplicationStart = true;
-    var authProps = this.getAuthenticationPropsForAppState(
-      ApplicationState.Launching
-    );
-    if (authProps.sources.length === 0) {
-      this.unlockApplication();
-    }
-  }
-
-  didLaunch() {
-    this.notifyOfState(ApplicationState.Launching);
-  }
-
-  notifyOfState(state: AppStateType) {
-    if (this.ignoreStateChanges) {
-      return;
-    }
-
-    // Set most recent state before notifying observers, in case they need to query this value.
-    this.mostRecentState = state;
-
-    for (var observer of this.observers) {
-      observer.callback(state);
-    }
-  }
-
-  /* End State */
 
   /*
   Allows other parts of the code to perform external actions without triggering state change notifications.
@@ -363,121 +446,12 @@ export default class ApplicationState {
     return this.mostRecentState;
   }
 
-  addStateObserver(callback: Observer['callback']) {
-    const observer = { key: Math.random, callback };
-    this.observers.push(observer);
-
-    if (this.mostRecentState) {
-      callback(this.mostRecentState);
-    }
-
-    return observer;
-  }
-
-  // clearPreviousState() {
-  //   this.previousEvents = [];
-  // }
-
-  removeStateObserver(observer: Observer) {
-    _.pull(this.observers, observer);
-  }
-
-  /* Locking / Unlocking */
-
-  isLocked() {
-    return this.locked;
-  }
-
-  isUnlocked() {
-    return !this.locked;
-  }
-
-  shouldLockApplication() {
-    const showPasscode =
-      KeysManager.get().hasOfflinePasscode() &&
-      KeysManager.get().passcodeTiming === 'immediately';
-    const showBiometrics =
-      KeysManager.get().hasBiometrics() &&
-      KeysManager.get().biometricPrefs.timing === 'immediately';
-    return showPasscode || showBiometrics;
-  }
-
-  lockApplication() {
-    this.notifyOfState(ApplicationState.Locking);
-    this.locked = true;
-  }
-
-  unlockApplication() {
-    this.notifyOfState(ApplicationState.Unlocking);
-    this.setAuthenticationInProgress(false);
-    KeysManager.get().updateScreenshotPrivacy();
-    this.locked = false;
-  }
-
   setAuthenticationInProgress(inProgress: boolean) {
     this.authenticationInProgress = inProgress;
   }
 
   isAuthenticationInProgress() {
     return this.authenticationInProgress;
-  }
-
-  getAuthenticationPropsForAppState(state: AppStateType) {
-    // We don't want to do anything on gaining focus, since that may be called extraenously,
-    // when you come back from notification center, etc. Any immediate locking should be handled
-    // LosingFocus anyway.
-    if (
-      !this.isAppVisibilityChange(state) ||
-      state === ApplicationState.GainingFocus
-    ) {
-      return { sources: [] };
-    }
-
-    // If a privileges authentication session is in progress, we don't want to lock the application
-    // or return any sources. That's because while authenticating, Face ID prompts may trigger losing focus
-    // notifications, causing the app to lock.
-    if (PrivilegesManager.get().authenticationInProgress()) {
-      return { sources: [] };
-    }
-
-    const hasPasscode = KeysManager.get().hasOfflinePasscode();
-    const hasBiometrics = KeysManager.get().hasBiometrics();
-
-    let showPasscode = hasPasscode,
-      showBiometrics = hasBiometrics;
-
-    if (
-      state === ApplicationState.Backgrounding ||
-      state === ApplicationState.ResumingFromBackground ||
-      state === ApplicationState.LosingFocus
-    ) {
-      showPasscode =
-        hasPasscode && KeysManager.get().passcodeTiming === 'immediately';
-      showBiometrics =
-        hasBiometrics &&
-        KeysManager.get().biometricPrefs.timing === 'immediately';
-    }
-
-    const title =
-      showPasscode && showBiometrics
-        ? 'Authentication Required'
-        : showPasscode
-        ? 'Passcode Required'
-        : 'Fingerprint Required';
-
-    let sources = [];
-    if (showPasscode) {
-      sources.push(new AuthenticationSourceLocalPasscode());
-    }
-    if (showBiometrics) {
-      sources.push(new AuthenticationSourceBiometric());
-    }
-
-    return {
-      title: title,
-      sources: sources,
-      onAuthenticate: this.unlockApplication.bind(this),
-    };
   }
 
   static openURL(url: string) {

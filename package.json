@@ -20,7 +20,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@react-native-community/async-storage": "1.6.3",
+    "@react-native-community/async-storage": "1.10.1",
     "@react-native-community/masked-view": "^0.1.10",
     "base-64": "^0.1.0",
     "bugsnag-react-native": "^2.23.7",
@@ -39,7 +39,7 @@
     "react-native-flag-secure-android": "standardnotes/react-native-flag-secure-android#3d59055",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.6.1",
-    "react-native-keychain": "^4.0.1",
+    "react-native-keychain": "^6.0.0",
     "react-native-mail": "standardnotes/react-native-mail#9862c76",
     "react-native-reanimated": "^1.8.0",
     "react-native-safe-area-context": "^1.0.0",
@@ -54,7 +54,7 @@
     "react-navigation-stack": "^1.10.3",
     "regenerator": "^0.14.2",
     "sn-textview": "standardnotes/sn-textview#f42f0bf",
-    "snjs": "standardnotes/snjs#9382050",
+    "snjs": "standardnotes/snjs#a18da1b",
     "standard-notes-rn": "standardnotes/standard-notes-rn"
   },
   "devDependencies": {
@@ -65,10 +65,10 @@
     "@types/faker": "^4.1.11",
     "@types/jest": "^25.2.1",
     "@types/lodash": "^4.14.150",
-    "@types/react-native": "^0.62.7",
+    "@types/react-native": "^0.62.8",
     "@types/react-native-vector-icons": "^6.4.5",
-    "@typescript-eslint/eslint-plugin": "^2.31.0",
-    "@typescript-eslint/parser": "^2.31.0",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
     "babel-jest": "^26.0.1",
     "concurrently": "^5.2.0",
     "detox": "^16.5.0",
@@ -83,7 +83,7 @@
     "prettier": "^2.0.5",
     "react-test-renderer": "16.11.0",
     "replace-in-file": "^6.0.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.2"
   },
   "jest": {
     "preset": "react-native"

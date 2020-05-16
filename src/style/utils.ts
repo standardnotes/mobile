@@ -1,11 +1,9 @@
-import { SNTheme as SNJSTheme } from 'snjs';
+import { SNTheme } from 'snjs';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';
 export const DARK_MODE_KEY = 'dark';
 export const LIGHT_CONTENT = 'light-content';
 export const DARK_CONTENT = 'dark-content';
-
-type SNTheme = typeof SNJSTheme;
 
 export function statusBarColorForTheme(theme: SNTheme) {
   // The main nav bar uses contrast background color

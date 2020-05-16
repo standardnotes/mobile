@@ -8,7 +8,7 @@ import TableSection from '@Components/TableSection';
 import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
-import AlertManager from '@Lib/snjs/alertManager';
+import AlertManager from '@Lib/AlertService';
 import Auth from '@Lib/snjs/authManager';
 import Storage from '@Lib/snjs/storageManager';
 import Sync from '@Lib/snjs/syncManager';

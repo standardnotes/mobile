@@ -8,7 +8,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import HeaderTitleView from '@Components/HeaderTitleView';
 import ThemedComponent from '@Components/ThemedComponent';
 import ApplicationState, { AppStateType } from '@Lib/ApplicationState';
-import PrivilegesManager from '@Lib/snjs/privilegesManager';
 import StyleKit from '@Style/StyleKit';
 
 const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => (

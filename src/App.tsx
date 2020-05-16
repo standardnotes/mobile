@@ -9,14 +9,6 @@ import {
 import { createAppContainer, NavigationActions } from 'react-navigation';
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
-import KeysManager from '@Lib/keysManager';
-import ApplicationState from '@Lib/ApplicationState';
-import Auth from '@Lib/snjs/authManager';
-import ModelManager from '@Lib/snjs/modelManager';
-import PrivilegesManager from '@Lib/snjs/privilegesManager';
-import MigrationManager from '@Lib/snjs/migrationManager';
-import Sync from '@Lib/snjs/syncManager';
-import ReviewManager from '@Lib/reviewManager';
 import Authenticate from '@Screens/Authentication/Authenticate';
 import Compose from '@Screens/Compose';
 import {

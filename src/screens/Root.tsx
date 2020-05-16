@@ -9,15 +9,10 @@ import ApplicationState, {
   NoteSideMenuToggleChange,
   AppStateType,
 } from '@Lib/ApplicationState';
-import KeysManager from '@Lib/keysManager';
 import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 import Compose from '@Screens/Compose';
 import Notes from '@Screens/Notes/Notes';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
-import AlertManager from '@Lib/snjs/alertManager';
-import Auth from '@Lib/snjs/authManager';
-import ModelManager from '@Lib/snjs/modelManager';
-import Sync from '@Lib/snjs/syncManager';
 import StyleKit from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
 import AuthenticationSource from './Authentication/Sources/AuthenticationSource';

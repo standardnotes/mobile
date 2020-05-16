@@ -12,7 +12,7 @@ import SideMenuHero from '@Screens/SideMenu/SideMenuHero';
 import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
 import SideMenuSection from '@Screens/SideMenu/SideMenuSection';
 import TagSelectionList from '@Screens/SideMenu/TagSelectionList';
-import AlertManager from '@Lib/snjs/alertManager';
+import AlertManager from '@Lib/AlertService';
 import Auth from '@Lib/snjs/authManager';
 import Sync from '@Lib/snjs/syncManager';
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
@@ -21,11 +21,9 @@ import StyleKit from '@Style/StyleKit';
 import ThemeManager from '@Style/ThemeManager';
 import { LIGHT_MODE_KEY, DARK_MODE_KEY } from '@Style/utils';
 
-import { SFAuthManager, SNTheme as SNJSTheme } from 'snjs';
+import { SFAuthManager, SNTheme } from 'snjs';
 import { Mode } from 'react-native-dark-mode';
 import { AbstractProps, AbstractState } from '@Screens/Abstract';
-
-type SNTheme = typeof SNJSTheme;
 
 type State = {
   outOfSync: boolean;

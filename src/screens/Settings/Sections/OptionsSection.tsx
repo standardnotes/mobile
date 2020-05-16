@@ -6,14 +6,9 @@ import SectionHeader from '@Components/SectionHeader';
 import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
 import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
 import TableSection from '@Components/TableSection';
-import BackupsManager from '@Lib/BackupsManager';
-import KeysManager from '@Lib/keysManager';
 import moment from '@Lib/moment';
 import UserPrefsManager, { LAST_EXPORT_DATE_KEY } from '@Lib/userPrefsManager';
-import Auth from '@Lib/snjs/authManager';
 import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
-
-import { SFPrivilegesManager } from 'snjs';
 
 type Props = {
   title: string;
