@@ -51,6 +51,7 @@ export class StyleKit extends ApplicationService {
   private themeData: Partial<Record<UuidString, ThemeContent>> = {};
   activeTheme?: string;
   currentDarkMode: ColorSchemeName;
+  modeChangeListener?: Appearance.AppearanceListener;
   private unsubState!: () => void;
   private unregisterComponent!: () => void;
   static constants = {
@@ -68,6 +69,11 @@ export class StyleKit extends ApplicationService {
     this.registerObservers();
     this.buildSystemThemesAndData();
     this.resolveInitialTheme();
+  }
+
+  deinit() {
+    Appearance.removeChangeListener(this.setModeTo.bind(this));
+    super.deinit();
   }
 
   onAppEvent(event: ApplicationEvent) {
@@ -93,7 +99,11 @@ export class StyleKit extends ApplicationService {
     );
   }
 
-  findOrCreateDataForTheme(themeId: string) {
+  private registerAppearanceChangeLister() {
+    Appearance.addChangeListener(this.setModeTo);
+  }
+
+  private findOrCreateDataForTheme(themeId: string) {
     let data = this.themeData[themeId];
     if (!data) {
       data = {} as ThemeContent;
@@ -102,7 +112,7 @@ export class StyleKit extends ApplicationService {
     return data;
   }
 
-  buildSystemThemesAndData() {
+  private buildSystemThemesAndData() {
     const themeData = [
       {
         variables: THEME_BLUE_JSON,
@@ -136,8 +146,8 @@ export class StyleKit extends ApplicationService {
     }
   }
 
-  setModeTo(mode: ColorSchemeName) {
-    this.currentDarkMode = mode;
+  setModeTo(preferences: Appearance.AppearancePreferences) {
+    this.currentDarkMode = preferences.colorScheme;
   }
 
   /**
