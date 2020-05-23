@@ -1,12 +1,10 @@
 import { Platform } from 'react-native';
-import Server from '@Lib/snjs/httpManager';
 import CSSParser from '@Style/Util/CSSParser';
-import { SNTheme as SNJSTheme } from 'snjs';
-
-type SNTheme = typeof SNJSTheme;
+import { SNTheme, SNHttpService } from 'snjs';
 
 export default class ThemeDownloader {
   private static instance: ThemeDownloader;
+  private httpService = new SNHttpService();
 
   static get() {
     if (!this.instance) {
@@ -18,15 +16,10 @@ export default class ThemeDownloader {
 
   async downloadTheme(theme: SNTheme) {
     let errorBlock = (error: null) => {
-      if (!theme.getNotAvailOnMobile()) {
-        theme.setNotAvailOnMobile(true);
-        theme.setDirty(true);
-      }
-
       console.error('Theme download error', error);
     };
 
-    var url = theme.hosted_url || theme.url;
+    let url = theme.hosted_url;
 
     if (!url) {
       errorBlock(null);
@@ -37,18 +30,15 @@ export default class ThemeDownloader {
       url = url.replace('localhost', '10.0.2.2');
     }
 
-    return new Promise(resolve => {
-      Server.get().getAbsolute(
-        url,
-        {},
-        (response: any) => {
-          let variables = CSSParser.cssToObject(response);
-          resolve(variables);
-        },
-        () => {
-          resolve(null);
-        }
-      );
+    return new Promise(async resolve => {
+      try {
+        const response = await this.httpService.getAbsolute(url, {});
+        // @ts-ignore TODO: check response type
+        let variables = CSSParser.cssToObject(response);
+        resolve(variables);
+      } catch (e) {
+        resolve(null);
+      }
     });
   }
 }

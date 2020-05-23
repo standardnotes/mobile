@@ -13,12 +13,13 @@ import { ComponentGroup } from './componentGroup';
 import { ReviewService } from './reviewService';
 import { BackupsService } from './BackupsService';
 import { PreferencesManager } from './PreferencesManager';
+import { StyleKit } from '@Style/StyleKit';
 
 type MobileServices = {
   applicationState: ApplicationState;
   reviewService: ReviewService;
   backupsService: BackupsService;
-  themeService: ThemeManager;
+  themeService: StyleKit;
   prefsService: PreferencesManager;
 };
 

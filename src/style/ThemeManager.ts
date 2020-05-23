@@ -1,11 +1,13 @@
-import { SFItemParams, SNTheme as SNJSTheme } from 'snjs';
-import _ from 'lodash';
-import UserPrefsManager from '@Lib/userPrefsManager';
-import { isNullOrUndefined } from '@Lib/utils';
-import Storage from '@Lib/snjs/storageManager';
-import StyleKit from '@Style/StyleKit';
+import {
+  SNTheme,
+  ApplicationService,
+  StorageValueModes,
+  EncryptionIntent,
+  isNullOrUndefined,
+} from 'snjs';
 import { LIGHT_MODE_KEY } from '@Style/utils';
 import { Mode } from 'react-native-dark-mode';
+import _ from 'lodash';
 
 const THEME_PREFERENCES_KEY = 'ThemePreferencesKey';
 const LIGHT_THEME_KEY = 'lightTheme';
@@ -15,45 +17,40 @@ function getThemeKeyForMode(mode: Mode) {
   return mode === LIGHT_MODE_KEY ? LIGHT_THEME_KEY : DARK_THEME_KEY;
 }
 
-type SNTheme = typeof SNJSTheme;
-
 type ThemeManagerData = {
   [LIGHT_THEME_KEY]: any;
   [DARK_THEME_KEY]: any;
 };
 
-export default class ThemeManager {
-  private static instance: ThemeManager;
+export class ThemeManager extends ApplicationService {
   data: ThemeManagerData | null = null;
   saveAction: any;
 
-  static get() {
-    if (isNullOrUndefined(this.instance)) {
-      this.instance = new ThemeManager();
-    }
-    return this.instance;
-  }
-
-  async initialize() {
+  async onAppStart() {
     await this.runPendingMigrations();
   }
 
   async runPendingMigrations() {
     const themePrefMigrationName = '01212020SavedThemePref';
+
     if (
-      isNullOrUndefined(await Storage.get().getItem(themePrefMigrationName))
+      isNullOrUndefined(
+        await this.application?.getValue(themePrefMigrationName)
+      )
     ) {
       console.log('Running migration', themePrefMigrationName);
       await this.migrateThemePrefForModes();
-      await Storage.get().setItem(themePrefMigrationName, 'true');
+      await this.application?.setValue(themePrefMigrationName, 'true');
     }
   }
 
   async migrateThemePrefForModes() {
     const savedSystemThemeIdKey = 'savedSystemThemeId';
     const savedThemeKey = 'savedTheme';
-    const systemThemeId = await Storage.get().getItem(savedSystemThemeIdKey);
-    const savedTheme = await Storage.get().getItem(savedThemeKey);
+    const systemThemeId = await this.application?.getValue(
+      savedSystemThemeIdKey
+    );
+    const savedTheme = await this.application?.getValue(savedThemeKey);
 
     let themeData;
     if (savedTheme) {
@@ -125,6 +122,25 @@ export default class ThemeManager {
       this.data = await this.buildDefaultPreferences();
     }
     return this.data;
+  }
+
+  private async cacheThemes() {
+    const themes = this.application!.getAll(this.activeThemes) as SNTheme[];
+    const mapped = await Promise.all(
+      themes.map(async theme => {
+        const payload = theme.payloadRepresentation();
+        const processedPayload = await this.application!.protocolService!.payloadByEncryptingPayload(
+          payload,
+          EncryptionIntent.LocalStorageDecrypted
+        );
+        return processedPayload;
+      })
+    );
+    return this.application!.setValue(
+      CACHED_THEMES_KEY,
+      mapped,
+      StorageValueModes.Nonwrapped
+    );
   }
 
   saveToStorage() {

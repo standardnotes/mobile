@@ -1,126 +1,173 @@
-import { StatusBar, Alert, Platform, ViewStyle, TextStyle } from 'react-native';
+import {
+  StatusBar,
+  Alert,
+  Platform,
+  ViewStyle,
+  TextStyle,
+  Appearance,
+  ColorSchemeName,
+} from 'react-native';
 import IconChanger from 'react-native-alternate-icons';
-import { supportsDarkMode, Mode } from 'react-native-dark-mode';
-import _ from 'lodash';
-import Auth from '@Lib/snjs/authManager';
-import ModelManager from '@Lib/snjs/modelManager';
-import Sync from '@Lib/snjs/syncManager';
-import ThemeManager from '@Style/ThemeManager';
+import _, { pull } from 'lodash';
 import {
   statusBarColorForTheme,
   keyboardColorForTheme,
   LIGHT_CONTENT,
   DARK_CONTENT,
-  LIGHT_MODE_KEY,
 } from '@Style/utils';
 import ThemeDownloader from '@Style/Util/ThemeDownloader';
-import { SFAuthManager, SNTheme as SNJSTheme } from 'snjs';
+import {
+  SNTheme,
+  ApplicationService,
+  ApplicationEvent,
+  ComponentArea,
+  SNComponent,
+} from 'snjs';
 
 import THEME_RED_JSON from './Themes/red.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
+import { UuidString } from 'snjs/dist/@types/types';
+import { MobileApplication } from '@Lib/application';
 
-type SNTheme = typeof SNJSTheme;
+type ThemeChangeObserver = () => Promise<void>;
 
-export default class StyleKit {
-  private static instance: StyleKit;
-  themeChangeObservers: Array<() => void>;
-  activeTheme: SNTheme;
-  mode?: Mode;
-  currentDarkMode!: Mode;
-  systemThemes: Array<SNTheme>;
-  constants: { mainTextFontSize: number; paddingLeft: number };
+export interface ThemeContent {
+  isSystemTheme: boolean;
+  isInitial: boolean;
+  name: string;
+  luminosity?: number;
+  isSwapIn?: boolean;
+  variables: Record<string, string>;
+  package_info: SNComponent['package_info'];
+}
+
+enum SystemThemes {
+  Blue = 'Blue',
+  Red = 'Red',
+}
+
+export class StyleKit extends ApplicationService {
+  observers: ThemeChangeObserver[] = [];
+  private themeData: Partial<Record<UuidString, ThemeContent>> = {};
+  activeTheme?: string;
+  currentDarkMode: ColorSchemeName;
+  private unsubState!: () => void;
+  private unregisterComponent!: () => void;
+  static constants = {
+    mainTextFontSize: 16,
+    paddingLeft: 14,
+  };
   styles: Record<string, ViewStyle | TextStyle> = {};
-  signoutObserver: any;
 
-  static get() {
-    if (!this.instance) {
-      this.instance = new StyleKit();
-    }
-
-    return this.instance;
+  get mobileApplication() {
+    return this.application as MobileApplication;
   }
 
-  constructor() {
-    this.themeChangeObservers = [];
-    this.systemThemes = [];
+  async onAppStart() {
+    super.onAppStart();
+    this.registerObservers();
+    this.buildSystemThemesAndData();
+    this.resolveInitialTheme();
+  }
 
-    this.constants = {
-      mainTextFontSize: 16,
-      paddingLeft: 14,
-    };
+  onAppEvent(event: ApplicationEvent) {
+    super.onAppEvent(event);
+    if (event === ApplicationEvent.SignedOut) {
+      this.resetToSystemTheme();
+    }
+  }
 
-    this.buildDefaultThemes();
-
-    ModelManager.get().addItemSyncObserver(
-      'themes',
-      'SN|Theme',
-      (_allItems: any, _validItems: any, deletedItems: any, _source: any) => {
-        if (
-          this.activeTheme &&
-          !this.activeTheme.isSystemTheme &&
-          this.activeTheme.isSwapIn
-        ) {
-          const match = _.find(this.themes(), { uuid: this.activeTheme.uuid });
-          if (match) {
-            this.setActiveTheme(match);
-            this.activeTheme.isSwapIn = false;
+  private registerObservers() {
+    this.unregisterComponent = this.application!.componentManager!.registerHandler(
+      {
+        identifier: 'themeManager',
+        areas: [ComponentArea.Themes],
+        activationHandler: component => {
+          if (component.active) {
+            this.activateExternalTheme(component as SNTheme);
+          } else {
+            this.activateTheme(SystemThemes.Blue);
           }
-        }
-
-        const activeUuid = this.activeTheme.uuid;
-        for (const theme of deletedItems) {
-          if (activeUuid === theme.uuid) {
-            this.resetToSystemTheme();
-            return;
-          }
-        }
+        },
       }
     );
-
-    this.signoutObserver = Auth.get().addEventHandler((event: any) => {
-      if (event === SFAuthManager.DidSignOutEvent) {
-        this.resetToSystemTheme();
-      }
-    });
   }
 
-  async initialize() {
-    await ThemeManager.get().initialize();
-    await this.resolveInitialTheme();
+  findOrCreateDataForTheme(themeId: string) {
+    let data = this.themeData[themeId];
+    if (!data) {
+      data = {} as ThemeContent;
+      this.themeData[themeId] = data;
+    }
+    return data;
   }
 
-  setModeTo(mode: Mode) {
+  buildSystemThemesAndData() {
+    const themeData = [
+      {
+        variables: THEME_BLUE_JSON,
+        name: SystemThemes.Blue,
+        isInitial: true,
+      },
+      {
+        variables: THEME_RED_JSON,
+        name: SystemThemes.Red,
+      },
+    ];
+
+    for (const option of themeData) {
+      const variables = option.variables;
+      variables.statusBar =
+        Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
+
+      this.themeData[option.name] = {
+        isSystemTheme: true,
+        isInitial: Boolean(option.isInitial),
+        name: option.name,
+        variables: variables,
+        package_info: {
+          dock_icon: {
+            type: 'circle',
+            background_color: variables.stylekitInfoColor,
+            border_color: variables.stylekitInfoColor,
+          },
+        },
+      };
+    }
+  }
+
+  setModeTo(mode: ColorSchemeName) {
     this.currentDarkMode = mode;
   }
 
-  addThemeChangeObserver(observer: () => void) {
-    this.themeChangeObservers.push(observer);
-    return observer;
-  }
-
-  removeThemeChangeObserver(observer: () => void) {
-    _.pull(this.themeChangeObservers, observer);
+  /**
+   * Registers an observer for theme change
+   * @returns function that unregisters this observer
+   */
+  public addThemeChangeObserver(callback: ThemeChangeObserver) {
+    this.observers.push(callback);
+    return () => {
+      pull(this.observers, callback);
+    };
   }
 
   notifyObserversOfThemeChange() {
-    for (const observer of this.themeChangeObservers) {
+    for (const observer of this.observers) {
       observer();
     }
   }
 
-  assignThemeForMode({ theme, mode }: { theme: SNTheme; mode: Mode }) {
-    if (!StyleKit.doesDeviceSupportDarkMode()) {
-      mode = LIGHT_MODE_KEY;
-    }
-
-    ThemeManager.get().setThemeForMode({ mode: mode, theme: theme });
+  assignThemeForMode(themeId: string) {
+    const currentMode = Appearance.getColorScheme() || 'light'; // set to light in case of no support for dark theme
+    // TODO: Save theme to storage
+    // ThemeManager.get().setThemeForMode({ mode: mode, theme: theme });
 
     /**
      * If we're changing the theme for a specific mode and we're currently on
      * that mode, then activate this theme.
      */
-    if (this.currentDarkMode === mode && this.activeTheme.uuid !== theme.uuid) {
-      this.activateTheme(theme);
+    if (this.currentDarkMode === currentMode && this.activeTheme !== themeId) {
+      this.activateTheme(themeId);
     }
   }
 
@@ -134,123 +181,70 @@ export default class StyleKit {
     return _.clone(THEME_RED_JSON);
   }
 
-  buildDefaultThemes() {
-    this.systemThemes = [];
-    const options = [
-      {
-        variables: THEME_BLUE_JSON,
-        name: 'Blue',
-        isInitial: true,
-      },
-      {
-        variables: THEME_RED_JSON,
-        name: 'Red',
-      },
-    ];
-
-    for (const option of options) {
-      const variables = option.variables;
-      variables.statusBar =
-        Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
-
-      const theme = new SNJSTheme({
-        uuid: option.name,
-        content: {
-          isSystemTheme: true,
-          isInitial: option.isInitial,
-          name: option.name,
-          variables: variables,
-          package_info: {
-            dock_icon: {
-              type: 'circle',
-              background_color: variables.stylekitInfoColor,
-              border_color: variables.stylekitInfoColor,
-            },
-          },
-        },
-      });
-
-      this.systemThemes.push(theme);
-    }
-  }
-
-  /**
-   * @private
-   */
-  resetToSystemTheme() {
-    this.activateTheme(this.systemThemes[0]);
+  private resetToSystemTheme() {
+    this.activateTheme(Object.keys(this.themeData)[0]);
   }
 
   async resolveInitialTheme() {
-    const currentMode = this.currentDarkMode;
+    // const currentMode = Appearance.getColorScheme();
     const runDefaultTheme = () => {
-      const defaultTheme = this.systemThemes[0];
+      const defaultTheme = SystemThemes.Blue;
 
-      ThemeManager.get().setThemeForMode({
-        mode: currentMode,
-        theme: defaultTheme,
-      });
+      // TODO: save to starege
 
       this.setActiveTheme(defaultTheme);
     };
 
-    await ThemeManager.get().loadFromStorage();
+    // TODO: load from storage
 
-    const themeData = ThemeManager.get().getThemeForMode(currentMode);
-    if (!themeData) {
-      return runDefaultTheme();
-    }
+    // TODO:  get theme for mode
+    // const themeData = ThemeManager.get().getThemeForMode(currentMode);
 
-    try {
-      const matchingTheme = _.find(this.systemThemes, { uuid: themeData.uuid });
-      let newTheme;
+    return runDefaultTheme();
 
-      /** Use latest app theme data if preference is a previous system theme. */
-      if (matchingTheme) {
-        newTheme = matchingTheme;
-      } else {
-        newTheme = new SNJSTheme(themeData);
-        newTheme.isSwapIn = true;
-      }
+    // try {
+    //   const matchingTheme = _.find(this.systemThemes, { uuid: themeData.uuid });
+    //   let newTheme;
 
-      this.setActiveTheme(newTheme);
-    } catch (e) {
-      console.error('Error parsing initial theme', e);
-      return runDefaultTheme();
-    }
+    //   /** Use latest app theme data if preference is a previous system theme. */
+    //   if (matchingTheme) {
+    //     newTheme = matchingTheme;
+    //   } else {
+    //     newTheme = new SNTheme(themeData);
+    //     newTheme.isSwapIn = true;
+    //   }
+
+    //   this.setActiveTheme(newTheme);
+    // } catch (e) {
+    //   console.error('Error parsing initial theme', e);
+    //   return runDefaultTheme();
+    // }
   }
 
   keyboardColorForActiveTheme() {
-    return keyboardColorForTheme(this.activeTheme);
+    return keyboardColorForTheme(
+      this.findOrCreateDataForTheme(this.activeTheme!)
+    );
   }
 
   themes() {
-    const themes = ModelManager.get().themes.sort(
-      (
-        a: { name: { toLowerCase: () => number } },
-        b: { name: { toLowerCase: () => number } }
-      ) => {
-        if (!a.name || !b.name) {
-          return -1;
-        }
-        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-      }
-    );
-    return this.systemThemes.concat(themes);
+    // TODO: add external themes
+    return this.themeData;
   }
 
   isThemeActive(theme: SNTheme) {
-    return this.activeTheme && theme.uuid === this.activeTheme.uuid;
+    return this.activeTheme && theme.uuid === this.activeTheme;
   }
 
-  setActiveTheme(theme: SNTheme) {
+  setActiveTheme(themeId: string) {
     /** Merge default variables to ensure this theme has all the variables. */
-    const variables = theme.content.variables;
-    theme.content.variables = _.merge(this.templateVariables(), variables);
+    const themeData = this.findOrCreateDataForTheme(themeId);
+    const variables = themeData.variables;
+    themeData.variables = _.merge(this.templateVariables(), variables);
 
-    this.activeTheme = theme;
+    this.activeTheme = themeId;
 
-    this.updateDeviceForTheme(theme);
+    this.updateDeviceForTheme(themeId);
 
     this.reloadStyles();
 
@@ -264,9 +258,9 @@ export default class StyleKit {
    *     - Status Bar color
    *     - Local App Icon color
    */
-  updateDeviceForTheme(theme: SNTheme) {
+  updateDeviceForTheme(themeId: string) {
+    const theme = this.findOrCreateDataForTheme(themeId);
     const isAndroid = Platform.OS === 'android';
-
     /** On Android, a time out is required, especially during app startup. */
     setTimeout(
       () => {
@@ -283,7 +277,7 @@ export default class StyleKit {
             StatusBar.setBackgroundColor('#000000');
           } else {
             StatusBar.setBackgroundColor(
-              theme.content.variables.stylekitContrastBackgroundColor
+              theme.variables.stylekitContrastBackgroundColor
             );
           }
         }
@@ -291,15 +285,15 @@ export default class StyleKit {
       isAndroid ? 100 : 0
     );
 
-    if (theme.content.isSystemTheme && !isAndroid) {
+    if (theme.isSystemTheme && !isAndroid) {
       IconChanger.supportDevice(supported => {
         if (supported) {
           IconChanger.getIconName(currentName => {
-            if (theme.content.isInitial && currentName !== 'default') {
+            if (theme.isInitial && currentName !== 'default') {
               /** Clear the icon to default. */
               IconChanger.setIconName(null);
             } else {
-              const newName = theme.content.name;
+              const newName = theme.name;
               if (newName !== currentName) {
                 IconChanger.setIconName(newName);
               }
@@ -310,84 +304,53 @@ export default class StyleKit {
     }
   }
 
-  activateTheme(theme: {
-    content: { variables: { stylekitInfoColor: any } };
-    setDirty: (arg0: boolean) => void;
-    getNotAvailOnMobile: () => any;
-    setNotAvailOnMobile: (arg0: boolean) => void;
-  }) {
-    const performActivation = () => {
-      this.setActiveTheme(theme);
-      this.assignThemeForMode({ theme: theme, mode: this.currentDarkMode });
-    };
-
-    /**
-     * Update theme with StyleKit changes if the user has an old version.
-     */
-    const hasValidInfoColor =
-      theme.content.variables && theme.content.variables.stylekitInfoColor;
-
-    if (!hasValidInfoColor) {
-      ThemeDownloader.get()
-        .downloadTheme(theme)
-        .then((variables: any) => {
-          if (!variables) {
-            Alert.alert(
-              'Not Available',
-              'This theme is not available on mobile.'
-            );
-            return;
-          }
-
-          if (variables !== theme.content.variables) {
-            theme.content.variables = variables;
-            theme.setDirty(true);
-          }
-
-          if (theme.getNotAvailOnMobile()) {
-            theme.setNotAvailOnMobile(false);
-            theme.setDirty(true);
-          }
-
-          Sync.get().sync();
-          performActivation();
-        });
-    } else {
-      performActivation();
-    }
-  }
-
-  activatePreferredTheme() {
-    const uuid = ThemeManager.get().getThemeUuidForMode(this.currentDarkMode);
-    const matchingTheme = _.find(this.themes(), { uuid: uuid });
-
-    if (matchingTheme) {
-      if (matchingTheme.uuid === this.activeTheme.uuid) {
-        /** Found a match and it's already active, no need to switch. */
-        return;
-      }
-
-      /** found a matching theme for user preference, switch to that theme. */
-      this.activateTheme(matchingTheme);
-    } else {
-      /** No matching theme found, set currently active theme as the default. */
-      this.assignThemeForMode({
-        theme: this.activeTheme,
-        mode: this.currentDarkMode,
+  activateExternalTheme(theme: SNTheme) {
+    ThemeDownloader.get()
+      .downloadTheme(theme)
+      .then(variables => {
+        if (!variables) {
+          Alert.alert(
+            'Not Available',
+            'This theme is not available on mobile.'
+          );
+          return;
+        }
+        // TODO: merge new theme style
+        // if (variables !== theme.content.variables) {
+        //   theme.content.variables = variables;
+        //   theme.setDirty(true);
+        // }
       });
-    }
+    this.activateTheme(theme.uuid);
   }
 
-  async downloadThemeAndReload(theme: {
-    content: {
-      package_info: { no_mobile: any };
-      isSystemTheme: any;
-      variables: any;
-    };
-    name?: any;
-    setDirty: (arg0: boolean) => void;
-    uuid?: any;
-  }) {
+  activateTheme(themeId: string) {
+    this.setActiveTheme(themeId);
+    this.assignThemeForMode(themeId);
+  }
+
+  // activatePreferredTheme() {
+  //   const uuid = ThemeManager.get().getThemeUuidForMode(this.currentDarkMode);
+  //   const matchingTheme = _.find(this.themes(), { uuid: uuid });
+
+  //   if (matchingTheme) {
+  //     if (matchingTheme.uuid === this.activeTheme.uuid) {
+  //       /** Found a match and it's already active, no need to switch. */
+  //       return;
+  //     }
+
+  //     /** found a matching theme for user preference, switch to that theme. */
+  //     this.activateTheme(matchingTheme);
+  //   } else {
+  //     /** No matching theme found, set currently active theme as the default. */
+  //     this.assignThemeForMode({
+  //       theme: this.activeTheme,
+  //       mode: this.currentDarkMode,
+  //     });
+  //   }
+  // }
+
+  async downloadThemeAndReload(theme: SNTheme) {
     const updatedVariables = await ThemeDownloader.get().downloadTheme(theme);
 
     /** Merge default variables to ensure this theme has all the variables. */
@@ -395,19 +358,18 @@ export default class StyleKit {
       this.templateVariables(),
       updatedVariables
     );
-    theme.content.variables = appliedVariables;
-    theme.setDirty(true);
+    let data = this.findOrCreateDataForTheme(theme.uuid);
+    data.variables = appliedVariables;
 
-    await Sync.get().sync();
-
-    if (theme.uuid === this.activeTheme.uuid) {
-      this.setActiveTheme(theme);
+    if (theme.uuid === this.activeTheme) {
+      this.setActiveTheme(theme.uuid);
     }
   }
 
   reloadStyles() {
-    const { variables } = this.activeTheme.content;
-    const { mainTextFontSize, paddingLeft } = this.constants;
+    const { variables } = this.findOrCreateDataForTheme(this.activeTheme!);
+    const { mainTextFontSize, paddingLeft } = StyleKit.constants;
+
     this.styles = {
       baseBackground: {
         backgroundColor: variables.stylekitBackgroundColor,
@@ -586,37 +548,34 @@ export default class StyleKit {
   }
 
   static doesDeviceSupportDarkMode() {
-    const isAndroid = Platform.OS === 'android';
-
     /**
      * Android supportsDarkMode relies on a Configuration value in the API
      * that was not available until Android 8.0 (26)
      * https://developer.android.com/reference/android/content/res/Configuration#UI_MODE_NIGHT_UNDEFINED
+     * iOS supports Dark mode from iOS 13
      */
-    if (isAndroid && Platform.Version < 26) {
+
+    if (Platform.OS === 'android' && Platform.Version < 26) {
       return false;
+    } else if (Platform.OS === 'ios') {
+      const majorVersionIOS = parseInt(Platform.Version as string, 10);
+      return majorVersionIOS >= 13;
     }
 
-    return supportsDarkMode;
+    return true;
   }
 
-  static variable(name: string) {
-    return this.get().activeTheme.content.variables[name];
+  variable(name: string) {
+    const { variables } = this.findOrCreateDataForTheme(this.activeTheme!);
+    return variables[name];
   }
 
-  static get variables() {
-    return this.get().activeTheme.content.variables;
+  get variables() {
+    const { variables } = this.findOrCreateDataForTheme(this.activeTheme!);
+    return variables;
   }
 
-  static get constants() {
-    return this.get().constants;
-  }
-
-  static get styles() {
-    return this.get().styles;
-  }
-
-  static stylesForKey(key: string) {
+  stylesForKey(key: string) {
     const allStyles = this.styles;
     const styles = [allStyles[key]];
     const platform = Platform.OS === 'android' ? 'Android' : 'IOS';

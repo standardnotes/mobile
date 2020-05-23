@@ -1,19 +1,19 @@
-import { SNTheme } from 'snjs';
+import { ThemeContent } from './StyleKit';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';
 export const DARK_MODE_KEY = 'dark';
 export const LIGHT_CONTENT = 'light-content';
 export const DARK_CONTENT = 'dark-content';
 
-export function statusBarColorForTheme(theme: SNTheme) {
+export function statusBarColorForTheme(themeData: ThemeContent) {
   // The main nav bar uses contrast background color
-  if (!theme.luminosity) {
-    theme.luminosity = getColorLuminosity(
-      theme.content.variables.stylekitContrastBackgroundColor
+  if (!themeData.luminosity) {
+    themeData.luminosity = getColorLuminosity(
+      themeData.variables.stylekitContrastBackgroundColor
     );
   }
 
-  if (theme.luminosity < 130) {
+  if (themeData.luminosity < 130) {
     // is dark color, return white status bar
     return LIGHT_CONTENT;
   } else {
@@ -21,14 +21,14 @@ export function statusBarColorForTheme(theme: SNTheme) {
   }
 }
 
-export function keyboardColorForTheme(theme: SNTheme) {
-  if (!theme.luminosity) {
-    theme.luminosity = getColorLuminosity(
-      theme.content.variables.stylekitContrastBackgroundColor
+export function keyboardColorForTheme(themeData: ThemeContent) {
+  if (!themeData.luminosity) {
+    themeData.luminosity = getColorLuminosity(
+      themeData.variables.stylekitContrastBackgroundColor
     );
   }
 
-  if (theme.luminosity < 130) {
+  if (themeData.luminosity < 130) {
     // is dark color, return dark keyboard
     return DARK_MODE_KEY;
   } else {

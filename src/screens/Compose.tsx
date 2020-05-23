@@ -11,7 +11,6 @@ import {
   TextStyle,
 } from 'react-native';
 import TextView from 'sn-textview';
-import { SFAuthManager } from 'snjs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
@@ -21,10 +20,6 @@ import ApplicationState, {
   TabletModeChangeData,
   NoteSideMenuToggleChange,
 } from '@Lib/ApplicationState';
-import ComponentManager from '@Lib/componentManager';
-import Auth from '@Lib/snjs/authManager';
-import ModelManager from '@Lib/snjs/modelManager';
-import Sync from '@Lib/snjs/syncManager';
 import Abstract, { AbstractState, AbstractProps } from '@Screens/Abstract';
 import ComponentView from '@Screens/ComponentView';
 import SideMenuManager from '@Screens/SideMenu/SideMenuManager';

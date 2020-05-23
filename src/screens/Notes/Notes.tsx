@@ -4,9 +4,6 @@ import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
-import Auth from '@Lib/snjs/authManager';
-import ModelManager from '@Lib/snjs/modelManager';
-import Sync from '@Lib/snjs/syncManager';
 import ApplicationState, {
   AppStateEventHandler,
   AppStateEventType,

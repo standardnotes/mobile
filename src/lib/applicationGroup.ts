@@ -1,6 +1,10 @@
 import { MobileApplication } from './application';
 import { removeFromArray } from 'snjs';
 import { ApplicationState } from './ApplicationState';
+import { ReviewService } from './reviewService';
+import { BackupsService } from './BackupsService';
+import { StyleKit } from '@Style/StyleKit';
+import { PreferencesManager } from './PreferencesManager';
 
 type AppManagerChangeCallback = () => void;
 
@@ -20,7 +24,6 @@ export class ApplicationGroup {
     this.notifyObserversOfAppChange();
   }
 
-  /** @callback */
   onApplicationDeinit(application: MobileApplication) {
     removeFromArray(this.applications, application);
     if (this.activeApplication === application) {
@@ -35,24 +38,16 @@ export class ApplicationGroup {
   private createNewApplication() {
     const application = new MobileApplication(this.onApplicationDeinit);
     const applicationState = new ApplicationState(application);
-    const archiveService = new ArchiveManager(application);
-    const desktopService = new DesktopManager(application);
-    const keyboardService = new KeyboardManager();
-    const lockService = new LockManager(application);
-    const nativeExtService = new NativeExtManager(application);
+    const reviewService = new ReviewService(application);
+    const backupsService = new BackupsService(application);
+    const themeService = new StyleKit(application);
     const prefsService = new PreferencesManager(application);
-    const statusService = new StatusManager();
-    const themeService = new ThemeManager(application);
     application.setMobileServices({
       applicationState,
-      archiveService,
-      desktopService,
-      keyboardService,
-      lockService,
-      nativeExtService,
-      prefsService,
-      statusService,
+      reviewService,
+      backupsService,
       themeService,
+      prefsService,
     });
     return application;
   }

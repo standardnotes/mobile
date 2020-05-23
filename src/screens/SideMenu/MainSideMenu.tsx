@@ -91,7 +91,7 @@ export default class MainSideMenu extends AbstractSideMenu<
 
   onThemeSelect = (theme: SNTheme) => {
     /** Prevent themes that aren't meant for mobile from being activated. */
-    if (theme.content.package_info && theme.content.package_info.no_mobile) {
+    if (!theme.getNotAvailOnMobile()) {
       AlertManager.get().alert({
         title: 'Not Available',
         text: 'This theme is not available on mobile.',
