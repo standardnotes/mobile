@@ -1,8 +1,6 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import ApplicationState from '@Lib/ApplicationState';
-import StyleKit from '@Style/StyleKit';
 
 type Option =
   | {
@@ -89,9 +87,8 @@ export default class ActionSheetWrapper {
 
       titleWrapperStyle: StyleKit.styles.actionSheetTitleWrapper,
       titleTextStyle: StyleKit.styles.actionSheetTitleText,
-      tintColor: ApplicationState.isIOS
-        ? undefined
-        : StyleKit.variables.stylekitInfoColor,
+      tintColor:
+        Platform.OS == 'ios' ? undefined : StyleKit.variables.stylekitInfoColor,
 
       buttonUnderlayColor: StyleKit.variables.stylekitBorderColor,
 

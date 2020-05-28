@@ -1,21 +1,21 @@
 import React from 'react';
 import { TouchableHighlight, View, ViewStyle, TextStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { SFAuthManager } from 'snjs';
-import ApplicationState, {
-  AppStateEventHandler,
+import {
   AppStateEventType,
   TabletModeChangeData,
   NoteSideMenuToggleChange,
   AppStateType,
+  ApplicationState,
 } from '@Lib/ApplicationState';
 import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 import Compose from '@Screens/Compose';
 import Notes from '@Screens/Notes/Notes';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
-import StyleKit from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
 import AuthenticationSource from './Authentication/Sources/AuthenticationSource';
+import { ApplicationContext } from 'App';
+import { StyleKit } from '@Style/StyleKit';
 
 type State = {
   shouldSplitLayout?: boolean;
@@ -29,12 +29,11 @@ type State = {
 } & AbstractState;
 
 export default class Root extends Abstract<AbstractProps, State> {
+  static contextType = ApplicationContext;
+  declare context: React.ContextType<typeof ApplicationContext>;
   styles!: Record<string, ViewStyle | TextStyle>;
-  applicationStateEventHandler?: AppStateEventHandler;
-  stateObserver?: {
-    key: () => number;
-    callback: (state: AppStateType) => void;
-  };
+  removeApplicationStateEventHandler?: () => void;
+  removeStateObserver?: () => void;
   dataLoaded?: boolean;
   syncEventHandler?: any;
   didShowSessionInvalidAlert?: boolean;
@@ -54,66 +53,66 @@ export default class Root extends Abstract<AbstractProps, State> {
   }
 
   registerObservers() {
-    this.stateObserver = ApplicationState.get().addStateObserver(state => {
-      const authProps = ApplicationState.get().getAuthenticationPropsForAppState(
-        state
-      );
-      if (authProps.sources.length > 0) {
-        this.presentAuthenticationModal(authProps);
-      } else if (state === ApplicationState.GainingFocus) {
-        // we only want to perform sync here if the app is resuming, not if it's a fresh start
-        if (this.dataLoaded) {
-          Sync.get().sync();
+    this.removeStateObserver = this.context
+      ?.getAppState()
+      .addStateChangeObserver(state => {
+        if (state === AppStateType.GainingFocus) {
+          // we only want to perform sync here if the app is resuming, not if it's a fresh start
+          if (this.dataLoaded) {
+            this.context?.sync();
+          }
         }
-      }
-    });
+      });
 
-    this.applicationStateEventHandler = ApplicationState.get().addEventHandler(
-      (
-        event: AppStateEventType,
-        data: TabletModeChangeData | NoteSideMenuToggleChange | undefined
-      ) => {
-        if (event === ApplicationState.AppStateEventNoteSideMenuToggle) {
-          // update state to toggle Notes side menu if we triggered the collapse
-          this.setState({
-            notesListCollapsed: (data as NoteSideMenuToggleChange)
-              .new_isNoteSideMenuCollapsed,
-          });
-        } else if (event === ApplicationState.KeyboardChangeEvent) {
-          // need to refresh the height of the keyboard when it opens so that we can change the position
-          // of the sidebar collapse icon
-          if (ApplicationState.get().isInTabletMode) {
+    this.removeApplicationStateEventHandler = this.context
+      ?.getAppState()
+      .addStateEventObserver(
+        (
+          event: AppStateEventType,
+          data: TabletModeChangeData | NoteSideMenuToggleChange | undefined
+        ) => {
+          if (event === AppStateEventType.AppStateEventNoteSideMenuToggle) {
+            // update state to toggle Notes side menu if we triggered the collapse
             this.setState({
-              keyboardHeight: ApplicationState.get().getKeyboardHeight(),
+              notesListCollapsed: (data as NoteSideMenuToggleChange)
+                .new_isNoteSideMenuCollapsed,
             });
+          } else if (event === AppStateEventType.KeyboardChangeEvent) {
+            // need to refresh the height of the keyboard when it opens so that we can change the position
+            // of the sidebar collapse icon
+            if (this.context?.getAppState().isInTabletMode) {
+              this.setState({
+                keyboardHeight: this.context?.getAppState().getKeyboardHeight(),
+              });
+            }
           }
         }
-      }
-    );
+      );
 
-    this.syncEventHandler = Sync.get().addEventHandler(
-      async (event: string) => {
-        if (event === 'sync-session-invalid') {
-          if (!this.didShowSessionInvalidAlert) {
-            this.didShowSessionInvalidAlert = true;
-            AlertManager.get().confirm({
-              title: 'Session Expired',
-              text:
-                'Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.',
-              confirmButtonText: 'Sign Out',
-              onConfirm: () => {
-                this.didShowSessionInvalidAlert = false;
-                Auth.get().signout();
-              },
-              onCancel: () => {
-                this.didShowSessionInvalidAlert = false;
-              },
-            });
-          }
-        }
-      }
-    );
-
+    // TODO: check this Sync
+    // this.syncEventHandler = Sync.get().addEventHandler(
+    //   async (event: string) => {
+    //     if (event === 'sync-session-invalid') {
+    //       if (!this.didShowSessionInvalidAlert) {
+    //         this.didShowSessionInvalidAlert = true;
+    //         AlertManager.get().confirm({
+    //           title: 'Session Expired',
+    //           text:
+    //             'Your session has expired. New changes will not be pulled in. Please sign out and sign back in to refresh your session.',
+    //           confirmButtonText: 'Sign Out',
+    //           onConfirm: () => {
+    //             this.didShowSessionInvalidAlert = false;
+    //             Auth.get().signout();
+    //           },
+    //           onCancel: () => {
+    //             this.didShowSessionInvalidAlert = false;
+    //           },
+    //         });
+    //       }
+    //     }
+    //   }
+    // );
+    this.context?.getSyncStatus();
     this.syncStatusObserver = Sync.get().registerSyncStatusObserver(
       (status: { error: any; retrievedCount: number }) => {
         if (status.error) {
@@ -121,7 +120,10 @@ export default class Root extends Abstract<AbstractProps, State> {
           this.showingErrorStatus = true;
           setTimeout(() => {
             // need timeout for syncing on app launch
-            this.setSubTitle(text, StyleKit.variables.stylekitWarningColor);
+            this.setSubTitle(
+              text,
+              this.context?.getThemeService().variables.stylekitWarningColor
+            );
           }, 250);
         } else if (status.retrievedCount > 20) {
           const text = `Downloading ${status.retrievedCount} items. Keep app open.`;
@@ -185,13 +187,11 @@ export default class Root extends Abstract<AbstractProps, State> {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    if (this.stateObserver) {
-      ApplicationState.get().removeStateObserver(this.stateObserver);
+    if (this.removeStateObserver) {
+      this.removeStateObserver();
     }
-    if (this.applicationStateEventHandler) {
-      ApplicationState.get().removeEventHandler(
-        this.applicationStateEventHandler
-      );
+    if (this.removeApplicationStateEventHandler) {
+      this.removeApplicationStateEventHandler();
     }
 
     Sync.get().removeEventHandler(this.syncEventHandler);
@@ -397,7 +397,7 @@ export default class Root extends Abstract<AbstractProps, State> {
 
     const notesStyles = shouldSplitLayout
       ? [this.styles.left, { width: notesListCollapsed ? 0 : '40%' }]
-      : [StyleKit.styles.container, { flex: 1 }];
+      : [this.context?.getThemeService().styles.container, { flex: 1 }];
     const composeStyles = shouldSplitLayout
       ? [this.styles.right, { width: notesListCollapsed ? '100%' : '60%' }]
       : null;
@@ -420,7 +420,10 @@ export default class Root extends Abstract<AbstractProps, State> {
       <View
         testID="rootView"
         onLayout={this.onLayout}
-        style={[StyleKit.styles.container, this.styles.root]}
+        style={[
+          this.context?.getThemeService().styles.container,
+          this.styles.root,
+        ]}
       >
         <View style={notesStyles}>
           <Notes
@@ -448,7 +451,10 @@ export default class Root extends Abstract<AbstractProps, State> {
             />
 
             <TouchableHighlight
-              underlayColor={StyleKit.variables.stylekitBackgroundColor}
+              underlayColor={
+                this.context?.getThemeService().variables
+                  .stylekitBackgroundColor
+              }
               style={[
                 this.styles.toggleButtonContainer,
                 this.styles.toggleButton,
@@ -460,7 +466,10 @@ export default class Root extends Abstract<AbstractProps, State> {
                 <Icon
                   name={collapseIconName}
                   size={24}
-                  color={hexToRGBA(StyleKit.variables.stylekitInfoColor, 0.85)}
+                  color={hexToRGBA(
+                    this.context!.getThemeService().variables.stylekitInfoColor,
+                    0.85
+                  )}
                 />
               </View>
             </TouchableHighlight>
@@ -477,13 +486,15 @@ export default class Root extends Abstract<AbstractProps, State> {
         flexDirection: 'row',
       },
       left: {
-        borderRightColor: StyleKit.variables.stylekitBorderColor,
+        borderRightColor: this.context!.getThemeService().variables
+          .stylekitBorderColor,
         borderRightWidth: 1,
       },
       right: {},
       toggleButtonContainer: {
         backgroundColor: hexToRGBA(
-          StyleKit.variables.stylekitContrastBackgroundColor,
+          this.context!.getThemeService().variables
+            .stylekitContrastBackgroundColor,
           0.5
         ),
       },

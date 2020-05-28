@@ -1,9 +1,6 @@
-import KeysManager from '@Lib/keysManager';
-import { protocolManager } from 'snjs';
-import Storage from '@Lib/snjs/storageManager';
 import AuthenticationSource from '@Screens/Authentication/Sources/AuthenticationSource';
-import StyleKit from '@Style/StyleKit';
 import { KeyboardTypeOptions } from 'react-native';
+import { StyleKit } from '@Style/StyleKit';
 
 export default class AuthenticationSourceLocalPasscode extends AuthenticationSource {
   keyboardType: KeyboardTypeOptions | null = 'default';
@@ -24,7 +21,7 @@ export default class AuthenticationSourceLocalPasscode extends AuthenticationSou
 
   get headerButtonStyles() {
     return {
-      color: StyleKit.variables.stylekitNeutralColor,
+      color: '#989898', // TODO: connect to stylekit => stylekitNeutralColor
       fontSize: StyleKit.constants.mainTextFontSize - 5,
     };
   }

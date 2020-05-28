@@ -6,9 +6,6 @@ import App from './src/App';
 import { name as appName } from './app.json';
 // TODO: this breaks typescript and has to be fixed
 // import 'style/AndroidTextFix';
-import { SFItem } from 'snjs';
-
-SFItem.AppDomain = 'org.standardnotes.sn';
 
 require('react-native').unstable_enableLogBox();
 

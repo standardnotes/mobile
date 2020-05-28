@@ -69,7 +69,7 @@ export class MobileDeviceInterface extends DeviceInterface {
     return this.getRawStorageKeyValues(keys);
   }
   setRawStorageValue(key: string, value: any): Promise<void> {
-    return AsyncStorage.setItem(key, value);
+    return AsyncStorage.setItem(key, JSON.stringify(value));
   }
   removeRawStorageValue(key: string): Promise<void> {
     return AsyncStorage.removeItem(key);
@@ -96,10 +96,7 @@ export class MobileDeviceInterface extends DeviceInterface {
 
     await Promise.all(
       payloads.map(item => {
-        return AsyncStorage.setItem(
-          this.keyForPayloadId(item),
-          JSON.stringify(item)
-        );
+        return AsyncStorage.setItem(this.keyForPayloadId(item), item);
       })
     );
   }

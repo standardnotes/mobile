@@ -8,11 +8,8 @@ import {
   ViewStyle,
 } from 'react-native';
 import ThemedPureComponent from '@Components/ThemedPureComponent';
-import ItemActionManager, { EventType } from '@Lib/itemActionManager';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
-import StyleKit from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
-import OptionsState from '@Lib/OptionsState';
 
 type Props = {
   item: any;
@@ -205,60 +202,61 @@ export default class NoteCell extends ThemedPureComponent<Props, State> {
     deleted: boolean;
   }) {
     let flags = [];
+    const variables = this.context!.getThemeService().variables;
 
     if (note.pinned) {
       flags.push({
         text: 'Pinned',
-        color: StyleKit.variables.stylekitInfoColor,
+        color: variables.stylekitInfoColor,
       });
     }
 
     if (note.archived) {
       flags.push({
         text: 'Archived',
-        color: StyleKit.variables.stylekitWarningColor,
+        color: variables.stylekitWarningColor,
       });
     }
 
     if (note.content.protected) {
       flags.push({
         text: 'Protected',
-        color: StyleKit.variables.stylekitSuccessColor,
+        color: variables.stylekitSuccessColor,
       });
     }
 
     if (note.locked) {
       flags.push({
         text: 'Locked',
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: variables.stylekitNeutralColor,
       });
     }
 
     if (note.content.trashed) {
       flags.push({
         text: 'Deleted',
-        color: StyleKit.variables.stylekitDangerColor,
+        color: variables.stylekitDangerColor,
       });
     }
 
     if (note.errorDecrypting) {
       flags.push({
         text: 'Missing Keys',
-        color: StyleKit.variables.stylekitDangerColor,
+        color: variables.stylekitDangerColor,
       });
     }
 
     if (note.content.conflict_of) {
       flags.push({
         text: 'Conflicted Copy',
-        color: StyleKit.variables.stylekitDangerColor,
+        color: variables.stylekitDangerColor,
       });
     }
 
     if (note.deleted) {
       flags.push({
         text: 'Deletion Pending Sync',
-        color: StyleKit.variables.stylekitDangerColor,
+        color: variables.stylekitDangerColor,
       });
     }
 
@@ -267,10 +265,11 @@ export default class NoteCell extends ThemedPureComponent<Props, State> {
 
   flagElement = (flag: { color: any; text: any }) => {
     let bgColor = flag.color;
-    let textColor = StyleKit.variables.stylekitInfoContrastColor;
+    const variables = this.context!.getThemeService().variables;
+    let textColor = variables.stylekitInfoContrastColor;
     if (this.state.selected || this.props.highlighted) {
-      bgColor = StyleKit.variables.stylekitInfoContrastColor;
-      textColor = StyleKit.variables.stylekitInfoColor;
+      bgColor = variables.stylekitInfoContrastColor;
+      textColor = variables.stylekitInfoColor;
     }
     const styles = {
       background: {
@@ -429,20 +428,18 @@ export default class NoteCell extends ThemedPureComponent<Props, State> {
   loadStyles() {
     let padding = 14;
     // @ts-ignore ignore null return from hexToRGBA
+    const variables = this.context!.getThemeService().variables;
     this.styles = StyleSheet.create({
       noteCell: {
         padding: padding,
         paddingRight: padding * 2,
-        borderBottomColor: hexToRGBA(
-          StyleKit.variables.stylekitBorderColor,
-          0.75
-        ),
+        borderBottomColor: hexToRGBA(variables.stylekitBorderColor, 0.75),
         borderBottomWidth: 1,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: variables.stylekitBackgroundColor,
       },
 
       noteCellSelected: {
-        backgroundColor: StyleKit.variables.stylekitInfoColor,
+        backgroundColor: variables.stylekitInfoColor,
       },
 
       noteTagsContainer: {
@@ -466,51 +463,51 @@ export default class NoteCell extends ThemedPureComponent<Props, State> {
       noteTag: {
         marginRight: 2,
         fontSize: 12,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: variables.stylekitForegroundColor,
         opacity: 0.5,
       },
 
       noteTagSelected: {
-        color: StyleKit.variables.stylekitInfoContrastColor,
+        color: variables.stylekitInfoContrastColor,
         opacity: 0.8,
       },
 
       noteTitle: {
         fontWeight: 'bold',
         fontSize: 16,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: variables.stylekitForegroundColor,
       },
 
       noteTitleSelected: {
-        color: StyleKit.variables.stylekitInfoContrastColor,
+        color: variables.stylekitInfoContrastColor,
       },
 
       noteText: {
         fontSize: 15,
         marginTop: 4,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: variables.stylekitForegroundColor,
         opacity: 0.8,
         lineHeight: 21,
       },
 
       noteTextSelected: {
-        color: StyleKit.variables.stylekitInfoContrastColor,
+        color: variables.stylekitInfoContrastColor,
       },
 
       noteDate: {
         marginTop: 5,
         fontSize: 12,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: variables.stylekitForegroundColor,
         opacity: 0.5,
       },
 
       noteDateSelected: {
-        color: StyleKit.variables.stylekitInfoContrastColor,
+        color: variables.stylekitInfoContrastColor,
         opacity: 0.8,
       },
 
       deleting: {
-        color: StyleKit.variables.stylekitInfoColor,
+        color: variables.stylekitInfoColor,
         marginBottom: 5,
       },
     });

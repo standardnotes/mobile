@@ -30,7 +30,6 @@ import {
   ICON_MEDICAL,
   ICON_PRICE_TAG,
 } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
 
 type State = {
   lockContent: boolean;
@@ -350,7 +349,10 @@ export default class NoteSideMenu extends AbstractSideMenu<
   }
 
   render() {
-    const viewStyles = [StyleKit.styles.container, this.styles.sideMenu];
+    const viewStyles = [
+      this.context!.getThemeService().styles.container,
+      this.styles.sideMenu,
+    ];
 
     if (this.state.lockContent) {
       return <LockedView style={viewStyles} />;
@@ -405,8 +407,13 @@ export default class NoteSideMenu extends AbstractSideMenu<
           />
 
           <FAB
-            buttonColor={StyleKit.variables.stylekitInfoColor}
-            iconTextColor={StyleKit.variables.stylekitInfoContrastColor}
+            buttonColor={
+              this.context!.getThemeService().variables.stylekitInfoColor
+            }
+            iconTextColor={
+              this.context!.getThemeService().variables
+                .stylekitInfoContrastColor
+            }
             onClickAction={() => {
               this.presentNewTag();
             }}
@@ -424,22 +431,23 @@ export default class NoteSideMenu extends AbstractSideMenu<
   }
 
   loadStyles() {
+    const styleKitVariables = this.context!.getThemeService().variables;
     this.styles = {
       // We want top color to be different from bottom color of safe area.
       // See https://stackoverflow.com/questions/47725607/react-native-safeareaview-background-color-how-to-assign-two-different-backgro
       safeArea: {
         flex: 0,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: styleKitVariables.stylekitBackgroundColor,
       },
       sideMenu: {
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
-        color: StyleKit.variables.stylekitForegroundColor,
+        backgroundColor: styleKitVariables.stylekitBackgroundColor,
+        color: styleKitVariables.stylekitForegroundColor,
         flex: 1,
         flexDirection: 'column',
       },
       flatList: {
         padding: 15,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: styleKitVariables.stylekitBackgroundColor,
       },
     };
   }

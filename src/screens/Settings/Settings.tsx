@@ -20,7 +20,7 @@ import EncryptionSection from '@Screens/Settings/Sections/EncryptionSection';
 import OptionsSection from '@Screens/Settings/Sections/OptionsSection';
 import PasscodeSection from '@Screens/Settings/Sections/PasscodeSection';
 import { ICON_CHECKMARK } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
+import { StyleKit } from '@Style/StyleKit';
 
 import { SFPrivilegesManager, protocolManager } from 'snjs';
 import OptionsState from '@Lib/OptionsState';
@@ -312,11 +312,15 @@ export default class Settings extends Abstract<AbstractProps, State> {
     return (
       <SafeAreaView
         forceInset={{ top: 'never', bottom: 'never', left: 'always' }}
-        style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}
+        style={[
+          this.context?.getThemeService().styles.container,
+          this.context?.getThemeService().styles.baseBackground,
+        ]}
       >
         <ScrollView
           style={{
-            backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+            backgroundColor: this.context?.getThemeService().variables
+              .stylekitBackgroundColor,
           }}
           keyboardShouldPersistTaps={'always'}
           keyboardDismissMode={'interactive'}

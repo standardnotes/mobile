@@ -8,7 +8,7 @@ import {
   TextStyle,
 } from 'react-native';
 import ThemedComponent from '@Components/ThemedComponent';
-import StyleKit from '@Style/StyleKit';
+import { StyleKit } from '@Style/StyleKit';
 
 type Props = {
   title: string;
@@ -43,7 +43,10 @@ export default class SectionHeader extends ThemedComponent<Props> {
             style={[
               this.styles.title,
               this.props.tinted
-                ? { color: StyleKit.variables.stylekitInfoColor }
+                ? {
+                    color: this.context!.getThemeService().variables
+                      .stylekitInfoColor,
+                  }
                 : null,
             ]}
           >
@@ -68,6 +71,7 @@ export default class SectionHeader extends ThemedComponent<Props> {
   }
 
   loadStyles() {
+    const styleVariables = this.context!.getThemeService().variables;
     this.styles = {
       container: {
         flex: 1,
@@ -77,23 +81,23 @@ export default class SectionHeader extends ThemedComponent<Props> {
         paddingRight: StyleKit.constants.paddingLeft,
         paddingBottom: 10,
         paddingTop: 10,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: styleVariables.stylekitBackgroundColor,
       },
 
       title: {
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: styleVariables.stylekitBackgroundColor,
         fontSize: StyleKit.constants.mainTextFontSize - 4,
         paddingLeft: StyleKit.constants.paddingLeft,
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: styleVariables.stylekitNeutralColor,
         fontWeight: Platform.OS === 'android' ? 'bold' : 'normal',
       },
 
       subtitle: {
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: styleVariables.stylekitBackgroundColor,
         fontSize: StyleKit.constants.mainTextFontSize - 5,
         marginTop: 4,
         paddingLeft: StyleKit.constants.paddingLeft,
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: styleVariables.stylekitNeutralColor,
       },
 
       buttonContainer: {
@@ -103,12 +107,12 @@ export default class SectionHeader extends ThemedComponent<Props> {
       },
 
       button: {
-        color: StyleKit.variables.stylekitInfoColor,
+        color: styleVariables.stylekitInfoColor,
       },
 
       titleAndroid: {
         fontSize: StyleKit.constants.mainTextFontSize - 2,
-        color: StyleKit.variables.stylekitInfoColor,
+        color: styleVariables.stylekitInfoColor,
       },
     };
   }

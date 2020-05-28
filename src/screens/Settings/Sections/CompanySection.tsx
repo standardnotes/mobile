@@ -3,14 +3,16 @@ import { View, Text, Platform, Share } from 'react-native';
 import ButtonCell from '@Components/ButtonCell';
 import SectionHeader from '@Components/SectionHeader';
 import TableSection from '@Components/TableSection';
-import ApplicationState from '@Lib/ApplicationState';
-import StyleKit from '@Style/StyleKit';
+import { ApplicationContext } from 'App';
+import { ApplicationState } from '@Lib/ApplicationState';
 
 type Props = {
   title: string;
 };
 
 export default class CompanySection extends Component<Props> {
+  static contextType = ApplicationContext;
+  declare context: React.ContextType<typeof ApplicationContext>;
   onAction = (action: string) => {
     if (action === 'feedback') {
       const platformString = Platform.OS === 'android' ? 'Android' : 'iOS';
@@ -61,6 +63,7 @@ export default class CompanySection extends Component<Props> {
 
   render() {
     const storeName = Platform.OS === 'android' ? 'Play Store' : 'App Store';
+    const variables = this.context!.getThemeService().variables;
     return (
       <TableSection>
         <SectionHeader title={this.props.title} />
@@ -73,7 +76,7 @@ export default class CompanySection extends Component<Props> {
         >
           <Text
             style={{
-              color: StyleKit.variables.stylekitNeutralColor,
+              color: variables.stylekitNeutralColor,
               marginTop: 3,
             }}
           >
@@ -89,7 +92,7 @@ export default class CompanySection extends Component<Props> {
           <View style={{ display: 'flex', flexDirection: 'column' }}>
             <Text
               style={{
-                color: StyleKit.variables.stylekitNeutralColor,
+                color: variables.stylekitNeutralColor,
                 marginTop: 3,
               }}
             >
@@ -105,7 +108,7 @@ export default class CompanySection extends Component<Props> {
         >
           <Text
             style={{
-              color: StyleKit.variables.stylekitNeutralColor,
+              color: variables.stylekitNeutralColor,
               marginTop: 3,
             }}
           >
@@ -120,7 +123,7 @@ export default class CompanySection extends Component<Props> {
         >
           <Text
             style={{
-              color: StyleKit.variables.stylekitNeutralColor,
+              color: variables.stylekitNeutralColor,
               marginTop: 3,
             }}
           >
@@ -135,7 +138,7 @@ export default class CompanySection extends Component<Props> {
         >
           <Text
             style={{
-              color: StyleKit.variables.stylekitNeutralColor,
+              color: variables.stylekitNeutralColor,
               marginTop: 3,
             }}
           >
@@ -150,7 +153,7 @@ export default class CompanySection extends Component<Props> {
         >
           <Text
             style={{
-              color: StyleKit.variables.stylekitNeutralColor,
+              color: variables.stylekitNeutralColor,
               marginTop: 3,
             }}
           >
@@ -167,7 +170,7 @@ export default class CompanySection extends Component<Props> {
           <View style={{ display: 'flex', flexDirection: 'column' }}>
             <Text
               style={{
-                color: StyleKit.variables.stylekitNeutralColor,
+                color: variables.stylekitNeutralColor,
                 marginTop: 3,
               }}
             >
@@ -175,7 +178,7 @@ export default class CompanySection extends Component<Props> {
             </Text>
             <Text
               style={{
-                color: StyleKit.variables.stylekitNeutralColor,
+                color: variables.stylekitNeutralColor,
                 marginTop: 3,
               }}
             >

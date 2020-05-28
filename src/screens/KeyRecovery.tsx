@@ -1,14 +1,12 @@
 import React from 'react';
-import { TextInput, Text } from 'react-native';
+import { TextInput, Text, Platform } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import ButtonCell from '@Components/ButtonCell';
-import { SFModelManager, protocolManager } from 'snjs';
 import SectionedTableCell from '@Components/SectionedTableCell';
 import TableSection from '@Components/TableSection';
-import ApplicationState from '@Lib/ApplicationState';
 import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 import { ICON_CLOSE } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
+import { StyleKit } from '@Style/StyleKit';
 
 type State = {
   text: string;
@@ -19,10 +17,9 @@ export default class KeyRecovery extends Abstract<AbstractProps, State> {
     const templateOptions = {
       title: 'Key Recovery',
       leftButton: {
-        title: ApplicationState.isIOS ? 'Cancel' : null,
-        iconName: ApplicationState.isIOS
-          ? null
-          : StyleKit.nameForIcon(ICON_CLOSE),
+        title: Platform.OS === 'ios' ? 'Cancel' : null,
+        iconName:
+          Platform.OS === 'ios' ? null : StyleKit.nameForIcon(ICON_CLOSE),
       },
     };
     return Abstract.getDefaultNavigationOptions({
@@ -40,10 +37,9 @@ export default class KeyRecovery extends Abstract<AbstractProps, State> {
 
     props.navigation.setParams({
       leftButton: {
-        title: ApplicationState.isIOS ? 'Cancel' : null,
-        iconName: ApplicationState.isIOS
-          ? null
-          : StyleKit.nameForIcon(ICON_CLOSE),
+        title: Platform.OS === 'ios' ? 'Cancel' : null,
+        iconName:
+          Platform.OS === 'ios' ? null : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
         },
@@ -139,11 +135,10 @@ export default class KeyRecovery extends Abstract<AbstractProps, State> {
   };
 
   render() {
+    const styles = this.context!.getThemeService().styles;
     return (
-      <SafeAreaView
-        style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}
-      >
-        <TableSection extraStyles={[StyleKit.styles.container]}>
+      <SafeAreaView style={[styles.container, styles.baseBackground]}>
+        <TableSection extraStyles={[styles.container]}>
           <SectionedTableCell first={true}>
             <Text>
               {this.encryptedCount} items are encrypted and missing keys. This
@@ -158,16 +153,20 @@ export default class KeyRecovery extends Abstract<AbstractProps, State> {
               ref={ref => {
                 this.inputRef = ref;
               }}
-              style={[StyleKit.styles.sectionedTableCellTextInput]}
+              style={[styles.sectionedTableCellTextInput]}
               placeholder={'Enter Local Passcode'}
               onChangeText={this.onTextChange}
               value={this.state.text}
               secureTextEntry={true}
               autoCorrect={false}
               autoCapitalize={'none'}
-              keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+              keyboardAppearance={this.context
+                ?.getThemeService()
+                .keyboardColorForActiveTheme()}
               autoFocus={true}
-              placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
+              placeholderTextColor={
+                this.context?.getThemeService().variables.stylekitNeutralColor
+              }
               underlineColorAndroid={'transparent'}
               onSubmitEditing={this.submit.bind(this)}
             />

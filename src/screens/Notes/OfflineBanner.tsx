@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import ThemedPureComponent from '@Components/ThemedPureComponent';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_USER, ICON_FORWARD } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
+import { StyleKit } from '@Style/StyleKit';
 
 const NOT_BACKED_UP_TEXT = 'Data not backed up';
 const SIGN_IN_TEXT = 'Sign in or register to backup your notes';
@@ -57,6 +57,7 @@ export class OfflineBanner extends ThemedPureComponent<Props> {
   loadStyles() {
     const margin = 4;
     const padding = 12;
+    const styleVariables = this.context!.getThemeService().variables;
 
     this.styles = StyleSheet.create({
       container: {
@@ -66,11 +67,11 @@ export class OfflineBanner extends ThemedPureComponent<Props> {
         padding: padding,
         borderWidth: 1,
         borderRadius: 4,
-        borderColor: StyleKit.variables.stylekitBorderColor,
+        borderColor: styleVariables.stylekitBorderColor,
       },
       icon: {
         fontSize: 24,
-        color: StyleKit.variables.stylekitInfoColor,
+        color: styleVariables.stylekitInfoColor,
       },
       textContainer: {
         flex: 1,
@@ -79,15 +80,15 @@ export class OfflineBanner extends ThemedPureComponent<Props> {
       boldText: {
         fontSize: 15,
         fontWeight: '600',
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: styleVariables.stylekitForegroundColor,
       },
       subText: {
         marginTop: 2,
         fontSize: 11,
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: styleVariables.stylekitNeutralColor,
       },
       forward: {
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: styleVariables.stylekitNeutralColor,
       },
     });
   }

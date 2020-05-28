@@ -3,9 +3,7 @@ import { Text, View } from 'react-native';
 import SectionHeader from '@Components/SectionHeader';
 import SectionedTableCell from '@Components/SectionedTableCell';
 import TableSection from '@Components/TableSection';
-import KeysManager from '@Lib/keysManager';
-import ModelManager from '@Lib/snjs/modelManager';
-import StyleKit from '@Style/StyleKit';
+import { ApplicationContext } from 'App';
 
 type Props = {
   title: string;
@@ -16,6 +14,8 @@ type State = {
 };
 
 export default class PasscodeSection extends Component<Props, State> {
+  static contextType = ApplicationContext;
+  declare context: React.ContextType<typeof ApplicationContext>;
   constructor(props: Readonly<Props>) {
     super(props);
 
@@ -48,13 +48,13 @@ export default class PasscodeSection extends Component<Props, State> {
       items.length + '/' + items.length + ' notes and tags encrypted';
 
     const titleStyles = {
-      color: StyleKit.variables.stylekitForegroundColor,
+      color: this.context?.getThemeService().variables.stylekitForegroundColor,
       fontSize: 16,
       fontWeight: 'bold' as 'bold',
     };
 
     const subtitleStyles = {
-      color: StyleKit.variables.stylekitNeutralColor,
+      color: this.context?.getThemeService().variables.stylekitNeutralColor,
       fontSize: 14,
       marginTop: 4,
     };

@@ -1,5 +1,5 @@
 import { removeFromArray } from 'snjs';
-import { Editor } from './editor';
+import { Editor } from './Editor';
 import { MobileApplication } from './application';
 
 type EditorGroupChangeCallback = () => void;

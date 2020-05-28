@@ -1,7 +1,6 @@
 import React from 'react';
 import { TouchableHighlight, Text, View } from 'react-native';
 import SectionedTableCell from '@Components/SectionedTableCell';
-import StyleKit from '@Style/StyleKit';
 
 type Props = {
   maxHeight?: number;
@@ -23,18 +22,22 @@ export default class ButtonCell extends SectionedTableCell<Props> {
   }
 
   buttonRules() {
-    let rules = StyleKit.stylesForKey('buttonCellButton');
+    let rules = this.context!.getThemeService().stylesForKey(
+      'buttonCellButton'
+    );
     if (this.props.leftAligned) {
-      rules.push(StyleKit.styles.buttonCellButtonLeft);
+      rules.push(this.context!.getThemeService().styles.buttonCellButtonLeft);
     }
     if (this.props.bold) {
-      rules.push(StyleKit.styles.bold);
+      rules.push(this.context!.getThemeService().styles.bold);
     }
     if (this.props.disabled) {
       rules.push({ color: 'gray', opacity: 0.6 });
     }
     if (this.props.important) {
-      rules.push({ color: StyleKit.variables.stylekitDangerColor });
+      rules.push({
+        color: this.context?.getThemeService().variables.stylekitDangerColor,
+      });
     }
     return rules;
   }
@@ -43,10 +46,12 @@ export default class ButtonCell extends SectionedTableCell<Props> {
     return (
       <TouchableHighlight
         testID={this.props.testID}
-        underlayColor={StyleKit.variables.stylekitBorderColor}
+        underlayColor={
+          this.context?.getThemeService().variables.stylekitBorderColor
+        }
         style={[
-          StyleKit.styles.flexContainer,
-          StyleKit.styles.buttonCell,
+          this.context?.getThemeService().styles.flexContainer,
+          this.context?.getThemeService().styles.buttonCell,
           ...this.rules(),
         ]}
         disabled={this.props.disabled}

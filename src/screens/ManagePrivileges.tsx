@@ -1,15 +1,14 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import ButtonCell from '@Components/ButtonCell';
 import SectionHeader from '@Components/SectionHeader';
 import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
 import SectionedTableCell from '@Components/SectionedTableCell';
 import LockedView from '@Containers/LockedView';
-import { ApplicationState } from '@Lib/ApplicationState';
 import Abstract, { AbstractState, AbstractProps } from '@Screens/Abstract';
 import { ICON_CHECKMARK } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
+import { StyleKit } from '@Style/StyleKit';
 
 type State = {
   availableActions: any[];
@@ -24,10 +23,9 @@ export default class ManagePrivileges extends Abstract<AbstractProps, State> {
     const templateOptions = {
       title: 'Privileges',
       leftButton: {
-        title: ApplicationState.isIOS ? 'Done' : null,
-        iconName: ApplicationState.isIOS
-          ? null
-          : StyleKit.nameForIcon(ICON_CHECKMARK),
+        title: Platform.OS === 'ios' ? 'Done' : null,
+        iconName:
+          Platform.OS === 'ios' ? null : StyleKit.nameForIcon(ICON_CHECKMARK),
       },
     };
     return Abstract.getDefaultNavigationOptions({
@@ -52,10 +50,9 @@ export default class ManagePrivileges extends Abstract<AbstractProps, State> {
 
     props.navigation.setParams({
       leftButton: {
-        title: ApplicationState.isIOS ? 'Done' : null,
-        iconName: ApplicationState.isIOS
-          ? null
-          : StyleKit.nameForIcon(ICON_CHECKMARK),
+        title: Platform.OS === 'ios' ? 'Done' : null,
+        iconName:
+          Platform.OS === 'ios' ? null : StyleKit.nameForIcon(ICON_CHECKMARK),
         onPress: () => {
           this.dismiss();
         },
@@ -147,7 +144,10 @@ export default class ManagePrivileges extends Abstract<AbstractProps, State> {
 
     return (
       <SafeAreaView
-        style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}
+        style={[
+          this.context?.getThemeService().styles.container,
+          this.context?.getThemeService().styles.baseBackground,
+        ]}
       >
         <ScrollView>
           <View style={this.styles.section}>
@@ -230,7 +230,8 @@ export default class ManagePrivileges extends Abstract<AbstractProps, State> {
       cellText: {
         lineHeight: 19,
         fontSize: 16,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitForegroundColor,
       },
       aboutText: {
         marginBottom: 8,

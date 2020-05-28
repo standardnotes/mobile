@@ -5,9 +5,7 @@ import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell
 import SectionHeader from '@Components/SectionHeader';
 import TableSection from '@Components/TableSection';
 import SectionedTableCell from '@Components/SectionedTableCell';
-import Auth from '@Lib/snjs/authManager';
-import Sync from '@Lib/snjs/syncManager';
-import StyleKit from '@Style/StyleKit';
+import { ApplicationContext } from 'App';
 
 const DEFAULT_SIGN_IN_TEXT = 'Sign In';
 const DEFAULT_REGISTER_TEXT = 'Register';
@@ -33,6 +31,8 @@ type State = {
 };
 
 export default class AuthSection extends Component<Props, State> {
+  static contextType = ApplicationContext;
+  declare context: React.ContextType<typeof ApplicationContext>;
   static emailInProgress: any;
   static passwordInProgress: any;
   constructor(props: Readonly<Props>) {
@@ -235,13 +235,14 @@ export default class AuthSection extends Component<Props, State> {
 
   _renderRegistrationConfirm() {
     const padding = 14;
+    const styles = this.context!.getThemeService().styles;
     return (
       <TableSection>
         <SectionHeader title={'Confirm Password'} />
 
         <Text
           style={[
-            StyleKit.styles.uiText,
+            styles.uiText,
             {
               paddingLeft: padding,
               paddingRight: padding,
@@ -257,13 +258,13 @@ export default class AuthSection extends Component<Props, State> {
         <SectionedTableCell first={true} textInputCell={true}>
           <TextInput
             testID="passwordConfirmationField"
-            style={StyleKit.styles.sectionedTableCellTextInput}
+            style={styles.sectionedTableCellTextInput}
             placeholder={'Password confirmation'}
             onChangeText={text => this.setState({ passwordConfirmation: text })}
             value={this.state.passwordConfirmation}
             secureTextEntry={true}
             autoFocus={true}
-            keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+            keyboardAppearance={this.context!.getThemeService().keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
           />
         </SectionedTableCell>
@@ -286,12 +287,13 @@ export default class AuthSection extends Component<Props, State> {
 
   _renderDefaultContent() {
     const textPadding = 14;
+    const styles = this.context!.getThemeService().styles;
     const renderMfaSubcontent = () => {
       return (
         <View>
           <Text
             style={[
-              StyleKit.styles.uiText,
+              styles.uiText,
               {
                 paddingLeft: textPadding,
                 paddingRight: textPadding,
@@ -303,15 +305,17 @@ export default class AuthSection extends Component<Props, State> {
           </Text>
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
-              style={StyleKit.styles.sectionedTableCellTextInput}
+              style={styles.sectionedTableCellTextInput}
               placeholder=""
               onChangeText={text => this.setState({ mfa_token: text })}
               value={this.state.mfa_token}
               keyboardType={'numeric'}
-              keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+              keyboardAppearance={this.context!.getThemeService().keyboardColorForActiveTheme()}
               autoFocus={true}
               underlineColorAndroid={'transparent'}
-              placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
+              placeholderTextColor={
+                this.context!.getThemeService().variables.stylekitNeutralColor
+              }
               onSubmitEditing={this.onSignInPress}
             />
           </SectionedTableCell>
@@ -320,13 +324,16 @@ export default class AuthSection extends Component<Props, State> {
     };
 
     const renderNonMfaSubcontent = () => {
+      const themeStyles = this.context!.getThemeService().styles;
+      const variables = this.context!.getThemeService().variables;
+      const keyboardApperance = this.context!.getThemeService().keyboardColorForActiveTheme();
       return (
         <Fragment>
           <View>
             <SectionedTableCell textInputCell={true} first={true}>
               <TextInput
                 testID="emailField"
-                style={StyleKit.styles.sectionedTableCellTextInput}
+                style={themeStyles.sectionedTableCellTextInput}
                 placeholder={'Email'}
                 onChangeText={text => this.emailInputChanged(text)}
                 value={this.state.email ?? undefined}
@@ -334,24 +341,24 @@ export default class AuthSection extends Component<Props, State> {
                 autoCapitalize={'none'}
                 keyboardType={'email-address'}
                 textContentType={'emailAddress'}
-                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+                keyboardAppearance={keyboardApperance}
                 underlineColorAndroid={'transparent'}
-                placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
+                placeholderTextColor={variables.stylekitNeutralColor}
               />
             </SectionedTableCell>
 
             <SectionedTableCell textInputCell={true}>
               <TextInput
                 testID="passwordField"
-                style={StyleKit.styles.sectionedTableCellTextInput}
+                style={themeStyles.sectionedTableCellTextInput}
                 placeholder={'Password'}
                 onChangeText={text => this.passwordInputChanged(text)}
                 value={this.state.password ?? undefined}
                 textContentType={'password'}
                 secureTextEntry={true}
-                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+                keyboardAppearance={keyboardApperance}
                 underlineColorAndroid={'transparent'}
-                placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
+                placeholderTextColor={variables.stylekitNeutralColor}
               />
             </SectionedTableCell>
           </View>
@@ -362,16 +369,16 @@ export default class AuthSection extends Component<Props, State> {
               <SectionedTableCell textInputCell={true} first={true}>
                 <TextInput
                   testID="syncServerField"
-                  style={StyleKit.styles.sectionedTableCellTextInput}
+                  style={themeStyles.sectionedTableCellTextInput}
                   placeholder={'Sync Server'}
                   onChangeText={text => this.setState({ server: text })}
                   value={this.state.server}
                   autoCorrect={false}
                   autoCapitalize={'none'}
                   keyboardType={'url'}
-                  keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+                  keyboardAppearance={keyboardApperance}
                   underlineColorAndroid={'transparent'}
-                  placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
+                  placeholderTextColor={variables.stylekitNeutralColor}
                 />
               </SectionedTableCell>
 

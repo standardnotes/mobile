@@ -17,11 +17,10 @@ import Auth from '@Lib/snjs/authManager';
 import Sync from '@Lib/snjs/syncManager';
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
-import StyleKit from '@Style/StyleKit';
 import ThemeManager from '@Style/ThemeManager';
 import { LIGHT_MODE_KEY, DARK_MODE_KEY } from '@Style/utils';
 
-import { SFAuthManager, SNTheme } from 'snjs';
+import { SNTheme } from 'snjs';
 import { Mode } from 'react-native-dark-mode';
 import { AbstractProps, AbstractState } from '@Screens/Abstract';
 
@@ -100,11 +99,7 @@ export default class MainSideMenu extends AbstractSideMenu<
       return;
     }
 
-    const mode = StyleKit.doesDeviceSupportDarkMode()
-      ? StyleKit.get().currentDarkMode
-      : LIGHT_MODE_KEY;
-
-    StyleKit.get().assignThemeForMode({ theme: theme, mode: mode });
+    this.context?.getThemeService().assignThemeForMode(theme.uuid);
     this.forceUpdate();
   };
 
@@ -115,7 +110,7 @@ export default class MainSideMenu extends AbstractSideMenu<
      * If this theme is a mobile theme, allow it to be set as the preferred
      * option for light/dark mode.
      */
-    if (theme.content.package_info && !theme.content.package_info.no_mobile) {
+    if (!theme.getNotAvailOnMobile()) {
       const lightThemeAction = this.getModeActionForTheme({
         theme: theme,
         mode: LIGHT_MODE_KEY,
@@ -220,8 +215,10 @@ export default class MainSideMenu extends AbstractSideMenu<
       });
     } else {
       _.merge(desc, {
-        backgroundColor: StyleKit.variables.stylekitInfoColor,
-        borderColor: StyleKit.variables.stylekitInfoColor,
+        backgroundColor: this.context!.getThemeService().variables
+          .stylekitInfoColor,
+        borderColor: this.context!.getThemeService().variables
+          .stylekitInfoColor,
       });
     }
 
@@ -252,7 +249,7 @@ export default class MainSideMenu extends AbstractSideMenu<
       options.push(option);
     }
 
-    if (themes.length === StyleKit.get().systemThemes.length) {
+    if (themes.length === this.context!.getThemeService().systemThemes.length) {
       options.push(
         SideMenuSection.BuildOption({
           text: 'Get More Themes',
@@ -274,7 +271,11 @@ export default class MainSideMenu extends AbstractSideMenu<
   }
 
   render() {
-    const viewStyles = [StyleKit.styles.container, this.styles.sideMenu];
+    const styleKitVariables = this.context!.getThemeService().variables;
+    const viewStyles = [
+      this.context!.getThemeService().styles.container,
+      this.styles.sideMenu,
+    ];
 
     if (this.state.lockContent) {
       return <LockedView style={viewStyles} />;
@@ -347,8 +348,8 @@ export default class MainSideMenu extends AbstractSideMenu<
           />
 
           <FAB
-            buttonColor={StyleKit.variables.stylekitInfoColor}
-            iconTextColor={StyleKit.variables.stylekitInfoContrastColor}
+            buttonColor={styleKitVariables.stylekitInfoColor}
+            iconTextColor={styleKitVariables.stylekitInfoContrastColor}
             onClickAction={() => {
               this.presentSettings();
             }}
@@ -367,29 +368,30 @@ export default class MainSideMenu extends AbstractSideMenu<
   }
 
   loadStyles() {
+    const styleKitVariables = this.context!.getThemeService().variables;
     this.styles = {
       // We want top color to be different from bottom color of safe area.
       // See https://stackoverflow.com/questions/47725607/react-native-safeareaview-background-color-how-to-assign-two-different-backgro
       firstSafeArea: {
         flex: 0,
-        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
+        backgroundColor: styleKitVariables.stylekitContrastBackgroundColor,
       },
       secondSafeArea: {
         flex: 1,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: styleKitVariables.stylekitBackgroundColor,
       },
       sideMenu: {
         // We want the header to be totally contrast, but content to be main
         // So we have to set top level to contrast and individual elements to main
-        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
-        color: StyleKit.variables.stylekitForegroundColor,
+        backgroundColor: styleKitVariables.stylekitContrastBackgroundColor,
+        color: styleKitVariables.stylekitForegroundColor,
         flex: 1,
         flexDirection: 'column',
       },
       flatList: {
         padding: 15,
         flex: 1,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: styleKitVariables.stylekitBackgroundColor,
       },
     };
   }

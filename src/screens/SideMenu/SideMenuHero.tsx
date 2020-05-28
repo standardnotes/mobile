@@ -12,7 +12,6 @@ import ThemedComponent from '@Components/ThemedComponent';
 import KeysManager from '@Lib/keysManager';
 import Auth from '@Lib/snjs/authManager';
 import ModelManager from '@Lib/snjs/modelManager';
-import StyleKit from '@Style/StyleKit';
 
 type Props = {
   onPress: () => void;
@@ -48,6 +47,7 @@ export default class SideMenuHero extends ThemedComponent<Props> {
 
   render() {
     const textData = this.getText();
+    const styleKitVariables = this.context!.getThemeService().variables;
     return (
       <View style={[this.styles.cell]}>
         <TouchableOpacity
@@ -69,8 +69,8 @@ export default class SideMenuHero extends ThemedComponent<Props> {
             <View style={this.styles.iconCircle}>
               <Circle
                 size={10}
-                backgroundColor={StyleKit.variables.stylekitWarningColor}
-                borderColor={StyleKit.variables.stylekitWarningColor}
+                backgroundColor={styleKitVariables.stylekitWarningColor}
+                borderColor={styleKitVariables.stylekitWarningColor}
               />
             </View>
             <Text style={this.styles.outOfSync}>Potentially Out of Sync</Text>
@@ -81,10 +81,11 @@ export default class SideMenuHero extends ThemedComponent<Props> {
   }
 
   loadStyles() {
+    const styleKitVariables = this.context!.getThemeService().variables;
     this.styles = {
       cell: {
-        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
-        borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
+        backgroundColor: styleKitVariables.stylekitContrastBackgroundColor,
+        borderBottomColor: styleKitVariables.stylekitContrastBorderColor,
         borderBottomWidth: 1,
         padding: 15,
         paddingTop: 10,
@@ -95,13 +96,13 @@ export default class SideMenuHero extends ThemedComponent<Props> {
       title: {
         fontWeight: 'bold',
         fontSize: 16,
-        color: StyleKit.variables.stylekitContrastForegroundColor,
+        color: styleKitVariables.stylekitContrastForegroundColor,
         marginBottom: 3,
       },
 
       subtitle: {
         fontSize: 13,
-        color: StyleKit.variables.stylekitContrastForegroundColor,
+        color: styleKitVariables.stylekitContrastForegroundColor,
         opacity: 0.6,
       },
 
@@ -119,7 +120,7 @@ export default class SideMenuHero extends ThemedComponent<Props> {
       outOfSync: {
         marginTop: 10,
         fontSize: 13,
-        color: StyleKit.variables.stylekitWarningColor,
+        color: styleKitVariables.stylekitWarningColor,
         fontWeight: 'bold',
       },
     };

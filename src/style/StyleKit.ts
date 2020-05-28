@@ -29,7 +29,7 @@ import THEME_BLUE_JSON from './Themes/blue.json';
 import { UuidString } from 'snjs/dist/@types/types';
 import { MobileApplication } from '@Lib/application';
 
-type ThemeChangeObserver = () => Promise<void>;
+type ThemeChangeObserver = () => Promise<void> | void;
 
 export interface ThemeContent {
   isSystemTheme: boolean;

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
-
-import StyleKit from '@Style/StyleKit';
+import { ApplicationContext } from 'App';
 
 export type Props = {
   first?: boolean;
@@ -15,16 +14,22 @@ export type Props = {
 export default class SectionedTableCell<AdditionalProps = {}> extends Component<
   Props & AdditionalProps
 > {
+  static contextType = ApplicationContext;
+  declare context: React.ContextType<typeof ApplicationContext>;
   rules() {
-    let rules = [StyleKit.styles.sectionedTableCell];
+    let rules = [this.context?.getThemeService().styles.sectionedTableCell];
     if (this.props.first) {
-      rules.concat(StyleKit.stylesForKey('sectionedTableCellFirst'));
+      rules.concat(
+        this.context?.getThemeService().stylesForKey('sectionedTableCellFirst')
+      );
     }
     if (this.props.last) {
-      rules.concat(StyleKit.stylesForKey('sectionedTableCellLast'));
+      rules.concat(
+        this.context?.getThemeService().stylesForKey('sectionedTableCellLast')
+      );
     }
     if (this.props.textInputCell) {
-      rules.push(StyleKit.styles.textInputCell);
+      rules.push(this.context?.getThemeService().styles.textInputCell);
     }
     if (this.props.height) {
       rules.push({ height: this.props.height });

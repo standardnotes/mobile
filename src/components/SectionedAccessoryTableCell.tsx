@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableHighlight, Platform } from 'react-native';
 import SectionedTableCell from '@Components/SectionedTableCell';
-import StyleKit from '@Style/StyleKit';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -26,9 +25,11 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell<
     const rules = super
       .rules()
       .concat([
-        StyleKit.styles.view,
-        StyleKit.styles.flexContainer,
-        ...StyleKit.stylesForKey('sectionedAccessoryTableCell'),
+        this.context?.getThemeService().styles.view,
+        this.context?.getThemeService().styles.flexContainer,
+        ...this.context!.getThemeService().stylesForKey(
+          'sectionedAccessoryTableCell'
+        ),
       ]);
     return rules;
   }
@@ -69,8 +70,8 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell<
     const left = this.props.leftAlignIcon;
     let iconSize = left ? 25 : 30;
     let color = left
-      ? StyleKit.variables.stylekitForegroundColor
-      : StyleKit.variables.stylekitInfoColor;
+      ? this.context?.getThemeService().variables.stylekitForegroundColor
+      : this.context?.getThemeService().variables.stylekitInfoColor;
 
     if (Platform.OS === 'android') {
       iconSize -= 5;
@@ -89,16 +90,22 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell<
       );
     }
 
-    var textStyles = [StyleKit.styles.sectionedAccessoryTableCellLabel];
+    var textStyles = [
+      this.context?.getThemeService().styles.sectionedAccessoryTableCellLabel,
+    ];
 
     if (this.props.bold || (this.props.selected && this.props.selected())) {
-      textStyles.push(StyleKit.styles.bold);
+      textStyles.push(this.context?.getThemeService().styles.bold);
     }
     if (this.props.tinted) {
-      textStyles.push({ color: StyleKit.variables.stylekitInfoColor });
+      textStyles.push({
+        color: this.context?.getThemeService().variables.stylekitInfoColor,
+      });
     }
     if (this.props.dimmed) {
-      textStyles.push({ color: StyleKit.variables.stylekitNeutralColor });
+      textStyles.push({
+        color: this.context?.getThemeService().variables.stylekitNeutralColor,
+      });
     }
     if (this.props.color) {
       textStyles.push({ color: this.props.color });
@@ -113,7 +120,9 @@ export default class SectionedAccessoryTableCell extends SectionedTableCell<
     return (
       <TouchableHighlight
         testID={this.props.testID}
-        underlayColor={StyleKit.variables.stylekitBorderColor}
+        underlayColor={
+          this.context?.getThemeService().variables.stylekitBorderColor
+        }
         style={this.rules()}
         onPress={this.onPress}
         onLongPress={this.onLongPress}

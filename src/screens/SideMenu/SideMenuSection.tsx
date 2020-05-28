@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import ThemedComponent from '@Components/ThemedComponent';
 import SideMenuCell from '@Screens/SideMenu/SideMenuCell';
-import StyleKit from '@Style/StyleKit';
 
 type Props = {
   title: string;
@@ -126,6 +125,7 @@ export default class SideMenuSection extends ThemedComponent<Props, State> {
   }
 
   loadStyles() {
+    const styleKitVariables = this.context!.getThemeService().variables;
     this.styles = {
       root: {
         paddingBottom: 6,
@@ -137,7 +137,7 @@ export default class SideMenuSection extends ThemedComponent<Props, State> {
         height: 50,
       },
       title: {
-        color: StyleKit.variables.stylekitInfoColor,
+        color: styleKitVariables.stylekitInfoColor,
         fontSize: 13,
         fontWeight: '700',
       },
@@ -146,7 +146,7 @@ export default class SideMenuSection extends ThemedComponent<Props, State> {
         fontSize: 12,
         opacity: 0.7,
         marginTop: 3,
-        color: StyleKit.variables.stylekitContrastForegroundColor,
+        color: styleKitVariables.stylekitContrastForegroundColor,
       },
     };
   }

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, TextStyle } from 'react-native';
 import PlatformStyles from '@Models/PlatformStyles';
-import StyleKit from '@Style/StyleKit';
 
 type Props = {
   subtitleColor?: TextStyle['color'];
@@ -43,7 +42,8 @@ export default class HeaderTitleView extends Component<Props> {
   getStyles() {
     return new PlatformStyles({
       headerContainer: {
-        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
+        backgroundColor: this.context?.getThemeService().variables
+          .stylekitContrastBackgroundColor,
         flex: 1,
         justifyContent: 'flex-start',
         flexDirection: 'column',
@@ -54,14 +54,16 @@ export default class HeaderTitleView extends Component<Props> {
       },
 
       headerTitle: {
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitForegroundColor,
         fontWeight: 'bold',
         fontSize: 18,
         textAlign: 'center',
       },
 
       headerSubtitle: {
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitForegroundColor,
         opacity: 0.6,
         fontSize: 12,
       },

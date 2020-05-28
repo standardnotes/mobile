@@ -10,9 +10,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
 import Circle from '@Components/Circle';
 import ThemedComponent from '@Components/ThemedComponent';
-import ApplicationState from '@Lib/ApplicationState';
-import StyleKit from '@Style/StyleKit';
 import { SideMenuOption } from './SideMenuSection';
+import { Platform } from 'snjs';
 
 type Props = SideMenuOption;
 
@@ -52,7 +51,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
           <Icon
             name={desc.name}
             size={desc.size || 20}
-            color={StyleKit.variables.stylekitInfoColor}
+            color={this.context!.getThemeService().variables.stylekitInfoColor}
           />
         </View>
       );
@@ -81,14 +80,15 @@ export default class SideMenuCell extends ThemedComponent<Props> {
   }
 
   colorForTextClass = (textClass: Props['textClass']) => {
+    const styleKitVariables = this.context!.getThemeService().variables;
     if (!textClass) {
       return null;
     }
 
     return {
-      info: StyleKit.variables.stylekitInfoColor,
-      danger: StyleKit.variables.stylekitDangerColor,
-      warning: StyleKit.variables.stylekitWarningColor,
+      info: styleKitVariables.stylekitInfoColor,
+      danger: styleKitVariables.stylekitDangerColor,
+      warning: styleKitVariables.stylekitWarningColor,
     }[textClass];
   };
 
@@ -104,7 +104,8 @@ export default class SideMenuCell extends ThemedComponent<Props> {
 
     // if this is a dimmed cell, override text color with Neutral color
     if (this.props.dimmed) {
-      textColor = StyleKit.variables.stylekitNeutralColor;
+      textColor = this.context!.getThemeService().variables
+        .stylekitNeutralColor;
     }
 
     return (
@@ -180,6 +181,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
   }
 
   loadStyles() {
+    const styleKitVariables = this.context!.getThemeService().variables;
     this.styles = {
       cell: {
         minHeight: this.props.subtext ? 52 : 42,
@@ -214,25 +216,27 @@ export default class SideMenuCell extends ThemedComponent<Props> {
       },
 
       textContainerSelected: {
-        borderBottomColor: StyleKit.variables.stylekitInfoColor,
+        borderBottomColor: styleKitVariables.stylekitInfoColor,
         borderBottomWidth: 2,
       },
 
       text: {
-        color: StyleKit.variables.stylekitContrastForegroundColor,
+        color: styleKitVariables.stylekitContrastForegroundColor,
         fontWeight: 'bold',
         fontSize: 15,
         paddingBottom: 0,
-        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+        fontFamily:
+          this.context?.platform === Platform.Android ? 'Roboto' : undefined, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       subtext: {
-        color: StyleKit.variables.stylekitContrastForegroundColor,
+        color: styleKitVariables.stylekitContrastForegroundColor,
         opacity: 0.75,
         fontSize: 12,
         marginTop: -5,
         marginBottom: 3,
-        fontFamily: ApplicationState.isAndroid ? 'Roboto' : undefined, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
+        fontFamily:
+          this.context?.platform === Platform.Android ? 'Roboto' : undefined, // https://github.com/facebook/react-native/issues/15114#issuecomment-364458149
       },
 
       iconGraphic: {
@@ -254,7 +258,7 @@ export default class SideMenuCell extends ThemedComponent<Props> {
       iconAscii: {
         fontSize: 15,
         fontWeight: 'bold',
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: styleKitVariables.stylekitNeutralColor,
         opacity: 0.6,
         marginTop: -4,
       },

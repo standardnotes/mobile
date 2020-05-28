@@ -3,6 +3,9 @@ import {
   SNApplication,
   SNAlertService,
   platformFromString,
+  Challenge,
+  ChallengeOrchestrator,
+  ChallengeReason,
 } from 'snjs';
 import { MobileDeviceInterface } from './interface';
 import { AlertService } from './AlertService';
@@ -64,6 +67,15 @@ export class MobileApplication extends SNApplication {
     this.editorGroup.deinit();
     this.componentGroup.deinit();
     super.deinit();
+  }
+
+  promptForChallenge(
+    challenge: Challenge,
+    orchestrator: ChallengeOrchestrator
+  ) {
+    if (challenge.reason === ChallengeReason.ApplicationUnlock) {
+      // orchestrator.submitValues();
+    }
   }
 
   setMobileServices(services: MobileServices) {

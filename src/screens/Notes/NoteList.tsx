@@ -10,12 +10,9 @@ import {
 } from 'react-native';
 import Search from 'react-native-search-box';
 import ThemedComponent from '@Components/ThemedComponent';
-import ApplicationState from '@Lib/ApplicationState';
 import NoteCell from '@Screens/Notes/NoteCell';
 import OfflineBanner from '@Screens/Notes/OfflineBanner';
-import Auth from '@Lib/snjs/authManager';
-import StyleKit from '@Style/StyleKit';
-import { EventType } from '@Lib/itemActionManager';
+import { Platform } from 'snjs';
 
 type Props = {
   onSearchChange: (text: string) => void;
@@ -45,7 +42,8 @@ export default class NoteList extends ThemedComponent<Props> {
           paddingLeft: 5,
           paddingRight: 5,
           paddingTop: 5,
-          backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+          backgroundColor: this.context?.getThemeService().variables
+            .stylekitBackgroundColor,
         }}
       >
         <Search
@@ -53,14 +51,22 @@ export default class NoteList extends ThemedComponent<Props> {
           onCancel={this.props.onSearchCancel}
           onDelete={this.props.onSearchCancel}
           blurOnSubmit={true}
-          backgroundColor={StyleKit.variables.stylekitBackgroundColor}
-          titleCancelColor={StyleKit.variables.stylekitInfoColor}
+          backgroundColor={
+            this.context?.getThemeService().variables.stylekitBackgroundColor
+          }
+          titleCancelColor={
+            this.context?.getThemeService().variables.stylekitInfoColor
+          }
           keyboardDismissMode={'interactive'}
-          keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+          keyboardAppearance={this.context
+            ?.getThemeService()
+            .keyboardColorForActiveTheme()}
           inputBorderRadius={4}
           inputStyle={{
-            backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
-            color: StyleKit.variables.stylekitForegroundColor,
+            backgroundColor: this.context?.getThemeService().variables
+              .stylekitContrastBackgroundColor,
+            color: this.context?.getThemeService().variables
+              .stylekitForegroundColor,
             height: 30,
           }}
         />
@@ -82,7 +88,7 @@ export default class NoteList extends ThemedComponent<Props> {
      */
     const selectedTags = this.props.selectedTags || [];
     const renderTags =
-      ApplicationState.isIOS ||
+      this.context?.platform === Platform.Ios ||
       selectedTags.length === 0 ||
       !item.tags.includes(selectedTags[0]);
 
@@ -124,7 +130,10 @@ export default class NoteList extends ThemedComponent<Props> {
 
     return (
       <View
-        style={{ backgroundColor: StyleKit.variables.stylekitBackgroundColor }}
+        style={{
+          backgroundColor: this.context?.getThemeService().variables
+            .stylekitBackgroundColor,
+        }}
       >
         {placeholderText.length > 0 && (
           <View style={this.styles.loadingTextContainer}>
@@ -175,7 +184,8 @@ export default class NoteList extends ThemedComponent<Props> {
       loadingText: {
         position: 'absolute',
         opacity: 0.5,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitForegroundColor,
       },
     });
   }

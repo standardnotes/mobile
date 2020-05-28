@@ -57,8 +57,11 @@ export type NoteSideMenuToggleChange = {
 type EventObserverCallback = (
   event: AppStateEventType,
   data?: TabletModeChangeData | NoteSideMenuToggleChange
-) => Promise<void>;
-type ObserverCallback = (event: AppStateType, data?: any) => Promise<void>;
+) => void | Promise<void>;
+type ObserverCallback = (
+  event: AppStateType,
+  data?: any
+) => void | Promise<void>;
 
 export class ApplicationState {
   application: MobileApplication;

@@ -6,19 +6,20 @@ import {
   ScrollView,
   ViewStyle,
   TextStyle,
+  Platform,
 } from 'react-native';
 import _ from 'lodash';
 import ButtonCell from '@Components/ButtonCell';
 import SectionHeader from '@Components/SectionHeader';
 import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell';
 import SectionedTableCell from '@Components/SectionedTableCell';
-import ApplicationState, { AppStateType } from '@Lib/ApplicationState';
+import { AppStateType } from '@Lib/ApplicationState';
 import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 import { ICON_CLOSE } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
 import AuthenticationSourceAccountPassword from './Sources/AuthenticationSourceAccountPassword';
 import AuthenticationSourceBiometric from './Sources/AuthenticationSourceBiometric';
 import AuthenticationSourceLocalPasscode from './Sources/AuthenticationSourceLocalPasscode';
+import { StyleKit } from '@Style/StyleKit';
 
 type Source =
   | AuthenticationSourceAccountPassword
@@ -38,7 +39,7 @@ export default class Authenticate extends Abstract<AbstractProps, State> {
        * On Android, not having a left button will make the title appear all
        * the way at the edge. Below will add some padding
        */
-      title: ApplicationState.isAndroid ? '  Authenticate' : 'Authenticate',
+      title: Platform.OS === 'android' ? '  Authenticate' : 'Authenticate',
     };
     return Abstract.getDefaultNavigationOptions({
       navigation,
@@ -47,10 +48,7 @@ export default class Authenticate extends Abstract<AbstractProps, State> {
     });
   };
   styles!: Record<string, ViewStyle | TextStyle>;
-  stateObserver: {
-    key: () => number;
-    callback: (state: AppStateType) => void;
-  };
+  removeStateObserver: () => void;
   pendingSources: Source[];
   _sessionLength: number;
   successfulSources: Source[];
@@ -67,25 +65,26 @@ export default class Authenticate extends Abstract<AbstractProps, State> {
       source.initializeForInterface();
     }
 
-    this.stateObserver = ApplicationState.get().addStateObserver(state => {
-      if (state === ApplicationState.GainingFocus) {
-        if (!this.state.activeSource) {
-          this.begin();
+    this.removeStateObserver = this.context!.getAppState().addStateChangeObserver(
+      state => {
+        if (state === AppStateType.GainingFocus) {
+          if (!this.state.activeSource) {
+            this.begin();
+          }
+        } else if (state === AppStateType.EnteringBackground) {
+          this.cancel();
         }
-      } else if (state === ApplicationState.Backgrounding) {
-        this.cancel();
       }
-    });
+    );
 
     this._sessionLength = this.getProp('selectedSessionLength');
 
     if (this.getProp('hasCancelOption')) {
       props.navigation.setParams({
         leftButton: {
-          title: ApplicationState.isIOS ? 'Cancel' : null,
-          iconName: ApplicationState.isIOS
-            ? null
-            : StyleKit.nameForIcon(ICON_CLOSE),
+          title: Platform.OS === 'ios' ? 'Cancel' : null,
+          iconName:
+            Platform.OS === 'ios' ? null : StyleKit.nameForIcon(ICON_CLOSE),
           onPress: () => {
             this.getProp('onCancel')();
             this.dismiss();
@@ -115,7 +114,7 @@ export default class Authenticate extends Abstract<AbstractProps, State> {
     }
 
     super.componentWillUnmount();
-    ApplicationState.get().removeStateObserver(this.stateObserver);
+    this.removeStateObserver();
   }
 
   submitPressed() {
@@ -140,8 +139,8 @@ export default class Authenticate extends Abstract<AbstractProps, State> {
     super.componentWillFocus();
 
     if (
-      ApplicationState.get().getMostRecentState() !==
-      ApplicationState.LosingFocus
+      this.context?.getAppState().getMostRecentState() !==
+      AppStateType.LosingFocus
     ) {
       this.begin();
     }
@@ -172,8 +171,8 @@ export default class Authenticate extends Abstract<AbstractProps, State> {
      * wait until the app gains focus.
      */
     const isLosingFocus =
-      ApplicationState.get().getMostRecentState() ===
-      ApplicationState.LosingFocus;
+      this.context?.getAppState().getMostRecentState() ===
+      AppStateType.LosingFocus;
 
     if (source.type === 'biometric' && !isLosingFocus) {
       /** Begin authentication right away, we're not waiting for any input */
@@ -351,7 +350,9 @@ export default class Authenticate extends Abstract<AbstractProps, State> {
             ref={ref => {
               inputSource.inputRef = ref;
             }}
-            style={StyleKit.styles.sectionedTableCellTextInput}
+            style={
+              this.context?.getThemeService().styles.sectionedTableCellTextInput
+            }
             placeholder={inputSource.inputPlaceholder}
             onChangeText={text => {
               this.inputTextChanged(text, inputSource);
@@ -362,9 +363,13 @@ export default class Authenticate extends Abstract<AbstractProps, State> {
             autoCapitalize={'none'}
             secureTextEntry={true}
             keyboardType={inputSource.keyboardType || 'default'}
-            keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+            keyboardAppearance={this.context
+              ?.getThemeService()
+              .keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
-            placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
+            placeholderTextColor={
+              this.context?.getThemeService().variables.stylekitNeutralColor
+            }
             onSubmitEditing={() => {
               this.validateAuthentication(inputSource);
             }}
@@ -446,10 +451,11 @@ export default class Authenticate extends Abstract<AbstractProps, State> {
 
   render() {
     return (
-      <View style={StyleKit.styles.container}>
+      <View style={this.context?.getThemeService().styles.container}>
         <ScrollView
           style={{
-            backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+            backgroundColor: this.context?.getThemeService().variables
+              .stylekitBackgroundColor,
           }}
           keyboardShouldPersistTaps={'always'}
           keyboardDismissMode={'interactive'}

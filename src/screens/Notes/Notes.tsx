@@ -4,15 +4,11 @@ import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
-import ApplicationState, {
-  AppStateEventHandler,
+import {
   AppStateEventType,
   TabletModeChangeData,
   NoteSideMenuToggleChange,
 } from '@Lib/ApplicationState';
-import ItemActionManager, { EventType } from '@Lib/itemActionManager';
-import KeysManager from '@Lib/keysManager';
-import OptionsState, { Observer } from '@Lib/OptionsState';
 import Abstract, { AbstractProps, AbstractState } from '@Screens/Abstract';
 import NoteList from '@Screens/Notes/NoteList';
 import {
@@ -22,9 +18,8 @@ import {
 } from '@Screens/screens';
 import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
 import { ICON_MENU, ICON_ADD } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
-
-import { SFAuthManager, SFPrivilegesManager } from 'snjs';
+import { StyleKit } from '@Style/StyleKit';
+import { Platform } from 'snjs/dist/@types';
 
 type Props = {
   onNoteSelect?: (note: any) => void;
@@ -451,7 +446,7 @@ export default class Notes extends Abstract<
       run();
     }
 
-    if (!ApplicationState.get().isInTabletMode) {
+    if (!this.context?.getAppState().isInTabletMode) {
       // Make sure we close the keyboard here, otherwise the
       // search box keeps focus and leaves the Keyboard open. It creates a glitchy state
       // that leave the Keyboard confused if it should be open or closed
@@ -524,7 +519,10 @@ export default class Notes extends Abstract<
     return (
       <SafeAreaView
         forceInset={{ top: 'never', bottom: 'never', horizontal: 'always' }}
-        style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}
+        style={[
+          this.context?.getThemeService().styles.container,
+          this.context?.getThemeService().styles.baseBackground,
+        ]}
       >
         {this.state.notes && (
           <NoteList
@@ -541,7 +539,7 @@ export default class Notes extends Abstract<
             selectedTags={this.state.tags}
             options={this.options.displayOptions}
             selectedNoteId={
-              ApplicationState.get().isInTabletMode
+              this.context?.getAppState().isInTabletMode
                 ? this.state.selectedNoteId
                 : null
             }
@@ -552,18 +550,22 @@ export default class Notes extends Abstract<
         <FAB
           // @ts-ignore style prop does not exist for types
           style={
-            ApplicationState.get().isInTabletMode
-              ? { bottom: ApplicationState.get().getKeyboardHeight() }
+            this.context?.getAppState().isInTabletMode
+              ? { bottom: this.context?.getAppState().getKeyboardHeight() }
               : undefined
           }
-          buttonColor={StyleKit.variables.stylekitInfoColor}
-          iconTextColor={StyleKit.variables.stylekitInfoContrastColor}
+          buttonColor={
+            this.context?.getThemeService().variables.stylekitInfoColor
+          }
+          iconTextColor={
+            this.context?.getThemeService().variables.stylekitInfoContrastColor
+          }
           onClickAction={() => {
             this.selectNote();
           }}
           visible={true}
           size={30}
-          paddingTop={ApplicationState.isIOS ? 1 : 0}
+          paddingTop={this.context?.platform === Platform.Ios ? 1 : 0}
           iconTextComponent={
             <Icon
               testID="newNoteButton"

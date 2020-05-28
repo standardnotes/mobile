@@ -4,7 +4,6 @@ import {
   TextInput,
   View,
   TouchableOpacity,
-  Platform,
   Text,
   Alert,
   ViewStyle,
@@ -14,8 +13,7 @@ import TextView from 'sn-textview';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
-import ApplicationState, {
-  AppStateEventHandler,
+import {
   AppStateEventType,
   TabletModeChangeData,
   NoteSideMenuToggleChange,
@@ -24,8 +22,9 @@ import Abstract, { AbstractState, AbstractProps } from '@Screens/Abstract';
 import ComponentView from '@Screens/ComponentView';
 import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
 import { ICON_ALERT, ICON_LOCK, ICON_MENU } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
 import { lighten } from '@Style/utils';
+import { StyleKit } from '@Style/StyleKit';
+import { Platform } from 'snjs';
 
 type State = {
   webViewError: any;
@@ -327,7 +326,7 @@ export default class Compose extends Abstract<
       }
     }
 
-    if (ApplicationState.isIOS) {
+    if (this.context?.platform === Platform.Ios) {
       if (this.note.dummy && this.input) {
         this.input.focus();
       }
@@ -379,7 +378,7 @@ export default class Compose extends Abstract<
   componentWillBlur() {
     super.componentWillBlur();
 
-    if (!ApplicationState.get().isInTabletMode) {
+    if (!this.context?.getAppState().isInTabletMode) {
       this.props.navigation.lockRightDrawer(true);
     }
 
@@ -469,7 +468,7 @@ export default class Compose extends Abstract<
         this.syncTakingTooLong = false;
         this.setSubTitle(
           'Sync Unavailable (changes saved offline)',
-          StyleKit.variables.stylekitWarningColor
+          this.context?.getThemeService().variables.stylekitWarningColor
         );
       }, debouceMs);
     }
@@ -584,8 +583,8 @@ export default class Compose extends Abstract<
         forceInset={{ bottom: 'never', vertical: 'never', left: 'always' }}
         style={[
           this.styles.container,
-          StyleKit.styles.container,
-          StyleKit.styles.baseBackground,
+          this.context?.getThemeService().styles.container,
+          this.context?.getThemeService().styles.baseBackground,
         ]}
       >
         {this.note.locked && (
@@ -593,7 +592,10 @@ export default class Compose extends Abstract<
             <Icon
               name={StyleKit.nameForIcon(ICON_LOCK)}
               size={16}
-              color={StyleKit.variables.stylekitBackgroundColor}
+              color={
+                this.context?.getThemeService().variables
+                  .stylekitBackgroundColor
+              }
             />
             <Text style={this.styles.lockedText}>Note Locked</Text>
           </View>
@@ -604,7 +606,10 @@ export default class Compose extends Abstract<
             <Icon
               name={StyleKit.nameForIcon(ICON_ALERT)}
               size={16}
-              color={StyleKit.variables.stylekitBackgroundColor}
+              color={
+                this.context?.getThemeService().variables
+                  .stylekitBackgroundColor
+              }
             />
             <Text style={this.styles.lockedText}>
               Unable to load {noteEditor && noteEditor.content.name}
@@ -624,10 +629,16 @@ export default class Compose extends Abstract<
           onChangeText={this.onTitleChange}
           value={this.state.title}
           placeholder={'Add Title'}
-          selectionColor={StyleKit.variables.stylekitInfoColor}
+          selectionColor={
+            this.context?.getThemeService().variables.stylekitInfoColor
+          }
           underlineColorAndroid={'transparent'}
-          placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
-          keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+          placeholderTextColor={
+            this.context?.getThemeService().variables.stylekitNeutralColor
+          }
+          keyboardAppearance={this.context
+            ?.getThemeService()
+            .keyboardColorForActiveTheme()}
           autoCorrect={true}
           autoCapitalize={'sentences'}
           editable={!this.note.locked}
@@ -660,36 +671,45 @@ export default class Compose extends Abstract<
           />
         )}
 
-        {!shouldDisplayEditor && Platform.OS === 'android' && (
+        {!shouldDisplayEditor && this.context?.platform === Platform.Android && (
           <View style={[this.styles.noteTextContainer]}>
             <TextView
               testID="noteContentField"
               style={[
-                StyleKit.stylesForKey('noteText'),
+                this.context?.getThemeService().stylesForKey('noteText'),
                 this.styles.textContentAndroid,
               ]}
               ref={ref => (this.input = ref)}
               autoFocus={this.note.dummy}
               value={this.note.text}
               selectionColor={lighten(
-                StyleKit.variables.stylekitInfoColor,
+                this.context!.getThemeService().variables.stylekitInfoColor,
                 0.35
               )}
-              handlesColor={StyleKit.variables.stylekitInfoColor}
+              handlesColor={
+                this.context?.getThemeService().variables.stylekitInfoColor
+              }
               onChangeText={this.onTextChange}
             />
           </View>
         )}
 
-        {!shouldDisplayEditor && Platform.OS === 'ios' && (
+        {!shouldDisplayEditor && this.context?.platform === Platform.Ios && (
           <TextView
-            style={[StyleKit.stylesForKey('noteText'), { paddingBottom: 10 }]}
+            style={[
+              this.context?.getThemeService().stylesForKey('noteText'),
+              { paddingBottom: 10 },
+            ]}
             ref={ref => (this.input = ref)}
             autoFocus={false}
             value={this.note.text}
             keyboardDismissMode={'interactive'}
-            keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
-            selectionColor={lighten(StyleKit.variables.stylekitInfoColor)}
+            keyboardAppearance={this.context
+              ?.getThemeService()
+              .keyboardColorForActiveTheme()}
+            selectionColor={lighten(
+              this.context!.getThemeService().variables.stylekitInfoColor
+            )}
             onChangeText={this.onTextChange}
             editable={!this.note.locked}
           />
@@ -711,12 +731,15 @@ export default class Compose extends Abstract<
       noteTitle: {
         fontWeight: '600',
         fontSize: 16,
-        color: StyleKit.variables.stylekitForegroundColor,
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitForegroundColor,
+        backgroundColor: this.context?.getThemeService().variables
+          .stylekitBackgroundColor,
         height: noteTitleHeight,
-        borderBottomColor: StyleKit.variables.stylekitBorderColor,
+        borderBottomColor: this.context?.getThemeService().variables
+          .stylekitBorderColor,
         borderBottomWidth: 1,
-        paddingTop: Platform.OS === 'ios' ? 5 : 12,
+        paddingTop: this.context?.platform === Platform.Ios ? 5 : 12,
         paddingLeft: padding,
         paddingRight: padding,
       },
@@ -729,15 +752,18 @@ export default class Compose extends Abstract<
         height: 26,
         maxHeight: 26,
         paddingLeft: padding,
-        backgroundColor: StyleKit.variables.stylekitNeutralColor,
-        borderBottomColor: StyleKit.variables.stylekitBorderColor,
+        backgroundColor: this.context?.getThemeService().variables
+          .stylekitNeutralColor,
+        borderBottomColor: this.context?.getThemeService().variables
+          .stylekitBorderColor,
         borderBottomWidth: 1,
       },
 
       lockedText: {
         fontWeight: 'bold',
         fontSize: 12,
-        color: StyleKit.variables.stylekitBackgroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitBackgroundColor,
         paddingLeft: 10,
       },
 
@@ -751,12 +777,14 @@ export default class Compose extends Abstract<
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: this.context?.getThemeService().variables
+          .stylekitBackgroundColor,
       },
 
       loadingWebViewText: {
         paddingLeft: 0,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitForegroundColor,
         opacity: 0.7,
         fontSize: 22,
         fontWeight: 'bold',
@@ -764,7 +792,8 @@ export default class Compose extends Abstract<
 
       loadingWebViewSubtitle: {
         paddingLeft: 0,
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitForegroundColor,
         opacity: 0.7,
         marginTop: 5,
       },
@@ -780,7 +809,8 @@ export default class Compose extends Abstract<
       },
 
       webviewReloadButtonText: {
-        color: StyleKit.variables.stylekitBackgroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitBackgroundColor,
         fontSize: 12,
         fontWeight: 'bold',
       },

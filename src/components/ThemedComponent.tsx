@@ -1,22 +1,26 @@
 import { Component } from 'react';
-import StyleKit from '@Style/StyleKit';
+import { ApplicationContext } from 'App';
 
 export default class ThemedComponent<P = {}, S = any> extends Component<P, S> {
-  themeChangeObserver: () => void;
+  static contextType = ApplicationContext;
+  declare context: React.ContextType<typeof ApplicationContext>;
+  removeThemeChangeObserver: () => void;
   constructor(props: Readonly<P>) {
     super(props);
 
     this.loadStyles();
     this.updateStyles();
 
-    this.themeChangeObserver = StyleKit.get().addThemeChangeObserver(() => {
-      this.onThemeChange();
-      this.forceUpdate();
-    });
+    this.removeThemeChangeObserver = this.context!.getThemeService().addThemeChangeObserver(
+      () => {
+        this.onThemeChange();
+        this.forceUpdate();
+      }
+    );
   }
 
   componentWillUnmount() {
-    StyleKit.get().removeThemeChangeObserver(this.themeChangeObserver);
+    this.removeThemeChangeObserver();
   }
 
   onThemeChange() {

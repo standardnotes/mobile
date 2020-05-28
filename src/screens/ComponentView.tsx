@@ -10,7 +10,6 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { WebView } from 'react-native-webview';
 import { ICON_LOCK } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
 
 type Props = {
   noteId: string;

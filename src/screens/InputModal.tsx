@@ -1,15 +1,20 @@
 import React from 'react';
-import { TextInput, Keyboard, Alert, KeyboardTypeOptions } from 'react-native';
+import {
+  TextInput,
+  Keyboard,
+  Alert,
+  KeyboardTypeOptions,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import ButtonCell from '@Components/ButtonCell';
 import SectionedTableCell from '@Components/SectionedTableCell';
 import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
 import TableSection from '@Components/TableSection';
 import LockedView from '@Containers/LockedView';
-import ApplicationState from '@Lib/ApplicationState';
 import Abstract, { AbstractState, AbstractProps } from '@Screens/Abstract';
 import { ICON_CLOSE } from '@Style/icons';
-import StyleKit from '@Style/StyleKit';
+import { StyleKit } from '@Style/StyleKit';
 
 type State = {
   text: string;
@@ -20,10 +25,9 @@ export default class InputModal extends Abstract<AbstractProps, State> {
   static navigationOptions = ({ navigation, navigationOptions }: any) => {
     const templateOptions = {
       leftButton: {
-        title: ApplicationState.isIOS ? 'Cancel' : null,
-        iconName: ApplicationState.isIOS
-          ? null
-          : StyleKit.nameForIcon(ICON_CLOSE),
+        title: Platform.OS === 'ios' ? 'Cancel' : null,
+        iconName:
+          Platform.OS === 'ios' ? null : StyleKit.nameForIcon(ICON_CLOSE),
       },
     };
     return Abstract.getDefaultNavigationOptions({
@@ -43,10 +47,9 @@ export default class InputModal extends Abstract<AbstractProps, State> {
 
     props.navigation.setParams({
       leftButton: {
-        title: ApplicationState.isIOS ? 'Cancel' : null,
-        iconName: ApplicationState.isIOS
-          ? null
-          : StyleKit.nameForIcon(ICON_CLOSE),
+        title: Platform.OS === 'ios' ? 'Cancel' : null,
+        iconName:
+          Platform.OS === 'ios' ? null : StyleKit.nameForIcon(ICON_CLOSE),
         onPress: () => {
           this.dismiss();
         },
@@ -106,7 +109,7 @@ export default class InputModal extends Abstract<AbstractProps, State> {
   };
 
   refreshKeyboard() {
-    if (ApplicationState.isIOS) {
+    if (Platform.OS === 'ios') {
       // on Android, keyboard will update right away
       Keyboard.dismiss();
       setTimeout(() => {
@@ -149,15 +152,23 @@ export default class InputModal extends Abstract<AbstractProps, State> {
 
     return (
       <SafeAreaView
-        style={[StyleKit.styles.container, StyleKit.styles.baseBackground]}
+        style={[
+          this.context?.getThemeService().styles.container,
+          this.context?.getThemeService().styles.baseBackground,
+        ]}
       >
-        <TableSection extraStyles={[StyleKit.styles.container]}>
+        <TableSection
+          extraStyles={[this.context!.getThemeService().styles.container]}
+        >
           <SectionedTableCell textInputCell={true} first={true}>
             <TextInput
               ref={ref => {
                 this.inputRef = ref;
               }}
-              style={[StyleKit.styles.sectionedTableCellTextInput]}
+              style={[
+                this.context?.getThemeService().styles
+                  .sectionedTableCellTextInput,
+              ]}
               placeholder={this.getProp('placeholder')}
               onChangeText={this.onTextChange}
               value={this.state.text}
@@ -165,9 +176,13 @@ export default class InputModal extends Abstract<AbstractProps, State> {
               autoCorrect={false}
               autoCapitalize={'none'}
               keyboardType={this.keyboardType}
-              keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+              keyboardAppearance={this.context
+                ?.getThemeService()
+                .keyboardColorForActiveTheme()}
               autoFocus={true}
-              placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
+              placeholderTextColor={
+                this.context?.getThemeService().variables.stylekitNeutralColor
+              }
               underlineColorAndroid={'transparent'}
               onSubmitEditing={this.onTextSubmit.bind(this)}
             />
@@ -179,7 +194,10 @@ export default class InputModal extends Abstract<AbstractProps, State> {
                 ref={ref => {
                   this.confirmInputRef = ref;
                 }}
-                style={[StyleKit.styles.sectionedTableCellTextInput]}
+                style={[
+                  this.context?.getThemeService().styles
+                    .sectionedTableCellTextInput,
+                ]}
                 placeholder={this.getProp('confirmPlaceholder')}
                 onChangeText={this.onConfirmTextChange}
                 value={this.state.confirmText}
@@ -187,8 +205,12 @@ export default class InputModal extends Abstract<AbstractProps, State> {
                 autoCorrect={false}
                 autoCapitalize={'none'}
                 keyboardType={this.keyboardType}
-                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
-                placeholderTextColor={StyleKit.variables.stylekitNeutralColor}
+                keyboardAppearance={this.context
+                  ?.getThemeService()
+                  .keyboardColorForActiveTheme()}
+                placeholderTextColor={
+                  this.context?.getThemeService().variables.stylekitNeutralColor
+                }
                 underlineColorAndroid={'transparent'}
                 onSubmitEditing={this.onConfirmSubmit.bind(this)}
               />

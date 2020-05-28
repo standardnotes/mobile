@@ -1,5 +1,4 @@
 import AuthenticationSource from '@Screens/Authentication/Sources/AuthenticationSource';
-import Auth from '@Lib/snjs/authManager';
 import { KeyboardTypeOptions } from 'react-native';
 
 export default class AuthenticationSourceAccountPassword extends AuthenticationSource {

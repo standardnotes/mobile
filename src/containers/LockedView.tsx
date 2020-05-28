@@ -6,8 +6,8 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import StyleKit from '@Style/StyleKit';
 import { isArray } from 'lodash';
+import { ApplicationContext } from 'App';
 
 type Props = {
   style?: ViewStyle[];
@@ -15,6 +15,8 @@ type Props = {
 };
 
 export default class LockedView extends Component<Props> {
+  static contextType = ApplicationContext;
+  declare context: React.ContextType<typeof ApplicationContext>;
   styles?: {
     unlockButton: ViewStyle;
     unlockButtonText: TextStyle;
@@ -25,10 +27,13 @@ export default class LockedView extends Component<Props> {
   }
 
   render() {
-    const color = StyleKit.variables.stylekitInfoColor;
+    const color = this.context!.getThemeService().variables.stylekitInfoColor;
     let styles = [
-      StyleKit.styles.centeredContainer,
-      { backgroundColor: StyleKit.variables.stylekitBackgroundColor },
+      this.context!.getThemeService().styles.centeredContainer,
+      {
+        backgroundColor: this.context!.getThemeService().variables
+          .stylekitBackgroundColor,
+      },
     ];
     if (this.props.style) {
       if (isArray(this.props.style)) {
@@ -68,11 +73,13 @@ export default class LockedView extends Component<Props> {
         paddingLeft: 20,
         paddingRight: 20,
         borderRadius: 3,
-        backgroundColor: StyleKit.variables.stylekitInfoColor,
+        backgroundColor: this.context!.getThemeService().variables
+          .stylekitInfoColor,
       },
 
       unlockButtonText: {
-        color: StyleKit.variables.stylekitInfoContrastColor,
+        color: this.context!.getThemeService().variables
+          .stylekitInfoContrastColor,
         textAlign: 'center',
         fontWeight: 'bold',
       },

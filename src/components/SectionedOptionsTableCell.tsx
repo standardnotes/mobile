@@ -7,7 +7,6 @@ import {
   TextStyle,
 } from 'react-native';
 import ThemedComponent from '@Components/ThemedComponent';
-import StyleKit from '@Style/StyleKit';
 
 type Option = { selected: boolean; key: string; title: string };
 
@@ -24,9 +23,11 @@ type Props = {
 export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
   styles!: Record<string, ViewStyle | TextStyle>;
   rules() {
-    let rules = [StyleKit.styles.sectionedTableCell];
+    let rules = [this.context!.getThemeService().styles.sectionedTableCell];
     if (this.props.first) {
-      rules.push(StyleKit.styles.sectionedTableCellFirst);
+      rules.push(
+        this.context!.getThemeService().styles.sectionedTableCellFirst
+      );
     }
     if (this.props.height) {
       rules.push({ height: this.props.height });
@@ -54,7 +55,8 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
         <Text
           testID={`${this.props.testID}-title`}
           style={[
-            StyleKit.styles.sectionedAccessoryTableCellLabel,
+            this.context!.getThemeService().styles
+              .sectionedAccessoryTableCellLabel,
             this.styles.titleStyles,
           ]}
         >
@@ -69,10 +71,12 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
             return (
               <TouchableHighlight
                 testID={`${this.props.testID}-option-${option.key}`}
-                underlayColor={StyleKit.variables.stylekitBorderColor}
+                underlayColor={
+                  this.context!.getThemeService().variables.stylekitBorderColor
+                }
                 key={option.title}
                 style={[
-                  StyleKit.styles.view,
+                  this.context!.getThemeService().styles.view,
                   this.styles.buttonContainerStyles,
                 ]}
                 onPress={() => {
@@ -101,11 +105,13 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: StyleKit.variables.stylekitBackgroundColor,
+        backgroundColor: this.context!.getThemeService().variables
+          .stylekitBackgroundColor,
       },
 
       buttonContainerStyles: {
-        borderLeftColor: StyleKit.variables.stylekitBorderColor,
+        borderLeftColor: this.context!.getThemeService().variables
+          .stylekitBorderColor,
         borderLeftWidth: 1,
         height: '100%',
         flexGrow: 1,
@@ -114,14 +120,14 @@ export default class SectionedOptionsTableCell extends ThemedComponent<Props> {
       },
 
       buttonStyles: {
-        color: StyleKit.variables.stylekitNeutralColor,
+        color: this.context!.getThemeService().variables.stylekitNeutralColor,
         fontSize: 16,
         textAlign: 'center',
         width: '100%',
       },
 
       selectedButtonStyles: {
-        color: StyleKit.variables.stylekitInfoColor,
+        color: this.context!.getThemeService().variables.stylekitInfoColor,
       },
     };
   }

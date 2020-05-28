@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import HeaderButtons, {
   HeaderButton,
   HeaderButtonProps,
@@ -7,20 +7,23 @@ import _ from 'lodash';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HeaderTitleView from '@Components/HeaderTitleView';
 import ThemedComponent from '@Components/ThemedComponent';
-import ApplicationState, { AppStateType } from '@Lib/ApplicationState';
-import StyleKit from '@Style/StyleKit';
+import { ApplicationContext } from 'App';
+import { AppStateType } from '@Lib/ApplicationState';
 
-const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => (
+const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
   // and it is important to pass those props to `HeaderButton`
   // then you may add some information like icon size or color (if you use icons)
-  <HeaderButton
-    {...passMeFurther}
-    IconComponent={Icon}
-    iconSize={30}
-    color={StyleKit.variables.stylekitInfoColor}
-  />
-);
+  const application = useContext(ApplicationContext);
+  return (
+    <HeaderButton
+      {...passMeFurther}
+      IconComponent={Icon}
+      iconSize={30}
+      color={application?.getThemeService().variables.stylekitInfoColor}
+    />
+  );
+};
 
 export type AbstractProps = {
   navigation: any;
@@ -63,12 +66,13 @@ export default class Abstract<
           subtitleColor={navigation.getParam('subtitleColor')}
         />
       ),
+      // TODO: fix colors for navigation in static method or move to new navigation
       headerStyle: {
-        backgroundColor: StyleKit.variables.stylekitContrastBackgroundColor,
-        borderBottomColor: StyleKit.variables.stylekitContrastBorderColor,
+        backgroundColor: '#F6F6F6', // stylekitContrastBackgroundColor
+        borderBottomColor: '#e3e3e3', // stylekitContrastBorderColor
         borderBottomWidth: 1,
       },
-      headerTintColor: StyleKit.variables.stylekitInfoColor,
+      headerTintColor: '#086DD6', // stylekitInfoColor
     };
 
     let headerLeft, headerRight;
@@ -122,10 +126,7 @@ export default class Abstract<
     });
   };
   listeners: any[];
-  _stateObserver: {
-    key: () => number;
-    callback: (state: AppStateType) => void;
-  };
+  removeStateObserver: () => void;
   willUnmount: boolean = false;
   mounted: boolean = false;
   loadedInitialState: boolean = false;
@@ -154,19 +155,21 @@ export default class Abstract<
       }),
     ];
 
-    this._stateObserver = ApplicationState.get().addStateObserver(state => {
-      if (!this.isMounted()) {
-        return;
-      }
+    this.removeStateObserver = this.context!.getAppState().addStateChangeObserver(
+      state => {
+        if (!this.isMounted()) {
+          return;
+        }
 
-      if (state === ApplicationState.Unlocking) {
-        this.unlockContent();
-      }
+        if (state === AppStateType.Unlocking) {
+          this.unlockContent();
+        }
 
-      if (state === ApplicationState.Locking) {
-        this.lockContent();
+        if (state === AppStateType.Locking) {
+          this.lockContent();
+        }
       }
-    });
+    );
   }
 
   shouldComponentUpdate(nextProps: TProps, nextState: TState) {
@@ -182,7 +185,7 @@ export default class Abstract<
       // Navigator doesnt really use activeTheme. We pass it here just as a way to trigger
       // navigationOptions to reload.
       this.props.navigation.setParams({
-        activeTheme: StyleKit.get().activeTheme,
+        activeTheme: this.context?.getThemeService().activeTheme,
       });
     } catch {}
   }
@@ -194,7 +197,7 @@ export default class Abstract<
     for (const listener of this.listeners) {
       listener.remove();
     }
-    ApplicationState.get().removeStateObserver(this._stateObserver);
+    this.removeStateObserver();
     this.componentDidBlur(); // This is not called automatically when the component unmounts. https://github.com/react-navigation/react-navigation/issues/4003
   }
 
@@ -202,7 +205,7 @@ export default class Abstract<
     this.mounted = true;
     this.configureNavBar(true);
 
-    if (ApplicationState.get().isUnlocked() && !this.loadedInitialState) {
+    if (this.context?.isLocked() && !this.loadedInitialState) {
       this.loadInitialState();
     }
 
@@ -223,7 +226,7 @@ export default class Abstract<
   componentWillFocus() {
     this.willBeVisible = true;
 
-    if (ApplicationState.get().isUnlocked() && this.state.lockContent) {
+    if (this.context?.isLocked() && this.state.lockContent) {
       this.unlockContent();
     }
   }
@@ -277,7 +280,7 @@ export default class Abstract<
 
   constructState(state: { title?: any; noteLocked?: boolean; text?: any }) {
     this.state = _.merge(
-      { lockContent: ApplicationState.get().isLocked() },
+      { lockContent: this.context?.isLocked() },
       state
     ) as TState;
   }
@@ -328,35 +331,6 @@ export default class Abstract<
       the `null` parameter is actually very important: https://reactnavigation.org/docs/en/navigation-prop.html#goback-close-the-active-screen-and-move-back
     */
     this.props.navigation.goBack(null);
-  }
-
-  async handlePrivilegedAction(
-    isProtected: boolean,
-    action: any,
-    run: {
-      (): void;
-    },
-    onCancel?: { (): void; (): any }
-  ) {
-    if (isProtected) {
-      const actionRequiresPrivs = await PrivilegesManager.get().actionRequiresPrivilege(
-        action
-      );
-      if (actionRequiresPrivs) {
-        PrivilegesManager.get().presentPrivilegesModal(
-          action,
-          this.props.navigation,
-          () => {
-            run();
-          },
-          onCancel
-        );
-      } else {
-        run();
-      }
-    } else {
-      run();
-    }
   }
 
   static IsShallowEqual = (

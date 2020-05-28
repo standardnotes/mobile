@@ -9,9 +9,6 @@ import ModelManager from '@Lib/snjs/modelManager';
 import Sync from '@Lib/snjs/syncManager';
 import SideMenuCell from '@Screens/SideMenu/SideMenuCell';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
-import StyleKit from '@Style/StyleKit';
-
-import { SFAuthManager } from 'snjs';
 
 type Props = {
   contentType: string;
@@ -221,7 +218,8 @@ class TagSelectionList extends ThemedComponent<Props, State> {
         paddingBottom: this.props.hasBottomPadding ? 30 : 0,
       },
       emptyPlaceholderText: {
-        color: StyleKit.variables.stylekitForegroundColor,
+        color: this.context?.getThemeService().variables
+          .stylekitForegroundColor,
         opacity: 0.6,
         paddingRight: 30,
         lineHeight: 18,
