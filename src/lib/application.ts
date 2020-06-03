@@ -17,6 +17,7 @@ import { ReviewService } from './reviewService';
 import { BackupsService } from './BackupsService';
 import { PreferencesManager } from './PreferencesManager';
 import { StyleKit } from '@Style/StyleKit';
+import { SNReactNativeCrypto } from './SNReactNativeCrypto';
 
 type MobileServices = {
   applicationState: ApplicationState;
@@ -40,7 +41,7 @@ export class MobileApplication extends SNApplication {
       platformFromString(Platform.OS),
       deviceInterface,
       namespace,
-      undefined,
+      new SNReactNativeCrypto(),
       [
         {
           swap: SNAlertService,

@@ -209,7 +209,7 @@ export default class App extends Component<{}, State> {
     // });
     this.application = applicationGroup.application;
     this.state = { ready: false };
-    // this.loadApplication();
+    this.loadApplication();
   }
 
   /**
@@ -229,7 +229,7 @@ export default class App extends Component<{}, State> {
         this.application!.promptForChallenge(challenge, orchestrator);
       },
     });
-    await this.application!.launch();
+    await this.application!.launch(false);
     this.setState({ ready: true });
   }
 
@@ -253,7 +253,7 @@ export default class App extends Component<{}, State> {
     if (!this.state.ready) {
       return null;
     }
-    // this.application?.protocolService?.crypto.
+
     return (
       <ApplicationContext.Provider value={this.application}>
         <Text>Test</Text>

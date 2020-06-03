@@ -238,13 +238,15 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
   - React-jsinspector (0.62.2)
-  - react-native-aes (1.3.8):
+  - react-native-aes (1.3.9):
     - React
   - react-native-fingerprint-scanner (4.0.0):
     - React
   - react-native-mail (4.1.0):
     - React
   - react-native-safe-area-context (1.0.0):
+    - React
+  - react-native-sodium (0.4.0):
     - React
   - react-native-webview (9.2.2):
     - React
@@ -367,6 +369,7 @@ DEPENDENCIES:
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-mail (from `../node_modules/react-native-mail`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - react-native-sodium (from `../node_modules/react-native-sodium`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -451,6 +454,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-mail"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-sodium:
+    :path: "../node_modules/react-native-sodium"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -531,10 +536,11 @@ SPEC CHECKSUMS:
   React-jsi: b6dc94a6a12ff98e8877287a0b7620d365201161
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
-  react-native-aes: 6bbed31e8767d0ce1c6af07d255475fa79920c3c
+  react-native-aes: ff31f0dd4c791eb423a631ee04570fcf3c618924
   react-native-fingerprint-scanner: f0d8190ceaf0b9e1893e3379d78724375b8f6ea7
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-safe-area-context: a346c75f2288147527365ce27b59ca6d38c27805
+  react-native-sodium: ef43e28fdf8d866e68ed06890c32f8d86a570cc7
   react-native-webview: 881baa70f381b838964574f48153a2d453402922
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
@@ -566,4 +572,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 9724e54e39a9110ec859a56db83aa58b4b0f28bd
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.9.2
