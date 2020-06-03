@@ -456,20 +456,4 @@ export class ApplicationState {
   isAuthenticationInProgress() {
     return this.authenticationInProgress;
   }
-
-  static openURL(url: string) {
-    const showAlert = () => {
-      Alert.alert('Unable to Open', `Unable to open URL ${url}.`);
-    };
-
-    Linking.canOpenURL(url)
-      .then(supported => {
-        if (!supported) {
-          showAlert();
-        } else {
-          return Linking.openURL(url);
-        }
-      })
-      .catch(() => showAlert());
-  }
 }

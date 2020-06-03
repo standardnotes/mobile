@@ -1,7 +1,6 @@
 import { DeviceInterface } from 'snjs';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Platform } from 'react-native';
-import ApplicationState from './ApplicationState';
+import { Platform, Alert, Linking } from 'react-native';
 import Keychain from './keychain';
 
 export class MobileDeviceInterface extends DeviceInterface {
@@ -40,10 +39,7 @@ export class MobileDeviceInterface extends DeviceInterface {
         try {
           const item = await AsyncStorage.getItem(key);
           if (item) {
-            results.push({
-              key,
-              value: item,
-            });
+            results.push(JSON.parse(item));
           }
         } catch (e) {
           console.log('Error getting item', key, e);
@@ -51,7 +47,12 @@ export class MobileDeviceInterface extends DeviceInterface {
       }
     } else {
       try {
-        return AsyncStorage.multiGet(keys);
+        const items = await AsyncStorage.multiGet(keys);
+        return items.map(item => {
+          if (item[1]) {
+            return JSON.parse(item[1]);
+          }
+        });
       } catch (e) {
         console.log('Error getting items', keys, e);
       }
@@ -93,10 +94,12 @@ export class MobileDeviceInterface extends DeviceInterface {
     if (payloads.length === 0) {
       return;
     }
-
     await Promise.all(
       payloads.map(item => {
-        return AsyncStorage.setItem(this.keyForPayloadId(item), item);
+        return AsyncStorage.setItem(
+          this.keyForPayloadId(item.uuid),
+          JSON.stringify(item)
+        );
       })
     );
   }
@@ -118,6 +121,18 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   openUrl(url: string) {
-    return ApplicationState.openURL(url);
+    const showAlert = () => {
+      Alert.alert('Unable to Open', `Unable to open URL ${url}.`);
+    };
+
+    Linking.canOpenURL(url)
+      .then(supported => {
+        if (!supported) {
+          showAlert();
+        } else {
+          return Linking.openURL(url);
+        }
+      })
+      .catch(() => showAlert());
   }
 }
