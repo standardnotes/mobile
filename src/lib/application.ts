@@ -40,8 +40,8 @@ export class MobileApplication extends SNApplication {
       Environment.Mobile,
       platformFromString(Platform.OS),
       deviceInterface,
-      namespace,
       new SNReactNativeCrypto(),
+      namespace,
       [
         {
           swap: SNAlertService,

@@ -1,10 +1,29 @@
+/* eslint-disable no-bitwise */
 import { SNPureCrypto } from 'snjs';
 import { Base64 } from 'js-base64';
 import { decode as decodeBase64toArrayBuffer } from 'base64-arraybuffer';
 import Sodium from 'react-native-sodium';
 import Aes from 'react-native-aes-crypto';
 
-export class SNReactNativeCrypto extends SNPureCrypto {
+export class SNReactNativeCrypto implements SNPureCrypto {
+  deinit(): void {}
+  public timingSafeEqual(a: string, b: string) {
+    const strA = String(a);
+    let strB = String(b);
+    const lenA = strA.length;
+    let result = 0;
+
+    if (lenA !== strB.length) {
+      strB = strA;
+      result = 1;
+    }
+
+    for (let i = 0; i < lenA; i++) {
+      result |= strA.charCodeAt(i) ^ strB.charCodeAt(i);
+    }
+
+    return result === 0;
+  }
   public async pbkdf2(
     password: string,
     salt: string,

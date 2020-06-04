@@ -6990,15 +6990,9 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-"sncrypto@github:standardnotes/sncrypto#6625bbcc141161eb866475d9786238001f3c514d":
-  version "1.1.2"
-  resolved "https://codeload.github.com/standardnotes/sncrypto/tar.gz/6625bbcc141161eb866475d9786238001f3c514d"
-
-snjs@standardnotes/snjs#a18da1b:
+snjs@standardnotes/snjs#6249603:
   version "1.0.5"
-  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/a18da1b197310486781fe215652ded1cfc47e524"
-  dependencies:
-    sncrypto "github:standardnotes/sncrypto#6625bbcc141161eb866475d9786238001f3c514d"
+  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/624960349a58b798190698702bf8055d3a6a2cd0"
 
 source-map-resolve@^0.5.0:
   version "0.5.3"
