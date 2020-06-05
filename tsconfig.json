@@ -23,6 +23,7 @@
         "@Lib/*": ["./lib/*"],
         "@Screens/*": ["./screens/*"],
         "@Style/*": ["./style/*"],
+        "@Root/*": ["./*"],
       },
       "types": ["jest"],
       "typeRoots": ["./src/types/*", "node_modules/@types"],
