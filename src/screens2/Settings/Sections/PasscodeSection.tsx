@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Alert, Text } from 'react-native';
-import ButtonCell from '@Root/components2/ButtonCell';
-import SectionHeader from '@Root/components2/SectionHeader';
-import SectionedOptionsTableCell from '@Root/components2/SectionedOptionsTableCell';
-import TableSection from '@Root/components2/TableSection';
+import { ButtonCell } from '@Components/ButtonCell';
+import { SectionHeader } from '@Components/SectionHeader';
+import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
+import { TableSection } from '@Components/TableSection';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager, { BiometricsType } from '@Lib/keysManager';
 import { ApplicationContext } from '@Root/ApplicationContext';

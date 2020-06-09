@@ -7,7 +7,7 @@ import {
   TextStyle,
   ViewProps,
 } from 'react-native';
-import Circle from '@Root/components2/Circle';
+import { Circle } from '@Components/Circle';
 import ThemedComponent from '@Root/components2/ThemedComponent';
 import KeysManager from '@Lib/keysManager';
 import Auth from '@Lib/snjs/authManager';

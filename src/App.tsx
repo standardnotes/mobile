@@ -1,6 +1,7 @@
 import { Client } from 'bugsnag-react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import styled, { ThemeProvider } from 'styled-components/native';
 import { Text } from 'react-native';
 // import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 // import Authenticate from '@Screens/Authentication/Authenticate';
@@ -171,6 +172,10 @@ type State = {
   ready: boolean;
 };
 
+const ThemeTest = styled.Text`
+  color: ${props => props.theme.stylekitInfoColor};
+`;
+
 export const App: React.FC<{}> = () => {
   const [ready, setReady] = useState(false);
 
@@ -188,27 +193,14 @@ export const App: React.FC<{}> = () => {
     loadApplication();
   }, [loadApplication]);
 
-  // async loadInitialData() {
-  //   await StyleKit.get().initialize();
-
-  //   const ready = () => {
-  //     KeysManager.get().markApplicationAsRan();
-  //     ApplicationState.get().receiveApplicationStartEvent();
-  //     this.setState({ ready: true });
-  //   };
-
-  //   if (await KeysManager.get().needsWipe()) {
-  //     KeysManager.get().wipeData().then(ready).catch(ready);
-  //   } else {
-  //     ready();
-  //   }
-  // }
   if (!ready) {
     return null;
   }
   return (
     <NavigationContainer>
-      <Text>ssssss</Text>
+      <ThemeProvider theme={CurrentApplication!.getThemeService().theme}>
+        <ThemeTest>ssssss</ThemeTest>
+      </ThemeProvider>
     </NavigationContainer>
   );
 };

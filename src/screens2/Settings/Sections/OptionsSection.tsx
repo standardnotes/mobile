@@ -1,11 +1,11 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
-import ButtonCell from '@Root/components2/ButtonCell';
-import SectionHeader from '@Root/components2/SectionHeader';
+import { ButtonCell } from '@Components/ButtonCell';
+import { SectionHeader } from '@Components/SectionHeader';
 import SectionedAccessoryTableCell from '@Root/components2/SectionedAccessoryTableCell';
-import SectionedOptionsTableCell from '@Root/components2/SectionedOptionsTableCell';
-import TableSection from '@Root/components2/TableSection';
+import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
+import { TableSection } from '@Components/TableSection';
 import moment from '@Lib/moment';
 import UserPrefsManager, { LAST_EXPORT_DATE_KEY } from '@Lib/userPrefsManager';
 import Abstract, {

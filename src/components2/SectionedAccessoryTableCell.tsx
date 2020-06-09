@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableHighlight, Platform } from 'react-native';
-import SectionedTableCell from '@Root/components2/SectionedTableCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 

@@ -7,10 +7,10 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import ButtonCell from '@Root/components2/ButtonCell';
-import SectionedTableCell from '@Root/components2/SectionedTableCell';
-import SectionedOptionsTableCell from '@Root/components2/SectionedOptionsTableCell';
-import TableSection from '@Root/components2/TableSection';
+import { ButtonCell } from '@Components/ButtonCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
+import { TableSection } from '@Components/TableSection';
 import LockedView from '@Containers/LockedView';
 import Abstract, {
   AbstractState,

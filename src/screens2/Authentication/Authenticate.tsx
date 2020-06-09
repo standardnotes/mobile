@@ -9,10 +9,10 @@ import {
   Platform,
 } from 'react-native';
 import _ from 'lodash';
-import ButtonCell from '@Root/components2/ButtonCell';
-import SectionHeader from '@Root/components2/SectionHeader';
+import { ButtonCell } from '@Components/ButtonCell';
+import { SectionHeader } from '@Components/SectionHeader';
 import SectionedAccessoryTableCell from '@Root/components2/SectionedAccessoryTableCell';
-import SectionedTableCell from '@Root/components2/SectionedTableCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { AppStateType } from '@Lib/ApplicationState';
 import Abstract, {
   AbstractProps,

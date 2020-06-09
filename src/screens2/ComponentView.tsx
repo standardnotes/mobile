@@ -268,7 +268,6 @@ export default class ComponentView extends Component<Props> {
             scalesPageToFit={
               true /* Android only, not available with WKWebView */
             }
-            // @ts-ignore this is patched
             autoManageStatusBarEnabled={
               false /* To prevent StatusBar from changing colors when focusing */
             }

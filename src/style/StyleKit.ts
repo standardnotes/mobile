@@ -28,6 +28,7 @@ import THEME_RED_JSON from './Themes/red.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 import { UuidString } from 'snjs/dist/@types/types';
 import { MobileApplication } from '@Lib/application';
+import { StyleKitTheme } from './Themes/styled-components';
 
 type ThemeChangeObserver = () => Promise<void> | void;
 
@@ -37,7 +38,7 @@ export interface ThemeContent {
   name: string;
   luminosity?: number;
   isSwapIn?: boolean;
-  variables: Record<string, string>;
+  variables: StyleKitTheme;
   package_info: SNComponent['package_info'];
 }
 
@@ -59,6 +60,7 @@ export class StyleKit extends ApplicationService {
     paddingLeft: 14,
   };
   styles: Record<string, ViewStyle | TextStyle> = {};
+  theme?: StyleKitTheme;
 
   get mobileApplication() {
     return this.application as MobileApplication;
@@ -126,7 +128,10 @@ export class StyleKit extends ApplicationService {
     ];
 
     for (const option of themeData) {
-      const variables = option.variables;
+      const variables: StyleKitTheme = {
+        ...option.variables,
+        ...StyleKit.constants,
+      };
       variables.statusBar =
         Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
 
@@ -369,7 +374,10 @@ export class StyleKit extends ApplicationService {
       updatedVariables
     );
     let data = this.findOrCreateDataForTheme(theme.uuid);
-    data.variables = appliedVariables;
+    data.variables = {
+      ...appliedVariables,
+      ...StyleKit.constants,
+    };
 
     if (theme.uuid === this.activeTheme) {
       this.setActiveTheme(theme.uuid);
@@ -379,6 +387,8 @@ export class StyleKit extends ApplicationService {
   reloadStyles() {
     const { variables } = this.findOrCreateDataForTheme(this.activeTheme!);
     const { mainTextFontSize, paddingLeft } = StyleKit.constants;
+
+    this.theme = variables;
 
     this.styles = {
       baseBackground: {
@@ -573,16 +583,6 @@ export class StyleKit extends ApplicationService {
     }
 
     return true;
-  }
-
-  variable(name: string) {
-    const { variables } = this.findOrCreateDataForTheme(this.activeTheme!);
-    return variables[name];
-  }
-
-  get variables() {
-    const { variables } = this.findOrCreateDataForTheme(this.activeTheme!);
-    return variables;
   }
 
   stylesForKey(key: string) {

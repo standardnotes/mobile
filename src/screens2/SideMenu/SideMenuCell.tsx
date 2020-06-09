@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
-import Circle from '@Root/components2/Circle';
+import { Circle } from '@Components/Circle';
 import ThemedComponent from '@Root/components2/ThemedComponent';
 import { SideMenuOption } from './SideMenuSection';
 import { Platform } from 'snjs';

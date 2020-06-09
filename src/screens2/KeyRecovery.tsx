@@ -1,9 +1,9 @@
 import React from 'react';
 import { TextInput, Text, Platform } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import ButtonCell from '@Root/components2/ButtonCell';
-import SectionedTableCell from '@Root/components2/SectionedTableCell';
-import TableSection from '@Root/components2/TableSection';
+import { ButtonCell } from '@Components/ButtonCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { TableSection } from '@Components/TableSection';
 import Abstract, {
   AbstractProps,
   AbstractState,

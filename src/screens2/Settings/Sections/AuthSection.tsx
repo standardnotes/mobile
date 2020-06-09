@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import { TextInput, View, Text, Keyboard, Alert } from 'react-native';
-import ButtonCell from '@Root/components2/ButtonCell';
+import { ButtonCell } from '@Components/ButtonCell';
 import SectionedAccessoryTableCell from '@Root/components2/SectionedAccessoryTableCell';
-import SectionHeader from '@Root/components2/SectionHeader';
-import TableSection from '@Root/components2/TableSection';
-import SectionedTableCell from '@Root/components2/SectionedTableCell';
+import { SectionHeader } from '@Components/SectionHeader';
+import { TableSection } from '@Components/TableSection';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { ApplicationContext } from '@Root/ApplicationContext';
 
 const DEFAULT_SIGN_IN_TEXT = 'Sign In';

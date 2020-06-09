@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Text, View } from 'react-native';
-import SectionHeader from '@Root/components2/SectionHeader';
-import SectionedTableCell from '@Root/components2/SectionedTableCell';
-import TableSection from '@Root/components2/TableSection';
+import { SectionHeader } from '@Components/SectionHeader';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { TableSection } from '@Components/TableSection';
 import { ApplicationContext } from '@Root/ApplicationContext';
 
 type Props = {

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, Platform, Share } from 'react-native';
-import ButtonCell from '@Root/components2/ButtonCell';
-import SectionHeader from '@Root/components2/SectionHeader';
-import TableSection from '@Root/components2/TableSection';
+import { ButtonCell } from '@Components/ButtonCell';
+import { SectionHeader } from '@Components/SectionHeader';
+import { TableSection } from '@Components/TableSection';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ApplicationState } from '@Lib/ApplicationState';
 

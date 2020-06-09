@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import ButtonCell from '@Root/components2/ButtonCell';
-import SectionHeader from '@Root/components2/SectionHeader';
+import { ButtonCell } from '@Components/ButtonCell';
+import { SectionHeader } from '@Components/SectionHeader';
 import SectionedAccessoryTableCell from '@Root/components2/SectionedAccessoryTableCell';
-import SectionedTableCell from '@Root/components2/SectionedTableCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
 import LockedView from '@Containers/LockedView';
 import Abstract, {
   AbstractState,
