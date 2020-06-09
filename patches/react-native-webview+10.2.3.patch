@@ -1,7 +1,7 @@
-diff --git a/node_modules/react-native-webview/ios/RNCWebView.h b/node_modules/react-native-webview/ios/RNCWebView.h
-index 4e94bed..b4349a9 100644
---- a/node_modules/react-native-webview/ios/RNCWebView.h
-+++ b/node_modules/react-native-webview/ios/RNCWebView.h
+diff --git a/node_modules/react-native-webview/apple/RNCWebView.h b/node_modules/react-native-webview/apple/RNCWebView.h
+index c55950f..6c0356c 100644
+--- a/node_modules/react-native-webview/apple/RNCWebView.h
++++ b/node_modules/react-native-webview/apple/RNCWebView.h
 @@ -35,6 +35,7 @@
  @property (nonatomic, assign) BOOL injectedJavaScriptBeforeContentLoadedForMainFrameOnly;
  @property (nonatomic, assign) BOOL scrollEnabled;
@@ -10,11 +10,11 @@ index 4e94bed..b4349a9 100644
  @property (nonatomic, assign) BOOL pagingEnabled;
  @property (nonatomic, assign) CGFloat decelerationRate;
  @property (nonatomic, assign) BOOL allowsInlineMediaPlayback;
-diff --git a/node_modules/react-native-webview/ios/RNCWebView.m b/node_modules/react-native-webview/ios/RNCWebView.m
-index 11385cf..1bfff4d 100644
---- a/node_modules/react-native-webview/ios/RNCWebView.m
-+++ b/node_modules/react-native-webview/ios/RNCWebView.m
-@@ -123,6 +123,7 @@ - (instancetype)initWithFrame:(CGRect)frame
+diff --git a/node_modules/react-native-webview/apple/RNCWebView.m b/node_modules/react-native-webview/apple/RNCWebView.m
+index 02b4238..a1f0177 100644
+--- a/node_modules/react-native-webview/apple/RNCWebView.m
++++ b/node_modules/react-native-webview/apple/RNCWebView.m
+@@ -125,6 +125,7 @@ - (instancetype)initWithFrame:(CGRect)frame
      _showsVerticalScrollIndicator = YES;
      _directionalLockEnabled = YES;
      _automaticallyAdjustContentInsets = YES;
@@ -22,7 +22,7 @@ index 11385cf..1bfff4d 100644
      _contentInset = UIEdgeInsetsZero;
      _savedKeyboardDisplayRequiresUserAction = YES;
      #if !TARGET_OS_OSX
-@@ -314,6 +315,9 @@ - (void)removeFromSuperview
+@@ -324,6 +325,9 @@ - (void)removeFromSuperview
  -(void)showFullScreenVideoStatusBars
  {
  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -32,21 +32,11 @@ index 11385cf..1bfff4d 100644
      _isFullScreenVideoOpen = YES;
      RCTUnsafeExecuteOnMainQueueSync(^{
        [RCTSharedApplication() setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
-@@ -324,6 +328,9 @@ -(void)showFullScreenVideoStatusBars
- -(void)hideFullScreenVideoStatusBars
- {
- #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-+    if (!_autoManageStatusBarEnabled) {
-+      return;
-+    }
-     _isFullScreenVideoOpen = NO;
-     RCTUnsafeExecuteOnMainQueueSync(^{
-       [RCTSharedApplication() setStatusBarHidden:self->_savedStatusBarHidden animated:YES];
-diff --git a/node_modules/react-native-webview/ios/RNCWebViewManager.m b/node_modules/react-native-webview/ios/RNCWebViewManager.m
-index b69cfbd..02ae2f4 100644
---- a/node_modules/react-native-webview/ios/RNCWebViewManager.m
-+++ b/node_modules/react-native-webview/ios/RNCWebViewManager.m
-@@ -54,6 +54,7 @@ - (RCTUIView *)view
+diff --git a/node_modules/react-native-webview/apple/RNCWebViewManager.m b/node_modules/react-native-webview/apple/RNCWebViewManager.m
+index 23ab93b..ea17ae2 100644
+--- a/node_modules/react-native-webview/apple/RNCWebViewManager.m
++++ b/node_modules/react-native-webview/apple/RNCWebViewManager.m
+@@ -56,6 +56,7 @@ - (RCTUIView *)view
  #endif
  RCT_EXPORT_VIEW_PROPERTY(contentInset, UIEdgeInsets)
  RCT_EXPORT_VIEW_PROPERTY(automaticallyAdjustContentInsets, BOOL)
@@ -55,10 +45,10 @@ index b69cfbd..02ae2f4 100644
  RCT_EXPORT_VIEW_PROPERTY(allowsBackForwardNavigationGestures, BOOL)
  RCT_EXPORT_VIEW_PROPERTY(incognito, BOOL)
 diff --git a/node_modules/react-native-webview/lib/WebViewTypes.d.ts b/node_modules/react-native-webview/lib/WebViewTypes.d.ts
-index cf5c838..062f628 100644
+index b532b76..d2427b6 100644
 --- a/node_modules/react-native-webview/lib/WebViewTypes.d.ts
 +++ b/node_modules/react-native-webview/lib/WebViewTypes.d.ts
-@@ -202,6 +202,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
+@@ -207,6 +207,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
      allowsInlineMediaPlayback?: boolean;
      allowsLinkPreview?: boolean;
      automaticallyAdjustContentInsets?: boolean;
@@ -66,10 +56,10 @@ index cf5c838..062f628 100644
      bounces?: boolean;
      contentInset?: ContentInsetProp;
      contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
-@@ -493,6 +494,12 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
-      * @platform macos
+@@ -329,6 +330,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
+      * @platform ios
       */
-     sharedCookiesEnabled?: boolean;
+     allowsInlineMediaPlayback?: boolean;
 +    /**
 +     * Set true if StatusBar should be light when user watch video fullscreen.
 +     * The default value is `true`.
@@ -77,5 +67,5 @@ index cf5c838..062f628 100644
 +     */
 +    autoManageStatusBarEnabled?: boolean;
      /**
-      * A Boolean value that determines whether scrolling is disabled in a particular direction.
-      * The default value is `true`.
+      * Hide the accessory view when the keyboard is open. Default is false to be
+      * backward compatible.

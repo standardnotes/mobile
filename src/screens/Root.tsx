@@ -112,45 +112,45 @@ export default class Root extends Abstract<AbstractProps, State> {
     //     }
     //   }
     // );
-    this.context?.getSyncStatus();
-    this.syncStatusObserver = Sync.get().registerSyncStatusObserver(
-      (status: { error: any; retrievedCount: number }) => {
-        if (status.error) {
-          const text = 'Unable to connect to sync server.';
-          this.showingErrorStatus = true;
-          setTimeout(() => {
-            // need timeout for syncing on app launch
-            this.setSubTitle(
-              text,
-              this.context?.getThemeService().variables.stylekitWarningColor
-            );
-          }, 250);
-        } else if (status.retrievedCount > 20) {
-          const text = `Downloading ${status.retrievedCount} items. Keep app open.`;
-          this.setSubTitle(text);
-          this.showingDownloadStatus = true;
-        } else if (this.showingDownloadStatus) {
-          this.showingDownloadStatus = false;
-          const text = 'Download Complete.';
-          this.setSubTitle(text);
-          setTimeout(() => {
-            this.setSubTitle(null);
-          }, 2000);
-        } else if (this.showingErrorStatus) {
-          this.setSubTitle(null);
-        }
-      }
-    );
+    // this.context?.getSyncStatus();
+    // this.syncStatusObserver = Sync.get().registerSyncStatusObserver(
+    //   (status: { error: any; retrievedCount: number }) => {
+    //     if (status.error) {
+    //       const text = 'Unable to connect to sync server.';
+    //       this.showingErrorStatus = true;
+    //       setTimeout(() => {
+    //         // need timeout for syncing on app launch
+    //         this.setSubTitle(
+    //           text,
+    //           this.context?.getThemeService().variables.stylekitWarningColor
+    //         );
+    //       }, 250);
+    //     } else if (status.retrievedCount > 20) {
+    //       const text = `Downloading ${status.retrievedCount} items. Keep app open.`;
+    //       this.setSubTitle(text);
+    //       this.showingDownloadStatus = true;
+    //     } else if (this.showingDownloadStatus) {
+    //       this.showingDownloadStatus = false;
+    //       const text = 'Download Complete.';
+    //       this.setSubTitle(text);
+    //       setTimeout(() => {
+    //         this.setSubTitle(null);
+    //       }, 2000);
+    //     } else if (this.showingErrorStatus) {
+    //       this.setSubTitle(null);
+    //     }
+    //   }
+    // );
 
-    this.signoutObserver = Auth.get().addEventHandler(async (event: any) => {
-      if (event === SFAuthManager.DidSignOutEvent) {
-        this.setSubTitle(null);
-        const notifyObservers = false;
-        ApplicationState.getOptions().reset(notifyObservers);
-        this.reloadOptionsToDefault();
-        ApplicationState.getOptions().notifyObservers();
-      }
-    });
+    // this.signoutObserver = Auth.get().addEventHandler(async (event: any) => {
+    //   if (event === SFAuthManager.DidSignOutEvent) {
+    //     this.setSubTitle(null);
+    //     const notifyObservers = false;
+    //     ApplicationState.getOptions().reset(notifyObservers);
+    //     this.reloadOptionsToDefault();
+    //     ApplicationState.getOptions().notifyObservers();
+    //   }
+    // });
 
     this.reloadOptionsToDefault();
   }

@@ -1,9 +1,9 @@
 PODS:
   - boost-for-react-native (1.63.0)
-  - BugsnagReactNative (2.23.7):
-    - BugsnagReactNative/Core (= 2.23.7)
+  - BugsnagReactNative (2.23.9):
+    - BugsnagReactNative/Core (= 2.23.9)
     - React
-  - BugsnagReactNative/Core (2.23.7):
+  - BugsnagReactNative/Core (2.23.9):
     - React
   - CocoaAsyncSocket (7.6.4)
   - CocoaLibEvent (1.0.0)
@@ -244,11 +244,11 @@ PODS:
     - React
   - react-native-mail (4.1.0):
     - React
-  - react-native-safe-area-context (1.0.0):
+  - react-native-safe-area-context (3.0.2):
     - React
   - react-native-sodium (0.4.0):
     - React
-  - react-native-webview (9.2.2):
+  - react-native-webview (10.2.3):
     - React
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
@@ -311,23 +311,21 @@ PODS:
     - ReactCommon/callinvoker (= 0.62.2)
   - ReactNativeAlternateIcons (0.3.0):
     - React
-  - ReactNativeDarkMode (0.2.2):
-    - React
-  - RNCAsyncStorage (1.10.1):
+  - RNCAsyncStorage (1.11.0):
     - React
   - RNCMaskedView (0.1.10):
     - React
-  - RNFileViewer (2.0.2):
+  - RNFileViewer (2.1.1):
     - React
   - RNFS (2.16.6):
     - React
   - RNGestureHandler (1.6.1):
     - React
-  - RNKeychain (6.0.0):
+  - RNKeychain (6.1.0):
     - React
-  - RNReanimated (1.8.0):
+  - RNReanimated (1.9.0):
     - React
-  - RNScreens (2.7.0):
+  - RNScreens (2.8.0):
     - React
   - RNStoreReview (0.1.5):
     - React
@@ -383,7 +381,6 @@ DEPENDENCIES:
   - ReactCommon/callinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - ReactNativeAlternateIcons (from `../node_modules/react-native-alternate-icons`)
-  - ReactNativeDarkMode (from `../node_modules/react-native-dark-mode`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
@@ -480,8 +477,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   ReactNativeAlternateIcons:
     :path: "../node_modules/react-native-alternate-icons"
-  ReactNativeDarkMode:
-    :path: "../node_modules/react-native-dark-mode"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
   RNCMaskedView:
@@ -511,7 +506,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BugsnagReactNative: 14c1b59cfbf34fd5591b734bfec65a277b677ef8
+  BugsnagReactNative: 10fc11d9a29800052b3747eb45e7c903b3b057d5
   CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
@@ -539,9 +534,9 @@ SPEC CHECKSUMS:
   react-native-aes: ff31f0dd4c791eb423a631ee04570fcf3c618924
   react-native-fingerprint-scanner: f0d8190ceaf0b9e1893e3379d78724375b8f6ea7
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-safe-area-context: a346c75f2288147527365ce27b59ca6d38c27805
+  react-native-safe-area-context: b11a34881faac509cad5578726c98161ad4d275c
   react-native-sodium: ef43e28fdf8d866e68ed06890c32f8d86a570cc7
-  react-native-webview: 881baa70f381b838964574f48153a2d453402922
+  react-native-webview: 0bacc79175bc44869e4c1a015b9bc21df8cf4feb
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
@@ -553,15 +548,14 @@ SPEC CHECKSUMS:
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
   ReactNativeAlternateIcons: b2a8a729d9d9756ed0652c352694f190407f297f
-  ReactNativeDarkMode: 0178ffca3b10f6a7c9f49d6f9810232b328fa949
-  RNCAsyncStorage: 39831e0dc5f547a1fb2669eb9e091d460a9be2be
+  RNCAsyncStorage: d059c3ee71738c39834a627476322a5a8cd5bf36
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
-  RNFileViewer: b815b353fdc08552766c6325e5b66ff52bb6b7af
+  RNFileViewer: db62d60dd19007c54b2c959b5e675a46d59f8a43
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
-  RNKeychain: bf2d7e9a0ae7a073c07770dd2aa6d11c67581733
-  RNReanimated: 955cf4068714003d2f1a6e2bae3fb1118f359aff
-  RNScreens: cf198f915f8a2bf163de94ca9f5bfc8d326c3706
+  RNKeychain: 7cab1c45629f265ebccd8d737cd4cb5b23a865df
+  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
+  RNScreens: 62211832af51e0aebcf6e8c36bcf7dd65592f244
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   sn-textview: f478ee79531da2c7b129c4ea3b20c665e75e1f4b

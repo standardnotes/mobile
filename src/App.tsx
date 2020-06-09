@@ -1,9 +1,8 @@
 import { Client } from 'bugsnag-react-native';
-import React, { Component, useState, useEffect, useCallback } from 'react';
-// import { Animated } from 'react-native';
-import { createAppContainer, NavigationActions } from 'react-navigation';
+import React, { useState, useEffect, useCallback } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { Text } from 'react-native';
 // import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
-import { createStackNavigator } from 'react-navigation-stack';
 // import Authenticate from '@Screens/Authentication/Authenticate';
 // import Compose from '@Screens/Compose';
 // import {
@@ -21,13 +20,13 @@ import { createStackNavigator } from 'react-navigation-stack';
 // import MainSideMenu from '@Screens/SideMenu/MainSideMenu';
 // import ManagePrivileges from '@Screens/ManagePrivileges';
 // import NoteSideMenu from '@Screens/SideMenu/NoteSideMenu';
-import Root from '@Screens/Root';
+// import Root from '@Screens/Root';
 // import Settings from '@Screens/Settings/Settings';
 // import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
-import { MobileApplication } from '@Lib/application';
+// import { MobileApplication } from '@Lib/application';
 import { CurrentApplication } from './ApplicationContext';
-import { ApplicationGroup } from '@Lib/applicationGroup';
-import ThemedComponent from '@Components/ThemedComponent';
+// import { ApplicationGroup } from '@Lib/applicationGroup';
+// import ThemedComponent from '@Components/ThemedComponent';
 // import Notes from '@Screens/Notes/Notes';
 
 if (__DEV__ === false) {
@@ -102,9 +101,9 @@ if (__DEV__ === false) {
 //   screen: ManagePrivileges,
 // });
 
-const KeyRecoveryStack = createStackNavigator({
-  screen: Root,
-});
+// const KeyRecoveryStack = createStackNavigator({
+//   screen: Root,
+// });
 
 // const AppDrawer = createStackNavigator(
 //   {
@@ -168,8 +167,6 @@ const KeyRecoveryStack = createStackNavigator({
 //   }
 // );
 
-const AppContainer = createAppContainer(KeyRecoveryStack);
-
 type State = {
   ready: boolean;
 };
@@ -209,5 +206,9 @@ export const App: React.FC<{}> = () => {
   if (!ready) {
     return null;
   }
-  return <AppContainer />;
+  return (
+    <NavigationContainer>
+      <Text>ssssss</Text>
+    </NavigationContainer>
+  );
 };
