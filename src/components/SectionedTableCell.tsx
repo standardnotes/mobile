@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
-import { ApplicationContext } from 'App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 
 export type Props = {
   first?: boolean;
@@ -15,7 +15,7 @@ export default class SectionedTableCell<AdditionalProps = {}> extends Component<
   Props & AdditionalProps
 > {
   static contextType = ApplicationContext;
-  declare context: React.ContextType<typeof ApplicationContext>;
+  context!: React.ContextType<typeof ApplicationContext>;
   rules() {
     let rules = [this.context?.getThemeService().styles.sectionedTableCell];
     if (this.props.first) {

@@ -6,7 +6,7 @@ import SectionedOptionsTableCell from '@Components/SectionedOptionsTableCell';
 import TableSection from '@Components/TableSection';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager, { BiometricsType } from '@Lib/keysManager';
-import { ApplicationContext } from 'App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 
 type Props = {
   hasBiometrics: boolean;
@@ -30,7 +30,7 @@ type State = {
 
 export default class PasscodeSection extends Component<Props, State> {
   static contextType = ApplicationContext;
-  declare context: React.ContextType<typeof ApplicationContext>;
+  context!: React.ContextType<typeof ApplicationContext>;
   constructor(props: Readonly<Props>) {
     super(props);
     let state: State = { biometricsAvailable: false || __DEV__ };

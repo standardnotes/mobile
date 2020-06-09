@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import SectionHeader from '@Components/SectionHeader';
 import SectionedTableCell from '@Components/SectionedTableCell';
 import TableSection from '@Components/TableSection';
-import { ApplicationContext } from 'App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 
 type Props = {
   title: string;
@@ -15,7 +15,7 @@ type State = {
 
 export default class PasscodeSection extends Component<Props, State> {
   static contextType = ApplicationContext;
-  declare context: React.ContextType<typeof ApplicationContext>;
+  context!: React.ContextType<typeof ApplicationContext>;
   constructor(props: Readonly<Props>) {
     super(props);
 

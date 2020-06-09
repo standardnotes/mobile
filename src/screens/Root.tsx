@@ -14,7 +14,7 @@ import Notes from '@Screens/Notes/Notes';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { hexToRGBA } from '@Style/utils';
 import AuthenticationSource from './Authentication/Sources/AuthenticationSource';
-import { ApplicationContext } from 'App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 import { StyleKit } from '@Style/StyleKit';
 
 type State = {
@@ -30,7 +30,6 @@ type State = {
 
 export default class Root extends Abstract<AbstractProps, State> {
   static contextType = ApplicationContext;
-  declare context: React.ContextType<typeof ApplicationContext>;
   styles!: Record<string, ViewStyle | TextStyle>;
   removeApplicationStateEventHandler?: () => void;
   removeStateObserver?: () => void;
@@ -49,6 +48,7 @@ export default class Root extends Abstract<AbstractProps, State> {
   composeRef: any;
   constructor(props: Readonly<AbstractProps>) {
     super(props);
+    // console.log('======', this.context);
     this.registerObservers();
   }
 
@@ -392,7 +392,7 @@ export default class Root extends Abstract<AbstractProps, State> {
 
   render() {
     /* Don't render LockedView here since we need this.notesRef as soon as we can (for componentWillFocus callback) */
-
+    console.log(this.context);
     const { shouldSplitLayout, notesListCollapsed } = this.state;
 
     const notesStyles = shouldSplitLayout
@@ -486,17 +486,12 @@ export default class Root extends Abstract<AbstractProps, State> {
         flexDirection: 'row',
       },
       left: {
-        borderRightColor: this.context!.getThemeService().variables
-          .stylekitBorderColor,
+        borderRightColor: 'black',
         borderRightWidth: 1,
       },
       right: {},
       toggleButtonContainer: {
-        backgroundColor: hexToRGBA(
-          this.context!.getThemeService().variables
-            .stylekitContrastBackgroundColor,
-          0.5
-        ),
+        backgroundColor: 'black',
       },
       toggleButton: {
         justifyContent: 'center',

@@ -7,7 +7,7 @@ import _ from 'lodash';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HeaderTitleView from '@Components/HeaderTitleView';
 import ThemedComponent from '@Components/ThemedComponent';
-import { ApplicationContext } from 'App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStateType } from '@Lib/ApplicationState';
 
 const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {
@@ -37,6 +37,7 @@ export default class Abstract<
   TProps extends AbstractProps = AbstractProps,
   TState extends AbstractState = AbstractState
 > extends ThemedComponent<TProps, TState> {
+  static contextType = ApplicationContext;
   static getDefaultNavigationOptions = ({
     navigation,
     _navigationOptions,

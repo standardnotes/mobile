@@ -5,7 +5,7 @@ import SectionedAccessoryTableCell from '@Components/SectionedAccessoryTableCell
 import SectionHeader from '@Components/SectionHeader';
 import TableSection from '@Components/TableSection';
 import SectionedTableCell from '@Components/SectionedTableCell';
-import { ApplicationContext } from 'App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 
 const DEFAULT_SIGN_IN_TEXT = 'Sign In';
 const DEFAULT_REGISTER_TEXT = 'Register';
@@ -32,7 +32,7 @@ type State = {
 
 export default class AuthSection extends Component<Props, State> {
   static contextType = ApplicationContext;
-  declare context: React.ContextType<typeof ApplicationContext>;
+  context!: React.ContextType<typeof ApplicationContext>;
   static emailInProgress: any;
   static passwordInProgress: any;
   constructor(props: Readonly<Props>) {

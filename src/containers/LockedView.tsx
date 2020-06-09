@@ -7,7 +7,7 @@ import {
   TextStyle,
 } from 'react-native';
 import { isArray } from 'lodash';
-import { ApplicationContext } from 'App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 
 type Props = {
   style?: ViewStyle[];
@@ -16,7 +16,7 @@ type Props = {
 
 export default class LockedView extends Component<Props> {
   static contextType = ApplicationContext;
-  declare context: React.ContextType<typeof ApplicationContext>;
+  context!: React.ContextType<typeof ApplicationContext>;
   styles?: {
     unlockButton: ViewStyle;
     unlockButtonText: TextStyle;

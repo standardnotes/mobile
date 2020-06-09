@@ -1,12 +1,12 @@
 import { PureComponent } from 'react';
-import { ApplicationContext } from 'App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 
 export default class ThemedPureComponent<P = {}, S = {}> extends PureComponent<
   P,
   S
 > {
   static contextType = ApplicationContext;
-  declare context: React.ContextType<typeof ApplicationContext>;
+  context!: React.ContextType<typeof ApplicationContext>;
   removeThemeChangeObserver: () => void;
   constructor(props: Readonly<P>) {
     super(props);

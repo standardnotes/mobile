@@ -1,49 +1,39 @@
 import { Client } from 'bugsnag-react-native';
-import React, { Component } from 'react';
-import { Animated, Text } from 'react-native';
+import React, { Component, useState, useEffect, useCallback } from 'react';
+// import { Animated } from 'react-native';
 import { createAppContainer, NavigationActions } from 'react-navigation';
-import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
+// import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { createStackNavigator } from 'react-navigation-stack';
-import Authenticate from '@Screens/Authentication/Authenticate';
-import Compose from '@Screens/Compose';
-import {
-  SCREEN_AUTHENTICATE,
-  SCREEN_HOME,
-  SCREEN_NOTES,
-  SCREEN_COMPOSE,
-  SCREEN_INPUT_MODAL,
-  SCREEN_SETTINGS,
-  SCREEN_MANAGE_PRIVILEGES,
-  SCREEN_KEY_RECOVERY,
-} from '@Screens/screens';
-import InputModal from '@Screens/InputModal';
-import KeyRecovery from '@Screens/KeyRecovery';
-import MainSideMenu from '@Screens/SideMenu/MainSideMenu';
-import ManagePrivileges from '@Screens/ManagePrivileges';
-import NoteSideMenu from '@Screens/SideMenu/NoteSideMenu';
+// import Authenticate from '@Screens/Authentication/Authenticate';
+// import Compose from '@Screens/Compose';
+// import {
+//   SCREEN_AUTHENTICATE,
+//   SCREEN_HOME,
+//   SCREEN_NOTES,
+//   SCREEN_COMPOSE,
+//   SCREEN_INPUT_MODAL,
+//   SCREEN_SETTINGS,
+//   SCREEN_MANAGE_PRIVILEGES,
+//   SCREEN_KEY_RECOVERY,
+// } from '@Screens/screens';
+// import InputModal from '@Screens/InputModal';
+// import KeyRecovery from '@Screens/KeyRecovery';
+// import MainSideMenu from '@Screens/SideMenu/MainSideMenu';
+// import ManagePrivileges from '@Screens/ManagePrivileges';
+// import NoteSideMenu from '@Screens/SideMenu/NoteSideMenu';
 import Root from '@Screens/Root';
-import Settings from '@Screens/Settings/Settings';
-import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
-import { ApplicationGroup } from '@Lib/applicationGroup';
+// import Settings from '@Screens/Settings/Settings';
+// import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
 import { MobileApplication } from '@Lib/application';
-
-// import { NativeModules } from 'react-native';
-// import { SFAuthManager, protocolManager } from 'snjs';
-
-// protocolManager.crypto.setNativeModules({
-//   base64: require('base-64'),
-//   aes: NativeModules.Aes,
-// });
-
-export const applicationGroup = new ApplicationGroup();
+import { CurrentApplication } from './ApplicationContext';
+import { ApplicationGroup } from '@Lib/applicationGroup';
+import ThemedComponent from '@Components/ThemedComponent';
+// import Notes from '@Screens/Notes/Notes';
 
 if (__DEV__ === false) {
   // bugsnag
   // eslint-disable-next-line no-new
   new Client();
-
-  /** Disable console.log for non-dev builds */
-  console.log = () => {};
 }
 
 // const AppStack = createStackNavigator(
@@ -112,9 +102,9 @@ if (__DEV__ === false) {
 //   screen: ManagePrivileges,
 // });
 
-// const KeyRecoveryStack = createStackNavigator({
-//   screen: KeyRecovery,
-// });
+const KeyRecoveryStack = createStackNavigator({
+  screen: Root,
+});
 
 // const AppDrawer = createStackNavigator(
 //   {
@@ -178,60 +168,28 @@ if (__DEV__ === false) {
 //   }
 // );
 
-// const AppContainer = createAppContainer(DrawerStack);
+const AppContainer = createAppContainer(KeyRecoveryStack);
 
 type State = {
   ready: boolean;
 };
 
-export const ApplicationContext = React.createContext(
-  applicationGroup.application
-);
+export const App: React.FC<{}> = () => {
+  const [ready, setReady] = useState(false);
 
-export const StylekitContext = React.createContext(
-  applicationGroup.application?.getThemeService()
-);
-
-export default class App extends Component<{}, State> {
-  authEventHandler: any;
-  application?: MobileApplication;
-  constructor(props: Readonly<{}>) {
-    super(props);
-
-    // KeysManager.get().registerAccountRelatedStorageKeys(['options']);
-
-    /** Listen to sign out event */
-    // this.authEventHandler = Auth.get().addEventHandler(async (event: any) => {
-    //   if (event === SFAuthManager.DidSignOutEvent) {
-    //     ModelManager.get().handleSignout();
-    //     Sync.get().handleSignout();
-    //   }
-    // });
-    this.application = applicationGroup.application;
-    this.state = { ready: false };
-    this.loadApplication();
-  }
-
-  /**
-   * We initially didn't expect App to ever unmount. However, on Android,
-   * if you are in the root screen, and press the physical back button,
-   * then strangely, App unmounts, but other components, like Notes, do not.
-   * We've remedied this by modifiying Android back button behavior natively
-   * to background instead of quit, but we keep this below anyway.
-   */
-  componentWillUnmount() {
-    // Auth.get().removeEventHandler(this.authEventHandler);
-  }
-
-  async loadApplication() {
-    await this.application!.prepareForLaunch({
+  const loadApplication = useCallback(async () => {
+    await CurrentApplication!.prepareForLaunch({
       receiveChallenge: async (challenge, orchestrator) => {
-        this.application!.promptForChallenge(challenge, orchestrator);
+        CurrentApplication!.promptForChallenge(challenge, orchestrator);
       },
     });
-    await this.application!.launch(false);
-    this.setState({ ready: true });
-  }
+    await CurrentApplication!.launch(false);
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    loadApplication();
+  }, [loadApplication]);
 
   // async loadInitialData() {
   //   await StyleKit.get().initialize();
@@ -248,17 +206,8 @@ export default class App extends Component<{}, State> {
   //     ready();
   //   }
   // }
-
-  render() {
-    if (!this.state.ready) {
-      return null;
-    }
-
-    return (
-      <ApplicationContext.Provider value={this.application}>
-        <Text>Test</Text>
-        {/* <AppContainer  /> */}
-      </ApplicationContext.Provider>
-    );
+  if (!ready) {
+    return null;
   }
-}
+  return <AppContainer />;
+};

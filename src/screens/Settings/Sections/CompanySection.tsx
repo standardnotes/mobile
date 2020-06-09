@@ -3,7 +3,7 @@ import { View, Text, Platform, Share } from 'react-native';
 import ButtonCell from '@Components/ButtonCell';
 import SectionHeader from '@Components/SectionHeader';
 import TableSection from '@Components/TableSection';
-import { ApplicationContext } from 'App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 import { ApplicationState } from '@Lib/ApplicationState';
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
 
 export default class CompanySection extends Component<Props> {
   static contextType = ApplicationContext;
-  declare context: React.ContextType<typeof ApplicationContext>;
+  context!: React.ContextType<typeof ApplicationContext>;
   onAction = (action: string) => {
     if (action === 'feedback') {
       const platformString = Platform.OS === 'android' ? 'Android' : 'iOS';
