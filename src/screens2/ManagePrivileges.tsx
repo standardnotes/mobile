@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionHeader } from '@Components/SectionHeader';
-import SectionedAccessoryTableCell from '@Root/components2/SectionedAccessoryTableCell';
+import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import LockedView from '@Containers/LockedView';
 import Abstract, {

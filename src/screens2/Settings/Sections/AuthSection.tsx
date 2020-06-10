@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { TextInput, View, Text, Keyboard, Alert } from 'react-native';
 import { ButtonCell } from '@Components/ButtonCell';
-import SectionedAccessoryTableCell from '@Root/components2/SectionedAccessoryTableCell';
+import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { SectionedTableCell } from '@Components/SectionedTableCell';

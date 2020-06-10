@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import { SectionHeader } from '@Components/SectionHeader';
-import SectionedAccessoryTableCell from '@Root/components2/SectionedAccessoryTableCell';
+import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { TableSection } from '@Components/TableSection';
 import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';

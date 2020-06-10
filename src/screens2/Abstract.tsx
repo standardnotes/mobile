@@ -5,7 +5,7 @@ import HeaderButtons, {
 } from 'react-navigation-header-buttons';
 import _ from 'lodash';
 import Icon from 'react-native-vector-icons/Ionicons';
-import HeaderTitleView from '@Root/components2/HeaderTitleView';
+import { HeaderTitleView } from '@Components/HeaderTitleView';
 import ThemedComponent from '@Root/components2/ThemedComponent';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStateType } from '@Lib/ApplicationState';

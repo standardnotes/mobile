@@ -11,7 +11,7 @@ import {
 import _ from 'lodash';
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionHeader } from '@Components/SectionHeader';
-import SectionedAccessoryTableCell from '@Root/components2/SectionedAccessoryTableCell';
+import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { AppStateType } from '@Lib/ApplicationState';
 import Abstract, {
