@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { SNPureCrypto } from 'snjs';
+import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Base64 } from 'js-base64';
 import { decode as decodeBase64toArrayBuffer } from 'base64-arraybuffer';
 import Sodium from 'react-native-sodium';
@@ -35,7 +35,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
   public async generateRandomKey(bits: number): Promise<string> {
     const bytes = bits / 8;
-    return Aes.randomKey(bytes);
+    const result = await Sodium.randombytes_buf(bytes);
+    return this.base64ToHex(result);
   }
 
   public async aes256CbcEncrypt(
@@ -104,8 +105,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   ): Promise<string> {
     return Sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
       Base64.encode(plaintext),
-      Base64.encode(nonce),
-      Base64.encode(key),
+      this.hexToBase64(nonce),
+      this.hexToBase64(key),
       Base64.encode(assocData)
     );
   }
@@ -118,9 +119,9 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   ): Promise<string | null> {
     try {
       const result = await Sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
-        Base64.encode(ciphertext),
-        Base64.encode(nonce),
-        Base64.encode(key),
+        ciphertext,
+        this.hexToBase64(nonce),
+        this.hexToBase64(key),
         Base64.encode(assocData)
       );
       return Base64.decode(result);
@@ -160,5 +161,42 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     return new Promise<string>(resolve => {
       resolve(Base64.decode(base64String));
     });
+  }
+
+  /**
+   * Converts hex string to base64 string
+   * @param hexString - hex string
+   * @returns A string key in base64 format
+   */
+  hexToBase64(hexString: string) {
+    let base64 = '';
+    for (let i = 0; i < hexString.length; i++) {
+      base64 += !((i - 1) & 1)
+        ? String.fromCharCode(parseInt(hexString.substring(i - 1, i + 1), 16))
+        : '';
+    }
+    return Base64.btoa(base64);
+  }
+
+  /**
+   * Converts hex string to base64 string
+   * @param string - base64 string
+   * @returns A string key in hex format
+   */
+  base64ToHex(base64String: string) {
+    for (
+      var i = 0,
+        bin = Base64.atob(base64String.replace(/[ \r\n]+$/, '')),
+        hex = [];
+      i < bin.length;
+      ++i
+    ) {
+      let tmp = bin.charCodeAt(i).toString(16);
+      if (tmp.length === 1) {
+        tmp = '0' + tmp;
+      }
+      hex[hex.length] = tmp;
+    }
+    return hex.join('');
   }
 }
