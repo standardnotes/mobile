@@ -2,7 +2,6 @@ import { Client } from 'bugsnag-react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import styled, { ThemeProvider } from 'styled-components/native';
-import { Text } from 'react-native';
 // import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 // import Authenticate from '@Screens/Authentication/Authenticate';
 // import Compose from '@Screens/Compose';
@@ -25,7 +24,8 @@ import { Text } from 'react-native';
 // import Settings from '@Screens/Settings/Settings';
 // import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
 // import { MobileApplication } from '@Lib/application';
-import { CurrentApplication } from './ApplicationContext';
+import { CurrentApplication, ContextProvider } from './ApplicationContext';
+import { Notes } from '@Screens/Notes/Notes';
 // import { ApplicationGroup } from '@Lib/applicationGroup';
 // import ThemedComponent from '@Components/ThemedComponent';
 // import Notes from '@Screens/Notes/Notes';
@@ -193,13 +193,15 @@ export const App: React.FC<{}> = () => {
     loadApplication();
   }, [loadApplication]);
 
-  if (!ready) {
+  if (!ready || !CurrentApplication!.getThemeService().theme) {
     return null;
   }
   return (
     <NavigationContainer>
-      <ThemeProvider theme={CurrentApplication!.getThemeService().theme}>
-        <ThemeTest>ssssss</ThemeTest>
+      <ThemeProvider theme={CurrentApplication!.getThemeService().theme!}>
+        <ContextProvider>
+          <Notes />
+        </ContextProvider>
       </ThemeProvider>
     </NavigationContainer>
   );
