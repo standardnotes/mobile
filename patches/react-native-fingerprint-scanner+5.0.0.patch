@@ -1,0 +1,16 @@
+diff --git a/node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.m b/node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.m
+index e29bad7..3ba4724 100644
+--- a/node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.m
++++ b/node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.m
+@@ -66,9 +66,9 @@ @implementation ReactNativeFingerprintScanner
+     }
+
+     // Device has FingerprintScanner
+-    if ([context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
++    if ([context canEvaluatePolicy:LAPolicyDeviceOwnerAuthentication error:&error]) {
+         // Attempt Authentication
+-        [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
++        [context evaluatePolicy:LAPolicyDeviceOwnerAuthentication
+                 localizedReason:reason
+                           reply:^(BOOL success, NSError *error)
+          {

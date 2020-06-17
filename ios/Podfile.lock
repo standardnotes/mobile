@@ -189,7 +189,7 @@ PODS:
   - React-jsinspector (0.61.5)
   - react-native-aes (1.3.6):
     - React
-  - react-native-fingerprint-scanner (4.0.0):
+  - react-native-fingerprint-scanner (5.0.0):
     - React
   - react-native-mail (4.1.0):
     - React
@@ -414,7 +414,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: d5525f9ed5f782fdbacb64b9b01a43a9323d2386
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
   react-native-aes: 30cdabac81ff8461d2a838d4fd042bb3df74e23d
-  react-native-fingerprint-scanner: bfcf11a00eee4bb68e6d4e5cdd67d69bed687ea6
+  react-native-fingerprint-scanner: 77140320ed56d612200371ebc2abefa5f20b574e
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-webview: b1ea98894c474b27c4080779939959e1f3653147
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
