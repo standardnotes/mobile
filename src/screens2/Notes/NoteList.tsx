@@ -11,7 +11,7 @@ import {
 import Search from 'react-native-search-box';
 import ThemedComponent from '@Root/components2/ThemedComponent';
 import NoteCell from '@Root/screens2/Notes/NoteCell';
-import OfflineBanner from '@Root/screens2/Notes/OfflineBanner';
+import OfflineBanner from '@Screens/Notes/OfflineBanner';
 import { Platform } from 'snjs';
 
 type Props = {

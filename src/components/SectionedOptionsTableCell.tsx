@@ -64,7 +64,7 @@ const ButtonTitle = styled.Text<{ selected: boolean }>`
     props.selected
       ? props.theme.stylekitInfoColor
       : props.theme.stylekitNeutralColor};
-  font-size: 16;
+  font-size: 16px;
   text-align: 'center';
   width: '100%';
 `;
