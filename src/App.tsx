@@ -1,7 +1,9 @@
 import { Client } from 'bugsnag-react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import styled, { ThemeProvider } from 'styled-components/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { ThemeProvider, ThemeContext } from 'styled-components/native';
 // import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 // import Authenticate from '@Screens/Authentication/Authenticate';
 // import Compose from '@Screens/Compose';
@@ -23,9 +25,23 @@ import styled, { ThemeProvider } from 'styled-components/native';
 // import Root from '@Screens/Root';
 // import Settings from '@Screens/Settings/Settings';
 // import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
-// import { MobileApplication } from '@Lib/application';
 import { CurrentApplication, ContextProvider } from './ApplicationContext';
-import { Notes } from '@Screens/Notes/Notes';
+import { Root } from '@Screens/Root';
+import {
+  SCREEN_NOTES,
+  SCREEN_COMPOSE,
+  SCREEN_SETTINGS,
+} from './screens2/screens';
+import { HeaderTitleView } from '@Components/HeaderTitleView';
+import {
+  HeaderButtons,
+  HeaderButtonProps,
+  HeaderButton,
+  Item,
+} from 'react-navigation-header-buttons';
+import { ICON_MENU } from '@Style/icons';
+import { StyleKit } from '@Style/StyleKit';
+import Icon from 'react-native-vector-icons/Ionicons';
 // import { ApplicationGroup } from '@Lib/applicationGroup';
 // import ThemedComponent from '@Components/ThemedComponent';
 // import Notes from '@Screens/Notes/Notes';
@@ -106,6 +122,121 @@ if (__DEV__ === false) {
 //   screen: Root,
 // });
 
+const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {
+  // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
+  // and it is important to pass those props to `HeaderButton`
+  // then you may add some information like icon size or color (if you use icons)
+  const theme = useContext(ThemeContext);
+  return (
+    <HeaderButton
+      {...passMeFurther}
+      IconComponent={Icon}
+      iconSize={30}
+      color={theme.stylekitInfoColor}
+    />
+  );
+};
+
+type HeaderTitleParams = {
+  title?: string;
+  subTitle: string;
+  subTitleColor?: string;
+};
+
+type AppStackNavigatorParamList = {
+  [SCREEN_NOTES]: HeaderTitleParams;
+  [SCREEN_COMPOSE]: undefined;
+};
+
+const AppStack = createStackNavigator<AppStackNavigatorParamList>();
+
+const AppStackComponent = () => {
+  const theme = useContext(ThemeContext);
+  return (
+    <AppStack.Navigator
+      screenOptions={({ navigation, route }) => ({
+        headerStyle: {
+          backgroundColor: theme.stylekitContrastBackgroundColor,
+          borderBottomColor: theme.stylekitContrastBorderColor,
+          borderBottomWidth: 1,
+        },
+        headerTintColor: theme.stylekitInfoColor,
+        headerTitle: ({ children }) => {
+          return <HeaderTitleView title={children || ''} />;
+        },
+      })}
+      initialRouteName={SCREEN_NOTES}
+    >
+      <AppStack.Screen
+        name={SCREEN_NOTES}
+        options={({ route, navigation }) => ({
+          title: 'All notes',
+          headerTitle: ({ children }) => {
+            return (
+              <HeaderTitleView
+                title={route.params?.title ?? (children || '')}
+                subtitle={route.params?.subTitle}
+                subtitleColor={route.params?.subTitleColor}
+              />
+            );
+          },
+          headerLeft: () => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="drawerButton"
+                disabled={false}
+                title={''}
+                iconName={StyleKit.nameForIcon(ICON_MENU)}
+                onPress={() => navigation.openDrawer()}
+              />
+            </HeaderButtons>
+          ),
+        })}
+        component={Root}
+      />
+      {/* <AppStack.Screen name={SCREEN_COMPOSE} component={Notifications} /> */}
+      {/* <AppStack.Screen name={SCREEN_INPUT_MODAL} component={InputModal} /> */}
+    </AppStack.Navigator>
+  );
+};
+
+// const NoteDrawer = createDrawerNavigator();
+
+// const NoteDrawerComponent = () => (
+//   <NoteDrawer.Navigator drawerPosition="right" drawerType="slide">
+//     <NoteDrawer.Screen name="Main" component={AppStackComponent} />
+//   </NoteDrawer.Navigator>
+// );
+
+const SettingsStack = createStackNavigator();
+const SettingsMock = () => <></>;
+const SettingsStackComponent = () => {
+  const theme = useContext(ThemeContext);
+  return (
+    <SettingsStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.stylekitContrastBackgroundColor,
+          borderBottomColor: theme.stylekitContrastBorderColor,
+          borderBottomWidth: 1,
+        },
+        headerTintColor: theme.stylekitInfoColor,
+      }}
+    >
+      <SettingsStack.Screen name={SCREEN_SETTINGS} component={SettingsMock} />
+    </SettingsStack.Navigator>
+  );
+};
+
+const AppDrawer = createDrawerNavigator();
+
+const AppDrawerComponent = () => (
+  <AppDrawer.Navigator drawerType="slide">
+    <AppDrawer.Screen name="Core" component={AppStackComponent} />
+    <AppDrawer.Screen name="Settings" component={SettingsStackComponent} />
+  </AppDrawer.Navigator>
+);
+
 // const AppDrawer = createStackNavigator(
 //   {
 //     [SCREEN_HOME]: AppDrawerStack,
@@ -168,15 +299,7 @@ if (__DEV__ === false) {
 //   }
 // );
 
-type State = {
-  ready: boolean;
-};
-
-const ThemeTest = styled.Text`
-  color: ${props => props.theme.stylekitInfoColor};
-`;
-
-export const App: React.FC<{}> = () => {
+export const App: React.FC = () => {
   const [ready, setReady] = useState(false);
 
   const loadApplication = useCallback(async () => {
@@ -200,7 +323,7 @@ export const App: React.FC<{}> = () => {
     <NavigationContainer>
       <ThemeProvider theme={CurrentApplication!.getThemeService().theme!}>
         <ContextProvider>
-          <Notes />
+          <AppDrawerComponent />
         </ContextProvider>
       </ThemeProvider>
     </NavigationContainer>

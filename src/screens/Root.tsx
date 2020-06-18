@@ -12,22 +12,21 @@ import {
 
 const Container = styled.View`
   flex: 1;
-  flex-direction: 'row';
+  flex-direction: row;
 `;
 const NotesContainer = styled.View<{
   shouldSplitLayout?: boolean;
   notesListCollapsed?: boolean;
 }>`
-  border-right-color: ${props =>
-    props.shouldSplitLayout ? 'black' : undefined};
-  border-right-width: ${props => (props.shouldSplitLayout ? 1 : undefined)}px;
-  width: ${props =>
-    props.shouldSplitLayout
-      ? props.notesListCollapsed
-        ? 0
-        : '40%'
-      : undefined};
-  flex: ${props => (props.shouldSplitLayout ? undefined : 1)};
+  ${({ shouldSplitLayout, notesListCollapsed }) =>
+    shouldSplitLayout
+      ? `
+  border-right-color: black;
+  border-right-width: 1px;
+  width: ${notesListCollapsed ? 0 : '40%'}
+  `
+      : `
+flex: 1`}
 `;
 const ComposeContainer = styled.View<{ notesListCollapsed?: boolean }>`
   width: ${props => (props.notesListCollapsed ? '100%' : '60%')};

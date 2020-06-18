@@ -9,15 +9,16 @@ type Props = {
 };
 
 const Container = styled.View`
-  background-color: ${props => props.theme.stylekitContrastBackgroundColor};
+  /* background-color: ${props =>
+    props.theme.stylekitContrastBackgroundColor}; */
   flex: 1;
   justify-content: flex-start;
   flex-direction: column;
-  align-items: ${Platform.OS === 'android' ? 'flex-start' : undefined};
+  ${Platform.OS === 'android' && 'align-items: flex-start'}
 `;
 const Title = styled.Text`
   color: ${props => props.theme.stylekitForegroundColor};
-  font-weight: 'bold';
+  font-weight: bold;
   font-size: 18px;
   text-align: center;
 `;
@@ -28,7 +29,7 @@ const SubTitle = styled.Text.attrs(() => ({
   color: ${props => props.color ?? props.theme.stylekitForegroundColor};
   opacity: ${props => (props.color ? 1 : 0.6)};
   font-size: ${Platform.OS === 'android' ? 13 : 12}px;
-  text-align: ${Platform.OS === 'ios' ? 'center' : undefined};
+  ${Platform.OS === 'ios' && 'text-align: center'}
 `;
 
 export const HeaderTitleView: React.FC<Props> = props => (

@@ -22,7 +22,9 @@
   "dependencies": {
     "@react-native-community/async-storage": "1.11.0",
     "@react-native-community/masked-view": "^0.1.10",
+    "@react-navigation/drawer": "^5.8.2",
     "@react-navigation/native": "^5.5.1",
+    "@react-navigation/stack": "^5.5.1",
     "base-64": "^0.1.0",
     "base64-arraybuffer": "^0.2.0",
     "bugsnag-react-native": "^2.23.9",
@@ -47,6 +49,7 @@
     "react-native-safe-area-context": "^3.0.5",
     "react-native-screens": "^2.8.0",
     "react-native-search-box": "standardnotes/react-native-search-box#f61a2b5",
+    "react-native-side-menu-updated": "^1.2.1",
     "react-native-sodium": "standardnotes/react-native-sodium#c548383",
     "react-native-store-review": "^0.1.5",
     "react-native-vector-icons": "6.6.0",
