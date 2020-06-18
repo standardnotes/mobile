@@ -169,6 +169,39 @@ export class ApplicationState {
     }
   }
 
+  async openEditor(noteUuid: string) {
+    const note = this.application.findItem(noteUuid) as SNNote;
+    const run = async () => {
+      const activeEditor = this.getActiveEditor();
+      if (!activeEditor || this.multiEditorEnabled) {
+        this.application.editorGroup.createEditor(noteUuid);
+      } else {
+        activeEditor.setNote(note);
+      }
+      this.notifyOfStateChange(AppStateType.ActiveEditorChanged);
+    };
+    // TODO: protected note
+    // if (
+    //   note &&
+    //   note.safeContent.protected &&
+    //   (await this.application.privilegesService!.actionRequiresPrivilege(
+    //     ProtectedAction.ViewProtectedNotes
+    //   ))
+    // ) {
+    //   return new Promise(resolve => {
+    //     this.application.presentPrivilegesModal(
+    //       ProtectedAction.ViewProtectedNotes,
+    //       () => {
+    //         run().then(resolve);
+    //       }
+    //     );
+    //   });
+    // } else {
+    //   return run();
+    // }
+    return run();
+  }
+
   getActiveEditor() {
     return this.application.editorGroup.editors[0];
   }
