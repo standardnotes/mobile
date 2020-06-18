@@ -430,84 +430,9 @@ export default class NoteCell extends ThemedPureComponent<Props, State> {
     // @ts-ignore ignore null return from hexToRGBA
     const variables = this.context!.getThemeService().variables;
     this.styles = StyleSheet.create({
-      noteCell: {
-        padding: padding,
-        paddingRight: padding * 2,
-        borderBottomColor: hexToRGBA(variables.stylekitBorderColor, 0.75),
-        borderBottomWidth: 1,
-        backgroundColor: variables.stylekitBackgroundColor,
-      },
-
-      noteCellSelected: {
-        backgroundColor: variables.stylekitInfoColor,
-      },
-
-      noteTagsContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        marginTop: 7,
-      },
-
       pinnedView: {
         flex: 1,
         flexDirection: 'row',
-        marginBottom: 5,
-      },
-
-      flagsContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        marginBottom: 8,
-      },
-
-      noteTag: {
-        marginRight: 2,
-        fontSize: 12,
-        color: variables.stylekitForegroundColor,
-        opacity: 0.5,
-      },
-
-      noteTagSelected: {
-        color: variables.stylekitInfoContrastColor,
-        opacity: 0.8,
-      },
-
-      noteTitle: {
-        fontWeight: 'bold',
-        fontSize: 16,
-        color: variables.stylekitForegroundColor,
-      },
-
-      noteTitleSelected: {
-        color: variables.stylekitInfoContrastColor,
-      },
-
-      noteText: {
-        fontSize: 15,
-        marginTop: 4,
-        color: variables.stylekitForegroundColor,
-        opacity: 0.8,
-        lineHeight: 21,
-      },
-
-      noteTextSelected: {
-        color: variables.stylekitInfoContrastColor,
-      },
-
-      noteDate: {
-        marginTop: 5,
-        fontSize: 12,
-        color: variables.stylekitForegroundColor,
-        opacity: 0.5,
-      },
-
-      noteDateSelected: {
-        color: variables.stylekitInfoContrastColor,
-        opacity: 0.8,
-      },
-
-      deleting: {
-        color: variables.stylekitInfoColor,
         marginBottom: 5,
       },
     });

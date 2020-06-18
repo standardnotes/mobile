@@ -329,7 +329,7 @@ export class ApplicationState {
     return this.tabletMode;
   }
 
-  private setTabletModeEnabled(enabled: boolean) {
+  setTabletModeEnabled(enabled: boolean) {
     if (enabled !== this.tabletMode) {
       this.tabletMode = enabled;
       this.notifyEventObservers(

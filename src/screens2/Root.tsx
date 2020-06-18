@@ -395,7 +395,7 @@ export default class Root extends Abstract<AbstractProps, State> {
 
   render() {
     /* Don't render LockedView here since we need this.notesRef as soon as we can (for componentWillFocus callback) */
-    console.log(this.context);
+
     const { shouldSplitLayout, notesListCollapsed } = this.state;
 
     const notesStyles = shouldSplitLayout
@@ -484,14 +484,6 @@ export default class Root extends Abstract<AbstractProps, State> {
 
   loadStyles() {
     this.styles = {
-      root: {
-        flex: 1,
-        flexDirection: 'row',
-      },
-      left: {
-        borderRightColor: 'black',
-        borderRightWidth: 1,
-      },
       right: {},
       toggleButtonContainer: {
         backgroundColor: 'black',
