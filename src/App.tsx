@@ -2,7 +2,6 @@ import { Client } from 'bugsnag-react-native';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { ThemeProvider, ThemeContext } from 'styled-components/native';
 // import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 // import Authenticate from '@Screens/Authentication/Authenticate';
@@ -42,9 +41,8 @@ import {
 import { ICON_MENU } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
 import Icon from 'react-native-vector-icons/Ionicons';
-// import { ApplicationGroup } from '@Lib/applicationGroup';
-// import ThemedComponent from '@Components/ThemedComponent';
-// import Notes from '@Screens/Notes/Notes';
+import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
+import { View, Text } from 'react-native';
 
 if (__DEV__ === false) {
   // bugsnag
@@ -152,90 +150,70 @@ const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 
 const AppStackComponent = () => {
   const theme = useContext(ThemeContext);
+  const drawerRef = React.createRef<DrawerLayout>();
+  const renderDrawer = () => {
+    return (
+      <View>
+        <Text>I am in the drawer!</Text>
+      </View>
+    );
+  };
   return (
-    <AppStack.Navigator
-      screenOptions={({ navigation, route }) => ({
-        headerStyle: {
-          backgroundColor: theme.stylekitContrastBackgroundColor,
-          borderBottomColor: theme.stylekitContrastBorderColor,
-          borderBottomWidth: 1,
-        },
-        headerTintColor: theme.stylekitInfoColor,
-        headerTitle: ({ children }) => {
-          return <HeaderTitleView title={children || ''} />;
-        },
-      })}
-      initialRouteName={SCREEN_NOTES}
+    <DrawerLayout
+      ref={drawerRef}
+      drawerWidth={200}
+      drawerPosition={'left'}
+      drawerType="slide"
+      drawerBackgroundColor="#ddd"
+      renderNavigationView={renderDrawer}
     >
-      <AppStack.Screen
-        name={SCREEN_NOTES}
-        options={({ route, navigation }) => ({
-          title: 'All notes',
-          headerTitle: ({ children }) => {
-            return (
-              <HeaderTitleView
-                title={route.params?.title ?? (children || '')}
-                subtitle={route.params?.subTitle}
-                subtitleColor={route.params?.subTitleColor}
-              />
-            );
+      <AppStack.Navigator
+        screenOptions={({ navigation, route }) => ({
+          headerStyle: {
+            backgroundColor: theme.stylekitContrastBackgroundColor,
+            borderBottomColor: theme.stylekitContrastBorderColor,
+            borderBottomWidth: 1,
           },
-          headerLeft: () => (
-            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-              <Item
-                testID="drawerButton"
-                disabled={false}
-                title={''}
-                iconName={StyleKit.nameForIcon(ICON_MENU)}
-                onPress={() => navigation.openDrawer()}
-              />
-            </HeaderButtons>
-          ),
+          headerTintColor: theme.stylekitInfoColor,
+          headerTitle: ({ children }) => {
+            return <HeaderTitleView title={children || ''} />;
+          },
         })}
-        component={Root}
-      />
-      {/* <AppStack.Screen name={SCREEN_COMPOSE} component={Notifications} /> */}
-      {/* <AppStack.Screen name={SCREEN_INPUT_MODAL} component={InputModal} /> */}
-    </AppStack.Navigator>
+        initialRouteName={SCREEN_NOTES}
+      >
+        <AppStack.Screen
+          name={SCREEN_NOTES}
+          options={({ route, navigation }) => ({
+            title: 'All notes',
+            headerTitle: ({ children }) => {
+              return (
+                <HeaderTitleView
+                  title={route.params?.title ?? (children || '')}
+                  subtitle={route.params?.subTitle}
+                  subtitleColor={route.params?.subTitleColor}
+                />
+              );
+            },
+            headerLeft: () => (
+              <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+                <Item
+                  testID="drawerButton"
+                  disabled={false}
+                  title={''}
+                  iconName={StyleKit.nameForIcon(ICON_MENU)}
+                  onPress={() => drawerRef.current?.openDrawer()}
+                />
+              </HeaderButtons>
+            ),
+          })}
+          component={Root}
+        />
+        {/* <AppStack.Screen name={SCREEN_COMPOSE} component={Notifications} /> */}
+        {/* <AppStack.Screen name={SCREEN_INPUT_MODAL} component={InputModal} /> */}
+      </AppStack.Navigator>
+    </DrawerLayout>
   );
 };
-
-// const NoteDrawer = createDrawerNavigator();
-
-// const NoteDrawerComponent = () => (
-//   <NoteDrawer.Navigator drawerPosition="right" drawerType="slide">
-//     <NoteDrawer.Screen name="Main" component={AppStackComponent} />
-//   </NoteDrawer.Navigator>
-// );
-
-const SettingsStack = createStackNavigator();
-const SettingsMock = () => <></>;
-const SettingsStackComponent = () => {
-  const theme = useContext(ThemeContext);
-  return (
-    <SettingsStack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: theme.stylekitContrastBackgroundColor,
-          borderBottomColor: theme.stylekitContrastBorderColor,
-          borderBottomWidth: 1,
-        },
-        headerTintColor: theme.stylekitInfoColor,
-      }}
-    >
-      <SettingsStack.Screen name={SCREEN_SETTINGS} component={SettingsMock} />
-    </SettingsStack.Navigator>
-  );
-};
-
-const AppDrawer = createDrawerNavigator();
-
-const AppDrawerComponent = () => (
-  <AppDrawer.Navigator drawerType="slide">
-    <AppDrawer.Screen name="Core" component={AppStackComponent} />
-    <AppDrawer.Screen name="Settings" component={SettingsStackComponent} />
-  </AppDrawer.Navigator>
-);
 
 // const AppDrawer = createStackNavigator(
 //   {
@@ -323,7 +301,7 @@ export const App: React.FC = () => {
     <NavigationContainer>
       <ThemeProvider theme={CurrentApplication!.getThemeService().theme!}>
         <ContextProvider>
-          <AppDrawerComponent />
+          <AppStackComponent />
         </ContextProvider>
       </ThemeProvider>
     </NavigationContainer>
