@@ -28,12 +28,12 @@ export const TextContainer = styled.View<{
   selected?: boolean;
 }>`
   min-height: ${props => (props.isSubtext ? 38 : 24)}px;
-  margin-left: 6;
+  margin-left: 6px;
   ${({ selected, theme }) =>
     selected &&
     css`
-      border-border-bottom-color: ${theme.stylekitInfoColor};
-      border-border-top-width: 2;
+      border-bottom-color: ${theme.stylekitInfoColor};
+      border-bottom-width: 2px;
     `}
 `;
 const BaseText = styled.Text`
