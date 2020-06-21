@@ -48,7 +48,6 @@
     "react-native-safe-area-context": "^3.0.5",
     "react-native-screens": "^2.9.0",
     "react-native-search-box": "standardnotes/react-native-search-box#f61a2b5",
-    "react-native-side-menu-updated": "^1.2.1",
     "react-native-sodium": "standardnotes/react-native-sodium#c548383",
     "react-native-store-review": "^0.1.5",
     "react-native-vector-icons": "6.6.0",

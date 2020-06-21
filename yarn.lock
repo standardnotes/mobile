@@ -6288,13 +6288,6 @@ react-native-search-box@standardnotes/react-native-search-box#f61a2b5:
   dependencies:
     prop-types "^15.5.10"
 
-react-native-side-menu-updated@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-side-menu-updated/-/react-native-side-menu-updated-1.2.1.tgz#5513b0b40b7f4ce098c72b23617f07aed609fee7"
-  integrity sha512-ARslMh8Zwax+BvIWOOuxOR1Bq4Hc1d9FzbLk02uaxP0cXKH2RPlsMITJpCvLZuybKF0JuatrGEtWt6mxLv6tmA==
-  dependencies:
-    prop-types "^15.5.10"
-
 react-native-sodium@standardnotes/react-native-sodium#c548383:
   version "0.4.0"
   resolved "https://codeload.github.com/standardnotes/react-native-sodium/tar.gz/c548383e9076a33420e571c337061776f84d9991"
