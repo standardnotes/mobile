@@ -20,6 +20,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@expo/react-native-action-sheet": "^3.8.0",
     "@react-native-community/async-storage": "1.11.0",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.5.1",
@@ -33,7 +34,6 @@
     "moment": "^2.27.0",
     "react": "16.11.0",
     "react-native": "0.62.2",
-    "react-native-actionsheet": "standardnotes/react-native-actionsheet#9cb323f",
     "react-native-aes-crypto": "standardnotes/react-native-aes#d156762",
     "react-native-alternate-icons": "standardnotes/react-native-alternate-icons#1d335d",
     "react-native-fab": "standardnotes/react-native-fab#cb60e00",

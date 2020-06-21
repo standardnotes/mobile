@@ -1,29 +1,9 @@
 import { Client } from 'bugsnag-react-native';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
+import { Platform, Dimensions, ScaledSize } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { ThemeProvider, ThemeContext } from 'styled-components/native';
-// import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
-// import Authenticate from '@Screens/Authentication/Authenticate';
-// import Compose from '@Screens/Compose';
-// import {
-//   SCREEN_AUTHENTICATE,
-//   SCREEN_HOME,
-//   SCREEN_NOTES,
-//   SCREEN_COMPOSE,
-//   SCREEN_INPUT_MODAL,
-//   SCREEN_SETTINGS,
-//   SCREEN_MANAGE_PRIVILEGES,
-//   SCREEN_KEY_RECOVERY,
-// } from '@Screens/screens';
-// import InputModal from '@Screens/InputModal';
-// import KeyRecovery from '@Screens/KeyRecovery';
-// import MainSideMenu from '@Screens/SideMenu/MainSideMenu';
-// import ManagePrivileges from '@Screens/ManagePrivileges';
-// import NoteSideMenu from '@Screens/SideMenu/NoteSideMenu';
-// import Root from '@Screens/Root';
-// import Settings from '@Screens/Settings/Settings';
-// import SideMenuManager from '@Screens/SideMenu/SideMenuManager';
 import { CurrentApplication, ContextProvider } from './ApplicationContext';
 import { Root } from '@Screens/Root';
 import {
@@ -41,8 +21,12 @@ import {
 import { ICON_MENU } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { enableScreens } from 'react-native-screens';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
-import { View, Text } from 'react-native';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
+
+enableScreens();
 
 if (__DEV__ === false) {
   // bugsnag
@@ -146,22 +130,43 @@ type AppStackNavigatorParamList = {
   [SCREEN_COMPOSE]: undefined;
 };
 
+const getDefaultDrawerWidth = ({ height, width }: ScaledSize) => {
+  /*
+   * Default drawer width is screen width - header height
+   * with a max width of 280 on mobile and 320 on tablet
+   * https://material.io/guidelines/patterns/navigation-drawer.html
+   */
+  const smallerAxisSize = Math.min(height, width);
+  const isLandscape = width > height;
+  const isTablet = smallerAxisSize >= 600;
+  const appBarHeight = Platform.OS === 'ios' ? (isLandscape ? 32 : 44) : 56;
+  const maxWidth = isTablet ? 320 : 280;
+
+  return Math.min(smallerAxisSize - appBarHeight, maxWidth);
+};
+
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 
 const AppStackComponent = () => {
   const theme = useContext(ThemeContext);
   const drawerRef = React.createRef<DrawerLayout>();
-  const renderDrawer = () => {
-    return (
-      <View>
-        <Text>I am in the drawer!</Text>
-      </View>
-    );
-  };
+  const [dimensions, setDimensions] = React.useState(() =>
+    Dimensions.get('window')
+  );
+  React.useEffect(() => {
+    const updateDimensions = ({ window }: { window: ScaledSize }) => {
+      setDimensions(window);
+    };
+
+    Dimensions.addEventListener('change', updateDimensions);
+
+    return () => Dimensions.removeEventListener('change', updateDimensions);
+  }, []);
+  const renderDrawer = () => <MainSideMenu />;
   return (
     <DrawerLayout
       ref={drawerRef}
-      drawerWidth={200}
+      drawerWidth={getDefaultDrawerWidth(dimensions)}
       drawerPosition={'left'}
       drawerType="slide"
       drawerBackgroundColor="#ddd"
@@ -301,7 +306,9 @@ export const App: React.FC = () => {
     <NavigationContainer>
       <ThemeProvider theme={CurrentApplication!.getThemeService().theme!}>
         <ContextProvider>
-          <AppStackComponent />
+          <ActionSheetProvider>
+            <AppStackComponent />
+          </ActionSheetProvider>
         </ContextProvider>
       </ThemeProvider>
     </NavigationContainer>
