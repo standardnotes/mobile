@@ -50,7 +50,7 @@ export const NoteTitleInput = styled.TextInput`
   border-bottom-color: ${({ theme }) => theme.stylekitBorderColor};
   border-bottom-width: 1px;
   padding-top: ${PADDING}px;
-  padding-right: ${PADDING}pxl;
+  padding-right: ${PADDING}px;
 `;
 export const LoadingWebViewContainer = styled.View`
   position: absolute;
@@ -90,9 +90,9 @@ export const StyledTextView = styled(TextView)`
   padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   padding-left: ${({ theme }) =>
-    theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)};
+    theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   padding-right: ${({ theme }) =>
-    theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)};
+    theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   padding-bottom: 10px;
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   ${Platform.OS === 'ios' && 'padding-bottom: 10px'};

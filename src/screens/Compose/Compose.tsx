@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useCallback } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useCallback,
+  useState,
+  createRef,
+} from 'react';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ThemeContext } from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -17,82 +23,21 @@ import {
   NoteTitleInput,
 } from './Compose.styled';
 import { StyleKit } from '@Style/StyleKit';
-import { Platform } from 'snjs';
+import { Platform, ComponentArea } from 'snjs';
+import { lighten } from '@Style/utils';
+import TextView from 'sn-textview';
 
 export const Compose = (): JSX.Element => {
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
-
-  useEffect(() => {
-    // application?.componentGroup.;
-  }, [application]);
-
-  useCallback(() => {
-    let unregisterComponent = application.componentManager!.registerHandler(
-      {
-        identifier: 'editor',
-        areas: [
-          ComponentArea.NoteTags,
-          ComponentArea.EditorStack,
-          ComponentArea.Editor,,
-        ],
-        contextRequestHandler: componentUuid => {
-          const currentEditor = this.activeEditorComponent;
-          if (
-            componentUuid === currentEditor?.uuid ||
-            componentUuid === this.activeTagsComponent?.uuid ||
-            Uuids(this.getState().activeStackComponents).includes(componentUuid)
-          ) {
-            return this.note;
-          }
-        },
-        focusHandler: (component, focused) => {
-          if (component.isEditor() && focused) {
-            this.closeAllMenus();
-          }
-        },
-        actionHandler: (component, action, data) => {
-          if (action === ComponentAction.SetSize) {
-            const setSize = (
-              element: HTMLElement,
-              size: { width: number; height: number }
-            ) => {
-              const widthString =
-                typeof size.width === 'string' ? size.width : `${data.width}px`;
-              const heightString =
-                typeof size.height === 'string'
-                  ? size.height
-                  : `${data.height}px`;
-              element.setAttribute(
-                'style',
-                `width: ${widthString}; height: ${heightString};`
-              );
-            };
-            if (data.type === 'container') {
-              if (component.area === ComponentArea.NoteTags) {
-                const container = document.getElementById(
-                  ElementIds.NoteTagsComponentContainer
-                );
-                setSize(container!, data);
-              }
-            }
-          } else if (action === ComponentAction.AssociateItem) {
-            if (data.item.content_type === ContentType.Tag) {
-              const tag = this.application.findItem(data.item.uuid) as SNTag;
-              this.addTag(tag);
-            }
-          } else if (action === ComponentAction.DeassociateItem) {
-            const tag = this.application.findItem(data.item.uuid) as SNTag;
-            this.removeTag(tag);
-          }
-        },,
-      }
-    );
-  }, [application]);
+  const [webViewError, setWebviewError] = useState();
+  const [title, setTitle] = useState('');
+  const [basicNote, setBasicNote] = useState('');
+  const editorViewRef = createRef<TextView>();
 
   return (
     <Container>
-      {this.note.locked && (
+      {/* {this.note.locked && (
         <LockedContainer>
           <Icon
             name={StyleKit.nameForIcon(ICON_LOCK)}
@@ -101,8 +46,8 @@ export const Compose = (): JSX.Element => {
           />
           <LockedText>Note Locked</LockedText>
         </LockedContainer>
-      )}
-      {this.state.webViewError && (
+      )} */}
+      {/* {webViewError && (
         <LockedContainer>
           <Icon
             name={StyleKit.nameForIcon(ICON_ALERT)}
@@ -116,12 +61,11 @@ export const Compose = (): JSX.Element => {
             <WebViewReloadButtonText>Reload</WebViewReloadButtonText>
           </WebViewReloadButton>
         </LockedContainer>
-      )}
+      )} */}
       <NoteTitleInput
         testID="noteTitleField"
-        style={this.styles.noteTitle}
-        onChangeText={this.onTitleChange}
-        value={this.state.title}
+        onChangeText={setTitle}
+        value={title}
         placeholder={'Add Title'}
         selectionColor={theme.stylekitInfoColor}
         underlineColorAndroid={'transparent'}
@@ -131,16 +75,16 @@ export const Compose = (): JSX.Element => {
           .keyboardColorForActiveTheme()}
         autoCorrect={true}
         autoCapitalize={'sentences'}
-        editable={!this.note.locked}
+        // editable={!this.note.locked}
       />
-      {this.state.loadingWebView && (
+      {/* {this.state.loadingWebView && (
         <LoadingWebViewContainer>
           <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
           <LoadingWebViewSubtitle>
             {noteEditor && noteEditor.content.name}
           </LoadingWebViewSubtitle>
         </LoadingWebViewContainer>
-      )}
+      )} */}
       {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
       {/* {shouldDisplayEditor && (
         <ComponentView
@@ -159,31 +103,31 @@ export const Compose = (): JSX.Element => {
           }}
         />
       )} */}
-      {!shouldDisplayEditor && application?.platform === Platform.Android && (
+      {application?.platform === Platform.Android && (
         <TextContainer>
           <StyledTextView
             testID="noteContentField"
-            ref={ref => (this.input = ref)}
-            autoFocus={this.note.dummy}
-            value={this.note.text}
+            ref={editorViewRef}
+            autoFocus={false}
+            value={basicNote}
             selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
             handlesColor={theme.stylekitInfoColor}
-            onChangeText={this.onTextChange}
+            onChangeText={setBasicNote}
           />
         </TextContainer>
       )}
-      {!shouldDisplayEditor && application?.platform === Platform.Ios && (
+      {application?.platform === Platform.Ios && (
         <StyledTextView
-          ref={ref => (this.input = ref)}
+          ref={editorViewRef}
           autoFocus={false}
-          value={this.note.text}
+          value={basicNote}
           keyboardDismissMode={'interactive'}
           keyboardAppearance={application
             ?.getThemeService()
             .keyboardColorForActiveTheme()}
           selectionColor={lighten(theme.stylekitInfoColor)}
-          onChangeText={this.onTextChange}
-          editable={!this.note.locked}
+          onChangeText={setBasicNote}
+          // editable={!this.note.locked}
         />
       )}
     </Container>

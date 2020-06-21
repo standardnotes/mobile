@@ -5,7 +5,6 @@ import { EmptyPlaceholder } from './TagSelectionList.styled';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SideMenuCell } from './SideMenuCell';
 import { useCustomActionSheet } from '@Style/useCustomActionSheet';
-import { ScrollView } from 'react-native-gesture-handler';
 
 type Props = {
   contentType: ContentType.Tag | ContentType.SmartTag;

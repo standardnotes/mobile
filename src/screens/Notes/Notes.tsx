@@ -4,15 +4,26 @@ import {
   ContentType,
   SNNote,
   SNTag,
-  findInArray,
   CollectionSort,
   SNSmartTag,
+  Platform,
 } from 'snjs';
-import { Text, View } from 'react-native';
 import { NoteList } from './NoteList';
+import FAB from 'react-native-fab';
+import { ThemeContext } from 'styled-components/native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { StyleKit } from '@Style/StyleKit';
+import { ICON_ADD } from '@Style/icons';
+import { AppStackNavigationProp } from '@Root/App';
+import { SCREEN_NOTES, SCREEN_COMPOSE } from '@Root/screens2/screens';
 
-export const Notes: React.FC = props => {
+type Props = {
+  onNoteSelect: () => void;
+};
+
+export const Notes: React.FC<Props> = props => {
   const application = useContext(ApplicationContext);
+  const theme = useContext(ThemeContext);
   const [sortBy, setSortBy] = useState<string>();
   const [sortReverse, setSortReverse] = useState<string>();
   const [notes, setNotes] = useState<SNNote[]>([]);
@@ -21,22 +32,21 @@ export const Notes: React.FC = props => {
   //   const addNote = async () => {
   //     console.log('testing');
   //     const item = await application?.createManagedItem(ContentType.Note, {
-  //       title: 'New Ideasss',
-  //       text:
-  //         'Note fdsfdsfsfsdfsdfsdfsNote fdsfdsfsfsdfsdfsdfsd hehehehehehheheNote fdsfdsfsfsdfsdfsdfsd hehehehehehheheNote fdsfdsfsfsdfsdfsdfsd hehehehehehheheNote fdsfdsfsfsdfsdfsdfsd hehehehehehheheNote fdsfdsfsfsdfsdfsdfsd hehehehehehhehed hehehehehehhehe',
+  //       title: 'Testing & Tags',
+  //       text: 'test',
   //       references: [],
   //     });
-  //     application?.saveItem(item?.uuid);
+  //     application?.saveItem(item.uuid);
   //   };
 
   //   addNote();
   // }, [application]);
 
   const reloadNotes = useCallback(() => {
-    // const tag = application!.getAppState().selectedTag;
-    // if (!tag) {
-    //   return;
-    // }
+    const tag = application!.getAppState().selectedTag;
+    if (!tag) {
+      return;
+    }
     setNotes(application!.getDisplayableItems(ContentType.Note) as SNNote[]);
   }, [application]);
 
@@ -107,24 +117,51 @@ export const Notes: React.FC = props => {
     streamNotesAndTags();
   }, [streamNotesAndTags]);
 
+  const openComposer = () => {
+    props.onNoteSelect();
+  };
+
   return (
-    <NoteList
-      // onRefresh={this._onRefresh.bind(this)}
-      // hasRefreshControl={!Auth.get().offline()}
-      // onPressItem={this._onPressItem}
-      // refreshing={this.state.refreshing}
-      // onSearchChange={this.onSearchTextChange}
-      // onSearchCancel={this.onSearchCancel}
-      notes={notes}
-      // sortType={this.options.sortBy}
-      // decrypting={this.state.decrypting}
-      // loading={this.state.loading}
-      // selectedTags={this.state.tags}
-      selectedNoteId={
-        application?.getAppState().isInTabletMode
-          ? null // selectedNoteId
-          : null
-      }
-    />
+    <>
+      <NoteList
+        // onRefresh={this._onRefresh.bind(this)}
+        // hasRefreshControl={!Auth.get().offline()}
+        // onPressItem={this._onPressItem}
+        // refreshing={this.state.refreshing}
+        // onSearchChange={this.onSearchTextChange}
+        // onSearchCancel={this.onSearchCancel}
+        notes={notes}
+        // sortType={this.options.sortBy}
+        // decrypting={this.state.decrypting}
+        // loading={this.state.loading}
+        // selectedTags={this.state.tags}
+        selectedNoteId={
+          application?.getAppState().isInTabletMode
+            ? null // selectedNoteId
+            : null
+        }
+      />
+      <FAB
+        // @ts-ignore style prop does not exist for types
+        style={
+          application?.getAppState().isInTabletMode
+            ? { bottom: application?.getAppState().getKeyboardHeight() }
+            : undefined
+        }
+        buttonColor={theme.stylekitInfoColor}
+        iconTextColor={theme.stylekitInfoContrastColor}
+        onClickAction={openComposer}
+        visible={true}
+        size={30}
+        paddingTop={application!.platform === Platform.Ios ? 1 : 0}
+        iconTextComponent={
+          <Icon
+            testID="newNoteButton"
+            style={{ textAlignVertical: 'center' }}
+            name={StyleKit.nameForIcon(ICON_ADD)}
+          />
+        }
+      />
+    </>
   );
 };

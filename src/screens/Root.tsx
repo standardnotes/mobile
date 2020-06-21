@@ -9,6 +9,8 @@ import {
   NoteSideMenuToggleChange,
   AppStateType,
 } from '@Lib/ApplicationState';
+import { SCREEN_NOTES, SCREEN_COMPOSE } from '@Root/screens2/screens';
+import { AppStackNavigationProp } from '@Root/App';
 
 const Container = styled.View`
   flex: 1;
@@ -33,7 +35,9 @@ const ComposeContainer = styled.View<{ notesListCollapsed?: boolean }>`
   width: ${props => (props.notesListCollapsed ? '100%' : '60%')};
 `;
 
-export const Root = (): JSX.Element => {
+type Props = AppStackNavigationProp<typeof SCREEN_NOTES>;
+
+export const Root = (props: Props): JSX.Element => {
   const application = useContext(ApplicationContext);
   const [width, setWidth] = useState<number | undefined>(undefined);
   const [height, setHeight] = useState<number | undefined>(undefined);
@@ -120,6 +124,13 @@ export const Root = (): JSX.Element => {
     setNotesListCollapsed(application?.getAppState().isNoteSideMenuCollapsed);
     setKeyboardHeight(application?.getAppState().getKeyboardHeight());
   };
+
+  const onNoteSelect = () => {
+    if (shouldSplitLayout) {
+    } else {
+      props.navigation.navigate(SCREEN_COMPOSE);
+    }
+  };
   return (
     <Container testID="rootView" onLayout={onLayout}>
       <NotesContainer
@@ -127,10 +138,8 @@ export const Root = (): JSX.Element => {
         notesListCollapsed={notesListCollapsed}
       >
         <Notes
-        // onUnlockPress={this.onUnlockPress}
-        // onNoteSelect={
-        //   shouldSplitLayout ? this.onNoteSelect : undefined /* tablet only */
-        // }
+          // onUnlockPress={this.onUnlockPress}
+          onNoteSelect={onNoteSelect}
         />
       </NotesContainer>
 

@@ -1,8 +1,11 @@
 import { Client } from 'bugsnag-react-native';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { Platform, Dimensions, ScaledSize } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { Dimensions, ScaledSize } from 'react-native';
+import { NavigationContainer, RouteProp } from '@react-navigation/native';
+import {
+  createStackNavigator,
+  StackNavigationProp,
+} from '@react-navigation/stack';
 import { ThemeProvider, ThemeContext } from 'styled-components/native';
 import { CurrentApplication, ContextProvider } from './ApplicationContext';
 import { Root } from '@Screens/Root';
@@ -12,19 +15,16 @@ import {
   SCREEN_SETTINGS,
 } from './screens2/screens';
 import { HeaderTitleView } from '@Components/HeaderTitleView';
-import {
-  HeaderButtons,
-  HeaderButtonProps,
-  HeaderButton,
-  Item,
-} from 'react-navigation-header-buttons';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ICON_MENU } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { enableScreens } from 'react-native-screens';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
+import { Compose } from '@Screens/Compose/Compose';
+import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
+import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 
 enableScreens();
 
@@ -33,91 +33,6 @@ if (__DEV__ === false) {
   // eslint-disable-next-line no-new
   new Client();
 }
-
-// const AppStack = createStackNavigator(
-//   {
-//     [SCREEN_NOTES]: { screen: Root },
-//     [SCREEN_COMPOSE]: { screen: Compose },
-//   },
-//   {
-//     initialRouteName: SCREEN_NOTES,
-//     navigationOptions: () => ({
-//       drawerLockMode: SideMenuManager.get().isRightSideMenuLocked()
-//         ? 'locked-closed'
-//         : null,
-//     }),
-//   }
-// );
-
-// const AppDrawerStack = createDrawerNavigator(
-//   {
-//     Main: AppStack,
-//   },
-//   {
-//     contentComponent: ({ navigation }) => (
-//       <NoteSideMenu
-//         ref={ref => {
-//           SideMenuManager.get().setRightSideMenuReference(ref);
-//         }}
-//         // @ts-ignore navigation is ignored
-//         navigation={navigation}
-//       />
-//     ),
-//     drawerPosition: 'right',
-//     drawerType: 'slide',
-//     // @ts-ignore navigation is ignored
-//     getCustomActionCreators: (route, stateKey) => {
-//       return {
-//         openRightDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
-//         closeRightDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
-//         lockRightDrawer: (lock: any) => {
-//           /** This is the key part */
-//           SideMenuManager.get().setLockedForRightSideMenu(lock);
-//           /** We have to return something. */
-//           return NavigationActions.setParams({
-//             params: { dummy: true },
-//             key: route.key,
-//           });
-//         },
-//       };
-//     },
-//   }
-// );
-
-// const SettingsStack = createStackNavigator({
-//   screen: Settings,
-// });
-
-// const InputModalStack = createStackNavigator({
-//   screen: InputModal,
-// });
-
-// const AuthenticateModalStack = createStackNavigator({
-//   screen: Authenticate,
-// });
-
-// const ManagePrivilegesStack = createStackNavigator({
-//   screen: ManagePrivileges,
-// });
-
-// const KeyRecoveryStack = createStackNavigator({
-//   screen: Root,
-// });
-
-const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {
-  // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />
-  // and it is important to pass those props to `HeaderButton`
-  // then you may add some information like icon size or color (if you use icons)
-  const theme = useContext(ThemeContext);
-  return (
-    <HeaderButton
-      {...passMeFurther}
-      IconComponent={Icon}
-      iconSize={30}
-      color={theme.stylekitInfoColor}
-    />
-  );
-};
 
 type HeaderTitleParams = {
   title?: string;
@@ -130,19 +45,11 @@ type AppStackNavigatorParamList = {
   [SCREEN_COMPOSE]: undefined;
 };
 
-const getDefaultDrawerWidth = ({ height, width }: ScaledSize) => {
-  /*
-   * Default drawer width is screen width - header height
-   * with a max width of 280 on mobile and 320 on tablet
-   * https://material.io/guidelines/patterns/navigation-drawer.html
-   */
-  const smallerAxisSize = Math.min(height, width);
-  const isLandscape = width > height;
-  const isTablet = smallerAxisSize >= 600;
-  const appBarHeight = Platform.OS === 'ios' ? (isLandscape ? 32 : 44) : 56;
-  const maxWidth = isTablet ? 320 : 280;
-
-  return Math.min(smallerAxisSize - appBarHeight, maxWidth);
+export type AppStackNavigationProp<
+  T extends keyof AppStackNavigatorParamList
+> = {
+  navigation: StackNavigationProp<AppStackNavigatorParamList, T>;
+  route: RouteProp<AppStackNavigatorParamList, T>;
 };
 
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
@@ -213,74 +120,28 @@ const AppStackComponent = () => {
           })}
           component={Root}
         />
-        {/* <AppStack.Screen name={SCREEN_COMPOSE} component={Notifications} /> */}
+        <AppStack.Screen
+          options={() => ({
+            headerRight: () => (
+              <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+                <Item
+                  testID="noteDrawerButton"
+                  disabled={false}
+                  title={''}
+                  iconName={StyleKit.nameForIcon(ICON_MENU)}
+                  onPress={() => {}}
+                />
+              </HeaderButtons>
+            ),
+          })}
+          name={SCREEN_COMPOSE}
+          component={Compose}
+        />
         {/* <AppStack.Screen name={SCREEN_INPUT_MODAL} component={InputModal} /> */}
       </AppStack.Navigator>
     </DrawerLayout>
   );
 };
-
-// const AppDrawer = createStackNavigator(
-//   {
-//     [SCREEN_HOME]: AppDrawerStack,
-//     [SCREEN_SETTINGS]: SettingsStack,
-//     [SCREEN_INPUT_MODAL]: InputModalStack,
-//     [SCREEN_AUTHENTICATE]: AuthenticateModalStack,
-//     [SCREEN_MANAGE_PRIVILEGES]: ManagePrivilegesStack,
-//     [SCREEN_KEY_RECOVERY]: KeyRecoveryStack,
-//   },
-//   {
-//     mode: 'modal',
-//     headerMode: 'none',
-//     // @ts-ignore navigation is ignored
-//     transitionConfig: () => ({
-//       transitionSpec: {
-//         duration: 300,
-//         timing: Animated.timing,
-//       },
-//     }),
-//     navigationOptions: () => ({
-//       drawerLockMode: SideMenuManager.get().isLeftSideMenuLocked()
-//         ? 'locked-closed'
-//         : null,
-//     }),
-//   }
-// );
-
-// const DrawerStack = createDrawerNavigator(
-//   {
-//     Main: AppDrawer,
-//   },
-//   {
-//     contentComponent: ({ navigation }) => (
-//       <MainSideMenu
-//         ref={ref => {
-//           SideMenuManager.get().setLeftSideMenuReference(ref);
-//         }}
-//         // @ts-ignore navigation is ignored
-//         navigation={navigation}
-//       />
-//     ),
-//     drawerPosition: 'left',
-//     drawerType: 'slide',
-//     // @ts-ignore navigation is ignored
-//     getCustomActionCreators: (route, stateKey) => {
-//       return {
-//         openLeftDrawer: () => DrawerActions.openDrawer({ key: stateKey }),
-//         closeLeftDrawer: () => DrawerActions.closeDrawer({ key: stateKey }),
-//         lockLeftDrawer: (lock: any) => {
-//           /** This is the key part. */
-//           SideMenuManager.get().setLockedForLeftSideMenu(lock);
-//           /** We have to return something. */
-//           return NavigationActions.setParams({
-//             params: { dummy: true },
-//             key: route.key,
-//           });
-//         },
-//       };
-//     },
-//   }
-// );
 
 export const App: React.FC = () => {
   const [ready, setReady] = useState(false);
