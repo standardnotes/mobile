@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { LayoutChangeEvent } from 'react-native';
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { Notes } from './Notes/Notes';
 import {
@@ -20,13 +20,14 @@ const NotesContainer = styled.View<{
 }>`
   ${({ shouldSplitLayout, notesListCollapsed }) =>
     shouldSplitLayout
-      ? `
-  border-right-color: black;
-  border-right-width: 1px;
-  width: ${notesListCollapsed ? 0 : '40%'}
-  `
-      : `
-flex: 1`}
+      ? css`
+          border-right-color: black;
+          border-right-width: 1px;
+          width: ${notesListCollapsed ? 0 : '40%'};
+        `
+      : css`
+          flex: 1;
+        `}
 `;
 const ComposeContainer = styled.View<{ notesListCollapsed?: boolean }>`
   width: ${props => (props.notesListCollapsed ? '100%' : '60%')};
