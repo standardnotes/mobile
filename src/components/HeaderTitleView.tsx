@@ -12,8 +12,7 @@ const Container = styled.View`
   /* background-color: ${props =>
     props.theme.stylekitContrastBackgroundColor}; */
   flex: 1;
-  justify-content: flex-start;
-  flex-direction: column;
+  justify-content: center;
   ${Platform.OS === 'android' && 'align-items: flex-start'}
 `;
 const Title = styled.Text`
