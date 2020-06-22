@@ -28,25 +28,21 @@ export const Notes: React.FC<Props> = props => {
   const [sortReverse, setSortReverse] = useState<string>();
   const [notes, setNotes] = useState<SNNote[]>([]);
 
-  // useEffect(() => {
-  //   const addNote = async () => {
-  //     console.log('testing');
-  //     const item = await application?.createManagedItem(ContentType.Note, {
-  //       title: 'Testing & Tags',
-  //       text: 'test',
-  //       references: [],
-  //     });
-  //     application?.saveItem(item.uuid);
-  //   };
-
-  //   addNote();
-  // }, [application]);
+  const addNote = async () => {
+    console.log('testing');
+    const item = await application!.createManagedItem(ContentType.Note, {
+      title: 'fdsfsfss & Tags',
+      text: 'tests asdad',
+      references: [],
+    });
+    application?.saveItem(item.uuid);
+  };
 
   const reloadNotes = useCallback(() => {
-    const tag = application!.getAppState().selectedTag;
-    if (!tag) {
-      return;
-    }
+    // const tag = application!.getAppState().selectedTag;
+    // if (!tag) {
+    //   return;
+    // }
     setNotes(application!.getDisplayableItems(ContentType.Note) as SNNote[]);
   }, [application]);
 
@@ -55,7 +51,7 @@ export const Notes: React.FC<Props> = props => {
    * so call sparingly. The runtime complexity of destroying and building
    * an index is roughly O(n^2).
    */
-  const reloadNotesDisplayOptions = useCallback(async () => {
+  const reloadNotesDisplayOptions = useCallback(() => {
     const tag = application!.getAppState().selectedTag!;
     application!.setDisplayOptions(
       ContentType.Note,
@@ -77,44 +73,57 @@ export const Notes: React.FC<Props> = props => {
     );
   }, [application, sortBy, sortReverse]);
 
-  const streamNotesAndTags = useCallback(async () => {
-    application!.streamItems([ContentType.Note], async items => {
-      const tempNotes = items as SNNote[];
-      /** Note has changed values, reset its flags */
-      for (const note of tempNotes) {
-        if (note.deleted) {
-          continue;
+  const streamNotesAndTags = useCallback(() => {
+    const removeStreamNotes = application!.streamItems(
+      [ContentType.Note],
+      async items => {
+        const tempNotes = items as SNNote[];
+        /** Note has changed values, reset its flags */
+        for (const note of tempNotes) {
+          if (note.deleted) {
+            continue;
+          }
+          // this.loadFlagsForNote(note);
         }
-        // this.loadFlagsForNote(note);
+        /** If a note changes, it will be queried against the existing filter;
+         * we dont need to reload display options */
+        reloadNotes();
+        // const activeNote = application!.editorGroup.activeEditor.note;
+        // if (activeNote) {
+        //   const discarded = activeNote.deleted || activeNote.trashed;
+        //   if (discarded) {
+        //     this.selectNextOrCreateNew();
+        //   }
+        // } else {
+        //   this.selectFirstNote();
+        // }
       }
-      /** If a note changes, it will be queried against the existing filter;
-       * we dont need to reload display options */
-      reloadNotes();
-      // const activeNote = application!.editorGroup.activeEditor.note;
-      // if (activeNote) {
-      //   const discarded = activeNote.deleted || activeNote.trashed;
-      //   if (discarded) {
-      //     this.selectNextOrCreateNew();
-      //   }
-      // } else {
-      //   this.selectFirstNote();
-      // }
-    });
+    );
 
-    application!.streamItems([ContentType.Tag], async items => {
-      const tags = items as SNTag[];
-      /** A tag could have changed its relationships, so we need to reload the filter */
-      reloadNotesDisplayOptions();
-      // await this.reloadNotes();
-      // if (findInArray(tags, 'uuid', this.appState.selectedTag?.uuid)) {
-      //   /** Tag title could have changed */
-      //   this.reloadPanelTitle();
-      // }
-    });
+    const removeStreamTags = application!.streamItems(
+      [ContentType.Tag],
+      async items => {
+        const tags = items as SNTag[];
+        /** A tag could have changed its relationships, so we need to reload the filter */
+        reloadNotesDisplayOptions();
+        // await this.reloadNotes();
+        // if (findInArray(tags, 'uuid', this.appState.selectedTag?.uuid)) {
+        //   /** Tag title could have changed */
+        //   this.reloadPanelTitle();
+        // }
+      }
+    );
+
+    return () => {
+      removeStreamNotes();
+      removeStreamTags();
+    };
   }, [application, reloadNotes, reloadNotesDisplayOptions]);
 
   useEffect(() => {
-    streamNotesAndTags();
+    const removeStreams = streamNotesAndTags();
+
+    return removeStreams;
   }, [streamNotesAndTags]);
 
   const openComposer = () => {
@@ -126,7 +135,7 @@ export const Notes: React.FC<Props> = props => {
       <NoteList
         // onRefresh={this._onRefresh.bind(this)}
         // hasRefreshControl={!Auth.get().offline()}
-        // onPressItem={this._onPressItem}
+        // onPressItem={addNote}
         // refreshing={this.state.refreshing}
         // onSearchChange={this.onSearchTextChange}
         // onSearchCancel={this.onSearchCancel}

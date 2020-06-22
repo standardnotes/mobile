@@ -43,20 +43,20 @@ const TitleText = styled.Text<{ selected: boolean }>`
 `;
 // const TagsContainter = styled.View`
 //   flex: 1;
-//   flex-direction: 'row';
-//   margin-top: 7;
+//   flex-direction: row;
+//   margin-top: 7px;
 // `;
-// const TagText = styled.Text<{ selected: boolean }>`
-//   margin-right: 2px;
-//   font-size: 12;
-//   color: ${({ theme, selected }) =>
-//     selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
-//   opacity: ${props => (props.selected ? 0.8 : 0.5)};
-// `;
-// const DateText = styled(TagText)`
-//   margin-right: 0px;
-//   margin-top: 5px;
-// `;
+const TagText = styled.Text<{ selected: boolean }>`
+  margin-right: 2px;
+  font-size: 12px;
+  color: ${({ theme, selected }) =>
+    selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
+  opacity: ${props => (props.selected ? 0.8 : 0.5)};
+`;
+const DateText = styled(TagText)`
+  margin-right: 0px;
+  margin-top: 5px;
+`;
 
 export const NoteCell = (props: Props): JSX.Element => {
   const [selected, setSelected] = useState(false);
@@ -129,23 +129,17 @@ export const NoteCell = (props: Props): JSX.Element => {
           </NoteText>
         )}
 
-        {/* {!this.state.options.hideDates && (
-          <DateText
-            numberOfLines={1}
-            selected={highlight}
-          >
+        {true && (
+          <DateText numberOfLines={1} selected={highlight}>
             {props.sortType === 'client_updated_at'
               ? 'Modified ' + note.updatedAtString
-              : note.createdAtString
+              : note.createdAtString}
           </DateText>
-        )} */}
+        )}
 
-        {/* {showTagsString && (
+        {/* {true && (
           <TagsContainter>
-            <TagText
-              numberOfLines={1}
-              selected={highlight}
-            >
+            <TagText numberOfLines={1} selected={highlight}>
               {props.tagsString}
             </TagText>
           </TagsContainter>
