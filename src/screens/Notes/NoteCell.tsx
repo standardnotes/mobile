@@ -21,7 +21,7 @@ const Container = styled.View<{ selected: boolean; padding: number }>`
     hexToRGBA(theme.stylekitBorderColor, 0.75)};
   border-bottom-width: 1px;
   background-color: ${({ theme, selected }) =>
-    selected ? theme.stylekitBackgroundColor : theme.stylekitBackgroundColor};
+    selected ? theme.stylekitInfoColor : theme.stylekitBackgroundColor};
 `;
 const DeletedText = styled.Text`
   color: ${({ theme }) => theme.stylekitInfoColor};

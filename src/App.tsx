@@ -1,6 +1,6 @@
 import { Client } from 'bugsnag-react-native';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { Dimensions, ScaledSize } from 'react-native';
+import { Dimensions, ScaledSize, StatusBar } from 'react-native';
 import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import {
   createStackNavigator,
@@ -42,7 +42,7 @@ type HeaderTitleParams = {
 
 type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
-  [SCREEN_COMPOSE]: undefined;
+  [SCREEN_COMPOSE]: HeaderTitleParams;
 };
 
 export type AppStackNavigationProp<
@@ -69,7 +69,6 @@ const AppStackComponent = () => {
 
     return () => Dimensions.removeEventListener('change', updateDimensions);
   }, []);
-  const renderDrawer = () => <MainSideMenu />;
   return (
     <DrawerLayout
       ref={drawerRef}
@@ -77,7 +76,7 @@ const AppStackComponent = () => {
       drawerPosition={'left'}
       drawerType="slide"
       drawerBackgroundColor="#ddd"
-      renderNavigationView={renderDrawer}
+      renderNavigationView={() => <MainSideMenu />}
     >
       <AppStack.Navigator
         screenOptions={({ navigation, route }) => ({
@@ -95,7 +94,7 @@ const AppStackComponent = () => {
       >
         <AppStack.Screen
           name={SCREEN_NOTES}
-          options={({ route, navigation }) => ({
+          options={({ route }) => ({
             title: 'All notes',
             headerTitle: ({ children }) => {
               return (
@@ -121,7 +120,17 @@ const AppStackComponent = () => {
           component={Root}
         />
         <AppStack.Screen
-          options={() => ({
+          name={SCREEN_COMPOSE}
+          options={({ route }) => ({
+            headerTitle: ({ children }) => {
+              return (
+                <HeaderTitleView
+                  title={route.params?.title ?? (children || '')}
+                  subtitle={route.params?.subTitle}
+                  subtitleColor={route.params?.subTitleColor}
+                />
+              );
+            },
             headerRight: () => (
               <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
                 <Item
@@ -134,7 +143,6 @@ const AppStackComponent = () => {
               </HeaderButtons>
             ),
           })}
-          name={SCREEN_COMPOSE}
           component={Compose}
         />
         {/* <AppStack.Screen name={SCREEN_INPUT_MODAL} component={InputModal} /> */}
@@ -165,6 +173,7 @@ export const App: React.FC = () => {
   }
   return (
     <NavigationContainer>
+      <StatusBar translucent />
       <ThemeProvider theme={CurrentApplication!.getThemeService().theme!}>
         <ContextProvider>
           <ActionSheetProvider>

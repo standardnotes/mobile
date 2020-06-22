@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextStyle, Platform } from 'react-native';
+import { TextStyle, Platform, Animated } from 'react-native';
 import styled from 'styled-components/native';
 
 type Props = {
@@ -13,7 +13,8 @@ const Container = styled.View`
     props.theme.stylekitContrastBackgroundColor}; */
   flex: 1;
   justify-content: center;
-  ${Platform.OS === 'android' && 'align-items: flex-start'}
+
+  ${Platform.OS === 'android' && 'align-items: flex-start; min-width: 100px;'}
 `;
 const Title = styled.Text`
   color: ${props => props.theme.stylekitForegroundColor};
