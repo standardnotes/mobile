@@ -17,14 +17,26 @@ type Props = {
 export const TagSelectionList = (props: Props): JSX.Element => {
   const application = useContext(ApplicationContext);
   const { showActionSheet } = useCustomActionSheet();
-  const [tags, setTags] = useState<SNTag[] | SNSmartTag[]>([]);
-  const streamTags = useCallback(async () => {
-    application!.streamItems(props.contentType, items => {
-      setTags(items as SNTag[] | SNSmartTag[]);
-    });
-  }, [props.contentType, application, setTags]);
+  const [tags, setTags] = useState<SNTag[] | SNSmartTag[]>(() =>
+    props.contentType === ContentType.SmartTag
+      ? application!.getSmartTags()
+      : []
+  );
+  const streamTags = useCallback(
+    () =>
+      application!.streamItems(props.contentType, items => {
+        if (props.contentType === ContentType.SmartTag) {
+          setTags(application!.getSmartTags().concat(items as SNSmartTag[]));
+        } else {
+          setTags(items as SNTag[]);
+        }
+      }),
+    [props.contentType, application, setTags]
+  );
   useEffect(() => {
-    streamTags();
+    const removeStreamTags = streamTags();
+
+    return removeStreamTags;
   }, [streamTags]);
   const onTagLongPress = (tag: SNTag | SNSmartTag) => {
     showActionSheet(tag.title, [
@@ -69,6 +81,7 @@ export const TagSelectionList = (props: Props): JSX.Element => {
         onLongPress={() => onTagLongPress(item)}
         text={title}
         iconDesc={{
+          side: 'left',
           type: 'ascii',
           value: '#',
         }}

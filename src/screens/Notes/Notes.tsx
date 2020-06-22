@@ -16,6 +16,7 @@ import { StyleKit } from '@Style/StyleKit';
 import { ICON_ADD } from '@Style/icons';
 import { AppStackNavigationProp } from '@Root/App';
 import { SCREEN_NOTES, SCREEN_COMPOSE } from '@Root/screens2/screens';
+import { AppStateType } from '@Lib/ApplicationState';
 
 type Props = {
   onNoteSelect: () => void;
@@ -39,10 +40,10 @@ export const Notes: React.FC<Props> = props => {
   };
 
   const reloadNotes = useCallback(() => {
-    // const tag = application!.getAppState().selectedTag;
-    // if (!tag) {
-    //   return;
-    // }
+    const tag = application!.getAppState().selectedTag;
+    if (!tag) {
+      return;
+    }
     setNotes(application!.getDisplayableItems(ContentType.Note) as SNNote[]);
   }, [application]);
 
@@ -106,7 +107,7 @@ export const Notes: React.FC<Props> = props => {
         const tags = items as SNTag[];
         /** A tag could have changed its relationships, so we need to reload the filter */
         reloadNotesDisplayOptions();
-        // await this.reloadNotes();
+        reloadNotes();
         // if (findInArray(tags, 'uuid', this.appState.selectedTag?.uuid)) {
         //   /** Tag title could have changed */
         //   this.reloadPanelTitle();
@@ -121,10 +122,21 @@ export const Notes: React.FC<Props> = props => {
   }, [application, reloadNotes, reloadNotesDisplayOptions]);
 
   useEffect(() => {
+    const removeAppStateChangeHandler = application!
+      .getAppState()
+      .addStateChangeObserver(state => {
+        if (state === AppStateType.TagChanged) {
+          reloadNotesDisplayOptions();
+          reloadNotes();
+        }
+      });
     const removeStreams = streamNotesAndTags();
 
-    return removeStreams;
-  }, [streamNotesAndTags]);
+    return () => {
+      removeAppStateChangeHandler();
+      removeStreams();
+    };
+  }, [application, reloadNotes, reloadNotesDisplayOptions, streamNotesAndTags]);
 
   const openComposer = () => {
     props.onNoteSelect();

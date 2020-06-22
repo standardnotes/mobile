@@ -86,6 +86,7 @@ export class ApplicationState {
     this.setTabletModeEnabled(this.isTabletDevice);
     this.handleApplicationEvents();
     this.handleItemsChanges();
+    this.setSelectedTag(this.application.getSmartTags()[0]);
     AppState.addEventListener('change', this.handleReactNativeAppStateChange);
 
     this.keyboardDidShowListener = Keyboard.addListener(

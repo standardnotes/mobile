@@ -9,14 +9,11 @@ export const CellContent = styled.View`
   flex-direction: row;
   align-items: center;
 `;
-const IconContainer = styled.ProgressViewIOS`
-  flex: 0;
+const IconContainer = styled.View`
   justify-content: center;
-  flex-direction: column;
 `;
 export const IconContainerLeft = styled(IconContainer)`
   margin-right: 6px;
-  height: 100%;
 `;
 export const IconContainerRight = styled(IconContainer)`
   margin-left: 6px;
