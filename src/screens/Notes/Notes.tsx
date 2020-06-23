@@ -24,27 +24,21 @@ type Props = {
 };
 
 export const Notes: React.FC<Props> = props => {
+  // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
-  const [sortBy, setSortBy] = useState<string>();
-  const [sortReverse, setSortReverse] = useState<string>();
-  const [notes, setNotes] = useState<SNNote[]>([]);
 
-  const addNote = async () => {
-    console.log('testing');
-    const item = await application!.createManagedItem(ContentType.Note, {
-      title: 'fdsfsfss & Tags',
-      text: 'tests asdad',
-      references: [],
-    });
-    application?.saveItem(item.uuid);
-  };
+  // State
+  const [sortBy] = useState<CollectionSort>(CollectionSort.UpdatedAt);
+  const [sortReverse] = useState<string>();
+  const [notes, setNotes] = useState<SNNote[]>([]);
 
   const reloadNotes = useCallback(() => {
     const tag = application!.getAppState().selectedTag;
     if (!tag) {
       return;
     }
+
     setNotes(application!.getDisplayableItems(ContentType.Note) as SNNote[]);
   }, [application]);
 
@@ -63,6 +57,7 @@ export const Notes: React.FC<Props> = props => {
         const matchesTag = tag.isSmartTag()
           ? note.satisfiesPredicate((tag as SNSmartTag).predicate)
           : tag.hasRelationshipWithItem(note);
+
         return matchesTag;
         // notePassesFilter(
         //   note,
