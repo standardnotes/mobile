@@ -7,7 +7,7 @@ import { NoteCellFlags } from './NoteCellFlags';
 type Props = {
   note: SNNote;
   highlighted?: boolean;
-  onPressItem: (item: any) => void;
+  onPressItem: (itemUuid: SNNote['uuid']) => void;
   renderTags: boolean;
   sortType: string;
   tagsString: string;
@@ -66,7 +66,7 @@ export const NoteCell = (props: Props): JSX.Element => {
 
   const _onPress = () => {
     setSelected(true);
-    props.onPressItem(props.note);
+    props.onPressItem(props.note.uuid);
     setSelected(false);
   };
 

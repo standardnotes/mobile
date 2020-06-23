@@ -2,11 +2,11 @@ import { SNNote, ContentType, PayloadSource } from 'snjs';
 import { MobileApplication } from './application';
 
 export class Editor {
-  public note!: SNNote;
+  public note?: SNNote;
   private application: MobileApplication;
-  private _onNoteChange?: () => void;
+  private _onNoteChange?: (note: SNNote) => void;
   private _onNoteValueChange?: (note: SNNote, source?: PayloadSource) => void;
-  private removeStreamObserver: () => void;
+  private removeStreamObserver?: () => void;
   public isTemplateNote = false;
 
   constructor(
@@ -15,10 +15,14 @@ export class Editor {
     noteTitle?: string
   ) {
     this.application = application;
+    this.init(noteUuid, noteTitle);
+  }
+
+  async init(noteUuid?: string, noteTitle?: string) {
     if (noteUuid) {
-      this.note = application.findItem(noteUuid) as SNNote;
+      this.note = this.application.findItem(noteUuid) as SNNote;
     } else {
-      this.reset(noteTitle);
+      await this.reset(noteTitle);
     }
 
     this.removeStreamObserver = this.application.streamItems(
@@ -30,7 +34,9 @@ export class Editor {
   }
 
   deinit() {
-    this.removeStreamObserver();
+    if (this.removeStreamObserver) {
+      this.removeStreamObserver();
+    }
     (this.removeStreamObserver as any) = undefined;
     this._onNoteChange = undefined;
     (this.application as any) = undefined;
@@ -41,7 +47,7 @@ export class Editor {
   private async handleNoteStream(notes: SNNote[], source?: PayloadSource) {
     /** Update our note object reference whenever it changes */
     const matchingNote = notes.find(item => {
-      return item.uuid === this.note.uuid;
+      return item.uuid === this.note?.uuid;
     }) as SNNote;
     if (matchingNote) {
       this.isTemplateNote = false;
@@ -51,7 +57,7 @@ export class Editor {
   }
 
   async insertTemplatedNote() {
-    return this.application.insertItem(this.note);
+    return this.application.insertItem(this.note!);
   }
 
   /**
@@ -71,11 +77,14 @@ export class Editor {
   /**
    * Register to be notified when the editor's note changes.
    */
-  public onNoteChange(callback: () => void) {
+  public onNoteChange(callback: (note: SNNote) => void) {
     this._onNoteChange = callback;
     if (this.note) {
-      callback();
+      callback(this.note);
     }
+    return () => {
+      this._onNoteChange = undefined;
+    };
   }
 
   /**
@@ -86,6 +95,10 @@ export class Editor {
     callback: (note: SNNote, source?: PayloadSource) => void
   ) {
     this._onNoteValueChange = callback;
+
+    return () => {
+      this._onNoteValueChange = undefined;
+    };
   }
 
   /**
@@ -94,7 +107,7 @@ export class Editor {
   public setNote(note: SNNote) {
     this.note = note;
     if (this._onNoteChange) {
-      this._onNoteChange();
+      this._onNoteChange(this.note);
     }
   }
 }

@@ -13,7 +13,7 @@ import { NoteCell } from './NoteCell';
 type Props = {
   onSearchChange: (text: string) => void;
   onSearchCancel: () => void;
-  onPressItem: (item: SNNote) => void;
+  onPressItem: (noteUuid: SNNote['uuid']) => void;
   selectedTags: SNTag[];
   selectedNoteId: string | null;
   sortType: string;

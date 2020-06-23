@@ -11,6 +11,7 @@ import {
 } from '@Lib/ApplicationState';
 import { SCREEN_NOTES, SCREEN_COMPOSE } from '@Root/screens2/screens';
 import { AppStackNavigationProp } from '@Root/App';
+import { SNNote } from 'snjs/dist/@types';
 
 const Container = styled.View`
   flex: 1;
@@ -125,12 +126,23 @@ export const Root = (props: Props): JSX.Element => {
     setKeyboardHeight(application?.getAppState().getKeyboardHeight());
   };
 
-  const onNoteSelect = () => {
+  const openCompose = () => {
     if (shouldSplitLayout) {
     } else {
       props.navigation.navigate(SCREEN_COMPOSE);
     }
   };
+
+  const onNoteSelect = async (noteUuid: SNNote['uuid']) => {
+    await application!.getAppState().openEditor(noteUuid);
+    openCompose();
+  };
+
+  const onNoteCreate = async () => {
+    await application!.getAppState().createEditor();
+    openCompose();
+  };
+
   return (
     <Container testID="rootView" onLayout={onLayout}>
       <NotesContainer
@@ -140,6 +152,7 @@ export const Root = (props: Props): JSX.Element => {
         <Notes
           // onUnlockPress={this.onUnlockPress}
           onNoteSelect={onNoteSelect}
+          onNoteCreate={onNoteCreate}
         />
       </NotesContainer>
 

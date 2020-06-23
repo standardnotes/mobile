@@ -2,7 +2,7 @@ import { removeFromArray } from 'snjs';
 import { Editor } from './Editor';
 import { MobileApplication } from './application';
 
-type EditorGroupChangeCallback = () => void;
+type EditorGroupChangeCallback = (editor?: Editor) => void;
 
 export class EditorGroup {
   public editors: Editor[] = [];
@@ -59,7 +59,7 @@ export class EditorGroup {
   public addChangeObserver(callback: EditorGroupChangeCallback) {
     this.changeObservers.push(callback);
     if (this.activeEditor) {
-      callback();
+      callback(this.activeEditor);
     }
     return () => {
       removeFromArray(this.changeObservers, callback);

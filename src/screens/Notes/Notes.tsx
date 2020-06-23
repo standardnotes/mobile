@@ -19,7 +19,8 @@ import { SCREEN_NOTES, SCREEN_COMPOSE } from '@Root/screens2/screens';
 import { AppStateType } from '@Lib/ApplicationState';
 
 type Props = {
-  onNoteSelect: () => void;
+  onNoteSelect: (noteUuid: SNNote['uuid']) => void;
+  onNoteCreate: () => void;
 };
 
 export const Notes: React.FC<Props> = props => {
@@ -138,16 +139,12 @@ export const Notes: React.FC<Props> = props => {
     };
   }, [application, reloadNotes, reloadNotesDisplayOptions, streamNotesAndTags]);
 
-  const openComposer = () => {
-    props.onNoteSelect();
-  };
-
   return (
     <>
       <NoteList
         // onRefresh={this._onRefresh.bind(this)}
         // hasRefreshControl={!Auth.get().offline()}
-        // onPressItem={addNote}
+        onPressItem={props.onNoteSelect}
         // refreshing={this.state.refreshing}
         // onSearchChange={this.onSearchTextChange}
         // onSearchCancel={this.onSearchCancel}
@@ -171,7 +168,7 @@ export const Notes: React.FC<Props> = props => {
         }
         buttonColor={theme.stylekitInfoColor}
         iconTextColor={theme.stylekitInfoContrastColor}
-        onClickAction={openComposer}
+        onClickAction={props.onNoteCreate}
         visible={true}
         size={30}
         paddingTop={application!.platform === Platform.Ios ? 1 : 0}

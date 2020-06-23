@@ -56,7 +56,7 @@ const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 
 const AppStackComponent = () => {
   const theme = useContext(ThemeContext);
-  const drawerRef = React.createRef<DrawerLayout>();
+  const drawerRef = React.useRef<DrawerLayout>();
   const [dimensions, setDimensions] = React.useState(() =>
     Dimensions.get('window')
   );
