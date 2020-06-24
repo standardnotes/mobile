@@ -23,10 +23,19 @@ import {
   NoteTitleInput,
 } from './Compose.styled';
 import { StyleKit } from '@Style/StyleKit';
-import { Platform, SNNote, isPayloadSourceRetrieved, NoteMutator } from 'snjs';
+import {
+  Platform,
+  SNNote,
+  isPayloadSourceRetrieved,
+  NoteMutator,
+  SNComponent,
+  ComponentArea,
+  ContentType,
+} from 'snjs';
 import { lighten } from '@Style/utils';
 import TextView from 'sn-textview';
 import { Editor } from '@Lib/editor';
+import { ComponentView } from './ComponentView';
 
 const NOTE_PREVIEW_CHAR_LIMIT = 80;
 const MINIMUM_STATUS_DURATION = 400;
@@ -35,13 +44,22 @@ const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
 const EDITOR_DEBOUNCE = 100;
 
 export const Compose = (): JSX.Element => {
+  // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
-  // const [webViewError, setWebviewError] = useState();
+
+  //State
   const [title, setTitle] = useState<string | undefined>(undefined);
   const [noteText, setNoteText] = useState<string | undefined>(undefined);
   const [editor, setEditor] = useState<Editor | undefined>(undefined);
   const [note, setNote] = useState<SNNote | undefined>(undefined);
+  const [editorComponent, setEditorComponent] = useState<
+    SNComponent | undefined
+  >();
+  const [webViewError, setWebviewError] = useState(false);
+  const [loadingWebview, setLoadingWebiev] = useState(false);
+
+  // Ref
   const editorViewRef = useRef<TextView>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
@@ -54,11 +72,46 @@ export const Compose = (): JSX.Element => {
         setNoteText(editorTemp.note?.safeText());
       }
     );
+
+    const removeComponentGroupObserver = application?.componentGroup.addChangeObserver(
+      async () => {
+        const currentEditor = editorComponent;
+        const newEditor = application?.componentGroup.activeComponentForArea(
+          ComponentArea.Editor
+        );
+        if (
+          currentEditor &&
+          newEditor &&
+          currentEditor.uuid !== newEditor.uuid
+        ) {
+          /** Unload current component view so that we create a new one,
+           * then change the active editor */
+          // await this.setEditorState({
+          //   editorComponentUnloading: true,
+          // });
+        }
+        setEditorComponent(newEditor);
+        /** Stop unloading, if we were already unloading */
+        // await this.setEditorState({
+        //   editorComponentUnloading: false,
+        // });
+      }
+    );
+
+    const removeStreamItems = streamItems();
+    const editors = application!.componentManager!.componentsForArea(ComponentArea.Editor).sort((a, b) => {
+      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+    });
+
+    console.log('editors', editors);
+
     return () => {
       removeEditorObserver && removeEditorObserver();
-      // removeEditorNoteChangeObserver();
+      removeComponentGroupObserver && removeComponentGroupObserver();
+      removeStreamItems();
     };
-  }, [application]);
+
+  }, [application, editorComponent]);
 
   useEffect(() => {
     const removeEditorNoteChangeObserver = editor?.onNoteChange(setNote);
@@ -88,6 +141,71 @@ export const Compose = (): JSX.Element => {
         removeEditorNoteValueChangeObserver();
     };
   }, [editor]);
+
+  const reloadComponentEditorState = useCallback(async () => {
+    const associatedEditor = application?.componentManager!.editorForNote(
+      note!
+    );
+    if (!associatedEditor) {
+      /** No editor */
+      let changed = false;
+      if (editorComponent) {
+        await application?.componentGroup.deactivateComponentForArea(
+          ComponentArea.Editor
+        );
+        changed = true;
+      }
+      return { updatedEditor: undefined, changed };
+    }
+
+    if (associatedEditor.uuid === editorComponent?.uuid) {
+      /** Same editor, no change */
+      return { updatedEditor: associatedEditor, changed: false };
+    }
+
+    await application?.componentGroup.activateComponent(associatedEditor);
+    return { updatedEditor: associatedEditor, changed: true };
+  }, [application]);
+
+  const reloadComponentContext = () => {
+    if (note) {
+        if (editorComponent?.active) {
+          application!.componentManager!.setComponentHidden(
+            editorComponent,
+            !editorComponent.isExplicitlyEnabledForItem(note.uuid)
+          );
+        }
+      }
+    application?.componentManager!.contextItemDidChangeInArea(ComponentArea.Editor);
+  }
+
+  const streamItems = useCallback(() => {
+    const removeComponentsObserver = application?.streamItems(
+      ContentType.Component,
+      async items => {
+        const components = items as SNComponent[];
+        if (!note) {
+          return;
+        }
+        /** Reload componentStack in case new ones were added or removed */
+        reloadComponentContext();
+        // await this.reloadComponentStack();
+        /** Observe editor changes to see if the current note should update its editor */
+        const editors = components.filter(component => {
+          return component.isEditor();
+        });
+        if (editors.length === 0) {
+          return;
+        }
+        /** Find the most recent editor for note */
+        reloadComponentEditorState()
+      }
+    );
+
+    return () => {
+      removeComponentsObserver && removeComponentsObserver();
+    };
+  }, [application?.streamItems, note, reloadComponentEditorState]);
 
   const saveNote = async (
     bypassDebouncer: boolean,
@@ -173,7 +291,7 @@ export const Compose = (): JSX.Element => {
           <LockedText>Note Locked</LockedText>
         </LockedContainer>
       )}
-      {/* {webViewError && (
+      {webViewError && (
         <LockedContainer>
           <Icon
             name={StyleKit.nameForIcon(ICON_ALERT)}
@@ -181,13 +299,16 @@ export const Compose = (): JSX.Element => {
             color={theme.stylekitBackgroundColor}
           />
           <LockedText>
-            Unable to load {noteEditor && noteEditor.content.name}
+            Unable to load
           </LockedText>
-          <WebViewReloadButton onPress={this.reloadEditor}>
+          <WebViewReloadButton onPress={() => {
+             setLoadingWebiev(false);
+             setWebviewError(false);
+          }}>
             <WebViewReloadButtonText>Reload</WebViewReloadButtonText>
           </WebViewReloadButton>
         </LockedContainer>
-      )} */}
+      )}
       <NoteTitleInput
         testID="noteTitleField"
         onChangeText={onTitleChange}
@@ -203,32 +324,32 @@ export const Compose = (): JSX.Element => {
         autoCapitalize={'sentences'}
         editable={note?.locked}
       />
-      {/* {this.state.loadingWebView && (
+      {loadingWebview && (
         <LoadingWebViewContainer>
           <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
           <LoadingWebViewSubtitle>
-            {noteEditor && noteEditor.content.name}
+            {/* {noteEditor && noteEditor.content.name} */}
           </LoadingWebViewSubtitle>
         </LoadingWebViewContainer>
-      )} */}
+      )}
       {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
-      {/* {shouldDisplayEditor && (
+      {editorComponent && Boolean(note) && (
         <ComponentView
-          key={noteEditor.uuid}
-          noteId={this.note.uuid}
-          editorId={noteEditor.uuid}
+          key={editorComponent.uuid}
+          componentUuid={editorComponent!.uuid}
           onLoadStart={() => {
-            this.setState({ loadingWebView: true, webViewError: false });
+            setLoadingWebiev(true);
+            setWebviewError(false);
           }}
-
           onLoadEnd={() => {
-            this.setState({ loadingWebView: false });
+            setLoadingWebiev(false)
           }}
           onLoadError={() => {
-            this.setState({ loadingWebView: false, webViewError: true });
+            setLoadingWebiev(false)
+            setWebviewError(true);
           }}
         />
-      )} */}
+      )}
       {application?.platform === Platform.Android && (
         <TextContainer>
           <StyledTextView
