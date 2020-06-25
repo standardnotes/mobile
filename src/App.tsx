@@ -1,17 +1,7 @@
 import { Client } from 'bugsnag-react-native';
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-  useRef,
-} from 'react';
-import { Dimensions, ScaledSize, StatusBar } from 'react-native';
-import {
-  NavigationContainer,
-  RouteProp,
-  NavigationContainerRef,
-} from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
+import { Dimensions, ScaledSize, StatusBar, Platform } from 'react-native';
+import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import {
   createStackNavigator,
   StackNavigationProp,
@@ -26,7 +16,7 @@ import {
 } from './screens2/screens';
 import { HeaderTitleView } from '@Components/HeaderTitleView';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ICON_MENU } from '@Style/icons';
+import { ICON_MENU, ICON_CHECKMARK } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
 import { enableScreens } from 'react-native-screens';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
@@ -54,9 +44,12 @@ type HeaderTitleParams = {
 type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
   [SCREEN_COMPOSE]: HeaderTitleParams;
-  [SCREEN_SETTINGS]: HeaderTitleParams;
 };
 
+type ModalStackNavigatorParamList = {
+  AppStack: undefined;
+  [SCREEN_SETTINGS]: HeaderTitleParams;
+};
 export type AppStackNavigationProp<
   T extends keyof AppStackNavigatorParamList
 > = {
@@ -64,7 +57,7 @@ export type AppStackNavigationProp<
   route: RouteProp<AppStackNavigatorParamList, T>;
 };
 
-const navigationRef = React.createRef<NavigationContainerRef>();
+const MainStack = createStackNavigator();
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 
 const AppStackComponent = () => {
@@ -88,12 +81,8 @@ const AppStackComponent = () => {
       drawerWidth={getDefaultDrawerWidth(dimensions)}
       drawerPosition={'left'}
       drawerType="slide"
-      drawerBackgroundColor="#ddd"
       renderNavigationView={() => (
-        <MainSideMenu
-          drawerRef={drawerRef.current}
-          navigation={navigationRef.current}
-        />
+        <MainSideMenu drawerRef={drawerRef.current} />
       )}
     >
       <AppStack.Navigator
@@ -163,27 +152,49 @@ const AppStackComponent = () => {
           })}
           component={Compose}
         />
-        <AppStack.Screen
-          name={SCREEN_SETTINGS}
-          options={({ route }) => ({
-            title: 'Settings',
-            headerTitle: ({ children }) => {
-              return (
-                <HeaderTitleView
-                  title={route.params?.title ?? (children || '')}
-                  subtitle={route.params?.subTitle}
-                  subtitleColor={route.params?.subTitleColor}
-                />
-              );
-            },
-          })}
-          component={Settings}
-        />
         {/* <AppStack.Screen name={SCREEN_INPUT_MODAL} component={InputModal} /> */}
       </AppStack.Navigator>
     </DrawerLayout>
   );
 };
+
+const MainStackComponent = () => (
+  <MainStack.Navigator mode="modal" initialRouteName="AppStack">
+    <MainStack.Screen
+      name={'AppStack'}
+      options={{
+        headerShown: false,
+      }}
+      component={AppStackComponent}
+    />
+    <MainStack.Screen
+      name={SCREEN_SETTINGS}
+      options={({ route }) => ({
+        title: 'Settings',
+        gestureEnabled: false,
+        headerTitle: ({ children }) => {
+          return <HeaderTitleView title={children || ''} />;
+        },
+        headerLeft: ({ disabled, onPress }) => (
+          <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+            <Item
+              testID="headerButton"
+              disabled={disabled}
+              title={Platform.OS === 'ios' ? 'Done' : ''}
+              iconName={
+                Platform.OS === 'ios'
+                  ? undefined
+                  : StyleKit.nameForIcon(ICON_CHECKMARK)
+              }
+              onPress={onPress}
+            />
+          </HeaderButtons>
+        ),
+      })}
+      component={Settings}
+    />
+  </MainStack.Navigator>
+);
 
 export const App: React.FC = () => {
   const [ready, setReady] = useState(false);
@@ -214,12 +225,12 @@ export const App: React.FC = () => {
   }
 
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer>
       <StatusBar translucent />
       <ThemeProvider theme={CurrentApplication?.getThemeService().theme!}>
         <ContextProvider>
           <ActionSheetProvider>
-            <AppStackComponent />
+            <MainStackComponent />
           </ActionSheetProvider>
         </ContextProvider>
       </ThemeProvider>

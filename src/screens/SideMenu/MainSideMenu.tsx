@@ -17,19 +17,19 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 // import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import { TagSelectionList } from './TagSelectionList';
 import { AppStateType } from '@Lib/ApplicationState';
-import { NavigationContainerRef } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { SCREEN_SETTINGS } from '@Root/screens2/screens';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 
 type Props = {
-  navigation: NavigationContainerRef | null;
   drawerRef: DrawerLayout | null;
 };
 
-export const MainSideMenu = ({ navigation, drawerRef }: Props): JSX.Element => {
+export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   // Context
   const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
+  const navigation = useNavigation();
 
   // const { showActionSheet } = useCustomActionSheet();
   // State
@@ -75,6 +75,11 @@ export const MainSideMenu = ({ navigation, drawerRef }: Props): JSX.Element => {
     application!.getAppState().setSelectedTag(tag);
   };
 
+  const openSettings = () => {
+    drawerRef?.closeDrawer();
+    navigation?.navigate(SCREEN_SETTINGS);
+  };
+
   return (
     <Fragment>
       <FirstSafeAreaView />
@@ -82,7 +87,7 @@ export const MainSideMenu = ({ navigation, drawerRef }: Props): JSX.Element => {
         <SideMenuHero
           outOfSync={outOfSync}
           testID="settingsButton"
-          onPress={() => {}} // TODO: nav open settings
+          onPress={openSettings} // TODO: nav open settings
           onOutOfSyncPress={outOfSyncPressed}
         />
 
@@ -115,10 +120,7 @@ export const MainSideMenu = ({ navigation, drawerRef }: Props): JSX.Element => {
         <FAB
           buttonColor={theme.stylekitInfoColor}
           iconTextColor={theme.stylekitInfoContrastColor}
-          onClickAction={() => {
-            drawerRef?.closeDrawer();
-            navigation?.navigate(SCREEN_SETTINGS);
-          }}
+          onClickAction={openSettings}
           visible={true}
           size={29}
           paddingTop={Platform.OS ? 2 : 0}

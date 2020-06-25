@@ -99,11 +99,6 @@ export const Compose = (): JSX.Element => {
     );
 
     const removeStreamItems = streamItems();
-    const editors = application!.componentManager!.componentsForArea(ComponentArea.Editor).sort((a, b) => {
-      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-    });
-
-    console.log('editors', editors);
 
     return () => {
       removeEditorObserver && removeEditorObserver();
