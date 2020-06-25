@@ -4,7 +4,6 @@ import {
   SNAlertService,
   platformFromString,
   Challenge,
-  ChallengeOrchestrator,
   ChallengeReason,
 } from 'snjs';
 import { MobileDeviceInterface } from './interface';
@@ -70,10 +69,7 @@ export class MobileApplication extends SNApplication {
     super.deinit();
   }
 
-  promptForChallenge(
-    challenge: Challenge,
-    orchestrator: ChallengeOrchestrator
-  ) {
+  promptForChallenge(challenge: Challenge) {
     if (challenge.reason === ChallengeReason.ApplicationUnlock) {
       // orchestrator.submitValues();
     }

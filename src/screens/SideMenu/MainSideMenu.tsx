@@ -17,15 +17,27 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 // import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import { TagSelectionList } from './TagSelectionList';
 import { AppStateType } from '@Lib/ApplicationState';
+import { NavigationContainerRef } from '@react-navigation/native';
+import { SCREEN_SETTINGS } from '@Root/screens2/screens';
+import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 
-export const MainSideMenu = (): JSX.Element => {
+type Props = {
+  navigation: NavigationContainerRef | null;
+  drawerRef: DrawerLayout | null;
+};
+
+export const MainSideMenu = ({ navigation, drawerRef }: Props): JSX.Element => {
+  // Context
   const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
+
   // const { showActionSheet } = useCustomActionSheet();
+  // State
   const [outOfSync, setOutOfSync] = useState(false);
   const [selectedTag, setSelectedTag] = useState(() =>
     application!.getAppState().getSelectedTag()
   );
+
   useEffect(() => {
     const removeTagChangeObserver = application!
       .getAppState()
@@ -103,7 +115,10 @@ export const MainSideMenu = (): JSX.Element => {
         <FAB
           buttonColor={theme.stylekitInfoColor}
           iconTextColor={theme.stylekitInfoContrastColor}
-          onClickAction={() => {}} // TODO: nav open settings
+          onClickAction={() => {
+            drawerRef?.closeDrawer();
+            navigation?.navigate(SCREEN_SETTINGS);
+          }}
           visible={true}
           size={29}
           paddingTop={Platform.OS ? 2 : 0}

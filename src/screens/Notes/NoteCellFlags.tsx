@@ -4,22 +4,22 @@ import { SNNote } from 'snjs';
 
 const FlagsContainer = styled.View`
   flex: 1;
-  flex-direction: 'row';
-  margin-bottom: 8;
+  flex-direction: row;
+  margin-bottom: 8px;
 `;
 const FlagContainer = styled.View<{ color: string; selected: boolean }>`
   background-color: ${({ theme, selected, color }) =>
     selected ? theme.stylekitInfoContrastColor : color};
-  padding: 4;
-  padding-left: 6;
-  padding-right: 6;
-  border-radius: 3;
-  margin-right: 4;
+  padding: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+  border-radius: 3px;
+  margin-right: 4px;
 `;
 const FlagLabel = styled.Text<{ selected: boolean }>`
   color: ${({ theme, selected }) =>
     selected ? theme.stylekitInfoColor : theme.stylekitInfoContrastColor};
-  font-size: 10;
+  font-size: 10px;
   font-weight: bold;
 `;
 

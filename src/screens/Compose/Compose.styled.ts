@@ -65,14 +65,14 @@ export const LoadingWebViewContainer = styled.View`
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
 `;
 export const LoadingWebViewText = styled.Text`
-  padding-left: 0;
+  padding-left: 0px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   opacity: 0.7;
   font-size: 22px;
   font-weight: bold;
 `;
 export const LoadingWebViewSubtitle = styled.Text`
-  padding-left: 0;
+  padding-left: 0px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   opacity: 0.7;
   margin-top: 5px;

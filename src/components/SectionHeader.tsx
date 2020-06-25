@@ -17,7 +17,7 @@ const Container = styled.View<Pick<Props, 'backgroundColor'>>`
   flex-grow: 0;
   justify-content: space-between;
   flex-direction: row;
-  padding-right: ${props => props.theme.paddingLeft};
+  padding-right: ${props => props.theme.paddingLeft}px;
   padding-bottom: 10px;
   padding-top: 10px;
   background-color: ${props =>

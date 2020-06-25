@@ -225,7 +225,7 @@ export class ApplicationState {
 
   editorForNote(note: SNNote) {
     for (const editor of this.getEditors()) {
-      if (editor.note.uuid === note.uuid) {
+      if (editor.note?.uuid === note.uuid) {
         return editor;
       }
     }

@@ -3,14 +3,14 @@ import { Platform } from 'react-native';
 import { SectionedTableCellTouchableHighlight } from '@Components/SectionedTableCell';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import styled, { ThemeContext } from 'styled-components/native';
+import styled, { ThemeContext, css } from 'styled-components/native';
 
 type Props = {
   disabled?: boolean;
   onPress: () => void;
   onLongPress?: () => void;
   iconName?: string;
-  selected?: () => void;
+  selected?: () => boolean;
   leftAlignIcon?: boolean;
   color?: string;
   bold?: boolean;
@@ -29,7 +29,7 @@ const TouchableContainer = styled(SectionedTableCellTouchableHighlight).attrs(
   padding-top: 0px;
   padding-bottom: 0px;
   min-height: 47px;
-  background-color: 'transparent';
+  background-color: transparent;
 `;
 const ContentContainer = styled.View<Pick<Props, 'leftAlignIcon'>>`
   flex: 1;
@@ -47,7 +47,7 @@ type LabelProps = Pick<
   'bold' | 'tinted' | 'dimmed' | 'selected' | 'color'
 >;
 const Label = styled.Text<LabelProps>`
-  min-width: '80%';
+  min-width: 80%;
   color: ${props => {
     let color = props.theme.stylekitForegroundColor;
     if (props.tinted) {
@@ -61,9 +61,12 @@ const Label = styled.Text<LabelProps>`
     }
     return color;
   }};
-  font-size: ${props => props.theme.mainTextFontSize};
-  font-weight: ${props =>
-    props.bold || (props.selected && props.selected()) ? 'bold' : undefined};
+  font-size: ${props => props.theme.mainTextFontSize}px;
+  ${({ bold, selected }) =>
+    ((selected && selected() === true) || bold) &&
+    css`
+      font-weight: bold;
+    `};
 `;
 
 export const SectionedAccessoryTableCell: React.FC<Props> = props => {

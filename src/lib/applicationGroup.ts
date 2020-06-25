@@ -18,7 +18,7 @@ export class ApplicationGroup {
     this.createDefaultApplication();
   }
 
-  private createDefaultApplication() {
+  private async createDefaultApplication() {
     this.activeApplication = this.createNewApplication();
     this.applications.push(this.activeApplication!);
     this.notifyObserversOfAppChange();

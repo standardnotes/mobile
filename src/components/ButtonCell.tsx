@@ -1,9 +1,13 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import styled from 'styled-components/native';
-import { SectionedTableCellTouchableHighlight } from './SectionedTableCell';
+import styled, { css } from 'styled-components/native';
+import {
+  SectionedTableCellTouchableHighlight,
+  Props as TableCellProps,
+} from './SectionedTableCell';
 
 type Props = {
+  testID?: string;
   maxHeight?: number;
   leftAligned?: boolean;
   bold?: boolean;
@@ -13,16 +17,17 @@ type Props = {
   title?: string;
 };
 
-type ContainerProps = Pick<Props, 'maxHeight'>;
+type ContainerProps = Pick<Props, 'maxHeight'> & TableCellProps;
 const Container = styled(SectionedTableCellTouchableHighlight).attrs(props => ({
   underlayColor: props.theme.stylekitBorderColor,
 }))<ContainerProps>`
-  flex: 1;
-  flex-direction: column;
-  padding-top: 0px;
-  padding-bottom: 0px;
+  padding-top: ${12}px;
   justify-content: center;
-  max-height: ${props => props.maxHeight ?? undefined};
+  ${({ maxHeight }) =>
+    maxHeight &&
+    css`
+      max-height: 50px;
+    `};
 `;
 const ButtonContainer = styled.View``;
 
@@ -45,15 +50,35 @@ const ButtonLabel = styled.Text<ButtonLabelProps>`
     }
     return color;
   }};
-  font-size: ${props => props.theme.mainTextFontSize};
-  font-weight: ${props => (props.bold ? 'bold' : undefined)};
-  opacity: ${props => (props.disabled ? 0.6 : undefined)};
+  font-size: ${props => props.theme.mainTextFontSize}px;
+  ${({ bold }) =>
+    bold &&
+    css`
+      font-weight: bold;
+    `}
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      opacity: 0.6;
+    `}
 `;
 
 export const ButtonCell: React.FC<Props> = props => (
-  <Container disabled={props.disabled} onPress={props.onPress}>
+  <Container
+    maxHeight={props.maxHeight}
+    testID={props.testID}
+    disabled={props.disabled}
+    onPress={props.onPress}
+  >
     <ButtonContainer>
-      <ButtonLabel>{props.title}</ButtonLabel>
+      <ButtonLabel
+        important={props.important}
+        disabled={props.disabled}
+        bold={props.bold}
+        leftAligned={props.leftAligned}
+      >
+        {props.title}
+      </ButtonLabel>
       {props.children && props.children}
     </ButtonContainer>
   </Container>

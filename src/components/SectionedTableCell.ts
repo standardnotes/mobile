@@ -1,4 +1,4 @@
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
 
 export type Props = {
   first?: boolean;
@@ -10,32 +10,52 @@ export type Props = {
 
 export const SectionedTableCell = styled.View<Props>`
   border-bottom-color: ${props => props.theme.stylekitBorderColor};
-  border-bottom-width: 1;
-  padding-left: ${props => props.theme.paddingLeft};
-  padding-right: ${props => props.theme.paddingLeft};
-  max-height: ${props => (props.textInputCell ? 0 : 13)};
-  padding-bottom: ${props => (props.textInputCell ? 0 : 12)};
+  border-bottom-width: 1px;
+  padding-left: ${props => props.theme.paddingLeft}px;
+  padding-right: ${props => props.theme.paddingLeft}px;
+  padding-bottom: ${props => (props.textInputCell ? 0 : 12)}px;
   background-color: ${props => props.theme.stylekitBackgroundColor};
-  border-top-color: ${props =>
-    props.first ? props.theme.stylekitBorderColor : undefined};
-  border-top-width: ${props => (props.first ? 1 : undefined)};
-  max-height: ${props => (props.textInputCell ? 50 : undefined)};
-  height: ${props => props.height ?? undefined};
+  ${({ first, theme }) =>
+    first &&
+    css`
+      border-top-color: ${theme.stylekitBorderColor};
+      border-top-width: ${1}px;
+    `};
+  ${({ textInputCell }) =>
+    textInputCell &&
+    css`
+      max-height: 50px;
+    `};
+  ${({ height }) =>
+    height &&
+    css`
+      height: ${height}px;
+    `};
 `;
 
 export const SectionedTableCellTouchableHighlight = styled.TouchableHighlight<
   Props
 >`
   border-bottom-color: ${props => props.theme.stylekitBorderColor};
-  border-bottom-width: 1;
-  padding-left: ${props => props.theme.paddingLeft};
-  padding-right: ${props => props.theme.paddingLeft};
-  max-height: ${props => (props.textInputCell ? 0 : 13)};
-  padding-bottom: ${props => (props.textInputCell ? 0 : 12)};
+  border-bottom-width: 1px;
+  padding-left: ${props => props.theme.paddingLeft}px;
+  padding-right: ${props => props.theme.paddingLeft}px;
+  padding-bottom: ${props => (props.textInputCell ? 0 : 12)}px;
   background-color: ${props => props.theme.stylekitBackgroundColor};
-  border-top-color: ${props =>
-    props.first ? props.theme.stylekitBorderColor : undefined};
-  border-top-width: ${props => (props.first ? 1 : undefined)};
-  max-height: ${props => (props.textInputCell ? 50 : undefined)};
-  height: ${props => props.height ?? undefined};
+  ${({ first, theme }) =>
+    first &&
+    css`
+      border-top-color: ${theme.stylekitBorderColor};
+      border-top-width: ${1}px;
+    `};
+  ${({ textInputCell }) =>
+    textInputCell &&
+    css`
+      max-height: 50px;
+    `};
+  ${({ height }) =>
+    height &&
+    css`
+      height: ${height}px;
+    `};
 `;

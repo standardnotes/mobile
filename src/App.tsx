@@ -1,7 +1,17 @@
 import { Client } from 'bugsnag-react-native';
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useRef,
+} from 'react';
 import { Dimensions, ScaledSize, StatusBar } from 'react-native';
-import { NavigationContainer, RouteProp } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  RouteProp,
+  NavigationContainerRef,
+} from '@react-navigation/native';
 import {
   createStackNavigator,
   StackNavigationProp,
@@ -25,6 +35,7 @@ import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
 import { Compose } from '@Screens/Compose/Compose';
 import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
 import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
+import { Settings } from '@Screens/Settings/Settings';
 
 enableScreens();
 
@@ -43,6 +54,7 @@ type HeaderTitleParams = {
 type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
   [SCREEN_COMPOSE]: HeaderTitleParams;
+  [SCREEN_SETTINGS]: HeaderTitleParams;
 };
 
 export type AppStackNavigationProp<
@@ -52,11 +64,12 @@ export type AppStackNavigationProp<
   route: RouteProp<AppStackNavigatorParamList, T>;
 };
 
+const navigationRef = React.createRef<NavigationContainerRef>();
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 
 const AppStackComponent = () => {
   const theme = useContext(ThemeContext);
-  const drawerRef = React.useRef<DrawerLayout>();
+  const drawerRef = React.useRef<DrawerLayout>(null);
   const [dimensions, setDimensions] = React.useState(() =>
     Dimensions.get('window')
   );
@@ -76,7 +89,12 @@ const AppStackComponent = () => {
       drawerPosition={'left'}
       drawerType="slide"
       drawerBackgroundColor="#ddd"
-      renderNavigationView={() => <MainSideMenu />}
+      renderNavigationView={() => (
+        <MainSideMenu
+          drawerRef={drawerRef.current}
+          navigation={navigationRef.current}
+        />
+      )}
     >
       <AppStack.Navigator
         screenOptions={({ navigation, route }) => ({
@@ -145,6 +163,22 @@ const AppStackComponent = () => {
           })}
           component={Compose}
         />
+        <AppStack.Screen
+          name={SCREEN_SETTINGS}
+          options={({ route }) => ({
+            title: 'Settings',
+            headerTitle: ({ children }) => {
+              return (
+                <HeaderTitleView
+                  title={route.params?.title ?? (children || '')}
+                  subtitle={route.params?.subTitle}
+                  subtitleColor={route.params?.subTitleColor}
+                />
+              );
+            },
+          })}
+          component={Settings}
+        />
         {/* <AppStack.Screen name={SCREEN_INPUT_MODAL} component={InputModal} /> */}
       </AppStack.Navigator>
     </DrawerLayout>
@@ -155,12 +189,19 @@ export const App: React.FC = () => {
   const [ready, setReady] = useState(false);
 
   const loadApplication = useCallback(async () => {
-    await CurrentApplication!.prepareForLaunch({
-      receiveChallenge: async (challenge, orchestrator) => {
-        CurrentApplication!.promptForChallenge(challenge, orchestrator);
+    await CurrentApplication?.prepareForLaunch({
+      receiveChallenge: async challenge => {
+        CurrentApplication!.promptForChallenge(challenge);
       },
     });
-    await CurrentApplication!.launch(false);
+    if (__DEV__) {
+      await CurrentApplication?.setHost(
+        'https://syncing-server-dev.standardnotes.org/'
+      );
+    } else {
+      await CurrentApplication?.setHost('https://sync.standardnotes.org');
+    }
+    await CurrentApplication?.launch(false);
     setReady(true);
   }, []);
 
@@ -168,13 +209,14 @@ export const App: React.FC = () => {
     loadApplication();
   }, [loadApplication]);
 
-  if (!ready || !CurrentApplication!.getThemeService().theme) {
+  if (!ready || !CurrentApplication?.getThemeService().theme) {
     return null;
   }
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <StatusBar translucent />
-      <ThemeProvider theme={CurrentApplication!.getThemeService().theme!}>
+      <ThemeProvider theme={CurrentApplication?.getThemeService().theme!}>
         <ContextProvider>
           <ActionSheetProvider>
             <AppStackComponent />
