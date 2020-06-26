@@ -33,7 +33,6 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
 
   // const { showActionSheet } = useCustomActionSheet();
   // State
-  const [outOfSync, setOutOfSync] = useState(false);
   const [selectedTag, setSelectedTag] = useState(() =>
     application!.getAppState().getSelectedTag()
   );
@@ -48,14 +47,6 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
       });
     return removeTagChangeObserver;
   });
-
-  useEffect(() => {
-    const performSyncResolution = async () => {
-      const isOutofSync = await application!.isOutOfSync();
-      setOutOfSync(isOutofSync);
-    };
-    performSyncResolution();
-  }, [application]);
 
   const outOfSyncPressed = () => {
     application!.alertService!.confirm(
@@ -85,7 +76,6 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
       <FirstSafeAreaView />
       <MainSafeAreaView edges={['bottom', 'left']}>
         <SideMenuHero
-          outOfSync={outOfSync}
           testID="settingsButton"
           onPress={openSettings} // TODO: nav open settings
           onOutOfSyncPress={outOfSyncPressed}

@@ -14,6 +14,8 @@ type Props = {
   disabled?: boolean;
   important?: boolean;
   onPress: () => void;
+  first?: boolean;
+  last?: boolean;
   title?: string;
 };
 
@@ -65,6 +67,8 @@ const ButtonLabel = styled.Text<ButtonLabelProps>`
 
 export const ButtonCell: React.FC<Props> = props => (
   <Container
+    first={props.first}
+    last={props.last}
     maxHeight={props.maxHeight}
     testID={props.testID}
     disabled={props.disabled}

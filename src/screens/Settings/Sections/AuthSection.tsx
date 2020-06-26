@@ -16,8 +16,8 @@ const DEFAULT_REGISTER_TEXT = 'Register';
 const SIGNIN_IN = 'Generating Keys...';
 
 type Props = {
-  onAuthSuccess: () => void;
   title: string;
+  signedIn: boolean;
 };
 
 export const AuthSection = (props: Props) => {
@@ -38,6 +38,26 @@ export const AuthSection = (props: Props) => {
   const [server, setServer] = useState('');
   const [confirmRegistration, setConfirmRegistration] = useState(false);
 
+  const signIn = async () => {
+    setSigningIn(true);
+    await application!.signIn(
+      email,
+      password,
+      strictSignIn,
+      undefined,
+      undefined,
+      undefined,
+      false
+    );
+    setSigningIn(false);
+  };
+
+  const register = async () => {
+    setRegistering(true);
+    await application!.register(email, password, undefined, false);
+    setRegistering(false);
+  };
+
   // set initial server
   useEffect(() => {
     const getServer = async () => {
@@ -46,6 +66,10 @@ export const AuthSection = (props: Props) => {
     };
     getServer();
   }, [application]);
+
+  if (props.signedIn) {
+    return null;
+  }
 
   const _renderRegistrationConfirm = () => {
     return (
@@ -58,14 +82,14 @@ export const AuthSection = (props: Props) => {
           permanently lose access to your data.
         </RegistrationDescription>
 
-        <SectionedTableCell first={true} textInputCell={true}>
+        <SectionedTableCell first textInputCell>
           <RegistrationInput
             testID="passwordConfirmationField"
             placeholder={'Password confirmation'}
             onChangeText={setPasswordConfirmation}
             value={passwordConfirmation}
-            secureTextEntry={true}
-            autoFocus={true}
+            secureTextEntry
+            autoFocus
             keyboardAppearance={application!
               .getThemeService()
               .keyboardColorForActiveTheme()}
@@ -76,11 +100,14 @@ export const AuthSection = (props: Props) => {
           testID="registerConfirmButton"
           disabled={registering}
           title={registering ? 'Generating Keys...' : 'Register'}
-          bold={true}
-          onPress={() => {}}
+          bold
+          onPress={register}
         />
 
-        <ButtonCell title="Cancel" onPress={() => {}} />
+        <ButtonCell
+          title="Cancel"
+          onPress={() => setConfirmRegistration(false)}
+        />
       </TableSection>
     );
   };
@@ -183,7 +210,7 @@ export const AuthSection = (props: Props) => {
           title={signingIn ? SIGNIN_IN : DEFAULT_SIGN_IN_TEXT}
           disabled={signingIn}
           bold={true}
-          onPress={() => {}}
+          onPress={signIn}
         />
 
         {mfa && (
@@ -199,8 +226,8 @@ export const AuthSection = (props: Props) => {
             testID="registerButton"
             title={DEFAULT_REGISTER_TEXT}
             disabled={registering}
-            bold={true}
-            onPress={() => {}}
+            bold
+            onPress={() => setConfirmRegistration(true)}
           />
         )}
 

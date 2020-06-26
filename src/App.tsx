@@ -56,8 +56,14 @@ export type AppStackNavigationProp<
   navigation: StackNavigationProp<AppStackNavigatorParamList, T>;
   route: RouteProp<AppStackNavigatorParamList, T>;
 };
+export type ModalStackNavigationProp<
+  T extends keyof ModalStackNavigatorParamList
+> = {
+  navigation: StackNavigationProp<ModalStackNavigatorParamList, T>;
+  route: RouteProp<ModalStackNavigatorParamList, T>;
+};
 
-const MainStack = createStackNavigator();
+const MainStack = createStackNavigator<ModalStackNavigatorParamList>();
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 
 const AppStackComponent = () => {

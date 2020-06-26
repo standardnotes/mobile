@@ -22,7 +22,7 @@ export const SubTitle = styled.Text`
   opacity: 0.6;
 `;
 export const OutOfSyncContainer = styled.TouchableOpacity`
-  flex: 0px;
+  flex: 1;
   flex-direction: row;
   align-items: center;
 `;

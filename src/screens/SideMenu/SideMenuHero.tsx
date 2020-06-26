@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ContentType } from 'snjs';
 import {
@@ -13,10 +13,10 @@ import {
 import { ViewProps } from 'react-native';
 import { Circle } from '@Components/Circle';
 import { ThemeContext } from 'styled-components/native';
+import { useSignedIn, useOutOfSync } from '@Lib/customHooks';
 
 type Props = {
   onPress: () => void;
-  outOfSync: boolean;
   onOutOfSyncPress: () => void;
   testID: ViewProps['testID'];
 };
@@ -24,10 +24,11 @@ type Props = {
 export const SideMenuHero: React.FC<Props> = props => {
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
-  const getText = useCallback(() => {
-    const noAccount = application?.noAccount();
-    const hasEncryption = !noAccount; // TODO: check this
-    if (noAccount) {
+  const signedIn = useSignedIn();
+  const isOutOfSync = useOutOfSync();
+  const textData = useMemo(() => {
+    const hasEncryption = !signedIn; // TODO: check this
+    if (!signedIn) {
       return {
         title: 'Data Not Backed Up',
         text: hasEncryption
@@ -45,8 +46,8 @@ export const SideMenuHero: React.FC<Props> = props => {
         text: itemsStatus,
       };
     }
-  }, []);
-  const textData = getText();
+  }, [signedIn]);
+
   return (
     <Cell>
       <Touchable testID={props.testID} onPress={props.onPress}>
@@ -55,7 +56,7 @@ export const SideMenuHero: React.FC<Props> = props => {
       <Touchable onPress={props.onPress}>
         <SubTitle>{textData.text}</SubTitle>
       </Touchable>
-      {props.outOfSync && (
+      {isOutOfSync && (
         <OutOfSyncContainer onPress={props.onOutOfSyncPress}>
           <IconCircle>
             <Circle
