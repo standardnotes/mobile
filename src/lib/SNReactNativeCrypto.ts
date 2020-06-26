@@ -94,7 +94,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
       bytes,
       Sodium.crypto_pwhash_ALG_DEFAULT
     );
-    return Base64.decode(result);
+    return this.base64ToHex(result);
   }
 
   public async xchacha20Encrypt(
