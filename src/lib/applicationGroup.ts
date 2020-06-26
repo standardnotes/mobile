@@ -5,6 +5,7 @@ import { ReviewService } from './reviewService';
 import { BackupsService } from './BackupsService';
 import { StyleKit } from '@Style/StyleKit';
 import { PreferencesManager } from './PreferencesManager';
+import { pull } from 'lodash';
 
 type AppManagerChangeCallback = () => void;
 
@@ -20,19 +21,19 @@ export class ApplicationGroup {
 
   private async createDefaultApplication() {
     this.activeApplication = this.createNewApplication();
-    this.applications.push(this.activeApplication!);
+    this.applications.push(this.activeApplication);
+
     this.notifyObserversOfAppChange();
   }
 
-  onApplicationDeinit(application: MobileApplication) {
+  async onApplicationDeinit(application: MobileApplication) {
     removeFromArray(this.applications, application);
     if (this.activeApplication === application) {
       this.activeApplication = undefined;
     }
     if (this.applications.length === 0) {
-      this.createDefaultApplication();
+      await this.createDefaultApplication();
     }
-    this.notifyObserversOfAppChange();
   }
 
   private createNewApplication() {
@@ -70,6 +71,10 @@ export class ApplicationGroup {
     if (this.application) {
       callback();
     }
+
+    return () => {
+      pull(this.changeObservers, callback);
+    };
   }
 
   private notifyObserversOfAppChange() {

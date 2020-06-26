@@ -48,15 +48,6 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
     return removeTagChangeObserver;
   });
 
-  const outOfSyncPressed = () => {
-    application!.alertService!.confirm(
-      "We've detected that the data in the current application session may not match the data on the server. This can happen due to poor network conditions, or if a large note fails to download on your device. To resolve this issue, we recommend first creating a backup of your data in the Settings screen, the signing out of your account and signing back in.",
-      'Potentially Out of Sync',
-      'Open Settings',
-      undefined,
-      () => {} // TODO: nav open settings
-    );
-  };
   const onTagSelect = async (tag: SNTag) => {
     if (tag.conflictOf) {
       application!.changeAndSaveItem(tag.uuid, mutator => {
@@ -71,13 +62,23 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
     navigation?.navigate(SCREEN_SETTINGS);
   };
 
+  const outOfSyncPressed = () => {
+    application!.alertService!.confirm(
+      "We've detected that the data in the current application session may not match the data on the server. This can happen due to poor network conditions, or if a large note fails to download on your device. To resolve this issue, we recommend first creating a backup of your data in the Settings screen, the signing out of your account and signing back in.",
+      'Potentially Out of Sync',
+      'Open Settings',
+      undefined,
+      openSettings
+    );
+  };
+
   return (
     <Fragment>
       <FirstSafeAreaView />
       <MainSafeAreaView edges={['bottom', 'left']}>
         <SideMenuHero
           testID="settingsButton"
-          onPress={openSettings} // TODO: nav open settings
+          onPress={openSettings}
           onOutOfSyncPress={outOfSyncPressed}
         />
 

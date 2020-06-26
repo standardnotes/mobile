@@ -1,5 +1,11 @@
 import { Client } from 'bugsnag-react-native';
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useRef,
+} from 'react';
 import { Dimensions, ScaledSize, StatusBar, Platform } from 'react-native';
 import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import {
@@ -7,7 +13,7 @@ import {
   StackNavigationProp,
 } from '@react-navigation/stack';
 import { ThemeProvider, ThemeContext } from 'styled-components/native';
-import { CurrentApplication, ContextProvider } from './ApplicationContext';
+import { ApplicationContext } from './ApplicationContext';
 import { Root } from '@Screens/Root';
 import {
   SCREEN_NOTES,
@@ -26,6 +32,8 @@ import { Compose } from '@Screens/Compose/Compose';
 import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
 import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 import { Settings } from '@Screens/Settings/Settings';
+import { ApplicationGroup } from '@Lib/applicationGroup';
+import { MobileApplication } from '@Lib/application';
 
 enableScreens();
 
@@ -202,44 +210,69 @@ const MainStackComponent = () => (
   </MainStack.Navigator>
 );
 
-export const App: React.FC = () => {
+const AppComponent: React.FC<{ application?: MobileApplication }> = ({
+  application,
+}) => {
   const [ready, setReady] = useState(false);
 
-  const loadApplication = useCallback(async () => {
-    await CurrentApplication?.prepareForLaunch({
-      receiveChallenge: async challenge => {
-        CurrentApplication!.promptForChallenge(challenge);
-      },
-    });
-    if (__DEV__) {
-      await CurrentApplication?.setHost(
-        'https://syncing-server-dev.standardnotes.org/'
-      );
-    } else {
-      await CurrentApplication?.setHost('https://sync.standardnotes.org');
-    }
-    await CurrentApplication?.launch(false);
-    setReady(true);
-  }, []);
-
   useEffect(() => {
+    setReady(false);
+    const loadApplication = async () => {
+      await application?.prepareForLaunch({
+        receiveChallenge: async challenge => {
+          console.log('challenge');
+          application!.promptForChallenge(challenge);
+        },
+      });
+      if (__DEV__) {
+        await application?.setHost(
+          'https://syncing-server-dev.standardnotes.org/'
+        );
+      } else {
+        await application?.setHost('https://sync.standardnotes.org');
+      }
+      await application?.launch(false);
+      setReady(true);
+    };
     loadApplication();
-  }, [loadApplication]);
+  }, [application]);
 
-  if (!ready || !CurrentApplication?.getThemeService().theme) {
+  if (!ready || !application?.getThemeService().theme) {
     return null;
   }
 
   return (
     <NavigationContainer>
       <StatusBar translucent />
-      <ThemeProvider theme={CurrentApplication?.getThemeService().theme!}>
-        <ContextProvider>
-          <ActionSheetProvider>
-            <MainStackComponent />
-          </ActionSheetProvider>
-        </ContextProvider>
+      <ThemeProvider theme={application?.getThemeService().theme!}>
+        <ActionSheetProvider>
+          <MainStackComponent />
+        </ActionSheetProvider>
       </ThemeProvider>
     </NavigationContainer>
+  );
+};
+
+const AppGroupInstance = new ApplicationGroup();
+
+export const App = () => {
+  const applicationGroupRef = useRef(AppGroupInstance);
+  const [application, setApplication] = useState(
+    () => applicationGroupRef.current.application
+  );
+  useEffect(() => {
+    const removeAppChangeObserver = applicationGroupRef.current.addApplicationChangeObserver(
+      () => {
+        setApplication(applicationGroupRef.current.application);
+      }
+    );
+
+    return removeAppChangeObserver;
+  }, [applicationGroupRef.current.application]);
+
+  return (
+    <ApplicationContext.Provider value={application}>
+      <AppComponent application={application} />
+    </ApplicationContext.Provider>
   );
 };

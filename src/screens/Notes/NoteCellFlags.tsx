@@ -93,7 +93,11 @@ export const NoteCellFlags = ({
   return flags.length > 0 ? (
     <FlagsContainer>
       {flags.map(flag => (
-        <FlagContainer color={flag.color} selected={highlight}>
+        <FlagContainer
+          key={flag.text.concat(flag.color)}
+          color={flag.color}
+          selected={highlight}
+        >
           <FlagLabel selected={highlight}>{flag.text}</FlagLabel>
         </FlagContainer>
       ))}
