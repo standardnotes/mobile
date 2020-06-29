@@ -9,7 +9,6 @@ import {
   KeyboardEventListener,
   EmitterSubscription,
 } from 'react-native';
-import { pull } from 'lodash';
 import { MobileApplication } from './application';
 import { Editor } from './editor';
 import {
@@ -20,6 +19,7 @@ import {
   SNTag,
   ApplicationEvent,
   SNSmartTag,
+  removeFromArray,
 } from 'snjs';
 
 const pjson = require('../../package.json');
@@ -114,7 +114,7 @@ export class ApplicationState {
   public addStateChangeObserver(callback: ObserverCallback) {
     this.observers.push(callback);
     return () => {
-      pull(this.observers, callback);
+      removeFromArray(this.observers, callback);
     };
   }
 
@@ -125,7 +125,7 @@ export class ApplicationState {
   public addStateEventObserver(callback: EventObserverCallback) {
     this.eventObservers.push(callback);
     return () => {
-      pull(this.eventObservers, callback);
+      removeFromArray(this.eventObservers, callback);
     };
   }
 

@@ -5,7 +5,6 @@ import { ReviewService } from './reviewService';
 import { BackupsService } from './BackupsService';
 import { StyleKit } from '@Style/StyleKit';
 import { PreferencesManager } from './PreferencesManager';
-import { pull } from 'lodash';
 
 type AppManagerChangeCallback = () => void;
 
@@ -73,8 +72,7 @@ export class ApplicationGroup {
     }
 
     return () => {
-      const indexOf = this.changeObservers.indexOf(callback);
-      this.changeObservers.splice(indexOf, 1);
+      removeFromArray(this.changeObservers, callback);
     };
   }
 

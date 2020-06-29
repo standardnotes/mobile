@@ -1,11 +1,5 @@
 import { Client } from 'bugsnag-react-native';
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-  useRef,
-} from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Dimensions, ScaledSize, StatusBar, Platform } from 'react-native';
 import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import {

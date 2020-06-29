@@ -8,7 +8,7 @@ import {
   ColorSchemeName,
 } from 'react-native';
 import IconChanger from 'react-native-alternate-icons';
-import _, { pull } from 'lodash';
+import _ from 'lodash';
 import {
   statusBarColorForTheme,
   keyboardColorForTheme,
@@ -22,6 +22,7 @@ import {
   ApplicationEvent,
   ComponentArea,
   SNComponent,
+  removeFromArray,
 } from 'snjs';
 
 import THEME_RED_JSON from './Themes/red.json';
@@ -162,7 +163,7 @@ export class StyleKit extends ApplicationService {
   public addThemeChangeObserver(callback: ThemeChangeObserver) {
     this.observers.push(callback);
     return () => {
-      pull(this.observers, callback);
+      removeFromArray(this.observers, callback);
     };
   }
 
