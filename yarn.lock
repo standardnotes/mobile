@@ -1169,10 +1169,10 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.10.tgz#5dda643e19e587793bc2034dd9bf7398ad43d401"
   integrity sha512-rk4sWFsmtOw8oyx8SD3KSvawwaK7gRBSEIy2TAwURyGt+3TizssXP1r8nx3zY+R7v2vYYHXZ+k2/GULAT/bcaQ==
 
-"@react-navigation/core@^5.11.0":
-  version "5.11.0"
-  resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-5.11.0.tgz#329cf455bcdc82ea6b171fd945db27406c1e3663"
-  integrity sha512-ro54NCCW25ngoJrfKzJgKmFqabEWjIpMeGYXa54dEnIT6tEoJW0Z/C60DfhRs8nYHOSEYsDetiQk3yL48EXCVA==
+"@react-navigation/core@^5.11.1":
+  version "5.11.1"
+  resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-5.11.1.tgz#c4890910ba3d6332ee6873f0adb3d3d13cf4fa4c"
+  integrity sha512-zJ/w84msKBhgRR35/tHdY1facxdnN/WP9Ebutnjp/J9ENuv7fHXhYlxX+oIRrMn+/MnbG79RVnYcO/r4lO8OTQ==
   dependencies:
     "@react-navigation/routers" "^5.4.8"
     escape-string-regexp "^4.0.0"
@@ -1181,12 +1181,12 @@
     react-is "^16.13.0"
     use-subscription "^1.4.0"
 
-"@react-navigation/native@^5.6.0":
-  version "5.6.0"
-  resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-5.6.0.tgz#3b03a35dd1337d3d3c7d170e9b6f7d0a666109bd"
-  integrity sha512-P+kr2Jz8aouNmtLRsxzihApFHpp14e4eyyir2t1nc9O2KKdZ5tULPIwdYXGEX0n2ty3BnCU0xkI2ZsK+qY0YnQ==
+"@react-navigation/native@^5.6.1":
+  version "5.6.1"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-5.6.1.tgz#a603b921f39fe3fcfcc27232d71b24e80effc1f2"
+  integrity sha512-jnSNEnuRzqLvG+7QcMthfB8eCZIzAE0Wku7HDgzfjFS2iA7Oa9ugeX/1qdP9heT2Mp0t9BDQ4XX4boJma9Z/xg==
   dependencies:
-    "@react-navigation/core" "^5.11.0"
+    "@react-navigation/core" "^5.11.1"
     nanoid "^3.1.9"
 
 "@react-navigation/routers@^5.4.8":
@@ -1196,10 +1196,10 @@
   dependencies:
     nanoid "^3.1.9"
 
-"@react-navigation/stack@^5.6.1":
-  version "5.6.1"
-  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-5.6.1.tgz#9cdb64cfa1b8fc3d9c7204589effce7278bf6d2e"
-  integrity sha512-pbiNHKGa+7awvh+mjuvU6L05s/6qYxxs+4tY5ldCsMrqP+PoYW8/avY0lJBaByAfTZmJbHAZrtcC+rFic8NAnA==
+"@react-navigation/stack@^5.6.2":
+  version "5.6.2"
+  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-5.6.2.tgz#d2371f9ffdcf3eee26245697d0947c9722542f38"
+  integrity sha512-51Aasxg8j2eKxz4mhA0ajJXrhAyJQkk2iiNE511zcqJ3tlfxv/h70Eej3PetnbbHFMOwNsEwc2GjB3OnfQcxjQ==
   dependencies:
     color "^3.1.2"
     react-native-iphone-x-helper "^1.2.1"
@@ -1373,10 +1373,17 @@
     "@types/react" "*"
     "@types/react-native" "*"
 
-"@types/react-native@*", "@types/react-native@^0.62.13":
+"@types/react-native@*":
   version "0.62.13"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.62.13.tgz#c688c5ae03e426f927f7e1fa1a59cd067f35d1c2"
   integrity sha512-hs4/tSABhcJx+J8pZhVoXHrOQD89WFmbs8QiDLNSA9zNrD46pityAuBWuwk1aMjPk9I3vC5ewkJroVRHgRIfdg==
+  dependencies:
+    "@types/react" "*"
+
+"@types/react-native@^0.62.14":
+  version "0.62.14"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.62.14.tgz#13ce7dab136bb124b6f394fe7510442557b16d29"
+  integrity sha512-ItBgiEQks2Mid6GsiLBx75grNH0glaKemTK9V7G+vSnvP+Zk3x1Wr+aTy4dJxRPPMg14DAJyYePLZwj2cigXbw==
   dependencies:
     "@types/react" "*"
 
@@ -6125,10 +6132,10 @@ react-native-reanimated@^1.9.0:
   dependencies:
     fbjs "^1.0.0"
 
-react-native-safe-area-context@^3.0.6:
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.0.6.tgz#ee180f53f9f40f8302923b9c09d821cf8ada01eb"
-  integrity sha512-/McWHgRG3CjXo/1ctlxH3mjW2psjf/QYAt9kWUTEtHu4b6z1y4hfUIGuYEJ02asaS1ixPsYrkqVqwzTv4olUMQ==
+react-native-safe-area-context@^3.0.7:
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.0.7.tgz#0f53de7a30d626d82936000f3f6db374ecc4b800"
+  integrity sha512-dqhRTlIFe5+P1yxitj0C9XVUxLqOmjomeqzUSSY8sNOWVjtIhEY/fl4ZKYpAVnktd8dt3zl13XmJTmRmy3d0uA==
 
 react-native-screens@^2.9.0:
   version "2.9.0"

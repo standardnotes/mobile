@@ -73,7 +73,8 @@ export class ApplicationGroup {
     }
 
     return () => {
-      pull(this.changeObservers, callback);
+      const indexOf = this.changeObservers.indexOf(callback);
+      this.changeObservers.splice(indexOf, 1);
     };
   }
 
