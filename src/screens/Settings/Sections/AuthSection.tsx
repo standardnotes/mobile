@@ -117,7 +117,7 @@ export const AuthSection = (props: Props) => {
       return (
         <RegularView>
           <RegistrationDescription>{mfaMessage}</RegistrationDescription>
-          <SectionedTableCell textInputCell={true} first={true}>
+          <SectionedTableCell textInputCell first>
             <RegistrationInput
               placeholder=""
               onChangeText={setMfaText}
@@ -126,7 +126,7 @@ export const AuthSection = (props: Props) => {
               keyboardAppearance={application!
                 .getThemeService()
                 .keyboardColorForActiveTheme()}
-              autoFocus={true}
+              autoFocus
               onSubmitEditing={() => {}}
             />
           </SectionedTableCell>
@@ -141,7 +141,7 @@ export const AuthSection = (props: Props) => {
       return (
         <>
           <RegularView>
-            <SectionedTableCell textInputCell={true} first={true}>
+            <SectionedTableCell textInputCell first>
               <RegistrationInput
                 testID="emailField"
                 placeholder={'Email'}
@@ -155,14 +155,14 @@ export const AuthSection = (props: Props) => {
               />
             </SectionedTableCell>
 
-            <SectionedTableCell textInputCell={true}>
+            <SectionedTableCell textInputCell>
               <RegistrationInput
                 testID="passwordField"
                 placeholder={'Password'}
                 onChangeText={setPassword}
                 value={password ?? undefined}
                 textContentType={'password'}
-                secureTextEntry={true}
+                secureTextEntry
                 keyboardAppearance={keyboardApperance}
               />
             </SectionedTableCell>
@@ -171,7 +171,7 @@ export const AuthSection = (props: Props) => {
           {(showAdvanced || !server) && (
             <RegularView>
               <SectionHeader title={'Advanced'} />
-              <SectionedTableCell textInputCell={true} first={true}>
+              <SectionedTableCell textInputCell first>
                 <RegistrationInput
                   testID="syncServerField"
                   placeholder={'Sync Server'}
