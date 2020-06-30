@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components/native';
 
-type Option = { selected: boolean; key: string; title: string };
+export type Option = { selected: boolean; key: string; title: string };
 
 type Props = {
   title: string;
@@ -28,7 +28,6 @@ export const Container = styled.View<ContainerProps>`
     css`
       height: ${height}px;
     `};
-  flex: 1;
   flex-direction: row;
   justify-content: center;
   align-items: center;
@@ -42,13 +41,13 @@ export const Container = styled.View<ContainerProps>`
 const Title = styled.Text`
   font-size: ${props => props.theme.mainTextFontSize}px;
   color: ${props => props.theme.stylekitForegroundColor};
+  text-align: center;
   width: 42%;
   min-width: 0px;
 `;
 
 const OptionsContainer = styled.View`
   width: 58%;
-  flex: 1;
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -60,7 +59,6 @@ const ButtonTouchable = styled.TouchableHighlight.attrs(props => ({
 }))`
   border-left-color: ${props => props.theme.stylekitBorderColor};
   border-left-width: 1px;
-  height: 100%;
   flex-grow: 1;
   padding: 10px;
   padding-top: 12px;

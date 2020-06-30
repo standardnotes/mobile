@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import {
   BaseView,
   Title,
@@ -12,28 +12,17 @@ import { StorageEncryptionPolicies, ContentType } from 'snjs';
 
 type Props = {
   title: string;
+  encryptionAvailable: boolean;
 };
 
 export const EncryptionSection = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
 
-  // State
-  const [encryptionAvailable, setEncryptionAvailable] = useState(false);
-
-  useEffect(() => {
-    const getEncryptionAvailable = async () => {
-      setEncryptionAvailable(
-        Boolean(await application?.isEncryptionAvailable())
-      );
-    };
-    getEncryptionAvailable();
-  }, [application]);
-
   const textData = useMemo(() => {
     const encryptionType = application?.getProtocolEncryptionDisplayName();
-    let encryptionStatus = encryptionAvailable ? 'Enabled' : 'Not Enabled';
-    if (encryptionAvailable) {
+    let encryptionStatus = props.encryptionAvailable ? 'Enabled' : 'Not Enabled';
+    if (props.encryptionAvailable) {
       encryptionStatus += ` | ${encryptionType}`;
     } else {
       encryptionStatus += '. '; // to connect sentence
@@ -54,20 +43,20 @@ export const EncryptionSection = (props: Props) => {
       sourceString,
       itemsStatus,
     };
-  }, [encryptionAvailable]);
+  }, [props.encryptionAvailable]);
 
   return (
     <TableSection>
       <SectionHeader title={props.title} />
 
-      <StyledSectionedTableCell last={!encryptionAvailable} first={true}>
+      <StyledSectionedTableCell last={!props.encryptionAvailable} first={true}>
         <BaseView>
           <Title>Encryption</Title>
           <Subtitle>{textData.encryptionStatus}</Subtitle>
         </BaseView>
       </StyledSectionedTableCell>
 
-      {encryptionAvailable && (
+      {props.encryptionAvailable && (
         <StyledSectionedTableCell>
           <BaseView>
             <Title>Encryption Source</Title>
@@ -76,7 +65,7 @@ export const EncryptionSection = (props: Props) => {
         </StyledSectionedTableCell>
       )}
 
-      {encryptionAvailable && (
+      {props.encryptionAvailable && (
         <StyledSectionedTableCell last>
           <BaseView>
             <Title>Items Encrypted</Title>

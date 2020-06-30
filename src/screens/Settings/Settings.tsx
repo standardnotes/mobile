@@ -8,6 +8,7 @@ import { SCREEN_SETTINGS } from '@Root/screens2/screens';
 import { useSignedIn } from '@Lib/customHooks';
 import { PasscodeSection } from './Sections/PasscodeSection';
 import { EncryptionSection } from './Sections/EncryptionSection';
+import { ApplicationEvent } from 'snjs';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_SETTINGS>;
 export const Settings = (props: Props) => {
@@ -15,6 +16,26 @@ export const Settings = (props: Props) => {
   const application = useContext(ApplicationContext);
 
   // State
+  const [hasPasscode, setHasPasscode] = useState(() =>
+    Boolean(application?.hasPasscode())
+  );
+  const [encryptionAvailable, setEncryptionAvailable] = useState(() =>
+    Boolean(application?.hasPasscode())
+  );
+
+  useEffect(() => {
+    const removeApplicationEventSubscriber = application?.addEventObserver(
+      async event => {
+        if (event === ApplicationEvent.KeyStatusChanged) {
+          setHasPasscode(Boolean(application?.hasPasscode()));
+          setEncryptionAvailable(
+            Boolean(await application?.isEncryptionAvailable())
+          );
+        }
+      }
+    );
+    return removeApplicationEventSubscriber;
+  });
 
   const goBack = useCallback(() => {
     props.navigation.goBack();
@@ -28,8 +49,15 @@ export const Settings = (props: Props) => {
       keyboardDismissMode={'interactive'}
     >
       <AuthSection title="Account" signedIn={signedIn} />
-      <PasscodeSection title="Security" />
-      <EncryptionSection title={'Encryption Status'} />
+      <PasscodeSection
+        encryptionAvailable={encryptionAvailable}
+        hasPasscode={hasPasscode}
+        title="Security"
+      />
+      <EncryptionSection
+        encryptionAvailable={encryptionAvailable}
+        title={'Encryption Status'}
+      />
       <CompanySection title="Standard Notes" />
     </Container>
   );

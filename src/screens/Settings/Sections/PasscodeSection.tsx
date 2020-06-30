@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { Title } from './PasscodeSection.styled';
 import { TableSection } from '@Components/TableSection';
 import { SectionHeader } from '@Components/SectionHeader';
@@ -6,18 +6,27 @@ import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { StorageEncryptionPolicies } from 'snjs';
+import { useNavigation } from '@react-navigation/native';
+import { ModalStackNavigationProp } from '@Root/App';
+import {
+  SCREEN_SETTINGS,
+  SCREEN_INPUT_MODAL_PASSCODE,
+} from '@Root/screens2/screens';
 
 type Props = {
   title: string;
+  hasPasscode: boolean;
+  encryptionAvailable: boolean;
 };
 
 export const PasscodeSection = (props: Props) => {
+  const navigation = useNavigation<
+    ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
+  >();
   // Context
   const application = useContext(ApplicationContext);
 
   // State
-  const [encryptionAvailable, setEncryptionAvailable] = useState(false);
-  const [hasPasscode] = useState(() => application?.hasPasscode());
   const [encryptionPolicy, setEncryptionPolicy] = useState(() =>
     application?.getStorageEncryptionPolicy()
   );
@@ -26,17 +35,8 @@ export const PasscodeSection = (props: Props) => {
     setEncryptionPolictChangeInProgress,
   ] = useState(false);
 
-  useEffect(() => {
-    const getEncryptionAvailable = async () => {
-      setEncryptionAvailable(
-        Boolean(await application?.isEncryptionAvailable())
-      );
-    };
-    getEncryptionAvailable();
-  }, [application]);
-
   const toggleEncryptionPolicy = async () => {
-    if (!encryptionAvailable) {
+    if (!props.encryptionAvailable) {
       return;
     }
 
@@ -58,7 +58,7 @@ export const PasscodeSection = (props: Props) => {
   };
 
   // State
-  const storageEncryptionTitle = encryptionAvailable
+  const storageEncryptionTitle = props.encryptionAvailable
     ? encryptionPolicy === StorageEncryptionPolicies.Default
       ? 'Disable Storage Encryption'
       : 'Enable Storage Encryption'
@@ -67,7 +67,7 @@ export const PasscodeSection = (props: Props) => {
   let storageSubText =
     "Encrypts your data before saving to your device's local storage.";
 
-  if (encryptionAvailable) {
+  if (props.encryptionAvailable) {
     storageSubText +=
       encryptionPolicy === StorageEncryptionPolicies.Default
         ? ' Disable to improve app start-up speed.'
@@ -81,12 +81,35 @@ export const PasscodeSection = (props: Props) => {
     storageSubText = 'Applying changes...';
   }
 
-  const passcodeTitle = hasPasscode
+  const passcodeTitle = props.hasPasscode
     ? 'Disable Passcode Lock'
     : 'Enable Passcode Lock';
-  const passcodeOnPress = () => {};
-  // ? this.props.onDisable
-  // : this.props.onEnable;
+
+  const passcodeOnPress = () => {
+    if (props.hasPasscode) {
+      const hasAccount = Boolean(application?.getUser());
+      let message;
+      if (hasAccount) {
+        message =
+          'Are you sure you want to disable your local passcode? This will not affect your encryption status, as your data is currently being encrypted through your sync account keys.';
+      } else {
+        message =
+          'Are you sure you want to disable your local passcode? This will disable encryption on your data.';
+      }
+
+      application?.alertService?.confirm(
+        message,
+        'Disable Passcode',
+        'Disable Passcode',
+        undefined,
+        async () => {
+          await application.removePasscode();
+        }
+      );
+    } else {
+      navigation.push(SCREEN_INPUT_MODAL_PASSCODE);
+    }
+  };
 
   // const { biometricsNoun } = this.state;
 
@@ -119,7 +142,7 @@ export const PasscodeSection = (props: Props) => {
         onPress={biometricOnPress}
       /> */}
 
-      {hasPasscode && (
+      {props.hasPasscode && (
         <SectionedOptionsTableCell
           title={'Require Passcode'}
           options={[]}

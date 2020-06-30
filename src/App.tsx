@@ -13,10 +13,12 @@ import {
   SCREEN_NOTES,
   SCREEN_COMPOSE,
   SCREEN_SETTINGS,
+  SCREEN_INPUT_MODAL_PASSCODE,
+  SCREEN_INPUT_MODAL_TAG,
 } from './screens2/screens';
 import { HeaderTitleView } from '@Components/HeaderTitleView';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ICON_MENU, ICON_CHECKMARK } from '@Style/icons';
+import { ICON_MENU, ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
 import { enableScreens } from 'react-native-screens';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
@@ -28,6 +30,8 @@ import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 import { Settings } from '@Screens/Settings/Settings';
 import { ApplicationGroup } from '@Lib/applicationGroup';
 import { MobileApplication } from '@Lib/application';
+import { TagInputModal } from '@Screens/InputModal/TagInputModal';
+import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
 
 enableScreens();
 
@@ -50,7 +54,11 @@ type AppStackNavigatorParamList = {
 
 type ModalStackNavigatorParamList = {
   AppStack: undefined;
-  [SCREEN_SETTINGS]: HeaderTitleParams;
+  [SCREEN_SETTINGS]: undefined;
+  [SCREEN_INPUT_MODAL_TAG]: HeaderTitleParams & {
+    initialValue?: string;
+  };
+  [SCREEN_INPUT_MODAL_PASSCODE]: undefined;
 };
 export type AppStackNavigationProp<
   T extends keyof AppStackNavigatorParamList
@@ -160,7 +168,6 @@ const AppStackComponent = () => {
           })}
           component={Compose}
         />
-        {/* <AppStack.Screen name={SCREEN_INPUT_MODAL} component={InputModal} /> */}
       </AppStack.Navigator>
     </DrawerLayout>
   );
@@ -200,6 +207,60 @@ const MainStackComponent = () => (
         ),
       })}
       component={Settings}
+    />
+    <MainStack.Screen
+      name={SCREEN_INPUT_MODAL_PASSCODE}
+      options={{
+        title: 'Setup Passcode',
+        gestureEnabled: false,
+        headerTitle: ({ children }) => {
+          return <HeaderTitleView title={children || ''} />;
+        },
+        headerLeft: ({ disabled, onPress }) => (
+          <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+            <Item
+              testID="headerButton"
+              disabled={disabled}
+              title={Platform.OS === 'ios' ? 'Cancel' : ''}
+              iconName={
+                Platform.OS === 'ios'
+                  ? undefined
+                  : StyleKit.nameForIcon(ICON_CLOSE)
+              }
+              onPress={onPress}
+            />
+          </HeaderButtons>
+        ),
+      }}
+      component={PasscodeInputModal}
+    />
+    <MainStack.Screen
+      name={SCREEN_INPUT_MODAL_TAG}
+      options={({ route }) => ({
+        title: 'Tag',
+        gestureEnabled: false,
+        headerTitle: ({ children }) => {
+          return (
+            <HeaderTitleView title={route.params?.title ?? (children || '')} />
+          );
+        },
+        headerLeft: ({ disabled, onPress }) => (
+          <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+            <Item
+              testID="headerButton"
+              disabled={disabled}
+              title={Platform.OS === 'ios' ? 'Cancel' : ''}
+              iconName={
+                Platform.OS === 'ios'
+                  ? undefined
+                  : StyleKit.nameForIcon(ICON_CLOSE)
+              }
+              onPress={onPress}
+            />
+          </HeaderButtons>
+        ),
+      })}
+      component={TagInputModal}
     />
   </MainStack.Navigator>
 );
