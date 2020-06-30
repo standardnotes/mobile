@@ -13,7 +13,7 @@ type Props = {
 type ContainerProps = Omit<Props, 'title' | 'onPress' | 'options'>;
 export const Container = styled.View<ContainerProps>`
   border-bottom-color: ${props => props.theme.stylekitBorderColor};
-  border-bottom-width: 1;
+  border-bottom-width: 1px;
   padding-left: ${props => props.theme.paddingLeft}px;
   padding-right: ${props => props.theme.paddingLeft}px;
   background-color: ${props => props.theme.stylekitBackgroundColor};
@@ -40,14 +40,14 @@ export const Container = styled.View<ContainerProps>`
 `;
 
 const Title = styled.Text`
-  font-size: ${props => props.theme.mainTextFontSize};
+  font-size: ${props => props.theme.mainTextFontSize}px;
   color: ${props => props.theme.stylekitForegroundColor};
   width: 42%;
   min-width: 0px;
 `;
 
 const OptionsContainer = styled.View`
-  width: '58%';
+  width: 58%;
   flex: 1;
   flex-direction: row;
   align-items: center;

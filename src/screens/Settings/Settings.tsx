@@ -6,6 +6,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/App';
 import { SCREEN_SETTINGS } from '@Root/screens2/screens';
 import { useSignedIn } from '@Lib/customHooks';
+import { PasscodeSection } from './Sections/PasscodeSection';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_SETTINGS>;
 export const Settings = (props: Props) => {
@@ -25,8 +26,9 @@ export const Settings = (props: Props) => {
       keyboardShouldPersistTaps={'always'}
       keyboardDismissMode={'interactive'}
     >
-      {true && <AuthSection title={'Account'} signedIn={signedIn} />}
-      <CompanySection title={'Standard Notes'} />
+      <AuthSection title="Account" signedIn={signedIn} />
+      <PasscodeSection title="Security" />
+      <CompanySection title="Standard Notes" />
     </Container>
   );
 };
