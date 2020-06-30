@@ -19,11 +19,15 @@ export const Settings = (props: Props) => {
   const [hasPasscode, setHasPasscode] = useState(() =>
     Boolean(application?.hasPasscode())
   );
-  const [encryptionAvailable, setEncryptionAvailable] = useState(() =>
-    Boolean(application?.hasPasscode())
-  );
+  const [encryptionAvailable, setEncryptionAvailable] = useState(false);
 
   useEffect(() => {
+    const getEncryptionAvailable = async () => {
+      setEncryptionAvailable(
+        Boolean(await application?.isEncryptionAvailable())
+      );
+    };
+    getEncryptionAvailable();
     const removeApplicationEventSubscriber = application?.addEventObserver(
       async event => {
         if (event === ApplicationEvent.KeyStatusChanged) {
@@ -35,7 +39,7 @@ export const Settings = (props: Props) => {
       }
     );
     return removeApplicationEventSubscriber;
-  });
+  }, [application]);
 
   const goBack = useCallback(() => {
     props.navigation.goBack();
