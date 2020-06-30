@@ -7,7 +7,6 @@ import {
 } from './EncryptionSection.styled';
 import { TableSection } from '@Components/TableSection';
 import { SectionHeader } from '@Components/SectionHeader';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { StorageEncryptionPolicies, ContentType } from 'snjs';
 
@@ -32,7 +31,7 @@ export const EncryptionSection = (props: Props) => {
   }, [application]);
 
   const textData = useMemo(() => {
-    const encryptionType = 'AES-256';
+    const encryptionType = application?.getProtocolEncryptionDisplayName();
     let encryptionStatus = encryptionAvailable ? 'Enabled' : 'Not Enabled';
     if (encryptionAvailable) {
       encryptionStatus += ` | ${encryptionType}`;
@@ -55,7 +54,7 @@ export const EncryptionSection = (props: Props) => {
       sourceString,
       itemsStatus,
     };
-  }, [application, encryptionAvailable]);
+  }, [encryptionAvailable]);
 
   return (
     <TableSection>

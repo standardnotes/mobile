@@ -47,6 +47,7 @@ export const AuthSection = (props: Props) => {
       undefined,
       undefined,
       undefined,
+      true,
       false
     );
     setSigningIn(false);
@@ -54,7 +55,7 @@ export const AuthSection = (props: Props) => {
 
   const register = async () => {
     setRegistering(true);
-    await application!.register(email, password, undefined, false);
+    await application!.register(email, password, undefined, true);
     setRegistering(false);
   };
 

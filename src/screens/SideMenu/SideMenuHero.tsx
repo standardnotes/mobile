@@ -1,6 +1,6 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useEffect, useState } from 'react';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { ContentType } from 'snjs';
+import { ContentType, StorageEncryptionPolicies } from 'snjs';
 import {
   Cell,
   Touchable,
@@ -22,12 +22,30 @@ type Props = {
 };
 
 export const SideMenuHero: React.FC<Props> = props => {
+  // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
+
+  // State
   const signedIn = useSignedIn();
   const isOutOfSync = useOutOfSync();
+  const [itemsLength, setItemsLength] = useState(0);
+
+  useEffect(() => {
+    const removeStreamItems = application!.streamItems(
+      [ContentType.Note, ContentType.Tag],
+      items => {
+        setItemsLength(items.length);
+      }
+    );
+
+    return removeStreamItems;
+  });
+
   const textData = useMemo(() => {
-    const hasEncryption = !signedIn; // TODO: check this
+    const hasEncryption =
+      application?.getStorageEncryptionPolicy() ===
+      StorageEncryptionPolicies.Default; // TODO: check this
     if (!signedIn) {
       return {
         title: 'Data Not Backed Up',
@@ -38,15 +56,19 @@ export const SideMenuHero: React.FC<Props> = props => {
     } else {
       const user = application?.getUser();
       const email = user?.email;
-      const items = application!.getItems([ContentType.Note, ContentType.Tag]);
       const itemsStatus =
-        items.length + '/' + items.length + ' notes and tags encrypted';
+        itemsLength + '/' + itemsLength + ' notes and tags encrypted';
       return {
         title: email,
         text: itemsStatus,
       };
     }
-  }, [signedIn]);
+  }, [
+    application?.getStorageEncryptionPolicy,
+    application?.getUser,
+    signedIn,
+    itemsLength,
+  ]);
 
   return (
     <Cell>
