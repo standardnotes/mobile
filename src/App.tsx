@@ -1,7 +1,11 @@
 import { Client } from 'bugsnag-react-native';
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Dimensions, ScaledSize, StatusBar, Platform } from 'react-native';
-import { NavigationContainer, RouteProp } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  RouteProp,
+  NavigationContainerRef,
+} from '@react-navigation/native';
 import {
   createStackNavigator,
   StackNavigationProp,
@@ -269,18 +273,16 @@ const AppComponent: React.FC<{ application: MobileApplication }> = ({
   application,
 }) => {
   const [ready, setReady] = useState(false);
+  const navigationRef = useRef<NavigationContainerRef>(null);
   const styleKit = useRef<StyleKit | undefined>(undefined);
 
   useEffect(() => {
-    setReady(false);
     const loadApplication = async () => {
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
-          console.log('challenge');
-          application!.promptForChallenge(challenge);
+          application!.promptForChallenge(challenge, navigationRef.current);
         },
       });
-
       if (__DEV__) {
         await application?.setHost(
           'https://syncing-server-dev.standardnotes.org/'
@@ -293,6 +295,7 @@ const AppComponent: React.FC<{ application: MobileApplication }> = ({
       setReady(true);
       await application?.launch(false);
     };
+    setReady(false);
     loadApplication();
   }, [application]);
 
@@ -301,15 +304,19 @@ const AppComponent: React.FC<{ application: MobileApplication }> = ({
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <StatusBar translucent />
-      <ThemeProvider theme={styleKit.current.theme!}>
-        <ActionSheetProvider>
-          <StyleKitContext.Provider value={styleKit.current}>
-            <MainStackComponent />
-          </StyleKitContext.Provider>
-        </ActionSheetProvider>
-      </ThemeProvider>
+      {ready && styleKit.current && (
+        <>
+          <ThemeProvider theme={styleKit.current.theme!}>
+            <ActionSheetProvider>
+              <StyleKitContext.Provider value={styleKit.current}>
+                <MainStackComponent />
+              </StyleKitContext.Provider>
+            </ActionSheetProvider>
+          </ThemeProvider>
+        </>
+      )}
     </NavigationContainer>
   );
 };

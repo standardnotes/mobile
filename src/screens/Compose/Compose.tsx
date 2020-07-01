@@ -363,7 +363,7 @@ export const Compose = (): JSX.Element => {
           autoFocus={false}
           value={noteText}
           keyboardDismissMode={'interactive'}
-          keyboardAppearance={stylekit?.keyboardColorForActiveTheme()}
+          keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
           selectionColor={lighten(theme.stylekitInfoColor)}
           onChangeText={onContentChange}
           editable={!note?.locked}

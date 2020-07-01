@@ -17,6 +17,7 @@ import { BackupsService } from './BackupsService';
 import { PreferencesManager } from './PreferencesManager';
 import { StyleKit } from '@Style/StyleKit';
 import { SNReactNativeCrypto } from './SNReactNativeCrypto';
+import { NavigationContainerRef } from '@react-navigation/native';
 
 type MobileServices = {
   applicationState: ApplicationState;
@@ -69,7 +70,10 @@ export class MobileApplication extends SNApplication {
     super.deinit();
   }
 
-  promptForChallenge(challenge: Challenge) {
+  promptForChallenge(
+    challenge: Challenge,
+    navigation: NavigationContainerRef | null
+  ) {
     if (challenge.reason === ChallengeReason.ApplicationUnlock) {
       // orchestrator.submitValues();
     }

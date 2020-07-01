@@ -412,7 +412,6 @@ export class ApplicationState {
 
     if (isEnteringBackground) {
       this.notifyOfStateChange(AppStateType.EnteringBackground);
-
       if (true) {
         // TODO: add lockManager
         this.application.lock();
