@@ -16,20 +16,14 @@ import {
   DARK_CONTENT,
 } from '@Style/utils';
 import ThemeDownloader from '@Style/Util/ThemeDownloader';
-import {
-  SNTheme,
-  ApplicationService,
-  ApplicationEvent,
-  ComponentArea,
-  SNComponent,
-  removeFromArray,
-} from 'snjs';
+import { SNTheme, SNComponent, removeFromArray } from 'snjs';
 
 import THEME_RED_JSON from './Themes/red.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 import { UuidString } from 'snjs/dist/@types/types';
-import { MobileApplication } from '@Lib/application';
 import { StyleKitTheme } from './Themes/styled-components';
+import React from 'react';
+import { MobileApplication } from '@Lib/application';
 
 type ThemeChangeObserver = () => Promise<void> | void;
 
@@ -48,7 +42,11 @@ enum SystemThemes {
   Red = 'Red',
 }
 
-export class StyleKit extends ApplicationService {
+export const StyleKitContext = React.createContext<StyleKit | undefined>(
+  undefined
+);
+
+export class StyleKit {
   observers: ThemeChangeObserver[] = [];
   private themeData: Partial<Record<UuidString, ThemeContent>> = {};
   activeTheme?: string;
@@ -62,45 +60,44 @@ export class StyleKit extends ApplicationService {
   };
   styles: Record<string, ViewStyle | TextStyle> = {};
   theme?: StyleKitTheme;
+  application: MobileApplication;
 
-  get mobileApplication() {
-    return this.application as MobileApplication;
+  constructor(application: MobileApplication) {
+    this.application = application;
+    this.buildSystemThemesAndData();
   }
 
-  async onAppStart() {
-    super.onAppStart();
-    this.registerObservers();
-    this.buildSystemThemesAndData();
-    this.resolveInitialTheme();
+  async initialize() {
+    await this.resolveInitialTheme();
+    this.registerAppearanceChangeLister();
   }
 
   deinit() {
     Appearance.removeChangeListener(this.setModeTo.bind(this));
-    super.deinit();
   }
 
-  onAppEvent(event: ApplicationEvent) {
-    super.onAppEvent(event);
-    if (event === ApplicationEvent.SignedOut) {
-      this.resetToSystemTheme();
-    }
-  }
+  // onAppEvent(event: ApplicationEvent) {
+  //   super.onAppEvent(event);
+  //   if (event === ApplicationEvent.SignedOut) {
+  //     this.resetToSystemTheme();
+  //   }
+  // }
 
-  private registerObservers() {
-    this.unregisterComponent = this.application!.componentManager!.registerHandler(
-      {
-        identifier: 'themeManager',
-        areas: [ComponentArea.Themes],
-        activationHandler: component => {
-          if (component.active) {
-            this.activateExternalTheme(component as SNTheme);
-          } else {
-            this.activateTheme(SystemThemes.Blue);
-          }
-        },
-      }
-    );
-  }
+  // private registerObservers() {
+  //   this.unregisterComponent = this.application!.componentManager!.registerHandler(
+  //     {
+  //       identifier: 'themeManager',
+  //       areas: [ComponentArea.Themes],
+  //       activationHandler: component => {
+  //         if (component.active) {
+  //           this.activateExternalTheme(component as SNTheme);
+  //         } else {
+  //           this.activateTheme(SystemThemes.Blue);
+  //         }
+  //       },
+  //     }
+  //   );
+  // }
 
   private registerAppearanceChangeLister() {
     Appearance.addChangeListener(this.setModeTo);

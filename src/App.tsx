@@ -19,7 +19,7 @@ import {
 import { HeaderTitleView } from '@Components/HeaderTitleView';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ICON_MENU, ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
+import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import { enableScreens } from 'react-native-screens';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
@@ -265,10 +265,11 @@ const MainStackComponent = () => (
   </MainStack.Navigator>
 );
 
-const AppComponent: React.FC<{ application?: MobileApplication }> = ({
+const AppComponent: React.FC<{ application: MobileApplication }> = ({
   application,
 }) => {
   const [ready, setReady] = useState(false);
+  const styleKit = useRef<StyleKit | undefined>(undefined);
 
   useEffect(() => {
     setReady(false);
@@ -279,6 +280,7 @@ const AppComponent: React.FC<{ application?: MobileApplication }> = ({
           application!.promptForChallenge(challenge);
         },
       });
+
       if (__DEV__) {
         await application?.setHost(
           'https://syncing-server-dev.standardnotes.org/'
@@ -286,22 +288,26 @@ const AppComponent: React.FC<{ application?: MobileApplication }> = ({
       } else {
         await application?.setHost('https://sync.standardnotes.org');
       }
-      await application?.launch(false);
+      styleKit.current = new StyleKit(application);
+      await styleKit.current.initialize();
       setReady(true);
+      await application?.launch(false);
     };
     loadApplication();
   }, [application]);
 
-  if (!ready || !application?.getThemeService().theme) {
+  if (!ready || !styleKit.current) {
     return null;
   }
 
   return (
     <NavigationContainer>
       <StatusBar translucent />
-      <ThemeProvider theme={application?.getThemeService().theme!}>
+      <ThemeProvider theme={styleKit.current.theme!}>
         <ActionSheetProvider>
-          <MainStackComponent />
+          <StyleKitContext.Provider value={styleKit.current}>
+            <MainStackComponent />
+          </StyleKitContext.Provider>
         </ActionSheetProvider>
       </ThemeProvider>
     </NavigationContainer>
@@ -312,9 +318,9 @@ const AppGroupInstance = new ApplicationGroup();
 
 export const App = () => {
   const applicationGroupRef = useRef(AppGroupInstance);
-  const [application, setApplication] = useState(
-    () => applicationGroupRef.current.application
-  );
+  const [application, setApplication] = useState<
+    MobileApplication | undefined
+  >();
   useEffect(() => {
     const removeAppChangeObserver = applicationGroupRef.current.addApplicationChangeObserver(
       () => {
@@ -327,7 +333,7 @@ export const App = () => {
 
   return (
     <ApplicationContext.Provider value={application}>
-      <AppComponent application={application} />
+      {application && <AppComponent application={application} />}
     </ApplicationContext.Provider>
   );
 };

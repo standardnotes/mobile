@@ -22,7 +22,7 @@ import {
   LoadingWebViewText,
   NoteTitleInput,
 } from './Compose.styled';
-import { StyleKit } from '@Style/StyleKit';
+import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import {
   Platform,
   SNNote,
@@ -47,6 +47,7 @@ export const Compose = (): JSX.Element => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
+  const styleKit = useContext(StyleKitContext);
 
   //State
   const [title, setTitle] = useState<string | undefined>(undefined);
@@ -312,9 +313,7 @@ export const Compose = (): JSX.Element => {
         selectionColor={theme.stylekitInfoColor}
         underlineColorAndroid={'transparent'}
         placeholderTextColor={theme.stylekitNeutralColor}
-        keyboardAppearance={application
-          ?.getThemeService()
-          .keyboardColorForActiveTheme()}
+        keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
         autoCorrect={true}
         autoCapitalize={'sentences'}
         editable={note?.locked}
@@ -364,9 +363,7 @@ export const Compose = (): JSX.Element => {
           autoFocus={false}
           value={noteText}
           keyboardDismissMode={'interactive'}
-          keyboardAppearance={application
-            ?.getThemeService()
-            .keyboardColorForActiveTheme()}
+          keyboardAppearance={stylekit?.keyboardColorForActiveTheme()}
           selectionColor={lighten(theme.stylekitInfoColor)}
           onChangeText={onContentChange}
           editable={!note?.locked}

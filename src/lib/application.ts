@@ -83,10 +83,6 @@ export class MobileApplication extends SNApplication {
     return this.MobileServices.applicationState;
   }
 
-  public getThemeService() {
-    return this.MobileServices.themeService;
-  }
-
   public getBackupsService() {
     return this.MobileServices.backupsService;
   }

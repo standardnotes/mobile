@@ -10,6 +10,7 @@ import {
   RegularView,
   RegistrationInput,
 } from './AuthSection.styled';
+import { StyleKitContext } from '@Style/StyleKit';
 
 const DEFAULT_SIGN_IN_TEXT = 'Sign In';
 const DEFAULT_REGISTER_TEXT = 'Register';
@@ -23,9 +24,9 @@ type Props = {
 export const AuthSection = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+  const styleKit = useContext(StyleKitContext);
 
   // State
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [registering, setRegistering] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
   const [strictSignIn, setStrictSignIn] = useState(false);
@@ -36,6 +37,7 @@ export const AuthSection = (props: Props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [server, setServer] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [confirmRegistration, setConfirmRegistration] = useState(false);
 
   const signIn = async () => {
@@ -51,6 +53,8 @@ export const AuthSection = (props: Props) => {
       false
     );
     setSigningIn(false);
+    setPassword('');
+    setPasswordConfirmation('');
   };
 
   const register = async () => {
@@ -91,9 +95,7 @@ export const AuthSection = (props: Props) => {
             value={passwordConfirmation}
             secureTextEntry
             autoFocus
-            keyboardAppearance={application!
-              .getThemeService()
-              .keyboardColorForActiveTheme()}
+            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
           />
         </SectionedTableCell>
 
@@ -107,7 +109,11 @@ export const AuthSection = (props: Props) => {
 
         <ButtonCell
           title="Cancel"
-          onPress={() => setConfirmRegistration(false)}
+          onPress={() => {
+            setConfirmRegistration(false);
+            setPasswordConfirmation('');
+            setPassword('');
+          }}
         />
       </TableSection>
     );
@@ -124,9 +130,7 @@ export const AuthSection = (props: Props) => {
               onChangeText={setMfaText}
               value={mfaText}
               keyboardType={'numeric'}
-              keyboardAppearance={application!
-                .getThemeService()
-                .keyboardColorForActiveTheme()}
+              keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
               autoFocus
               onSubmitEditing={() => {}}
             />
@@ -136,9 +140,7 @@ export const AuthSection = (props: Props) => {
     };
 
     const renderNonMfaSubcontent = () => {
-      const keyboardApperance = application!
-        .getThemeService()
-        .keyboardColorForActiveTheme();
+      const keyboardApperance = styleKit?.keyboardColorForActiveTheme();
       return (
         <>
           <RegularView>

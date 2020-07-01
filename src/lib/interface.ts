@@ -2,6 +2,13 @@ import { DeviceInterface } from 'snjs';
 import AsyncStorage from '@react-native-community/async-storage';
 import { Platform, Alert, Linking } from 'react-native';
 import Keychain from './keychain';
+import FingerprintScanner from 'react-native-fingerprint-scanner';
+
+export type BiometricsType =
+  | 'Fingerprint'
+  | 'Face ID'
+  | 'Biometrics'
+  | 'Touch ID';
 
 export class MobileDeviceInterface extends DeviceInterface {
   constructor(namespace: string) {
@@ -83,7 +90,7 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
   openDatabase(): Promise<{ isNewDatabase?: boolean | undefined } | undefined> {
     // TODO: check if items do not have to be redownloaded in case of a failure
-    return Promise.resolve({ isNewDatabase: false });
+    return Promise.resolve({ isNewDatabase: true });
   }
 
   async getAllRawDatabasePayloads(): Promise<any[]> {
@@ -121,6 +128,30 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
   clearKeychainValue(): Promise<void> {
     return Keychain.clearKeys();
+  }
+
+  getDeviceBiometricsAvailability(
+    callback: (available: boolean, type?: BiometricsType, noun?: string) => void
+  ) {
+    if (__DEV__) {
+      const isAndroid = Platform.OS === 'android';
+      if (isAndroid && Platform.Version < 23) {
+        callback(true, 'Fingerprint', 'Fingerprint (Dev)');
+      } else if (isAndroid) {
+        callback(true, 'Biometrics', 'Biometrics (Dev)');
+      } else {
+        callback(true, 'Face ID', 'Face ID');
+      }
+      return;
+    }
+    FingerprintScanner.isSensorAvailable()
+      .then(type => {
+        const noun = type === 'Touch ID' ? 'Fingerprint' : type;
+        callback(true, type, noun);
+      })
+      .catch(() => {
+        callback(false);
+      });
   }
 
   openUrl(url: string) {

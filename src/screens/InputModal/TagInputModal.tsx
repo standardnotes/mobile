@@ -7,11 +7,13 @@ import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { ButtonCell } from '@Components/ButtonCell';
 import { SCREEN_INPUT_MODAL_TAG } from '@Root/screens2/screens';
 import { ModalStackNavigationProp } from '@Root/App';
+import { StyleKitContext } from '@Style/StyleKit';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_TAG>;
 export const TagInputModal = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+  const styleKit = useContext(StyleKitContext);
 
   // State
   const [text, setText] = useState('');
@@ -34,9 +36,7 @@ export const TagInputModal = (props: Props) => {
             value={text}
             autoCorrect={false}
             autoCapitalize={'none'}
-            keyboardAppearance={application
-              ?.getThemeService()
-              .keyboardColorForActiveTheme()}
+            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
             autoFocus
             underlineColorAndroid={'transparent'}
             onSubmitEditing={onSubmit}

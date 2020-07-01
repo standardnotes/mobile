@@ -11,11 +11,13 @@ import {
   SectionedOptionsTableCell,
   Option,
 } from '@Components/SectionedOptionsTableCell';
+import { StyleKitContext } from '@Style/StyleKit';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_PASSCODE>;
 export const PasscodeInputModal = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+  const styleKit = useContext(StyleKitContext);
 
   // State
   const [settingPassocode, setSettingPassocode] = useState(false);
@@ -94,9 +96,7 @@ export const PasscodeInputModal = (props: Props) => {
             autoCorrect={false}
             autoCapitalize={'none'}
             keyboardType={keyboardType}
-            keyboardAppearance={application
-              ?.getThemeService()
-              .keyboardColorForActiveTheme()}
+            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
             autoFocus={true}
             underlineColorAndroid={'transparent'}
             onSubmitEditing={onTextSubmit}
@@ -113,9 +113,7 @@ export const PasscodeInputModal = (props: Props) => {
             autoCorrect={false}
             autoCapitalize={'none'}
             keyboardType={keyboardType}
-            keyboardAppearance={application
-              ?.getThemeService()
-              .keyboardColorForActiveTheme()}
+            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
             onSubmitEditing={onSubmit}
           />
