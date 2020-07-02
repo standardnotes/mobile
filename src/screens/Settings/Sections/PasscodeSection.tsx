@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Title } from './PasscodeSection.styled';
 import { TableSection } from '@Components/TableSection';
 import { SectionHeader } from '@Components/SectionHeader';
@@ -12,6 +12,7 @@ import {
   SCREEN_SETTINGS,
   SCREEN_INPUT_MODAL_PASSCODE,
 } from '@Root/screens2/screens';
+import { MobileDeviceInterface } from '@Lib/interface';
 
 type Props = {
   title: string;
@@ -30,10 +31,27 @@ export const PasscodeSection = (props: Props) => {
   const [encryptionPolicy, setEncryptionPolicy] = useState(() =>
     application?.getStorageEncryptionPolicy()
   );
+  const [hasBiometrics, setHasBiometrics] = useState(false);
+  const [supportsBiometrics, setSupportsBiometrics] = useState(false);
   const [
     encryptionPolictChangeInProgress,
     setEncryptionPolictChangeInProgress,
   ] = useState(false);
+
+  useEffect(() => {
+    const getHasBiometrics = async () => {
+      setHasBiometrics(await application!.hasBiometrics());
+    };
+    getHasBiometrics();
+    const supportsBiometrics = async () => {
+      (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(
+        (available, type, noun) => {
+          setSupportsBiometrics(available);
+        }
+      );
+    };
+    supportsBiometrics();
+  }, [application]);
 
   const toggleEncryptionPolicy = async () => {
     if (!props.encryptionAvailable) {
@@ -111,14 +129,19 @@ export const PasscodeSection = (props: Props) => {
     }
   };
 
-  // const { biometricsNoun } = this.state;
+  const onBiometricsPress = () => {
+    if (hasBiometrics) {
+      setHasBiometrics(false);
+      application?.disableBiometrics();
+    } else {
+      setHasBiometrics(true);
+      application?.enableBiometrics();
+    }
+  };
 
-  // let biometricTitle = this.props.hasBiometrics
-  //   ? `Disable ${biometricsNoun} Lock`
-  //   : `Enable ${biometricsNoun} Lock`;
-  // let biometricOnPress = this.props.hasBiometrics
-  //   ? this.props.onFingerprintDisable
-  //   : this.props.onFingerprintEnable;
+  let biometricTitle = hasBiometrics
+    ? 'Disable Biometrics Lock'
+    : 'Enable Biometrics Lock';
   return (
     <TableSection>
       <SectionHeader title={props.title} />
@@ -134,13 +157,13 @@ export const PasscodeSection = (props: Props) => {
 
       <ButtonCell leftAligned title={passcodeTitle} onPress={passcodeOnPress} />
 
-      {/* <ButtonCell
-        last={!this.props.hasBiometrics && !hasPasscode}
-        disabled={!this.state.biometricsAvailable}
+      <ButtonCell
+        last={!hasBiometrics && !props.hasPasscode}
+        disabled={!supportsBiometrics}
         leftAligned
         title={biometricTitle}
-        onPress={biometricOnPress}
-      /> */}
+        onPress={onBiometricsPress}
+      />
 
       {props.hasPasscode && (
         <SectionedOptionsTableCell

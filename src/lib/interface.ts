@@ -133,17 +133,17 @@ export class MobileDeviceInterface extends DeviceInterface {
   getDeviceBiometricsAvailability(
     callback: (available: boolean, type?: BiometricsType, noun?: string) => void
   ) {
-    if (__DEV__) {
-      const isAndroid = Platform.OS === 'android';
-      if (isAndroid && Platform.Version < 23) {
-        callback(true, 'Fingerprint', 'Fingerprint (Dev)');
-      } else if (isAndroid) {
-        callback(true, 'Biometrics', 'Biometrics (Dev)');
-      } else {
-        callback(true, 'Face ID', 'Face ID');
-      }
-      return;
-    }
+    // if (__DEV__) {
+    //   const isAndroid = Platform.OS === 'android';
+    //   if (isAndroid && Platform.Version < 23) {
+    //     callback(true, 'Fingerprint', 'Fingerprint (Dev)');
+    //   } else if (isAndroid) {
+    //     callback(true, 'Biometrics', 'Biometrics');
+    //   } else {
+    //     callback(true, 'Face ID', 'Face ID');
+    //   }
+    //   return;
+    // }
     FingerprintScanner.isSensorAvailable()
       .then(type => {
         const noun = type === 'Touch ID' ? 'Fingerprint' : type;
