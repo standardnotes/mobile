@@ -39,18 +39,24 @@ export const PasscodeSection = (props: Props) => {
   ] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
     const getHasBiometrics = async () => {
-      setHasBiometrics(await application!.hasBiometrics());
+      const appHasBiometrics = await application!.hasBiometrics();
+      if (mounted) {
+        setHasBiometrics(appHasBiometrics);
+      }
     };
     getHasBiometrics();
-    const supportsBiometrics = async () => {
-      (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(
-        (available, type, noun) => {
-          setSupportsBiometrics(available);
-        }
-      );
+    const hasBiometricsSupport = async () => {
+      const hasBiometricsAvailable = await (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability();
+      if (mounted) {
+        setSupportsBiometrics(hasBiometricsAvailable);
+      }
     };
-    supportsBiometrics();
+    hasBiometricsSupport();
+    return () => {
+      mounted = false;
+    };
   }, [application]);
 
   const toggleEncryptionPolicy = async () => {

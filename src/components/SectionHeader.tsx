@@ -13,8 +13,8 @@ type Props = {
 };
 
 const Container = styled.View<Pick<Props, 'backgroundColor'>>`
-  flex: 1;
-  flex-grow: 0;
+  /* flex: 1; */
+  /* flex-grow: 0; */
   justify-content: space-between;
   flex-direction: row;
   padding-right: ${props => props.theme.paddingLeft}px;

@@ -18,6 +18,7 @@ import { PreferencesManager } from './PreferencesManager';
 import { StyleKit } from '@Style/StyleKit';
 import { SNReactNativeCrypto } from './SNReactNativeCrypto';
 import { NavigationContainerRef } from '@react-navigation/native';
+import { SCREEN_AUTHENTICATE } from '@Root/screens2/screens';
 
 type MobileServices = {
   applicationState: ApplicationState;
@@ -74,9 +75,7 @@ export class MobileApplication extends SNApplication {
     challenge: Challenge,
     navigation: NavigationContainerRef | null
   ) {
-    if (challenge.reason === ChallengeReason.ApplicationUnlock) {
-      // orchestrator.submitValues();
-    }
+    navigation?.navigate(SCREEN_AUTHENTICATE, { challenge });
   }
 
   setMobileServices(services: MobileServices) {

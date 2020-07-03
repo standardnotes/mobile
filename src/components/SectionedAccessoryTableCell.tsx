@@ -24,7 +24,6 @@ const TouchableContainer = styled(SectionedTableCellTouchableHighlight).attrs(
     underlayColor: props.theme.stylekitBorderColor,
   })
 )`
-  flex: 1;
   flex-direction: column;
   padding-top: 0px;
   padding-bottom: 0px;

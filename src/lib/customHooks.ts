@@ -41,11 +41,17 @@ export const useOutOfSync = () => {
   const [outOfSync, setOutOfSync] = React.useState<boolean>(false);
 
   React.useEffect(() => {
+    let isMounted = true;
     const getOutOfSync = async () => {
       const outOfSyncInitial = await application?.isOutOfSync();
-      setOutOfSync(Boolean(outOfSyncInitial));
+      if (isMounted) {
+        setOutOfSync(Boolean(outOfSyncInitial));
+      }
     };
     getOutOfSync();
+    return () => {
+      isMounted = false;
+    };
   }, [application]);
 
   React.useEffect(() => {
@@ -63,4 +69,29 @@ export const useOutOfSync = () => {
   }, [application]);
 
   return outOfSync;
+};
+
+const useLocked = () => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  // State
+  const [isLocked, setIsLocked] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    const getIsLocked = async () => {
+      application?.isLocked();
+    };
+    const removeSignedInObserver = application?.addEventObserver(
+      async event => {
+        if (event === ApplicationEvent.Started) {
+          setOutOfSync(true);
+        } else if (event === ApplicationEvent.ExitedOutOfSync) {
+          setOutOfSync(false);
+        }
+      }
+    );
+
+    return removeSignedInObserver;
+  }, [application]);
 };

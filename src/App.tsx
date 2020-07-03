@@ -19,6 +19,7 @@ import {
   SCREEN_SETTINGS,
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_INPUT_MODAL_TAG,
+  SCREEN_AUTHENTICATE,
 } from './screens2/screens';
 import { HeaderTitleView } from '@Components/HeaderTitleView';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -36,6 +37,8 @@ import { ApplicationGroup } from '@Lib/applicationGroup';
 import { MobileApplication } from '@Lib/application';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
+import { Challenge, ChallengeType } from 'snjs';
+import { Authenticate } from '@Screens/Authenticate/Authenticate';
 
 enableScreens();
 
@@ -63,6 +66,9 @@ type ModalStackNavigatorParamList = {
     initialValue?: string;
   };
   [SCREEN_INPUT_MODAL_PASSCODE]: undefined;
+  [SCREEN_AUTHENTICATE]: {
+    challenge: Challenge;
+  };
 };
 export type AppStackNavigationProp<
   T extends keyof AppStackNavigatorParamList
@@ -178,7 +184,13 @@ const AppStackComponent = () => {
 };
 
 const MainStackComponent = () => (
-  <MainStack.Navigator mode="modal" initialRouteName="AppStack">
+  <MainStack.Navigator
+    screenOptions={{
+      gestureEnabled: false,
+    }}
+    mode="modal"
+    initialRouteName="AppStack"
+  >
     <MainStack.Screen
       name={'AppStack'}
       options={{
@@ -190,7 +202,6 @@ const MainStackComponent = () => (
       name={SCREEN_SETTINGS}
       options={({ route }) => ({
         title: 'Settings',
-        gestureEnabled: false,
         headerTitle: ({ children }) => {
           return <HeaderTitleView title={children || ''} />;
         },
@@ -216,7 +227,6 @@ const MainStackComponent = () => (
       name={SCREEN_INPUT_MODAL_PASSCODE}
       options={{
         title: 'Setup Passcode',
-        gestureEnabled: false,
         headerTitle: ({ children }) => {
           return <HeaderTitleView title={children || ''} />;
         },
@@ -266,6 +276,17 @@ const MainStackComponent = () => (
       })}
       component={TagInputModal}
     />
+    <MainStack.Screen
+      name={SCREEN_AUTHENTICATE}
+      options={({ route }) => ({
+        title: 'Authenticate',
+        headerLeft: () => undefined,
+        headerTitle: ({ children }) => {
+          return <HeaderTitleView title={children || ''} />;
+        },
+      })}
+      component={Authenticate}
+    />
   </MainStack.Navigator>
 );
 
@@ -293,7 +314,7 @@ const AppComponent: React.FC<{ application: MobileApplication }> = ({
       styleKit.current = new StyleKit(application);
       await styleKit.current.initialize();
       setReady(true);
-      await application?.launch(false);
+      // await application?.launch(false);
     };
     setReady(false);
     loadApplication();
@@ -304,9 +325,14 @@ const AppComponent: React.FC<{ application: MobileApplication }> = ({
   }
 
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer
+      onReady={() => {
+        application?.launch(false);
+      }}
+      ref={navigationRef}
+    >
       <StatusBar translucent />
-      {ready && styleKit.current && (
+      {styleKit.current && (
         <>
           <ThemeProvider theme={styleKit.current.theme!}>
             <ActionSheetProvider>

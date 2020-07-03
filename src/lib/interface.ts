@@ -130,9 +130,7 @@ export class MobileDeviceInterface extends DeviceInterface {
     return Keychain.clearKeys();
   }
 
-  getDeviceBiometricsAvailability(
-    callback: (available: boolean, type?: BiometricsType, noun?: string) => void
-  ) {
+  async getDeviceBiometricsAvailability() {
     // if (__DEV__) {
     //   const isAndroid = Platform.OS === 'android';
     //   if (isAndroid && Platform.Version < 23) {
@@ -144,14 +142,12 @@ export class MobileDeviceInterface extends DeviceInterface {
     //   }
     //   return;
     // }
-    FingerprintScanner.isSensorAvailable()
-      .then(type => {
-        const noun = type === 'Touch ID' ? 'Fingerprint' : type;
-        callback(true, type, noun);
-      })
-      .catch(() => {
-        callback(false);
-      });
+    try {
+      await FingerprintScanner.isSensorAvailable();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   openUrl(url: string) {
