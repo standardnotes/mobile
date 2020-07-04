@@ -37,7 +37,7 @@ import { ApplicationGroup } from '@Lib/applicationGroup';
 import { MobileApplication } from '@Lib/application';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
-import { Challenge, ChallengeType } from 'snjs';
+import { Challenge } from 'snjs';
 import { Authenticate } from '@Screens/Authenticate/Authenticate';
 
 enableScreens();

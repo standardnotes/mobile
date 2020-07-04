@@ -93,10 +93,10 @@ export const Authenticate = ({
       await application?.submitValuesForChallenge(challenge, [challengeValue]);
     },
     [
-      application?.submitValuesForChallenge,
-      challenge,
       challengeValueStates,
       challengeValues,
+      application?.submitValuesForChallenge,
+      challenge,
     ]
   );
 
@@ -137,8 +137,9 @@ export const Authenticate = ({
             deviceCredentialAllowed: true,
             description: 'Biometrics are required to access your notes.',
           });
-          onValueChange({ ...challengeValue, value: true });
-          return validateChallengeValue(challengeValue);
+          const newChallengeValue = { ...challengeValue, value: true };
+          onValueChange(newChallengeValue);
+          return validateChallengeValue(newChallengeValue);
         } catch (error) {
           console.log('Biometrics error', error);
 
@@ -168,8 +169,9 @@ export const Authenticate = ({
             fallbackEnabled: true,
             description: 'This is required to access your notes.',
           });
-          onValueChange({ ...challengeValue, value: true });
-          return validateChallengeValue(challengeValue);
+          const newChallengeValue = { ...challengeValue, value: true };
+          onValueChange(newChallengeValue);
+          return validateChallengeValue(newChallengeValue);
         } catch (error_1) {
           onValueChange({ ...challengeValue, value: false });
           if (error_1.name !== 'UserCancel') {
@@ -186,64 +188,95 @@ export const Authenticate = ({
     [onValueLocked, supportsBiometrics, validateChallengeValue]
   );
 
-  const beginAuthenticatingForNextChallengeReason = useCallback(() => {
-    const firstNotSuccessful = challengeValueStates.findIndex(
-      state => state !== ChallengeValueStateType.Success
-    );
-    const challengeValue = challengeValues[firstNotSuccessful];
-    console.log(challengeValueStates, challengeValue);
+  const firstNotSuccessful = useMemo(
+    () =>
+      challengeValueStates.findIndex(
+        state => state !== ChallengeValueStateType.Success
+      ),
+    [challengeValueStates]
+  );
 
-    /**
-     * Authentication modal may be displayed on lose focus just before the app
-     * is closing. In this state however, we don't want to begin auth. We'll
-     * wait until the app gains focus.
-     */
-    const isLosingFocus =
-      application?.getAppState().getMostRecentState() ===
-      AppStateType.LosingFocus;
+  const beginAuthenticatingForNextChallengeReason = useCallback(
+    (completedChallengeValue?: ChallengeValue) => {
+      let challengeValue;
+      if (completedChallengeValue === undefined) {
+        challengeValue = challengeValues[firstNotSuccessful];
+      } else {
+        const index = findMatchingValueIndex(
+          challengeValues,
+          completedChallengeValue.type
+        );
 
-    if (challengeValue.type === ChallengeType.Biometric && !isLosingFocus) {
-      /** Begin authentication right away, we're not waiting for any input */
-      authenticateBiometrics(challengeValue);
-      // this.validateAuthentication(source);
-    }
-    if (challengeValue.type === ChallengeType.LocalPasscode) {
-      localPasscodeRef.current?.focus();
-    } else if (challengeValue.type === ChallengeType.AccountPassword) {
-      accountPasswordRef.current?.focus();
-    }
+        if (!challengeValues.hasOwnProperty(index + 1)) {
+          return;
+        }
+        challengeValue = challengeValues[index + 1];
+      }
 
-    dispatch({
-      type: 'setState',
-      valueType: challengeValue.type,
-      state: ChallengeValueStateType.WaitingInput,
-    });
-  }, [
-    application?.getAppState,
-    authenticateBiometrics,
-    challengeValueStates,
-    challengeValues,
-  ]);
+      /**
+       * Authentication modal may be displayed on lose focus just before the app
+       * is closing. In this state however, we don't want to begin auth. We'll
+       * wait until the app gains focus.
+       */
+      const isLosingFocus =
+        application?.getAppState().getMostRecentState() ===
+        AppStateType.LosingFocus;
 
-  const onValidValue = useCallback((value: ChallengeValue) => {
-    console.log(value);
+      if (challengeValue.type === ChallengeType.Biometric && !isLosingFocus) {
+        /** Begin authentication right away, we're not waiting for any input */
+        authenticateBiometrics(challengeValue);
+      }
+      if (challengeValue.type === ChallengeType.LocalPasscode) {
+        localPasscodeRef.current?.focus();
+      } else if (challengeValue.type === ChallengeType.AccountPassword) {
+        accountPasswordRef.current?.focus();
+      }
+
+      dispatch({
+        type: 'setState',
+        valueType: challengeValue.type,
+        state: ChallengeValueStateType.WaitingInput,
+      });
+    },
+    [
+      application?.getAppState,
+      authenticateBiometrics,
+      challengeValues,
+      firstNotSuccessful,
+    ]
+  );
+
+  const onValidValue = useCallback(
+    (value: ChallengeValue) => {
+      dispatch({
+        type: 'setState',
+        valueType: value.type,
+        state: ChallengeValueStateType.Success,
+      });
+      beginAuthenticatingForNextChallengeReason(value);
+    },
+    [beginAuthenticatingForNextChallengeReason]
+  );
+
+  const onInvalidValue = (value: ChallengeValue) => {
     dispatch({
       type: 'setState',
       valueType: value.type,
-      state: ChallengeValueStateType.Success,
+      state: ChallengeValueStateType.Fail,
     });
-    // beginAuthenticatingForNextChallengeReason();
-  }, []);
+  };
 
   useEffect(() => {
-    application?.setChallengeCallbacks({
-      challenge,
-      onValidValue,
-      onInvalidValue,
-      onComplete: () => {
-        navigation.goBack();
-      },
-    });
+    if (application?.setChallengeCallbacks) {
+      application?.setChallengeCallbacks({
+        challenge,
+        onValidValue,
+        onInvalidValue,
+        onComplete: () => {
+          navigation.goBack();
+        },
+      });
+    }
   }, [application, challenge, navigation, onValidValue]);
 
   useEffect(() => {
@@ -264,14 +297,6 @@ export const Authenticate = ({
     beginAuthenticatingForNextChallengeReason();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const onInvalidValue = (value: ChallengeValue) => {
-    dispatch({
-      type: 'setState',
-      valueType: value.type,
-      state: ChallengeValueStateType.Fail,
-    });
-  };
 
   const onBiometricDirectPress = () => {
     const index = findMatchingValueIndex(
@@ -377,14 +402,6 @@ export const Authenticate = ({
       </SourceContainer>
     );
   };
-
-  const firstNotSuccessful = useMemo(
-    () =>
-      challengeValueStates.findIndex(
-        state => state !== ChallengeValueStateType.Success
-      ),
-    [challengeValueStates]
-  );
 
   const isPending = useMemo(
     () =>

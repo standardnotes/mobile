@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ApplicationEvent, ApplicationService } from 'snjs';
+import { useFocusEffect } from '@react-navigation/native';
 
 export const useSignedIn = (
   signedInCallback?: () => void,
@@ -71,27 +72,22 @@ export const useOutOfSync = () => {
   return outOfSync;
 };
 
-const useLocked = () => {
+export const useLocked = () => {
   // Context
   const application = React.useContext(ApplicationContext);
 
   // State
   const [isLocked, setIsLocked] = React.useState<boolean>(false);
 
-  React.useEffect(() => {
-    const getIsLocked = async () => {
-      application?.isLocked();
-    };
-    const removeSignedInObserver = application?.addEventObserver(
-      async event => {
-        if (event === ApplicationEvent.Started) {
-          setOutOfSync(true);
-        } else if (event === ApplicationEvent.ExitedOutOfSync) {
-          setOutOfSync(false);
-        }
-      }
-    );
+  useFocusEffect(
+    useCallback(() => {
+      const getIsLocked = async () => {
+        const locked = await application?.isLocked();
+        setIsLocked(Boolean(locked));
+      };
+      getIsLocked();
+    }, [application?.isLocked])
+  );
 
-    return removeSignedInObserver;
-  }, [application]);
+  return isLocked;
 };

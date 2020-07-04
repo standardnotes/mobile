@@ -40,7 +40,7 @@
     "react-native-flag-secure-android": "standardnotes/react-native-flag-secure-android#3d59055",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.6.1",
-    "react-native-keychain": "^6.1.1",
+    "react-native-keychain": "^4.0.5",
     "react-native-mail": "standardnotes/react-native-mail#9862c76",
     "react-native-reanimated": "^1.9.0",
     "react-native-safe-area-context": "^3.0.7",
