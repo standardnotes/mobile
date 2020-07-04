@@ -20,7 +20,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { ChallengeType, ChallengeValue } from 'snjs';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { StyleKitContext } from '@Style/StyleKit';
-import { TextInput, Platform, Alert } from 'react-native';
+import { TextInput, Platform, Alert, BackHandler } from 'react-native';
 import { SectionHeader } from '@Components/SectionHeader';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { ThemeContext } from 'styled-components/native';
@@ -35,6 +35,7 @@ import {
 import { AppStateType } from '@Lib/ApplicationState';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { MobileDeviceInterface } from '@Lib/interface';
+import { useFocusEffect } from '@react-navigation/native';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_AUTHENTICATE>;
 
@@ -318,6 +319,20 @@ export const Authenticate = ({
       value: newValue.value,
     });
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        // Always block back button on Android
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );
 
   const renderAuthenticationSource = (
     challengeValue: ChallengeValue,
