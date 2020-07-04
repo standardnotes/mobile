@@ -2,8 +2,6 @@ import {
   AppState,
   Platform,
   NativeModules,
-  Linking,
-  Alert,
   Keyboard,
   AppStateStatus,
   KeyboardEventListener,
@@ -101,6 +99,10 @@ export class ApplicationState {
 
   deinit() {
     this.appEventObersever();
+    AppState.removeEventListener(
+      'change',
+      this.handleReactNativeAppStateChange
+    );
     this.appEventObersever = undefined;
     this.observers.length = 0;
     this.keyboardDidShowListener = undefined;
@@ -396,7 +398,9 @@ export class ApplicationState {
   /**
    * handles App State change from React Native
    */
-  private handleReactNativeAppStateChange = (nextAppState: AppStateStatus) => {
+  private handleReactNativeAppStateChange = async (
+    nextAppState: AppStateStatus
+  ) => {
     if (this.ignoreStateChanges) {
       return;
     }
@@ -409,12 +413,12 @@ export class ApplicationState {
       isResuming && this.mostRecentState === AppStateType.EnteringBackground;
     const isEnteringBackground = nextAppState === 'background';
     const isLosingFocus = nextAppState === 'inactive';
-
     if (isEnteringBackground) {
       this.notifyOfStateChange(AppStateType.EnteringBackground);
-      if (true) {
+      const isLocked = await this.application.isLocked();
+      if (!isLocked) {
         // TODO: add lockManager
-        this.application.lock();
+        await this.application.lock();
       }
     }
 

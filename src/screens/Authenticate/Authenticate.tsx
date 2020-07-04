@@ -303,14 +303,12 @@ export const Authenticate = ({
       challengeValues,
       ChallengeType.Biometric
     );
-    // const challengeValue = challengeValues[index];
     const state = challengeValueStates[index];
     if (state === ChallengeValueStateType.Locked) {
       return;
     }
 
     beginAuthenticatingForNextChallengeReason();
-    // beginAuthenticationForSource(source)
   };
 
   const onValueChange = (newValue: ChallengeValue) => {
