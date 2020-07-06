@@ -474,9 +474,11 @@ export class ApplicationState {
   Allows other parts of the code to perform external actions without triggering state change notifications.
   This is useful on Android when you present a share sheet and dont want immediate authentication to appear.
   */
-  performActionWithoutStateChangeImpact(block: () => void) {
+  async performActionWithoutStateChangeImpact(
+    block: () => void | Promise<void>
+  ) {
     this.ignoreStateChanges = true;
-    block();
+    await block();
     setTimeout(() => {
       this.ignoreStateChanges = false;
     }, 350);

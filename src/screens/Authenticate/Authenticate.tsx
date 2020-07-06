@@ -51,7 +51,9 @@ export const Authenticate = ({
   const theme = useContext(ThemeContext);
 
   // State
-  const [supportsBiometrics, setSupportsBiometrics] = useState(false);
+  const [supportsBiometrics, setSupportsBiometrics] = useState<
+    boolean | undefined
+  >(undefined);
   const [{ challengeValues, challengeValueStates }, dispatch] = useReducer(
     authenticationReducer,
     {
@@ -117,9 +119,20 @@ export const Authenticate = ({
     }, 30 * 1000);
   }, []);
 
+  const checkForBiometrics = useCallback(
+    async () =>
+      (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(),
+    [application?.deviceInterface]
+  );
+
   const authenticateBiometrics = useCallback(
     async (challengeValue: ChallengeValue) => {
-      if (!supportsBiometrics) {
+      let hasBiometrics = supportsBiometrics;
+      if (supportsBiometrics === undefined) {
+        hasBiometrics = await checkForBiometrics();
+        setSupportsBiometrics(hasBiometrics);
+      }
+      if (!hasBiometrics) {
         FingerprintScanner.release();
         dispatch({
           type: 'setState',
@@ -130,15 +143,21 @@ export const Authenticate = ({
           'Unsuccessful',
           'This device either does not have a biometric sensor or it may not configured.'
         );
+        return;
       }
 
       if (Platform.OS === 'android') {
         try {
-          await FingerprintScanner.authenticate({
-            // @ts-ignore TODO: check deviceCredentialAllowed
-            deviceCredentialAllowed: true,
-            description: 'Biometrics are required to access your notes.',
-          });
+          await application
+            ?.getAppState()
+            .performActionWithoutStateChangeImpact(async () => {
+              await FingerprintScanner.authenticate({
+                // @ts-ignore TODO: check deviceCredentialAllowed
+                deviceCredentialAllowed: true,
+                description: 'Biometrics are required to access your notes.',
+              });
+            });
+
           FingerprintScanner.release();
           const newChallengeValue = { ...challengeValue, value: true };
 
@@ -146,7 +165,6 @@ export const Authenticate = ({
           return validateChallengeValue(newChallengeValue);
         } catch (error) {
           FingerprintScanner.release();
-          console.log('Biometrics error', error);
 
           if (error.name === 'DeviceLocked') {
             onValueLocked(challengeValue);
@@ -192,7 +210,13 @@ export const Authenticate = ({
         }
       }
     },
-    [onValueLocked, supportsBiometrics, validateChallengeValue]
+    [
+      application?.getAppState,
+      checkForBiometrics,
+      onValueLocked,
+      supportsBiometrics,
+      validateChallengeValue,
+    ]
   );
 
   const firstNotSuccessful = useMemo(
@@ -280,6 +304,7 @@ export const Authenticate = ({
         onValidValue,
         onInvalidValue,
         onComplete: () => {
+          console.log('onSuccess');
           navigation.goBack();
         },
       });
@@ -288,17 +313,17 @@ export const Authenticate = ({
 
   useEffect(() => {
     let mounted = true;
-    const hasBiometricsSupport = async () => {
-      const hasBiometricsAvailable = await (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability();
+    const setBiometricsAsync = async () => {
+      const hasBiometrics = await checkForBiometrics();
       if (mounted) {
-        setSupportsBiometrics(hasBiometricsAvailable);
+        setSupportsBiometrics(hasBiometrics);
       }
     };
-    hasBiometricsSupport();
+    setBiometricsAsync();
     return () => {
       mounted = false;
     };
-  }, [application]);
+  }, [checkForBiometrics]);
 
   useEffect(() => {
     beginAuthenticatingForNextChallengeReason();
