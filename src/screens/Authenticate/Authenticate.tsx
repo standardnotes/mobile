@@ -120,6 +120,7 @@ export const Authenticate = ({
   const authenticateBiometrics = useCallback(
     async (challengeValue: ChallengeValue) => {
       if (!supportsBiometrics) {
+        FingerprintScanner.release();
         dispatch({
           type: 'setState',
           valueType: challengeValue.type,
@@ -138,10 +139,13 @@ export const Authenticate = ({
             deviceCredentialAllowed: true,
             description: 'Biometrics are required to access your notes.',
           });
+          FingerprintScanner.release();
           const newChallengeValue = { ...challengeValue, value: true };
+
           onValueChange(newChallengeValue);
           return validateChallengeValue(newChallengeValue);
         } catch (error) {
+          FingerprintScanner.release();
           console.log('Biometrics error', error);
 
           if (error.name === 'DeviceLocked') {
@@ -170,11 +174,13 @@ export const Authenticate = ({
             fallbackEnabled: true,
             description: 'This is required to access your notes.',
           });
+          FingerprintScanner.release();
           const newChallengeValue = { ...challengeValue, value: true };
           onValueChange(newChallengeValue);
           return validateChallengeValue(newChallengeValue);
         } catch (error_1) {
           onValueChange({ ...challengeValue, value: false });
+          FingerprintScanner.release();
           if (error_1.name !== 'UserCancel') {
             Alert.alert('Unsuccessful');
           } else {
