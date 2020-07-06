@@ -1,49 +1,48 @@
-import { Client } from 'bugsnag-react-native';
-import React, { useState, useEffect, useContext, useRef } from 'react';
-import { Dimensions, ScaledSize, StatusBar, Platform } from 'react-native';
+import { HeaderTitleView } from '@Components/HeaderTitleView';
+import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { MobileApplication } from '@Lib/application';
+import { ApplicationGroup } from '@Lib/applicationGroup';
 import {
   NavigationContainer,
-  RouteProp,
   NavigationContainerRef,
+  RouteProp,
 } from '@react-navigation/native';
 import {
   createStackNavigator,
   StackNavigationProp,
 } from '@react-navigation/stack';
-import { ThemeProvider, ThemeContext } from 'styled-components/native';
-import { ApplicationContext } from './ApplicationContext';
+import { Authenticate } from '@Screens/Authenticate/Authenticate';
+import { Compose } from '@Screens/Compose/Compose';
+import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
+import { TagInputModal } from '@Screens/InputModal/TagInputModal';
 import { Root } from '@Screens/Root';
+import { Settings } from '@Screens/Settings/Settings';
+import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
+import { ICON_CHECKMARK, ICON_CLOSE, ICON_MENU } from '@Style/icons';
+import { StyleKit, StyleKitContext } from '@Style/StyleKit';
+import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
+import { Client } from 'bugsnag-react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Dimensions, Platform, ScaledSize, StatusBar } from 'react-native';
+import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
+import { enableScreens } from 'react-native-screens';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import { Challenge } from 'snjs';
+import { ThemeContext, ThemeProvider } from 'styled-components/native';
+import { ApplicationContext } from './ApplicationContext';
 import {
-  SCREEN_NOTES,
+  SCREEN_AUTHENTICATE,
   SCREEN_COMPOSE,
-  SCREEN_SETTINGS,
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_INPUT_MODAL_TAG,
-  SCREEN_AUTHENTICATE,
+  SCREEN_NOTES,
+  SCREEN_SETTINGS,
 } from './screens2/screens';
-import { HeaderTitleView } from '@Components/HeaderTitleView';
-import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ICON_MENU, ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
-import { StyleKit, StyleKitContext } from '@Style/StyleKit';
-import { enableScreens } from 'react-native-screens';
-import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
-import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
-import { Compose } from '@Screens/Compose/Compose';
-import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
-import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
-import { Settings } from '@Screens/Settings/Settings';
-import { ApplicationGroup } from '@Lib/applicationGroup';
-import { MobileApplication } from '@Lib/application';
-import { TagInputModal } from '@Screens/InputModal/TagInputModal';
-import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
-import { Challenge } from 'snjs';
-import { Authenticate } from '@Screens/Authenticate/Authenticate';
 
 enableScreens();
 
 if (__DEV__ === false) {
-  // bugsnag
   // eslint-disable-next-line no-new
   new Client();
 }

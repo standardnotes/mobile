@@ -82,6 +82,7 @@
     "patch-package": "^6.2.2",
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.0.5",
+    "prettier-plugin-organize-imports": "^1.1.1",
     "react-test-renderer": "16.11.0",
     "replace-in-file": "^6.1.0",
     "sncrypto": "standardnotes/sncrypto#7e76ab9",

@@ -1,41 +1,41 @@
+import { ButtonCell } from '@Components/ButtonCell';
+import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { SectionHeader } from '@Components/SectionHeader';
+import { AppStateType } from '@Lib/ApplicationState';
+import { MobileDeviceInterface } from '@Lib/interface';
+import { useFocusEffect } from '@react-navigation/native';
+import { ModalStackNavigationProp } from '@Root/App';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_AUTHENTICATE } from '@Root/screens2/screens';
+import { StyleKitContext } from '@Style/StyleKit';
 import React, {
-  useEffect,
-  useContext,
-  useRef,
   useCallback,
-  useReducer,
+  useContext,
+  useEffect,
   useMemo,
+  useReducer,
+  useRef,
   useState,
 } from 'react';
+import { Alert, BackHandler, Platform, TextInput } from 'react-native';
+import FingerprintScanner from 'react-native-fingerprint-scanner';
+import { ChallengeType, ChallengeValue } from 'snjs';
+import { ThemeContext } from 'styled-components/native';
 import {
   Container,
   Input,
   SectionContainer,
   SourceContainer,
 } from './Authenticate.styled';
-import { ButtonCell } from '@Components/ButtonCell';
-import { SCREEN_AUTHENTICATE } from '@Root/screens2/screens';
-import { ModalStackNavigationProp } from '@Root/App';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { ChallengeType, ChallengeValue } from 'snjs';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
-import { StyleKitContext } from '@Style/StyleKit';
-import { TextInput, Platform, Alert, BackHandler } from 'react-native';
-import { SectionHeader } from '@Components/SectionHeader';
-import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
-import { ThemeContext } from 'styled-components/native';
 import {
   authenticationReducer,
   ChallengeValueStateType,
-  isInActiveState,
+  findMatchingValueIndex,
   getLabelForStateAndType,
   getTitleForStateAndType,
-  findMatchingValueIndex,
+  isInActiveState,
 } from './helpers';
-import { AppStateType } from '@Lib/ApplicationState';
-import FingerprintScanner from 'react-native-fingerprint-scanner';
-import { MobileDeviceInterface } from '@Lib/interface';
-import { useFocusEffect } from '@react-navigation/native';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_AUTHENTICATE>;
 
@@ -304,7 +304,6 @@ export const Authenticate = ({
         onValidValue,
         onInvalidValue,
         onComplete: () => {
-          console.log('onSuccess');
           navigation.goBack();
         },
       });

@@ -1,24 +1,24 @@
 import {
   AppState,
-  Platform,
-  NativeModules,
-  Keyboard,
   AppStateStatus,
-  KeyboardEventListener,
   EmitterSubscription,
+  Keyboard,
+  KeyboardEventListener,
+  NativeModules,
+  Platform,
 } from 'react-native';
-import { MobileApplication } from './application';
-import { Editor } from './editor';
 import {
-  SNNote,
+  ApplicationEvent,
   ContentType,
   PayloadSource,
-  SNUserPrefs,
-  SNTag,
-  ApplicationEvent,
-  SNSmartTag,
   removeFromArray,
+  SNNote,
+  SNSmartTag,
+  SNTag,
+  SNUserPrefs,
 } from 'snjs';
+import { MobileApplication } from './application';
+import { Editor } from './editor';
 
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;

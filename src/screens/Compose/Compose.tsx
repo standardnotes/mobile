@@ -1,6 +1,6 @@
+/* eslint-disable eslint-plugin-react-hooks */
 import React, {
   useContext,
-  useEffect,
   useCallback,
   useState,
   useRef,
@@ -36,6 +36,7 @@ import { lighten } from '@Style/utils';
 import TextView from 'sn-textview';
 import { Editor } from '@Lib/editor';
 import { ComponentView } from './ComponentView';
+import { useFocusEffect } from '@react-navigation/native';
 
 const NOTE_PREVIEW_CHAR_LIMIT = 80;
 const MINIMUM_STATUS_DURATION = 400;
@@ -64,7 +65,7 @@ export const Compose = (): JSX.Element => {
   const editorViewRef = useRef<TextView>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     const removeEditorObserver = application?.editorGroup.addChangeObserver(
       () => {
         const editorTemp = application!.editorGroup.activeEditor;
@@ -107,9 +108,9 @@ export const Compose = (): JSX.Element => {
       removeStreamItems();
     };
 
-  }, [application, editorComponent]);
+  }, [application, editorComponent]));
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     const removeEditorNoteChangeObserver = editor?.onNoteChange(setNote);
     const removeEditorNoteValueChangeObserver = editor?.onNoteValueChange(
       (newNote, source) => {
@@ -136,7 +137,7 @@ export const Compose = (): JSX.Element => {
       removeEditorNoteValueChangeObserver &&
         removeEditorNoteValueChangeObserver();
     };
-  }, [editor]);
+  }, [editor]));
 
   const reloadComponentEditorState = useCallback(async () => {
     const associatedEditor = application?.componentManager!.editorForNote(

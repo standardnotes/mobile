@@ -1,9 +1,8 @@
+import { SectionedTableCellTouchableHighlight } from '@Components/SectionedTableCell';
 import React, { useContext } from 'react';
 import { Platform } from 'react-native';
-import { SectionedTableCellTouchableHighlight } from '@Components/SectionedTableCell';
-
 import Icon from 'react-native-vector-icons/Ionicons';
-import styled, { ThemeContext, css } from 'styled-components/native';
+import styled, { css, ThemeContext } from 'styled-components/native';
 
 type Props = {
   disabled?: boolean;
