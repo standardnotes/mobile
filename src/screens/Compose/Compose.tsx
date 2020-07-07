@@ -1,4 +1,3 @@
-/* eslint-disable eslint-plugin-react-hooks */
 import { Editor } from '@Lib/editor';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -59,6 +58,73 @@ export const Compose = (): JSX.Element => {
   // Ref
   const editorViewRef = useRef<TextView>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const reloadComponentContext = useCallback(() => {
+    if (note) {
+      if (editorComponent?.active) {
+        application!.componentManager!.setComponentHidden(
+          editorComponent,
+          !editorComponent.isExplicitlyEnabledForItem(note.uuid)
+        );
+      }
+    }
+    application?.componentManager!.contextItemDidChangeInArea(
+      ComponentArea.Editor
+    );
+  }, [application, editorComponent, note]);
+
+  const reloadComponentEditorState = useCallback(async () => {
+    const associatedEditor = application?.componentManager!.editorForNote(
+      note!
+    );
+    if (!associatedEditor) {
+      /** No editor */
+      let changed = false;
+      if (editorComponent) {
+        await application?.componentGroup.deactivateComponentForArea(
+          ComponentArea.Editor
+        );
+        changed = true;
+      }
+      return { updatedEditor: undefined, changed };
+    }
+
+    if (associatedEditor.uuid === editorComponent?.uuid) {
+      /** Same editor, no change */
+      return { updatedEditor: associatedEditor, changed: false };
+    }
+
+    await application?.componentGroup.activateComponent(associatedEditor);
+    return { updatedEditor: associatedEditor, changed: true };
+  }, [application, editorComponent, note]);
+
+  const streamItems = useCallback(() => {
+    const removeComponentsObserver = application?.streamItems(
+      ContentType.Component,
+      async items => {
+        const components = items as SNComponent[];
+        if (!note) {
+          return;
+        }
+        /** Reload componentStack in case new ones were added or removed */
+        reloadComponentContext();
+        // await this.reloadComponentStack();
+        /** Observe editor changes to see if the current note should update its editor */
+        const editors = components.filter(component => {
+          return component.isEditor();
+        });
+        if (editors.length === 0) {
+          return;
+        }
+        /** Find the most recent editor for note */
+        reloadComponentEditorState();
+      }
+    );
+
+    return () => {
+      removeComponentsObserver && removeComponentsObserver();
+    };
+  }, [application, note, reloadComponentContext, reloadComponentEditorState]);
 
   useFocusEffect(
     useCallback(() => {
@@ -136,73 +202,6 @@ export const Compose = (): JSX.Element => {
       };
     }, [editor])
   );
-
-  const reloadComponentEditorState = useCallback(async () => {
-    const associatedEditor = application?.componentManager!.editorForNote(
-      note!
-    );
-    if (!associatedEditor) {
-      /** No editor */
-      let changed = false;
-      if (editorComponent) {
-        await application?.componentGroup.deactivateComponentForArea(
-          ComponentArea.Editor
-        );
-        changed = true;
-      }
-      return { updatedEditor: undefined, changed };
-    }
-
-    if (associatedEditor.uuid === editorComponent?.uuid) {
-      /** Same editor, no change */
-      return { updatedEditor: associatedEditor, changed: false };
-    }
-
-    await application?.componentGroup.activateComponent(associatedEditor);
-    return { updatedEditor: associatedEditor, changed: true };
-  }, [application, editorComponent, note]);
-
-  const reloadComponentContext = () => {
-    if (note) {
-      if (editorComponent?.active) {
-        application!.componentManager!.setComponentHidden(
-          editorComponent,
-          !editorComponent.isExplicitlyEnabledForItem(note.uuid)
-        );
-      }
-    }
-    application?.componentManager!.contextItemDidChangeInArea(
-      ComponentArea.Editor
-    );
-  };
-
-  const streamItems = useCallback(() => {
-    const removeComponentsObserver = application?.streamItems(
-      ContentType.Component,
-      async items => {
-        const components = items as SNComponent[];
-        if (!note) {
-          return;
-        }
-        /** Reload componentStack in case new ones were added or removed */
-        reloadComponentContext();
-        // await this.reloadComponentStack();
-        /** Observe editor changes to see if the current note should update its editor */
-        const editors = components.filter(component => {
-          return component.isEditor();
-        });
-        if (editors.length === 0) {
-          return;
-        }
-        /** Find the most recent editor for note */
-        reloadComponentEditorState();
-      }
-    );
-
-    return () => {
-      removeComponentsObserver && removeComponentsObserver();
-    };
-  }, [application, note, reloadComponentContext, reloadComponentEditorState]);
 
   const saveNote = async (
     bypassDebouncer: boolean,
