@@ -1,22 +1,22 @@
+import { Circle } from '@Components/Circle';
 import React, { useContext } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { ThemeContext } from 'styled-components/native';
 import {
-  Touchable,
   CellContent,
-  IconContainerLeft,
-  TextContainer,
-  SubTextContainer,
-  SubText,
-  Text,
-  IconContainerRight,
-  IconGraphicContainer,
   IconAscii,
   IconCircleContainer,
+  IconContainerLeft,
+  IconContainerRight,
+  IconGraphicContainer,
   RegularText,
+  SubText,
+  SubTextContainer,
+  Text,
+  TextContainer,
+  Touchable,
 } from './SideMenuCell.styled';
-import { Circle } from '@Components/Circle';
 import { SideMenuOption } from './SideMenuSection';
-import { ThemeContext } from 'styled-components/native';
 
 const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
   if (!desc) {

@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {
-  HeaderButtonProps,
   HeaderButton,
+  HeaderButtonProps,
 } from 'react-navigation-header-buttons';
 import { ThemeContext } from 'styled-components/native';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 export const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />

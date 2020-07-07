@@ -1,20 +1,17 @@
-import React from 'react';
-import _ from 'lodash';
-import { ScrollView, Alert } from 'react-native';
-import { SafeAreaView } from 'react-navigation';
-import { SectionHeader } from '@Components/SectionHeader';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
+import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import LockedView from '@Containers/LockedView';
+import AlertManager from '@Lib/AlertService';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager from '@Lib/keysManager';
-import AlertManager from '@Lib/AlertService';
+import OptionsState from '@Lib/OptionsState';
 import Auth from '@Lib/snjs/authManager';
 import Storage from '@Lib/snjs/storageManager';
 import Sync from '@Lib/snjs/syncManager';
 import Abstract, {
-  AbstractState,
   AbstractProps,
+  AbstractState,
 } from '@Root/screens2/Abstract';
 import {
   SCREEN_INPUT_MODAL,
@@ -27,9 +24,11 @@ import OptionsSection from '@Root/screens2/Settings/Sections/OptionsSection';
 import PasscodeSection from '@Root/screens2/Settings/Sections/PasscodeSection';
 import { ICON_CHECKMARK } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
-
-import { SFPrivilegesManager, protocolManager } from 'snjs';
-import OptionsState from '@Lib/OptionsState';
+import _ from 'lodash';
+import React from 'react';
+import { Alert, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-navigation';
+import { protocolManager, SFPrivilegesManager } from 'snjs';
 
 type State = {
   confirmRegistration: boolean;

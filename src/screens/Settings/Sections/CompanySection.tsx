@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
-import { ApplicationState } from '@Lib/ApplicationState';
-import { Platform, Share } from 'react-native';
-import { TableSection } from '@Components/TableSection';
-import { SectionHeader } from '@Components/SectionHeader';
 import { ButtonCell } from '@Components/ButtonCell';
+import { SectionHeader } from '@Components/SectionHeader';
+import { TableSection } from '@Components/TableSection';
+import { ApplicationState } from '@Lib/ApplicationState';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { Label, ContentContainer } from './CompanySection.styled';
+import React, { useContext } from 'react';
+import { Platform, Share } from 'react-native';
+import { ContentContainer, Label } from './CompanySection.styled';
 
 const URLS = {
   feedback: `mailto:help@standardnotes.org?subject=${

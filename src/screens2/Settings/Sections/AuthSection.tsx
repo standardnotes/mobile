@@ -1,11 +1,11 @@
-import React, { Component, Fragment } from 'react';
-import { TextInput, View, Text, Keyboard, Alert } from 'react-native';
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import React, { Component, Fragment } from 'react';
+import { Alert, Keyboard, Text, TextInput, View } from 'react-native';
 
 const DEFAULT_SIGN_IN_TEXT = 'Sign In';
 const DEFAULT_REGISTER_TEXT = 'Register';

@@ -1,9 +1,9 @@
 /* eslint-disable no-bitwise */
-import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
-import { Base64 } from 'js-base64';
 import { decode as decodeBase64toArrayBuffer } from 'base64-arraybuffer';
-import Sodium from 'react-native-sodium';
+import { Base64 } from 'js-base64';
 import Aes from 'react-native-aes-crypto';
+import Sodium from 'react-native-sodium';
+import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 
 export class SNReactNativeCrypto implements SNPureCrypto {
   deinit(): void {}

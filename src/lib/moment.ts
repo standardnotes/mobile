@@ -1,7 +1,8 @@
-import { Platform, NativeModules } from 'react-native';
-
 // moment.js
 import moment from 'moment';
+import { NativeModules, Platform } from 'react-native';
+
+// moment.js
 const locale =
   Platform.OS === 'android'
     ? NativeModules.I18nManager.localeIdentifier

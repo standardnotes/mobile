@@ -1,27 +1,14 @@
-import React from 'react';
-import { Alert, Keyboard } from 'react-native';
-import FAB from 'react-native-fab';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { SafeAreaView } from 'react-navigation';
-import LockedView from '@Containers/LockedView';
-import {
-  AppStateEventType,
-  TabletModeChangeData,
-  NoteSideMenuToggleChange,
-} from '@Lib/ApplicationState';
 import Abstract, {
   AbstractProps,
   AbstractState,
 } from '@Root/screens2/Abstract';
 import NoteList from '@Root/screens2/Notes/NoteList';
-import {
-  SCREEN_SETTINGS,
-  SCREEN_KEY_RECOVERY,
-  SCREEN_COMPOSE,
-} from '@Root/screens2/screens';
-import SideMenuManager from '@Root/screens2/SideMenu/SideMenuManager';
-import { ICON_MENU, ICON_ADD } from '@Style/icons';
+import { ICON_ADD } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
+import React from 'react';
+import FAB from 'react-native-fab';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
 import { Platform } from 'snjs';
 
 type Props = {

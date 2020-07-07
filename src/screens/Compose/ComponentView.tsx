@@ -1,4 +1,12 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
+import { WebView } from 'react-native-webview';
+import {
+  OnShouldStartLoadWithRequest,
+  WebViewMessageEvent,
+} from 'react-native-webview/lib/WebViewTypes';
+import { ComponentAction, LiveItem, SNComponent } from 'snjs';
 import {
   FlexContainer,
   LockedContainer,
@@ -6,14 +14,6 @@ import {
   StyledIcon,
   StyledWebview,
 } from './ComponentView.styled';
-import { LiveItem, SNComponent, ComponentAction } from 'snjs';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { WebView } from 'react-native-webview';
-import { Platform } from 'react-native';
-import {
-  OnShouldStartLoadWithRequest,
-  WebViewMessageEvent,
-} from 'react-native-webview/lib/WebViewTypes';
 
 type Props = {
   componentUuid: string;

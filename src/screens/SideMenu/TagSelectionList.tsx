@@ -1,10 +1,10 @@
-import React, { useEffect, useContext, useState, useCallback } from 'react';
-import { FlatList, ListRenderItem } from 'react-native';
-import { SNTag, SNSmartTag, ContentType } from 'snjs';
-import { EmptyPlaceholder } from './TagSelectionList.styled';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SideMenuCell } from './SideMenuCell';
 import { useCustomActionSheet } from '@Style/useCustomActionSheet';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { FlatList, ListRenderItem } from 'react-native';
+import { ContentType, SNSmartTag, SNTag } from 'snjs';
+import { SideMenuCell } from './SideMenuCell';
+import { EmptyPlaceholder } from './TagSelectionList.styled';
 
 type Props = {
   contentType: ContentType.Tag | ContentType.SmartTag;

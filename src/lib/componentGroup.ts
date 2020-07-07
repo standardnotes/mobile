@@ -1,6 +1,6 @@
-import { SNComponent, ComponentArea, removeFromArray, addIfUnique } from 'snjs';
-import { MobileApplication } from './application';
+import { addIfUnique, ComponentArea, removeFromArray, SNComponent } from 'snjs';
 import { UuidString } from 'snjs/dist/@types/types';
+import { MobileApplication } from './application';
 
 /** Areas that only allow a single component to be active */
 const SingleComponentAreas = [

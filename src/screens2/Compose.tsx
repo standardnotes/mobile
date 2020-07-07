@@ -1,32 +1,32 @@
-import React from 'react';
-import {
-  StyleSheet,
-  TextInput,
-  View,
-  TouchableOpacity,
-  Text,
-  Alert,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
-import TextView from 'sn-textview';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
 import {
   AppStateEventType,
-  TabletModeChangeData,
   NoteSideMenuToggleChange,
+  TabletModeChangeData,
 } from '@Lib/ApplicationState';
 import Abstract, {
-  AbstractState,
   AbstractProps,
+  AbstractState,
 } from '@Root/screens2/Abstract';
 import ComponentView from '@Root/screens2/ComponentView';
 import SideMenuManager from '@Root/screens2/SideMenu/SideMenuManager';
 import { ICON_ALERT, ICON_LOCK, ICON_MENU } from '@Style/icons';
-import { lighten } from '@Style/utils';
 import { StyleKit } from '@Style/StyleKit';
+import { lighten } from '@Style/utils';
+import React from 'react';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
+import TextView from 'sn-textview';
 import { Platform } from 'snjs';
 
 type State = {

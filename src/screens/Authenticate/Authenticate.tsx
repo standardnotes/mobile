@@ -95,12 +95,7 @@ export const Authenticate = ({
 
       await application?.submitValuesForChallenge(challenge, [challengeValue]);
     },
-    [
-      challengeValueStates,
-      challengeValues,
-      application?.submitValuesForChallenge,
-      challenge,
-    ]
+    [challengeValues, challengeValueStates, application, challenge]
   );
 
   const onValueLocked = useCallback((challengeValue: ChallengeValue) => {
@@ -122,7 +117,7 @@ export const Authenticate = ({
   const checkForBiometrics = useCallback(
     async () =>
       (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(),
-    [application?.deviceInterface]
+    [application]
   );
 
   const authenticateBiometrics = useCallback(
@@ -211,7 +206,7 @@ export const Authenticate = ({
       }
     },
     [
-      application?.getAppState,
+      application,
       checkForBiometrics,
       onValueLocked,
       supportsBiometrics,
@@ -269,12 +264,7 @@ export const Authenticate = ({
         state: ChallengeValueStateType.WaitingInput,
       });
     },
-    [
-      application?.getAppState,
-      authenticateBiometrics,
-      challengeValues,
-      firstNotSuccessful,
-    ]
+    [application, authenticateBiometrics, challengeValues, firstNotSuccessful]
   );
 
   const onValidValue = useCallback(

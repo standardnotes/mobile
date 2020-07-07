@@ -1,8 +1,8 @@
-import { Keyboard } from 'react-native';
 import Abstract, {
   AbstractProps,
   AbstractState,
 } from '@Root/screens2/Abstract';
+import { Keyboard } from 'react-native';
 
 export default class AbstractSideMenu<
   AdditionalProps extends AbstractProps,

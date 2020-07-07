@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import styled, { ThemeContext } from 'styled-components/native';
 import { SNNote } from 'snjs';
+import styled, { ThemeContext } from 'styled-components/native';
 
 const FlagsContainer = styled.View`
   flex: 1;

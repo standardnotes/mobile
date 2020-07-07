@@ -1,13 +1,11 @@
-import React from 'react';
-import { TouchableHighlight, View, ViewStyle, TextStyle } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {
-  AppStateEventType,
-  TabletModeChangeData,
-  NoteSideMenuToggleChange,
-  AppStateType,
   ApplicationState,
+  AppStateEventType,
+  AppStateType,
+  NoteSideMenuToggleChange,
+  TabletModeChangeData,
 } from '@Lib/ApplicationState';
+import { ApplicationContext } from '@Root/ApplicationContext';
 import Abstract, {
   AbstractProps,
   AbstractState,
@@ -15,10 +13,12 @@ import Abstract, {
 import Compose from '@Root/screens2/Compose';
 import Notes from '@Root/screens2/Notes/Notes';
 import { SCREEN_AUTHENTICATE } from '@Root/screens2/screens';
-import { hexToRGBA } from '@Style/utils';
-import AuthenticationSource from './Authentication/Sources/AuthenticationSource';
-import { ApplicationContext } from '@Root/ApplicationContext';
 import { StyleKit } from '@Style/StyleKit';
+import { hexToRGBA } from '@Style/utils';
+import React from 'react';
+import { TextStyle, TouchableHighlight, View, ViewStyle } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import AuthenticationSource from './Authentication/Sources/AuthenticationSource';
 
 type State = {
   shouldSplitLayout?: boolean;

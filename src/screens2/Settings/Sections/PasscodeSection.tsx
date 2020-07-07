@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import { Alert, Text } from 'react-native';
 import { ButtonCell } from '@Components/ButtonCell';
-import { SectionHeader } from '@Components/SectionHeader';
 import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
+import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import ApplicationState from '@Lib/ApplicationState';
 import KeysManager, { BiometricsType } from '@Lib/keysManager';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import React, { Component } from 'react';
+import { Alert, Text } from 'react-native';
 
 type Props = {
   hasBiometrics: boolean;

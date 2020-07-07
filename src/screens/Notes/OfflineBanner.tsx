@@ -1,17 +1,17 @@
-import React from 'react';
-import { SCREEN_SETTINGS } from '@Root/screens2/screens';
-import { ICON_USER, ICON_FORWARD } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
 import { useNavigation } from '@react-navigation/native';
+import { SCREEN_SETTINGS } from '@Root/screens2/screens';
+import { ICON_FORWARD, ICON_USER } from '@Style/icons';
+import { StyleKit } from '@Style/StyleKit';
+import React from 'react';
 import {
-  Touchable,
-  Container,
-  CenterContainer,
-  UserIcon,
-  TextContainer,
   BoldText,
-  SubText,
+  CenterContainer,
+  Container,
   ForwardIcon,
+  SubText,
+  TextContainer,
+  Touchable,
+  UserIcon,
 } from './OfflineBanner.styled';
 
 const NOT_BACKED_UP_TEXT = 'Data not backed up';

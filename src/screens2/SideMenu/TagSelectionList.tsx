@@ -1,14 +1,14 @@
-import React, { Fragment } from 'react';
-import { View, Text, FlatList, ViewStyle, TextStyle } from 'react-native';
-import { withNavigation } from 'react-navigation';
-import ThemedComponent from '@Root/components2/ThemedComponent';
 import ItemActionManager from '@Lib/itemActionManager';
-import { SCREEN_INPUT_MODAL } from '@Root/screens2/screens';
 import Auth from '@Lib/snjs/authManager';
 import ModelManager from '@Lib/snjs/modelManager';
 import Sync from '@Lib/snjs/syncManager';
+import ThemedComponent from '@Root/components2/ThemedComponent';
+import { SCREEN_INPUT_MODAL } from '@Root/screens2/screens';
 import SideMenuCell from '@Root/screens2/SideMenu/SideMenuCell';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import React, { Fragment } from 'react';
+import { FlatList, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { withNavigation } from 'react-navigation';
 
 type Props = {
   contentType: string;

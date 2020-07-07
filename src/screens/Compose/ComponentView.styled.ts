@@ -1,8 +1,8 @@
-import styled from 'styled-components/native';
-import WebView from 'react-native-webview';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { StyleKit } from '@Style/StyleKit';
 import { ICON_LOCK } from '@Style/icons';
+import { StyleKit } from '@Style/StyleKit';
+import Icon from 'react-native-vector-icons/Ionicons';
+import WebView from 'react-native-webview';
+import styled from 'styled-components/native';
 
 export const FlexContainer = styled.View`
   flex: 1;

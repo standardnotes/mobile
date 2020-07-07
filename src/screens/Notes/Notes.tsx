@@ -1,22 +1,20 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import {
-  ContentType,
-  SNNote,
-  SNTag,
-  CollectionSort,
-  SNSmartTag,
-  Platform,
-} from 'snjs';
-import { NoteList } from './NoteList';
-import FAB from 'react-native-fab';
-import { ThemeContext } from 'styled-components/native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { StyleKit } from '@Style/StyleKit';
-import { ICON_ADD } from '@Style/icons';
-import { AppStackNavigationProp } from '@Root/App';
-import { SCREEN_NOTES, SCREEN_COMPOSE } from '@Root/screens2/screens';
 import { AppStateType } from '@Lib/ApplicationState';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import { ICON_ADD } from '@Style/icons';
+import { StyleKit } from '@Style/StyleKit';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import FAB from 'react-native-fab';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {
+  CollectionSort,
+  ContentType,
+  Platform,
+  SNNote,
+  SNSmartTag,
+  SNTag,
+} from 'snjs';
+import { ThemeContext } from 'styled-components/native';
+import { NoteList } from './NoteList';
 
 type Props = {
   onNoteSelect: (noteUuid: SNNote['uuid']) => void;

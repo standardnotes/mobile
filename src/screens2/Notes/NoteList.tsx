@@ -1,17 +1,17 @@
-import React from 'react';
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  RefreshControl,
-  Text,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
-import Search from 'react-native-search-box';
 import ThemedComponent from '@Root/components2/ThemedComponent';
 import NoteCell from '@Root/screens2/Notes/NoteCell';
 import OfflineBanner from '@Screens/Notes/OfflineBanner';
+import React from 'react';
+import {
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
+import Search from 'react-native-search-box';
 import { Platform } from 'snjs';
 
 type Props = {

@@ -1,5 +1,5 @@
-import { useContext } from 'react';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import { useContext } from 'react';
 import { ThemeContext } from 'styled-components/native';
 
 type Option =

@@ -1,29 +1,28 @@
+import { MobileApplication } from '@Lib/application';
+import ThemeDownloader from '@Style/Util/ThemeDownloader';
 import {
-  StatusBar,
-  Alert,
-  Platform,
-  ViewStyle,
-  TextStyle,
-  Appearance,
-  ColorSchemeName,
-} from 'react-native';
-import IconChanger from 'react-native-alternate-icons';
-import _ from 'lodash';
-import {
-  statusBarColorForTheme,
+  DARK_CONTENT,
   keyboardColorForTheme,
   LIGHT_CONTENT,
-  DARK_CONTENT,
+  statusBarColorForTheme,
 } from '@Style/utils';
-import ThemeDownloader from '@Style/Util/ThemeDownloader';
-import { SNTheme, SNComponent, removeFromArray } from 'snjs';
-
-import THEME_RED_JSON from './Themes/red.json';
-import THEME_BLUE_JSON from './Themes/blue.json';
-import { UuidString } from 'snjs/dist/@types/types';
-import { StyleKitTheme } from './Themes/styled-components';
+import _ from 'lodash';
 import React from 'react';
-import { MobileApplication } from '@Lib/application';
+import {
+  Alert,
+  Appearance,
+  ColorSchemeName,
+  Platform,
+  StatusBar,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
+import IconChanger from 'react-native-alternate-icons';
+import { removeFromArray, SNComponent, SNTheme } from 'snjs';
+import { UuidString } from 'snjs/dist/@types/types';
+import THEME_BLUE_JSON from './Themes/blue.json';
+import THEME_RED_JSON from './Themes/red.json';
+import { StyleKitTheme } from './Themes/styled-components';
 
 type ThemeChangeObserver = () => Promise<void> | void;
 

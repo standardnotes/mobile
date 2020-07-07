@@ -1,5 +1,5 @@
 const faker = require('faker');
-import { device, waitFor, element, by, expect } from 'detox';
+import { by, device, element, expect, waitFor } from 'detox';
 
 export const expectToBeVisible = async (testedElement: Detox.DetoxAny) => {
   try {

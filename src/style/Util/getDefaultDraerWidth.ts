@@ -1,4 +1,4 @@
-import { ScaledSize, Platform } from 'react-native';
+import { Platform, ScaledSize } from 'react-native';
 
 export const getDefaultDrawerWidth = ({ height, width }: ScaledSize) => {
   /*

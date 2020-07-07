@@ -1,6 +1,6 @@
-import styled from 'styled-components/native';
-import TextView from 'sn-textview';
 import { Platform } from 'react-native';
+import TextView from 'sn-textview';
+import styled from 'styled-components/native';
 
 const PADDING = 14;
 const NOTE_TITLE_HEIGHT = 50;

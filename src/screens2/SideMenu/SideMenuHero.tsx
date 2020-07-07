@@ -1,17 +1,17 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ViewStyle,
-  TextStyle,
-  ViewProps,
-} from 'react-native';
 import { Circle } from '@Components/Circle';
-import ThemedComponent from '@Root/components2/ThemedComponent';
 import KeysManager from '@Lib/keysManager';
 import Auth from '@Lib/snjs/authManager';
 import ModelManager from '@Lib/snjs/modelManager';
+import ThemedComponent from '@Root/components2/ThemedComponent';
+import React from 'react';
+import {
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewProps,
+  ViewStyle,
+} from 'react-native';
 
 type Props = {
   onPress: () => void;

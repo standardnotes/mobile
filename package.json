@@ -59,7 +59,7 @@
   "devDependencies": {
     "@babel/core": "^7.10.4",
     "@babel/runtime": "^7.10.4",
-    "@react-native-community/eslint-config": "^2.0.0",
+    "@react-native-community/eslint-config": "1.1.0",
     "@types/detox": "^16.4.1",
     "@types/faker": "^4.1.12",
     "@types/jest": "^26.0.3",

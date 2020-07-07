@@ -1,17 +1,17 @@
-import React from 'react';
-import { View, Text, ScrollView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-navigation';
 import { ButtonCell } from '@Components/ButtonCell';
-import { SectionHeader } from '@Components/SectionHeader';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { SectionHeader } from '@Components/SectionHeader';
 import LockedView from '@Containers/LockedView';
 import Abstract, {
-  AbstractState,
   AbstractProps,
+  AbstractState,
 } from '@Root/screens2/Abstract';
 import { ICON_CHECKMARK } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
+import React from 'react';
+import { Platform, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-navigation';
 
 type State = {
   availableActions: any[];

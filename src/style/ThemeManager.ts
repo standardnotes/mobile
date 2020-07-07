@@ -1,13 +1,13 @@
+import { LIGHT_MODE_KEY } from '@Style/utils';
+import _ from 'lodash';
+import { Mode } from 'react-native-dark-mode';
 import {
-  SNTheme,
   ApplicationService,
-  StorageValueModes,
   EncryptionIntent,
   isNullOrUndefined,
+  SNTheme,
+  StorageValueModes,
 } from 'snjs';
-import { LIGHT_MODE_KEY } from '@Style/utils';
-import { Mode } from 'react-native-dark-mode';
-import _ from 'lodash';
 
 const THEME_PREFERENCES_KEY = 'ThemePreferencesKey';
 const LIGHT_THEME_KEY = 'lightTheme';

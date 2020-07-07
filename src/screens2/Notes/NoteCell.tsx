@@ -1,15 +1,14 @@
+import ThemedPureComponent from '@Root/components2/ThemedPureComponent';
+import ActionSheetWrapper from '@Style/ActionSheetWrapper';
 import React from 'react';
 import {
   StyleSheet,
-  View,
   Text,
-  TouchableWithoutFeedback,
   TextStyle,
+  TouchableWithoutFeedback,
+  View,
   ViewStyle,
 } from 'react-native';
-import ThemedPureComponent from '@Root/components2/ThemedPureComponent';
-import ActionSheetWrapper from '@Style/ActionSheetWrapper';
-import { hexToRGBA } from '@Style/utils';
 
 type Props = {
   item: any;

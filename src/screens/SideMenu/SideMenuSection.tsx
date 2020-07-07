@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { Root, Header, Title, CollapsedLabel } from './SideMenuSection.styled';
+import React, { useMemo, useState } from 'react';
 import { SideMenuCell } from './SideMenuCell';
+import { CollapsedLabel, Header, Root, Title } from './SideMenuSection.styled';
 
 export type SideMenuOption = {
   text: string;

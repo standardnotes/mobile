@@ -1,13 +1,13 @@
-import React, { useContext, useState, useRef } from 'react';
-import { TextInput } from 'react-native';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { Container, Input } from './InputModal.styled';
-import { TableSection } from '@Components/TableSection';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { ButtonCell } from '@Components/ButtonCell';
-import { SCREEN_INPUT_MODAL_TAG } from '@Root/screens2/screens';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { TableSection } from '@Components/TableSection';
 import { ModalStackNavigationProp } from '@Root/App';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_INPUT_MODAL_TAG } from '@Root/screens2/screens';
 import { StyleKitContext } from '@Style/StyleKit';
+import React, { useContext, useRef, useState } from 'react';
+import { TextInput } from 'react-native';
+import { Container, Input } from './InputModal.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_TAG>;
 export const TagInputModal = (props: Props) => {

@@ -1,28 +1,27 @@
-import React, { Fragment } from 'react';
-import { View, FlatList, ViewStyle, TextStyle } from 'react-native';
-import FAB from 'react-native-fab';
-import Icon from 'react-native-vector-icons/Ionicons';
-import _ from 'lodash';
-import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
+import AlertManager from '@Lib/AlertService';
 import ApplicationState from '@Lib/ApplicationState';
+import Auth from '@Lib/snjs/authManager';
+import Sync from '@Lib/snjs/syncManager';
+import { AbstractProps, AbstractState } from '@Root/screens2/Abstract';
 import { SCREEN_SETTINGS } from '@Root/screens2/screens';
 import AbstractSideMenu from '@Root/screens2/SideMenu/AbstractSideMenu';
 import SideMenuHero from '@Root/screens2/SideMenu/SideMenuHero';
 import SideMenuManager from '@Root/screens2/SideMenu/SideMenuManager';
 import SideMenuSection from '@Root/screens2/SideMenu/SideMenuSection';
 import TagSelectionList from '@Root/screens2/SideMenu/TagSelectionList';
-import AlertManager from '@Lib/AlertService';
-import Auth from '@Lib/snjs/authManager';
-import Sync from '@Lib/snjs/syncManager';
-import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
+import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
 import ThemeManager from '@Style/ThemeManager';
-import { LIGHT_MODE_KEY, DARK_MODE_KEY } from '@Style/utils';
-
-import { SNTheme } from 'snjs';
+import { DARK_MODE_KEY, LIGHT_MODE_KEY } from '@Style/utils';
+import _ from 'lodash';
+import React, { Fragment } from 'react';
+import { FlatList, TextStyle, View, ViewStyle } from 'react-native';
 import { Mode } from 'react-native-dark-mode';
-import { AbstractProps, AbstractState } from '@Root/screens2/Abstract';
+import FAB from 'react-native-fab';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
+import { SNTheme } from 'snjs';
 
 type State = {
   outOfSync: boolean;

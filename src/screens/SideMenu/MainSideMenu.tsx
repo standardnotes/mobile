@@ -1,25 +1,24 @@
-import React, { Fragment, useContext, useState, useEffect } from 'react';
+import { AppStateType } from '@Lib/ApplicationState';
+import { useNavigation } from '@react-navigation/native';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_SETTINGS } from '@Root/screens2/screens';
+import { ICON_SETTINGS } from '@Style/icons';
+import { StyleKit } from '@Style/StyleKit';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import FAB from 'react-native-fab';
-import { ThemeContext } from 'styled-components/native';
+import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { ContentType, SNTag } from 'snjs';
+import { ThemeContext } from 'styled-components/native';
 import {
-  MainSafeAreaView,
   FirstSafeAreaView,
+  MainSafeAreaView,
   SideMenuSectionContainer,
 } from './MainSideMenu.styled';
 import { SideMenuHero } from './SideMenuHero';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { StyleKit } from '@Style/StyleKit';
-import { ICON_SETTINGS } from '@Style/icons';
 import { SideMenuSection } from './SideMenuSection';
-import { ApplicationContext } from '@Root/ApplicationContext';
-// import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import { TagSelectionList } from './TagSelectionList';
-import { AppStateType } from '@Lib/ApplicationState';
-import { useNavigation } from '@react-navigation/native';
-import { SCREEN_SETTINGS } from '@Root/screens2/screens';
-import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 
 type Props = {
   drawerRef: DrawerLayout | null;

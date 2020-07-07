@@ -1,20 +1,15 @@
-import React, { Fragment } from 'react';
-import { View, FlatList, ViewStyle, TextStyle } from 'react-native';
-import FAB from 'react-native-fab';
-import { SFPrivilegesManager, SNTag } from 'snjs';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { SafeAreaView } from 'react-navigation';
 import LockedView from '@Containers/LockedView';
 import ApplicationState from '@Lib/ApplicationState';
 import ComponentManager from '@Lib/componentManager';
 import ItemActionManager, { EventType } from '@Lib/itemActionManager';
+import ModelManager from '@Lib/snjs/modelManager';
+import PrivilegesManager from '@Lib/snjs/privilegesManager';
+import Sync from '@Lib/snjs/syncManager';
+import type { AbstractProps } from '@Root/screens2/Abstract';
 import {
   SCREEN_INPUT_MODAL,
   SCREEN_MANAGE_PRIVILEGES,
 } from '@Root/screens2/screens';
-import ModelManager from '@Lib/snjs/modelManager';
-import PrivilegesManager from '@Lib/snjs/privilegesManager';
-import Sync from '@Lib/snjs/syncManager';
 import AbstractSideMenu from '@Root/screens2/SideMenu/AbstractSideMenu';
 import SideMenuManager from '@Root/screens2/SideMenu/SideMenuManager';
 import SideMenuSection, {
@@ -22,17 +17,22 @@ import SideMenuSection, {
 } from '@Root/screens2/SideMenu/SideMenuSection';
 import TagSelectionList from '@Root/screens2/SideMenu/TagSelectionList';
 import ActionSheetWrapper from '@Style/ActionSheetWrapper';
-import type { AbstractProps } from '@Root/screens2/Abstract';
 import {
-  ICON_BOOKMARK,
   ICON_ARCHIVE,
-  ICON_LOCK,
+  ICON_BOOKMARK,
   ICON_FINGER_PRINT,
-  ICON_SHARE,
-  ICON_TRASH,
+  ICON_LOCK,
   ICON_MEDICAL,
   ICON_PRICE_TAG,
+  ICON_SHARE,
+  ICON_TRASH,
 } from '@Style/icons';
+import React, { Fragment } from 'react';
+import { FlatList, TextStyle, View, ViewStyle } from 'react-native';
+import FAB from 'react-native-fab';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
+import { SFPrivilegesManager, SNTag } from 'snjs';
 
 type State = {
   lockContent: boolean;

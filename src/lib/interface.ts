@@ -1,8 +1,8 @@
-import { DeviceInterface } from 'snjs';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Platform, Alert, Linking } from 'react-native';
-import Keychain from './keychain';
+import { Alert, Linking, Platform } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
+import { DeviceInterface } from 'snjs';
+import Keychain from './keychain';
 
 export type BiometricsType =
   | 'Fingerprint'

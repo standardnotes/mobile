@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
-import styled from 'styled-components/native';
 import { hexToRGBA } from '@Style/utils';
+import React, { useRef, useState } from 'react';
 import { SNNote } from 'snjs';
+import styled from 'styled-components/native';
 import { NoteCellFlags } from './NoteCellFlags';
 
 type Props = {

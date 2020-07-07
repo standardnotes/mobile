@@ -2,8 +2,8 @@ import React from 'react';
 import { Platform } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import {
-  SectionedTableCellTouchableHighlight,
   Props as TableCellProps,
+  SectionedTableCellTouchableHighlight,
 } from './SectionedTableCell';
 
 type Props = {

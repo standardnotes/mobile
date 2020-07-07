@@ -1,14 +1,14 @@
+import { SectionHeader } from '@Components/SectionHeader';
+import { TableSection } from '@Components/TableSection';
+import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext, useMemo } from 'react';
+import { ContentType, StorageEncryptionPolicies } from 'snjs';
 import {
   BaseView,
-  Title,
-  Subtitle,
   StyledSectionedTableCell,
+  Subtitle,
+  Title,
 } from './EncryptionSection.styled';
-import { TableSection } from '@Components/TableSection';
-import { SectionHeader } from '@Components/SectionHeader';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { StorageEncryptionPolicies, ContentType } from 'snjs';
 
 type Props = {
   title: string;
@@ -21,7 +21,9 @@ export const EncryptionSection = (props: Props) => {
 
   const textData = useMemo(() => {
     const encryptionType = application?.getProtocolEncryptionDisplayName();
-    let encryptionStatus = props.encryptionAvailable ? 'Enabled' : 'Not Enabled';
+    let encryptionStatus = props.encryptionAvailable
+      ? 'Enabled'
+      : 'Not Enabled';
     if (props.encryptionAvailable) {
       encryptionStatus += ` | ${encryptionType}`;
     } else {
@@ -43,7 +45,7 @@ export const EncryptionSection = (props: Props) => {
       sourceString,
       itemsStatus,
     };
-  }, [props.encryptionAvailable]);
+  }, [application, props.encryptionAvailable]);
 
   return (
     <TableSection>

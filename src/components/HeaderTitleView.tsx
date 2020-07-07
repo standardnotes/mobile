@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextStyle, Platform, Animated } from 'react-native';
+import { Platform, TextStyle } from 'react-native';
 import styled from 'styled-components/native';
 
 type Props = {

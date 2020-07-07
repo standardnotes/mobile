@@ -1,10 +1,7 @@
-import React from 'react';
-import { Alert } from 'react-native';
-import { withNavigation } from 'react-navigation';
 import { ButtonCell } from '@Components/ButtonCell';
-import { SectionHeader } from '@Components/SectionHeader';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
+import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import moment from '@Lib/moment';
 import UserPrefsManager, { LAST_EXPORT_DATE_KEY } from '@Lib/userPrefsManager';
@@ -12,6 +9,9 @@ import Abstract, {
   AbstractProps,
   AbstractState,
 } from '@Root/screens2/Abstract';
+import React from 'react';
+import { Alert } from 'react-native';
+import { withNavigation } from 'react-navigation';
 
 type Props = {
   title: string;

@@ -1,15 +1,15 @@
+import { ICON_LOCK } from '@Style/icons';
 import React, { Component } from 'react';
 import {
   Alert,
-  View,
   Platform,
   Text,
-  ViewStyle,
   TextStyle,
+  View,
+  ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { WebView } from 'react-native-webview';
-import { ICON_LOCK } from '@Style/icons';
 
 type Props = {
   noteId: string;

@@ -1,13 +1,13 @@
+import { ApplicationContext } from '@Root/ApplicationContext';
+import { isArray } from 'lodash';
 import React, { Component } from 'react';
 import {
-  View,
   Text,
-  TouchableOpacity,
-  ViewStyle,
   TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from 'react-native';
-import { isArray } from 'lodash';
-import { ApplicationContext } from '@Root/ApplicationContext';
 
 type Props = {
   style?: ViewStyle[];

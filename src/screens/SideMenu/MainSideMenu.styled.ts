@@ -1,6 +1,6 @@
-import styled, { css } from 'styled-components/native';
+import { FlatList, Platform, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FlatList, StatusBar, Platform } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 // We want top color to be different from bottom color of safe area.
 // See https://stackoverflow.com/questions/47725607/react-native-safeareaview-background-color-how-to-assign-two-different-backgro

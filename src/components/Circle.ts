@@ -1,5 +1,5 @@
-import { ViewStyle } from 'react-native';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
 
 type Props = {

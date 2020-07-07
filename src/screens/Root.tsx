@@ -1,17 +1,17 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { LayoutChangeEvent } from 'react-native';
-import styled, { css } from 'styled-components/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { Notes } from './Notes/Notes';
 import {
   AppStateEventType,
-  TabletModeChangeData,
-  NoteSideMenuToggleChange,
   AppStateType,
+  NoteSideMenuToggleChange,
+  TabletModeChangeData,
 } from '@Lib/ApplicationState';
-import { SCREEN_NOTES, SCREEN_COMPOSE } from '@Root/screens2/screens';
 import { AppStackNavigationProp } from '@Root/App';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Root/screens2/screens';
+import React, { useContext, useEffect, useState } from 'react';
+import { LayoutChangeEvent } from 'react-native';
 import { SNNote } from 'snjs/dist/@types';
+import styled, { css } from 'styled-components/native';
+import { Notes } from './Notes/Notes';
 
 const Container = styled.View`
   flex: 1;

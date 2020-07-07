@@ -1,5 +1,5 @@
-import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import styled from 'styled-components/native';
 
 const MARGIN = 4;
 const PADDING = 12;

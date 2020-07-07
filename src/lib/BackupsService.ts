@@ -1,6 +1,6 @@
-import { Share, Alert } from 'react-native';
-import RNFS from 'react-native-fs';
+import { Alert, Share } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
+import RNFS from 'react-native-fs';
 import { ApplicationService, Platform } from 'snjs';
 import { MobileApplication } from './application';
 

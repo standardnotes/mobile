@@ -1,6 +1,3 @@
-import React from 'react';
-import { TextInput, Text, Platform } from 'react-native';
-import { SafeAreaView } from 'react-navigation';
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
@@ -10,6 +7,9 @@ import Abstract, {
 } from '@Root/screens2/Abstract';
 import { ICON_CLOSE } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
+import React from 'react';
+import { Platform, Text, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-navigation';
 
 type State = {
   text: string;

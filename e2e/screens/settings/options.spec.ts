@@ -1,5 +1,5 @@
 const helpers = require('../../helpers');
-import { expect, element, by, device } from 'detox';
+import { by, device, element, expect } from 'detox';
 
 describe('Options section', () => {
   beforeAll(async () => {

@@ -1,17 +1,17 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import _ from 'lodash';
 import { Circle } from '@Components/Circle';
 import ThemedComponent from '@Root/components2/ThemedComponent';
-import { SideMenuOption } from './SideMenuSection';
+import _ from 'lodash';
+import React from 'react';
+import {
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { Platform } from 'snjs';
+import { SideMenuOption } from './SideMenuSection';
 
 type Props = SideMenuOption;
 

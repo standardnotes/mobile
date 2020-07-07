@@ -1,6 +1,6 @@
 import AuthenticationSource from '@Root/screens2/Authentication/Sources/AuthenticationSource';
-import { KeyboardTypeOptions } from 'react-native';
 import { StyleKit } from '@Style/StyleKit';
+import { KeyboardTypeOptions } from 'react-native';
 
 export default class AuthenticationSourceLocalPasscode extends AuthenticationSource {
   keyboardType: KeyboardTypeOptions | null = 'default';

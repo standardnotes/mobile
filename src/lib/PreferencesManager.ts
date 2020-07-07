@@ -1,13 +1,13 @@
-import { MobileApplication } from './application';
 import {
-  SNPredicate,
-  ContentType,
   ApplicationService,
-  SNUserPrefs,
-  WebPrefKey,
-  UserPrefsMutator,
+  ContentType,
   FillItemContent,
+  SNPredicate,
+  SNUserPrefs,
+  UserPrefsMutator,
+  WebPrefKey,
 } from 'snjs';
+import { MobileApplication } from './application';
 
 export class PreferencesManager extends ApplicationService {
   private userPreferences!: SNUserPrefs;

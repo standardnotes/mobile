@@ -1,4 +1,4 @@
-import { ChallengeValue, ChallengeType } from 'snjs';
+import { ChallengeType, ChallengeValue } from 'snjs';
 
 export const findMatchingValueIndex = (
   values: ChallengeValue[],

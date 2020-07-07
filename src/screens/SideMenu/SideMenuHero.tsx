@@ -1,19 +1,19 @@
-import React, { useContext, useMemo, useEffect, useState } from 'react';
+import { Circle } from '@Components/Circle';
+import { useOutOfSync, useSignedIn } from '@Lib/customHooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { ViewProps } from 'react-native';
 import { ContentType, StorageEncryptionPolicies } from 'snjs';
+import { ThemeContext } from 'styled-components/native';
 import {
   Cell,
-  Touchable,
-  Title,
-  SubTitle,
-  OutOfSyncContainer,
   IconCircle,
+  OutOfSyncContainer,
   OutOfSyncLabel,
+  SubTitle,
+  Title,
+  Touchable,
 } from './SideMenuHero.styled';
-import { ViewProps } from 'react-native';
-import { Circle } from '@Components/Circle';
-import { ThemeContext } from 'styled-components/native';
-import { useSignedIn, useOutOfSync } from '@Lib/customHooks';
 
 type Props = {
   onPress: () => void;
@@ -63,12 +63,7 @@ export const SideMenuHero: React.FC<Props> = props => {
         text: itemsStatus,
       };
     }
-  }, [
-    application?.getStorageEncryptionPolicy,
-    application?.getUser,
-    signedIn,
-    itemsLength,
-  ]);
+  }, [application, signedIn, itemsLength]);
 
   return (
     <Cell>

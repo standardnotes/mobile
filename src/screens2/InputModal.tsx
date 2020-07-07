@@ -1,23 +1,23 @@
-import React from 'react';
-import {
-  TextInput,
-  Keyboard,
-  Alert,
-  KeyboardTypeOptions,
-  Platform,
-} from 'react-native';
-import { SafeAreaView } from 'react-navigation';
 import { ButtonCell } from '@Components/ButtonCell';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
 import LockedView from '@Containers/LockedView';
 import Abstract, {
-  AbstractState,
   AbstractProps,
+  AbstractState,
 } from '@Root/screens2/Abstract';
 import { ICON_CLOSE } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
+import React from 'react';
+import {
+  Alert,
+  Keyboard,
+  KeyboardTypeOptions,
+  Platform,
+  TextInput,
+} from 'react-native';
+import { SafeAreaView } from 'react-navigation';
 
 type State = {
   text: string;

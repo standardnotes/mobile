@@ -1,18 +1,18 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Title } from './PasscodeSection.styled';
-import { TableSection } from '@Components/TableSection';
-import { SectionHeader } from '@Components/SectionHeader';
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { StorageEncryptionPolicies } from 'snjs';
+import { SectionHeader } from '@Components/SectionHeader';
+import { TableSection } from '@Components/TableSection';
+import { MobileDeviceInterface } from '@Lib/interface';
 import { useNavigation } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
+import { ApplicationContext } from '@Root/ApplicationContext';
 import {
-  SCREEN_SETTINGS,
   SCREEN_INPUT_MODAL_PASSCODE,
+  SCREEN_SETTINGS,
 } from '@Root/screens2/screens';
-import { MobileDeviceInterface } from '@Lib/interface';
+import React, { useContext, useEffect, useState } from 'react';
+import { StorageEncryptionPolicies } from 'snjs';
+import { Title } from './PasscodeSection.styled';
 
 type Props = {
   title: string;

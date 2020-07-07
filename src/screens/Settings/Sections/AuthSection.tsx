@@ -1,16 +1,16 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { TableSection } from '@Components/TableSection';
-import { SectionHeader } from '@Components/SectionHeader';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { SectionHeader } from '@Components/SectionHeader';
+import { TableSection } from '@Components/TableSection';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { StyleKitContext } from '@Style/StyleKit';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   RegistrationDescription,
-  RegularView,
   RegistrationInput,
+  RegularView,
 } from './AuthSection.styled';
-import { StyleKitContext } from '@Style/StyleKit';
 
 const DEFAULT_SIGN_IN_TEXT = 'Sign In';
 const DEFAULT_REGISTER_TEXT = 'Register';

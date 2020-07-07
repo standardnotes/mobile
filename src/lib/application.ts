@@ -1,24 +1,23 @@
-import {
-  Environment,
-  SNApplication,
-  SNAlertService,
-  platformFromString,
-  Challenge,
-  ChallengeReason,
-} from 'snjs';
-import { MobileDeviceInterface } from './interface';
-import { AlertService } from './AlertService';
-import { ApplicationState } from './ApplicationState';
-import { Platform } from 'react-native';
-import { EditorGroup } from './EditorGroup';
-import { ComponentGroup } from './componentGroup';
-import { ReviewService } from './reviewService';
-import { BackupsService } from './BackupsService';
-import { PreferencesManager } from './PreferencesManager';
-import { StyleKit } from '@Style/StyleKit';
-import { SNReactNativeCrypto } from './SNReactNativeCrypto';
 import { NavigationContainerRef } from '@react-navigation/native';
 import { SCREEN_AUTHENTICATE } from '@Root/screens2/screens';
+import { StyleKit } from '@Style/StyleKit';
+import { Platform } from 'react-native';
+import {
+  Challenge,
+  Environment,
+  platformFromString,
+  SNAlertService,
+  SNApplication,
+} from 'snjs';
+import { AlertService } from './AlertService';
+import { ApplicationState } from './ApplicationState';
+import { BackupsService } from './BackupsService';
+import { ComponentGroup } from './componentGroup';
+import { EditorGroup } from './EditorGroup';
+import { MobileDeviceInterface } from './interface';
+import { PreferencesManager } from './PreferencesManager';
+import { ReviewService } from './reviewService';
+import { SNReactNativeCrypto } from './SNReactNativeCrypto';
 
 type MobileServices = {
   applicationState: ApplicationState;

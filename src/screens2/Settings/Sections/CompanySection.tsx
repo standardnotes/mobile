@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import { View, Text, Platform, Share } from 'react-native';
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
-import { ApplicationContext } from '@Root/ApplicationContext';
 import { ApplicationState } from '@Lib/ApplicationState';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import React, { Component } from 'react';
+import { Platform, Share, Text, View } from 'react-native';
 
 type Props = {
   title: string;

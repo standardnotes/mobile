@@ -1,13 +1,13 @@
-import React, { Fragment } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextStyle,
-  ViewStyle,
-} from 'react-native';
 import ThemedComponent from '@Root/components2/ThemedComponent';
 import SideMenuCell from '@Root/screens2/SideMenu/SideMenuCell';
+import React, { Fragment } from 'react';
+import {
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 
 type Props = {
   title: string;

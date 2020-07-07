@@ -1,5 +1,5 @@
 const helpers = require('../../helpers');
-import { element, by, device, expect, waitFor } from 'detox';
+import { by, device, element, expect, waitFor } from 'detox';
 
 describe('Account section', () => {
   describe('Form', () => {

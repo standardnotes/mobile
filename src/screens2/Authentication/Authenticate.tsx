@@ -1,28 +1,28 @@
-import React from 'react';
-import {
-  TextInput,
-  View,
-  Alert,
-  ScrollView,
-  ViewStyle,
-  TextStyle,
-  Platform,
-} from 'react-native';
-import _ from 'lodash';
 import { ButtonCell } from '@Components/ButtonCell';
-import { SectionHeader } from '@Components/SectionHeader';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { SectionHeader } from '@Components/SectionHeader';
 import { AppStateType } from '@Lib/ApplicationState';
 import Abstract, {
   AbstractProps,
   AbstractState,
 } from '@Root/screens2/Abstract';
 import { ICON_CLOSE } from '@Style/icons';
+import { StyleKit } from '@Style/StyleKit';
+import _ from 'lodash';
+import React from 'react';
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  TextInput,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
 import AuthenticationSourceAccountPassword from './Sources/AuthenticationSourceAccountPassword';
 import AuthenticationSourceBiometric from './Sources/AuthenticationSourceBiometric';
 import AuthenticationSourceLocalPasscode from './Sources/AuthenticationSourceLocalPasscode';
-import { StyleKit } from '@Style/StyleKit';
 
 type Source =
   | AuthenticationSourceAccountPassword

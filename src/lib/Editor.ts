@@ -1,4 +1,4 @@
-import { SNNote, ContentType, PayloadSource } from 'snjs';
+import { ContentType, PayloadSource, SNNote } from 'snjs';
 import { MobileApplication } from './application';
 
 export class Editor {

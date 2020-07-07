@@ -46,11 +46,7 @@ export const Settings = (props: Props) => {
         isMounted = false;
         removeApplicationEventSubscriber && removeApplicationEventSubscriber();
       };
-    }, [
-      application?.addEventObserver,
-      application?.hasPasscode,
-      application?.isEncryptionAvailable,
-    ])
+    }, [application])
   );
 
   const goBack = useCallback(() => {

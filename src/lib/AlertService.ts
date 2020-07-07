@@ -1,5 +1,4 @@
 import { Alert } from 'react-native';
-
 import { SNAlertService } from 'snjs';
 
 export class AlertService extends SNAlertService {

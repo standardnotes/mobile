@@ -1,10 +1,10 @@
-import { MobileApplication } from './application';
-import { removeFromArray } from 'snjs';
-import { ApplicationState } from './ApplicationState';
-import { ReviewService } from './reviewService';
-import { BackupsService } from './BackupsService';
 import { StyleKit } from '@Style/StyleKit';
+import { removeFromArray } from 'snjs';
+import { MobileApplication } from './application';
+import { ApplicationState } from './ApplicationState';
+import { BackupsService } from './BackupsService';
 import { PreferencesManager } from './PreferencesManager';
+import { ReviewService } from './reviewService';
 
 type AppManagerChangeCallback = () => void;
 

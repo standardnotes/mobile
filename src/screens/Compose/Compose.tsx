@@ -1,42 +1,37 @@
 /* eslint-disable eslint-plugin-react-hooks */
-import React, {
-  useContext,
-  useCallback,
-  useState,
-  useRef,
-} from 'react';
+import { Editor } from '@Lib/editor';
+import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { ThemeContext } from 'styled-components/native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { ICON_LOCK, ICON_ALERT } from '@Style/icons';
-import {
-  Container,
-  LockedContainer,
-  LockedText,
-  WebViewReloadButton,
-  WebViewReloadButtonText,
-  LoadingWebViewSubtitle,
-  StyledTextView,
-  TextContainer,
-  LoadingWebViewContainer,
-  LoadingWebViewText,
-  NoteTitleInput,
-} from './Compose.styled';
+import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
+import { lighten } from '@Style/utils';
+import React, { useCallback, useContext, useRef, useState } from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
+import TextView from 'sn-textview';
 import {
-  Platform,
-  SNNote,
-  isPayloadSourceRetrieved,
-  NoteMutator,
-  SNComponent,
   ComponentArea,
   ContentType,
+  isPayloadSourceRetrieved,
+  NoteMutator,
+  Platform,
+  SNComponent,
+  SNNote,
 } from 'snjs';
-import { lighten } from '@Style/utils';
-import TextView from 'sn-textview';
-import { Editor } from '@Lib/editor';
+import { ThemeContext } from 'styled-components/native';
 import { ComponentView } from './ComponentView';
-import { useFocusEffect } from '@react-navigation/native';
+import {
+  Container,
+  LoadingWebViewContainer,
+  LoadingWebViewSubtitle,
+  LoadingWebViewText,
+  LockedContainer,
+  LockedText,
+  NoteTitleInput,
+  StyledTextView,
+  TextContainer,
+  WebViewReloadButton,
+  WebViewReloadButtonText,
+} from './Compose.styled';
 
 const NOTE_PREVIEW_CHAR_LIMIT = 80;
 const MINIMUM_STATUS_DURATION = 400;
@@ -65,79 +60,82 @@ export const Compose = (): JSX.Element => {
   const editorViewRef = useRef<TextView>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  useFocusEffect(useCallback(() => {
-    const removeEditorObserver = application?.editorGroup.addChangeObserver(
-      () => {
-        const editorTemp = application!.editorGroup.activeEditor;
-        setEditor(editorTemp);
-        setTitle(editorTemp?.note?.safeTitle());
-        setNoteText(editorTemp.note?.safeText());
-      }
-    );
+  useFocusEffect(
+    useCallback(() => {
+      const removeEditorObserver = application?.editorGroup.addChangeObserver(
+        () => {
+          const editorTemp = application!.editorGroup.activeEditor;
+          setEditor(editorTemp);
+          setTitle(editorTemp?.note?.safeTitle());
+          setNoteText(editorTemp.note?.safeText());
+        }
+      );
 
-    const removeComponentGroupObserver = application?.componentGroup.addChangeObserver(
-      async () => {
-        const currentEditor = editorComponent;
-        const newEditor = application?.componentGroup.activeComponentForArea(
-          ComponentArea.Editor
-        );
-        if (
-          currentEditor &&
-          newEditor &&
-          currentEditor.uuid !== newEditor.uuid
-        ) {
-          /** Unload current component view so that we create a new one,
-           * then change the active editor */
+      const removeComponentGroupObserver = application?.componentGroup.addChangeObserver(
+        async () => {
+          const currentEditor = editorComponent;
+          const newEditor = application?.componentGroup.activeComponentForArea(
+            ComponentArea.Editor
+          );
+          if (
+            currentEditor &&
+            newEditor &&
+            currentEditor.uuid !== newEditor.uuid
+          ) {
+            /** Unload current component view so that we create a new one,
+             * then change the active editor */
+            // await this.setEditorState({
+            //   editorComponentUnloading: true,
+            // });
+          }
+          setEditorComponent(newEditor);
+          /** Stop unloading, if we were already unloading */
           // await this.setEditorState({
-          //   editorComponentUnloading: true,
+          //   editorComponentUnloading: false,
           // });
         }
-        setEditorComponent(newEditor);
-        /** Stop unloading, if we were already unloading */
-        // await this.setEditorState({
-        //   editorComponentUnloading: false,
-        // });
-      }
-    );
+      );
 
-    const removeStreamItems = streamItems();
+      const removeStreamItems = streamItems();
 
-    return () => {
-      removeEditorObserver && removeEditorObserver();
-      removeComponentGroupObserver && removeComponentGroupObserver();
-      removeStreamItems();
-    };
+      return () => {
+        removeEditorObserver && removeEditorObserver();
+        removeComponentGroupObserver && removeComponentGroupObserver();
+        removeStreamItems();
+      };
+    }, [application, editorComponent, streamItems])
+  );
 
-  }, [application, editorComponent]));
-
-  useFocusEffect(useCallback(() => {
-    const removeEditorNoteChangeObserver = editor?.onNoteChange(setNote);
-    const removeEditorNoteValueChangeObserver = editor?.onNoteValueChange(
-      (newNote, source) => {
-        if (isPayloadSourceRetrieved(source!)) {
-          setTitle(newNote.title);
-          setNoteText(newNote.text);
-        }
-        if (newNote.lastSyncBegan && newNote.lastSyncEnd) {
-          if (
-            newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
-          ) {
-            // this.showSavingStatus();
-          } else if (
-            newNote.lastSyncEnd!.getTime() > newNote.lastSyncBegan!.getTime()
-          ) {
-            // this.showAllChangesSavedStatus();
+  useFocusEffect(
+    useCallback(() => {
+      const removeEditorNoteChangeObserver = editor?.onNoteChange(setNote);
+      const removeEditorNoteValueChangeObserver = editor?.onNoteValueChange(
+        (newNote, source) => {
+          if (isPayloadSourceRetrieved(source!)) {
+            setTitle(newNote.title);
+            setNoteText(newNote.text);
+          }
+          if (newNote.lastSyncBegan && newNote.lastSyncEnd) {
+            if (
+              newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
+            ) {
+              // this.showSavingStatus();
+            } else if (
+              newNote.lastSyncEnd!.getTime() > newNote.lastSyncBegan!.getTime()
+            ) {
+              // this.showAllChangesSavedStatus();
+            }
           }
         }
-      }
-    );
+      );
 
-    return () => {
-      removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
-      removeEditorNoteValueChangeObserver &&
-        removeEditorNoteValueChangeObserver();
-    };
-  }, [editor]));
+      return () => {
+        removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
+        removeEditorNoteValueChangeObserver &&
+          removeEditorNoteValueChangeObserver();
+      };
+    }, [editor])
+  );
 
   const reloadComponentEditorState = useCallback(async () => {
     const associatedEditor = application?.componentManager!.editorForNote(
@@ -162,19 +160,21 @@ export const Compose = (): JSX.Element => {
 
     await application?.componentGroup.activateComponent(associatedEditor);
     return { updatedEditor: associatedEditor, changed: true };
-  }, [application]);
+  }, [application, editorComponent, note]);
 
   const reloadComponentContext = () => {
     if (note) {
-        if (editorComponent?.active) {
-          application!.componentManager!.setComponentHidden(
-            editorComponent,
-            !editorComponent.isExplicitlyEnabledForItem(note.uuid)
-          );
-        }
+      if (editorComponent?.active) {
+        application!.componentManager!.setComponentHidden(
+          editorComponent,
+          !editorComponent.isExplicitlyEnabledForItem(note.uuid)
+        );
       }
-    application?.componentManager!.contextItemDidChangeInArea(ComponentArea.Editor);
-  }
+    }
+    application?.componentManager!.contextItemDidChangeInArea(
+      ComponentArea.Editor
+    );
+  };
 
   const streamItems = useCallback(() => {
     const removeComponentsObserver = application?.streamItems(
@@ -195,14 +195,14 @@ export const Compose = (): JSX.Element => {
           return;
         }
         /** Find the most recent editor for note */
-        reloadComponentEditorState()
+        reloadComponentEditorState();
       }
     );
 
     return () => {
       removeComponentsObserver && removeComponentsObserver();
     };
-  }, [application?.streamItems, note, reloadComponentEditorState]);
+  }, [application, note, reloadComponentContext, reloadComponentEditorState]);
 
   const saveNote = async (
     bypassDebouncer: boolean,
@@ -295,13 +295,13 @@ export const Compose = (): JSX.Element => {
             size={16}
             color={theme.stylekitBackgroundColor}
           />
-          <LockedText>
-            Unable to load
-          </LockedText>
-          <WebViewReloadButton onPress={() => {
-             setLoadingWebiev(false);
-             setWebviewError(false);
-          }}>
+          <LockedText>Unable to load</LockedText>
+          <WebViewReloadButton
+            onPress={() => {
+              setLoadingWebiev(false);
+              setWebviewError(false);
+            }}
+          >
             <WebViewReloadButtonText>Reload</WebViewReloadButtonText>
           </WebViewReloadButton>
         </LockedContainer>
@@ -337,10 +337,10 @@ export const Compose = (): JSX.Element => {
             setWebviewError(false);
           }}
           onLoadEnd={() => {
-            setLoadingWebiev(false)
+            setLoadingWebiev(false);
           }}
           onLoadError={() => {
-            setLoadingWebiev(false)
+            setLoadingWebiev(false);
             setWebviewError(true);
           }}
         />

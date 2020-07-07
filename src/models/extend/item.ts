@@ -1,5 +1,4 @@
 import moment from '@Lib/moment';
-
 import { SFItem } from 'snjs';
 
 // Override Item instance methods without overriding actual class, since we'd then need

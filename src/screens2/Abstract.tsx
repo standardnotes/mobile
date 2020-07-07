@@ -1,14 +1,14 @@
+import { HeaderTitleView } from '@Components/HeaderTitleView';
+import { AppStateType } from '@Lib/ApplicationState';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import ThemedComponent from '@Root/components2/ThemedComponent';
+import _ from 'lodash';
 import React, { useContext } from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
 import HeaderButtons, {
   HeaderButton,
   HeaderButtonProps,
 } from 'react-navigation-header-buttons';
-import _ from 'lodash';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { HeaderTitleView } from '@Components/HeaderTitleView';
-import ThemedComponent from '@Root/components2/ThemedComponent';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { AppStateType } from '@Lib/ApplicationState';
 
 const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />

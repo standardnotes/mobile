@@ -1,7 +1,7 @@
-import { Platform } from 'react-native';
-import FingerprintScanner from 'react-native-fingerprint-scanner';
 import KeysManager from '@Lib/keysManager';
 import AuthenticationSource from '@Root/screens2/Authentication/Sources/AuthenticationSource';
+import { Platform } from 'react-native';
+import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 export default class AuthenticationSourceBiometric extends AuthenticationSource {
   isReady: boolean = true;

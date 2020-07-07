@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import { Text, View } from 'react-native';
-import { SectionHeader } from '@Components/SectionHeader';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import React, { Component } from 'react';
+import { Text, View } from 'react-native';
 
 type Props = {
   title: string;

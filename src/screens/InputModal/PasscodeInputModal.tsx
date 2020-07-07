@@ -1,17 +1,17 @@
-import React, { useContext, useState, useRef, useMemo } from 'react';
-import { TextInput, KeyboardType, Keyboard, Platform } from 'react-native';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { Container, Input } from './InputModal.styled';
-import { TableSection } from '@Components/TableSection';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { ButtonCell } from '@Components/ButtonCell';
-import { SCREEN_INPUT_MODAL_PASSCODE } from '@Root/screens2/screens';
-import { ModalStackNavigationProp } from '@Root/App';
 import {
-  SectionedOptionsTableCell,
   Option,
+  SectionedOptionsTableCell,
 } from '@Components/SectionedOptionsTableCell';
+import { SectionedTableCell } from '@Components/SectionedTableCell';
+import { TableSection } from '@Components/TableSection';
+import { ModalStackNavigationProp } from '@Root/App';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_INPUT_MODAL_PASSCODE } from '@Root/screens2/screens';
 import { StyleKitContext } from '@Style/StyleKit';
+import React, { useContext, useMemo, useRef, useState } from 'react';
+import { Keyboard, KeyboardType, Platform, TextInput } from 'react-native';
+import { Container, Input } from './InputModal.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_PASSCODE>;
 export const PasscodeInputModal = (props: Props) => {

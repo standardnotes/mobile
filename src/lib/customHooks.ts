@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { ApplicationEvent, ApplicationService } from 'snjs';
 import { useFocusEffect } from '@react-navigation/native';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import React, { useCallback } from 'react';
+import { ApplicationEvent } from 'snjs';
 
 export const useSignedIn = (
   signedInCallback?: () => void,

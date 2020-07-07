@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-  RefreshControl,
   FlatList,
-  Platform,
   ListRenderItem,
+  Platform,
+  RefreshControl,
   StyleSheet,
 } from 'react-native';
 import { SNNote, SNTag } from 'snjs';

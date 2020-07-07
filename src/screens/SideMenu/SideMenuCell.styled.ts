@@ -1,5 +1,5 @@
-import styled, { css } from 'styled-components/native';
 import { Platform } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 export const Touchable = styled.TouchableOpacity<{ isSubtext: boolean }>`
   min-height: ${props => (props.isSubtext ? 52 : 42)}px;

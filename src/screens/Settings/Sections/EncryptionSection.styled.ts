@@ -1,5 +1,5 @@
-import styled from 'styled-components/native';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
+import styled from 'styled-components/native';
 
 export const BaseView = styled.View``;
 
