@@ -72,12 +72,12 @@ export const useOutOfSync = () => {
   return outOfSync;
 };
 
-export const useLocked = () => {
+export const useIsLocked = () => {
   // Context
   const application = React.useContext(ApplicationContext);
 
   // State
-  const [isLocked, setIsLocked] = React.useState<boolean>(false);
+  const [isLocked, setIsLocked] = React.useState<boolean>(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -86,7 +86,7 @@ export const useLocked = () => {
         setIsLocked(Boolean(locked));
       };
       getIsLocked();
-    }, [application?.isLocked])
+    }, [application])
   );
 
   return isLocked;

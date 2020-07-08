@@ -5,6 +5,7 @@ import {
 } from '@Components/SectionedOptionsTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
+import { UnlockTiming } from '@Lib/ApplicationState';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_INPUT_MODAL_PASSCODE } from '@Root/screens2/screens';
@@ -51,6 +52,7 @@ export const PasscodeInputModal = (props: Props) => {
       setSettingPassocode(false);
     } else {
       await application?.setPasscode(text);
+      await application?.getAppState().setPasscodeTiming(UnlockTiming.OnQuit);
       setSettingPassocode(false);
       props.navigation.goBack();
     }

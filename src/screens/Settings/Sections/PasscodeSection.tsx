@@ -1,16 +1,20 @@
 import { ButtonCell } from '@Components/ButtonCell';
-import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
+import {
+  Option,
+  SectionedOptionsTableCell,
+} from '@Components/SectionedOptionsTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
+import { UnlockTiming } from '@Lib/ApplicationState';
 import { MobileDeviceInterface } from '@Lib/interface';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_SETTINGS,
 } from '@Root/screens2/screens';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { StorageEncryptionPolicies } from 'snjs';
 import { Title } from './PasscodeSection.styled';
 
@@ -32,6 +36,12 @@ export const PasscodeSection = (props: Props) => {
     application?.getStorageEncryptionPolicy()
   );
   const [hasBiometrics, setHasBiometrics] = useState(false);
+  const [biometricsTimingOptions, setBiometricsTimingOptions] = useState(() =>
+    application!.getAppState().getBiometricsTimingOptions()
+  );
+  const [passcodeTimingOptions, setPasscodeTimingOptions] = useState(() =>
+    application!.getAppState().getPasscodeTimingOptions()
+  );
   const [supportsBiometrics, setSupportsBiometrics] = useState(false);
   const [
     encryptionPolictChangeInProgress,
@@ -58,6 +68,16 @@ export const PasscodeSection = (props: Props) => {
       mounted = false;
     };
   }, [application]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (props.hasPasscode) {
+        setPasscodeTimingOptions(() =>
+          application!.getAppState().getPasscodeTimingOptions()
+        );
+      }
+    }, [application, props.hasPasscode])
+  );
 
   const toggleEncryptionPolicy = async () => {
     if (!props.encryptionAvailable) {
@@ -135,13 +155,28 @@ export const PasscodeSection = (props: Props) => {
     }
   };
 
-  const onBiometricsPress = () => {
+  const setBiometricsTiming = async (timing: UnlockTiming) => {
+    await application?.getAppState().setBiometricsTiming(timing);
+    setBiometricsTimingOptions(() =>
+      application!.getAppState().getBiometricsTimingOptions()
+    );
+  };
+
+  const setPasscodeTiming = async (timing: UnlockTiming) => {
+    await application?.getAppState().setPasscodeTiming(timing);
+    setPasscodeTimingOptions(() =>
+      application!.getAppState().getPasscodeTimingOptions()
+    );
+  };
+
+  const onBiometricsPress = async () => {
     if (hasBiometrics) {
       setHasBiometrics(false);
       application?.disableBiometrics();
     } else {
       setHasBiometrics(true);
-      application?.enableBiometrics();
+      await application?.enableBiometrics();
+      await setBiometricsTiming(UnlockTiming.OnQuit);
     }
   };
 
@@ -174,18 +209,22 @@ export const PasscodeSection = (props: Props) => {
       {props.hasPasscode && (
         <SectionedOptionsTableCell
           title={'Require Passcode'}
-          options={[]}
-          onPress={() => {}}
+          options={passcodeTimingOptions}
+          onPress={(option: Option) =>
+            setPasscodeTiming(option.key as UnlockTiming)
+          }
         />
       )}
 
-      {/* {this.props.hasBiometrics && (
+      {hasBiometrics && (
         <SectionedOptionsTableCell
-          title={`Require ${biometricsNoun}`}
-          options={biometricOptions}
-          onPress={this.onBiometricsOptionPress}
+          title={'Require Biometrics'}
+          options={biometricsTimingOptions}
+          onPress={(option: Option) =>
+            setBiometricsTiming(option.key as UnlockTiming)
+          }
         />
-      )} */}
+      )}
     </TableSection>
   );
 };

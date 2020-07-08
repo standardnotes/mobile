@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {
   ApplicationEvent,
+  ApplicationService,
   ContentType,
   PayloadSource,
   removeFromArray,
@@ -16,6 +17,8 @@ import {
   SNSmartTag,
   SNTag,
   SNUserPrefs,
+  StorageKey,
+  StorageValueModes,
 } from 'snjs';
 import { MobileApplication } from './application';
 import { Editor } from './editor';
@@ -52,6 +55,11 @@ export type NoteSideMenuToggleChange = {
   old_isNoteSideMenuCollapsed: boolean;
 };
 
+export enum UnlockTiming {
+  Immediately = 'immediately',
+  OnQuit = 'on-quit',
+}
+
 type EventObserverCallback = (
   event: AppStateEventType,
   data?: TabletModeChangeData | NoteSideMenuToggleChange
@@ -61,10 +69,10 @@ type ObserverCallback = (
   data?: any
 ) => void | Promise<void>;
 
-export class ApplicationState {
+export class ApplicationState extends ApplicationService {
   application: MobileApplication;
   observers: ObserverCallback[] = [];
-  eventObservers: EventObserverCallback[] = [];
+  private stateObservers: EventObserverCallback[] = [];
   locked = true;
   keyboardDidShowListener?: EmitterSubscription;
   keyboardDidHideListener?: EmitterSubscription;
@@ -78,12 +86,16 @@ export class ApplicationState {
   mostRecentState?: AppStateType;
   authenticationInProgress: boolean = false;
   multiEditorEnabled = false;
+  passcodeTiming?: UnlockTiming;
+  biometricsTiming?: UnlockTiming;
 
   constructor(application: MobileApplication) {
+    super(application);
     this.application = application;
     this.setTabletModeEnabled(this.isTabletDevice);
     this.handleApplicationEvents();
     this.handleItemsChanges();
+
     this.setSelectedTag(this.application.getSmartTags()[0]);
     AppState.addEventListener('change', this.handleReactNativeAppStateChange);
 
@@ -109,6 +121,10 @@ export class ApplicationState {
     this.keyboardDidHideListener = undefined;
   }
 
+  async onAppLaunch() {
+    await this.getUnlockTiming();
+  }
+
   /**
    * Registers an observer for App State change
    * @returns function that unregisters this observer
@@ -125,9 +141,9 @@ export class ApplicationState {
    * @returns function that unregisters this observer
    */
   public addStateEventObserver(callback: EventObserverCallback) {
-    this.eventObservers.push(callback);
+    this.stateObservers.push(callback);
     return () => {
-      removeFromArray(this.eventObservers, callback);
+      removeFromArray(this.stateObservers, callback);
     };
   }
 
@@ -154,7 +170,7 @@ export class ApplicationState {
     event: AppStateEventType,
     data?: TabletModeChangeData | NoteSideMenuToggleChange
   ) {
-    for (const observer of this.eventObservers) {
+    for (const observer of this.stateObservers) {
       observer(event, data);
     }
   }
@@ -170,6 +186,11 @@ export class ApplicationState {
     } else {
       await activeEditor.reset(title);
     }
+  }
+
+  private async getUnlockTiming() {
+    this.passcodeTiming = await this.getPasscodeTiming();
+    this.biometricsTiming = await this.getBiometricsTiming();
   }
 
   async openEditor(noteUuid: string) {
@@ -395,6 +416,36 @@ export class ApplicationState {
     }
   }
 
+  getPasscodeTimingOptions() {
+    return [
+      {
+        title: 'Immediately',
+        key: UnlockTiming.Immediately,
+        selected: this.passcodeTiming === UnlockTiming.Immediately,
+      },
+      {
+        title: 'On Quit',
+        key: UnlockTiming.OnQuit,
+        selected: this.passcodeTiming === UnlockTiming.OnQuit,
+      },
+    ];
+  }
+
+  getBiometricsTimingOptions() {
+    return [
+      {
+        title: 'Immediately',
+        key: UnlockTiming.Immediately,
+        selected: this.biometricsTiming === UnlockTiming.Immediately,
+      },
+      {
+        title: 'On Quit',
+        key: UnlockTiming.OnQuit,
+        selected: this.biometricsTiming === UnlockTiming.OnQuit,
+      },
+    ];
+  }
+
   /**
    * handles App State change from React Native
    */
@@ -416,9 +467,16 @@ export class ApplicationState {
     if (isEnteringBackground) {
       this.notifyOfStateChange(AppStateType.EnteringBackground);
       const isLocked = await this.application.isLocked();
+
       if (!isLocked) {
-        // TODO: add lockManager
-        await this.application.lock();
+        if (
+          (this.application.hasPasscode() &&
+            this.passcodeTiming === UnlockTiming.Immediately) ||
+          ((await this.application.hasBiometrics()) &&
+            this.biometricsTiming === UnlockTiming.Immediately)
+        ) {
+          await this.application.lock();
+        }
       }
     }
 
@@ -468,6 +526,38 @@ export class ApplicationState {
       AppStateType.GainingFocus,
       AppStateType.ResumingFromBackground,
     ] as Array<AppStateType>).includes(state);
+  }
+
+  private async getPasscodeTiming(): Promise<UnlockTiming | undefined> {
+    return this.application.getValue(
+      StorageKey.MobilePasscodeTiming,
+      StorageValueModes.Nonwrapped
+    );
+  }
+
+  private async getBiometricsTiming(): Promise<UnlockTiming | undefined> {
+    return this.application.getValue(
+      StorageKey.MobileBiometricsTiming,
+      StorageValueModes.Nonwrapped
+    );
+  }
+
+  public async setPasscodeTiming(timing: UnlockTiming) {
+    await this.application.setValue(
+      StorageKey.MobilePasscodeTiming,
+      timing,
+      StorageValueModes.Nonwrapped
+    );
+    this.passcodeTiming = timing;
+  }
+
+  public async setBiometricsTiming(timing: UnlockTiming) {
+    await this.application.setValue(
+      StorageKey.MobileBiometricsTiming,
+      timing,
+      StorageValueModes.Nonwrapped
+    );
+    this.biometricsTiming = timing;
   }
 
   /*

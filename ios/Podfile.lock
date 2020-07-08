@@ -321,7 +321,7 @@ PODS:
     - React
   - RNGestureHandler (1.6.1):
     - React
-  - RNKeychain (6.1.1):
+  - RNKeychain (4.0.5):
     - React
   - RNReanimated (1.9.0):
     - React
@@ -329,7 +329,7 @@ PODS:
     - React
   - RNStoreReview (0.1.5):
     - React
-  - RNVectorIcons (6.6.0):
+  - RNVectorIcons (7.0.0):
     - React
   - sn-textview (1.0.0):
     - React
@@ -553,11 +553,11 @@ SPEC CHECKSUMS:
   RNFileViewer: db62d60dd19007c54b2c959b5e675a46d59f8a43
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
-  RNKeychain: db956c02a018f7dd3a0ea8a6cf3087bc1894bf2b
+  RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
   RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
-  RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
+  RNVectorIcons: da6fe858f5a65d7bbc3379540a889b0b12aa5976
   sn-textview: f478ee79531da2c7b129c4ea3b20c665e75e1f4b
   SNReactNative: c47c4fd6d310eea152cc52e23f4fd306491efee3
   TrustKit: a2f0c3a926f0a3ce3c082db9a39f1f540dbb04cb

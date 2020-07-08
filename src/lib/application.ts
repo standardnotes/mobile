@@ -92,8 +92,4 @@ export class MobileApplication extends SNApplication {
   public getPrefsService() {
     return this.MobileServices.prefsService;
   }
-
-  async checkForSecurityUpdate() {
-    return this.protocolUpgradeAvailable();
-  }
 }

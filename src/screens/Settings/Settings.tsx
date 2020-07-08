@@ -1,9 +1,8 @@
 import { useSignedIn } from '@Lib/customHooks';
-import { useFocusEffect } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Root/screens2/screens';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ApplicationEvent } from 'snjs';
 import { AuthSection } from './Sections/AuthSection';
 import { CompanySection } from './Sections/CompanySection';
@@ -22,32 +21,30 @@ export const Settings = (props: Props) => {
   );
   const [encryptionAvailable, setEncryptionAvailable] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      let isMounted = true;
-      const getEncryptionAvailable = async () => {
-        const isEncryptionAvailable = await application?.isEncryptionAvailable();
-        if (isMounted) {
-          setEncryptionAvailable(Boolean(isEncryptionAvailable));
+  useEffect(() => {
+    let isMounted = true;
+    const getEncryptionAvailable = async () => {
+      const isEncryptionAvailable = await application?.isEncryptionAvailable();
+      if (isMounted) {
+        setEncryptionAvailable(Boolean(isEncryptionAvailable));
+      }
+    };
+    getEncryptionAvailable();
+    const removeApplicationEventSubscriber = application?.addEventObserver(
+      async event => {
+        if (event === ApplicationEvent.KeyStatusChanged) {
+          setHasPasscode(Boolean(application?.hasPasscode()));
+          setEncryptionAvailable(
+            Boolean(await application?.isEncryptionAvailable())
+          );
         }
-      };
-      getEncryptionAvailable();
-      const removeApplicationEventSubscriber = application?.addEventObserver(
-        async event => {
-          if (event === ApplicationEvent.KeyStatusChanged) {
-            setHasPasscode(Boolean(application?.hasPasscode()));
-            setEncryptionAvailable(
-              Boolean(await application?.isEncryptionAvailable())
-            );
-          }
-        }
-      );
-      return () => {
-        isMounted = false;
-        removeApplicationEventSubscriber && removeApplicationEventSubscriber();
-      };
-    }, [application])
-  );
+      }
+    );
+    return () => {
+      isMounted = false;
+      removeApplicationEventSubscriber && removeApplicationEventSubscriber();
+    };
+  }, [application]);
 
   const goBack = useCallback(() => {
     props.navigation.goBack();
