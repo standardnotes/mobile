@@ -374,7 +374,6 @@ const AppComponent: React.FC<{ application: MobileApplication }> = ({
       styleKit.current = new StyleKit(application);
       await styleKit.current.initialize();
       setReady(true);
-      // await application?.launch(false);
     };
     setReady(false);
     loadApplication();

@@ -9,7 +9,7 @@ import { EmptyPlaceholder } from './TagSelectionList.styled';
 type Props = {
   contentType: ContentType.Tag | ContentType.SmartTag;
   onTagSelect: (tag: SNTag | SNSmartTag) => void;
-  selectedTag?: SNTag | SNSmartTag;
+  selectedTags: SNTag[] | SNSmartTag[];
   emptyPlaceholder?: string;
   hasBottomPadding?: boolean;
 };
@@ -86,7 +86,11 @@ export const TagSelectionList = (props: Props): JSX.Element => {
           value: '#',
         }}
         key={item.uuid}
-        selected={props.selectedTag?.uuid === item.uuid}
+        selected={
+          props.selectedTags.findIndex(
+            selectedTag => selectedTag.uuid === item.uuid
+          ) > -1
+        }
       />
     );
   };
@@ -103,7 +107,7 @@ export const TagSelectionList = (props: Props): JSX.Element => {
         renderItem={rendetItem}
         extraData={
           /* Required to force list cells to update on selection change */
-          props.selectedTag
+          props.selectedTags
         }
       />
 

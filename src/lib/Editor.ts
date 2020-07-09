@@ -54,6 +54,7 @@ export class Editor {
     const matchingNote = notes.find(item => {
       return item.uuid === this.note?.uuid;
     }) as SNNote;
+
     if (matchingNote) {
       this.isTemplateNote = false;
       this.note = matchingNote;
@@ -80,7 +81,7 @@ export class Editor {
   }
 
   private onNoteChange(note: SNNote) {
-    if (this.note) {
+    if (note) {
       for (const observer of this.noteChangeObservers) {
         observer(note);
       }
@@ -120,8 +121,6 @@ export class Editor {
    */
   public setNote(note: SNNote) {
     this.note = note;
-    if (note) {
-      this.onNoteChange(this.note);
-    }
+    this.onNoteChange(this.note);
   }
 }

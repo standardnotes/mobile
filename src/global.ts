@@ -9,4 +9,4 @@
 
 // TODO: still crashes without this
 // @ts-ignore
-global._ = require('lodash');
+// global._ = require('lodash');

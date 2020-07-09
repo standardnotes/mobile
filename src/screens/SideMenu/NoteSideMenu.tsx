@@ -41,16 +41,34 @@ export const NoteSideMenu = (props: Props) => {
   const [note, setNote] = useState<SNNote | undefined>(undefined);
 
   useEffect(() => {
+    let mounted = true;
+    if (!editor && mounted) {
+      const initialEditor = application?.editorGroup.activeEditor;
+      const tempNote = initialEditor?.note;
+      setEditor(initialEditor);
+      setNote(tempNote);
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [application, editor]);
+
+  useEffect(() => {
+    let mounted = true;
     const removeEditorObserver = application?.editorGroup.addChangeObserver(
-      () => {
-        const editorTemp = application!.editorGroup.activeEditor;
-        setNote(editorTemp?.note);
-        setEditor(editorTemp);
+      activeEditor => {
+        if (mounted) {
+          setNote(activeEditor?.note);
+          setEditor(activeEditor);
+        }
       }
     );
 
+    // const streamTags;
+
     return () => {
-      removeEditorObserver;
+      mounted = false;
+      removeEditorObserver && removeEditorObserver();
     };
   }, [application]);
 
@@ -107,6 +125,7 @@ export const NoteSideMenu = (props: Props) => {
         );
         return;
       }
+
       await application?.changeAndSaveItem(note.uuid, mutator => {
         const noteMutator = mutator as NoteMutator;
         mutate(noteMutator);
@@ -114,6 +133,11 @@ export const NoteSideMenu = (props: Props) => {
     },
     [application, editor, note]
   );
+
+  const leaveEditor = useCallback(() => {
+    props.drawerRef?.closeDrawer();
+    navigation.goBack();
+  }, [props.drawerRef, navigation]);
 
   const noteOptions = useMemo(() => {
     if (!note) {
@@ -127,10 +151,14 @@ export const NoteSideMenu = (props: Props) => {
       });
 
     const archiveOption = note.archived ? 'Unarchive' : 'Archive';
-    const archiveEvent = () =>
+    const archiveEvent = () => {
       changeNote(mutator => {
         mutator.archived = !note.archived;
       });
+      leaveEditor();
+      application?.getAppState().closeEditor(editor!);
+    };
+
     // TODO: close editor
 
     const lockOption = note.locked ? 'Unlock' : 'Lock';
@@ -201,7 +229,7 @@ export const NoteSideMenu = (props: Props) => {
     // }
 
     return options;
-  }, [note, changeNote]);
+  }, [note, changeNote, leaveEditor, application, editor]);
 
   if (!editor || !note) {
     return null;

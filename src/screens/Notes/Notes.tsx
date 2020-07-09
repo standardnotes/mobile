@@ -1,8 +1,9 @@
 import { AppStateType } from '@Lib/ApplicationState';
+import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ICON_ADD } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import FAB from 'react-native-fab';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
@@ -115,22 +116,29 @@ export const Notes: React.FC<Props> = props => {
     };
   }, [application, reloadNotes, reloadNotesDisplayOptions]);
 
-  useEffect(() => {
-    const removeAppStateChangeHandler = application!
-      .getAppState()
-      .addStateChangeObserver(state => {
-        if (state === AppStateType.TagChanged) {
-          reloadNotesDisplayOptions();
-          reloadNotes();
-        }
-      });
-    const removeStreams = streamNotesAndTags();
+  useFocusEffect(
+    useCallback(() => {
+      const removeAppStateChangeHandler = application!
+        .getAppState()
+        .addStateChangeObserver(state => {
+          if (state === AppStateType.TagChanged) {
+            reloadNotesDisplayOptions();
+            reloadNotes();
+          }
+        });
+      const removeStreams = streamNotesAndTags();
 
-    return () => {
-      removeAppStateChangeHandler();
-      removeStreams();
-    };
-  }, [application, reloadNotes, reloadNotesDisplayOptions, streamNotesAndTags]);
+      return () => {
+        removeAppStateChangeHandler();
+        removeStreams();
+      };
+    }, [
+      application,
+      reloadNotes,
+      reloadNotesDisplayOptions,
+      streamNotesAndTags,
+    ])
+  );
 
   return (
     <>

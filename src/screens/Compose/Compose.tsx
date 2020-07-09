@@ -1,5 +1,4 @@
 import { Editor } from '@Lib/editor';
-import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
@@ -51,10 +50,10 @@ export const Compose = (): JSX.Element => {
   const styleKit = useContext(StyleKitContext);
 
   //State
-  const [title, setTitle] = useState<string | undefined>(undefined);
+  const [title, setTitle] = useState<string | undefined>();
   const [noteText, setNoteText] = useState<string | undefined>(undefined);
-  const [editor, setEditor] = useState<Editor | undefined>(undefined);
-  const [note, setNote] = useState<SNNote | undefined>(undefined);
+  const [editor, setEditor] = useState<Editor | undefined>();
+  const [note, setNote] = useState<SNNote | undefined>();
   const [editorComponent, setEditorComponent] = useState<
     SNComponent | undefined
   >();
@@ -64,6 +63,23 @@ export const Compose = (): JSX.Element => {
   // Ref
   const editorViewRef = useRef<TextView>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!editor && mounted) {
+      const initialEditor = application?.editorGroup.activeEditor;
+      const tempNote = initialEditor?.note;
+      setEditor(initialEditor);
+      setNote(tempNote);
+      setNoteText(initialEditor?.note?.safeText());
+      setTitle(initialEditor?.note?.safeTitle());
+    }
+
+    return () => {
+      mounted = false;
+      application?.getAppState().closeActiveEditor();
+    };
+  }, [application, editor]);
 
   const reloadComponentContext = useCallback(() => {
     if (note) {
@@ -132,56 +148,66 @@ export const Compose = (): JSX.Element => {
     };
   }, [application, note, reloadComponentContext, reloadComponentEditorState]);
 
-  useFocusEffect(
-    useCallback(() => {
-      const removeEditorObserver = application?.editorGroup.addChangeObserver(
-        () => {
-          const editorTemp = application!.editorGroup.activeEditor;
-          setEditor(editorTemp);
-          setNote(editorTemp?.note);
-          setTitle(editorTemp?.note?.safeTitle());
-          setNoteText(editorTemp.note?.safeText());
-        }
-      );
-
-      const removeComponentGroupObserver = application?.componentGroup.addChangeObserver(
-        async () => {
-          const currentEditor = editorComponent;
-          const newEditor = application?.componentGroup.activeComponentForArea(
-            ComponentArea.Editor
-          );
-          if (
-            currentEditor &&
-            newEditor &&
-            currentEditor.uuid !== newEditor.uuid
-          ) {
-            /** Unload current component view so that we create a new one,
-             * then change the active editor */
-            // await this.setEditorState({
-            //   editorComponentUnloading: true,
-            // });
+  useEffect(() => {
+    let mounted = true;
+    const removeEditorObserver = application?.editorGroup.addChangeObserver(
+      newEditor => {
+        if (mounted) {
+          setEditor(newEditor);
+          setNote(newEditor?.note);
+          if (newEditor && newEditor.note) {
+            setTitle(newEditor?.note?.safeTitle());
+            setNoteText(newEditor.note?.safeText());
           }
-          setEditorComponent(newEditor);
-          /** Stop unloading, if we were already unloading */
+        }
+      }
+    );
+
+    const removeComponentGroupObserver = application?.componentGroup.addChangeObserver(
+      async () => {
+        const currentEditor = editorComponent;
+        const newEditor = application?.componentGroup.activeComponentForArea(
+          ComponentArea.Editor
+        );
+        if (
+          currentEditor &&
+          newEditor &&
+          currentEditor.uuid !== newEditor.uuid
+        ) {
+          /** Unload current component view so that we create a new one,
+           * then change the active editor */
           // await this.setEditorState({
-          //   editorComponentUnloading: false,
+          //   editorComponentUnloading: true,
           // });
         }
-      );
+        if (mounted) {
+          setEditorComponent(newEditor);
+        }
 
-      const removeStreamItems = streamItems();
+        /** Stop unloading, if we were already unloading */
+        // await this.setEditorState({
+        //   editorComponentUnloading: false,
+        // });
+      }
+    );
 
-      return () => {
-        removeEditorObserver && removeEditorObserver();
-        removeComponentGroupObserver && removeComponentGroupObserver();
-        removeStreamItems();
-      };
-    }, [application, editorComponent, streamItems])
-  );
+    const removeStreamItems = streamItems();
+
+    return () => {
+      mounted = false;
+      removeEditorObserver && removeEditorObserver();
+      removeComponentGroupObserver && removeComponentGroupObserver();
+      removeStreamItems();
+    };
+  }, [application, editorComponent, streamItems]);
 
   useEffect(() => {
     const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
-      setNote
+      newNote => {
+        setNote(newNote);
+        setTitle(newNote.title);
+        setNoteText(newNote.text);
+      }
     );
     const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
       (newNote, source) => {
@@ -223,8 +249,7 @@ export const Compose = (): JSX.Element => {
         return;
       }
 
-      const tempNote = note;
-      if (tempNote?.deleted) {
+      if (note?.deleted) {
         application!.alertService!.alert('deteled replace this');
         return;
       }
@@ -235,17 +260,17 @@ export const Compose = (): JSX.Element => {
           await application.changeItem(
             application?.getAppState().selectedTag!.uuid,
             mutator => {
-              mutator.addItemAsRelationship(tempNote!);
+              mutator.addItemAsRelationship(note!);
             }
           );
         }
       }
-      if (!application?.findItem(tempNote!.uuid)) {
+      if (!application?.findItem(note!.uuid)) {
         application?.alertService!.alert('invalid note replace');
         return;
       }
       await application!.changeItem(
-        tempNote!.uuid,
+        note!.uuid,
         mutator => {
           const noteMutator = mutator as NoteMutator;
           noteMutator.title = values.newTitle!;

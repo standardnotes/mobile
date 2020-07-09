@@ -88,7 +88,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
                 key="views-section-list"
                 contentType={ContentType.SmartTag}
                 onTagSelect={onTagSelect}
-                selectedTag={selectedTag}
+                selectedTags={selectedTag ? [selectedTag] : []}
               />
             </SideMenuSection>,
 
@@ -99,7 +99,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
                 emptyPlaceholder={'No tags. Create one from the note composer.'}
                 contentType={ContentType.Tag}
                 onTagSelect={onTagSelect}
-                selectedTag={selectedTag}
+                selectedTags={selectedTag ? [selectedTag] : []}
               />
             </SideMenuSection>,
           ]}
