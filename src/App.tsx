@@ -146,9 +146,9 @@ const AppStackComponent = () => {
         drawerPosition={'right'}
         drawerType="slide"
         drawerLockMode="locked-closed"
-        renderNavigationView={() => (
-          <NoteSideMenu drawerRef={noteDrawerRef.current} />
-        )}
+        renderNavigationView={() =>
+          hasEditor && <NoteSideMenu drawerRef={noteDrawerRef.current} />
+        }
       >
         <AppStack.Navigator
           screenOptions={({ navigation, route }) => ({

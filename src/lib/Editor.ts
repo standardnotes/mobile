@@ -27,8 +27,6 @@ export class Editor {
   async init(noteUuid?: string, noteTitle?: string) {
     if (noteUuid) {
       this.note = this.application.findItem(noteUuid) as SNNote;
-
-      // console.log(this.note);
     } else {
       await this.reset(noteTitle);
     }

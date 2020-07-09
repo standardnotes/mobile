@@ -55,17 +55,23 @@ export const NoteSideMenu = (props: Props) => {
   }, [application]);
 
   useEffect(() => {
-    // console.log('jezyk', editor?.onNoteChange);
+    let mounted = true;
     const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
-      setNote
+      newNote => {
+        if (mounted) {
+          setNote(newNote);
+        }
+      }
     );
     const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
       newNote => {
-        // console.log(newNote);
-        setNote(newNote);
+        if (mounted) {
+          setNote(newNote);
+        }
       }
     );
     return () => {
+      mounted = false;
       removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
       removeEditorNoteValueChangeObserver &&
         removeEditorNoteValueChangeObserver();
@@ -105,7 +111,6 @@ export const NoteSideMenu = (props: Props) => {
         const noteMutator = mutator as NoteMutator;
         mutate(noteMutator);
       });
-      console.log(note.pinned);
     },
     [application, editor, note]
   );
