@@ -49,7 +49,8 @@ export const NoteTitleInput = styled.TextInput`
   height: ${NOTE_TITLE_HEIGHT}px;
   border-bottom-color: ${({ theme }) => theme.stylekitBorderColor};
   border-bottom-width: 1px;
-  padding-top: ${PADDING}px;
+  padding-top: ${Platform.OS === 'ios' ? 5 : 12}px;
+  padding-left: ${PADDING}px;
   padding-right: ${PADDING}px;
 `;
 export const LoadingWebViewContainer = styled.View`

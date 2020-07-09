@@ -58,9 +58,9 @@ export class EditorGroup {
    */
   public addChangeObserver(callback: EditorGroupChangeCallback) {
     this.changeObservers.push(callback);
-    if (this.activeEditor) {
-      callback(this.activeEditor);
-    }
+    // if (this.activeEditor) {
+    callback(this.activeEditor);
+    // }
     return () => {
       removeFromArray(this.changeObservers, callback);
     };

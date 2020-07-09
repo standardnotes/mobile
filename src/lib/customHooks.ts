@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { ApplicationEvent } from 'snjs';
 
 export const useSignedIn = (
@@ -90,4 +90,23 @@ export const useIsLocked = () => {
   );
 
   return isLocked;
+};
+
+export const useHasEditor = () => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  // State
+  const [hasEditor, setHasEditor] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    const removeEditorObserver = application?.editorGroup.addChangeObserver(
+      () => {
+        setHasEditor(Boolean(application!.editorGroup.activeEditor));
+      }
+    );
+    return removeEditorObserver;
+  });
+
+  return hasEditor;
 };

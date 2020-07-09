@@ -72,7 +72,7 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
       onPress={props.onSelect}
       onLongPress={props.onLongPress}
     >
-      <CellContent>
+      <CellContent iconSide={iconSide}>
         {iconSide === 'left' && (
           <IconContainerLeft>
             {renderIcon(props.iconDesc, theme.stylekitInfoColor)}

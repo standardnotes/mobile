@@ -4,10 +4,17 @@ import styled, { css } from 'styled-components/native';
 export const Touchable = styled.TouchableOpacity<{ isSubtext: boolean }>`
   min-height: ${props => (props.isSubtext ? 52 : 42)}px;
 `;
-export const CellContent = styled.View`
+export const CellContent = styled.View<{
+  iconSide: 'right' | 'left' | null;
+}>`
   flex: 1;
   flex-direction: row;
   align-items: center;
+  ${({ iconSide }) =>
+    iconSide === 'right' &&
+    css`
+      justify-content: space-between;
+    `}
 `;
 const IconContainer = styled.View`
   justify-content: center;
@@ -16,6 +23,7 @@ export const IconContainerLeft = styled(IconContainer)`
   margin-right: 6px;
 `;
 export const IconContainerRight = styled(IconContainer)`
+  justify-content: space-between;
   margin-left: 6px;
   margin-right: 4px;
   height: 100%;

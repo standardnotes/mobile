@@ -42,17 +42,12 @@ export enum AppStateType {
 
 export enum AppStateEventType {
   KeyboardChangeEvent = 1,
-  AppStateEventTabletModeChange = 2,
-  AppStateEventNoteSideMenuToggle = 3,
+  TabletModeChange = 2,
 }
 
 export type TabletModeChangeData = {
   new_isInTabletMode: boolean;
   old_isInTabletMode: boolean;
-};
-export type NoteSideMenuToggleChange = {
-  new_isNoteSideMenuCollapsed: boolean;
-  old_isNoteSideMenuCollapsed: boolean;
 };
 
 export enum UnlockTiming {
@@ -62,7 +57,7 @@ export enum UnlockTiming {
 
 type EventObserverCallback = (
   event: AppStateEventType,
-  data?: TabletModeChangeData | NoteSideMenuToggleChange
+  data?: TabletModeChangeData
 ) => void | Promise<void>;
 type ObserverCallback = (
   event: AppStateType,
@@ -81,13 +76,13 @@ export class ApplicationState extends ApplicationService {
   selectedTag?: SNTag;
   userPreferences?: SNUserPrefs;
   tabletMode: boolean = false;
-  noteSideMenuCollapsed: boolean = false;
   ignoreStateChanges: boolean = false;
   mostRecentState?: AppStateType;
   authenticationInProgress: boolean = false;
   multiEditorEnabled = false;
   passcodeTiming?: UnlockTiming;
   biometricsTiming?: UnlockTiming;
+  removeItemChangesListener?: () => void;
 
   constructor(application: MobileApplication) {
     super(application);
@@ -115,6 +110,9 @@ export class ApplicationState extends ApplicationService {
       'change',
       this.handleReactNativeAppStateChange
     );
+    if (this.removeItemChangesListener) {
+      this.removeItemChangesListener();
+    }
     this.appEventObersever = undefined;
     this.observers.length = 0;
     this.keyboardDidShowListener = undefined;
@@ -168,11 +166,16 @@ export class ApplicationState extends ApplicationService {
    */
   private notifyEventObservers(
     event: AppStateEventType,
-    data?: TabletModeChangeData | NoteSideMenuToggleChange
+    data?: TabletModeChangeData
   ) {
     for (const observer of this.stateObservers) {
       observer(event, data);
     }
+  }
+
+  private async getUnlockTiming() {
+    this.passcodeTiming = await this.getPasscodeTiming();
+    this.biometricsTiming = await this.getBiometricsTiming();
   }
 
   /**
@@ -186,11 +189,6 @@ export class ApplicationState extends ApplicationService {
     } else {
       await activeEditor.reset(title);
     }
-  }
-
-  private async getUnlockTiming() {
-    this.passcodeTiming = await this.getPasscodeTiming();
-    this.biometricsTiming = await this.getBiometricsTiming();
   }
 
   async openEditor(noteUuid: string) {
@@ -275,7 +273,7 @@ export class ApplicationState extends ApplicationService {
    * Reacts to @SNNote and @SNTag Changes
    */
   private handleItemsChanges() {
-    this.application!.streamItems(
+    this.removeItemChangesListener = this.application!.streamItems(
       [ContentType.Note, ContentType.Tag],
       async (items, source) => {
         /** Close any editors for deleted/trashed/archived notes */
@@ -389,30 +387,10 @@ export class ApplicationState extends ApplicationService {
   setTabletModeEnabled(enabled: boolean) {
     if (enabled !== this.tabletMode) {
       this.tabletMode = enabled;
-      this.notifyEventObservers(
-        AppStateEventType.AppStateEventTabletModeChange,
-        {
-          new_isInTabletMode: enabled,
-          old_isInTabletMode: !enabled,
-        }
-      );
-    }
-  }
-
-  get isNoteSideMenuCollapsed() {
-    return this.noteSideMenuCollapsed;
-  }
-
-  setNoteSideMenuCollapsed(collapsed: boolean) {
-    if (collapsed !== this.noteSideMenuCollapsed) {
-      this.noteSideMenuCollapsed = collapsed;
-      this.notifyEventObservers(
-        AppStateEventType.AppStateEventNoteSideMenuToggle,
-        {
-          new_isNoteSideMenuCollapsed: collapsed,
-          old_isNoteSideMenuCollapsed: !collapsed,
-        }
-      );
+      this.notifyEventObservers(AppStateEventType.TabletModeChange, {
+        new_isInTabletMode: enabled,
+        old_isInTabletMode: !enabled,
+      });
     }
   }
 

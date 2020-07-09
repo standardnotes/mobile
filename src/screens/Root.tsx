@@ -1,98 +1,83 @@
 import {
   AppStateEventType,
   AppStateType,
-  NoteSideMenuToggleChange,
   TabletModeChangeData,
 } from '@Lib/ApplicationState';
+import { useHasEditor } from '@Lib/customHooks';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Root/screens2/screens';
-import React, { useContext, useEffect, useState } from 'react';
+import { StyleKit } from '@Style/StyleKit';
+import { hexToRGBA } from '@Style/utils';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { LayoutChangeEvent } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { SNNote } from 'snjs/dist/@types';
-import styled, { css } from 'styled-components/native';
+import { ThemeContext } from 'styled-components/native';
+import { Compose } from './Compose/Compose';
 import { Notes } from './Notes/Notes';
-
-const Container = styled.View`
-  flex: 1;
-  flex-direction: row;
-`;
-const NotesContainer = styled.View<{
-  shouldSplitLayout?: boolean;
-  notesListCollapsed?: boolean;
-}>`
-  ${({ shouldSplitLayout, notesListCollapsed }) =>
-    shouldSplitLayout
-      ? css`
-          border-right-color: black;
-          border-right-width: 1px;
-          width: ${notesListCollapsed ? 0 : '40%'};
-        `
-      : css`
-          flex: 1;
-        `}
-`;
-const ComposeContainer = styled.View<{ notesListCollapsed?: boolean }>`
-  width: ${props => (props.notesListCollapsed ? '100%' : '60%')};
-`;
+import {
+  ComposeContainer,
+  Container,
+  ExpandTouchable,
+  iconNames,
+  NotesContainer,
+} from './Root.styled';
 
 type Props = AppStackNavigationProp<typeof SCREEN_NOTES>;
 
 export const Root = (props: Props): JSX.Element => {
   const application = useContext(ApplicationContext);
+  const theme = useContext(ThemeContext);
+
   const [width, setWidth] = useState<number | undefined>(undefined);
   const [height, setHeight] = useState<number | undefined>(undefined);
   const [x, setX] = useState<number | undefined>(undefined);
   const [y, setY] = useState<number | undefined>(undefined);
+  const hasEditor = useHasEditor();
+  const [noteListCollapsed, setNoteListCollapsed] = useState<boolean>(false);
   const [shouldSplitLayout, setShouldSplitLayout] = useState<
     boolean | undefined
   >(false);
   const [keyboardHeight, setKeyboardHeight] = useState<number | undefined>(
     undefined
   );
-  const [notesListCollapsed, setNotesListCollapsed] = useState<
-    boolean | undefined
-  >();
 
   /**
    * Register observers
    */
   useEffect(() => {
-    let removeApplicationStateEventHandler: (() => void) | undefined;
-    let removeStateObserver: (() => void) | undefined;
-    const startObservers = async () => {
-      removeStateObserver = application
-        ?.getAppState()
-        .addStateChangeObserver(state => {
-          if (state === AppStateType.GainingFocus) {
-            application.sync();
-          }
-        });
-      removeApplicationStateEventHandler = application
-        ?.getAppState()
-        .addStateEventObserver(
-          (
-            event: AppStateEventType,
-            data: TabletModeChangeData | NoteSideMenuToggleChange | undefined
-          ) => {
-            if (event === AppStateEventType.AppStateEventNoteSideMenuToggle) {
-              // update state to toggle Notes side menu if we triggered the collapse
-              setNotesListCollapsed(
-                (data as NoteSideMenuToggleChange).new_isNoteSideMenuCollapsed
-              );
-            } else if (event === AppStateEventType.KeyboardChangeEvent) {
-              // need to refresh the height of the keyboard when it opens so that we can change the position
-              // of the sidebar collapse icon
-              if (application?.getAppState().isInTabletMode) {
-                setKeyboardHeight(
-                  application?.getAppState().getKeyboardHeight()
-                );
-              }
+    const removeStateObserver = application
+      ?.getAppState()
+      .addStateChangeObserver(state => {
+        if (state === AppStateType.GainingFocus) {
+          application.sync();
+        }
+      });
+    const removeApplicationStateEventHandler = application
+      ?.getAppState()
+      .addStateEventObserver(
+        (event: AppStateEventType, data: TabletModeChangeData | undefined) => {
+          if (event === AppStateEventType.TabletModeChange) {
+            const eventData = data as TabletModeChangeData;
+            if (eventData.new_isInTabletMode && !eventData.old_isInTabletMode) {
+              setShouldSplitLayout(true);
+            } else if (
+              !eventData.new_isInTabletMode &&
+              eventData.old_isInTabletMode
+            ) {
+              setShouldSplitLayout(false);
             }
           }
-        );
-    };
-    startObservers();
+          if (event === AppStateEventType.KeyboardChangeEvent) {
+            // need to refresh the height of the keyboard when it opens so that we can change the position
+            // of the sidebar collapse icon
+            if (application?.getAppState().isInTabletMode) {
+              setKeyboardHeight(application?.getAppState().getKeyboardHeight());
+            }
+          }
+        }
+      );
     return () => {
       if (removeApplicationStateEventHandler) {
         removeApplicationStateEventHandler();
@@ -102,6 +87,16 @@ export const Root = (props: Props): JSX.Element => {
       }
     };
   }, [application]);
+
+  const collapseIconName = useMemo(() => {
+    const collapseIconPrefix = StyleKit.platformIconPrefix();
+
+    return (
+      collapseIconPrefix +
+      '-' +
+      iconNames[collapseIconPrefix][noteListCollapsed ? 0 : 1]
+    );
+  }, [noteListCollapsed]);
 
   const onLayout = (e: LayoutChangeEvent) => {
     const tempWidth = e.nativeEvent.layout.width;
@@ -122,7 +117,6 @@ export const Root = (props: Props): JSX.Element => {
     setHeight(e.nativeEvent.layout.height);
     setX(e.nativeEvent.layout.x);
     setShouldSplitLayout(application?.getAppState().isInTabletMode);
-    setNotesListCollapsed(application?.getAppState().isNoteSideMenuCollapsed);
     setKeyboardHeight(application?.getAppState().getKeyboardHeight());
   };
 
@@ -143,49 +137,42 @@ export const Root = (props: Props): JSX.Element => {
     openCompose();
   };
 
+  const toggleNoteList = () => {
+    setNoteListCollapsed(value => !value);
+  };
+
+  const collapseIconBottomPosition =
+    (keyboardHeight ?? 0) > (height ?? 0) / 2 ? keyboardHeight : '50%';
+
   return (
     <Container testID="rootView" onLayout={onLayout}>
-      <NotesContainer
-        shouldSplitLayout={shouldSplitLayout}
-        notesListCollapsed={notesListCollapsed}
-      >
-        <Notes
-          // onUnlockPress={this.onUnlockPress}
-          onNoteSelect={onNoteSelect}
-          onNoteCreate={onNoteCreate}
-        />
-      </NotesContainer>
+      {!noteListCollapsed && (
+        <NotesContainer shouldSplitLayout={shouldSplitLayout}>
+          <Notes
+            // onUnlockPress={this.onUnlockPress}
+            onNoteSelect={onNoteSelect}
+            onNoteCreate={onNoteCreate}
+          />
+        </NotesContainer>
+      )}
 
-      {shouldSplitLayout && (
-        <ComposeContainer notesListCollapsed={notesListCollapsed}>
-          {/* <Compose
-            ref={ref => {
-              this.composeRef = ref;
-            }}
-            selectedTagId={this.state.selectedTagId}
-            navigation={this.props.navigation}
-          /> */}
-          {/*
-          <TouchableHighlight
+      {hasEditor && shouldSplitLayout && (
+        <ComposeContainer>
+          <Compose
+          // selectedTagId={this.state.selectedTagId}
+          // navigation={this.props.navigation}
+          />
 
-            style={[
-              this.styles.toggleButtonContainer,
-              this.styles.toggleButton,
-              { bottom: collapseIconBottomPosition },
-            ]}
-            onPress={this.toggleNoteSideMenu}
+          <ExpandTouchable
+            style={{ bottom: collapseIconBottomPosition }}
+            onPress={toggleNoteList}
           >
-            <View>
-              <Icon
-                name={collapseIconName}
-                size={24}
-                color={hexToRGBA(
-                  this.context!.getThemeService().variables.stylekitInfoColor,
-                  0.85
-                )}
-              />
-            </View>
-          </TouchableHighlight> */}
+            <Icon
+              name={collapseIconName}
+              size={24}
+              color={hexToRGBA(theme.stylekitInfoColor, 0.85)}
+            />
+          </ExpandTouchable>
         </ComposeContainer>
       )}
     </Container>

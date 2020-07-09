@@ -18,7 +18,7 @@ export type SideMenuOption = {
   };
   dimmed?: boolean;
   selected?: boolean;
-  onSelect?: () => void;
+  onSelect?: () => void | Promise<void>;
   onLongPress?: () => void;
 };
 

@@ -4,7 +4,13 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import { lighten } from '@Style/utils';
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import TextView from 'sn-textview';
 import {
@@ -132,6 +138,7 @@ export const Compose = (): JSX.Element => {
         () => {
           const editorTemp = application!.editorGroup.activeEditor;
           setEditor(editorTemp);
+          setNote(editorTemp?.note);
           setTitle(editorTemp?.note?.safeTitle());
           setNoteText(editorTemp.note?.safeText());
         }
@@ -172,107 +179,120 @@ export const Compose = (): JSX.Element => {
     }, [application, editorComponent, streamItems])
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      const removeEditorNoteChangeObserver = editor?.onNoteChange(setNote);
-      const removeEditorNoteValueChangeObserver = editor?.onNoteValueChange(
-        (newNote, source) => {
-          if (isPayloadSourceRetrieved(source!)) {
-            setTitle(newNote.title);
-            setNoteText(newNote.text);
-          }
-          if (newNote.lastSyncBegan && newNote.lastSyncEnd) {
-            if (
-              newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
-            ) {
-              // this.showSavingStatus();
-            } else if (
-              newNote.lastSyncEnd!.getTime() > newNote.lastSyncBegan!.getTime()
-            ) {
-              // this.showAllChangesSavedStatus();
-            }
+  useEffect(() => {
+    const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
+      setNote
+    );
+    const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
+      (newNote, source) => {
+        if (isPayloadSourceRetrieved(source!)) {
+          setNote(newNote);
+          setTitle(newNote.title);
+          setNoteText(newNote.text);
+        }
+        if (newNote.lastSyncBegan && newNote.lastSyncEnd) {
+          if (
+            newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
+          ) {
+            // this.showSavingStatus();
+          } else if (
+            newNote.lastSyncEnd!.getTime() > newNote.lastSyncBegan!.getTime()
+          ) {
+            // this.showAllChangesSavedStatus();
           }
         }
+      }
+    );
+
+    return () => {
+      removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
+      removeEditorNoteValueChangeObserver &&
+        removeEditorNoteValueChangeObserver();
+    };
+  }, [editor]);
+
+  const saveNote = useCallback(
+    async (
+      bypassDebouncer: boolean,
+      isUserModified: boolean,
+      dontUpdatePreviews: boolean,
+      closeAfterSync: boolean,
+      values: { newTitle: string | undefined; newNoteText: string | undefined }
+    ) => {
+      if (!note) {
+        return;
+      }
+
+      const tempNote = note;
+      if (tempNote?.deleted) {
+        application!.alertService!.alert('deteled replace this');
+        return;
+      }
+
+      if (editor?.isTemplateNote) {
+        await editor?.insertTemplatedNote();
+        if (application?.getAppState().selectedTag?.isSmartTag() === false) {
+          await application.changeItem(
+            application?.getAppState().selectedTag!.uuid,
+            mutator => {
+              mutator.addItemAsRelationship(tempNote!);
+            }
+          );
+        }
+      }
+      if (!application?.findItem(tempNote!.uuid)) {
+        application?.alertService!.alert('invalid note replace');
+        return;
+      }
+      await application!.changeItem(
+        tempNote!.uuid,
+        mutator => {
+          const noteMutator = mutator as NoteMutator;
+          noteMutator.title = values.newTitle!;
+          noteMutator.text = values.newNoteText!;
+          if (!dontUpdatePreviews) {
+            const text = values.newNoteText ?? '';
+            const truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT;
+            const substring = text.substring(0, NOTE_PREVIEW_CHAR_LIMIT);
+            const previewPlain = substring + (truncate ? '...' : '');
+            noteMutator.preview_plain = previewPlain;
+            noteMutator.preview_html = undefined;
+          }
+        },
+        isUserModified
       );
 
-      return () => {
-        removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
-        removeEditorNoteValueChangeObserver &&
-          removeEditorNoteValueChangeObserver();
-      };
-    }, [editor])
-  );
-
-  const saveNote = async (
-    bypassDebouncer: boolean,
-    isUserModified: boolean,
-    dontUpdatePreviews: boolean,
-    closeAfterSync: boolean
-  ) => {
-    const tempNote = note;
-    if (tempNote?.deleted) {
-      application!.alertService!.alert('deteled replace this');
-      return;
-    }
-    if (editor?.isTemplateNote) {
-      await editor?.insertTemplatedNote();
-      if (application?.getAppState().selectedTag?.isSmartTag() === false) {
-        await application.changeItem(
-          application?.getAppState().selectedTag!.uuid,
-          mutator => {
-            mutator.addItemAsRelationship(tempNote!);
-          }
-        );
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
-    }
-    if (!application?.findItem(tempNote!.uuid)) {
-      application?.alertService!.alert('invalid note replace');
-      return;
-    }
-    await application!.changeItem(
-      tempNote!.uuid,
-      mutator => {
-        const noteMutator = mutator as NoteMutator;
-        noteMutator.title = title!;
-        noteMutator.text = noteText!;
-        if (!dontUpdatePreviews) {
-          const text = noteText || '';
-          const truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT;
-          const substring = text.substring(0, NOTE_PREVIEW_CHAR_LIMIT);
-          const previewPlain = substring + (truncate ? '...' : '');
-          noteMutator.preview_plain = previewPlain;
-          noteMutator.preview_html = undefined;
+      const noDebounce = bypassDebouncer || application?.noAccount();
+      const syncDebouceMs = noDebounce
+        ? SAVE_TIMEOUT_NO_DEBOUNCE
+        : SAVE_TIMEOUT_DEBOUNCE;
+      timeoutRef.current = setTimeout(() => {
+        application?.sync();
+        if (closeAfterSync) {
+          application?.getAppState().closeEditor(editor!);
         }
-      },
-      isUserModified
-    );
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    const noDebounce = bypassDebouncer || application?.noAccount();
-    const syncDebouceMs = noDebounce
-      ? SAVE_TIMEOUT_NO_DEBOUNCE
-      : SAVE_TIMEOUT_DEBOUNCE;
-    timeoutRef.current = setTimeout(() => {
-      application?.sync();
-      if (closeAfterSync) {
-        application?.getAppState().closeEditor(editor!);
-      }
-    }, syncDebouceMs);
-  };
+      }, syncDebouceMs);
+    },
+    [application, editor, note]
+  );
 
   const onTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    if (note) {
-      saveNote(false, true, false, false);
-    }
+    saveNote(false, true, false, false, {
+      newTitle,
+      newNoteText: noteText,
+    });
   };
 
   const onContentChange = (newNoteText: string) => {
     setNoteText(newNoteText);
-    if (note) {
-      saveNote(false, true, true, false);
-    }
+    saveNote(false, true, true, false, {
+      newTitle: title,
+      newNoteText,
+    });
   };
 
   return (
