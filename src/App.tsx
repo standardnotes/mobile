@@ -65,7 +65,8 @@ type ModalStackNavigatorParamList = {
   AppStack: undefined;
   [SCREEN_SETTINGS]: undefined;
   [SCREEN_INPUT_MODAL_TAG]: HeaderTitleParams & {
-    initialValue?: string;
+    tagUuid?: string;
+    noteUuid?: string;
   };
   [SCREEN_INPUT_MODAL_PASSCODE]: undefined;
   [SCREEN_AUTHENTICATE]: {

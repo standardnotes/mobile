@@ -5,8 +5,16 @@ import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_INPUT_MODAL_TAG } from '@Root/screens2/screens';
 import { StyleKitContext } from '@Style/StyleKit';
-import React, { useContext, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { TextInput } from 'react-native';
+import { SNTag } from 'snjs';
+import { TagMutator } from 'snjs/dist/@types/models/app/tag';
 import { Container, Input } from './InputModal.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_TAG>;
@@ -21,7 +29,48 @@ export const TagInputModal = (props: Props) => {
   // Refs
   const textRef = useRef<TextInput>(null);
 
-  const onSubmit = () => {};
+  useEffect(() => {
+    if (props.route.params.tagUuid) {
+      const tag = application?.findItem(props.route.params.tagUuid) as SNTag;
+      setText(tag.title);
+    }
+  }, [application, props.route.params.tagUuid]);
+
+  const onSubmit = useCallback(async () => {
+    if (props.route.params.tagUuid) {
+      const tag = application?.findItem(props.route.params.tagUuid) as SNTag;
+      await application?.changeItem(tag.uuid, mutator => {
+        const tagMutator = mutator as TagMutator;
+        tagMutator.title = text;
+        if (props.route.params.noteUuid) {
+          const note = application.findItem(props.route.params.noteUuid);
+          if (note) {
+            tagMutator.addItemAsRelationship(note);
+          }
+        }
+      });
+    } else {
+      const tag = await application!.findOrCreateTag(text);
+      if (props.route.params.noteUuid) {
+        await application?.changeItem(tag.uuid, mutator => {
+          const tagMutator = mutator as TagMutator;
+          const note = application.findItem(props.route.params.noteUuid!);
+          if (note) {
+            tagMutator.addItemAsRelationship(note);
+          }
+        });
+      }
+    }
+
+    application?.sync();
+    props.navigation.goBack();
+  }, [
+    application,
+    props.navigation,
+    props.route.params.noteUuid,
+    props.route.params.tagUuid,
+    text,
+  ]);
 
   return (
     <Container>
@@ -30,7 +79,7 @@ export const TagInputModal = (props: Props) => {
           <Input
             ref={textRef}
             placeholder={
-              props.route.params.initialValue ? 'Tag name' : 'New tag name'
+              props.route.params.tagUuid ? 'Tag name' : 'New tag name'
             }
             onChangeText={setText}
             value={text}
@@ -48,7 +97,7 @@ export const TagInputModal = (props: Props) => {
           disabled={text.length === 0}
           title={'Save'}
           bold
-          onPress={() => {}}
+          onPress={onSubmit}
         />
       </TableSection>
     </Container>

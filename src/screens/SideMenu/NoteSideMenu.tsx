@@ -1,6 +1,8 @@
 import { Editor } from '@Lib/editor';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Root/screens2/screens';
 import {
   ICON_ARCHIVE,
   ICON_BOOKMARK,
@@ -20,7 +22,7 @@ import { Platform } from 'react-native';
 import FAB from 'react-native-fab';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ContentType, NoteMutator, SNNote } from 'snjs';
+import { ContentType, NoteMutator, SNNote, SNSmartTag, SNTag } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { SafeAreaContainer, StyledList } from './NoteSideMenu.styled';
 import { SideMenuOption, SideMenuSection } from './SideMenuSection';
@@ -34,11 +36,14 @@ export const NoteSideMenu = (props: Props) => {
   // Context
   const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
-  const navigation = useNavigation();
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+  >();
 
   // State
   const [editor, setEditor] = useState<Editor | undefined>(undefined);
   const [note, setNote] = useState<SNNote | undefined>(undefined);
+  const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -63,8 +68,6 @@ export const NoteSideMenu = (props: Props) => {
         }
       }
     );
-
-    // const streamTags;
 
     return () => {
       mounted = false;
@@ -95,6 +98,26 @@ export const NoteSideMenu = (props: Props) => {
         removeEditorNoteValueChangeObserver();
     };
   }, [editor]);
+
+  const reloadTags = useCallback(() => {
+    if (note) {
+      const tags = application!.getAppState().getNoteTags(note);
+      setSelectedTags(tags);
+    }
+  }, [application, note]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let mounted = true;
+      if (mounted) {
+        reloadTags();
+      }
+
+      return () => {
+        mounted = false;
+      };
+    }, [reloadTags])
+  );
 
   const changeNote = useCallback(
     async (mutate: (mutator: NoteMutator) => void) => {
@@ -156,10 +179,7 @@ export const NoteSideMenu = (props: Props) => {
         mutator.archived = !note.archived;
       });
       leaveEditor();
-      application?.getAppState().closeEditor(editor!);
     };
-
-    // TODO: close editor
 
     const lockOption = note.locked ? 'Unlock' : 'Lock';
     const lockEvent = () =>
@@ -229,7 +249,30 @@ export const NoteSideMenu = (props: Props) => {
     // }
 
     return options;
-  }, [note, changeNote, leaveEditor, application, editor]);
+  }, [note, changeNote, leaveEditor]);
+
+  const onTagSelect = useCallback(
+    async (tag: SNTag | SNSmartTag) => {
+      const isSelected =
+        selectedTags.findIndex(selectedTag => selectedTag.uuid === tag.uuid) >
+        -1;
+
+      if (note) {
+        if (isSelected) {
+          await application?.changeItem(tag.uuid, mutator => {
+            mutator.removeItemAsRelationship(note);
+          });
+        } else {
+          await application?.changeItem(tag.uuid, mutator => {
+            mutator.addItemAsRelationship(note);
+          });
+        }
+      }
+      reloadTags();
+      application?.sync();
+    },
+    [application, note, reloadTags, selectedTags]
+  );
 
   if (!editor || !note) {
     return null;
@@ -257,8 +300,8 @@ export const NoteSideMenu = (props: Props) => {
               key="tags-section-list"
               hasBottomPadding={Platform.OS === 'android'}
               contentType={ContentType.Tag}
-              onTagSelect={() => {}}
-              selectedTags={[]}
+              onTagSelect={onTagSelect}
+              selectedTags={selectedTags}
               emptyPlaceholder={
                 'Create a new tag using the tag button in the bottom right corner.'
               }
@@ -272,7 +315,10 @@ export const NoteSideMenu = (props: Props) => {
       <FAB
         buttonColor={theme.stylekitInfoColor}
         iconTextColor={theme.stylekitInfoContrastColor}
-        onClickAction={() => {}}
+        onClickAction={() =>
+          // @ts-expect-error
+          navigation.navigate(SCREEN_INPUT_MODAL_TAG, { noteUuid: note.uuid })
+        }
         visible={true}
         size={30}
         paddingTop={Platform.OS === 'ios' ? 1 : 0}

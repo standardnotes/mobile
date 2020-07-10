@@ -1,4 +1,7 @@
+import { useNavigation } from '@react-navigation/native';
+import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Root/screens2/screens';
 import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
@@ -16,47 +19,58 @@ type Props = {
 
 export const TagSelectionList = (props: Props): JSX.Element => {
   const application = useContext(ApplicationContext);
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+  >();
+
   const { showActionSheet } = useCustomActionSheet();
   const [tags, setTags] = useState<SNTag[] | SNSmartTag[]>(() =>
     props.contentType === ContentType.SmartTag
       ? application!.getSmartTags()
       : []
   );
+
+  const reloadTags = useCallback(() => {
+    if (props.contentType === ContentType.SmartTag) {
+      setTags(application!.getSmartTags());
+    } else {
+      setTags(application?.getItems(props.contentType) as SNTag[]);
+    }
+  }, [application, props.contentType]);
+
   const streamTags = useCallback(
     () =>
       application!.streamItems(props.contentType, items => {
-        if (props.contentType === ContentType.SmartTag) {
-          setTags(application!.getSmartTags().concat(items as SNSmartTag[]));
-        } else {
-          setTags(items as SNTag[]);
+        reloadTags();
+        if (application?.getAppState().selectedTag) {
+          /** If the selected tag has been deleted, revert to All view. */
+          const matchingTag = items.find(tag => {
+            return tag.uuid === application?.getAppState().selectedTag?.uuid;
+          }) as SNTag;
+          if (matchingTag) {
+            if (matchingTag.deleted) {
+              application
+                .getAppState()
+                .setSelectedTag(application!.getSmartTags()[0]);
+            }
+          }
         }
       }),
-    [props.contentType, application, setTags]
+    [application, props.contentType, reloadTags]
   );
   useEffect(() => {
     const removeStreamTags = streamTags();
 
     return removeStreamTags;
   }, [streamTags]);
+
   const onTagLongPress = (tag: SNTag | SNSmartTag) => {
     showActionSheet(tag.title, [
       {
         text: 'Rename',
-        callback: () => {
-          //   this.props.navigation.navigate(SCREEN_INPUT_MODAL, {
-          //     title: 'Rename Tag',
-          //     placeholder: 'Tag name',
-          //     initialValue: tag.title,
-          //     onSubmit: (text: string) => {
-          //       if (tag) {
-          //         tag.title = text; // Update the text on the tag to the input text
-          //         tag.setDirty(true);
-          //         Sync.get().sync();
-          //         this.forceUpdate();
-          //       }
-          //     },
-          //   });
-        },
+        callback: () =>
+          // @ts-expect-error
+          navigation.navigate(SCREEN_INPUT_MODAL_TAG, { tagUuid: tag.uuid }),
       },
       {
         text: 'Delete',
@@ -67,6 +81,7 @@ export const TagSelectionList = (props: Props): JSX.Element => {
       },
     ]);
   };
+
   const rendetItem: ListRenderItem<SNTag | SNSmartTag> = ({ item }) => {
     let title = item.deleted ? 'Deleting...' : item.title;
     if (item.errorDecrypting) {
@@ -94,6 +109,7 @@ export const TagSelectionList = (props: Props): JSX.Element => {
       />
     );
   };
+
   return (
     <>
       <FlatList
@@ -105,10 +121,6 @@ export const TagSelectionList = (props: Props): JSX.Element => {
         data={tags}
         keyExtractor={item => item.uuid}
         renderItem={rendetItem}
-        extraData={
-          /* Required to force list cells to update on selection change */
-          props.selectedTags
-        }
       />
 
       {tags.length === 0 && (
