@@ -1,5 +1,4 @@
 import { Platform } from 'react-native';
-import TextView from 'sn-textview';
 import styled from 'styled-components/native';
 
 const PADDING = 14;
@@ -7,7 +6,7 @@ const NOTE_TITLE_HEIGHT = 50;
 
 export const Container = styled.View`
   flex: 1;
-  background-color: ${({ theme }) => theme.stylekitBackgroundColor};,
+  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
 `;
 export const LockedContainer = styled.View`
   flex: 1;
@@ -85,17 +84,17 @@ export const TextContainer = styled.View`
   flex-grow: 1;
   flex: 1;
 `;
-export const StyledTextView = styled(TextView)`
-  flex-grow: 1;
-  margin-top: 0px;
-  padding-top: 10px;
+export const StyledTextView = styled.TextInput`
+height: 90%;
+  /* margin-top: 0px; */
+  /* padding-top: 10px; */
   color: ${({ theme }) => theme.stylekitForegroundColor};
   padding-left: ${({ theme }) =>
     theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   padding-right: ${({ theme }) =>
     theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
-  padding-bottom: 10px;
+  /* padding-bottom: 10px; */
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   ${Platform.OS === 'ios' && 'padding-bottom: 10px'};
-  ${Platform.OS === 'android' && 'flex: 1'};
+  /* ${Platform.OS === 'android' && 'flex: 1'}; */
 `;

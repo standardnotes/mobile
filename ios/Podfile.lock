@@ -327,6 +327,8 @@ PODS:
     - React
   - RNScreens (2.9.0):
     - React
+  - RNSearchBar (3.5.1):
+    - React
   - RNStoreReview (0.1.5):
     - React
   - RNVectorIcons (7.0.0):
@@ -389,6 +391,7 @@ DEPENDENCIES:
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSearchBar (from `../node_modules/react-native-search-bar`)
   - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - sn-textview (from `../node_modules/sn-textview`)
@@ -493,6 +496,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSearchBar:
+    :path: "../node_modules/react-native-search-bar"
   RNStoreReview:
     :path: "../node_modules/react-native-store-review/ios"
   RNVectorIcons:
@@ -556,6 +561,7 @@ SPEC CHECKSUMS:
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
   RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
+  RNSearchBar: 9860431356b7d12a8449d2fddb2b5f3c78d1e99f
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: da6fe858f5a65d7bbc3379540a889b0b12aa5976
   sn-textview: f478ee79531da2c7b129c4ea3b20c665e75e1f4b

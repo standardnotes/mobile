@@ -392,6 +392,7 @@ export const Compose = (): JSX.Element => {
         <TextContainer>
           <StyledTextView
             testID="noteContentField"
+            multiline
             ref={editorViewRef}
             autoFocus={false}
             value={noteText}
@@ -405,12 +406,14 @@ export const Compose = (): JSX.Element => {
         <StyledTextView
           ref={editorViewRef}
           autoFocus={false}
+          multiline
           value={noteText}
           keyboardDismissMode={'interactive'}
           keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
           selectionColor={lighten(theme.stylekitInfoColor)}
           onChangeText={onContentChange}
           editable={!note?.locked}
+          scrollEnabled
         />
       )}
     </Container>
