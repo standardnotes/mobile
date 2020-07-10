@@ -101,8 +101,8 @@ export const useHasEditor = () => {
 
   useEffect(() => {
     const removeEditorObserver = application?.editorGroup.addChangeObserver(
-      () => {
-        setHasEditor(Boolean(application!.editorGroup.activeEditor));
+      newEditor => {
+        setHasEditor(Boolean(newEditor));
       }
     );
     return removeEditorObserver;

@@ -16,6 +16,7 @@ import {
 } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
+import { notePassesFilter } from './utils';
 
 type Props = {
   onNoteSelect: (noteUuid: SNNote['uuid']) => void;
@@ -57,14 +58,16 @@ export const Notes: React.FC<Props> = props => {
           ? note.satisfiesPredicate((tag as SNSmartTag).predicate)
           : tag.hasRelationshipWithItem(note);
 
-        return matchesTag;
-        // notePassesFilter(
-        //   note,
-        //   application?.getAppState().selectedTag!,
-        //   application?.getAppState().showArchived!,
-        //   application?.getAppState().hidePinned!,
-        //   application?.getAppState().noteFilter.text.toLowerCase()
-        // );
+        return (
+          matchesTag &&
+          notePassesFilter(
+            note,
+            application?.getAppState().selectedTag!,
+            false, // application?.getAppState().showArchived!,
+            false, // application?.getAppState().hidePinned!,
+            '' // application?.getAppState().noteFilter.text.toLowerCase()
+          )
+        );
       }
     );
   }, [application, sortBy, sortReverse]);
@@ -74,13 +77,6 @@ export const Notes: React.FC<Props> = props => {
       [ContentType.Note],
       async items => {
         const tempNotes = items as SNNote[];
-        /** Note has changed values, reset its flags */
-        for (const note of tempNotes) {
-          if (note.deleted) {
-            continue;
-          }
-          // this.loadFlagsForNote(note);
-        }
         /** If a note changes, it will be queried against the existing filter;
          * we dont need to reload display options */
         reloadNotes();

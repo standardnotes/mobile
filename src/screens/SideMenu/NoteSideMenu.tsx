@@ -9,6 +9,8 @@ import {
   ICON_FINGER_PRINT,
   ICON_LOCK,
   ICON_PRICE_TAG,
+  ICON_SHARE,
+  ICON_TRASH,
 } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
 import React, {
@@ -18,7 +20,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Share } from 'react-native';
 import FAB from 'react-native-fab';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -193,21 +195,48 @@ export const NoteSideMenu = (props: Props) => {
         mutator.protected = !note.protected;
       });
 
+    const shareNote = () => {
+      if (note) {
+        application?.getAppState().performActionWithoutStateChangeImpact(() => {
+          Share.share({
+            title: note.title,
+            message: note.text,
+          });
+        });
+      }
+    };
+
     const rawOptions = [
       { text: pinOption, onSelect: pinEvent, icon: ICON_BOOKMARK },
       { text: archiveOption, onSelect: archiveEvent, icon: ICON_ARCHIVE },
       { text: lockOption, onSelect: lockEvent, icon: ICON_LOCK },
       { text: protectOption, onSelect: protectEvent, icon: ICON_FINGER_PRINT },
-      // { text: 'Share', key: ItemActionManager.ShareEvent, icon: ICON_SHARE },
+      { text: 'Share', onSelect: shareNote, icon: ICON_SHARE },
     ];
 
-    // if (!note.safeContent.trashed) {
-    //   rawOptions.push({
-    //     text: 'Move to Trash',
-    //     key: ItemActionManager.TrashEvent,
-    //     icon: ICON_TRASH,
-    //   });
-    // }
+    if (!note.safeContent.trashed) {
+      rawOptions.push({
+        text: 'Move to Trash',
+        onSelect: () => {
+          const title = 'Move to Trash';
+          const message =
+            'Are you sure you want to move this note to the trash?';
+
+          application?.alertService?.confirm(
+            message,
+            title,
+            'Confirm',
+            'Cancel',
+            () => {
+              changeNote(mutator => {
+                mutator.trashed = true;
+              });
+            }
+          );
+        },
+        icon: ICON_TRASH,
+      });
+    }
 
     let options: SideMenuOption[] = rawOptions.map(rawOption => ({
       text: rawOption.text,
@@ -220,36 +249,87 @@ export const NoteSideMenu = (props: Props) => {
       onSelect: rawOption.onSelect,
     }));
 
-    // if (note.safeContent.trashed) {
-    //   options = options.concat([
-    //     {
-    //       text: 'Restore',
-    //       key: 'restore-note',
-    //       onSelect: () => {
-    //         this.runAction(ItemActionManager.RestoreEvent);
-    //       },
-    //     },
-    //     {
-    //       text: 'Delete Permanently',
-    //       textClass: 'danger' as 'danger',
-    //       key: 'delete-forever',
-    //       onSelect: () => {
-    //         this.runAction(ItemActionManager.DeleteEvent);
-    //       },
-    //     },
-    //     {
-    //       text: 'Empty Trash',
-    //       textClass: 'danger' as 'danger',
-    //       key: 'empty trash',
-    //       onSelect: () => {
-    //         this.runAction(ItemActionManager.EmptyTrashEvent);
-    //       },
-    //     },
-    //   ]);
-    // }
+    if (note.safeContent.trashed) {
+      options = options.concat([
+        {
+          text: 'Restore',
+          key: 'restore-note',
+          onSelect: () => {
+            changeNote(mutator => {
+              mutator.trashed = false;
+            });
+          },
+        },
+        {
+          text: 'Delete Permanently',
+          textClass: 'danger' as 'danger',
+          key: 'delete-forever',
+          onSelect: () => {
+            const title = `Delete ${note.safeTitle()}`;
+            const message =
+              'Are you sure you want to permanently delete this nite}?';
+            if (editor?.isTemplateNote) {
+              application?.alertService!.alert(
+                'This note is a placeholder and cannot be deleted. To remove from your list, simply navigate to a different note.'
+              );
+              return;
+            }
+            if (note.locked) {
+              application?.alertService!.alert(
+                "This note is locked. If you'd like to delete it, unlock it, and try again."
+              );
+              return;
+            }
+            application?.alertService?.confirm(
+              message,
+              title,
+              'Delete',
+              'Cancel',
+              async () => {
+                await application?.deleteItem(note);
+                props.drawerRef?.closeDrawer();
+                navigation.popToTop();
+              },
+              undefined,
+              true
+            );
+          },
+        },
+        {
+          text: 'Empty Trash',
+          textClass: 'danger' as 'danger',
+          key: 'empty trash',
+          onSelect: () => {
+            const count = application?.getTrashedItems().length;
+            application?.alertService!.confirm(
+              `Are you sure you want to permanently delete ${count} notes?`,
+              'Empty Trash',
+              'Delete',
+              undefined,
+              async () => {
+                await application?.emptyTrash();
+                props.drawerRef?.closeDrawer();
+                navigation.popToTop();
+                application?.sync();
+              },
+              undefined,
+              true
+            );
+          },
+        },
+      ]);
+    }
 
     return options;
-  }, [note, changeNote, leaveEditor]);
+  }, [
+    note,
+    changeNote,
+    leaveEditor,
+    application,
+    editor?.isTemplateNote,
+    props.drawerRef,
+    navigation,
+  ]);
 
   const onTagSelect = useCallback(
     async (tag: SNTag | SNSmartTag) => {

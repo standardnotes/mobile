@@ -37,7 +37,8 @@ export enum AppStateType {
   Unlocking = 8,
   TagChanged = 9,
   ActiveEditorChanged = 10,
-  PreferencesChanged = 11,
+  EditorClosed = 11,
+  PreferencesChanged = 12,
 }
 
 export enum AppStateEventType {
@@ -233,14 +234,17 @@ export class ApplicationState extends ApplicationService {
   }
 
   closeEditor(editor: Editor) {
+    this.notifyOfStateChange(AppStateType.EditorClosed);
     this.application.editorGroup.closeEditor(editor);
   }
 
   closeActiveEditor() {
+    this.notifyOfStateChange(AppStateType.EditorClosed);
     this.application.editorGroup.closeActiveEditor();
   }
 
   closeAllEditors() {
+    this.notifyOfStateChange(AppStateType.EditorClosed);
     this.application.editorGroup.closeAllEditors();
   }
 

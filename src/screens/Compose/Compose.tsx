@@ -77,7 +77,6 @@ export const Compose = (): JSX.Element => {
 
     return () => {
       mounted = false;
-      application?.getAppState().closeActiveEditor();
     };
   }, [application, editor]);
 

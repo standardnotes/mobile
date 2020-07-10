@@ -3,7 +3,11 @@ import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { MobileApplication } from '@Lib/application';
 import { ApplicationGroup } from '@Lib/applicationGroup';
-import { AppStateEventType, TabletModeChangeData } from '@Lib/ApplicationState';
+import {
+  AppStateEventType,
+  AppStateType,
+  TabletModeChangeData,
+} from '@Lib/ApplicationState';
 import { useHasEditor } from '@Lib/customHooks';
 import {
   NavigationContainer,
@@ -89,7 +93,7 @@ export type ModalStackNavigationProp<
 const MainStack = createStackNavigator<ModalStackNavigatorParamList>();
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 
-const AppStackComponent = () => {
+const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
   const drawerRef = useRef<DrawerLayout>(null);
@@ -99,6 +103,22 @@ const AppStackComponent = () => {
   const [isInTabletMode, setIsInTabletMode] = useState(
     () => application?.getAppState().isInTabletMode
   );
+
+  useEffect(() => {
+    const removeObserver = application
+      ?.getAppState()
+      .addStateChangeObserver(event => {
+        if (event === AppStateType.EditorClosed) {
+          noteDrawerRef.current?.closeDrawer();
+          if (!isInTabletMode) {
+            props.navigation.popToTop();
+          }
+        }
+      });
+
+    return removeObserver;
+  }, [application, props.navigation, isInTabletMode]);
+
   const hasEditor = useHasEditor();
 
   useEffect(() => {
