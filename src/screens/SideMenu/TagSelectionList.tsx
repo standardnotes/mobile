@@ -34,7 +34,11 @@ export const TagSelectionList = (props: Props): JSX.Element => {
     if (props.contentType === ContentType.SmartTag) {
       setTags(application!.getSmartTags());
     } else {
-      setTags(application?.getItems(props.contentType) as SNTag[]);
+      setTags(
+        application!
+          .getItems(props.contentType)
+          .sort((a, b) => a.title.localeCompare(b.title)) as SNTag[]
+      );
     }
   }, [application, props.contentType]);
 
