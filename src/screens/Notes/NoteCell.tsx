@@ -41,11 +41,11 @@ const TitleText = styled.Text<{ selected: boolean }>`
   color: ${({ theme, selected }) =>
     selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
 `;
-// const TagsContainter = styled.View`
-//   flex: 1;
-//   flex-direction: row;
-//   margin-top: 7px;
-// `;
+const TagsContainter = styled.View`
+  flex: 1;
+  flex-direction: row;
+  margin-top: 7px;
+`;
 const TagText = styled.Text<{ selected: boolean }>`
   margin-right: 2px;
   font-size: 12px;
@@ -92,7 +92,7 @@ export const NoteCell = (props: Props): JSX.Element => {
     !note.protected && !note.hidePreview;
   // const showTagsString =
   //   props.renderTags &&
-  //   !this.state.options.hideTags &&
+  //   // !this.state.options.hideTags &&
   //   note.tags.length > 0 &&
   //   !note.protected;
   return (
@@ -137,13 +137,13 @@ export const NoteCell = (props: Props): JSX.Element => {
           </DateText>
         )}
 
-        {/* {true && (
+        {false && (
           <TagsContainter>
             <TagText numberOfLines={1} selected={highlight}>
               {props.tagsString}
             </TagText>
           </TagsContainter>
-        )} */}
+        )}
 
         {/* {this.state.actionSheet && this.state.actionSheet} */}
       </Container>

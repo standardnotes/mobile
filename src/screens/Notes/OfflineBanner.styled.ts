@@ -7,18 +7,18 @@ const PADDING = 12;
 const Touchable = styled.TouchableWithoutFeedback``;
 const Container = styled.View`
   flex: 1;
-  flex-direction: 'row';
+  flex-direction: row;
   margin: ${MARGIN}px;
   padding: ${PADDING}px;
-  border-width: 1;
-  border-radius: 4;
+  border-width: 1px;
+  border-radius: 4px;
   border-color: ${props => props.theme.stylekitBorderColor};
 `;
 const CenterContainer = styled.View`
   justify-content: center;
 `;
 const UserIcon = styled(Icon)`
-  font-size: 24;
+  font-size: 24px;
   color: ${props => props.theme.stylekitInfoColor};
 `;
 const ForwardIcon = styled(UserIcon)`
@@ -26,16 +26,16 @@ const ForwardIcon = styled(UserIcon)`
 `;
 const TextContainer = styled.View`
   flex: 1;
-  padding-left: ${PADDING};
+  padding-left: ${PADDING}px;
 `;
 const BoldText = styled.Text`
   font-size: 15px;
-  font-weight: '600';
+  font-weight: 600;
   color: ${props => props.theme.stylekitForegroundColor};
 `;
 const SubText = styled.Text`
-  margin-top: 2;
-  font-size: 11;
+  margin-top: 2px;
+  font-size: 11px;
   color: ${props => props.theme.stylekitNeutralColor};
 `;
 

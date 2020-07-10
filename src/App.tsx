@@ -31,7 +31,13 @@ import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
 import { Client } from 'bugsnag-react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Dimensions, Platform, ScaledSize, StatusBar } from 'react-native';
+import {
+  Dimensions,
+  Keyboard,
+  Platform,
+  ScaledSize,
+  StatusBar,
+} from 'react-native';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import { enableScreens } from 'react-native-screens';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -206,6 +212,7 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
                     title={''}
                     iconName={StyleKit.nameForIcon(ICON_MENU)}
                     onPress={() => {
+                      Keyboard.dismiss();
                       drawerRef.current?.openDrawer();
                     }}
                   />
@@ -221,6 +228,7 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
                       title={''}
                       iconName={StyleKit.nameForIcon(ICON_MENU)}
                       onPress={() => {
+                        Keyboard.dismiss();
                         noteDrawerRef.current?.openDrawer();
                       }}
                     />
@@ -250,6 +258,7 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
                       title={''}
                       iconName={StyleKit.nameForIcon(ICON_MENU)}
                       onPress={() => {
+                        Keyboard.dismiss();
                         noteDrawerRef.current?.openDrawer();
                       }}
                     />

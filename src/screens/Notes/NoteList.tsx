@@ -1,14 +1,23 @@
-import React from 'react';
+import { useSignedIn } from '@Lib/customHooks';
+import { StyleKitContext } from '@Style/StyleKit';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   FlatList,
   ListRenderItem,
   Platform,
   RefreshControl,
-  StyleSheet,
 } from 'react-native';
+import SearchBar from 'react-native-search-bar';
 import { SNNote, SNTag } from 'snjs';
-import styled from 'styled-components/native';
 import { NoteCell } from './NoteCell';
+import {
+  Container,
+  HeaderContainer,
+  LoadingContainer,
+  LoadingText,
+  styles,
+} from './NoteList.styled';
+import { OfflineBanner } from './OfflineBanner';
 
 type Props = {
   onSearchChange: (text: string) => void;
@@ -25,34 +34,19 @@ type Props = {
   onRefresh: () => void;
 };
 
-const Container = styled.View`
-  background-color: ${props => props.theme.stylekitBackgroundColor};
-`;
-
-const LoadingContainer = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  z-index: -1;
-  position: absolute;
-  height: 100%;
-  width: 100%;
-`;
-
-const LoadingText = styled.Text`
-  position: absolute;
-  opacity: 0.5;
-  color: ${props => props.theme.stylekitForegroundColor};
-`;
-
-// no support for generic types in Flatlist
-const styles = StyleSheet.create({
-  list: {
-    height: '100%',
-  },
-});
-
 export const NoteList = (props: Props): JSX.Element => {
+  // Context
+  const signedIn = useSignedIn();
+  const styleKit = useContext(StyleKitContext);
+
+  // State
+  const [searchText, setSearchText] = useState(' ');
+
+  useEffect(() => {
+    // Android workaound to fix clear search not working
+    setSearchText('');
+  }, []);
+
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
     /**
      * On Android, only one tag is selected at a time. If it is selected, we
@@ -76,14 +70,6 @@ export const NoteList = (props: Props): JSX.Element => {
         // options={props.options}
         highlighted={item.uuid === props.selectedNoteId}
         // handleAction={props.handleAction}
-        // @ts-ignore TODO: not used props for extra data
-        pinned={item.pinned /* extraData */}
-        deleted={item.deleted /* extraData */}
-        archived={item.archived /* extraData */}
-        locked={item.locked /* extraData */}
-        protected={item?.protected /* extraData */}
-        hidePreview={item?.hidePreview /* extraData */}
-        conflictOf={item?.conflictOf /* extraData */}
       />
     );
   };
@@ -102,7 +88,17 @@ export const NoteList = (props: Props): JSX.Element => {
           <LoadingText>{placeholderText}</LoadingText>
         </LoadingContainer>
       )}
-
+      <HeaderContainer>
+        <SearchBar
+          // ref="searchBar"
+          keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+          placeholder="Search"
+          text={searchText}
+          onChangeText={() => {}}
+          onSearchButtonPress={() => {}}
+          onCancelButtonPress={() => {}}
+        />
+      </HeaderContainer>
       <FlatList
         style={styles.list}
         keyExtractor={item => item.uuid}
@@ -110,7 +106,7 @@ export const NoteList = (props: Props): JSX.Element => {
         windowSize={6}
         maxToRenderPerBatch={6}
         keyboardDismissMode={'interactive'}
-        keyboardShouldPersistTaps={'always'}
+        keyboardShouldPersistTaps={'never'}
         refreshControl={
           !props.hasRefreshControl ? undefined : (
             <RefreshControl
@@ -121,7 +117,10 @@ export const NoteList = (props: Props): JSX.Element => {
         }
         data={props.notes}
         renderItem={renderItem}
-        // ListHeaderComponent={this.renderHeader}
+        extraData={signedIn}
+        ListHeaderComponent={() => (
+          <HeaderContainer>{!signedIn && <OfflineBanner />}</HeaderContainer>
+        )}
       />
     </Container>
   );

@@ -45,6 +45,7 @@
     "react-native-reanimated": "^1.9.0",
     "react-native-safe-area-context": "^3.0.7",
     "react-native-screens": "^2.9.0",
+    "react-native-search-bar": "^3.5.1",
     "react-native-search-box": "standardnotes/react-native-search-box#f61a2b5",
     "react-native-sodium": "standardnotes/react-native-sodium#c548383",
     "react-native-store-review": "^0.1.5",
