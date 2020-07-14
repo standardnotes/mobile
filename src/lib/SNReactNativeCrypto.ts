@@ -119,7 +119,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   ): Promise<string | null> {
     try {
       const result = await Sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
-        ciphertext,
+        this.base64DecodeUrl(ciphertext),
         this.hexToBase64(nonce),
         this.hexToBase64(key),
         Base64.encode(assocData)
@@ -161,6 +161,17 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     return new Promise<string>(resolve => {
       resolve(Base64.decode(base64String));
     });
+  }
+
+  /**
+   * Converts base64URL to regular base64
+   * @param str - base64URL or base64 string
+   * @returns A string key in base64 format
+   */
+  private base64DecodeUrl(str: string) {
+    return (str + '==='.slice((str.length + 3) % 4))
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
   }
 
   /**
