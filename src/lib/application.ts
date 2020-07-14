@@ -6,7 +6,6 @@ import {
   Challenge,
   Environment,
   platformFromString,
-  SNAlertService,
   SNApplication,
 } from 'snjs';
 import { AlertService } from './AlertService';
@@ -41,13 +40,8 @@ export class MobileApplication extends SNApplication {
       platformFromString(Platform.OS),
       deviceInterface,
       new SNReactNativeCrypto(),
-      namespace,
-      [
-        {
-          swap: SNAlertService,
-          with: AlertService,
-        },
-      ]
+      new AlertService(),
+      namespace
     );
     this.onDeinit = onDeinit;
     this.editorGroup = new EditorGroup(this);

@@ -1,22 +1,17 @@
-import { Alert } from 'react-native';
-import { SNAlertService } from 'snjs';
+import { Alert, AlertButton } from 'react-native';
+import { ButtonType, DismissBlockingDialog, SNAlertService } from 'snjs';
 
-export class AlertService extends SNAlertService {
-  async alert(
-    title: string,
-    text: string,
-    closeButtonText?: string,
-    onClose?: () => void
-  ) {
-    return new Promise(resolve => {
+export class AlertService implements SNAlertService {
+  blockingDialog(_text: string): DismissBlockingDialog {
+    throw new Error('Method not implemented.');
+  }
+  alert(title: string, text: string, closeButtonText?: string) {
+    return new Promise<void>(resolve => {
       // On iOS, confirm should go first. On Android, cancel should go first.
       let buttons = [
         {
           text: closeButtonText,
           onPress: async () => {
-            if (onClose) {
-              onClose();
-            }
             resolve();
           },
         },
@@ -27,45 +22,36 @@ export class AlertService extends SNAlertService {
     });
   }
 
-  async confirm(
+  confirm(
     text: string,
     title: string,
     confirmButtonText = 'Confirm',
-    cancelButtonText = 'Cancel',
-    onConfirm: () => void,
-    onCancel: () => void,
-    _destructive = false
+    confirmButtonType?: ButtonType,
+    cancelButtonText = 'Cancel'
   ) {
-    return new Promise((resolve, reject) => {
+    return new Promise<boolean>((resolve, reject) => {
       // On iOS, confirm should go first. On Android, cancel should go first.
-      let buttons = [
+      let buttons: AlertButton[] = [
         {
           text: cancelButtonText,
+          style: 'cancel',
           onPress: async () => {
-            if (onCancel) {
-              onCancel();
-            }
-            reject();
+            resolve(false);
           },
         },
         {
           text: confirmButtonText,
+          style:
+            confirmButtonType === ButtonType.Danger ? 'destructive' : 'default',
           onPress: async () => {
-            if (onConfirm) {
-              onConfirm();
-            }
-            resolve();
+            resolve(true);
           },
         },
       ];
       Alert.alert(title, text, buttons, {
         cancelable: true,
         onDismiss: async () => {
-          // TODO: check alerts
-          // if (onDismiss) {
-          //   onDismiss();
-          // }
-          reject();
+          reject(false);
         },
       });
     });

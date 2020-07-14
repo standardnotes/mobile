@@ -1,7 +1,7 @@
 import { Alert, Share } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
-import { ApplicationService, Platform } from 'snjs';
+import { ApplicationService, ButtonType, Platform } from 'snjs';
 import { MobileApplication } from './application';
 
 const Mailer = 'react-native-mail';
@@ -43,17 +43,16 @@ export class BackupsService extends ApplicationService {
   }
 
   async _showAndroidEmailOrSaveOption() {
-    return this.application!.alertService?.confirm(
+    const confirmed = await this.application!.alertService?.confirm(
       'Choose Export Method',
       'Email',
       'Save to Disk'
-    )
-      .then(() => {
-        return 'save';
-      })
-      .catch(() => {
-        return 'email';
-      });
+    );
+    if (confirmed) {
+      return 'save';
+    } else {
+      return 'email';
+    }
   }
 
   async _exportIOS(filename: string, data: string) {
@@ -95,22 +94,17 @@ export class BackupsService extends ApplicationService {
   }
 
   async _showFileSavePromptAndroid(filepath: string) {
-    return this.application!.alertService?.confirm(
+    const confirmed = await this.application!.alertService?.confirm(
       'Backup Saved',
       `Your backup file has been saved to your local disk at this location:\n\n${filepath}`,
       'Done',
-      'Open File',
-      () => {
-        this._openFileAndroid(filepath);
-      }
-    )
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        // Did Cancel, still success
-        return true;
-      });
+      ButtonType.Info,
+      'Open File'
+    );
+    if (confirmed) {
+      this._openFileAndroid(filepath);
+    }
+    return true;
   }
 
   async _exportViaEmailAndroid(data: string, filename: string) {

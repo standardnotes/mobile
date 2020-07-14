@@ -129,7 +129,7 @@ export const PasscodeSection = (props: Props) => {
     ? 'Disable Passcode Lock'
     : 'Enable Passcode Lock';
 
-  const passcodeOnPress = () => {
+  const passcodeOnPress = async () => {
     if (props.hasPasscode) {
       const hasAccount = Boolean(application?.getUser());
       let message;
@@ -141,15 +141,15 @@ export const PasscodeSection = (props: Props) => {
           'Are you sure you want to disable your local passcode? This will disable encryption on your data.';
       }
 
-      application?.alertService?.confirm(
+      const confirmed = await application?.alertService?.confirm(
         message,
         'Disable Passcode',
         'Disable Passcode',
-        undefined,
-        async () => {
-          await application.removePasscode();
-        }
+        undefined
       );
+      if (confirmed) {
+        await application?.removePasscode();
+      }
     } else {
       navigation.push(SCREEN_INPUT_MODAL_PASSCODE);
     }

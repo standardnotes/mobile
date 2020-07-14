@@ -24,11 +24,25 @@ import { Platform, Share } from 'react-native';
 import FAB from 'react-native-fab';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ContentType, NoteMutator, SNNote, SNSmartTag, SNTag } from 'snjs';
+import {
+  ButtonType,
+  ContentType,
+  NoteMutator,
+  SNComponent,
+  SNNote,
+  SNSmartTag,
+  SNTag,
+} from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { SafeAreaContainer, StyledList } from './NoteSideMenu.styled';
 import { SideMenuOption, SideMenuSection } from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
+
+function sortAlphabetically(array: SNComponent[]): SNComponent[] {
+  return array.sort((a, b) =>
+    a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+  );
+}
 
 type Props = {
   drawerRef: DrawerLayout | null;
@@ -46,6 +60,7 @@ export const NoteSideMenu = (props: Props) => {
   const [editor, setEditor] = useState<Editor | undefined>(undefined);
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
+  const [components, setComponents] = useState<SNComponent[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -100,6 +115,66 @@ export const NoteSideMenu = (props: Props) => {
         removeEditorNoteValueChangeObserver();
     };
   }, [editor]);
+
+  useEffect(() => {
+    const removeComponentsObserver = application?.streamItems(
+      ContentType.Component,
+      async items => {
+        if (!note) {
+          return;
+        }
+        const displayComponents = sortAlphabetically([]);
+
+        setComponents(displayComponents);
+
+        // this.reloadComponentContext();
+        // this.reloadNoteTagsComponent();
+        /** Observe editor changes to see if the current note should update its editor */
+        // const components = items as SNComponent[];
+        // const editors = components.filter(component => {
+        //   return component.isEditor();
+        // });
+        // if (editors.length) {
+        //   /** Find the most recent editor for note */
+        //   const { editor, changed } = await this.reloadComponentEditorState();
+        //   if (!editor && changed) {
+        //     this.reloadFont();
+        //   }
+        // }
+      }
+    );
+
+    return removeComponentsObserver;
+  }, [application, note]);
+
+  const editorComponents = useMemo(() => {
+    if (!note) {
+      return [];
+    }
+    const componentEditor = application?.componentManager!.editorForNote(note);
+    const options: SideMenuOption[] = [
+      {
+        text: 'Plain Editor',
+        key: 'plain-editor',
+        selected: !componentEditor,
+        onSelect: () => {},
+        onLongPress: () => {},
+      },
+    ];
+
+    components.map(component => {
+      options.push({
+        text: component.name,
+        subtext: component.isMobileDefault ? 'Mobile Default' : undefined,
+        key: component.uuid || component.name,
+        selected: component === componentEditor,
+        onSelect: () => {},
+        onLongPress: () => {},
+      });
+    });
+
+    return options;
+  }, [application?.componentManager, components, note]);
 
   const reloadTags = useCallback(() => {
     if (note) {
@@ -217,22 +292,23 @@ export const NoteSideMenu = (props: Props) => {
     if (!note.safeContent.trashed) {
       rawOptions.push({
         text: 'Move to Trash',
-        onSelect: () => {
+        onSelect: async () => {
           const title = 'Move to Trash';
           const message =
             'Are you sure you want to move this note to the trash?';
 
-          application?.alertService?.confirm(
+          const confirmed = await application?.alertService?.confirm(
             message,
             title,
             'Confirm',
-            'Cancel',
-            () => {
-              changeNote(mutator => {
-                mutator.trashed = true;
-              });
-            }
+            ButtonType.Danger,
+            'Cancel'
           );
+          if (confirmed) {
+            changeNote(mutator => {
+              mutator.trashed = true;
+            });
+          }
         },
         icon: ICON_TRASH,
       });
@@ -264,7 +340,7 @@ export const NoteSideMenu = (props: Props) => {
           text: 'Delete Permanently',
           textClass: 'danger' as 'danger',
           key: 'delete-forever',
-          onSelect: () => {
+          onSelect: async () => {
             const title = `Delete ${note.safeTitle()}`;
             const message =
               'Are you sure you want to permanently delete this nite}?';
@@ -280,41 +356,38 @@ export const NoteSideMenu = (props: Props) => {
               );
               return;
             }
-            application?.alertService?.confirm(
+            const confirmed = await application?.alertService?.confirm(
               message,
               title,
               'Delete',
-              'Cancel',
-              async () => {
-                await application?.deleteItem(note);
-                props.drawerRef?.closeDrawer();
-                navigation.popToTop();
-              },
-              undefined,
-              true
+              ButtonType.Danger,
+              'Cancel'
             );
+            if (confirmed) {
+              await application?.deleteItem(note);
+              props.drawerRef?.closeDrawer();
+              navigation.popToTop();
+            }
           },
         },
         {
           text: 'Empty Trash',
           textClass: 'danger' as 'danger',
           key: 'empty trash',
-          onSelect: () => {
+          onSelect: async () => {
             const count = application?.getTrashedItems().length;
-            application?.alertService!.confirm(
+            const confirmed = await application?.alertService?.confirm(
               `Are you sure you want to permanently delete ${count} notes?`,
               'Empty Trash',
               'Delete',
-              undefined,
-              async () => {
-                await application?.emptyTrash();
-                props.drawerRef?.closeDrawer();
-                navigation.popToTop();
-                application?.sync();
-              },
-              undefined,
-              true
+              ButtonType.Danger
             );
+            if (confirmed) {
+              await application?.emptyTrash();
+              props.drawerRef?.closeDrawer();
+              navigation.popToTop();
+              application?.sync();
+            }
           },
         },
       ]);
@@ -371,7 +444,7 @@ export const NoteSideMenu = (props: Props) => {
           <SideMenuSection
             title="Editors"
             key="editors-section"
-            options={[]}
+            options={editorComponents}
             collapsed={true}
           />,
 
