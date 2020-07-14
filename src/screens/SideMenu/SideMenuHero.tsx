@@ -35,7 +35,9 @@ export const SideMenuHero: React.FC<Props> = props => {
     const removeStreamItems = application!.streamItems(
       [ContentType.Note, ContentType.Tag],
       items => {
-        setItemsLength(items.length);
+        if (items.length !== itemsLength) {
+          setItemsLength(items.length);
+        }
       }
     );
 

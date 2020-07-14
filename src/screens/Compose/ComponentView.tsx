@@ -17,6 +17,7 @@ import {
 
 type Props = {
   componentUuid: string;
+  noteUuid: string;
   onLoadEnd: () => void;
   onLoadStart: () => void;
   onLoadError: () => void;
@@ -60,8 +61,15 @@ export const ComponentView = (props: Props): JSX.Element => {
   }, [application, liveComponent]);
 
   useEffect(() => {
+    return () => {
+      liveComponent?.deinit();
+    };
+  }, [application, liveComponent]);
+
+  useEffect(() => {
     let unregisterComponentHandler;
-    if (liveComponent) {
+    const note = application?.findItem(props.noteUuid);
+    if (note && liveComponent) {
       unregisterComponentHandler = application?.componentManager!.registerHandler(
         {
           identifier: 'component-view-' + Math.random(),
@@ -74,12 +82,13 @@ export const ComponentView = (props: Props): JSX.Element => {
               );
             }
           },
+          contextRequestHandler: () => note,
         }
       );
     }
 
     return unregisterComponentHandler;
-  }, [application, liveComponent]);
+  }, [application, liveComponent, props.noteUuid]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     // if (!this.note) {
@@ -114,7 +123,7 @@ export const ComponentView = (props: Props): JSX.Element => {
     timeoutRef.current = setTimeout(() => {
       application!.componentManager?.registerComponentWindow(
         liveComponent!.item!,
-        webViewRef
+        webViewRef.current
       );
     }, 1);
 
@@ -174,16 +183,17 @@ export const ComponentView = (props: Props): JSX.Element => {
 
   return (
     <FlexContainer>
-      {false && (
-        <LockedContainer>
-          <StyledIcon />
-          <LockedText>
-            Extended expired. Editors are in a read-only state. To edit
-            immediately, please switch to the Plain Editor.
-          </LockedText>
-        </LockedContainer>
-      )}
-      {url && (
+      {liveComponent?.item.valid_until &&
+        liveComponent?.item.valid_until <= new Date() && (
+          <LockedContainer>
+            <StyledIcon />
+            <LockedText>
+              Extended expired. Editors are in a read-only state. To edit
+              immediately, please switch to the Plain Editor.
+            </LockedText>
+          </LockedContainer>
+        )}
+      {Boolean(url) && (
         <StyledWebview
           source={{ uri: url }}
           key={liveComponent?.item.uuid}

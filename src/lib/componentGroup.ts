@@ -3,11 +3,7 @@ import { UuidString } from 'snjs/dist/@types/types';
 import { MobileApplication } from './application';
 
 /** Areas that only allow a single component to be active */
-const SingleComponentAreas = [
-  ComponentArea.Editor,
-  ComponentArea.NoteTags,
-  ComponentArea.TagsList,
-];
+const SingleComponentAreas = [ComponentArea.Editor];
 
 export class ComponentGroup {
   private application: MobileApplication;

@@ -10,14 +10,24 @@ export const useSignedIn = (
   // Context
   const application = React.useContext(ApplicationContext);
 
+  const isLocked = useIsLocked();
+
   // State
-  const [signedIn, setSignedIn] = React.useState(() =>
-    Boolean(!application?.noAccount())
-  );
+  const [signedIn, setSignedIn] = React.useState(false);
 
   React.useEffect(() => {
+    let mounted = true;
+    const getSignedIn = async () => {
+      if (mounted) {
+        setSignedIn(() => Boolean(application?.hasAccount()));
+      }
+    };
+    // getSignedIn();
     const removeSignedInObserver = application?.addEventObserver(
       async event => {
+        if (event === ApplicationEvent.Launched) {
+          getSignedIn();
+        }
         if (event === ApplicationEvent.SignedIn) {
           setSignedIn(true);
           signedInCallback && signedInCallback();
@@ -28,8 +38,11 @@ export const useSignedIn = (
       }
     );
 
-    return removeSignedInObserver;
-  }, [application, signedInCallback, signedOutCallback]);
+    return () => {
+      mounted = false;
+      removeSignedInObserver && removeSignedInObserver();
+    };
+  }, [application, signedInCallback, signedOutCallback, isLocked]);
 
   return signedIn;
 };

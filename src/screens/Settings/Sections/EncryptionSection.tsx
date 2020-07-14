@@ -1,5 +1,6 @@
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
+import { useIsLocked } from '@Lib/customHooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext, useMemo } from 'react';
 import { ContentType, StorageEncryptionPolicies } from 'snjs';
@@ -19,7 +20,9 @@ export const EncryptionSection = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
 
-  const textData = useMemo(() => {
+  const isLocked = useIsLocked();
+
+  const textData = useMemo(async () => {
     const encryptionType = application?.getProtocolEncryptionDisplayName();
     let encryptionStatus = props.encryptionAvailable
       ? 'Enabled'
@@ -34,7 +37,11 @@ export const EncryptionSection = (props: Props) => {
           ? 'To enable encryption, sign in, register, or enable storage encryption.'
           : 'Sign in, register, or add a local passcode to enable encryption.';
     }
-    const sourceString = application?.getUser() ? 'Account Keys' : 'Passcode';
+    let sourceString;
+    if (!isLocked) {
+      sourceString = application?.getUser() ? 'Account Keys' : 'Passcode';
+      return { title: '', text: '' };
+    }
 
     const items = application!.getItems([ContentType.Note, ContentType.Tag]);
     const itemsStatus =
@@ -45,7 +52,7 @@ export const EncryptionSection = (props: Props) => {
       sourceString,
       itemsStatus,
     };
-  }, [application, props.encryptionAvailable]);
+  }, [application, props.encryptionAvailable, isLocked]);
 
   return (
     <TableSection>

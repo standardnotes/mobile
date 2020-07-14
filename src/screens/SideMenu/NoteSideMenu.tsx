@@ -26,6 +26,7 @@ import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   ButtonType,
+  ComponentArea,
   ContentType,
   NoteMutator,
   SNComponent,
@@ -123,7 +124,9 @@ export const NoteSideMenu = (props: Props) => {
         if (!note) {
           return;
         }
-        const displayComponents = sortAlphabetically([]);
+        const displayComponents = sortAlphabetically(
+          application!.componentManager!.componentsForArea(ComponentArea.Editor)
+        );
 
         setComponents(displayComponents);
 
@@ -161,7 +164,6 @@ export const NoteSideMenu = (props: Props) => {
         onLongPress: () => {},
       },
     ];
-
     components.map(component => {
       options.push({
         text: component.name,

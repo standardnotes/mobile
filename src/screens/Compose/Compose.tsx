@@ -319,6 +319,8 @@ export const Compose = (): JSX.Element => {
     });
   };
 
+  const shouldDisplayEditor = editorComponent && Boolean(note) && !webViewError;
+
   return (
     <Container>
       {note?.locked && (
@@ -371,10 +373,11 @@ export const Compose = (): JSX.Element => {
         </LoadingWebViewContainer>
       )}
       {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
-      {editorComponent && Boolean(note) && (
+      {shouldDisplayEditor && (
         <ComponentView
-          key={editorComponent.uuid}
+          key={editorComponent!.uuid}
           componentUuid={editorComponent!.uuid}
+          noteUuid={note!.uuid}
           onLoadStart={() => {
             setLoadingWebiev(true);
             setWebviewError(false);
@@ -388,7 +391,7 @@ export const Compose = (): JSX.Element => {
           }}
         />
       )}
-      {application?.platform === Platform.Android && (
+      {!shouldDisplayEditor && application?.platform === Platform.Android && (
         <TextContainer>
           <StyledTextView
             testID="noteContentField"
@@ -402,7 +405,7 @@ export const Compose = (): JSX.Element => {
           />
         </TextContainer>
       )}
-      {application?.platform === Platform.Ios && (
+      {!shouldDisplayEditor && application?.platform === Platform.Ios && (
         <StyledTextView
           ref={editorViewRef}
           autoFocus={false}
