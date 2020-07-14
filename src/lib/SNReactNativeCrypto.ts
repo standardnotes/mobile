@@ -89,7 +89,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     const result = await Sodium.crypto_pwhash(
       length,
       Base64.encode(password),
-      Base64.encode(salt),
+      this.hexToBase64(salt),
       iterations,
       bytes,
       Sodium.crypto_pwhash_ALG_DEFAULT
