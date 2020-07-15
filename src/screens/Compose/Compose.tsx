@@ -400,7 +400,7 @@ export const Compose = (): JSX.Element => {
             autoFocus={false}
             value={noteText}
             selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
-            handlesColor={theme.stylekitInfoColor}
+            // handlesColor={theme.stylekitInfoColor}
             onChangeText={onContentChange}
           />
         </TextContainer>
@@ -411,7 +411,6 @@ export const Compose = (): JSX.Element => {
           autoFocus={false}
           multiline
           value={noteText}
-          keyboardDismissMode={'interactive'}
           keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
           selectionColor={lighten(theme.stylekitInfoColor)}
           onChangeText={onContentChange}
