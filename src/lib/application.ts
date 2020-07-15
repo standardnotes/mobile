@@ -31,6 +31,7 @@ export class MobileApplication extends SNApplication {
   private MobileServices!: MobileServices;
   public editorGroup: EditorGroup;
   public componentGroup: ComponentGroup;
+  public Uuid: string; // UI remounts when Uuid changes
 
   constructor(onDeinit: (app: MobileApplication) => void) {
     const namespace = '';
@@ -43,6 +44,7 @@ export class MobileApplication extends SNApplication {
       new AlertService(),
       namespace
     );
+    this.Uuid = Math.random().toString();
     this.onDeinit = onDeinit;
     this.editorGroup = new EditorGroup(this);
     this.componentGroup = new ComponentGroup(this);

@@ -57,7 +57,11 @@ export const SideMenuHero: React.FC<Props> = props => {
 
     const removeSignedInObserver = application?.addEventObserver(
       async event => {
-        if (event === ApplicationEvent.Launched) {
+        if (
+          event === ApplicationEvent.Launched ||
+          event === ApplicationEvent.SignedIn ||
+          event === ApplicationEvent.SignedOut
+        ) {
           getIsLocked();
         }
       }

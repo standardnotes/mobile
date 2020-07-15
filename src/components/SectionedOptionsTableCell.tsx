@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components/native';
 export type Option = { selected: boolean; key: string; title: string };
 
 type Props = {
+  testID?: string;
   title: string;
   first?: boolean;
   height?: number;

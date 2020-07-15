@@ -7,6 +7,7 @@ import { ApplicationEvent } from 'snjs';
 import { AuthSection } from './Sections/AuthSection';
 import { CompanySection } from './Sections/CompanySection';
 import { EncryptionSection } from './Sections/EncryptionSection';
+import { OptionsSection } from './Sections/OptionsSection';
 import { PasscodeSection } from './Sections/PasscodeSection';
 import { Container } from './Settings.styled';
 
@@ -56,6 +57,10 @@ export const Settings = (props: Props) => {
       keyboardDismissMode={'interactive'}
     >
       <AuthSection title="Account" signedIn={signedIn} />
+      <OptionsSection
+        encryptionAvailable={encryptionAvailable}
+        title="Options"
+      />
       <PasscodeSection
         encryptionAvailable={encryptionAvailable}
         hasPasscode={hasPasscode}

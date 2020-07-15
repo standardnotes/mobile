@@ -42,7 +42,7 @@ export class BackupsService extends ApplicationService {
     }
   }
 
-  async _showAndroidEmailOrSaveOption() {
+  private async _showAndroidEmailOrSaveOption() {
     const confirmed = await this.application!.alertService?.confirm(
       'Choose Export Method',
       'Email',
@@ -55,7 +55,7 @@ export class BackupsService extends ApplicationService {
     }
   }
 
-  async _exportIOS(filename: string, data: string) {
+  private async _exportIOS(filename: string, data: string) {
     return new Promise(resolve => {
       (this.application! as MobileApplication)
         .getAppState()
@@ -74,14 +74,14 @@ export class BackupsService extends ApplicationService {
     });
   }
 
-  async _exportAndroid(filename: string, data: string) {
+  private async _exportAndroid(filename: string, data: string) {
     const filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
     return RNFS.writeFile(filepath, data).then(() => {
       return filepath;
     });
   }
 
-  async _openFileAndroid(filepath: string) {
+  private async _openFileAndroid(filepath: string) {
     return FileViewer.open(filepath)
       .then(() => {
         // success
@@ -93,7 +93,7 @@ export class BackupsService extends ApplicationService {
       });
   }
 
-  async _showFileSavePromptAndroid(filepath: string) {
+  private async _showFileSavePromptAndroid(filepath: string) {
     const confirmed = await this.application!.alertService?.confirm(
       'Backup Saved',
       `Your backup file has been saved to your local disk at this location:\n\n${filepath}`,
@@ -107,7 +107,7 @@ export class BackupsService extends ApplicationService {
     return true;
   }
 
-  async _exportViaEmailAndroid(data: string, filename: string) {
+  private async _exportViaEmailAndroid(data: string, filename: string) {
     return new Promise(resolve => {
       const fileType = '.json'; // Android creates a tmp file and expects dot with extension
 
@@ -142,7 +142,7 @@ export class BackupsService extends ApplicationService {
 
   /* Utils */
 
-  _formattedDate() {
+  private _formattedDate() {
     return new Date().getTime();
   }
 }

@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import styled, { css, ThemeContext } from 'styled-components/native';
 
 type Props = {
+  testID?: string;
   disabled?: boolean;
   onPress: () => void;
   onLongPress?: () => void;

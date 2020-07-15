@@ -275,112 +275,132 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
   );
 };
 
-const MainStackComponent = () => (
-  <MainStack.Navigator
-    screenOptions={{
-      gestureEnabled: false,
-    }}
-    mode="modal"
-    initialRouteName="AppStack"
-  >
-    <MainStack.Screen
-      name={'AppStack'}
-      options={{
-        headerShown: false,
-      }}
-      component={AppStackComponent}
-    />
-    <MainStack.Screen
-      name={SCREEN_SETTINGS}
-      options={({ route }) => ({
-        title: 'Settings',
-        headerTitle: ({ children }) => {
-          return <HeaderTitleView title={children || ''} />;
-        },
-        headerLeft: ({ disabled, onPress }) => (
-          <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-            <Item
-              testID="headerButton"
-              disabled={disabled}
-              title={Platform.OS === 'ios' ? 'Done' : ''}
-              iconName={
-                Platform.OS === 'ios'
-                  ? undefined
-                  : StyleKit.nameForIcon(ICON_CHECKMARK)
-              }
-              onPress={onPress}
-            />
-          </HeaderButtons>
-        ),
-      })}
-      component={Settings}
-    />
-    <MainStack.Screen
-      name={SCREEN_INPUT_MODAL_PASSCODE}
-      options={{
-        title: 'Setup Passcode',
-        headerTitle: ({ children }) => {
-          return <HeaderTitleView title={children || ''} />;
-        },
-        headerLeft: ({ disabled, onPress }) => (
-          <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-            <Item
-              testID="headerButton"
-              disabled={disabled}
-              title={Platform.OS === 'ios' ? 'Cancel' : ''}
-              iconName={
-                Platform.OS === 'ios'
-                  ? undefined
-                  : StyleKit.nameForIcon(ICON_CLOSE)
-              }
-              onPress={onPress}
-            />
-          </HeaderButtons>
-        ),
-      }}
-      component={PasscodeInputModal}
-    />
-    <MainStack.Screen
-      name={SCREEN_INPUT_MODAL_TAG}
-      options={({ route }) => ({
-        title: 'Tag',
+const MainStackComponent = () => {
+  const application = useContext(ApplicationContext);
+
+  return (
+    <MainStack.Navigator
+      screenOptions={{
         gestureEnabled: false,
-        headerTitle: ({ children }) => {
-          return (
-            <HeaderTitleView title={route.params?.title ?? (children || '')} />
-          );
-        },
-        headerLeft: ({ disabled, onPress }) => (
-          <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-            <Item
-              testID="headerButton"
-              disabled={disabled}
-              title={Platform.OS === 'ios' ? 'Cancel' : ''}
-              iconName={
-                Platform.OS === 'ios'
-                  ? undefined
-                  : StyleKit.nameForIcon(ICON_CLOSE)
-              }
-              onPress={onPress}
-            />
-          </HeaderButtons>
-        ),
-      })}
-      component={TagInputModal}
-    />
-    <MainStack.Screen
-      name={SCREEN_AUTHENTICATE}
-      options={({ route }) => ({
-        title: 'Authenticate',
-        headerLeft: () => undefined,
-        headerTitle: ({ children }) => {
-          return <HeaderTitleView title={children || ''} />;
-        },
-      })}
-      component={Authenticate}
-    />
-  </MainStack.Navigator>
-);
+      }}
+      mode="modal"
+      initialRouteName="AppStack"
+    >
+      <MainStack.Screen
+        name={'AppStack'}
+        options={{
+          headerShown: false,
+        }}
+        component={AppStackComponent}
+      />
+      <MainStack.Screen
+        name={SCREEN_SETTINGS}
+        options={({ route }) => ({
+          title: 'Settings',
+          headerTitle: ({ children }) => {
+            return <HeaderTitleView title={children || ''} />;
+          },
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Done' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : StyleKit.nameForIcon(ICON_CHECKMARK)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
+          headerRight: () =>
+            __DEV__ && (
+              <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+                <Item
+                  testID="headerButton"
+                  title={'Destroy Data'}
+                  onPress={async () => {
+                    await application?.deviceInterface?.removeAllRawStorageValues();
+                    await application?.deviceInterface?.removeAllRawDatabasePayloads();
+                    application?.deinit();
+                  }}
+                />
+              </HeaderButtons>
+            ),
+        })}
+        component={Settings}
+      />
+      <MainStack.Screen
+        name={SCREEN_INPUT_MODAL_PASSCODE}
+        options={{
+          title: 'Setup Passcode',
+          headerTitle: ({ children }) => {
+            return <HeaderTitleView title={children || ''} />;
+          },
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Cancel' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : StyleKit.nameForIcon(ICON_CLOSE)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
+        }}
+        component={PasscodeInputModal}
+      />
+      <MainStack.Screen
+        name={SCREEN_INPUT_MODAL_TAG}
+        options={({ route }) => ({
+          title: 'Tag',
+          gestureEnabled: false,
+          headerTitle: ({ children }) => {
+            return (
+              <HeaderTitleView
+                title={route.params?.title ?? (children || '')}
+              />
+            );
+          },
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Cancel' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : StyleKit.nameForIcon(ICON_CLOSE)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
+        })}
+        component={TagInputModal}
+      />
+      <MainStack.Screen
+        name={SCREEN_AUTHENTICATE}
+        options={({ route }) => ({
+          title: 'Authenticate',
+          headerLeft: () => undefined,
+          headerTitle: ({ children }) => {
+            return <HeaderTitleView title={children || ''} />;
+          },
+        })}
+        component={Authenticate}
+      />
+    </MainStack.Navigator>
+  );
+};
 
 const AppComponent: React.FC<{ application: MobileApplication }> = ({
   application,
@@ -454,10 +474,11 @@ export const App = () => {
 
     return removeAppChangeObserver;
   }, [applicationGroupRef.current.application]);
-
   return (
     <ApplicationContext.Provider value={application}>
-      {application && <AppComponent application={application} />}
+      {application && (
+        <AppComponent key={application.Uuid} application={application} />
+      )}
     </ApplicationContext.Provider>
   );
 };
