@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* StandardNotesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* StandardNotesTests.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
@@ -23,6 +22,7 @@
 		8343BD6D244F211C0020E9F0 /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD68244F211C0020E9F0 /* Red@3x.png */; };
 		8343BD6E244F211C0020E9F0 /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD69244F211C0020E9F0 /* Red@2x.png */; };
 		8343BD6F244F211C0020E9F0 /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD69244F211C0020E9F0 /* Red@2x.png */; };
+		83A5151724BF164700917BCF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83A5151624BF164700917BCF /* LaunchScreen.storyboard */; };
 		8B044E40EFE70C0A206C1E17 /* libPods-StandardNotes-StandardNotesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C6EF5C26462D9E90CCB159F /* libPods-StandardNotes-StandardNotesTests.a */; };
 		E64DD4A0B5437BEF0635C2C6 /* libPods-StandardNotes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FBF2D5D9BE147B3EFB23FEE6 /* libPods-StandardNotes.a */; };
 		F93BEF3ED64A302960BDDA50 /* libPods-StandardNotes-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 349A9BA52801567ECB4001BA /* libPods-StandardNotes-tvOS.a */; };
@@ -55,7 +55,6 @@
 		13B07F961A680F5B00A75B9A /* StandardNotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StandardNotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = StandardNotes/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = StandardNotes/AppDelegate.m; sourceTree = "<group>"; };
-		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = StandardNotes/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = StandardNotes/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = StandardNotes/main.m; sourceTree = "<group>"; };
@@ -67,6 +66,7 @@
 		8343BD67244F211C0020E9F0 /* Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red.png; sourceTree = "<group>"; };
 		8343BD68244F211C0020E9F0 /* Red@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@3x.png"; sourceTree = "<group>"; };
 		8343BD69244F211C0020E9F0 /* Red@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@2x.png"; sourceTree = "<group>"; };
+		83A5151624BF164700917BCF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9E56EE782382F79A872EF0D5 /* Pods-StandardNotes-StandardNotesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes-StandardNotesTests.debug.xcconfig"; path = "Target Support Files/Pods-StandardNotes-StandardNotesTests/Pods-StandardNotes-StandardNotesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A4567B1F6B373ECEDE3BC4EB /* Pods-StandardNotes-StandardNotesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes-StandardNotesTests.release.xcconfig"; path = "Target Support Files/Pods-StandardNotes-StandardNotesTests/Pods-StandardNotes-StandardNotesTests.release.xcconfig"; sourceTree = "<group>"; };
 		C4207FB7DBD4D910F261E7DA /* Pods-StandardNotes-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes-tvOS.release.xcconfig"; path = "Target Support Files/Pods-StandardNotes-tvOS/Pods-StandardNotes-tvOS.release.xcconfig"; sourceTree = "<group>"; };
@@ -142,8 +142,8 @@
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				83A5151624BF164700917BCF /* LaunchScreen.storyboard */,
 			);
 			name = StandardNotes;
 			sourceTree = "<group>";
@@ -356,7 +356,7 @@
 			files = (
 				8343BD6A244F211C0020E9F0 /* Red.png in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				83A5151724BF164700917BCF /* LaunchScreen.storyboard in Resources */,
 				8343BD6E244F211C0020E9F0 /* Red@2x.png in Resources */,
 				8343BD6C244F211C0020E9F0 /* Red@3x.png in Resources */,
 			);
@@ -681,18 +681,6 @@
 			targetProxy = 2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		13B07FB11A68108700A75B9A /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				13B07FB21A68108700A75B9A /* Base */,
-			);
-			name = LaunchScreen.xib;
-			path = StandardNotes;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
