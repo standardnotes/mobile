@@ -13,6 +13,7 @@ import {
   ICON_TRASH,
 } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
+import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, {
   useCallback,
   useContext,
@@ -27,6 +28,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {
   ButtonType,
   ComponentArea,
+  ComponentMutator,
   ContentType,
   NoteMutator,
   SNComponent,
@@ -56,6 +58,7 @@ export const NoteSideMenu = (props: Props) => {
   const navigation = useNavigation<
     AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
   >();
+  const { showActionSheet } = useCustomActionSheet();
 
   // State
   const [editor, setEditor] = useState<Editor | undefined>(undefined);
@@ -120,7 +123,7 @@ export const NoteSideMenu = (props: Props) => {
   useEffect(() => {
     const removeComponentsObserver = application?.streamItems(
       ContentType.Component,
-      async items => {
+      async () => {
         if (!note) {
           return;
         }
@@ -129,26 +132,146 @@ export const NoteSideMenu = (props: Props) => {
         );
 
         setComponents(displayComponents);
-
-        // this.reloadComponentContext();
-        // this.reloadNoteTagsComponent();
-        /** Observe editor changes to see if the current note should update its editor */
-        // const components = items as SNComponent[];
-        // const editors = components.filter(component => {
-        //   return component.isEditor();
-        // });
-        // if (editors.length) {
-        //   /** Find the most recent editor for note */
-        //   const { editor, changed } = await this.reloadComponentEditorState();
-        //   if (!editor && changed) {
-        //     this.reloadFont();
-        //   }
-        // }
       }
     );
 
     return removeComponentsObserver;
   }, [application, note]);
+
+  const disassociateComponentWithCurrentNote = useCallback(
+    async (component: SNComponent) => {
+      if (note) {
+        return application?.changeItem(component.uuid, m => {
+          const mutator = m as ComponentMutator;
+          mutator.removeAssociatedItemId(note.uuid);
+          mutator.disassociateWithItem(note.uuid);
+        });
+      }
+    },
+    [application, note]
+  );
+
+  const associateComponentWithCurrentNote = useCallback(
+    async (component: SNComponent) => {
+      if (note) {
+        return application?.changeItem(component.uuid, m => {
+          const mutator = m as ComponentMutator;
+          mutator.removeDisassociatedItemId(note.uuid);
+          mutator.associateWithItem(note.uuid);
+        });
+      }
+    },
+    [application, note]
+  );
+
+  const onEditorPress = useCallback(
+    async (component?: SNComponent) => {
+      const activeEditorComponent = application?.componentManager!.editorForNote(
+        note!
+      );
+      if (!component) {
+        console.log('plain click', note?.prefersPlainEditor);
+        if (!note?.prefersPlainEditor) {
+          console.log('prefers plain');
+          await application?.changeItem(note!.uuid, mutator => {
+            const noteMutator = mutator as NoteMutator;
+            noteMutator.prefersPlainEditor = true;
+          });
+        }
+        if (activeEditorComponent) {
+          await disassociateComponentWithCurrentNote(activeEditorComponent);
+        }
+      } else if (component.area === ComponentArea.Editor) {
+        const currentEditor = activeEditorComponent;
+        if (currentEditor && component !== currentEditor) {
+          await disassociateComponentWithCurrentNote(currentEditor);
+        }
+        const prefersPlain = note!.prefersPlainEditor;
+        if (prefersPlain) {
+          await application?.changeItem(note!.uuid, mutator => {
+            const noteMutator = mutator as NoteMutator;
+            noteMutator.prefersPlainEditor = false;
+          });
+        }
+        await associateComponentWithCurrentNote(component);
+      }
+      /** Dirtying can happen above */
+      application?.sync();
+    },
+    [
+      application,
+      associateComponentWithCurrentNote,
+      disassociateComponentWithCurrentNote,
+      note,
+    ]
+  );
+
+  const onEdtiorLongPress = useCallback(
+    async (component?: SNComponent) => {
+      const currentDefault = application!
+        .componentManager!.componentsForArea(ComponentArea.Editor)
+        .filter(e => e.isMobileDefault)[0];
+
+      let isDefault = false;
+      if (!component) {
+        // System editor
+        if (currentDefault) {
+          isDefault = false;
+        }
+      } else {
+        isDefault = component.isMobileDefault;
+      }
+
+      let action = isDefault
+        ? 'Remove as Mobile Default'
+        : 'Set as Mobile Default';
+      if (!component && !currentDefault) {
+        // Long pressing on plain editor while it is default, no actions available
+        action = 'Is Mobile Default';
+      }
+
+      const setAsDefault = () => {
+        if (currentDefault) {
+          application!.changeItem(currentDefault.uuid, m => {
+            const mutator = m as ComponentMutator;
+            mutator.isMobileDefault = false;
+          });
+        }
+
+        if (component) {
+          application!.changeAndSaveItem(component.uuid, m => {
+            const mutator = m as ComponentMutator;
+            mutator.isMobileDefault = true;
+          });
+        }
+      };
+
+      const removeAsDefault = () => {
+        application!.changeItem(currentDefault.uuid, m => {
+          const mutator = m as ComponentMutator;
+          mutator.isMobileDefault = false;
+        });
+      };
+
+      showActionSheet(component?.name ?? 'Plain editor', [
+        {
+          text: action,
+          callback: () => {
+            if (!component) {
+              setAsDefault();
+            } else {
+              if (isDefault) {
+                removeAsDefault();
+              } else {
+                setAsDefault();
+              }
+            }
+          },
+        },
+      ]);
+    },
+    [application, showActionSheet]
+  );
 
   const editorComponents = useMemo(() => {
     if (!note) {
@@ -160,8 +283,12 @@ export const NoteSideMenu = (props: Props) => {
         text: 'Plain Editor',
         key: 'plain-editor',
         selected: !componentEditor,
-        onSelect: () => {},
-        onLongPress: () => {},
+        onSelect: () => {
+          onEditorPress(undefined);
+        },
+        onLongPress: () => {
+          onEdtiorLongPress(undefined);
+        },
       },
     ];
     components.map(component => {
@@ -170,13 +297,23 @@ export const NoteSideMenu = (props: Props) => {
         subtext: component.isMobileDefault ? 'Mobile Default' : undefined,
         key: component.uuid || component.name,
         selected: component === componentEditor,
-        onSelect: () => {},
-        onLongPress: () => {},
+        onSelect: () => {
+          onEditorPress(component);
+        },
+        onLongPress: () => {
+          onEdtiorLongPress(component);
+        },
       });
     });
 
     return options;
-  }, [application?.componentManager, components, note]);
+  }, [
+    note,
+    application?.componentManager,
+    components,
+    onEditorPress,
+    onEdtiorLongPress,
+  ]);
 
   const reloadTags = useCallback(() => {
     if (note) {
