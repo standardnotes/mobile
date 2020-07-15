@@ -22,7 +22,7 @@ export const EncryptionSection = (props: Props) => {
 
   const isLocked = useIsLocked();
 
-  const textData = useMemo(async () => {
+  const textData = useMemo(() => {
     const encryptionType = application?.getProtocolEncryptionDisplayName();
     let encryptionStatus = props.encryptionAvailable
       ? 'Enabled'
@@ -38,9 +38,10 @@ export const EncryptionSection = (props: Props) => {
           : 'Sign in, register, or add a local passcode to enable encryption.';
     }
     let sourceString;
-    if (!isLocked) {
-      sourceString = application?.getUser() ? 'Account Keys' : 'Passcode';
+    if (isLocked) {
       return { title: '', text: '' };
+    } else {
+      sourceString = application?.getUser() ? 'Account Keys' : 'Passcode';
     }
 
     const items = application!.getItems([ContentType.Note, ContentType.Tag]);

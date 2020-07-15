@@ -1,6 +1,5 @@
-import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ApplicationEvent } from 'snjs';
 
 export const useSignedIn = (
@@ -18,11 +17,11 @@ export const useSignedIn = (
   React.useEffect(() => {
     let mounted = true;
     const getSignedIn = async () => {
-      if (mounted) {
-        setSignedIn(() => Boolean(application?.hasAccount()));
+      if (mounted && !isLocked) {
+        setSignedIn(!application?.noAccount());
       }
     };
-    // getSignedIn();
+    getSignedIn();
     const removeSignedInObserver = application?.addEventObserver(
       async event => {
         if (event === ApplicationEvent.Launched) {
@@ -92,15 +91,26 @@ export const useIsLocked = () => {
   // State
   const [isLocked, setIsLocked] = React.useState<boolean>(true);
 
-  useFocusEffect(
-    useCallback(() => {
-      const getIsLocked = async () => {
-        const locked = await application?.isLocked();
+  useEffect(() => {
+    const getIsLocked = async () => {
+      const locked = await application?.isLocked();
+      if (locked === undefined) {
+        setIsLocked(true);
+      } else {
         setIsLocked(Boolean(locked));
-      };
-      getIsLocked();
-    }, [application])
-  );
+      }
+    };
+    getIsLocked();
+    const removeSignedInObserver = application?.addEventObserver(
+      async event => {
+        if (event === ApplicationEvent.Launched) {
+          setIsLocked(false);
+        }
+      }
+    );
+
+    return removeSignedInObserver;
+  }, [application]);
 
   return isLocked;
 };

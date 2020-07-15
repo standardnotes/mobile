@@ -34,9 +34,7 @@ export const Settings = (props: Props) => {
       async event => {
         if (event === ApplicationEvent.KeyStatusChanged) {
           setHasPasscode(Boolean(application?.hasPasscode()));
-          setEncryptionAvailable(
-            Boolean(await application?.isEncryptionAvailable())
-          );
+          getEncryptionAvailable();
         }
       }
     );

@@ -8,7 +8,7 @@ import {
   AppStateType,
   TabletModeChangeData,
 } from '@Lib/ApplicationState';
-import { useHasEditor } from '@Lib/customHooks';
+import { useHasEditor, useIsLocked } from '@Lib/customHooks';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -110,6 +110,8 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
     () => application?.getAppState().isInTabletMode
   );
 
+  const isLocked = useIsLocked();
+
   useEffect(() => {
     const removeObserver = application
       ?.getAppState()
@@ -163,9 +165,9 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
       drawerWidth={getDefaultDrawerWidth(dimensions)}
       drawerPosition={'left'}
       drawerType="slide"
-      renderNavigationView={() => (
-        <MainSideMenu drawerRef={drawerRef.current} />
-      )}
+      renderNavigationView={() =>
+        !isLocked && <MainSideMenu drawerRef={drawerRef.current} />
+      }
     >
       <DrawerLayout
         ref={noteDrawerRef}
