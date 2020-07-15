@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { SCREEN_SETTINGS } from '@Root/screens2/screens';
+import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_FORWARD, ICON_USER } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
 import React from 'react';

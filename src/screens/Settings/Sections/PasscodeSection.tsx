@@ -10,10 +10,7 @@ import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import {
-  SCREEN_INPUT_MODAL_PASSCODE,
-  SCREEN_SETTINGS,
-} from '@Root/screens2/screens';
+import { SCREEN_INPUT_MODAL_PASSCODE, SCREEN_SETTINGS } from '@Screens/screens';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { StorageEncryptionPolicies } from 'snjs';
 import { Title } from './PasscodeSection.styled';

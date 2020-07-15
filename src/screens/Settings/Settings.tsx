@@ -1,7 +1,7 @@
 import { useSignedIn } from '@Lib/customHooks';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_SETTINGS } from '@Root/screens2/screens';
+import { SCREEN_SETTINGS } from '@Screens/screens';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ApplicationEvent } from 'snjs';
 import { AuthSection } from './Sections/AuthSection';

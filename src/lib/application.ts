@@ -1,5 +1,5 @@
 import { NavigationContainerRef } from '@react-navigation/native';
-import { SCREEN_AUTHENTICATE } from '@Root/screens2/screens';
+import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { StyleKit } from '@Style/StyleKit';
 import { Platform } from 'react-native';
 import {

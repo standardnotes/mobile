@@ -8,7 +8,7 @@ import { TableSection } from '@Components/TableSection';
 import { UnlockTiming } from '@Lib/ApplicationState';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_INPUT_MODAL_PASSCODE } from '@Root/screens2/screens';
+import { SCREEN_INPUT_MODAL_PASSCODE } from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, { useContext, useMemo, useRef, useState } from 'react';
 import { Keyboard, KeyboardType, Platform, TextInput } from 'react-native';

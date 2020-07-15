@@ -3,7 +3,7 @@ import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_INPUT_MODAL_TAG } from '@Root/screens2/screens';
+import { SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, {
   useCallback,

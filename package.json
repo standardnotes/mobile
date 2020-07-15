@@ -27,7 +27,7 @@
     "@react-navigation/stack": "^5.7.0",
     "base64-arraybuffer": "^0.2.0",
     "bugsnag-react-native": "^2.23.10",
-    "js-base64": "^2.6.3",
+    "js-base64": "^3.0.0",
     "lodash": "^4.17.15",
     "moment": "^2.27.0",
     "react": "16.11.0",
@@ -66,7 +66,7 @@
     "@types/jest": "^26.0.4",
     "@types/js-base64": "^2.3.2",
     "@types/lodash": "^4.14.157",
-    "@types/react-native": "^0.62.18",
+    "@types/react-native": "0.62.18",
     "@types/react-native-vector-icons": "^6.4.5",
     "@types/styled-components": "^5.1.1",
     "@typescript-eslint/eslint-plugin": "^3.6.1",
@@ -88,6 +88,9 @@
     "replace-in-file": "^6.1.0",
     "sncrypto": "standardnotes/sncrypto#7e76ab9",
     "typescript": "^3.9.2"
+  },
+  "resolutions": {
+    "@types/react-native": "0.62.18"
   },
   "jest": {
     "preset": "react-native"

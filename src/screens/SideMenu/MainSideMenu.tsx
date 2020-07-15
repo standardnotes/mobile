@@ -1,7 +1,7 @@
 import { AppStateType } from '@Lib/ApplicationState';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_SETTINGS } from '@Root/screens2/screens';
+import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_SETTINGS } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
 import React, { Fragment, useContext, useEffect, useState } from 'react';

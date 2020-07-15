@@ -2,7 +2,7 @@ import { Editor } from '@Lib/editor';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Root/screens2/screens';
+import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
 import {
   ICON_ARCHIVE,
   ICON_BOOKMARK,

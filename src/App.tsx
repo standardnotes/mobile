@@ -51,7 +51,7 @@ import {
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_NOTES,
   SCREEN_SETTINGS,
-} from './screens2/screens';
+} from './screens/screens';
 
 enableScreens();
 

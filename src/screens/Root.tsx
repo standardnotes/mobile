@@ -6,7 +6,7 @@ import {
 import { useHasEditor } from '@Lib/customHooks';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Root/screens2/screens';
+import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
 import { StyleKit } from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
 import React, { useContext, useEffect, useMemo, useState } from 'react';

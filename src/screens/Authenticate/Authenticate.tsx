@@ -7,7 +7,7 @@ import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_AUTHENTICATE } from '@Root/screens2/screens';
+import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, {
   useCallback,
