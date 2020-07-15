@@ -10,8 +10,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import TextView from 'sn-textview';
 import {
   ComponentArea,
   ContentType,
@@ -58,10 +58,10 @@ export const Compose = (): JSX.Element => {
     SNComponent | undefined
   >();
   const [webViewError, setWebviewError] = useState(false);
-  const [loadingWebview, setLoadingWebiev] = useState(false);
+  const [loadingWebview, setLoadingWebview] = useState(false);
 
   // Ref
-  const editorViewRef = useRef<TextView>(null);
+  const editorViewRef = useRef<TextInput>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
@@ -343,7 +343,7 @@ export const Compose = (): JSX.Element => {
           <LockedText>Unable to load</LockedText>
           <WebViewReloadButton
             onPress={() => {
-              setLoadingWebiev(false);
+              setLoadingWebview(false);
               setWebviewError(false);
             }}
           >
@@ -379,14 +379,14 @@ export const Compose = (): JSX.Element => {
           componentUuid={editorComponent!.uuid}
           noteUuid={note!.uuid}
           onLoadStart={() => {
-            setLoadingWebiev(true);
+            setLoadingWebview(true);
             setWebviewError(false);
           }}
           onLoadEnd={() => {
-            setLoadingWebiev(false);
+            setLoadingWebview(false);
           }}
           onLoadError={() => {
-            setLoadingWebiev(false);
+            setLoadingWebview(false);
             setWebviewError(true);
           }}
         />

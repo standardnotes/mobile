@@ -12,7 +12,6 @@ import {
   Platform,
   SNNote,
   SNSmartTag,
-  SNTag,
 } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
@@ -75,8 +74,8 @@ export const Notes: React.FC<Props> = props => {
   const streamNotesAndTags = useCallback(() => {
     const removeStreamNotes = application!.streamItems(
       [ContentType.Note],
-      async items => {
-        const tempNotes = items as SNNote[];
+      async () => {
+        // const tempNotes = items as SNNote[];
         /** If a note changes, it will be queried against the existing filter;
          * we dont need to reload display options */
         reloadNotes();
@@ -94,8 +93,8 @@ export const Notes: React.FC<Props> = props => {
 
     const removeStreamTags = application!.streamItems(
       [ContentType.Tag],
-      async items => {
-        const tags = items as SNTag[];
+      async () => {
+        // const tags = items as SNTag[];
         /** A tag could have changed its relationships, so we need to reload the filter */
         reloadNotesDisplayOptions();
         reloadNotes();

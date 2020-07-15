@@ -1,12 +1,18 @@
 import { ApplicationContext } from '@Root/ApplicationContext';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
-import { ComponentAction, LiveItem, SNComponent } from 'snjs';
+import { ComponentAction, ComponentArea, LiveItem, SNComponent } from 'snjs';
 import {
   FlexContainer,
   LockedContainer,
@@ -23,14 +29,20 @@ type Props = {
   onLoadError: () => void;
 };
 
-export const ComponentView = (props: Props): JSX.Element => {
+export const ComponentView = ({
+  onLoadEnd,
+  onLoadError,
+  onLoadStart,
+  noteUuid,
+  componentUuid,
+}: Props): JSX.Element => {
   // Context
   const application = useContext(ApplicationContext);
 
   // State
   const [liveComponent, setLiveComponent] = useState<
     LiveItem<SNComponent> | undefined
-  >(() => new LiveItem(props.componentUuid, application!));
+  >(() => new LiveItem(componentUuid, application!));
   const [url, setUrl] = useState('');
 
   // Ref
@@ -38,10 +50,10 @@ export const ComponentView = (props: Props): JSX.Element => {
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
-    if (liveComponent?.item.uuid !== props.componentUuid) {
-      setLiveComponent(new LiveItem(props.componentUuid, application!));
+    if (liveComponent?.item.uuid !== componentUuid) {
+      setLiveComponent(new LiveItem(componentUuid, application!));
     }
-  }, [application, liveComponent?.item.uuid, props.componentUuid]);
+  }, [application, liveComponent?.item.uuid, componentUuid]);
 
   useEffect(() => {
     if (liveComponent) {
@@ -58,17 +70,19 @@ export const ComponentView = (props: Props): JSX.Element => {
         setUrl(newUrl);
       }
     }
-  }, [application, liveComponent]);
 
-  useEffect(() => {
+    // deinit
     return () => {
+      application?.componentGroup.deactivateComponentForArea(
+        ComponentArea.Editor
+      );
       liveComponent?.deinit();
     };
   }, [application, liveComponent]);
 
   useEffect(() => {
-    let unregisterComponentHandler;
-    const note = application?.findItem(props.noteUuid);
+    let unregisterComponentHandler: (() => void) | undefined;
+    const note = application?.findItem(noteUuid);
     if (note && liveComponent) {
       unregisterComponentHandler = application?.componentManager!.registerHandler(
         {
@@ -87,8 +101,10 @@ export const ComponentView = (props: Props): JSX.Element => {
       );
     }
 
-    return unregisterComponentHandler;
-  }, [application, liveComponent, props.noteUuid]);
+    return () => {
+      unregisterComponentHandler && unregisterComponentHandler();
+    };
+  }, [application, liveComponent, noteUuid]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     // if (!this.note) {
@@ -106,7 +122,7 @@ export const ComponentView = (props: Props): JSX.Element => {
     application!.componentManager?.handleMessage(liveComponent!.item!, data);
   };
 
-  const onFrameLoad = () => {
+  const onFrameLoad = useCallback(() => {
     /**
      * We have no way of knowing if the webview load is successful or not. We
      * have to wait to see if the error event is fired. Looking at the code,
@@ -133,19 +149,19 @@ export const ComponentView = (props: Props): JSX.Element => {
      * This delay will allow editor to load its theme.
      */
     setTimeout(() => {
-      props.onLoadEnd();
+      onLoadEnd();
     }, 100);
+  }, [application, liveComponent, onLoadEnd]);
+
+  const onLoadStartHandler = () => {
+    onLoadStart();
   };
 
-  const onLoadStart = () => {
-    props.onLoadStart();
-  };
-
-  const onLoadError = () => {
+  const onLoadErrorHandler = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    props.onLoadError();
+    onLoadError();
   };
 
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
@@ -181,6 +197,13 @@ export const ComponentView = (props: Props): JSX.Element => {
     })()`;
   };
 
+  // const setRef = ref => {
+  //   if (ref) {
+  //     console.log(ref);
+  //     webViewRef.current = { postMessage: ref.postMessage };
+  //   }
+  // };
+
   return (
     <FlexContainer>
       {liveComponent?.item.valid_until &&
@@ -204,8 +227,8 @@ export const ComponentView = (props: Props): JSX.Element => {
            * onLoad is called once (what we want)
            */
           onLoad={onFrameLoad}
-          onLoadStart={onLoadStart}
-          onError={onLoadError}
+          onLoadStart={onLoadStartHandler}
+          onError={onLoadErrorHandler}
           onMessage={onMessage}
           hideKeyboardAccessoryView={true}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
