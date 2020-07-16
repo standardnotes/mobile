@@ -178,7 +178,7 @@ export const NoteSideMenu = (props: Props) => {
             noteMutator.prefersPlainEditor = true;
           });
         }
-        if (activeEditorComponent) {
+        if (activeEditorComponent?.isExplicitlyEnabledForItem(note!.uuid)) {
           await disassociateComponentWithCurrentNote(activeEditorComponent);
         }
       } else if (component.area === ComponentArea.Editor) {
