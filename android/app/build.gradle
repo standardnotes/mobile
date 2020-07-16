@@ -128,6 +128,12 @@ def enableHermes = project.ext.react.get("enableHermes", false);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
+    flavorDimensions "default"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         applicationId "com.standardnotes"
@@ -135,7 +141,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
 
         versionCode 3000210
-        versionName "3.0.21"
+        versionName "3.5.0"
 
         multiDexEnabled  true
 
@@ -143,13 +149,8 @@ android {
             abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
 
-        testBuildType System.getProperty('testBuildType', 'debug')  // This will later be used to control the test apk build type
+        testBuildType System.getProperty('testBuildType', 'debug')  // detox: This will later be used to control the test apk build type
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     signingConfigs {
@@ -160,17 +161,10 @@ android {
             keyPassword 'android'
         }
         release {
-            if (System.getenv('DETOX_CI')) { // if running on e2e CI sign with a debug key
-                storeFile file('debug.keystore')
-                storePassword 'android'
-                keyAlias 'androiddebugkey'
-                keyPassword 'android'
-            } else if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
-                storeFile file(MYAPP_RELEASE_STORE_FILE)
-                storePassword MYAPP_RELEASE_STORE_PASSWORD
-                keyAlias MYAPP_RELEASE_KEY_ALIAS
-                keyPassword MYAPP_RELEASE_KEY_PASSWORD
-            }
+            storeFile file('release.keystore')
+            keyAlias System.getenv("ANDROID_KEYSTORE_ALIAS")
+            keyPassword System.getenv("ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD")
+            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
         }
     }
 
@@ -182,20 +176,20 @@ android {
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
+    productFlavors {
+        dev {
+            applicationIdSuffix ".dev"
+        }
+        prod {
+            getIsDefault().set(true)
+        }
+    }
     buildTypes {
-        all {
-            matchingFallbacks = ['release', 'debug']
-        }
-        debug {
-            signingConfig signingConfigs.debug
-            matchingFallbacks = ['release', 'debug']
-        }
         release {
-            minifyEnabled true
-            matchingFallbacks = ['release', 'debug']
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
+            productFlavors.dev.signingConfig System.getenv('DETOX_CI') ? signingConfigs.debug : signingConfigs.release
+            productFlavors.prod.signingConfig System.getenv('DETOX_CI') ? signingConfigs.debug : signingConfigs.release
             proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
     }
