@@ -18,6 +18,14 @@
 		8343BD6E244F211C0020E9F0 /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD69244F211C0020E9F0 /* Red@2x.png */; };
 		8343BD6F244F211C0020E9F0 /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD69244F211C0020E9F0 /* Red@2x.png */; };
 		83A5151724BF164700917BCF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83A5151624BF164700917BCF /* LaunchScreen.storyboard */; };
+		83DCC09724C0A21200D58E1B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
+		83DCC09824C0A21200D58E1B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		83DCC09A24C0A21200D58E1B /* libPods-StandardNotes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FBF2D5D9BE147B3EFB23FEE6 /* libPods-StandardNotes.a */; };
+		83DCC09C24C0A21200D58E1B /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD67244F211C0020E9F0 /* Red.png */; };
+		83DCC09D24C0A21200D58E1B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		83DCC09E24C0A21200D58E1B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83A5151624BF164700917BCF /* LaunchScreen.storyboard */; };
+		83DCC09F24C0A21200D58E1B /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD69244F211C0020E9F0 /* Red@2x.png */; };
+		83DCC0A024C0A21200D58E1B /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD68244F211C0020E9F0 /* Red@3x.png */; };
 		8B044E40EFE70C0A206C1E17 /* libPods-StandardNotes-StandardNotesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C6EF5C26462D9E90CCB159F /* libPods-StandardNotes-StandardNotesTests.a */; };
 		E64DD4A0B5437BEF0635C2C6 /* libPods-StandardNotes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FBF2D5D9BE147B3EFB23FEE6 /* libPods-StandardNotes.a */; };
 /* End PBXBuildFile section */
@@ -52,6 +60,8 @@
 		8343BD68244F211C0020E9F0 /* Red@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@3x.png"; sourceTree = "<group>"; };
 		8343BD69244F211C0020E9F0 /* Red@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@2x.png"; sourceTree = "<group>"; };
 		83A5151624BF164700917BCF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		83DCC0A624C0A21200D58E1B /* SN Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SN Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		83DCC0A724C0A21200D58E1B /* StandardNotesDev-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "StandardNotesDev-Info.plist"; path = "/Users/radko93/Repo/mobile/ios/StandardNotesDev-Info.plist"; sourceTree = "<absolute>"; };
 		9E56EE782382F79A872EF0D5 /* Pods-StandardNotes-StandardNotesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes-StandardNotesTests.debug.xcconfig"; path = "Target Support Files/Pods-StandardNotes-StandardNotesTests/Pods-StandardNotes-StandardNotesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A4567B1F6B373ECEDE3BC4EB /* Pods-StandardNotes-StandardNotesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes-StandardNotesTests.release.xcconfig"; path = "Target Support Files/Pods-StandardNotes-StandardNotesTests/Pods-StandardNotes-StandardNotesTests.release.xcconfig"; sourceTree = "<group>"; };
 		C4207FB7DBD4D910F261E7DA /* Pods-StandardNotes-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes-tvOS.release.xcconfig"; path = "Target Support Files/Pods-StandardNotes-tvOS/Pods-StandardNotes-tvOS.release.xcconfig"; sourceTree = "<group>"; };
@@ -77,6 +87,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				E64DD4A0B5437BEF0635C2C6 /* libPods-StandardNotes.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		83DCC09924C0A21200D58E1B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83DCC09A24C0A21200D58E1B /* libPods-StandardNotes.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,6 +164,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				A775D9ADE5F5D52A80F88B7F /* Pods */,
+				83DCC0A724C0A21200D58E1B /* StandardNotesDev-Info.plist */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -157,6 +176,7 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* StandardNotes.app */,
 				00E356EE1AD99517003FC87E /* StandardNotesTests.xctest */,
+				83DCC0A624C0A21200D58E1B /* SN Dev.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -220,6 +240,27 @@
 			productReference = 13B07F961A680F5B00A75B9A /* StandardNotes.app */;
 			productType = "com.apple.product-type.application";
 		};
+		83DCC09324C0A21200D58E1B /* StandardNotes Dev */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 83DCC0A324C0A21200D58E1B /* Build configuration list for PBXNativeTarget "StandardNotes Dev" */;
+			buildPhases = (
+				83DCC09424C0A21200D58E1B /* [CP] Check Pods Manifest.lock */,
+				83DCC09524C0A21200D58E1B /* Start Packager */,
+				83DCC09624C0A21200D58E1B /* Sources */,
+				83DCC09924C0A21200D58E1B /* Frameworks */,
+				83DCC09B24C0A21200D58E1B /* Resources */,
+				83DCC0A124C0A21200D58E1B /* Bundle React Native code and images */,
+				83DCC0A224C0A21200D58E1B /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "StandardNotes Dev";
+			productName = StandardNotes;
+			productReference = 83DCC0A624C0A21200D58E1B /* SN Dev.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -234,6 +275,10 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
+						ProvisioningStyle = Manual;
+					};
+					83DCC09324C0A21200D58E1B = {
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -251,6 +296,7 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* StandardNotes */,
+				83DCC09324C0A21200D58E1B /* StandardNotes Dev */,
 				00E356ED1AD99517003FC87E /* StandardNotesTests */,
 			);
 		};
@@ -276,6 +322,18 @@
 				83A5151724BF164700917BCF /* LaunchScreen.storyboard in Resources */,
 				8343BD6E244F211C0020E9F0 /* Red@2x.png in Resources */,
 				8343BD6C244F211C0020E9F0 /* Red@3x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		83DCC09B24C0A21200D58E1B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83DCC09C24C0A21200D58E1B /* Red.png in Resources */,
+				83DCC09D24C0A21200D58E1B /* Images.xcassets in Resources */,
+				83DCC09E24C0A21200D58E1B /* LaunchScreen.storyboard in Resources */,
+				83DCC09F24C0A21200D58E1B /* Red@2x.png in Resources */,
+				83DCC0A024C0A21200D58E1B /* Red@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,6 +450,109 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StandardNotes-StandardNotesTests/Pods-StandardNotes-StandardNotesTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		83DCC09424C0A21200D58E1B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-StandardNotes-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		83DCC09524C0A21200D58E1B /* Start Packager */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Start Packager";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		83DCC0A124C0A21200D58E1B /* Bundle React Native code and images */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle React Native code and images";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		83DCC0A224C0A21200D58E1B /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-StandardNotes/Pods-StandardNotes-resources.sh",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StandardNotes/Pods-StandardNotes-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		98285A67AD8124BA2C6A7927 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -475,6 +636,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		83DCC09624C0A21200D58E1B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83DCC09724C0A21200D58E1B /* AppDelegate.m in Sources */,
+				83DCC09824C0A21200D58E1B /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -543,7 +713,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Blue;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -551,7 +723,7 @@
 				);
 				INFOPLIST_FILE = StandardNotes/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.21;
+				MARKETING_VERSION = 3.5.0;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DFB_SONARKIT_ENABLED=1",
@@ -563,6 +735,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.standardnotes.standardnotes;
 				PRODUCT_NAME = StandardNotes;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -576,10 +749,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Blue;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = StandardNotes/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.21;
+				MARKETING_VERSION = 3.5.0;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DFB_SONARKIT_ENABLED=1",
@@ -591,6 +766,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.standardnotes.standardnotes;
 				PRODUCT_NAME = StandardNotes;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -710,6 +886,72 @@
 			};
 			name = Release;
 		};
+		83DCC0A424C0A21200D58E1B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 346AB7D809E5F2A02D8850D8 /* Pods-StandardNotes.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"FB_SONARKIT_ENABLED=1",
+				);
+				INFOPLIST_FILE = "StandardNotesDev-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 3.5.0;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFB_SONARKIT_ENABLED=1",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.standardnotes.standardnotes.dev;
+				PRODUCT_NAME = "SN Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		83DCC0A524C0A21200D58E1B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CF7E5578B6DC2F6C5F5DAF70 /* Pods-StandardNotes.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = "StandardNotesDev-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 3.5.0;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFB_SONARKIT_ENABLED=1",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.standardnotes.standardnotes.dev;
+				PRODUCT_NAME = "SN Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -736,6 +978,15 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		83DCC0A324C0A21200D58E1B /* Build configuration list for PBXNativeTarget "StandardNotes Dev" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83DCC0A424C0A21200D58E1B /* Debug */,
+				83DCC0A524C0A21200D58E1B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
