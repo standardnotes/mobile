@@ -1,4 +1,4 @@
-import { Editor } from '@Lib/editor';
+import { Editor } from '@Lib/Editor';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';

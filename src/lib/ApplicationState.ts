@@ -21,7 +21,7 @@ import {
   StorageValueModes,
 } from 'snjs';
 import { MobileApplication } from './application';
-import { Editor } from './editor';
+import { Editor } from './Editor';
 
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;

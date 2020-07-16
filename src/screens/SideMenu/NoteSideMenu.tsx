@@ -1,4 +1,4 @@
-import { Editor } from '@Lib/editor';
+import { Editor } from '@Lib/Editor';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
