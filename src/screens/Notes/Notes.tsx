@@ -5,7 +5,6 @@ import { ICON_ADD } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
 import React, { useCallback, useContext, useState } from 'react';
 import FAB from 'react-native-fab';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {
   CollectionSort,
   ContentType,
@@ -15,6 +14,7 @@ import {
 } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
+import { StyledIcon } from './Notes.styled';
 import { notePassesFilter } from './utils';
 
 type Props = {
@@ -137,6 +137,7 @@ export const Notes: React.FC<Props> = props => {
 
   return (
     <>
+      {/* @ts-ignore TODO: fix notelist */}
       <NoteList
         // onRefresh={this._onRefresh.bind(this)}
         // hasRefreshControl={!Auth.get().offline()}
@@ -169,9 +170,8 @@ export const Notes: React.FC<Props> = props => {
         size={30}
         paddingTop={application!.platform === Platform.Ios ? 1 : 0}
         iconTextComponent={
-          <Icon
+          <StyledIcon
             testID="newNoteButton"
-            style={{ textAlignVertical: 'center' }}
             name={StyleKit.nameForIcon(ICON_ADD)}
           />
         }

@@ -33,7 +33,7 @@ export const AuthSection = (props: Props) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [mfa, setMfa] = useState(false);
   const [mfaText, setMfaText] = useState('');
-  const [mfaMessage, setMfaMessage] = useState<string | undefined>(undefined);
+  const [mfaMessage] = useState<string | undefined>(undefined);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [server, setServer] = useState('');

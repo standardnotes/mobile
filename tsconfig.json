@@ -17,8 +17,6 @@
       "esModuleInterop": true,
       "paths": {
         "@Components/*": ["./components/*"],
-        "@Containers/*": ["./containers/*"],
-        "@Models/*": ["./models/*"],
         "@Lib/*": ["./lib/*"],
         "@Screens/*": ["./screens/*"],
         "@Style/*": ["./style/*"],

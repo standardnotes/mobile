@@ -180,7 +180,7 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
         }
       >
         <AppStack.Navigator
-          screenOptions={({ navigation, route }) => ({
+          screenOptions={() => ({
             headerStyle: {
               backgroundColor: theme.stylekitContrastBackgroundColor,
               borderBottomColor: theme.stylekitContrastBorderColor,
@@ -295,7 +295,7 @@ const MainStackComponent = () => {
       />
       <MainStack.Screen
         name={SCREEN_SETTINGS}
-        options={({ route }) => ({
+        options={() => ({
           title: 'Settings',
           headerTitle: ({ children }) => {
             return <HeaderTitleView title={children || ''} />;
@@ -389,7 +389,7 @@ const MainStackComponent = () => {
       />
       <MainStack.Screen
         name={SCREEN_AUTHENTICATE}
-        options={({ route }) => ({
+        options={() => ({
           title: 'Authenticate',
           headerLeft: () => undefined,
           headerTitle: ({ children }) => {
