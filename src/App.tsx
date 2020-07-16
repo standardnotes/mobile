@@ -402,9 +402,10 @@ const MainStackComponent = () => {
   );
 };
 
-const AppComponent: React.FC<{ application: MobileApplication }> = ({
-  application,
-}) => {
+const AppComponent: React.FC<{
+  application: MobileApplication;
+  env: 'prod' | 'dev';
+}> = ({ application, env }) => {
   const [ready, setReady] = useState(false);
   const navigationRef = useRef<NavigationContainerRef>(null);
   const styleKit = useRef<StyleKit | undefined>(undefined);
@@ -416,7 +417,7 @@ const AppComponent: React.FC<{ application: MobileApplication }> = ({
           application!.promptForChallenge(challenge, navigationRef.current);
         },
       });
-      if (__DEV__) {
+      if (env === 'dev') {
         await application?.setHost(
           'https://syncing-server-dev.standardnotes.org/'
         );
@@ -429,7 +430,7 @@ const AppComponent: React.FC<{ application: MobileApplication }> = ({
     };
     setReady(false);
     loadApplication();
-  }, [application]);
+  }, [application, env]);
 
   if (!ready || !styleKit.current) {
     return null;
@@ -460,7 +461,7 @@ const AppComponent: React.FC<{ application: MobileApplication }> = ({
 
 const AppGroupInstance = new ApplicationGroup();
 
-export const App = () => {
+export const App = (props: { env: 'prod' | 'dev' }) => {
   const applicationGroupRef = useRef(AppGroupInstance);
   const [application, setApplication] = useState<
     MobileApplication | undefined
@@ -477,7 +478,11 @@ export const App = () => {
   return (
     <ApplicationContext.Provider value={application}>
       {application && (
-        <AppComponent key={application.Uuid} application={application} />
+        <AppComponent
+          env={props.env}
+          key={application.Uuid}
+          application={application}
+        />
       )}
     </ApplicationContext.Provider>
   );
