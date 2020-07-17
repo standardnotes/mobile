@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import SearchBar from 'react-native-search-bar';
 import { SNNote, SNTag } from 'snjs';
+import { ThemeContext } from 'styled-components/native';
 import { NoteCell } from './NoteCell';
 import {
   Container,
@@ -38,6 +39,7 @@ export const NoteList = (props: Props): JSX.Element => {
   // Context
   const signedIn = useSignedIn();
   const styleKit = useContext(StyleKitContext);
+  const theme = useContext(ThemeContext);
 
   // State
   const [searchText, setSearchText] = useState(' ');
@@ -90,10 +92,12 @@ export const NoteList = (props: Props): JSX.Element => {
       )}
       <HeaderContainer>
         <SearchBar
-          // ref="searchBar"
           keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
           placeholder="Search"
           text={searchText}
+          barTintColor={theme.stylekitBackgroundColor}
+          textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
+          textColor={theme.stylekitForegroundColor}
           onChangeText={() => {}}
           onSearchButtonPress={() => {}}
           onCancelButtonPress={() => {}}

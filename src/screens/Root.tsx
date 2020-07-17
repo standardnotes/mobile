@@ -27,9 +27,11 @@ import {
 type Props = AppStackNavigationProp<typeof SCREEN_NOTES>;
 
 export const Root = (props: Props): JSX.Element => {
+  // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
 
+  // State
   const [, setWidth] = useState<number | undefined>(undefined);
   const [height, setHeight] = useState<number | undefined>(undefined);
   const [, setX] = useState<number | undefined>(undefined);
@@ -122,7 +124,7 @@ export const Root = (props: Props): JSX.Element => {
 
   const openCompose = () => {
     if (!shouldSplitLayout) {
-      props.navigation.navigate({ key: SCREEN_COMPOSE });
+      props.navigation.navigate(SCREEN_COMPOSE);
     }
   };
 
