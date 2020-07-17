@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "83DCC09324C0A21200D58E1B"
-               BuildableName = "StandardNotes Dev.app"
-               BlueprintName = "StandardNotes Dev"
+               BuildableName = "SN Dev.app"
+               BlueprintName = "StandardNotesDev"
                ReferencedContainer = "container:StandardNotes.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "83DCC09324C0A21200D58E1B"
-            BuildableName = "StandardNotes Dev.app"
-            BlueprintName = "StandardNotes Dev"
+            BuildableName = "SN Dev.app"
+            BlueprintName = "StandardNotesDev"
             ReferencedContainer = "container:StandardNotes.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "83DCC09324C0A21200D58E1B"
-            BuildableName = "StandardNotes Dev.app"
-            BlueprintName = "StandardNotes Dev"
+            BuildableName = "SN Dev.app"
+            BlueprintName = "StandardNotesDev"
             ReferencedContainer = "container:StandardNotes.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

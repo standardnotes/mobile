@@ -374,8 +374,8 @@ export class ApplicationState extends ApplicationService {
 
   static get version() {
     return Platform.select({
-      ios: pjson.versionIOS,
-      android: pjson.versionAndroid,
+      ios: pjson.version,
+      android: pjson.version,
     });
   }
 

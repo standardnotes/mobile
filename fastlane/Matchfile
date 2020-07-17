@@ -1,0 +1,11 @@
+storage_mode("git")
+readonly(false) # turn off only you want to update profiles/certificates
+
+# type("development") # The default type, can be: appstore, adhoc, enterprise or development
+
+app_identifier(["com.standardnotes.standardnotes", "com.standardnotes.standardnotes.dev"])
+
+# For all available options run `fastlane match --help`
+# Remove the # in the beginning of the line to enable the other options
+
+# The docs are available on https://docs.fastlane.tools/actions/match

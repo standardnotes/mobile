@@ -1,0 +1,85 @@
+fastlane_version "2.152.0"
+
+platform :ios do
+  def sign_ios(type = 'appstore')
+    match(
+      git_url: ENV["MATCH_CERTIFICATES_URL"],
+      team_id: ENV["APPLE_TEAM_ID"],
+      type: type
+    )
+  end
+
+  def build_ios(scheme)
+    increment_build_number(
+      build_number: 2,
+      xcodeproj: "ios/StandardNotes.xcodeproj",
+    )
+    gym(
+      workspace: "ios/StandardNotes.xcworkspace",
+      scheme: scheme,
+      output_name: scheme,
+      xcargs: "DEBUG_INFORMATION_FORMAT=dwarf-with-dsym"
+    )
+  end
+
+  def deploy_ios(scheme)
+    sign_ios
+    build_ios(scheme)
+    pilot(
+      team_id: ENV["APPLE_TEAM_ID"],
+    )
+    refresh_dsyms
+  end
+
+  desc "Deploy dev app"
+  lane :dev do
+    deploy_ios "StandardNotesDev"
+  end
+
+  desc "Deploy production app"
+  lane :prod do
+    deploy_ios "StandardNotes"
+  end
+
+  lane :refresh_dsyms do
+    download_dsyms(version: ENV["PACKAGE_VERSION"])     # Download dSYM files from iTC
+    upload_symbols_to_bugsnag              # Upload them to Bugsnag
+    clean_build_artifacts                  # Delete the local dSYM files
+  end
+
+end
+
+platform :android do
+  def build_android(variant)
+    gradle(
+      task: "bundle",
+      project_dir: "android/",
+      build_type: "Release",
+      flavor: variant,
+      properties: {
+        "versionName" => "#{ENV["PACKAGE_VERSION"]}"
+      },
+    )
+  end
+
+  def deploy_android(variant, track = 'internal')
+    build_android(variant)
+    upload_to_play_store(
+      track: track,
+      json_key_data: "#{ENV["GOOGLE_PLAY_JSON_KEY_DATA"]}",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Deploy dev app"
+  lane :dev do
+    deploy_android 'dev'
+  end
+
+  desc "Deploy production app"
+  lane :prod do
+    deploy_android 'prod'
+  end
+end
