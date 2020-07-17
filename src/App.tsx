@@ -68,7 +68,7 @@ type HeaderTitleParams = {
 
 type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
-  [SCREEN_COMPOSE]: HeaderTitleParams;
+  [SCREEN_COMPOSE]: HeaderTitleParams | undefined;
 };
 
 type ModalStackNavigatorParamList = {
