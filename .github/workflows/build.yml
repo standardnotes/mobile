@@ -11,8 +11,6 @@ jobs:
     runs-on: macos-latest
     if: github.event_name != 'release'
     steps:
-      - name: test
-      run: echo $
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Export version from package.json
