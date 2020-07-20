@@ -126,6 +126,9 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  */
 def enableHermes = project.ext.react.get("enableHermes", false);
 
+def appVersionCode = Integer.valueOf(System.env.GITHUB_RUN_NUMBER ? 3000210 + GITHUB_RUN_NUMBER : 1)
+def appVersionName = System.env.PACKAGE_VERSION ?: "1.0"
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     flavorDimensions "default"
@@ -140,8 +143,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode 3000210
-        versionName "3.5.0"
+        versionCode appVersionCode
+        versionName appVersionName
 
         multiDexEnabled  true
 
@@ -161,7 +164,7 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file('release.keystore')
+            storeFile file('keystore.keystore')
             keyAlias System.getenv("ANDROID_KEYSTORE_ALIAS")
             keyPassword System.getenv("ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD")
             storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")

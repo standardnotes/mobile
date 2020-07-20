@@ -6083,13 +6083,13 @@ react-native-file-viewer@^2.1.1:
   resolved "https://registry.yarnpkg.com/react-native-file-viewer/-/react-native-file-viewer-2.1.1.tgz#d0b4c51e9b38870ba2b9fb1d436df844e974f087"
   integrity sha512-Q5OtfA+VlprLaXmKk1tH/IFzMHwa2B5YnR4xfoEKOJ53UI5BKvYc67Y/ammUUog7bUwPkUBWenwd4MxBTi1R+g==
 
-react-native-fingerprint-scanner@standardnotes/react-native-fingerprint-scanner#5984941:
+react-native-fingerprint-scanner@standardnotes/react-native-fingerprint-scanner#ddec061:
   version "4.0.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-fingerprint-scanner/tar.gz/5984941f452e978da9d18f8ad324a16b0b459580"
+  resolved "https://codeload.github.com/standardnotes/react-native-fingerprint-scanner/tar.gz/ddec061776d040c08f1ef34d3df3a92c9ffef2a3"
 
-react-native-flag-secure-android@standardnotes/react-native-flag-secure-android#3d59055:
+react-native-flag-secure-android@standardnotes/react-native-flag-secure-android#cb08e74:
   version "1.0.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-flag-secure-android/tar.gz/3d5905538fedd356e2fb59917a667279b1ce4313"
+  resolved "https://codeload.github.com/standardnotes/react-native-flag-secure-android/tar.gz/cb08e74583c22a5d912842459b35ebbbb4bcd852"
 
 react-native-fs@^2.16.6:
   version "2.16.6"
@@ -6158,9 +6158,9 @@ react-native-search-box@standardnotes/react-native-search-box#f61a2b5:
   dependencies:
     prop-types "^15.5.10"
 
-react-native-sodium@standardnotes/react-native-sodium#3a3fa4f:
+react-native-sodium@standardnotes/react-native-sodium#52718e6:
   version "0.4.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-sodium/tar.gz/3a3fa4f3c3eed445752329babae77131930c5a0e"
+  resolved "https://codeload.github.com/standardnotes/react-native-sodium/tar.gz/52718e63f5e91a17bcc94a80dcc256abc626f0c0"
 
 react-native-store-review@^0.1.5:
   version "0.1.5"
