@@ -25,6 +25,7 @@ jobs:
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
+          BUILD_NUMBER: ${{ github.run_number }}
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.DEV_ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PASSWORD }}
@@ -49,6 +50,7 @@ jobs:
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
+          BUILD_NUMBER: ${{ github.run_number }}
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -77,6 +79,7 @@ jobs:
   #         lane: 'ios dev'
   #     - name: Build & deploy production build
   #       uses: maierj/fastlane-action@v1.4.0
-  #       if: ${{ env.PROD == true }}
+  #       env:
+  #         BUILD_NUMBER: ${{ github.run_number }}
   #       with:
   #         lane: 'ios prod'
