@@ -66,8 +66,9 @@ jobs:
         with:
           name: release.aab
           path: android/app/build/outputs/bundle/release/app-release.aab
-  build-ios:
+  build-ios-dev:
     runs-on: macos-latest
+    if: github.event_name != 'release'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -78,7 +79,6 @@ jobs:
         run: yarn run init
       - name: Build & deploy development build
         uses: maierj/fastlane-action@v1.4.0
-        if: github.event_name != 'release'
         env:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -89,16 +89,26 @@ jobs:
           BUILD_NUMBER: ${{ github.run_number }}
         with:
           lane: 'ios dev'
-      - name: Build & deploy production build
+  build-ios-prod:
+    runs-on: macos-latest
+    if: github.event_name == 'release'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Export version from package.json
+        run: |
+          echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
+      - name: Install dependencies
+        run: yarn run init
+      - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
-        if: github.event_name == 'release'
         env:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           MATCH_CERTIFICATES_URL: ${{ secrets.MATCH_CERTIFICATES_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ github.run_number }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ github.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
           BUILD_NUMBER: ${{ github.run_number }}
         with:
           lane: 'ios prod'
