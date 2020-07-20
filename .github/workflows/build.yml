@@ -19,7 +19,7 @@ jobs:
         run: |
           echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
       - name: Setup react-native kernel and increase watchers
-        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee /etc/sysctl.d/40-max-user-watches.conf && sudo sysctl --system
       - name: Decode Dev Android keystore
         if: ${{ env.PROD == false }}
         run: |
