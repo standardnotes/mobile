@@ -79,8 +79,8 @@ jobs:
         run: yarn run init
       - name: Set ssh connection to Github
         uses: webfactory/ssh-agent@v0.4.0
-          with:
-            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Build & deploy development build
         uses: maierj/fastlane-action@v1.4.0
         env:
@@ -107,8 +107,8 @@ jobs:
         run: yarn run init
       - name: Set ssh connection to Github
         uses: webfactory/ssh-agent@v0.4.0
-          with:
-            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
