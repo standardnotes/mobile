@@ -1,0 +1,80 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - 004
+  release:
+
+env:
+  PROD: $({ github.event_name == "release" })
+
+jobs:
+  build-android:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Export version from package.json
+        run: |
+          echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
+      - name: Setup react-native kernel and increase watchers
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      - name: Decode Dev Android keystore
+        if: ${{ env.PROD == false }}
+        run: |
+          echo "${{ secrets.DEV_KEYSTORE }}" > keystore.keystore.asc
+          gpg -d --passphrase "${{ secrets.DEV_KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
+      - name: Decode Production Android keystore
+        if: ${{ env.PROD == true }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE }}" > keystore.keystore.asc
+          gpg -d --passphrase "${{ secrets.KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
+      - name: Install dependencies
+        run: yarn install
+      - name:  Build & deploy dev build
+        uses: maierj/fastlane-action@v1.4.0
+        if: ${{ env.PROD == false }}
+        env:
+          ANDROID_KEYSTORE_ALIAS: ${{ secrets.DEV_ANDROID_KEYSTORE_ALIAS }}
+          ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PASSWORD }}
+          GOOGLE_JSON_KEY_DATA: ${{ secrets.GOOGLE_JSON_KEY_DATA }}
+        with:
+          lane: 'android dev'
+      - name: Build & deploy production build
+        uses: maierj/fastlane-action@v1.4.0
+        if: ${{ env.PROD == true }}
+        env:
+          ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+          ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          GOOGLE_JSON_KEY_DATA: ${{ secrets.GOOGLE_JSON_KEY_DATA }}
+        with:
+          lane: 'android prod'
+      - name: Upload Android app bundle to artifacts
+        uses: actions/upload-artifact@v1
+        if: ${{ env.PROD == true }}
+        with:
+          name: release.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+  # build-ios:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+  #     - name: Export version from package.json
+  #       run: |
+  #         echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
+  #     - name: Install dependencies
+  #       run: yarn run init
+  #     - name: Build & deploy dev build
+  #       uses: maierj/fastlane-action@v1.4.0
+  #       if: ${{ env.PROD == false }}
+  #       with:
+  #         lane: 'ios dev'
+  #     - name: Build & deploy production build
+  #       uses: maierj/fastlane-action@v1.4.0
+  #       if: ${{ env.PROD == true }}
+  #       with:
+  #         lane: 'ios prod'
