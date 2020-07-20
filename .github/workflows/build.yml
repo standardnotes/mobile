@@ -18,15 +18,13 @@ jobs:
       - name: Export version from package.json
         run: |
           echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
-      # - name: Setup react-native kernel and increase watchers
-      #   run: echo fs.inotify.max_user_watches=524288 | sudo tee /etc/sysctl.d/40-max-user-watches.conf && sudo sysctl --system
       - name: Decode Dev Android keystore
-        if: ${{ env.PROD == false }}
+        if: ${{ env.PROD }}
         run: |
           echo "${{ secrets.DEV_KEYSTORE }}" > keystore.keystore.asc
           gpg -d --passphrase "${{ secrets.DEV_KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
       - name: Decode Production Android keystore
-        if: ${{ env.PROD == true }}
+        if: ${{ env.PROD }}
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE }}" > keystore.keystore.asc
           gpg -d --passphrase "${{ secrets.KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
@@ -34,7 +32,7 @@ jobs:
         run: yarn install
       - name:  Build & deploy dev build
         uses: maierj/fastlane-action@v1.4.0
-        if: ${{ env.PROD == false }}
+        if: ${{ env.PROD }}
         env:
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.DEV_ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
@@ -44,7 +42,7 @@ jobs:
           lane: 'android dev'
       - name: Build & deploy production build
         uses: maierj/fastlane-action@v1.4.0
-        if: ${{ env.PROD == true }}
+        if: ${{ env.PROD }}
         env:
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
@@ -54,7 +52,7 @@ jobs:
           lane: 'android prod'
       - name: Upload Android app bundle to artifacts
         uses: actions/upload-artifact@v1
-        if: ${{ env.PROD == true }}
+        if: ${{ env.PROD }}
         with:
           name: release.aab
           path: android/app/build/outputs/bundle/release/app-release.aab
