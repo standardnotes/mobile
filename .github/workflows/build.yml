@@ -6,33 +6,26 @@ on:
       - 004
   release:
 
-env:
-  PROD: $({ github.event_name == "release" })
-
 jobs:
-  build-android:
+  build-android-dev:
     runs-on: macos-latest
+    if: github.event_name != 'release'
     steps:
+      - name: test
+      run: echo $
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Export version from package.json
         run: |
           echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
       - name: Decode Dev Android keystore
-        if: ${{ env.PROD }}
         run: |
           echo "${{ secrets.DEV_KEYSTORE }}" > keystore.keystore.asc
           gpg -d --passphrase "${{ secrets.DEV_KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
-      - name: Decode Production Android keystore
-        if: ${{ env.PROD }}
-        run: |
-          echo "${{ secrets.ANDROID_KEYSTORE }}" > keystore.keystore.asc
-          gpg -d --passphrase "${{ secrets.KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
       - name: Install dependencies
         run: yarn install
-      - name:  Build & deploy dev build
+      - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
-        if: ${{ env.PROD }}
         env:
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.DEV_ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
@@ -40,9 +33,23 @@ jobs:
           GOOGLE_JSON_KEY_DATA: ${{ secrets.GOOGLE_JSON_KEY_DATA }}
         with:
           lane: 'android dev'
-      - name: Build & deploy production build
+  build-android-prod:
+    runs-on: macos-latest
+    if: github.event_name == 'release'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Export version from package.json
+        run: |
+          echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
+      - name: Decode Production Android keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE }}" > keystore.keystore.asc
+          gpg -d --passphrase "${{ secrets.KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
+      - name: Install dependencies
+        run: yarn install
+      - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
-        if: ${{ env.PROD }}
         env:
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
@@ -52,7 +59,6 @@ jobs:
           lane: 'android prod'
       - name: Upload Android app bundle to artifacts
         uses: actions/upload-artifact@v1
-        if: ${{ env.PROD }}
         with:
           name: release.aab
           path: android/app/build/outputs/bundle/release/app-release.aab
