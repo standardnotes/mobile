@@ -1,5 +1,4 @@
 storage_mode("git")
-readonly(true) # turn off only you want to update profiles/certificates
 
 # type("development") # The default type, can be: appstore, adhoc, enterprise or development
 

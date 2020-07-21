@@ -81,6 +81,13 @@ jobs:
         uses: webfactory/ssh-agent@v0.4.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Setup fastlane
+        uses: maierj/fastlane-action@v1.4.0
+        env:
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          lane: 'ios setup'
       - name: Build & deploy development build
         uses: maierj/fastlane-action@v1.4.0
         env:
@@ -109,6 +116,13 @@ jobs:
         uses: webfactory/ssh-agent@v0.4.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Setup fastlane
+        uses: maierj/fastlane-action@v1.4.0
+        env:
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          lane: 'ios setup'
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:

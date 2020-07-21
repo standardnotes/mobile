@@ -5,6 +5,7 @@ platform :ios do
     match(
       git_url: ENV["MATCH_CERTIFICATES_URL"],
       team_id: ENV["APPLE_TEAM_ID"],
+      readonly: is_ci,
       type: type
     )
   end
@@ -43,6 +44,22 @@ platform :ios do
   desc "Deploy production app"
   lane :prod do
     deploy_ios "StandardNotes"
+  end
+
+  desc "Setup iOS for running on CI"
+  lane :setup do
+    setup_project
+  end
+
+  private_lane :setup_project do
+    create_keychain(
+      name: "actiontest_keychain",
+      password: "meow",
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false
+    )
   end
 
   lane :refresh_dsyms do
