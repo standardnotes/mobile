@@ -86,6 +86,7 @@ jobs:
         env:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         with:
           lane: 'ios setup'
       - name: Build & deploy development build
@@ -121,6 +122,7 @@ jobs:
         env:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         with:
           lane: 'ios setup'
       - name: fastlane

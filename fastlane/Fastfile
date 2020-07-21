@@ -5,10 +5,15 @@ platform :ios do
     match(
       git_url: ENV["MATCH_CERTIFICATES_URL"],
       team_id: ENV["APPLE_TEAM_ID"],
-      keychain_name: "actiontest_keychain",
-      keychain_password: "meow",
+      keychain_name: "snkeychain",
+      keychain_password: ENV["MATCH_PASSWORD"],
       readonly: is_ci,
       type: type
+    )
+    update_project_provisioning(
+      xcodeproj: "ios/StandardNotes.xcodeproj",
+      profile: ENV["sigh_com.standardnotes.standardnotes.dev_appstore_profile-path"],
+      target_filter: "StandardNotesDev",
     )
   end
 
@@ -55,8 +60,8 @@ platform :ios do
 
   private_lane :setup_project do
     create_keychain(
-      name: "actiontest_keychain",
-      password: "meow",
+      name: "snkeychain",
+      password: ENV["MATCH_PASSWORD"],
       default_keychain: true,
       unlock: true,
       timeout: 3600,
@@ -73,20 +78,21 @@ platform :ios do
 end
 
 platform :android do
-  def build_android(variant)
+  def build_android(variant, versionCode)
     gradle(
       task: "bundle",
       project_dir: "android/",
       build_type: "Release",
       flavor: variant,
       properties: {
-        "versionName" => "#{ENV["PACKAGE_VERSION"]}"
+        "versionName" => "#{ENV["PACKAGE_VERSION"]}",
+        "versionCode" => versionCode
       },
     )
   end
 
-  def deploy_android(variant, track = 'internal')
-    build_android(variant)
+  def deploy_android(variant, versionCode, track = 'internal')
+    build_android(variant, versionCode)
     upload_to_play_store(
       track: track,
       json_key_data: "#{ENV["GOOGLE_PLAY_JSON_KEY_DATA"]}",
@@ -98,11 +104,13 @@ platform :android do
 
   desc "Deploy dev app"
   lane :dev do
-    deploy_android 'dev'
+    version = "3000210" + ENV['BUILD_NUMBER']
+    deploy_android 'dev', version
   end
 
   desc "Deploy production app"
   lane :prod do
-    deploy_android 'prod'
+    version = 3000210 + ENV['BUILD_NUMBER'].to_i
+    deploy_android 'prod', version
   end
 end

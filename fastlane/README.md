@@ -26,6 +26,11 @@ Deploy dev app
 fastlane ios prod
 ```
 Deploy production app
+### ios setup
+```
+fastlane ios setup
+```
+Setup iOS for running on CI
 ### ios refresh_dsyms
 ```
 fastlane ios refresh_dsyms
