@@ -31,7 +31,7 @@ jobs:
           GOOGLE_JSON_KEY_DATA: ${{ secrets.GOOGLE_JSON_KEY_DATA }}
         with:
           lane: 'android prod'
-      - name: Upload univsersal apk to artifacts
+      - name: Upload universal apk to artifacts
         uses: actions/upload-artifact@v2
         with:
           name: prod.apk

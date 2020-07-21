@@ -9,6 +9,7 @@ jobs:
   android:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -33,7 +34,7 @@ jobs:
           GOOGLE_PLAY_JSON_KEY_DATA: ${{ secrets.GOOGLE_PLAY_JSON_KEY_DATA }}
         with:
           lane: 'android dev'
-      - name: Upload univsersal apk to artifacts
+      - name: Upload universal apk to artifacts
         uses: actions/upload-artifact@v2
         with:
           name: dev.apk
@@ -41,6 +42,7 @@ jobs:
   ios:
     runs-on: macos-latest
     timeout-minutes: 90
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
