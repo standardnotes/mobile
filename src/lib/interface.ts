@@ -121,10 +121,14 @@ export class MobileDeviceInterface extends DeviceInterface {
     return AsyncStorage.multiRemove(keys.map(key => this.keyForPayloadId(key)));
   }
   getKeychainValue(): Promise<any> {
-    return Keychain.getKeys();
+    const keys = Keychain.getKeys();
+    return keys[this.keychainStorageKey];
   }
   setKeychainValue(value: any): Promise<void> {
-    return Keychain.setKeys(value);
+    const keys = {
+      [this.keychainStorageKey]: value,
+    };
+    return Keychain.setKeys(keys);
   }
   clearKeychainValue(): Promise<void> {
     return Keychain.clearKeys();
