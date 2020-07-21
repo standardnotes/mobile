@@ -6,7 +6,7 @@ on:
       - 004
 
 jobs:
-  android-dev:
+  android:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -33,7 +33,12 @@ jobs:
           GOOGLE_PLAY_JSON_KEY_DATA: ${{ secrets.GOOGLE_PLAY_JSON_KEY_DATA }}
         with:
           lane: 'android dev'
-  ios-dev:
+      - name: Upload univsersal apk to artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: dev.apk
+          path: android/app/build/outputs/apk/dev/release/app-dev-release.apk
+  ios:
     runs-on: macos-latest
     timeout-minutes: 90
     steps:

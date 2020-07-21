@@ -4,9 +4,9 @@ on:
   release:
 
 jobs:
-  android-prod:
+  android:
     runs-on: ubuntu-latest
-     timeout-minutes: 45
+    timeout-minutes: 45
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -31,14 +31,19 @@ jobs:
           GOOGLE_JSON_KEY_DATA: ${{ secrets.GOOGLE_JSON_KEY_DATA }}
         with:
           lane: 'android prod'
-      - name: Upload Android app bundle to artifacts
-        uses: actions/upload-artifact@v1
+      - name: Upload univsersal apk to artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: prod.apk
+          path: android/app/build/outputs/apk/prod/release/app-prod-release.apk
+      - name: Upload Android App Bundle to artifacts
+        uses: actions/upload-artifact@v2
         with:
           name: release.aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
-  ios-prod:
+          path: android/app/build/outputs/bundle/prodRelease/app-prod-release.aab
+  ios:
     runs-on: macos-latest
-     timeout-minutes: 90
+    timeout-minutes: 90
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

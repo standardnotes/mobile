@@ -96,11 +96,21 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
+    bundletool(
+      ks_path: 'android/app/keystore.keystore',
+      ks_password: ENV["ANDROID_KEYSTORE_PASSWORD"],
+      ks_key_alias: ENV["ANDROID_KEYSTORE_ALIAS"],
+      ks_key_alias_password: ENV["ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD"],
+      bundletool_version: '1.0.0',
+      aab_path: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      apk_output_path: "android/app/build/outputs/apk/#{variant}/release/app-#{variant}-release.apk",
+      verbose: true,
+    )
   end
 
   desc "Deploy dev app"
   lane :dev do
-    version = "3000210" + ENV['BUILD_NUMBER']
+    version = 300021000 + ENV['BUILD_NUMBER'].to_i
     deploy_android 'dev', version
   end
 
