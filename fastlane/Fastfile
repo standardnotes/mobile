@@ -10,11 +10,6 @@ platform :ios do
       readonly: is_ci,
       type: type
     )
-    update_project_provisioning(
-      xcodeproj: "ios/StandardNotes.xcodeproj",
-      profile: ENV["sigh_com.standardnotes.standardnotes.dev_appstore_profile-path"],
-      target_filter: "StandardNotesDev",
-    )
   end
 
   def build_ios(scheme)
