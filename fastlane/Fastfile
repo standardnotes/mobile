@@ -5,6 +5,8 @@ platform :ios do
     match(
       git_url: ENV["MATCH_CERTIFICATES_URL"],
       team_id: ENV["APPLE_TEAM_ID"],
+      keychain_name: "actiontest_keychain",
+      keychain_password: "meow"
       readonly: is_ci,
       type: type
     )
