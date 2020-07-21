@@ -1,14 +1,12 @@
-name: Build Development
+name: Build Production
 
 on:
-  push:
-    branches:
-      - 004
+  release:
 
 jobs:
-  android-dev:
+  android-prod:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+     timeout-minutes: 45
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -17,25 +15,30 @@ jobs:
           echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
       - name: Setup react-native kernel and increase watchers
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - name: Decode Dev Android keystore
+      - name: Decode Production Android keystore
         run: |
-          echo "${{ secrets.DEV_KEYSTORE }}" > keystore.keystore.asc
-          gpg -d --passphrase "${{ secrets.DEV_KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
+          echo "${{ secrets.ANDROID_KEYSTORE }}" > keystore.keystore.asc
+          gpg -d --passphrase "${{ secrets.KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
       - name: Install dependencies
         run: yarn install
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
           BUILD_NUMBER: ${{ github.run_number }}
-          ANDROID_KEYSTORE_ALIAS: ${{ secrets.DEV_ANDROID_KEYSTORE_ALIAS }}
-          ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PASSWORD }}
-          GOOGLE_PLAY_JSON_KEY_DATA: ${{ secrets.GOOGLE_PLAY_JSON_KEY_DATA }}
+          ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+          ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          GOOGLE_JSON_KEY_DATA: ${{ secrets.GOOGLE_JSON_KEY_DATA }}
         with:
-          lane: 'android dev'
-  ios-dev:
+          lane: 'android prod'
+      - name: Upload Android app bundle to artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: release.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+  ios-prod:
     runs-on: macos-latest
-    timeout-minutes: 90
+     timeout-minutes: 90
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -56,7 +59,7 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         with:
           lane: 'ios setup'
-      - name: Build & deploy development build
+      - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
@@ -65,8 +68,8 @@ jobs:
           MATCH_CERTIFICATES_URL: ${{ secrets.MATCH_CERTIFICATES_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ github.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           BUILD_NUMBER: ${{ github.run_number }}
         with:
-          lane: 'ios dev'
+          lane: 'ios prod'
