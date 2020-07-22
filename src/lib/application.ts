@@ -66,11 +66,6 @@ export class MobileApplication extends SNApplication {
     super.deinit();
   }
 
-  promptForCustomChallenge(challnge: Challenge) {
-    super.promptForCustomChallenge(challenge);
-    this.promptForChallenge(challenge);
-  }
-
   promptForChallenge(challenge: Challenge) {
     navigate(SCREEN_AUTHENTICATE, { challenge });
   }
