@@ -34,7 +34,7 @@ platform :ios do
     sign_ios
     build_ios(scheme)
     upload_to_testflight(
-      team_id: ENV["APPLE_TEAM_ID"],
+      apple_id: ENV{"FASTLANE_USER"},
       skip_waiting_for_build_processing: true,
     )
     # refresh_dsyms
