@@ -9,11 +9,8 @@ import {
   TabletModeChangeData,
 } from '@Lib/ApplicationState';
 import { useHasEditor, useIsLocked } from '@Lib/customHooks';
-import {
-  NavigationContainer,
-  NavigationContainerRef,
-  RouteProp,
-} from '@react-navigation/native';
+import { navigationRef } from '@Lib/NavigationService';
+import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import {
   createStackNavigator,
   StackNavigationProp,
@@ -29,7 +26,6 @@ import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
 import { ICON_CHECKMARK, ICON_CLOSE, ICON_MENU } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
-import { Client } from 'bugsnag-react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
@@ -39,7 +35,6 @@ import {
   StatusBar,
 } from 'react-native';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
-import { enableScreens } from 'react-native-screens';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { Challenge } from 'snjs';
 import { ThemeContext, ThemeProvider } from 'styled-components/native';
@@ -52,13 +47,6 @@ import {
   SCREEN_NOTES,
   SCREEN_SETTINGS,
 } from './screens/screens';
-
-enableScreens();
-
-if (__DEV__ === false) {
-  // eslint-disable-next-line no-new
-  new Client();
-}
 
 type HeaderTitleParams = {
   title?: string;
@@ -407,14 +395,13 @@ const AppComponent: React.FC<{
   env: 'prod' | 'dev';
 }> = ({ application, env }) => {
   const [ready, setReady] = useState(false);
-  const navigationRef = useRef<NavigationContainerRef>(null);
   const styleKit = useRef<StyleKit | undefined>(undefined);
 
   useEffect(() => {
     const loadApplication = async () => {
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
-          application!.promptForChallenge(challenge, navigationRef.current);
+          application!.promptForChallenge(challenge);
         },
       });
       if (env === 'dev') {

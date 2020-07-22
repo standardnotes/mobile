@@ -16,8 +16,8 @@ This is a React Native implementation of Standard Notes. React Native allows us 
 
 ### Building from source
 
-1. Make sure you can run an example React Native project, setup you environment according to [official docs](https://reactnative.dev/docs/environment-setup)
-2. If you would like to build an Android app, you need to install Android NDK. We use a native code from libsodium encryption library to ensure we achieve the best performance. You can install NDK in Android Studio, you need to pick version listed [here](https://github.com/standardnotes/react-native-sodium/blob/refactor/android/build.gradle#L47)
+1. Make sure you can run an example React Native project, setup your environment according to [official docs](https://reactnative.dev/docs/environment-setup)
+2. If you would like to build an Android app, you need to install Android NDK. We use a native code from libsodium encryption library to ensure we archieve the best performance. You can install NDK in Android Studio, you need to pick version listed [here](https://github.com/standardnotes/react-native-sodium/blob/refactor/android/build.gradle#L47)
 3. Install [yarn](https://yarnpkg.com/) if you don't have it already.
 3. Install project dependencies
 

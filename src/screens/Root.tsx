@@ -12,7 +12,7 @@ import { hexToRGBA } from '@Style/utils';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { SNNote } from 'snjs/dist/@types';
+import { SNNote } from 'snjs/';
 import { ThemeContext } from 'styled-components/native';
 import { Compose } from './Compose/Compose';
 import { Notes } from './Notes/Notes';

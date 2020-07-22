@@ -1,4 +1,3 @@
-import { NavigationContainerRef } from '@react-navigation/native';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { StyleKit } from '@Style/StyleKit';
 import { Platform } from 'react-native';
@@ -14,6 +13,7 @@ import { BackupsService } from './BackupsService';
 import { ComponentGroup } from './componentGroup';
 import { EditorGroup } from './EditorGroup';
 import { MobileDeviceInterface } from './interface';
+import { navigate } from './NavigationService';
 import { PreferencesManager } from './PreferencesManager';
 import { ReviewService } from './reviewService';
 import { SNReactNativeCrypto } from './SNReactNativeCrypto';
@@ -66,11 +66,13 @@ export class MobileApplication extends SNApplication {
     super.deinit();
   }
 
-  promptForChallenge(
-    challenge: Challenge,
-    navigation: NavigationContainerRef | null
-  ) {
-    navigation?.navigate(SCREEN_AUTHENTICATE, { challenge });
+  promptForCustomChallenge(challnge: Challenge) {
+    super.promptForCustomChallenge(challenge);
+    this.promptForChallenge(challenge);
+  }
+
+  promptForChallenge(challenge: Challenge) {
+    navigate(SCREEN_AUTHENTICATE, { challenge });
   }
 
   setMobileServices(services: MobileServices) {
