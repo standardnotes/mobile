@@ -244,11 +244,16 @@ export const Authenticate = ({
        * is closing. In this state however, we don't want to begin auth. We'll
        * wait until the app gains focus.
        */
-      const isLosingFocus =
+      const isLosingFocusOrInBackground =
         application?.getAppState().getMostRecentState() ===
-        AppStateType.LosingFocus;
+          AppStateType.LosingFocus ||
+        application?.getAppState().getMostRecentState() ===
+          AppStateType.EnteringBackground;
 
-      if (challengeValue.type === ChallengeType.Biometric && !isLosingFocus) {
+      if (
+        challengeValue.type === ChallengeType.Biometric &&
+        !isLosingFocusOrInBackground
+      ) {
         /** Begin authentication right away, we're not waiting for any input */
         authenticateBiometrics(challengeValue);
       }

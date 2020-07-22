@@ -33,8 +33,9 @@ platform :ios do
   def deploy_ios(scheme)
     sign_ios
     build_ios(scheme)
-    pilot(
-      team_id: ENV["APPLE_TEAM_ID"],
+    upload_to_testflight(
+      apple_id: ENV["FASTLANE_USER"],
+      skip_waiting_for_build_processing: true,
     )
     # refresh_dsyms
   end
