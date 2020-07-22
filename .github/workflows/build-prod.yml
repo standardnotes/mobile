@@ -67,6 +67,7 @@ jobs:
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
+          APPLE_APP_ID: ${{ secrets.APP_APPLE_ID }}
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
