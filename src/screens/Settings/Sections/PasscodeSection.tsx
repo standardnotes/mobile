@@ -146,6 +146,7 @@ export const PasscodeSection = (props: Props) => {
       );
       if (confirmed) {
         await application?.removePasscode();
+        await application?.getAppState().setScreenshotPrivacy();
       }
     } else {
       navigation.push(SCREEN_INPUT_MODAL_PASSCODE);
@@ -169,12 +170,13 @@ export const PasscodeSection = (props: Props) => {
   const onBiometricsPress = async () => {
     if (hasBiometrics) {
       setHasBiometrics(false);
-      application?.disableBiometrics();
+      await application?.disableBiometrics();
     } else {
       setHasBiometrics(true);
       await application?.enableBiometrics();
       await setBiometricsTiming(UnlockTiming.OnQuit);
     }
+    await application?.getAppState().setScreenshotPrivacy();
   };
 
   let biometricTitle = hasBiometrics

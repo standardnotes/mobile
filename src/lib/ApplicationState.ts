@@ -185,10 +185,12 @@ export class ApplicationState extends ApplicationService {
     this.biometricsTiming = await this.getBiometricsTiming();
   }
 
-  private setScreenshotPrivacy() {
+  public async setScreenshotPrivacy() {
+    const hasBiometrics = await this.application.hasBiometrics();
+    const hasPasscode = this.application.hasPasscode();
     const hasImmediateLock =
-      this.passcodeTiming === UnlockTiming.Immediately ||
-      this.biometricsTiming === UnlockTiming.Immediately;
+      (hasBiometrics && this.biometricsTiming === UnlockTiming.Immediately) ||
+      (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately);
     if (Platform.OS === 'ios') {
       enabled(hasImmediateLock);
     } else {
