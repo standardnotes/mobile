@@ -7,7 +7,8 @@ import {
   NativeModules,
   Platform,
 } from 'react-native';
-import { hide, show } from 'react-native-privacy-snapshot';
+import FlagSecure from 'react-native-flag-secure-android';
+import { enabled } from 'react-native-privacy-snapshot';
 import {
   ApplicationEvent,
   ApplicationService,
@@ -126,6 +127,7 @@ export class ApplicationState extends ApplicationService {
 
   async onAppLaunch() {
     await this.getUnlockTiming();
+    this.setScreenshotPrivacy();
   }
 
   /**
@@ -181,6 +183,21 @@ export class ApplicationState extends ApplicationService {
   private async getUnlockTiming() {
     this.passcodeTiming = await this.getPasscodeTiming();
     this.biometricsTiming = await this.getBiometricsTiming();
+  }
+
+  private setScreenshotPrivacy() {
+    const hasImmediateLock =
+      this.passcodeTiming === UnlockTiming.Immediately ||
+      this.biometricsTiming === UnlockTiming.Immediately;
+    if (Platform.OS === 'ios') {
+      enabled(hasImmediateLock);
+    } else {
+      if (hasImmediateLock) {
+        FlagSecure.activate();
+      } else {
+        FlagSecure.deactivate();
+      }
+    }
   }
 
   /**
@@ -474,7 +491,6 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isResumingFromBackground || isResuming) {
-      hide(); // hide privacy lock over the app (iOS only)
       if (isResumingFromBackground) {
         this.notifyOfStateChange(AppStateType.ResumingFromBackground);
       }
@@ -484,7 +500,6 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isLosingFocus) {
-      show(); // show privacy lock over the app (iOS only)
       this.notifyOfStateChange(AppStateType.LosingFocus);
 
       // If a privileges authentication session is in progress, we don't want to lock the application
@@ -538,6 +553,7 @@ export class ApplicationState extends ApplicationService {
       StorageValueModes.Nonwrapped
     );
     this.passcodeTiming = timing;
+    this.setScreenshotPrivacy();
   }
 
   public async setBiometricsTiming(timing: UnlockTiming) {
@@ -547,6 +563,7 @@ export class ApplicationState extends ApplicationService {
       StorageValueModes.Nonwrapped
     );
     this.biometricsTiming = timing;
+    this.setScreenshotPrivacy();
   }
 
   /*
@@ -565,13 +582,5 @@ export class ApplicationState extends ApplicationService {
 
   getMostRecentState() {
     return this.mostRecentState;
-  }
-
-  setAuthenticationInProgress(inProgress: boolean) {
-    this.authenticationInProgress = inProgress;
-  }
-
-  isAuthenticationInProgress() {
-    return this.authenticationInProgress;
   }
 }

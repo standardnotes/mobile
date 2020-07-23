@@ -183,10 +183,14 @@ export const Authenticate = ({
       } else {
         // iOS
         try {
-          await FingerprintScanner.authenticate({
-            fallbackEnabled: true,
-            description: 'This is required to access your notes.',
-          });
+          await application
+            ?.getAppState()
+            .performActionWithoutStateChangeImpact(async () => {
+              await FingerprintScanner.authenticate({
+                fallbackEnabled: true,
+                description: 'This is required to access your notes.',
+              });
+            });
           FingerprintScanner.release();
           const newChallengeValue = { ...challengeValue, value: true };
           onValueChange(newChallengeValue);
@@ -202,6 +206,11 @@ export const Authenticate = ({
               'Authentication failed. Tap to try again.'
             );
           }
+          dispatch({
+            type: 'setState',
+            valueType: challengeValue.type,
+            state: ChallengeValueStateType.Fail,
+          });
         }
       }
     },
@@ -291,6 +300,17 @@ export const Authenticate = ({
       state: ChallengeValueStateType.Fail,
     });
   };
+  useEffect(() => {
+    const removeAppStateSubscriber = application
+      ?.getAppState()
+      .addStateChangeObserver(state => {
+        if (state === AppStateType.ResumingFromBackground) {
+          beginAuthenticatingForNextChallengeReason();
+        }
+      });
+
+    return removeAppStateSubscriber;
+  }, [application, beginAuthenticatingForNextChallengeReason]);
 
   useEffect(() => {
     if (application?.setChallengeCallbacks) {
@@ -358,6 +378,22 @@ export const Authenticate = ({
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, [])
   );
+
+  const onSubmitPress = () => {
+    const challengeValue = challengeValues[firstNotSuccessful];
+    const index = findMatchingValueIndex(challengeValues, challengeValue.type);
+    const state = challengeValueStates[index];
+    if (
+      challengeValue.type === ChallengeType.Biometric &&
+      (state === ChallengeValueStateType.Locked ||
+        state === ChallengeValueStateType.Fail)
+    ) {
+      beginAuthenticatingForNextChallengeReason();
+      return;
+    }
+
+    validateChallengeValue(challengeValue);
+  };
 
   const renderAuthenticationSource = (
     challengeValue: ChallengeValue,
@@ -464,9 +500,7 @@ export const Authenticate = ({
             : 'Next'
         }
         bold={true}
-        onPress={() =>
-          validateChallengeValue(challengeValues[firstNotSuccessful])
-        }
+        onPress={onSubmitPress}
       />
     </Container>
   );
