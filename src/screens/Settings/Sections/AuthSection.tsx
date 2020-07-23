@@ -21,6 +21,15 @@ type Props = {
   signedIn: boolean;
 };
 
+type MfaResponse = {
+  message: string;
+  payload: {
+    mfa_key: string;
+  };
+  tag: string;
+  status: number;
+};
+
 export const AuthSection = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -31,9 +40,8 @@ export const AuthSection = (props: Props) => {
   const [signingIn, setSigningIn] = useState(false);
   const [strictSignIn, setStrictSignIn] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [mfa, setMfa] = useState(false);
-  const [mfaText, setMfaText] = useState('');
-  const [mfaMessage] = useState<string | undefined>(undefined);
+  const [mfa, setMfa] = useState<MfaResponse | undefined>();
+  const [mfaCode, setMfaCode] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [server, setServer] = useState('');
@@ -42,16 +50,25 @@ export const AuthSection = (props: Props) => {
 
   const signIn = async () => {
     setSigningIn(true);
-    await application!.signIn(
+    const result = await application!.signIn(
       email,
       password,
       strictSignIn,
       undefined,
-      undefined,
-      undefined,
+      mfa?.payload.mfa_key,
+      mfaCode || undefined,
       true,
       false
     );
+    if (result?.error) {
+      if (
+        result?.error.tag === 'mfa-required' ||
+        result?.error.tag === 'mfa-invalid'
+      ) {
+        setMfa(result?.error);
+      }
+    }
+
     setSigningIn(false);
     setPassword('');
     setPasswordConfirmation('');
@@ -123,16 +140,16 @@ export const AuthSection = (props: Props) => {
     const renderMfaSubcontent = () => {
       return (
         <RegularView>
-          <RegistrationDescription>{mfaMessage}</RegistrationDescription>
+          <RegistrationDescription>{mfa?.message}</RegistrationDescription>
           <SectionedTableCell textInputCell first>
             <RegistrationInput
               placeholder=""
-              onChangeText={setMfaText}
-              value={mfaText}
+              onChangeText={setMfaCode}
+              value={mfaCode}
               keyboardType={'numeric'}
               keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
               autoFocus
-              onSubmitEditing={() => {}}
+              onSubmitEditing={signIn}
             />
           </SectionedTableCell>
         </RegularView>
@@ -220,7 +237,7 @@ export const AuthSection = (props: Props) => {
           <ButtonCell
             title={'Cancel'}
             disabled={signingIn}
-            onPress={() => setMfa(false)}
+            onPress={() => setMfa(undefined)}
           />
         )}
 
