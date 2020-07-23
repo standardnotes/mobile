@@ -7,6 +7,7 @@ import {
   NativeModules,
   Platform,
 } from 'react-native';
+import { hide, show } from 'react-native-privacy-snapshot';
 import {
   ApplicationEvent,
   ApplicationService,
@@ -473,6 +474,7 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isResumingFromBackground || isResuming) {
+      hide(); // hide privacy lock over the app (iOS only)
       if (isResumingFromBackground) {
         this.notifyOfStateChange(AppStateType.ResumingFromBackground);
       }
@@ -482,6 +484,7 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isLosingFocus) {
+      show(); // show privacy lock over the app (iOS only)
       this.notifyOfStateChange(AppStateType.LosingFocus);
 
       // If a privileges authentication session is in progress, we don't want to lock the application

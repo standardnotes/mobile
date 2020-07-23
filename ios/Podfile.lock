@@ -323,6 +323,8 @@ PODS:
     - React
   - RNKeychain (4.0.5):
     - React
+  - RNPrivacySnapshot (1.0.0):
+    - React
   - RNReanimated (1.9.0):
     - React
   - RNScreens (2.9.0):
@@ -389,6 +391,7 @@ DEPENDENCIES:
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
+  - RNPrivacySnapshot (from `../node_modules/react-native-privacy-snapshot`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSearchBar (from `../node_modules/react-native-search-bar`)
@@ -492,6 +495,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNKeychain:
     :path: "../node_modules/react-native-keychain"
+  RNPrivacySnapshot:
+    :path: "../node_modules/react-native-privacy-snapshot"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -559,6 +564,7 @@ SPEC CHECKSUMS:
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
+  RNPrivacySnapshot: 71919dde3c6a29dd332115409c2aec564afee8f4
   RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
   RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
   RNSearchBar: 9860431356b7d12a8449d2fddb2b5f3c78d1e99f

@@ -40,6 +40,7 @@
     "react-native-gesture-handler": "^1.6.1",
     "react-native-keychain": "^4.0.5",
     "react-native-mail": "standardnotes/react-native-mail#9862c76",
+    "react-native-privacy-snapshot": "rhdeck/react-native-privacy-snapshot#529e462",
     "react-native-reanimated": "^1.9.0",
     "react-native-safe-area-context": "^3.1.1",
     "react-native-screens": "^2.9.0",
