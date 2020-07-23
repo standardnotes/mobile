@@ -409,12 +409,12 @@ export class ApplicationState extends ApplicationService {
     return this.tabletMode;
   }
 
-  setTabletModeEnabled(enabled: boolean) {
-    if (enabled !== this.tabletMode) {
-      this.tabletMode = enabled;
+  setTabletModeEnabled(enabledTabletMode: boolean) {
+    if (enabledTabletMode !== this.tabletMode) {
+      this.tabletMode = enabledTabletMode;
       this.notifyEventObservers(AppStateEventType.TabletModeChange, {
-        new_isInTabletMode: enabled,
-        old_isInTabletMode: !enabled,
+        new_isInTabletMode: enabledTabletMode,
+        old_isInTabletMode: !enabledTabletMode,
       });
     }
   }
