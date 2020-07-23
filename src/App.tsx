@@ -263,7 +263,7 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
   );
 };
 
-const MainStackComponent = () => {
+const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
   const application = useContext(ApplicationContext);
 
   return (
@@ -304,7 +304,7 @@ const MainStackComponent = () => {
             </HeaderButtons>
           ),
           headerRight: () =>
-            __DEV__ && (
+            env === 'dev' && (
               <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
                 <Item
                   testID="headerButton"
@@ -436,7 +436,7 @@ const AppComponent: React.FC<{
           <ThemeProvider theme={styleKit.current.theme!}>
             <ActionSheetProvider>
               <StyleKitContext.Provider value={styleKit.current}>
-                <MainStackComponent />
+                <MainStackComponent env={env} />
               </StyleKitContext.Provider>
             </ActionSheetProvider>
           </ThemeProvider>
