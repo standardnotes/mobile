@@ -81,7 +81,8 @@ export class MobileDeviceInterface extends DeviceInterface {
 
   async getAllRawDatabasePayloads(): Promise<any[]> {
     const keys = await this.getAllDatabaseKeys();
-    return this.getRawStorageKeyValues(keys);
+    const items = await this.getRawStorageKeyValues(keys);
+    return items.map(item => JSON.parse(item.value));
   }
   saveRawDatabasePayload(payload: any): Promise<void> {
     return this.saveRawDatabasePayloads([payload]);
