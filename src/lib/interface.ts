@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import { Alert, Linking } from 'react-native';
+import { Alert, Linking, Platform } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { DeviceInterface } from 'snjs';
 import Keychain from './keychain';
@@ -40,18 +40,35 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   private async getRawStorageKeyValues(keys: string[]) {
-    try {
-      const items = await AsyncStorage.multiGet(keys);
-      return items.map(item => {
-        if (item[1]) {
-          return {
-            key: item[0],
-            value: item[1],
-          };
+    if (Platform.OS === 'android') {
+      const results = [];
+      for (const key of keys) {
+        try {
+          const item = await AsyncStorage.getItem(key);
+          if (item) {
+            results.push({
+              key,
+              value: item,
+            });
+          }
+        } catch (e) {
+          console.log('Error getting item', key, e);
         }
-      }) as Record<string, string>[];
-    } catch (e) {
-      console.log('Error getting items', keys, e);
+      }
+    } else {
+      try {
+        const items = await AsyncStorage.multiGet(keys);
+        return items.map(item => {
+          if (item[1]) {
+            return {
+              key: item[0],
+              value: item[1],
+            };
+          }
+        }) as Record<string, string>[];
+      } catch (e) {
+        console.log('Error getting items', keys, e);
+      }
     }
     return [];
   }
