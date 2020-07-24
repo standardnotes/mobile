@@ -122,7 +122,15 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
   async getKeychainValue(): Promise<any> {
     const keys = await Keychain.getKeys();
-    return keys[this.keychainStorageKey] || keys;
+    // If the keychain is namespaced, return namespaced value.
+    if (keys[this.keychainStorageKey]) {
+      return keys[this.keychainStorageKey];
+    }
+    /*
+      The full keychain is returned if no namespace is present (i.e: before local migration).
+      This is the legacy behavior.
+    */
+    return keys;
   }
   setKeychainValue(value: any): Promise<void> {
     const keys = {
