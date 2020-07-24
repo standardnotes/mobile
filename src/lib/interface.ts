@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import { Alert, Linking, Platform } from 'react-native';
+import { Alert, Linking } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { DeviceInterface } from 'snjs';
 import Keychain from './keychain';
@@ -40,39 +40,24 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   private async getRawStorageKeyValues(keys: string[]) {
-    if (Platform.OS === 'android') {
-      const results = [];
-      for (const key of keys) {
-        try {
-          const item = await AsyncStorage.getItem(key);
-          if (item) {
-            results.push(JSON.parse(item));
-          }
-        } catch (e) {
-          console.log('Error getting item', key, e);
+    try {
+      const items = await AsyncStorage.multiGet(keys);
+      return items.map(item => {
+        if (item[1]) {
+          return {
+            key: item[0],
+            value: item[1],
+          };
         }
-      }
-    } else {
-      try {
-        const items = await AsyncStorage.multiGet(keys);
-        return items.map(item => {
-          if (item[1]) {
-            return JSON.parse(item[1]);
-          }
-        });
-      } catch (e) {
-        console.log('Error getting items', keys, e);
-      }
+      }) as Record<string, string>[];
+    } catch (e) {
+      console.log('Error getting items', keys, e);
     }
-
     return [];
   }
 
   async getRawStorageValue(key: string) {
-    const item = await AsyncStorage.getItem(key);
-    if (item) {
-      return JSON.parse(item);
-    }
+    return AsyncStorage.getItem(key);
   }
 
   async getAllRawStorageKeyValues(): Promise<Record<string, any>[]> {
@@ -80,7 +65,8 @@ export class MobileDeviceInterface extends DeviceInterface {
     return this.getRawStorageKeyValues(keys);
   }
   setRawStorageValue(key: string, value: any): Promise<void> {
-    return AsyncStorage.setItem(key, JSON.stringify(value));
+    const rawValue = typeof value !== 'string' ? JSON.stringify(value) : value;
+    return AsyncStorage.setItem(key, rawValue);
   }
   removeRawStorageValue(key: string): Promise<void> {
     return AsyncStorage.removeItem(key);
