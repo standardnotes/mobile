@@ -122,7 +122,7 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
   async getKeychainValue(): Promise<any> {
     const keys = await Keychain.getKeys();
-    return keys[this.keychainStorageKey];
+    return keys[this.keychainStorageKey] || keys;
   }
   setKeychainValue(value: any): Promise<void> {
     const keys = {
