@@ -451,6 +451,27 @@ export class ApplicationState extends ApplicationService {
     ];
   }
 
+  private async checkAndLockApplication() {
+    const isLocked = await this.application.isLocked();
+    if (!isLocked) {
+      const hasBiometrics = await this.application.hasBiometrics();
+      const hasPasscode = this.application.hasPasscode();
+      if (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately) {
+        await this.application.lock();
+      } else if (
+        hasBiometrics &&
+        this.biometricsTiming === UnlockTiming.Immediately
+      ) {
+        const challenge = new Challenge(
+          [ChallengeType.Biometric],
+          ChallengeReason.ApplicationUnlock
+        );
+        this.application.promptForCustomChallenge(challenge);
+        this.application.promptForChallenge(challenge);
+      }
+    }
+  }
+
   /**
    * handles App State change from React Native
    */
@@ -471,25 +492,8 @@ export class ApplicationState extends ApplicationService {
     const isLosingFocus = nextAppState === 'inactive';
     if (isEnteringBackground) {
       this.notifyOfStateChange(AppStateType.EnteringBackground);
-      const isLocked = await this.application.isLocked();
 
-      if (!isLocked) {
-        const hasBiometrics = await this.application.hasBiometrics();
-        const hasPasscode = this.application.hasPasscode();
-        if (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately) {
-          await this.application.lock();
-        } else if (
-          hasBiometrics &&
-          this.biometricsTiming === UnlockTiming.Immediately
-        ) {
-          const challenge = new Challenge(
-            [ChallengeType.Biometric],
-            ChallengeReason.ApplicationUnlock
-          );
-          this.application.promptForCustomChallenge(challenge);
-          this.application.promptForChallenge(challenge);
-        }
-      }
+      this.checkAndLockApplication();
     }
 
     if (isResumingFromBackground || isResuming) {
@@ -509,6 +513,7 @@ export class ApplicationState extends ApplicationService {
       // notifications, causing the app to lock. If the user backgrouds the app during privilege authentication,
       // it will still be locked via the Backgrounding event.
       // TODO: check this
+      this.checkAndLockApplication();
     }
 
     /*
