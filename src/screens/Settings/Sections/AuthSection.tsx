@@ -5,7 +5,7 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { StyleKitContext } from '@Style/StyleKit';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   RegistrationDescription,
   RegistrationInput,
@@ -48,8 +48,35 @@ export const AuthSection = (props: Props) => {
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [confirmRegistration, setConfirmRegistration] = useState(false);
 
+  const validate = () => {
+    if (!email) {
+      application?.alertService?.alert(
+        'Please enter a valid email address.',
+        'Missing Email',
+        'OK'
+      );
+      return false;
+    }
+
+    if (!password) {
+      application?.alertService?.alert(
+        'Please enter your password.',
+        'Missing Password',
+        'OK'
+      );
+      return false;
+    }
+
+    return true;
+  };
+
   const signIn = async () => {
     setSigningIn(true);
+    if (!validate()) {
+      setSigningIn(false);
+      return;
+    }
+
     const result = await application!.signIn(
       email,
       password,
@@ -60,23 +87,49 @@ export const AuthSection = (props: Props) => {
       true,
       false
     );
+
     if (result?.error) {
       if (
         result?.error.tag === 'mfa-required' ||
         result?.error.tag === 'mfa-invalid'
       ) {
         setMfa(result?.error);
+      } else if (result?.error.message) {
+        application?.alertService?.alert(result?.error.message, 'Oops', 'OK');
       }
+      setSigningIn(false);
+      return;
     }
 
     setSigningIn(false);
+    setMfa(undefined);
     setPassword('');
     setPasswordConfirmation('');
   };
 
   const register = async () => {
     setRegistering(true);
-    await application!.register(email, password, undefined, true);
+    if (password !== passwordConfirmation) {
+      application?.alertService?.alert(
+        'The passwords you entered do not match. Please try again.',
+        "Passwords Don't Match",
+        'OK'
+      );
+    } else {
+      const result = await application!.register(
+        email,
+        password,
+        undefined,
+        true
+      );
+      if (result?.error) {
+        application?.alertService?.alert(
+          'Registration failed. Please try again.',
+          'Registration failed',
+          'OK'
+        );
+      }
+    }
     setRegistering(false);
   };
 
@@ -89,6 +142,13 @@ export const AuthSection = (props: Props) => {
     getServer();
   }, [application]);
 
+  const updateServer = useCallback(
+    async (host: string) => {
+      setServer(host);
+      await application?.setHost(host);
+    },
+    [application]
+  );
   if (props.signedIn) {
     return null;
   }
@@ -195,7 +255,7 @@ export const AuthSection = (props: Props) => {
                 <RegistrationInput
                   testID="syncServerField"
                   placeholder={'Sync Server'}
-                  onChangeText={setServer}
+                  onChangeText={updateServer}
                   value={server}
                   autoCorrect={false}
                   autoCapitalize={'none'}
