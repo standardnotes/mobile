@@ -237,7 +237,7 @@ export const Compose = (): JSX.Element => {
       removeEditorNoteValueChangeObserver &&
         removeEditorNoteValueChangeObserver();
     };
-  }, [editor]);
+  }, [editor, note?.locked]);
 
   const saveNote = useCallback(
     async (
