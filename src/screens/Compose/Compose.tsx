@@ -215,6 +215,9 @@ export const Compose = (): JSX.Element => {
           setTitle(newNote.title);
           setNoteText(newNote.text);
         }
+        if (newNote.locked !== note?.locked) {
+          setNote(newNote);
+        }
         if (newNote.lastSyncBegan && newNote.lastSyncEnd) {
           if (
             newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
@@ -362,7 +365,7 @@ export const Compose = (): JSX.Element => {
         keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
         autoCorrect={true}
         autoCapitalize={'sentences'}
-        editable={note?.locked}
+        editable={!note?.locked}
       />
       {loadingWebview && (
         <LoadingWebViewContainer>
