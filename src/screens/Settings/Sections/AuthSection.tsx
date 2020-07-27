@@ -96,6 +96,7 @@ export const AuthSection = (props: Props) => {
         setMfa(result?.error);
       } else if (result?.error.message) {
         application?.alertService?.alert(result?.error.message, 'Oops', 'OK');
+        setMfa(undefined);
       }
       setSigningIn(false);
       return;
