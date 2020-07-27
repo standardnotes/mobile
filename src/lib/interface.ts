@@ -52,6 +52,7 @@ export class MobileDeviceInterface extends DeviceInterface {
           console.log('Error getting item', key, e);
         }
       }
+      return results;
     } else {
       try {
         const items = await AsyncStorage.multiGet(keys);
