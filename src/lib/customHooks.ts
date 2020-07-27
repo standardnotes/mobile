@@ -92,24 +92,32 @@ export const useIsLocked = () => {
   const [isLocked, setIsLocked] = React.useState<boolean>(true);
 
   useEffect(() => {
+    let isMounted = true;
     const getIsLocked = async () => {
       const locked = await application?.isLocked();
-      if (locked === undefined) {
-        setIsLocked(true);
-      } else {
-        setIsLocked(Boolean(locked));
+      if (isMounted) {
+        if (locked === undefined) {
+          setIsLocked(true);
+        } else {
+          setIsLocked(Boolean(locked));
+        }
       }
     };
     getIsLocked();
     const removeSignedInObserver = application?.addEventObserver(
       async event => {
         if (event === ApplicationEvent.Launched) {
-          setIsLocked(false);
+          if (isMounted) {
+            setIsLocked(false);
+          }
         }
       }
     );
 
-    return removeSignedInObserver;
+    return () => {
+      isMounted = false;
+      removeSignedInObserver && removeSignedInObserver();
+    };
   }, [application]);
 
   return isLocked;
