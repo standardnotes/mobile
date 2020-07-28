@@ -48,6 +48,26 @@ export const AuthSection = (props: Props) => {
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [confirmRegistration, setConfirmRegistration] = useState(false);
 
+  // set initial server
+  useEffect(() => {
+    const getServer = async () => {
+      const host = await application!.getHost();
+      setServer(host!);
+    };
+    getServer();
+  }, [application]);
+
+  const updateServer = useCallback(
+    async (host: string) => {
+      setServer(host);
+      await application?.setHost(host);
+    },
+    [application]
+  );
+  if (props.signedIn) {
+    return null;
+  }
+
   const validate = () => {
     if (!email) {
       application?.alertService?.alert(
@@ -108,6 +128,13 @@ export const AuthSection = (props: Props) => {
     setPasswordConfirmation('');
   };
 
+  const onRegisterPress = () => {
+    if (!validate()) {
+      return;
+    }
+    setConfirmRegistration(true);
+  };
+
   const register = async () => {
     setRegistering(true);
     if (password !== passwordConfirmation) {
@@ -133,26 +160,6 @@ export const AuthSection = (props: Props) => {
     }
     setRegistering(false);
   };
-
-  // set initial server
-  useEffect(() => {
-    const getServer = async () => {
-      const host = await application!.getHost();
-      setServer(host!);
-    };
-    getServer();
-  }, [application]);
-
-  const updateServer = useCallback(
-    async (host: string) => {
-      setServer(host);
-      await application?.setHost(host);
-    },
-    [application]
-  );
-  if (props.signedIn) {
-    return null;
-  }
 
   const _renderRegistrationConfirm = () => {
     return (
@@ -308,7 +315,7 @@ export const AuthSection = (props: Props) => {
             title={DEFAULT_REGISTER_TEXT}
             disabled={registering}
             bold
-            onPress={() => setConfirmRegistration(true)}
+            onPress={onRegisterPress}
           />
         )}
 
