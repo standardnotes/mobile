@@ -11,6 +11,7 @@ import React, {
   useState,
 } from 'react';
 import { TextInput } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   ComponentArea,
@@ -31,12 +32,12 @@ import {
   LockedContainer,
   LockedText,
   NoteTitleInput,
+  StyledKeyboardAvoidngView,
   StyledTextView,
   TextContainer,
   WebViewReloadButton,
   WebViewReloadButtonText,
 } from './Compose.styled';
-
 const NOTE_PREVIEW_CHAR_LIMIT = 80;
 // const MINIMUM_STATUS_DURATION = 400;
 const SAVE_TIMEOUT_DEBOUNCE = 350;
@@ -314,13 +315,30 @@ export const Compose = (): JSX.Element => {
     });
   };
 
-  const onContentChange = (newNoteText: string) => {
-    setNoteText(newNoteText);
-    saveNote(false, true, true, false, {
-      newTitle: title,
-      newNoteText,
-    });
-  };
+  const onContentChange = useCallback(
+    (newNoteText: string) => {
+      if (application?.platform === Platform.Android && note?.locked) {
+        application.alertService?.alert(
+          'This note is locked. Please unlock this note to make changes.',
+          'Note Locked',
+          'OK'
+        );
+        return;
+      }
+      setNoteText(newNoteText);
+      saveNote(false, true, true, false, {
+        newTitle: title,
+        newNoteText,
+      });
+    },
+    [
+      application?.alertService,
+      application?.platform,
+      note?.locked,
+      saveNote,
+      title,
+    ]
+  );
 
   const shouldDisplayEditor = editorComponent && Boolean(note) && !webViewError;
 
@@ -396,30 +414,40 @@ export const Compose = (): JSX.Element => {
       )}
       {!shouldDisplayEditor && application?.platform === Platform.Android && (
         <TextContainer>
-          <StyledTextView
-            testID="noteContentField"
-            multiline
-            ref={editorViewRef}
-            autoFocus={false}
-            value={noteText}
-            selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
-            // handlesColor={theme.stylekitInfoColor}
-            onChangeText={onContentChange}
-          />
+          <ScrollView keyboardShouldPersistTaps="handled">
+            <StyledTextView
+              testID="noteContentField"
+              multiline
+              ref={editorViewRef}
+              // autoFocus={editor?.isTemplateNote}
+              value={noteText}
+              textAlignVertical="top"
+              autoCapitalize={'sentences'}
+              selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
+              // TODO: handlesColor={theme.stylekitInfoColor}
+              onChangeText={onContentChange}
+              scrollEnabled={false}
+            />
+          </ScrollView>
         </TextContainer>
       )}
       {!shouldDisplayEditor && application?.platform === Platform.Ios && (
-        <StyledTextView
-          ref={editorViewRef}
-          autoFocus={false}
-          multiline
-          value={noteText}
-          keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
-          selectionColor={lighten(theme.stylekitInfoColor)}
-          onChangeText={onContentChange}
-          editable={!note?.locked}
-          scrollEnabled
-        />
+        <StyledKeyboardAvoidngView
+          behavior={'padding'}
+          keyboardVerticalOffset={80}
+        >
+          <StyledTextView
+            testID="noteContentField"
+            ref={editorViewRef}
+            // autoFocus={}
+            multiline
+            value={noteText}
+            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            selectionColor={lighten(theme.stylekitInfoColor)}
+            onChangeText={onContentChange}
+            editable={!note?.locked}
+          />
+        </StyledKeyboardAvoidngView>
       )}
     </Container>
   );
