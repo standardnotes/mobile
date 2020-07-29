@@ -123,20 +123,22 @@ export const Root = (props: Props): JSX.Element | null => {
     setKeyboardHeight(application?.getAppState().getKeyboardHeight());
   };
 
-  const openCompose = () => {
+  const openCompose = (newNote: boolean) => {
     if (!shouldSplitLayout) {
-      props.navigation.navigate(SCREEN_COMPOSE);
+      props.navigation.navigate(SCREEN_COMPOSE, {
+        title: newNote ? 'Compose' : 'Note',
+      });
     }
   };
 
   const onNoteSelect = async (noteUuid: SNNote['uuid']) => {
     await application!.getAppState().openEditor(noteUuid);
-    openCompose();
+    openCompose(false);
   };
 
   const onNoteCreate = async () => {
     await application!.getAppState().createEditor();
-    openCompose();
+    openCompose(true);
   };
 
   const toggleNoteList = () => {
