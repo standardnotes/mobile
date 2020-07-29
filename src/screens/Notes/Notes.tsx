@@ -1,9 +1,11 @@
 import { AppStateType } from '@Lib/ApplicationState';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_NOTES } from '@Screens/screens';
 import { ICON_ADD } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useRef, useState } from 'react';
 import FAB from 'react-native-fab';
 import {
   CollectionSort,
@@ -26,20 +28,32 @@ export const Notes: React.FC<Props> = props => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
+  >();
 
   // State
   const [sortBy] = useState<CollectionSort>(CollectionSort.UpdatedAt);
   const [sortReverse] = useState<string>();
   const [notes, setNotes] = useState<SNNote[]>([]);
 
-  const reloadNotes = useCallback(() => {
-    const tag = application!.getAppState().selectedTag;
-    if (!tag) {
-      return;
-    }
+  // Ref
+  const haveDisplayOptions = useRef(false);
 
-    setNotes(application!.getDisplayableItems(ContentType.Note) as SNNote[]);
-  }, [application]);
+  const reloadTitle = useCallback(() => {
+    let title = '';
+    // if (this.isFiltering()) {
+    // const resultCount = this.getState().notes!.length;
+    // title = `${resultCount} search results`;
+    if (application?.getAppState().selectedTag) {
+      title = application.getAppState().selectedTag!.title;
+    }
+    if (title) {
+      navigation.setParams({
+        title,
+      });
+    }
+  }, [application, navigation]);
 
   /**
    * Note that reloading display options destroys the current index and rebuilds it,
@@ -48,6 +62,7 @@ export const Notes: React.FC<Props> = props => {
    */
   const reloadNotesDisplayOptions = useCallback(() => {
     const tag = application!.getAppState().selectedTag!;
+
     application!.setDisplayOptions(
       ContentType.Note,
       sortBy! as CollectionSort,
@@ -61,7 +76,7 @@ export const Notes: React.FC<Props> = props => {
           matchesTag &&
           notePassesFilter(
             note,
-            application?.getAppState().selectedTag!,
+            tag,
             false, // application?.getAppState().showArchived!,
             false, // application?.getAppState().hidePinned!,
             '' // application?.getAppState().noteFilter.text.toLowerCase()
@@ -71,23 +86,29 @@ export const Notes: React.FC<Props> = props => {
     );
   }, [application, sortBy, sortReverse]);
 
+  const reloadNotes = useCallback(() => {
+    const tag = application!.getAppState().selectedTag;
+    if (!tag) {
+      return;
+    }
+
+    /** If no display options we set them initially */
+    if (!haveDisplayOptions.current) {
+      haveDisplayOptions.current = true;
+      reloadNotesDisplayOptions();
+    }
+
+    setNotes(application!.getDisplayableItems(ContentType.Note) as SNNote[]);
+    reloadTitle();
+  }, [application, haveDisplayOptions, reloadNotesDisplayOptions, reloadTitle]);
+
   const streamNotesAndTags = useCallback(() => {
     const removeStreamNotes = application!.streamItems(
       [ContentType.Note],
       async () => {
-        // const tempNotes = items as SNNote[];
         /** If a note changes, it will be queried against the existing filter;
          * we dont need to reload display options */
         reloadNotes();
-        // const activeNote = application!.editorGroup.activeEditor.note;
-        // if (activeNote) {
-        //   const discarded = activeNote.deleted || activeNote.trashed;
-        //   if (discarded) {
-        //     this.selectNextOrCreateNew();
-        //   }
-        // } else {
-        //   this.selectFirstNote();
-        // }
       }
     );
 
@@ -98,10 +119,6 @@ export const Notes: React.FC<Props> = props => {
         /** A tag could have changed its relationships, so we need to reload the filter */
         reloadNotesDisplayOptions();
         reloadNotes();
-        // if (findInArray(tags, 'uuid', this.appState.selectedTag?.uuid)) {
-        //   /** Tag title could have changed */
-        //   this.reloadPanelTitle();
-        // }
       }
     );
 

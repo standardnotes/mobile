@@ -54,6 +54,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
       });
     }
     application!.getAppState().setSelectedTag(tag);
+    drawerRef?.closeDrawer();
   };
 
   const openSettings = () => {
