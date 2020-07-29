@@ -1,8 +1,9 @@
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { useContext } from 'react';
+import { findNodeHandle } from 'react-native';
 import { ThemeContext } from 'styled-components/native';
 
-type Option =
+export type CustomActionSheetOption =
   | {
       text: string;
       key?: string;
@@ -12,7 +13,7 @@ type Option =
   | {
       text: string;
       key?: string;
-      callback?: (option: Option) => void;
+      callback?: (option: CustomActionSheetOption) => void;
       destructive?: boolean;
     };
 
@@ -24,10 +25,11 @@ export const useCustomActionSheet = () => {
 
   const showActionSheet = (
     title: string,
-    options: Option[],
-    onCancel?: () => void
+    options: CustomActionSheetOption[],
+    onCancel?: () => void,
+    anchor?: React.Component<any, any>
   ) => {
-    const cancelOption: Option[] = [
+    const cancelOption: CustomActionSheetOption[] = [
       {
         text: 'Cancel',
         callback: onCancel || (() => {}),
@@ -54,6 +56,7 @@ export const useCustomActionSheet = () => {
         titleTextStyle: {
           color: theme.stylekitForegroundColor,
         },
+        anchor: anchor ? findNodeHandle(anchor) ?? undefined : undefined,
       },
       buttonIndex => {
         let option = tempOptions[buttonIndex];
