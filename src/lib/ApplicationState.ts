@@ -49,6 +49,7 @@ export enum AppStateType {
 export enum AppStateEventType {
   KeyboardChangeEvent = 1,
   TabletModeChange = 2,
+  DrawerOpen = 3,
 }
 
 export type TabletModeChangeData = {
@@ -571,6 +572,10 @@ export class ApplicationState extends ApplicationService {
     );
     this.biometricsTiming = timing;
     this.setScreenshotPrivacy();
+  }
+
+  public onDrawerOpen() {
+    this.notifyEventObservers(AppStateEventType.DrawerOpen);
   }
 
   /*

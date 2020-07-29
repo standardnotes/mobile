@@ -26,7 +26,13 @@ import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
 import { ICON_CHECKMARK, ICON_CLOSE, ICON_MENU } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Dimensions,
   Keyboard,
@@ -34,7 +40,9 @@ import {
   ScaledSize,
   StatusBar,
 } from 'react-native';
-import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
+import DrawerLayout, {
+  DrawerState,
+} from 'react-native-gesture-handler/DrawerLayout';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { Challenge } from 'snjs';
 import { ThemeContext, ThemeProvider } from 'styled-components/native';
@@ -147,12 +155,22 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
     return remoteTabletModeSubscription;
   }, [application]);
 
+  const handleDrawerStateChange = useCallback(
+    (newState: DrawerState, drawerWillShow: boolean) => {
+      if (newState !== 'Idle' && drawerWillShow) {
+        application?.getAppState().onDrawerOpen();
+      }
+    },
+    [application]
+  );
+
   return (
     <DrawerLayout
       ref={drawerRef}
       drawerWidth={getDefaultDrawerWidth(dimensions)}
       drawerPosition={'left'}
       drawerType="slide"
+      onDrawerStateChanged={handleDrawerStateChange}
       renderNavigationView={() =>
         !isLocked && <MainSideMenu drawerRef={drawerRef.current} />
       }
@@ -160,6 +178,7 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
       <DrawerLayout
         ref={noteDrawerRef}
         drawerWidth={getDefaultDrawerWidth(dimensions)}
+        onDrawerStateChanged={handleDrawerStateChange}
         drawerPosition={'right'}
         drawerType="slide"
         drawerLockMode="locked-closed"
