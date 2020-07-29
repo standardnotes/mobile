@@ -58,7 +58,7 @@ import {
 
 type HeaderTitleParams = {
   title?: string;
-  subTitle: string;
+  subTitle?: string;
   subTitleColor?: string;
 };
 

@@ -36,55 +36,64 @@ export const Notes: React.FC<Props> = props => {
   const [sortBy] = useState<CollectionSort>(CollectionSort.UpdatedAt);
   const [sortReverse] = useState<string>();
   const [notes, setNotes] = useState<SNNote[]>([]);
+  // State
+  const [searchText, setSearchText] = useState('');
 
   // Ref
   const haveDisplayOptions = useRef(false);
 
-  const reloadTitle = useCallback(() => {
-    let title = '';
-    // if (this.isFiltering()) {
-    // const resultCount = this.getState().notes!.length;
-    // title = `${resultCount} search results`;
-    if (application?.getAppState().selectedTag) {
-      title = application.getAppState().selectedTag!.title;
-    }
-    if (title) {
-      navigation.setParams({
-        title,
-      });
-    }
-  }, [application, navigation]);
+  const reloadTitle = useCallback(
+    (newNotes?: SNNote[]) => {
+      let title = '';
+      if (newNotes && searchText.length > 0) {
+        const resultCount = newNotes.length;
+        title = `${resultCount} search results`;
+      } else if (application?.getAppState().selectedTag) {
+        title = application.getAppState().selectedTag!.title;
+      }
+
+      if (title) {
+        navigation.setParams({
+          title,
+        });
+      }
+    },
+    [application, navigation, searchText.length]
+  );
 
   /**
    * Note that reloading display options destroys the current index and rebuilds it,
    * so call sparingly. The runtime complexity of destroying and building
    * an index is roughly O(n^2).
    */
-  const reloadNotesDisplayOptions = useCallback(() => {
-    const tag = application!.getAppState().selectedTag!;
+  const reloadNotesDisplayOptions = useCallback(
+    (searchFilter?: string) => {
+      const tag = application!.getAppState().selectedTag!;
 
-    application!.setDisplayOptions(
-      ContentType.Note,
-      sortBy! as CollectionSort,
-      sortReverse! ? 'asc' : 'dsc',
-      (note: SNNote) => {
-        const matchesTag = tag.isSmartTag()
-          ? note.satisfiesPredicate((tag as SNSmartTag).predicate)
-          : tag.hasRelationshipWithItem(note);
+      application!.setDisplayOptions(
+        ContentType.Note,
+        sortBy! as CollectionSort,
+        sortReverse! ? 'asc' : 'dsc',
+        (note: SNNote) => {
+          const matchesTag = tag.isSmartTag()
+            ? note.satisfiesPredicate((tag as SNSmartTag).predicate)
+            : tag.hasRelationshipWithItem(note);
 
-        return (
-          matchesTag &&
-          notePassesFilter(
-            note,
-            tag,
-            false, // application?.getAppState().showArchived!,
-            false, // application?.getAppState().hidePinned!,
-            '' // application?.getAppState().noteFilter.text.toLowerCase()
-          )
-        );
-      }
-    );
-  }, [application, sortBy, sortReverse]);
+          return (
+            matchesTag &&
+            notePassesFilter(
+              note,
+              tag,
+              false, // application?.getAppState().showArchived!,
+              false, // application?.getAppState().hidePinned!,
+              searchFilter?.toLowerCase() || searchText.toLowerCase()
+            )
+          );
+        }
+      );
+    },
+    [application, sortBy, sortReverse, searchText]
+  );
 
   const reloadNotes = useCallback(() => {
     const tag = application!.getAppState().selectedTag;
@@ -97,9 +106,11 @@ export const Notes: React.FC<Props> = props => {
       haveDisplayOptions.current = true;
       reloadNotesDisplayOptions();
     }
-
-    setNotes(application!.getDisplayableItems(ContentType.Note) as SNNote[]);
-    reloadTitle();
+    const newNotes = application!.getDisplayableItems(
+      ContentType.Note
+    ) as SNNote[];
+    setNotes(newNotes);
+    reloadTitle(newNotes);
   }, [application, haveDisplayOptions, reloadNotesDisplayOptions, reloadTitle]);
 
   const streamNotesAndTags = useCallback(() => {
@@ -127,6 +138,12 @@ export const Notes: React.FC<Props> = props => {
       removeStreamTags();
     };
   }, [application, reloadNotes, reloadNotesDisplayOptions]);
+
+  const onSearchChange = (filter: string) => {
+    setSearchText(filter);
+    reloadNotesDisplayOptions(filter);
+    reloadNotes();
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -160,8 +177,9 @@ export const Notes: React.FC<Props> = props => {
         // hasRefreshControl={!Auth.get().offline()}
         onPressItem={props.onNoteSelect}
         // refreshing={this.state.refreshing}
-        // onSearchChange={this.onSearchTextChange}
-        // onSearchCancel={this.onSearchCancel}
+        searchText={searchText}
+        onSearchChange={onSearchChange}
+        onSearchCancel={() => onSearchChange('')}
         notes={notes}
         // sortType={this.options.sortBy}
         // decrypting={this.state.decrypting}

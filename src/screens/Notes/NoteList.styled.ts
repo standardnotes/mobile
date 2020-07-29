@@ -9,6 +9,9 @@ export const styles = StyleSheet.create({
   inputStyle: {
     height: 30,
   },
+  androidSearch: {
+    height: 30,
+  },
 });
 
 export const Container = styled.View`

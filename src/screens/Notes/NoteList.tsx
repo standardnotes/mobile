@@ -16,7 +16,8 @@ import {
   Platform,
   RefreshControl,
 } from 'react-native';
-import SearchBar from 'react-native-search-bar';
+import IosSearchBar from 'react-native-search-bar';
+import AndroidSearchBar from 'react-native-search-box';
 import { SNNote, SNTag } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteCell } from './NoteCell';
@@ -32,6 +33,7 @@ import { OfflineBanner } from './OfflineBanner';
 type Props = {
   onSearchChange: (text: string) => void;
   onSearchCancel: () => void;
+  searchText: string;
   onPressItem: (noteUuid: SNNote['uuid']) => void;
   selectedTags: SNTag[];
   selectedNoteId: string | null;
@@ -55,7 +57,7 @@ export const NoteList = (props: Props): JSX.Element => {
   const [searchText, setSearchText] = useState(' ');
 
   // Ref
-  const searchBoxInputRef = useRef<SearchBar>(null);
+  const searchBoxInputRef = useRef<IosSearchBar>(null);
 
   const dissmissKeybard = () => {
     searchBoxInputRef.current?.blur();
@@ -126,18 +128,45 @@ export const NoteList = (props: Props): JSX.Element => {
         </LoadingContainer>
       )}
       <HeaderContainer>
-        <SearchBar
-          ref={searchBoxInputRef}
-          keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
-          placeholder="Search"
-          text={searchText}
-          barTintColor={theme.stylekitBackgroundColor}
-          textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
-          textColor={theme.stylekitForegroundColor}
-          onChangeText={() => {}}
-          onSearchButtonPress={() => {}}
-          onCancelButtonPress={() => {}}
-        />
+        {Platform.OS === 'ios' && (
+          <IosSearchBar
+            ref={searchBoxInputRef}
+            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            placeholder="Search"
+            text={searchText}
+            barTintColor={theme.stylekitBackgroundColor}
+            textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
+            textColor={theme.stylekitForegroundColor}
+            onChangeText={props.onSearchChange}
+            onSearchButtonPress={() => {
+              searchBoxInputRef.current?.blur();
+            }}
+            onCancelButtonPress={() => {
+              searchBoxInputRef.current?.blur();
+              props.onSearchCancel();
+            }}
+          />
+        )}
+        {Platform.OS === 'android' && (
+          <AndroidSearchBar
+            onChangeText={props.onSearchChange}
+            onCancel={props.onSearchCancel}
+            onDelete={props.onSearchCancel}
+            blurOnSubmit={true}
+            backgroundColor={theme.stylekitBackgroundColor}
+            titleCancelColor={theme.stylekitInfoColor}
+            keyboardDismissMode={'interactive'}
+            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            inputBorderRadius={4}
+            inputStyle={[
+              styles.androidSearch,
+              {
+                backgroundColor: theme.stylekitContrastBackgroundColor,
+                color: theme.stylekitForegroundColor,
+              },
+            ]}
+          />
+        )}
       </HeaderContainer>
       <FlatList
         style={styles.list}
