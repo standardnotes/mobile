@@ -1,6 +1,15 @@
+import { AppStateEventType } from '@Lib/ApplicationState';
 import { useSignedIn } from '@Lib/customHooks';
+import { useFocusEffect } from '@react-navigation/native';
+import { ApplicationContext } from '@Root/ApplicationContext';
 import { StyleKitContext } from '@Style/StyleKit';
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   FlatList,
   ListRenderItem,
@@ -38,16 +47,42 @@ type Props = {
 export const NoteList = (props: Props): JSX.Element => {
   // Context
   const signedIn = useSignedIn();
+  const application = useContext(ApplicationContext);
   const styleKit = useContext(StyleKitContext);
   const theme = useContext(ThemeContext);
 
   // State
   const [searchText, setSearchText] = useState(' ');
 
+  // Ref
+  const searchBoxInputRef = useRef<SearchBar>(null);
+
+  const dissmissKeybard = () => {
+    searchBoxInputRef.current?.blur();
+  };
+
+  useEffect(() => {
+    const unsubscribeStateEventObserver = application
+      ?.getAppState()
+      .addStateEventObserver(state => {
+        if (state === AppStateEventType.DrawerOpen) {
+          dissmissKeybard();
+        }
+      });
+
+    return unsubscribeStateEventObserver;
+  }, [application]);
+
   useEffect(() => {
     // Android workaound to fix clear search not working
     setSearchText('');
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      return dissmissKeybard;
+    }, [])
+  );
 
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
     /**
@@ -92,6 +127,7 @@ export const NoteList = (props: Props): JSX.Element => {
       )}
       <HeaderContainer>
         <SearchBar
+          ref={searchBoxInputRef}
           keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
           placeholder="Search"
           text={searchText}
