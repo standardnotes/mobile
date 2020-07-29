@@ -1,4 +1,6 @@
+import { AppStateEventType } from '@Lib/ApplicationState';
 import { Editor } from '@Lib/Editor';
+import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
@@ -10,9 +12,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { TextInput } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import SNTextView from 'sn-textview';
 import {
   ComponentArea,
   ContentType,
@@ -32,7 +34,6 @@ import {
   LockedContainer,
   LockedText,
   NoteTitleInput,
-  StyledKeyboardAvoidngView,
   StyledTextView,
   TextContainer,
   WebViewReloadButton,
@@ -62,8 +63,43 @@ export const Compose = (): JSX.Element => {
   const [loadingWebview, setLoadingWebview] = useState(false);
 
   // Ref
-  const editorViewRef = useRef<TextInput>(null);
+  const editorViewRef = useRef<SNTextView>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const dissmissKeybard = () => {
+    Keyboard.dismiss();
+    editorViewRef.current?.blur();
+  };
+
+  useEffect(() => {
+    const unsubscribeStateEventObserver = application
+      ?.getAppState()
+      .addStateEventObserver(state => {
+        if (state === AppStateEventType.DrawerOpen) {
+          dissmissKeybard();
+        }
+      });
+
+    return unsubscribeStateEventObserver;
+  }, [application]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (mounted && editor && editor.isTemplateNote) {
+      if (application?.platform === Platform.Ios) {
+        editorViewRef.current?.focus();
+      }
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [application?.platform, editor, editor?.note?.uuid]);
+
+  useFocusEffect(
+    useCallback(() => {
+      return dissmissKeybard;
+    }, [])
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -156,6 +192,9 @@ export const Compose = (): JSX.Element => {
           setEditor(newEditor);
           setNote(newEditor?.note);
           if (newEditor && newEditor.note) {
+            if (newEditor.isTemplateNote) {
+              editorViewRef.current?.focus();
+            }
             setTitle(newEditor?.note?.safeTitle());
             setNoteText(newEditor.note?.safeText());
           }
@@ -414,40 +453,32 @@ export const Compose = (): JSX.Element => {
       )}
       {!shouldDisplayEditor && application?.platform === Platform.Android && (
         <TextContainer>
-          <ScrollView keyboardShouldPersistTaps="handled">
-            <StyledTextView
-              testID="noteContentField"
-              multiline
-              ref={editorViewRef}
-              // autoFocus={editor?.isTemplateNote}
-              value={noteText}
-              textAlignVertical="top"
-              autoCapitalize={'sentences'}
-              selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
-              // TODO: handlesColor={theme.stylekitInfoColor}
-              onChangeText={onContentChange}
-              scrollEnabled={false}
-            />
-          </ScrollView>
+          <StyledTextView
+            testID="noteContentField"
+            multiline
+            ref={editorViewRef}
+            autoFocus={false}
+            value={noteText}
+            textAlignVertical="top"
+            autoCapitalize={'sentences'}
+            selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
+            handlesColor={theme.stylekitInfoColor}
+            onChangeText={onContentChange}
+          />
         </TextContainer>
       )}
       {!shouldDisplayEditor && application?.platform === Platform.Ios && (
-        <StyledKeyboardAvoidngView
-          behavior={'padding'}
-          keyboardVerticalOffset={80}
-        >
-          <StyledTextView
-            testID="noteContentField"
-            ref={editorViewRef}
-            // autoFocus={}
-            multiline
-            value={noteText}
-            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
-            selectionColor={lighten(theme.stylekitInfoColor)}
-            onChangeText={onContentChange}
-            editable={!note?.locked}
-          />
-        </StyledKeyboardAvoidngView>
+        <StyledTextView
+          testID="noteContentField"
+          ref={editorViewRef}
+          autoFocus={false}
+          multiline
+          value={noteText}
+          keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+          selectionColor={lighten(theme.stylekitInfoColor)}
+          onChangeText={onContentChange}
+          editable={!note?.locked}
+        />
       )}
     </Container>
   );
