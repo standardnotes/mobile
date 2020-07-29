@@ -1,7 +1,9 @@
 import { AppStateEventType } from '@Lib/ApplicationState';
 import { Editor } from '@Lib/Editor';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_COMPOSE } from '@Screens/screens';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import { lighten } from '@Style/utils';
@@ -16,6 +18,7 @@ import { Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SNTextView from 'sn-textview';
 import {
+  ApplicationEvent,
   ComponentArea,
   ContentType,
   isPayloadSourceRetrieved,
@@ -50,12 +53,16 @@ export const Compose = (): JSX.Element => {
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
   const styleKit = useContext(StyleKitContext);
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+  >();
 
   //State
   const [title, setTitle] = useState<string | undefined>();
   const [noteText, setNoteText] = useState<string | undefined>(undefined);
   const [editor, setEditor] = useState<Editor | undefined>();
   const [note, setNote] = useState<SNNote | undefined>();
+  const [saveError, setSaveError] = useState(false);
   const [editorComponent, setEditorComponent] = useState<
     SNComponent | undefined
   >();
@@ -71,6 +78,33 @@ export const Compose = (): JSX.Element => {
     editorViewRef.current?.blur();
   };
 
+  const setStatus = useCallback(
+    (status: string, color?: string) => {
+      navigation.setParams({
+        subTitle: status,
+        subTitleColor: color,
+      });
+    },
+    [navigation]
+  );
+
+  const showSavingStatus = useCallback(() => {
+    setStatus('Saving...');
+  }, [setStatus]);
+
+  const showAllChangesSavedStatus = useCallback(() => {
+    setSaveError(false);
+    setStatus('All changes saved');
+  }, [setStatus]);
+
+  const showErrorStatus = useCallback(
+    (message: string) => {
+      setSaveError(true);
+      setStatus(message, theme.stylekitWarningColor);
+    },
+    [setStatus, theme.stylekitWarningColor]
+  );
+
   useEffect(() => {
     const unsubscribeStateEventObserver = application
       ?.getAppState()
@@ -80,8 +114,45 @@ export const Compose = (): JSX.Element => {
         }
       });
 
-    return unsubscribeStateEventObserver;
-  }, [application]);
+    const unsubscribeAppEventObserver = application?.addEventObserver(
+      async eventName => {
+        if (eventName === ApplicationEvent.HighLatencySync) {
+          // this.setState({ syncTakingTooLong: true });
+        } else if (eventName === ApplicationEvent.CompletedFullSync) {
+          // this.setState({ syncTakingTooLong: false });
+          // const isInErrorState = this.state.saveError;
+          /** if we're still dirty, don't change status, a sync is likely upcoming. */
+          if (!note?.dirty && saveError) {
+            showAllChangesSavedStatus();
+          }
+        } else if (eventName === ApplicationEvent.FailedSync) {
+          /**
+           * Only show error status in editor if the note is dirty.
+           * Otherwise, it means the originating sync came from somewhere else
+           * and we don't want to display an error here.
+           */
+          if (note?.dirty) {
+            showErrorStatus('Sync Unavailable (changes saved offline)');
+          }
+        } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
+          showErrorStatus('Offline Saving Issue (changes not saved)');
+        }
+      }
+    );
+
+    return () => {
+      unsubscribeAppEventObserver && unsubscribeAppEventObserver();
+      unsubscribeStateEventObserver && unsubscribeStateEventObserver();
+    };
+  }, [
+    application,
+    note?.dirty,
+    saveError,
+    setStatus,
+    showAllChangesSavedStatus,
+    showErrorStatus,
+    theme.stylekitWarningColor,
+  ]);
 
   useEffect(() => {
     let mounted = true;
@@ -192,9 +263,6 @@ export const Compose = (): JSX.Element => {
           setEditor(newEditor);
           setNote(newEditor?.note);
           if (newEditor && newEditor.note) {
-            if (newEditor.isTemplateNote) {
-              editorViewRef.current?.focus();
-            }
             setTitle(newEditor?.note?.safeTitle());
             setNoteText(newEditor.note?.safeText());
           }
@@ -204,29 +272,12 @@ export const Compose = (): JSX.Element => {
 
     const removeComponentGroupObserver = application?.componentGroup.addChangeObserver(
       async () => {
-        const currentEditor = editorComponent;
         const newEditor = application?.componentGroup.activeComponentForArea(
           ComponentArea.Editor
         );
-        if (
-          currentEditor &&
-          newEditor &&
-          currentEditor.uuid !== newEditor.uuid
-        ) {
-          /** Unload current component view so that we create a new one,
-           * then change the active editor */
-          // await this.setEditorState({
-          //   editorComponentUnloading: true,
-          // });
-        }
         if (mounted) {
           setEditorComponent(newEditor);
         }
-
-        /** Stop unloading, if we were already unloading */
-        // await this.setEditorState({
-        //   editorComponentUnloading: false,
-        // });
       }
     );
 
@@ -262,11 +313,11 @@ export const Compose = (): JSX.Element => {
           if (
             newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
           ) {
-            // this.showSavingStatus();
+            showSavingStatus();
           } else if (
             newNote.lastSyncEnd!.getTime() > newNote.lastSyncBegan!.getTime()
           ) {
-            // this.showAllChangesSavedStatus();
+            showAllChangesSavedStatus();
           }
         }
       }
@@ -277,7 +328,13 @@ export const Compose = (): JSX.Element => {
       removeEditorNoteValueChangeObserver &&
         removeEditorNoteValueChangeObserver();
     };
-  }, [editor, note?.locked]);
+  }, [
+    editor,
+    note?.locked,
+    setStatus,
+    showAllChangesSavedStatus,
+    showSavingStatus,
+  ]);
 
   const saveNote = useCallback(
     async (
@@ -458,7 +515,7 @@ export const Compose = (): JSX.Element => {
             multiline
             ref={editorViewRef}
             autoFocus={false}
-            value={noteText}
+            value={note?.text}
             textAlignVertical="top"
             autoCapitalize={'sentences'}
             selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
@@ -473,7 +530,7 @@ export const Compose = (): JSX.Element => {
           ref={editorViewRef}
           autoFocus={false}
           multiline
-          value={noteText}
+          value={note?.text}
           keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
           selectionColor={lighten(theme.stylekitInfoColor)}
           onChangeText={onContentChange}

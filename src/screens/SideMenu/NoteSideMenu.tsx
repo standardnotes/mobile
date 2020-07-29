@@ -505,7 +505,9 @@ export const NoteSideMenu = (props: Props) => {
             if (confirmed) {
               await application?.deleteItem(note);
               props.drawerRef?.closeDrawer();
-              navigation.popToTop();
+              if (!application?.getAppState().isInTabletMode) {
+                navigation.popToTop();
+              }
             }
           },
         },
@@ -524,7 +526,9 @@ export const NoteSideMenu = (props: Props) => {
             if (confirmed) {
               await application?.emptyTrash();
               props.drawerRef?.closeDrawer();
-              navigation.popToTop();
+              if (!application?.getAppState().isInTabletMode) {
+                navigation.popToTop();
+              }
               application?.sync();
             }
           },
