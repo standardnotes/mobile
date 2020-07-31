@@ -62,6 +62,15 @@ export enum UnlockTiming {
   OnQuit = 'on-quit',
 }
 
+export enum PasscodeKeyboardType {
+  Default = 'default',
+  Numeric = 'numeric',
+}
+
+export enum MobileStorageKey {
+  PasscodeKeyboardTypeKey = 'passcodeKeyboardType',
+}
+
 type EventObserverCallback = (
   event: AppStateEventType,
   data?: TabletModeChangeData
@@ -572,6 +581,21 @@ export class ApplicationState extends ApplicationService {
     );
     this.biometricsTiming = timing;
     this.setScreenshotPrivacy();
+  }
+
+  public async getPasscodeKeyboardType(): Promise<PasscodeKeyboardType> {
+    return this.application.getValue(
+      MobileStorageKey.PasscodeKeyboardTypeKey,
+      StorageValueModes.Nonwrapped
+    );
+  }
+
+  public async setPasscodeKeyboardType(type: PasscodeKeyboardType) {
+    await this.application.setValue(
+      MobileStorageKey.PasscodeKeyboardTypeKey,
+      type,
+      StorageValueModes.Nonwrapped
+    );
   }
 
   public onDrawerOpen() {

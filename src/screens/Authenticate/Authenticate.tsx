@@ -2,7 +2,7 @@ import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
-import { AppStateType } from '@Lib/ApplicationState';
+import { AppStateType, PasscodeKeyboardType } from '@Lib/ApplicationState';
 import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
@@ -53,6 +53,9 @@ export const Authenticate = ({
   // State
   const [supportsBiometrics, setSupportsBiometrics] = useState<
     boolean | undefined
+  >(undefined);
+  const [keyboardType, setKeyboardType] = useState<
+    PasscodeKeyboardType | undefined
   >(undefined);
   const [{ challengeValues, challengeValueStates }, dispatch] = useReducer(
     authenticationReducer,
@@ -117,6 +120,11 @@ export const Authenticate = ({
   const checkForBiometrics = useCallback(
     async () =>
       (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(),
+    [application]
+  );
+
+  const checkPasscodeKeyboardType = useCallback(
+    async () => application?.getAppState().getPasscodeKeyboardType(),
     [application]
   );
 
@@ -307,6 +315,9 @@ export const Authenticate = ({
         if (state === AppStateType.ResumingFromBackground) {
           beginAuthenticatingForNextChallengeReason();
         }
+        if (state === AppStateType.EnteringBackground) {
+          FingerprintScanner.release();
+        }
       });
 
     return removeAppStateSubscriber;
@@ -334,10 +345,17 @@ export const Authenticate = ({
       }
     };
     setBiometricsAsync();
+    const setInitialKeyboardType = async () => {
+      const initialKeyboardType = await checkPasscodeKeyboardType();
+      if (mounted) {
+        setKeyboardType(initialKeyboardType);
+      }
+    };
+    setInitialKeyboardType();
     return () => {
       mounted = false;
     };
-  }, [checkForBiometrics]);
+  }, [checkForBiometrics, checkPasscodeKeyboardType]);
 
   useEffect(() => {
     beginAuthenticatingForNextChallengeReason();
@@ -395,6 +413,14 @@ export const Authenticate = ({
     validateChallengeValue(challengeValue);
   };
 
+  const switchKeyboard = () => {
+    if (keyboardType === PasscodeKeyboardType.Default) {
+      setKeyboardType(PasscodeKeyboardType.Numeric);
+    } else if (keyboardType === PasscodeKeyboardType.Numeric) {
+      setKeyboardType(PasscodeKeyboardType.Default);
+    }
+  };
+
   const renderAuthenticationSource = (
     challengeValue: ChallengeValue,
     index: number
@@ -420,7 +446,7 @@ export const Authenticate = ({
               ? 'Change Keyboard'
               : undefined
           }
-          buttonAction={() => {}} // TODO: change keyboard
+          buttonAction={switchKeyboard}
           buttonStyles={
             challengeValue.type === ChallengeType.LocalPasscode
               ? {
@@ -434,6 +460,7 @@ export const Authenticate = ({
           <SectionContainer last={last}>
             <SectionedTableCell textInputCell={true} first={true}>
               <Input
+                key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={
                   challengeValue.type === ChallengeType.LocalPasscode
                     ? localPasscodeRef
@@ -452,7 +479,7 @@ export const Authenticate = ({
                 autoFocus={false}
                 autoCapitalize={'none'}
                 secureTextEntry={true}
-                // keyboardType={inputSource.keyboardType || 'default'}
+                keyboardType={keyboardType}
                 keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 onSubmitEditing={() => {

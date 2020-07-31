@@ -5,13 +5,13 @@ import {
 } from '@Components/SectionedOptionsTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
-import { UnlockTiming } from '@Lib/ApplicationState';
+import { PasscodeKeyboardType, UnlockTiming } from '@Lib/ApplicationState';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_INPUT_MODAL_PASSCODE } from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, { useContext, useMemo, useRef, useState } from 'react';
-import { Keyboard, KeyboardType, Platform, TextInput } from 'react-native';
+import { KeyboardType, Platform, TextInput } from 'react-native';
 import { Container, Input } from './InputModal.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_PASSCODE>;
@@ -63,12 +63,12 @@ export const PasscodeInputModal = (props: Props) => {
     () => [
       {
         title: 'General',
-        key: 'default',
+        key: 'default' as PasscodeKeyboardType,
         selected: keyboardType === 'default',
       },
       {
         title: 'Numeric',
-        key: 'numeric',
+        key: 'numeric' as PasscodeKeyboardType,
         selected: keyboardType === 'numeric',
       },
     ],
@@ -77,14 +77,17 @@ export const PasscodeInputModal = (props: Props) => {
 
   const onKeyboardTypeSelect = (option: Option) => {
     setKeyboardType(option.key as KeyboardType);
-    if (Platform.OS === 'ios') {
-      // on Android, keyboard will update right away
-      Keyboard.dismiss();
-      setTimeout(() => {
-        textRef.current?.focus();
-      }, 100);
-    }
+    application
+      ?.getAppState()
+      .setPasscodeKeyboardType(option.key as PasscodeKeyboardType);
   };
+
+  const mapKeyboardTypeForOS = useMemo(() => {
+    if (keyboardType === 'numeric') {
+      return 'number-pad';
+    }
+    return keyboardType;
+  }, [keyboardType]);
 
   return (
     <Container>
@@ -92,13 +95,14 @@ export const PasscodeInputModal = (props: Props) => {
         <SectionedTableCell textInputCell first={true}>
           <Input
             ref={textRef}
+            key={Platform.OS === 'android' ? keyboardType + '1' : undefined}
             placeholder="Enter a passcode"
             onChangeText={setText}
             value={text}
             secureTextEntry
             autoCorrect={false}
             autoCapitalize={'none'}
-            keyboardType={keyboardType}
+            keyboardType={mapKeyboardTypeForOS}
             keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
             autoFocus={true}
             underlineColorAndroid={'transparent'}
@@ -109,13 +113,14 @@ export const PasscodeInputModal = (props: Props) => {
         <SectionedTableCell textInputCell first={false}>
           <Input
             ref={confirmTextRef}
+            key={Platform.OS === 'android' ? keyboardType + '2' : undefined}
             placeholder="Confirm passcode"
             onChangeText={setConfirmText}
             value={confirmText}
             secureTextEntry
             autoCorrect={false}
             autoCapitalize={'none'}
-            keyboardType={keyboardType}
+            keyboardType={mapKeyboardTypeForOS}
             keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
             onSubmitEditing={onSubmit}
