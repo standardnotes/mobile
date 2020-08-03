@@ -6,11 +6,13 @@ import {
   Environment,
   platformFromString,
   SNApplication,
+  SNComponentManager,
 } from 'snjs';
 import { AlertService } from './AlertService';
 import { ApplicationState } from './ApplicationState';
 import { BackupsService } from './BackupsService';
 import { ComponentGroup } from './componentGroup';
+import ComponentManager from './ComponentManager';
 import { EditorGroup } from './EditorGroup';
 import { MobileDeviceInterface } from './interface';
 import { navigate } from './NavigationService';
@@ -42,7 +44,13 @@ export class MobileApplication extends SNApplication {
       deviceInterface,
       new SNReactNativeCrypto(),
       new AlertService(),
-      namespace
+      namespace,
+      [
+        {
+          swap: SNComponentManager,
+          with: ComponentManager,
+        },
+      ]
     );
     this.Uuid = Math.random().toString();
     this.onDeinit = onDeinit;
