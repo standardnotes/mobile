@@ -31,6 +31,7 @@ import {
   ComponentMutator,
   ContentType,
   NoteMutator,
+  PayloadSource,
   SNComponent,
   SNNote,
   SNSmartTag,
@@ -106,9 +107,11 @@ export const NoteSideMenu = (props: Props) => {
       }
     );
     const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
-      newNote => {
+      (newNote, source) => {
         if (mounted) {
-          setNote(newNote);
+          if (source !== PayloadSource.ComponentRetrieved) {
+            setNote(newNote);
+          }
         }
       }
     );
@@ -121,6 +124,7 @@ export const NoteSideMenu = (props: Props) => {
   }, [editor]);
 
   useEffect(() => {
+    let isMounted = true;
     const removeComponentsObserver = application?.streamItems(
       ContentType.Component,
       async () => {
@@ -130,12 +134,16 @@ export const NoteSideMenu = (props: Props) => {
         const displayComponents = sortAlphabetically(
           application!.componentManager!.componentsForArea(ComponentArea.Editor)
         );
-
-        setComponents(displayComponents);
+        if (isMounted) {
+          setComponents(displayComponents);
+        }
       }
     );
 
-    return removeComponentsObserver;
+    return () => {
+      isMounted = false;
+      removeComponentsObserver && removeComponentsObserver();
+    };
   }, [application, note]);
 
   const disassociateComponentWithCurrentNote = useCallback(
@@ -170,9 +178,7 @@ export const NoteSideMenu = (props: Props) => {
         note!
       );
       if (!component) {
-        console.log('plain click', note?.prefersPlainEditor);
         if (!note?.prefersPlainEditor) {
-          console.log('prefers plain');
           await application?.changeItem(note!.uuid, mutator => {
             const noteMutator = mutator as NoteMutator;
             noteMutator.prefersPlainEditor = true;

@@ -108,7 +108,6 @@ export const NoteList = (props: Props): JSX.Element => {
         renderTags={renderTags}
         // options={props.options}
         highlighted={item.uuid === props.selectedNoteId}
-        // handleAction={props.handleAction}
       />
     );
   };
@@ -158,11 +157,12 @@ export const NoteList = (props: Props): JSX.Element => {
             keyboardDismissMode={'interactive'}
             keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
             inputBorderRadius={4}
+            tintColorSearch={theme.stylekitForegroundColor}
             inputStyle={[
               styles.androidSearch,
               {
                 backgroundColor: theme.stylekitContrastBackgroundColor,
-                color: theme.stylekitForegroundColor,
+                // color: theme.stylekitForegroundColor,
               },
             ]}
           />

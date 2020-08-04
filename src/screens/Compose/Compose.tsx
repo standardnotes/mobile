@@ -23,6 +23,7 @@ import {
   ContentType,
   isPayloadSourceRetrieved,
   NoteMutator,
+  PayloadSource,
   Platform,
   SNComponent,
   SNNote,
@@ -222,7 +223,6 @@ export const Compose = (): JSX.Element => {
       /** Same editor, no change */
       return { updatedEditor: associatedEditor, changed: false };
     }
-
     await application?.componentGroup.activateComponent(associatedEditor);
     return { updatedEditor: associatedEditor, changed: true };
   }, [application, editorComponent, note]);
@@ -302,12 +302,20 @@ export const Compose = (): JSX.Element => {
     const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
       (newNote, source) => {
         if (isPayloadSourceRetrieved(source!)) {
-          setNote(newNote);
+          if (
+            !editorComponent ||
+            (editorComponent && source !== PayloadSource.ComponentRetrieved)
+          ) {
+            setNote(newNote);
+          }
+
           setTitle(newNote.title);
           setNoteText(newNote.text);
         }
         if (newNote.locked !== note?.locked) {
-          setNote(newNote);
+          if (note) {
+            setNote(newNote);
+          }
         }
         if (newNote.lastSyncBegan && newNote.lastSyncEnd) {
           if (
@@ -330,6 +338,8 @@ export const Compose = (): JSX.Element => {
     };
   }, [
     editor,
+    editorComponent,
+    note,
     note?.locked,
     setStatus,
     showAllChangesSavedStatus,

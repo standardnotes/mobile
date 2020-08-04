@@ -197,13 +197,6 @@ export const ComponentView = ({
     })()`;
   };
 
-  // const setRef = ref => {
-  //   if (ref) {
-  //     console.log(ref);
-  //     webViewRef.current = { postMessage: ref.postMessage };
-  //   }
-  // };
-
   return (
     <FlexContainer>
       {liveComponent?.item.valid_until &&
