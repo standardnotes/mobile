@@ -1,5 +1,11 @@
-import { ApplicationService, ButtonType, StorageValueModes } from 'snjs';
+import {
+  ApplicationService,
+  ButtonType,
+  isNullOrUndefined,
+  StorageValueModes,
+} from 'snjs';
 import SNReactNative from 'standard-notes-rn';
+import Keychain from './keychain';
 
 const FIRST_RUN_KEY = 'first_run';
 
@@ -29,7 +35,7 @@ export class InstallationService extends ApplicationService {
   async markApplicationAsRan() {
     return this.application?.setValue(
       FIRST_RUN_KEY,
-      'false',
+      false,
       StorageValueModes.Nonwrapped
     );
   }
@@ -38,15 +44,18 @@ export class InstallationService extends ApplicationService {
     // Needs wipe if has keys but no data. However, since "no data" can be incorrectly reported by underlying
     // AsyncStorage failures, we want to confirm with the user before deleting anything.
 
-    const hasKeys =
+    const hasNormalKeys =
       this.application?.hasAccount() || this.application?.hasPasscode();
+
+    const rawKeychainKey = await Keychain.getKeys();
+    const hasKeychainValue = !isNullOrUndefined(rawKeychainKey);
+
     let firstRunKey = await this.application?.getValue(
       FIRST_RUN_KEY,
       StorageValueModes.Nonwrapped
     );
-    const firstRunKeyMissing =
-      firstRunKey === null || firstRunKey === undefined;
-    return hasKeys && firstRunKeyMissing;
+    const firstRunKeyMissing = isNullOrUndefined(firstRunKey);
+    return !hasNormalKeys && hasKeychainValue && firstRunKeyMissing;
   }
 
   async wipeData() {
@@ -66,7 +75,7 @@ export class InstallationService extends ApplicationService {
     if (confirmed) {
       await this.application?.deviceInterface?.removeAllRawStorageValues();
       await this.application?.deviceInterface?.removeAllRawDatabasePayloads();
-      this.application?.deinit();
+      await this.application?.deviceInterface?.clearKeychainValue();
     } else {
       SNReactNative.exitApp();
     }

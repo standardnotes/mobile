@@ -1,16 +1,5 @@
 import { SNNote, SNTag } from 'snjs';
 
-export enum NoteSortKey {
-  CreatedAt = 'created_at',
-  UserUpdatedAt = 'userModifiedDate',
-  Title = 'title',
-
-  /** @legacy Use UserUpdatedAt instead */
-  UpdatedAt = 'updated_at',
-  /** @legacy Use UserUpdatedAt instead */
-  ClientUpdatedAt = 'client_updated_at',
-}
-
 export function notePassesFilter(
   note: SNNote,
   selectedTag: SNTag,
