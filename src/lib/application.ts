@@ -14,6 +14,7 @@ import { BackupsService } from './BackupsService';
 import { ComponentGroup } from './componentGroup';
 import ComponentManager from './ComponentManager';
 import { EditorGroup } from './EditorGroup';
+import { InstallationService } from './InstallationService';
 import { MobileDeviceInterface } from './interface';
 import { navigate } from './NavigationService';
 import { PreferencesManager } from './PreferencesManager';
@@ -24,6 +25,7 @@ type MobileServices = {
   applicationState: ApplicationState;
   reviewService: ReviewService;
   backupsService: BackupsService;
+  installationService: InstallationService;
   themeService: StyleKit;
   prefsService: PreferencesManager;
 };
