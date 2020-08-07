@@ -244,7 +244,7 @@ PODS:
     - React
   - react-native-mail (4.1.0):
     - React
-  - react-native-safe-area-context (3.1.1):
+  - react-native-safe-area-context (3.1.3):
     - React
   - react-native-sodium (0.4.0):
     - React
@@ -325,9 +325,9 @@ PODS:
     - React
   - RNPrivacySnapshot (1.0.0):
     - React
-  - RNReanimated (1.10.1):
+  - RNReanimated (1.10.2):
     - React
-  - RNScreens (2.9.0):
+  - RNScreens (2.10.1):
     - React
   - RNSearchBar (3.5.1):
     - React
@@ -544,7 +544,7 @@ SPEC CHECKSUMS:
   react-native-aes: ff31f0dd4c791eb423a631ee04570fcf3c618924
   react-native-fingerprint-scanner: f0d8190ceaf0b9e1893e3379d78724375b8f6ea7
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-safe-area-context: 344b969c45af3d8464d36e8dea264942992ef033
+  react-native-safe-area-context: b0bdaac4c56a861b06aaf1569efd1121c6a2427e
   react-native-sodium: ef43e28fdf8d866e68ed06890c32f8d86a570cc7
   react-native-webview: 0bacc79175bc44869e4c1a015b9bc21df8cf4feb
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
@@ -565,8 +565,8 @@ SPEC CHECKSUMS:
   RNGestureHandler: b6b359bb800ae399a9c8b27032bdbf7c18f08a08
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNPrivacySnapshot: 71919dde3c6a29dd332115409c2aec564afee8f4
-  RNReanimated: c2bb7438b57a3d987bb2e4e6e4bca94787e30b02
-  RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
+  RNReanimated: 7de2dca51deacff78bb880f63c1389a24311b376
+  RNScreens: b748efec66e095134c7166ca333b628cd7e6f3e2
   RNSearchBar: 9860431356b7d12a8449d2fddb2b5f3c78d1e99f
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: da6fe858f5a65d7bbc3379540a889b0b12aa5976
