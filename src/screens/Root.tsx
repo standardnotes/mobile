@@ -3,7 +3,7 @@ import {
   AppStateType,
   TabletModeChangeData,
 } from '@Lib/ApplicationState';
-import { useHasEditor, useIsLocked } from '@Lib/customHooks';
+import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';

@@ -1,5 +1,5 @@
 import { AppStateEventType } from '@Lib/ApplicationState';
-import { useSignedIn } from '@Lib/customHooks';
+import { useSignedIn } from '@Lib/snjsHooks';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { StyleKitContext } from '@Style/StyleKit';

@@ -1,5 +1,5 @@
 import { Circle } from '@Components/Circle';
-import { useOutOfSync, useSignedIn } from '@Lib/customHooks';
+import { useOutOfSync, useSignedIn } from '@Lib/snjsHooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ViewProps } from 'react-native';

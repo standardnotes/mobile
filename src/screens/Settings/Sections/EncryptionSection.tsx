@@ -1,6 +1,6 @@
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
-import { useIsLocked } from '@Lib/customHooks';
+import { useIsLocked } from '@Lib/snjsHooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext, useMemo } from 'react';
 import { ContentType, StorageEncryptionPolicies } from 'snjs';

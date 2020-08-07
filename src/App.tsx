@@ -8,8 +8,8 @@ import {
   AppStateType,
   TabletModeChangeData,
 } from '@Lib/ApplicationState';
-import { useHasEditor, useIsLocked } from '@Lib/customHooks';
 import { navigationRef } from '@Lib/NavigationService';
+import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
 import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import {
   createStackNavigator,

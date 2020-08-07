@@ -1,4 +1,4 @@
-import { useSignedIn } from '@Lib/customHooks';
+import { useSignedIn } from '@Lib/snjsHooks';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
