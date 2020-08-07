@@ -4,12 +4,18 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_SETTINGS } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Platform } from 'react-native';
 import FAB from 'react-native-fab';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ContentType, SNTag } from 'snjs';
+import { ContentType, SNTag, SNTheme } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   FirstSafeAreaView,
@@ -17,7 +23,7 @@ import {
   SideMenuSectionContainer,
 } from './MainSideMenu.styled';
 import { SideMenuHero } from './SideMenuHero';
-import { SideMenuSection } from './SideMenuSection';
+import { SideMenuOption, SideMenuSection } from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
 type Props = {
@@ -35,6 +41,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   const [selectedTag, setSelectedTag] = useState(() =>
     application!.getAppState().getSelectedTag()
   );
+  const [themes, setThemes] = useState<SNTheme[]>([]);
 
   useEffect(() => {
     const removeTagChangeObserver = application!
@@ -46,6 +53,33 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
       });
     return removeTagChangeObserver;
   });
+
+  const onThemeSelect = (_theme: SNTheme) => {};
+
+  useEffect(() => {
+    const unsubscribeStreamThemes = application?.streamItems(
+      ContentType.Theme,
+      () => {
+        const newItems = application.getItems(ContentType.Theme);
+        setThemes(newItems as SNTheme[]);
+      }
+    );
+
+    return unsubscribeStreamThemes;
+  }, [application]);
+
+  const themeOptions = useMemo(() => {
+    let options: SideMenuOption[] = themes
+      .filter(el => !el.errorDecrypting)
+      .map(mapTheme => ({
+        text: mapTheme.name,
+        key: mapTheme.uuid,
+        dimmed: mapTheme.getNotAvailOnMobile(),
+        onSelect: () => onThemeSelect(mapTheme),
+      }));
+
+    return options;
+  }, [themes]);
 
   const onTagSelect = async (tag: SNTag) => {
     if (tag.conflictOf) {
@@ -86,6 +120,12 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
 
         <SideMenuSectionContainer
           data={[
+            <SideMenuSection
+              title="Themes"
+              key="themes-section"
+              options={themeOptions}
+              collapsed={true}
+            />,
             <SideMenuSection title="Views" key="views-section">
               <TagSelectionList
                 key="views-section-list"

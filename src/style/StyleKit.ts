@@ -17,8 +17,7 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native';
-import IconChanger from 'react-native-alternate-icons';
-import { removeFromArray, SNComponent, SNTheme } from 'snjs';
+import { ComponentArea, removeFromArray, SNComponent, SNTheme } from 'snjs';
 import { UuidString } from 'snjs/dist/@types/types';
 import THEME_BLUE_JSON from './Themes/blue.json';
 import THEME_RED_JSON from './Themes/red.json';
@@ -50,9 +49,6 @@ export class StyleKit {
   private themeData: Partial<Record<UuidString, ThemeContent>> = {};
   activeTheme?: string;
   currentDarkMode: ColorSchemeName;
-  modeChangeListener?: Appearance.AppearanceListener;
-  private unsubState!: () => void;
-  private unregisterComponent!: () => void;
   static constants = {
     mainTextFontSize: 16,
     paddingLeft: 14,
@@ -60,19 +56,22 @@ export class StyleKit {
   styles: Record<string, ViewStyle | TextStyle> = {};
   theme?: StyleKitTheme;
   application: MobileApplication;
+  unregisterComponentHandler?: () => void;
 
   constructor(application: MobileApplication) {
     this.application = application;
     this.buildSystemThemesAndData();
   }
 
-  async initialize() {
+  async init() {
     await this.resolveInitialTheme();
-    this.registerAppearanceChangeLister();
+    Appearance.addChangeListener(this.setModeTo);
+    this.registerObservers();
   }
 
   deinit() {
     Appearance.removeChangeListener(this.setModeTo.bind(this));
+    this.unregisterComponentHandler && this.unregisterComponentHandler();
   }
 
   // onAppEvent(event: ApplicationEvent) {
@@ -82,24 +81,21 @@ export class StyleKit {
   //   }
   // }
 
-  // private registerObservers() {
-  //   this.unregisterComponent = this.application!.componentManager!.registerHandler(
-  //     {
-  //       identifier: 'themeManager',
-  //       areas: [ComponentArea.Themes],
-  //       activationHandler: component => {
-  //         if (component.active) {
-  //           this.activateExternalTheme(component as SNTheme);
-  //         } else {
-  //           this.activateTheme(SystemThemes.Blue);
-  //         }
-  //       },
-  //     }
-  //   );
-  // }
-
-  private registerAppearanceChangeLister() {
-    Appearance.addChangeListener(this.setModeTo);
+  private registerObservers() {
+    this.unregisterComponentHandler = this.application!.componentManager!.registerHandler(
+      {
+        identifier: 'themeManager',
+        areas: [ComponentArea.Themes],
+        activationHandler: (uuid, component) => {
+          if (component?.active) {
+            console.log('activeTheme');
+            // this.activateTheme(component as SNTheme);
+          } else {
+            // this.deactivateTheme(uuid);
+          }
+        },
+      }
+    );
   }
 
   private findOrCreateDataForTheme(themeId: string) {
@@ -297,23 +293,23 @@ export class StyleKit {
       isAndroid ? 100 : 0
     );
 
-    if (theme.isSystemTheme && !isAndroid) {
-      IconChanger.supportDevice(supported => {
-        if (supported) {
-          IconChanger.getIconName(currentName => {
-            if (theme.isInitial && currentName !== 'default') {
-              /** Clear the icon to default. */
-              IconChanger.setIconName(null);
-            } else {
-              const newName = theme.name;
-              if (newName !== currentName) {
-                IconChanger.setIconName(newName);
-              }
-            }
-          });
-        }
-      });
-    }
+    // if (theme.isSystemTheme && !isAndroid) {
+    //   IconChanger.supportDevice(supported => {
+    //     if (supported) {
+    //       IconChanger.getIconName(currentName => {
+    //         if (theme.isInitial && currentName !== 'default') {
+    //           /** Clear the icon to default. */
+    //           IconChanger.setIconName(null);
+    //         } else {
+    //           const newName = theme.name;
+    //           if (newName !== currentName) {
+    //             IconChanger.setIconName(newName);
+    //           }
+    //         }
+    //       });
+    //     }
+    //   });
+    // }
   }
 
   activateExternalTheme(theme: SNTheme) {
@@ -383,185 +379,8 @@ export class StyleKit {
 
   reloadStyles() {
     const { variables } = this.findOrCreateDataForTheme(this.activeTheme!);
-    const { mainTextFontSize, paddingLeft } = StyleKit.constants;
 
     this.theme = variables;
-
-    this.styles = {
-      baseBackground: {
-        backgroundColor: variables.stylekitBackgroundColor,
-      },
-      contrastBackground: {
-        backgroundColor: variables.stylekitContrastBackgroundColor,
-      },
-      container: {
-        flex: 1,
-        height: '100%',
-      },
-
-      flexContainer: {
-        flex: 1,
-        flexDirection: 'column',
-      },
-
-      centeredContainer: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-
-      flexedItem: {
-        flexGrow: 1,
-      },
-
-      uiText: {
-        color: variables.stylekitForegroundColor,
-        fontSize: mainTextFontSize,
-      },
-
-      view: {},
-
-      contrastView: {},
-
-      tableSection: {
-        marginTop: 10,
-        marginBottom: 10,
-        backgroundColor: variables.stylekitBackgroundColor,
-      },
-
-      sectionedTableCell: {
-        borderBottomColor: variables.stylekitBorderColor,
-        borderBottomWidth: 1,
-        paddingLeft: paddingLeft,
-        paddingRight: paddingLeft,
-        paddingTop: 13,
-        paddingBottom: 12,
-        backgroundColor: variables.stylekitBackgroundColor,
-      },
-
-      textInputCell: {
-        maxHeight: 50,
-        paddingTop: 0,
-        paddingBottom: 0,
-      },
-
-      sectionedTableCellTextInput: {
-        fontSize: mainTextFontSize,
-        padding: 0,
-        color: variables.stylekitForegroundColor,
-        height: '100%',
-      },
-
-      sectionedTableCellFirst: {
-        borderTopColor: variables.stylekitBorderColor,
-        borderTopWidth: 1,
-      },
-
-      sectionedTableCellLast: {},
-
-      sectionedAccessoryTableCell: {
-        paddingTop: 0,
-        paddingBottom: 0,
-        minHeight: 47,
-        backgroundColor: 'transparent',
-      },
-
-      sectionedAccessoryTableCellLabel: {
-        fontSize: mainTextFontSize,
-        color: variables.stylekitForegroundColor,
-        minWidth: '80%',
-      },
-
-      buttonCell: {
-        paddingTop: 0,
-        paddingBottom: 0,
-        flex: 1,
-        justifyContent: 'center',
-      },
-
-      buttonCellButton: {
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        color:
-          Platform.OS === 'android'
-            ? variables.stylekitForegroundColor
-            : variables.stylekitInfoColor,
-        fontSize: mainTextFontSize,
-      },
-
-      buttonCellButtonLeft: {
-        textAlign: 'left',
-      },
-
-      noteText: {
-        flexGrow: 1,
-        marginTop: 0,
-        paddingTop: 10,
-        color: variables.stylekitForegroundColor,
-        paddingLeft: paddingLeft,
-        paddingRight: paddingLeft,
-        paddingBottom: 10,
-        backgroundColor: variables.stylekitBackgroundColor,
-      },
-
-      noteTextIOS: {
-        paddingLeft: paddingLeft - 5,
-        paddingRight: paddingLeft - 5,
-      },
-
-      noteTextNoPadding: {
-        paddingLeft: 0,
-        paddingRight: 0,
-      },
-
-      actionSheetWrapper: {},
-
-      actionSheetOverlay: {
-        /** This is the dimmed background */
-        // backgroundColor: variables.stylekitNeutralColor
-      },
-
-      actionSheetBody: {
-        /**
-         * This will also set button border bottoms, since margin is used
-         * instead of borders
-         */
-        backgroundColor: variables.stylekitBorderColor,
-      },
-
-      actionSheetTitleWrapper: {
-        backgroundColor: variables.stylekitBackgroundColor,
-        marginBottom: 1,
-      },
-
-      actionSheetTitleText: {
-        color: variables.stylekitForegroundColor,
-        opacity: 0.5,
-      },
-
-      actionSheetButtonWrapper: {
-        backgroundColor: variables.stylekitBackgroundColor,
-        marginTop: 0,
-      },
-
-      actionSheetButtonTitle: {
-        color: variables.stylekitForegroundColor,
-      },
-
-      actionSheetCancelButtonWrapper: {
-        marginTop: 0,
-      },
-
-      actionSheetCancelButtonTitle: {
-        color: variables.stylekitInfoColor,
-        fontWeight: 'normal',
-      },
-
-      bold: {
-        fontWeight: 'bold',
-      },
-    };
   }
 
   static doesDeviceSupportDarkMode() {
@@ -580,17 +399,6 @@ export class StyleKit {
     }
 
     return true;
-  }
-
-  stylesForKey(key: string) {
-    const allStyles = this.styles;
-    const styles = [allStyles[key]];
-    const platform = Platform.OS === 'android' ? 'Android' : 'IOS';
-    const platformStyles = allStyles[key + platform];
-    if (platformStyles) {
-      styles.push(platformStyles);
-    }
-    return styles;
   }
 
   static platformIconPrefix() {

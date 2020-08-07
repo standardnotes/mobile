@@ -431,7 +431,7 @@ const AppComponent: React.FC<{
         await application?.setHost('https://sync.standardnotes.org');
       }
       styleKit.current = new StyleKit(application);
-      await styleKit.current.initialize();
+      await styleKit.current.init();
       setReady(true);
     };
     setReady(false);
