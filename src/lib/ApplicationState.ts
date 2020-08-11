@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
 import { enabled } from 'react-native-privacy-snapshot';
+import VersionInfo from 'react-native-version-info';
 import {
   ApplicationEvent,
   ApplicationService,
@@ -618,5 +619,10 @@ export class ApplicationState extends ApplicationService {
 
   getMostRecentState() {
     return this.mostRecentState;
+  }
+
+  public getEnvironment() {
+    const bundleId = VersionInfo.bundleIdentifier();
+    return bundleId === 'com.standardnotes.dev' ? 'dev' : 'prod';
   }
 }

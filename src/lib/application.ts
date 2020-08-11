@@ -1,6 +1,7 @@
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { StyleKit } from '@Style/StyleKit';
 import { Platform } from 'react-native';
+import VersionInfo from 'react-native-version-info';
 import {
   Challenge,
   Environment,
@@ -52,7 +53,11 @@ export class MobileApplication extends SNApplication {
           swap: SNComponentManager,
           with: ComponentManager,
         },
-      ]
+      ],
+      undefined,
+      VersionInfo.bundleIdentifier?.includes('dev')
+        ? 'https://syncing-server-dev.standardnotes.org/'
+        : 'https://sync.standardnotes.org'
     );
     this.Uuid = Math.random().toString();
     this.onDeinit = onDeinit;

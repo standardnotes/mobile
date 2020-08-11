@@ -6296,6 +6296,11 @@ react-native-vector-icons@^7.0.0:
     prop-types "^15.7.2"
     yargs "^15.0.2"
 
+react-native-version-info@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-version-info/-/react-native-version-info-1.0.1.tgz#6d1740f741e40adbc09dabfe2fe9049b59a0a6ab"
+  integrity sha512-8OnKRYncEBMYsmCEuj/v349KwEIldKrV7Y+yeSceBOsEJba2rH1wRLyA5gbkmfRnxzOWLGfY5hkxmpE+zv3c+Q==
+
 react-native-webview@^10.2.3:
   version "10.2.3"
   resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-10.2.3.tgz#78aef542deaa8f97f581743c205e6a6ada73559c"
@@ -6987,9 +6992,9 @@ sncrypto@standardnotes/sncrypto#7e76ab9:
   version "1.1.3"
   resolved "https://codeload.github.com/standardnotes/sncrypto/tar.gz/7e76ab9977f85039d9399b935aecfe495a951edb"
 
-snjs@standardnotes/snjs#25e28e5:
+snjs@standardnotes/snjs#9c67c28:
   version "1.0.5"
-  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/25e28e5a0d2cce4a1c0cb7863058492c1398b5bf"
+  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/9c67c28ac7525f908066979ef50eb2316fac4014"
 
 source-map-resolve@^0.5.0:
   version "0.5.3"

@@ -49,10 +49,11 @@
     "react-native-sodium": "standardnotes/react-native-sodium#f68a35b",
     "react-native-store-review": "^0.1.5",
     "react-native-vector-icons": "^7.0.0",
+    "react-native-version-info": "^1.0.1",
     "react-native-webview": "^10.2.3",
     "react-navigation-header-buttons": "^5.0.0",
     "sn-textview": "standardnotes/sn-textview#f42f0bf",
-    "snjs": "standardnotes/snjs#25e28e5",
+    "snjs": "standardnotes/snjs#9c67c28",
     "standard-notes-rn": "standardnotes/standard-notes-rn",
     "styled-components": "^5.1.1"
   },

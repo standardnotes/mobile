@@ -423,13 +423,6 @@ const AppComponent: React.FC<{
           application!.promptForChallenge(challenge);
         },
       });
-      if (env === 'dev') {
-        await application?.setHost(
-          'https://syncing-server-dev.standardnotes.org/'
-        );
-      } else {
-        await application?.setHost('https://sync.standardnotes.org');
-      }
       styleKit.current = new StyleKit(application);
       await styleKit.current.init();
       setReady(true);
