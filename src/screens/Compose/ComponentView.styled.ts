@@ -29,6 +29,7 @@ export const LockedText = styled.Text`
 export const StyledWebview = styled(WebView)`
   flex: 1;
   background-color: transparent;
+  opacity: 0.99;
 `;
 
 export const StyledIcon = styled(Icon).attrs(({ theme }) => ({
