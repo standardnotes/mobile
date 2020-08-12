@@ -51,7 +51,7 @@ export const AuthSection = (props: Props) => {
   // set initial server
   useEffect(() => {
     const getServer = async () => {
-      const host = await application!.getHost();
+      const host = await application?.getHost();
       setServer(host!);
     };
     getServer();
