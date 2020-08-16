@@ -10,7 +10,11 @@ import {
 } from '@Lib/ApplicationState';
 import { navigationRef } from '@Lib/NavigationService';
 import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
-import { NavigationContainer, RouteProp } from '@react-navigation/native';
+import {
+  DefaultTheme,
+  NavigationContainer,
+  RouteProp,
+} from '@react-navigation/native';
 import {
   createStackNavigator,
   StackNavigationProp,
@@ -190,8 +194,6 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
           screenOptions={() => ({
             headerStyle: {
               backgroundColor: theme.stylekitContrastBackgroundColor,
-              borderBottomColor: theme.stylekitContrastBorderColor,
-              borderBottomWidth: 1,
             },
             headerTintColor: theme.stylekitInfoColor,
             headerTitle: ({ children }) => {
@@ -284,11 +286,15 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
 
 const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
   const application = useContext(ApplicationContext);
+  const theme = useContext(ThemeContext);
 
   return (
     <MainStack.Navigator
       screenOptions={{
         gestureEnabled: false,
+        headerStyle: {
+          backgroundColor: theme.stylekitContrastBackgroundColor,
+        },
       }}
       mode="modal"
       initialRouteName="AppStack"
@@ -434,9 +440,17 @@ const AppComponent: React.FC<{
   if (!ready || !styleKit.current) {
     return null;
   }
-
+  // TODO: better modes support
   return (
     <NavigationContainer
+      theme={{
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          background: styleKit.current.theme!.stylekitBackgroundColor,
+          border: styleKit.current.theme!.stylekitBorderColor,
+        },
+      }}
       onReady={() => {
         application?.launch(false);
       }}

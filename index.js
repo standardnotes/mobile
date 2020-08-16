@@ -1,4 +1,3 @@
-import './src/global';
 import 'react-native-gesture-handler';
 import { Client } from 'bugsnag-react-native';
 import { enableScreens } from 'react-native-screens';

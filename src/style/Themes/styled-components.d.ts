@@ -1,4 +1,4 @@
-import theme from './red.json';
+import theme from './blue.json';
 
 export type StyleKitTheme = typeof theme & {
   paddingLeft: number;
