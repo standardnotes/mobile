@@ -250,7 +250,7 @@ PODS:
     - React
   - react-native-version-info (1.0.1):
     - React
-  - react-native-webview (10.4.0):
+  - react-native-webview (10.6.0):
     - React
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
@@ -327,7 +327,7 @@ PODS:
     - React
   - RNPrivacySnapshot (1.0.0):
     - React
-  - RNReanimated (1.12.0):
+  - RNReanimated (1.13.0):
     - React
   - RNScreens (2.10.1):
     - React
@@ -552,7 +552,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: eb91fe1fb3f7b87d9c30a7f0808407d8569d539d
   react-native-sodium: ef43e28fdf8d866e68ed06890c32f8d86a570cc7
   react-native-version-info: f95938832bdb2ce94c3d045c2e44fabcc88f796a
-  react-native-webview: 1ad70b21fb9e44811e33a99e43a4b68b94806a6d
+  react-native-webview: df9ff59f76e991aefa7174831a0af48ddbac5f1b
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
@@ -571,7 +571,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: b6b359bb800ae399a9c8b27032bdbf7c18f08a08
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNPrivacySnapshot: 71919dde3c6a29dd332115409c2aec564afee8f4
-  RNReanimated: 9c475f9b272232351d94a1a781e8b7580bac1ff4
+  RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
   RNScreens: b748efec66e095134c7166ca333b628cd7e6f3e2
   RNSearchBar: 9860431356b7d12a8449d2fddb2b5f3c78d1e99f
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
