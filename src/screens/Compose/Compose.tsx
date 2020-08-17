@@ -47,7 +47,6 @@ const NOTE_PREVIEW_CHAR_LIMIT = 80;
 // const MINIMUM_STATUS_DURATION = 400;
 const SAVE_TIMEOUT_DEBOUNCE = 350;
 const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
-// const EDITOR_DEBOUNCE = 100;
 
 export const Compose = (): JSX.Element => {
   // Context
@@ -189,71 +188,30 @@ export const Compose = (): JSX.Element => {
     };
   }, [application, editor]);
 
-  const reloadComponentContext = useCallback(() => {
-    if (note) {
-      if (editorComponent?.active) {
-        application!.componentManager!.setComponentHidden(
-          editorComponent,
-          !editorComponent.isExplicitlyEnabledForItem(note.uuid)
-        );
-      }
-    }
-    application?.componentManager!.contextItemDidChangeInArea(
-      ComponentArea.Editor
-    );
-  }, [application, editorComponent, note]);
-
   const reloadComponentEditorState = useCallback(async () => {
     const associatedEditor = application?.componentManager!.editorForNote(
       note!
     );
     if (!associatedEditor) {
       /** No editor */
-      let changed = false;
       if (editorComponent) {
         await application?.componentGroup.deactivateComponentForArea(
           ComponentArea.Editor
         );
-        changed = true;
       }
-      return { updatedEditor: undefined, changed };
+      return;
     }
 
     if (associatedEditor.uuid === editorComponent?.uuid) {
       /** Same editor, no change */
-      return { updatedEditor: associatedEditor, changed: false };
+      return;
     }
     await application?.componentGroup.activateComponent(associatedEditor);
-    return { updatedEditor: associatedEditor, changed: true };
-  }, [application, editorComponent, note]);
-
-  const streamItems = useCallback(() => {
-    const removeComponentsObserver = application?.streamItems(
-      ContentType.Component,
-      async items => {
-        const components = items as SNComponent[];
-        if (!note) {
-          return;
-        }
-        /** Reload componentStack in case new ones were added or removed */
-        reloadComponentContext();
-        // await this.reloadComponentStack();
-        /** Observe editor changes to see if the current note should update its editor */
-        const editors = components.filter(component => {
-          return component.isEditor();
-        });
-        if (editors.length === 0) {
-          return;
-        }
-        /** Find the most recent editor for note */
-        reloadComponentEditorState();
-      }
+    application?.componentManager!.contextItemDidChangeInArea(
+      ComponentArea.Editor
     );
-
-    return () => {
-      removeComponentsObserver && removeComponentsObserver();
-    };
-  }, [application, note, reloadComponentContext, reloadComponentEditorState]);
+    return;
+  }, [application, editorComponent, note]);
 
   useEffect(() => {
     let mounted = true;
@@ -281,15 +239,38 @@ export const Compose = (): JSX.Element => {
       }
     );
 
-    const removeStreamItems = streamItems();
-
     return () => {
       mounted = false;
       removeEditorObserver && removeEditorObserver();
       removeComponentGroupObserver && removeComponentGroupObserver();
-      removeStreamItems();
     };
-  }, [application, editorComponent, streamItems]);
+  }, [application, editorComponent]);
+
+  useEffect(() => {
+    const removeComponentsObserver = application?.streamItems(
+      ContentType.Component,
+      async items => {
+        const components = items as SNComponent[];
+        if (!note) {
+          return;
+        }
+        /** Reload componentStack in case new ones were added or removed */
+        // reloadComponentContext();
+        // await this.reloadComponentStack();
+        /** Observe editor changes to see if the current note should update its editor */
+        const editors = components.filter(component => {
+          return component.isEditor();
+        });
+        if (editors.length === 0) {
+          return;
+        }
+        /** Find the most recent editor for note */
+        reloadComponentEditorState();
+      }
+    );
+
+    return removeComponentsObserver;
+  }, [application, note, reloadComponentEditorState]);
 
   useEffect(() => {
     const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
@@ -357,7 +338,6 @@ export const Compose = (): JSX.Element => {
       if (!note) {
         return;
       }
-
       if (note?.deleted) {
         application!.alertService!.alert('deteled replace this');
         return;
