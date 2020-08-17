@@ -2795,10 +2795,10 @@ detect-newline@^3.0.0:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
 
-detox@^17.3.6:
-  version "17.3.6"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-17.3.6.tgz#112027d78fecc07a61ef6d8672dd161f0f1d1a68"
-  integrity sha512-f3JmOAQ7hELG/VXzGbcMDYqHJz6ACIjRoAfDhEdPsk7Exe7xCU6mgE91N/hlV/pbIFCOXm+8Z745Y8WRCQ25Vg==
+detox@^17.4.0:
+  version "17.4.0"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-17.4.0.tgz#8b8b85b6cfb54b4bb7daca317ec50fbf4c26de3e"
+  integrity sha512-rxoaA6b3Bqq+5D5S0GU7bvKvDkKW0vUQgCGY/SrJr8NrD990/rIdvhaVlikjpd1a0NIAQdgxjHdTOVezkinBaQ==
   dependencies:
     bunyan "^1.8.12"
     bunyan-debug-stream "^1.1.0"
@@ -6332,10 +6332,10 @@ react-native-version-info@^1.0.1:
   resolved "https://registry.yarnpkg.com/react-native-version-info/-/react-native-version-info-1.0.1.tgz#6d1740f741e40adbc09dabfe2fe9049b59a0a6ab"
   integrity sha512-8OnKRYncEBMYsmCEuj/v349KwEIldKrV7Y+yeSceBOsEJba2rH1wRLyA5gbkmfRnxzOWLGfY5hkxmpE+zv3c+Q==
 
-react-native-webview@^10.6.0:
-  version "10.6.0"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-10.6.0.tgz#83a574871a52540fec6b8a813f8f6432a07429c8"
-  integrity sha512-y1/zYx9LuoiPVSM3oxf77WQjRebaYG22Kya4lr2tmIESaR1GkKzwKSpKPyEZYfu8U/WNRSrrS/i78o+R1aQRTA==
+react-native-webview@^10.7.0:
+  version "10.7.0"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-10.7.0.tgz#b96e152ffdae4eeffaa74f43671a35733885b52d"
+  integrity sha512-4TSYwJqMBUTKB9+xqGbPwx+eLXbp6RRD7lQ2BumT8eSTfuuqr2rXNqcrlKU1VRla7QGGYowmYmxl2aXIx5k9wA==
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
@@ -7023,9 +7023,9 @@ sncrypto@standardnotes/sncrypto#7e76ab9:
   version "1.1.3"
   resolved "https://codeload.github.com/standardnotes/sncrypto/tar.gz/7e76ab9977f85039d9399b935aecfe495a951edb"
 
-snjs@standardnotes/snjs#9c67c28:
+snjs@standardnotes/snjs#a8205e4:
   version "1.0.5"
-  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/9c67c28ac7525f908066979ef50eb2316fac4014"
+  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/a8205e4e9a3b74815c7371230481ea24461c0c40"
 
 source-map-resolve@^0.5.0:
   version "0.5.3"

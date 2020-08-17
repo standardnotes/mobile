@@ -3817,7 +3817,7 @@ diff --git a/node_modules/react-native-webview/android/build/tmp/kotlin-classes/
 new file mode 100644
 index 0000000..e69de29
 diff --git a/node_modules/react-native-webview/apple/RNCWebView.h b/node_modules/react-native-webview/apple/RNCWebView.h
-index a0f8549..3bf2a2a 100644
+index 2b6e23a..c2df02e 100644
 --- a/node_modules/react-native-webview/apple/RNCWebView.h
 +++ b/node_modules/react-native-webview/apple/RNCWebView.h
 @@ -35,6 +35,7 @@
@@ -3829,7 +3829,7 @@ index a0f8549..3bf2a2a 100644
  @property (nonatomic, assign) CGFloat decelerationRate;
  @property (nonatomic, assign) BOOL allowsInlineMediaPlayback;
 diff --git a/node_modules/react-native-webview/apple/RNCWebView.m b/node_modules/react-native-webview/apple/RNCWebView.m
-index a595fd7..faf199d 100644
+index bdbce7e..cdcfdb4 100644
 --- a/node_modules/react-native-webview/apple/RNCWebView.m
 +++ b/node_modules/react-native-webview/apple/RNCWebView.m
 @@ -125,6 +125,7 @@ - (instancetype)initWithFrame:(CGRect)frame
@@ -3840,7 +3840,7 @@ index a595fd7..faf199d 100644
      _contentInset = UIEdgeInsetsZero;
      _savedKeyboardDisplayRequiresUserAction = YES;
      #if !TARGET_OS_OSX
-@@ -332,6 +333,9 @@ - (void)removeFromSuperview
+@@ -335,6 +336,9 @@ - (void)removeFromSuperview
  -(void)showFullScreenVideoStatusBars
  {
  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -3851,7 +3851,7 @@ index a595fd7..faf199d 100644
      RCTUnsafeExecuteOnMainQueueSync(^{
        [RCTSharedApplication() setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
 diff --git a/node_modules/react-native-webview/apple/RNCWebViewManager.m b/node_modules/react-native-webview/apple/RNCWebViewManager.m
-index 35c55a7..55d7f9f 100644
+index 2d1125c..3fd1aff 100644
 --- a/node_modules/react-native-webview/apple/RNCWebViewManager.m
 +++ b/node_modules/react-native-webview/apple/RNCWebViewManager.m
 @@ -66,6 +66,7 @@ - (RCTUIView *)view
@@ -3863,7 +3863,7 @@ index 35c55a7..55d7f9f 100644
  RCT_EXPORT_VIEW_PROPERTY(allowsBackForwardNavigationGestures, BOOL)
  RCT_EXPORT_VIEW_PROPERTY(incognito, BOOL)
 diff --git a/node_modules/react-native-webview/lib/WebViewTypes.d.ts b/node_modules/react-native-webview/lib/WebViewTypes.d.ts
-index 971cb87..a66dc6b 100644
+index 1178663..b86a242 100644
 --- a/node_modules/react-native-webview/lib/WebViewTypes.d.ts
 +++ b/node_modules/react-native-webview/lib/WebViewTypes.d.ts
 @@ -219,6 +219,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {

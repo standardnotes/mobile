@@ -250,7 +250,7 @@ PODS:
     - React
   - react-native-version-info (1.0.1):
     - React
-  - react-native-webview (10.6.0):
+  - react-native-webview (10.7.0):
     - React
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
@@ -552,7 +552,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: eb91fe1fb3f7b87d9c30a7f0808407d8569d539d
   react-native-sodium: ef43e28fdf8d866e68ed06890c32f8d86a570cc7
   react-native-version-info: f95938832bdb2ce94c3d045c2e44fabcc88f796a
-  react-native-webview: df9ff59f76e991aefa7174831a0af48ddbac5f1b
+  react-native-webview: 6edf4d6f71b9161fc3e96083726a538ee395304d
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
