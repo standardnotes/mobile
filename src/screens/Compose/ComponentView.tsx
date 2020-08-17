@@ -43,9 +43,6 @@ export const ComponentView = ({
   const [liveComponent, setLiveComponent] = useState<
     LiveItem<SNComponent> | undefined
   >(() => new LiveItem(componentUuid, application!));
-  const [liveNote, setLiveNote] = useState<LiveItem<SNComponent> | undefined>(
-    () => new LiveItem(noteUuid, application!)
-  );
   const [url, setUrl] = useState('');
 
   // Ref
@@ -57,12 +54,6 @@ export const ComponentView = ({
       setLiveComponent(new LiveItem(componentUuid, application!));
     }
   }, [application, liveComponent?.item.uuid, componentUuid]);
-
-  useEffect(() => {
-    if (liveNote?.item.uuid !== noteUuid) {
-      setLiveNote(new LiveItem(noteUuid, application!));
-    }
-  }, [application, liveNote?.item.uuid, noteUuid]);
 
   useEffect(() => {
     if (liveComponent) {
@@ -105,7 +96,7 @@ export const ComponentView = ({
               );
             }
           },
-          contextRequestHandler: () => liveNote?.item,
+          contextRequestHandler: () => application?.findItem(noteUuid),
         }
       );
     }
@@ -113,7 +104,7 @@ export const ComponentView = ({
     return () => {
       unregisterComponentHandler && unregisterComponentHandler();
     };
-  }, [application, liveComponent, liveNote?.item, noteUuid]);
+  }, [application, liveComponent, noteUuid]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     // if (!this.note) {
