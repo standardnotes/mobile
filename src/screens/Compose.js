@@ -619,17 +619,19 @@ export default class Compose extends Abstract {
         )}
 
         {!shouldDisplayEditor && Platform.OS === 'ios' && (
-          <TextView
-            style={[StyleKit.stylesForKey('noteText'), { paddingBottom: 10 }]}
-            ref={ref => (this.input = ref)}
-            autoFocus={false}
-            value={this.note.text}
-            keyboardDismissMode={'interactive'}
-            keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
-            selectionColor={lighten(StyleKit.variables.stylekitInfoColor)}
-            onChangeText={this.onTextChange}
-            editable={!this.note.locked}
-          />
+           <View key={this.note.uuid} style={this.styles.container}>
+              <TextView
+                style={[StyleKit.stylesForKey('noteText'), { paddingBottom: 10 }]}
+                ref={ref => (this.input = ref)}
+                autoFocus={false}
+                value={this.note.text}
+                keyboardDismissMode={'interactive'}
+                keyboardAppearance={StyleKit.get().keyboardColorForActiveTheme()}
+                selectionColor={lighten(StyleKit.variables.stylekitInfoColor)}
+                onChangeText={this.onTextChange}
+                editable={!this.note.locked}
+               />
+            </View>
         )}
       </SafeAreaView>
     );
