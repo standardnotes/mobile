@@ -66,6 +66,8 @@
 		83A5151624BF164700917BCF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		83DCC0A624C0A21200D58E1B /* SN Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SN Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		83DCC0A724C0A21200D58E1B /* StandardNotesDev-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "StandardNotesDev-Info.plist"; path = "/Users/radko93/Repo/mobile/ios/StandardNotesDev-Info.plist"; sourceTree = "<absolute>"; };
+		83E99B1D24EC4EC5007B8F21 /* SN Dev.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "SN Dev.entitlements"; sourceTree = "<group>"; };
+		83E99B1E24EC9953007B8F21 /* StandardNotes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = StandardNotes.entitlements; path = StandardNotes/StandardNotes.entitlements; sourceTree = "<group>"; };
 		83F9431724C1EBC5007014C8 /* Dev.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Dev.xcassets; sourceTree = "<group>"; };
 		9E56EE782382F79A872EF0D5 /* Pods-StandardNotes-StandardNotesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes-StandardNotesTests.debug.xcconfig"; path = "Target Support Files/Pods-StandardNotes-StandardNotesTests/Pods-StandardNotes-StandardNotesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A4567B1F6B373ECEDE3BC4EB /* Pods-StandardNotes-StandardNotesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes-StandardNotesTests.release.xcconfig"; path = "Target Support Files/Pods-StandardNotes-StandardNotesTests/Pods-StandardNotes-StandardNotesTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 		13B07FAE1A68108700A75B9A /* StandardNotes */ = {
 			isa = PBXGroup;
 			children = (
+				83E99B1E24EC9953007B8F21 /* StandardNotes.entitlements */,
 				8343BD67244F211C0020E9F0 /* Red.png */,
 				8343BD69244F211C0020E9F0 /* Red@2x.png */,
 				8343BD68244F211C0020E9F0 /* Red@3x.png */,
@@ -168,6 +171,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				83E99B1D24EC4EC5007B8F21 /* SN Dev.entitlements */,
 				13B07FAE1A68108700A75B9A /* StandardNotes */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* StandardNotesTests */,
@@ -691,6 +695,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Blue;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = StandardNotes/StandardNotes.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -728,6 +733,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Blue;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = StandardNotes/StandardNotes.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -872,6 +878,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "SN Dev.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 3;
@@ -909,6 +916,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "SN Dev.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 3;
