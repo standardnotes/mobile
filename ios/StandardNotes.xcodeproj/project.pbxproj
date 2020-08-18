@@ -365,7 +365,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = HKF9BXSN95;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.DataProtection = {
 								enabled = 1;
@@ -711,9 +711,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Blue;
 				CODE_SIGN_ENTITLEMENTS = StandardNotes/StandardNotes.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = HKF9BXSN95;
 				FRAMEWORK_SEARCH_PATHS = "";
@@ -725,7 +725,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 3.0.22;
+				MARKETING_VERSION = 3.0.23;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -733,7 +733,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.standardnotes.standardnotes;
 				PRODUCT_NAME = StandardNotes;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.standardnotes.standardnotes";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -745,9 +745,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Blue;
 				CODE_SIGN_ENTITLEMENTS = StandardNotes/StandardNotes.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HKF9BXSN95;
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = (
@@ -758,7 +758,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 3.0.22;
+				MARKETING_VERSION = 3.0.23;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -766,7 +766,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.standardnotes.standardnotes;
 				PRODUCT_NAME = StandardNotes;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.standardnotes.standardnotes";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
