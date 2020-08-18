@@ -14,7 +14,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Keyboard } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SNTextView from 'sn-textview';
 import {
@@ -514,18 +514,21 @@ export const Compose = (): JSX.Element => {
           />
         </TextContainer>
       )}
+      {/* Empty wrapping view fixes native textview crashing */}
       {!shouldDisplayEditor && application?.platform === Platform.Ios && (
-        <StyledTextView
-          testID="noteContentField"
-          ref={editorViewRef}
-          autoFocus={false}
-          multiline
-          value={note?.text}
-          keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
-          selectionColor={lighten(theme.stylekitInfoColor)}
-          onChangeText={onContentChange}
-          editable={!note?.locked}
-        />
+        <View>
+          <StyledTextView
+            testID="noteContentField"
+            ref={editorViewRef}
+            autoFocus={false}
+            multiline
+            value={note?.text}
+            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            selectionColor={lighten(theme.stylekitInfoColor)}
+            onChangeText={onContentChange}
+            editable={!note?.locked}
+          />
+        </View>
       )}
     </Container>
   );
