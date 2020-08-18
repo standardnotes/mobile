@@ -5,7 +5,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import WebView from 'react-native-webview';
 import styled from 'styled-components/native';
 
-export const FlexContainer = styled(SafeAreaView)`
+export const FlexContainer = styled(SafeAreaView).attrs(() => ({
+  edges: ['bottom'],
+}))`
   flex: 1;
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
 `;
