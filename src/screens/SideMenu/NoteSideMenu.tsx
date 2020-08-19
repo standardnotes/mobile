@@ -8,6 +8,7 @@ import {
   ICON_BOOKMARK,
   ICON_FINGER_PRINT,
   ICON_LOCK,
+  ICON_MEDICAL,
   ICON_PRICE_TAG,
   ICON_SHARE,
   ICON_TRASH,
@@ -311,11 +312,28 @@ export const NoteSideMenu = (props: Props) => {
         },
       });
     });
-
+    if (options.length === 1) {
+      options.push({
+        text: 'Get More Editors',
+        key: 'get-editors',
+        iconDesc: {
+          type: 'icon',
+          name: StyleKit.nameForIcon(ICON_MEDICAL),
+          side: 'right',
+          size: 17,
+        },
+        onSelect: () => {
+          application?.deviceInterface?.openUrl(
+            'https://standardnotes.org/extensions'
+          );
+        },
+      });
+    }
     return options;
   }, [
     note,
     application?.componentManager,
+    application?.deviceInterface,
     components,
     onEditorPress,
     onEdtiorLongPress,

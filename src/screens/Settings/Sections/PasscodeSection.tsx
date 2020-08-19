@@ -207,6 +207,7 @@ export const PasscodeSection = (props: Props) => {
 
       {props.hasPasscode && (
         <SectionedOptionsTableCell
+          leftAligned
           title={'Require Passcode'}
           options={passcodeTimingOptions}
           onPress={(option: Option) =>
@@ -217,6 +218,7 @@ export const PasscodeSection = (props: Props) => {
 
       {hasBiometrics && (
         <SectionedOptionsTableCell
+          leftAligned
           title={'Require Biometrics'}
           options={biometricsTimingOptions}
           onPress={(option: Option) =>

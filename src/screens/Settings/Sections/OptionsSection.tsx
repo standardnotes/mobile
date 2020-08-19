@@ -101,7 +101,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         // last={!signedIn}
         first={false}
         // disabled={this.state.loadingExport}
-        leftAligned={true}
+        leftAligned
         options={exportOptions}
         title={exporting ? 'Processing...' : 'Export Data'}
         onPress={onExportPress}

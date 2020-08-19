@@ -240,7 +240,17 @@ export class StyleKit {
   }
 
   systemThemes() {
-    return Object.values(this.themeData).filter(th => th.isSystemTheme);
+    return Object.values(this.themeData)
+      .filter(th => th.isSystemTheme)
+      .sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        }
+        if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      });
   }
 
   setActiveTheme(themeId: string) {

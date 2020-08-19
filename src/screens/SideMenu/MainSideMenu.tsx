@@ -2,7 +2,7 @@ import { AppStateType } from '@Lib/ApplicationState';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
-import { ICON_SETTINGS } from '@Style/icons';
+import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
 import { StyleKit, StyleKitContext, ThemeContent } from '@Style/StyleKit';
 import _ from 'lodash';
 import React, {
@@ -153,6 +153,24 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
             selected: styleKit!.activeThemeId === mapTheme.uuid,
           }))
       );
+
+    if (options.length === styleKit!.systemThemes().length) {
+      options.push({
+        text: 'Get More Themes',
+        key: 'get-theme',
+        iconDesc: {
+          type: 'icon',
+          name: StyleKit.nameForIcon(ICON_BRUSH),
+          side: 'right',
+          size: 17,
+        },
+        onSelect: () => {
+          application?.deviceInterface?.openUrl(
+            'https://standardnotes.org/extensions'
+          );
+        },
+      });
+    }
 
     return options;
     // We want to also track activeThemeId
