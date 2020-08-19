@@ -133,6 +133,7 @@ export const NoteList = (props: Props): JSX.Element => {
             keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
             placeholder="Search"
             text={searchText}
+            hideBackground
             barTintColor={theme.stylekitBackgroundColor}
             textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
             textColor={theme.stylekitForegroundColor}

@@ -111,7 +111,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   return (
     <Fragment>
       <FirstSafeAreaView />
-      <MainSafeAreaView edges={['bottom', 'left']}>
+      <MainSafeAreaView>
         <SideMenuHero
           testID="settingsButton"
           onPress={openSettings}

@@ -1,5 +1,4 @@
-import { FlatList, Platform, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, Platform, SafeAreaView, StatusBar } from 'react-native';
 import styled, { css } from 'styled-components/native';
 
 // We want top color to be different from bottom color of safe area.

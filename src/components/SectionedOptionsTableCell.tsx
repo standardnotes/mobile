@@ -10,6 +10,7 @@ type Props = {
   height?: number;
   onPress: (option: Option) => void;
   options: Option[];
+  leftAligned?: boolean;
 };
 type ContainerProps = Omit<Props, 'title' | 'onPress' | 'options'>;
 export const Container = styled.View<ContainerProps>`
@@ -32,17 +33,13 @@ export const Container = styled.View<ContainerProps>`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding: 0px;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  padding-right: 5px;
   max-height: 45px;
 `;
 
-const Title = styled.Text`
+const Title = styled.Text<{ leftAligned?: boolean }>`
   font-size: ${props => props.theme.mainTextFontSize}px;
   color: ${props => props.theme.stylekitForegroundColor};
-  text-align: center;
+  text-align: ${props => (props.leftAligned ? 'left' : 'center')};
   width: 42%;
   min-width: 0px;
 `;
@@ -77,7 +74,7 @@ const ButtonTitle = styled.Text<{ selected: boolean }>`
 
 export const SectionedOptionsTableCell: React.FC<Props> = props => (
   <Container>
-    <Title>{props.title}</Title>
+    <Title leftAligned={props.leftAligned}>{props.title}</Title>
     <OptionsContainer>
       {props.options.map(option => {
         return (

@@ -1,10 +1,12 @@
 import { ButtonCell } from '@Components/ButtonCell';
+import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { useSignedIn } from '@Lib/snjsHooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { Alert } from 'react-native';
 import { ButtonType } from 'snjs';
 
 type Props = {
@@ -76,12 +78,14 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     <TableSection>
       <SectionHeader title={title} />
 
-      {/* <ButtonCell
+      <ButtonCell
         first={true}
         leftAligned={true}
         title={'Manage Privileges'}
-        onPress={onManagePrivileges}
-      /> */}
+        onPress={() => {
+          Alert.alert('TODO', 'Not implemented yet');
+        }}
+      />
 
       {signedIn && (
         <ButtonCell
@@ -97,23 +101,24 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         // last={!signedIn}
         first={false}
         // disabled={this.state.loadingExport}
-        // leftAligned={true}
+        leftAligned={true}
         options={exportOptions}
         title={exporting ? 'Processing...' : 'Export Data'}
         onPress={onExportPress}
       />
 
-      {/* {!signedIn && (
+      {!signedIn && (
         <SectionedAccessoryTableCell
           testID="lastExportDate"
           // last={true}
           onPress={() => {
-            (!this.state.lastExportDate || stale) && this.showDataBackupAlert();
+            // TODO:
+            Alert.alert('TODO', 'Not implemented yet');
           }}
-          tinted={!this.state.lastExportDate || stale}
-          text={lastExportString}
+          tinted={true}
+          text={'Your data has not yet been backed up.'}
         />
-      )} */}
+      )}
     </TableSection>
   );
 };
