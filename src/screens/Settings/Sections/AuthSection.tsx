@@ -6,6 +6,7 @@ import { TableSection } from '@Components/TableSection';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Keyboard } from 'react-native';
 import {
   RegistrationDescription,
   RegistrationInput,
@@ -96,7 +97,7 @@ export const AuthSection = (props: Props) => {
       setSigningIn(false);
       return;
     }
-
+    Keyboard.dismiss();
     const result = await application!.signIn(
       email,
       password,
@@ -144,6 +145,7 @@ export const AuthSection = (props: Props) => {
         'OK'
       );
     } else {
+      Keyboard.dismiss();
       const result = await application!.register(
         email,
         password,

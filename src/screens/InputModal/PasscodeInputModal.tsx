@@ -11,7 +11,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_INPUT_MODAL_PASSCODE } from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, { useContext, useMemo, useRef, useState } from 'react';
-import { KeyboardType, Platform, TextInput } from 'react-native';
+import { Keyboard, KeyboardType, Platform, TextInput } from 'react-native';
 import { Container, Input } from './InputModal.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_PASSCODE>;
@@ -34,7 +34,7 @@ export const PasscodeInputModal = (props: Props) => {
     if (!confirmText) {
       confirmTextRef.current?.focus();
     } else {
-      // this.submit();
+      Keyboard.dismiss();
     }
   };
 
