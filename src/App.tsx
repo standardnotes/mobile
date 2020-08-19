@@ -29,6 +29,7 @@ import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
 import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
 import { ICON_CHECKMARK, ICON_CLOSE, ICON_MENU } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
+import { StyleKitTheme } from '@Style/Themes/styled-components';
 import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
 import React, {
   useCallback,
@@ -420,35 +421,55 @@ const AppComponent: React.FC<{
   env: 'prod' | 'dev';
 }> = ({ application, env }) => {
   const [ready, setReady] = useState(false);
-  const styleKit = useRef<StyleKit | undefined>(undefined);
+  const styleKit = useRef<StyleKit>();
+  const [activeTheme, setActiveTheme] = useState<StyleKitTheme | undefined>();
+
+  const setStyleKitRef = useCallback((node: StyleKit | undefined) => {
+    if (node) {
+      node.addThemeChangeObserver(() => {
+        setActiveTheme(node.theme);
+      });
+    }
+
+    // Save a reference to the node
+    styleKit.current = node;
+  }, []);
 
   useEffect(() => {
+    let styleKitInstance: StyleKit;
     const loadApplication = async () => {
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
           application!.promptForChallenge(challenge);
         },
       });
-      styleKit.current = new StyleKit(application);
-      await styleKit.current.init();
+      styleKitInstance = new StyleKit(application);
+      await styleKitInstance.init();
+      setStyleKitRef(styleKitInstance);
+      setActiveTheme(styleKitInstance.theme);
       setReady(true);
     };
     setReady(false);
     loadApplication();
-  }, [application, env]);
 
-  if (!ready || !styleKit.current) {
+    return () => {
+      styleKitInstance?.deinit();
+      setStyleKitRef(undefined);
+    };
+  }, [application, env, setStyleKitRef]);
+
+  if (!ready || !styleKit.current || !activeTheme) {
     return null;
   }
-  // TODO: better modes support
+
   return (
     <NavigationContainer
       theme={{
         ...DefaultTheme,
         colors: {
           ...DefaultTheme.colors,
-          background: styleKit.current.theme!.stylekitBackgroundColor,
-          border: styleKit.current.theme!.stylekitBorderColor,
+          background: activeTheme.stylekitBackgroundColor,
+          border: activeTheme.stylekitBorderColor,
         },
       }}
       onReady={() => {
@@ -459,7 +480,7 @@ const AppComponent: React.FC<{
       <StatusBar translucent />
       {styleKit.current && (
         <>
-          <ThemeProvider theme={styleKit.current.theme!}>
+          <ThemeProvider theme={activeTheme}>
             <ActionSheetProvider>
               <StyleKitContext.Provider value={styleKit.current}>
                 <MainStackComponent env={env} />

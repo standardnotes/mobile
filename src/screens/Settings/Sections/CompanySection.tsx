@@ -65,6 +65,7 @@ export const CompanySection = (props: Props) => {
       <SectionHeader title={props.title} />
 
       <ButtonCell
+        first
         leftAligned={true}
         title="Help"
         onPress={() => openUrl('help')}

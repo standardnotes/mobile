@@ -3,9 +3,11 @@ import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_SETTINGS } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
+import { StyleKit, StyleKitContext, ThemeContent } from '@Style/StyleKit';
+import _ from 'lodash';
 import React, {
   Fragment,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -15,7 +17,7 @@ import { Platform } from 'react-native';
 import FAB from 'react-native-fab';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ContentType, SNTag, SNTheme } from 'snjs';
+import { ContentType, SNTag, SNTheme, ThemeMutator } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   FirstSafeAreaView,
@@ -33,6 +35,7 @@ type Props = {
 export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   // Context
   const theme = useContext(ThemeContext);
+  const styleKit = useContext(StyleKitContext);
   const application = useContext(ApplicationContext);
   const navigation = useNavigation();
 
@@ -54,7 +57,41 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
     return removeTagChangeObserver;
   });
 
-  const onThemeSelect = (_theme: SNTheme) => {};
+  const onSystemThemeSelect = useCallback(
+    async (selectedTheme: ThemeContent) => {
+      const oldTheme = application!.findItem(styleKit!.activeThemeId!) as
+        | SNTheme
+        | undefined;
+
+      styleKit?.activateSystemTheme(selectedTheme.uuid);
+      if (oldTheme?.isTheme() && oldTheme.isMobileActive()) {
+        await application?.changeAndSaveItem(oldTheme.uuid, mutator => {
+          const themeMutator = mutator as ThemeMutator;
+          themeMutator.setMobileActive(false);
+        });
+      }
+    },
+    [application, styleKit]
+  );
+
+  const onThemeSelect = useCallback(
+    async (selectedTheme: SNTheme) => {
+      if (!selectedTheme.isMobileActive()) {
+        await application?.changeItem(selectedTheme.uuid, mutator => {
+          const themeMutator = mutator as ThemeMutator;
+          themeMutator.setMobileActive(true);
+        });
+        if (application!.findItem(styleKit!.activeThemeId!)) {
+          await application?.changeItem(styleKit!.activeThemeId!, mutator => {
+            const themeMutator = mutator as ThemeMutator;
+            themeMutator.setMobileActive(false);
+          });
+        }
+        await application?.sync();
+      }
+    },
+    [application, styleKit]
+  );
 
   useEffect(() => {
     const unsubscribeStreamThemes = application?.streamItems(
@@ -68,18 +105,65 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
     return unsubscribeStreamThemes;
   }, [application]);
 
+  const iconDescriptorForTheme = (currentTheme: SNTheme | ThemeContent) => {
+    const desc = {
+      type: 'circle',
+      side: 'right' as 'right',
+    };
+
+    const dockIcon =
+      currentTheme.package_info && currentTheme.package_info.dock_icon;
+
+    if (dockIcon && dockIcon.type === 'circle') {
+      _.merge(desc, {
+        backgroundColor: dockIcon.background_color,
+        borderColor: dockIcon.border_color,
+      });
+    } else {
+      _.merge(desc, {
+        backgroundColor: theme.stylekitInfoColor,
+        borderColor: theme.stylekitInfoColor,
+      });
+    }
+
+    return desc;
+  };
+
   const themeOptions = useMemo(() => {
-    let options: SideMenuOption[] = themes
-      .filter(el => !el.errorDecrypting)
-      .map(mapTheme => ({
-        text: mapTheme.name,
-        key: mapTheme.uuid,
-        dimmed: mapTheme.getNotAvailOnMobile(),
-        onSelect: () => onThemeSelect(mapTheme),
-      }));
+    const options: SideMenuOption[] = styleKit!
+      .systemThemes()
+      .map(systemTheme => ({
+        text: systemTheme?.name,
+        key: systemTheme?.uuid,
+        iconDesc: iconDescriptorForTheme(systemTheme),
+        dimmed: false,
+        onSelect: () => onSystemThemeSelect(systemTheme),
+        selected: styleKit!.activeThemeId === systemTheme?.uuid,
+      }))
+      .concat(
+        themes
+          .filter(el => !el.errorDecrypting)
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(mapTheme => ({
+            text: mapTheme.name,
+            key: mapTheme.uuid,
+            iconDesc: iconDescriptorForTheme(mapTheme),
+            dimmed: mapTheme.getNotAvailOnMobile(),
+            onSelect: () => onThemeSelect(mapTheme),
+            selected: styleKit!.activeThemeId === mapTheme.uuid,
+          }))
+      );
 
     return options;
-  }, [themes]);
+    // We want to also track activeThemeId
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    styleKit,
+    styleKit?.activeThemeId,
+    themes,
+    onSystemThemeSelect,
+    onThemeSelect,
+  ]);
 
   const onTagSelect = async (tag: SNTag) => {
     if (tag.conflictOf) {

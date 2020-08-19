@@ -1,5 +1,5 @@
 import { MobileApplication } from '@Lib/application';
-import ThemeDownloader from '@Style/Util/ThemeDownloader';
+import CSSParser from '@Style/Util/CSSParser';
 import {
   DARK_CONTENT,
   keyboardColorForTheme,
@@ -17,8 +17,9 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native';
-import { ComponentArea, removeFromArray, SNComponent, SNTheme } from 'snjs';
+import { ContentType, removeFromArray, SNComponent, SNTheme } from 'snjs';
 import { UuidString } from 'snjs/dist/@types/types';
+import THEME_DARK_JSON from './Themes/blue-dark.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 import THEME_RED_JSON from './Themes/red.json';
 import { StyleKitTheme } from './Themes/styled-components';
@@ -31,12 +32,14 @@ export interface ThemeContent {
   name: string;
   luminosity?: number;
   isSwapIn?: boolean;
+  uuid: string;
   variables: StyleKitTheme;
   package_info: SNComponent['package_info'];
 }
 
 enum SystemThemes {
   Blue = 'Blue',
+  Dark = 'Dark',
   Red = 'Red',
 }
 
@@ -46,8 +49,8 @@ export const StyleKitContext = React.createContext<StyleKit | undefined>(
 
 export class StyleKit {
   observers: ThemeChangeObserver[] = [];
-  private themeData: Partial<Record<UuidString, ThemeContent>> = {};
-  activeTheme?: string;
+  private themeData: Record<UuidString, ThemeContent> = {};
+  activeThemeId?: string;
   currentDarkMode: ColorSchemeName;
   static constants = {
     mainTextFontSize: 16,
@@ -74,28 +77,17 @@ export class StyleKit {
     this.unregisterComponentHandler && this.unregisterComponentHandler();
   }
 
-  // onAppEvent(event: ApplicationEvent) {
-  //   super.onAppEvent(event);
-  //   if (event === ApplicationEvent.SignedOut) {
-  //     this.resetToSystemTheme();
-  //   }
-  // }
-
   private registerObservers() {
-    this.unregisterComponentHandler = this.application!.componentManager!.registerHandler(
-      {
-        identifier: 'themeManager',
-        areas: [ComponentArea.Themes],
-        activationHandler: (uuid, component) => {
-          if (component?.active) {
-            console.log('activeTheme');
-            // this.activateTheme(component as SNTheme);
-          } else {
-            // this.deactivateTheme(uuid);
-          }
-        },
+    this.application.streamItems(ContentType.Theme, items => {
+      const themes = items as SNTheme[];
+      const activeTheme = themes.find(el => {
+        return !el.deleted && el.isMobileActive();
+      });
+
+      if (activeTheme && activeTheme.uuid !== this.activeThemeId) {
+        this.activateExternalTheme(activeTheme);
       }
-    );
+    });
   }
 
   private findOrCreateDataForTheme(themeId: string) {
@@ -110,11 +102,19 @@ export class StyleKit {
   private buildSystemThemesAndData() {
     const themeData = [
       {
+        uuid: SystemThemes.Blue,
         variables: THEME_BLUE_JSON,
         name: SystemThemes.Blue,
-        isInitial: true,
+        isInitial: Appearance.getColorScheme() === 'light',
       },
       {
+        uuid: SystemThemes.Dark,
+        variables: THEME_DARK_JSON,
+        name: SystemThemes.Dark,
+        isInitial: Appearance.getColorScheme() === 'dark',
+      },
+      {
+        uuid: SystemThemes.Red,
         variables: THEME_RED_JSON,
         name: SystemThemes.Red,
       },
@@ -128,10 +128,11 @@ export class StyleKit {
       variables.statusBar =
         Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
 
-      this.themeData[option.name] = {
+      this.themeData[option.uuid] = {
         isSystemTheme: true,
         isInitial: Boolean(option.isInitial),
         name: option.name,
+        uuid: option.uuid,
         variables: variables,
         package_info: {
           dock_icon: {
@@ -174,7 +175,10 @@ export class StyleKit {
      * If we're changing the theme for a specific mode and we're currently on
      * that mode, then activate this theme.
      */
-    if (this.currentDarkMode === currentMode && this.activeTheme !== themeId) {
+    if (
+      this.currentDarkMode === currentMode &&
+      this.activeThemeId !== themeId
+    ) {
       this.activateTheme(themeId);
     }
   }
@@ -186,17 +190,17 @@ export class StyleKit {
    * copy as the result may be modified before use.
    */
   templateVariables() {
-    return _.clone(THEME_RED_JSON);
+    return _.clone(THEME_BLUE_JSON);
   }
 
   private resetToSystemTheme() {
     this.activateTheme(Object.keys(this.themeData)[0]);
   }
 
-  async resolveInitialTheme() {
+  private async resolveInitialTheme() {
     // const currentMode = Appearance.getColorScheme();
     const runDefaultTheme = () => {
-      const defaultTheme = SystemThemes.Blue;
+      const defaultTheme = SystemThemes.Dark;
 
       // TODO: save to starege
 
@@ -231,17 +235,12 @@ export class StyleKit {
 
   keyboardColorForActiveTheme() {
     return keyboardColorForTheme(
-      this.findOrCreateDataForTheme(this.activeTheme!)
+      this.findOrCreateDataForTheme(this.activeThemeId!)
     );
   }
 
-  themes() {
-    // TODO: add external themes
-    return this.themeData;
-  }
-
-  isThemeActive(theme: SNTheme) {
-    return this.activeTheme && theme.uuid === this.activeTheme;
+  systemThemes() {
+    return Object.values(this.themeData).filter(th => th.isSystemTheme);
   }
 
   setActiveTheme(themeId: string) {
@@ -250,7 +249,7 @@ export class StyleKit {
     const variables = themeData.variables;
     themeData.variables = _.merge(this.templateVariables(), variables);
 
-    this.activeTheme = themeId;
+    this.activeThemeId = themeId;
 
     this.updateDeviceForTheme(themeId);
 
@@ -312,29 +311,61 @@ export class StyleKit {
     // }
   }
 
-  activateExternalTheme(theme: SNTheme) {
-    ThemeDownloader.get()
-      .downloadTheme(theme)
-      .then(variables => {
-        if (!variables) {
-          Alert.alert(
-            'Not Available',
-            'This theme is not available on mobile.'
-          );
-          return;
-        }
-        // TODO: merge new theme style
-        // if (variables !== theme.content.variables) {
-        //   theme.content.variables = variables;
-        //   theme.setDirty(true);
-        // }
-      });
+  private async downloadTheme(theme: SNTheme) {
+    let errorBlock = (error: null) => {
+      console.error('Theme download error', error);
+    };
+
+    let url = theme.hosted_url;
+
+    if (!url) {
+      errorBlock(null);
+      return;
+    }
+
+    if (Platform.OS === 'android' && url.includes('localhost')) {
+      url = url.replace('localhost', '10.0.2.2');
+    }
+
+    return new Promise(async resolve => {
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+        });
+        // console.log(JSON.parse(response));
+        const data = await response.text();
+        // @ts-ignore TODO: check response type
+        let variables = CSSParser.cssToObject(data);
+
+        resolve(variables);
+      } catch (e) {
+        resolve(null);
+      }
+    });
+  }
+
+  activateSystemTheme(themeId: string) {
+    this.activateTheme(themeId);
+  }
+
+  async activateExternalTheme(theme: SNTheme) {
+    const variables = await this.downloadTheme(theme);
+    if (!variables) {
+      Alert.alert('Not Available', 'This theme is not available on mobile.');
+      return;
+    }
+    let data = this.findOrCreateDataForTheme(theme.uuid);
+    const appliedVariables = _.merge(this.templateVariables(), variables);
+    data.variables = {
+      ...appliedVariables,
+      ...StyleKit.constants,
+    };
     this.activateTheme(theme.uuid);
   }
 
   activateTheme(themeId: string) {
     this.setActiveTheme(themeId);
-    this.assignThemeForMode(themeId);
+    // this.assignThemeForMode(themeId);
   }
 
   // activatePreferredTheme() {
@@ -359,7 +390,7 @@ export class StyleKit {
   // }
 
   async downloadThemeAndReload(theme: SNTheme) {
-    const updatedVariables = await ThemeDownloader.get().downloadTheme(theme);
+    const updatedVariables = await this.downloadTheme(theme);
 
     /** Merge default variables to ensure this theme has all the variables. */
     const appliedVariables = _.merge(
@@ -372,13 +403,13 @@ export class StyleKit {
       ...StyleKit.constants,
     };
 
-    if (theme.uuid === this.activeTheme) {
+    if (theme.uuid === this.activeThemeId) {
       this.setActiveTheme(theme.uuid);
     }
   }
 
   reloadStyles() {
-    const { variables } = this.findOrCreateDataForTheme(this.activeTheme!);
+    const { variables } = this.findOrCreateDataForTheme(this.activeThemeId!);
 
     this.theme = variables;
   }
