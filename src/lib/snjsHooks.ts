@@ -1,5 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
+import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import React, { useEffect } from 'react';
+import { SCREEN_NOTES } from '@Screens/screens';
+import React, { useCallback, useEffect } from 'react';
 import { ApplicationEvent } from 'snjs';
 
 export const useSignedIn = (
@@ -140,4 +143,123 @@ export const useHasEditor = () => {
   });
 
   return hasEditor;
+};
+
+export const useSyncStatus = () => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
+  >();
+
+  // State
+  const [completedInitialSync, setCompletedInitialSync] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [decrypting, setDecrypting] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const setStatus = useCallback(
+    (status?: string, color?: string) => {
+      navigation.setParams({
+        subTitle: status,
+        subTitleColor: color,
+      });
+    },
+    [navigation]
+  );
+
+  useEffect(() => {
+    let mounted = true;
+    const setInitialValues = async () => {
+      const isEncryptionAvailable = await application!.isEncryptionAvailable();
+      if (mounted) {
+        setDecrypting(!completedInitialSync && isEncryptionAvailable);
+        setLoading(!completedInitialSync && !isEncryptionAvailable);
+      }
+    };
+    setInitialValues();
+    return () => {
+      mounted = false;
+    };
+  }, [application, completedInitialSync]);
+
+  const updateLocalDataStatus = useCallback(() => {
+    const syncStatus = application!.getSyncStatus();
+    const stats = syncStatus.getStats();
+    const encryption = application!.isEncryptionAvailable();
+    if (stats.localDataDone) {
+      setStatus();
+    }
+    const notesString = `${stats.localDataCurrent}/${stats.localDataTotal} items...`;
+    const loadingStatus = encryption
+      ? `Decrypting ${notesString}`
+      : `Loading ${notesString}`;
+    setStatus(loadingStatus);
+  }, [application, setStatus]);
+
+  const updateSyncStatus = useCallback(() => {
+    const syncStatus = application!.getSyncStatus();
+    const stats = syncStatus.getStats();
+    if (syncStatus.hasError()) {
+      setStatus('Unable to Sync');
+    } else if (stats.downloadCount > 20) {
+      const text = `Downloading ${stats.downloadCount} items. Keep app open.`;
+      setStatus(text);
+    } else if (stats.uploadTotalCount > 20) {
+      setStatus(
+        `Syncing ${stats.uploadCompletionCount}/${stats.uploadTotalCount} items...`
+      );
+    } else {
+      setStatus();
+    }
+  }, [application, setStatus]);
+
+  useEffect(() => {
+    const unsubscribeAppEvents = application?.addEventObserver(
+      async eventName => {
+        if (eventName === ApplicationEvent.LocalDataIncrementalLoad) {
+          updateLocalDataStatus();
+        } else if (
+          eventName === ApplicationEvent.SyncStatusChanged ||
+          eventName === ApplicationEvent.FailedSync
+        ) {
+          updateSyncStatus();
+        } else if (eventName === ApplicationEvent.LocalDataLoaded) {
+          setDecrypting(false);
+          setLoading(false);
+          updateLocalDataStatus();
+        } else if (eventName === ApplicationEvent.WillSync) {
+          if (!completedInitialSync) {
+            setStatus('Syncing...');
+          }
+        } else if (eventName === ApplicationEvent.CompletedFullSync) {
+          if (!completedInitialSync) {
+            setStatus();
+            setCompletedInitialSync(true);
+            setLoading(false);
+            setRefreshing(false);
+          }
+          setStatus();
+        } else if (eventName === ApplicationEvent.LocalDatabaseReadError) {
+          application!.alertService!.alert(
+            'Unable to load local storage. Please restart the app and try again.'
+          );
+        } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
+          application!.alertService!.alert(
+            'Unable to write to local storage. Please restart the app and try again.'
+          );
+        }
+      }
+    );
+
+    return unsubscribeAppEvents;
+  }, [
+    application,
+    completedInitialSync,
+    setStatus,
+    updateLocalDataStatus,
+    updateSyncStatus,
+  ]);
+
+  return [loading, decrypting, refreshing];
 };

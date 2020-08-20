@@ -1,4 +1,5 @@
 import { AppStateType } from '@Lib/ApplicationState';
+import { useSyncStatus } from '@Lib/snjsHooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -31,6 +32,11 @@ export const Notes: React.FC<Props> = props => {
   const navigation = useNavigation<
     AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
   >();
+
+  /**
+   * Update sync status
+   */
+  const [loading, decrypting] = useSyncStatus();
 
   // State
   const [sortBy] = useState<CollectionSort>(CollectionSort.UpdatedAt);
@@ -182,8 +188,8 @@ export const Notes: React.FC<Props> = props => {
         onSearchCancel={() => onSearchChange('')}
         notes={notes}
         // sortType={this.options.sortBy}
-        // decrypting={this.state.decrypting}
-        // loading={this.state.loading}
+        decrypting={decrypting}
+        loading={loading}
         // selectedTags={this.state.tags}
         selectedNoteId={
           application?.getAppState().isInTabletMode

@@ -156,11 +156,7 @@ export const Root = (props: Props): JSX.Element | null => {
     <Container testID="rootView" onLayout={onLayout}>
       {!noteListCollapsed && (
         <NotesContainer shouldSplitLayout={shouldSplitLayout}>
-          <Notes
-            // onUnlockPress={this.onUnlockPress}
-            onNoteSelect={onNoteSelect}
-            onNoteCreate={onNoteCreate}
-          />
+          <Notes onNoteSelect={onNoteSelect} onNoteCreate={onNoteCreate} />
         </NotesContainer>
       )}
 
@@ -168,7 +164,6 @@ export const Root = (props: Props): JSX.Element | null => {
         <ComposeContainer>
           <Compose
           // selectedTagId={this.state.selectedTagId}
-          // navigation={this.props.navigation}
           />
 
           <ExpandTouchable
