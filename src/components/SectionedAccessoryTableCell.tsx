@@ -113,7 +113,7 @@ export const SectionedAccessoryTableCell: React.FC<Props> = props => {
 
   if (iconName) {
     icon = (
-      <IconContainer>
+      <IconContainer key={iconName}>
         <Icon name={iconName} size={iconSize} color={color} />
       </IconContainer>
     );

@@ -244,7 +244,7 @@ PODS:
     - React
   - react-native-mail (4.1.0):
     - React
-  - react-native-safe-area-context (3.1.4):
+  - react-native-safe-area-context (3.1.6):
     - React
   - react-native-sodium (0.4.0):
     - React
@@ -549,7 +549,7 @@ SPEC CHECKSUMS:
   react-native-aes: ff31f0dd4c791eb423a631ee04570fcf3c618924
   react-native-fingerprint-scanner: f0d8190ceaf0b9e1893e3379d78724375b8f6ea7
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-safe-area-context: eb91fe1fb3f7b87d9c30a7f0808407d8569d539d
+  react-native-safe-area-context: 4fb3cdeb4a405ec19f18aca80ef2144381ffc761
   react-native-sodium: ef43e28fdf8d866e68ed06890c32f8d86a570cc7
   react-native-version-info: f95938832bdb2ce94c3d045c2e44fabcc88f796a
   react-native-webview: 6edf4d6f71b9161fc3e96083726a538ee395304d
