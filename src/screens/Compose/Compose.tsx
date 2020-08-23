@@ -412,7 +412,7 @@ export const Compose = (): JSX.Element => {
         return;
       }
       setNoteText(newNoteText);
-      saveNote(false, true, true, false, {
+      saveNote(false, true, false, false, {
         newTitle: title,
         newNoteText,
       });
