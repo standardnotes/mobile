@@ -44,7 +44,7 @@ import {
   WebViewReloadButtonText,
 } from './Compose.styled';
 const NOTE_PREVIEW_CHAR_LIMIT = 80;
-// const MINIMUM_STATUS_DURATION = 400;
+const MINIMUM_STATUS_DURATION = 400;
 const SAVE_TIMEOUT_DEBOUNCE = 350;
 const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
 
@@ -71,7 +71,8 @@ export const Compose = (): JSX.Element => {
 
   // Ref
   const editorViewRef = useRef<SNTextView>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const statusTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const dissmissKeybard = () => {
     Keyboard.dismiss();
@@ -79,17 +80,29 @@ export const Compose = (): JSX.Element => {
   };
 
   const setStatus = useCallback(
-    (status: string, color?: string) => {
-      navigation.setParams({
-        subTitle: status,
-        subTitleColor: color,
-      });
+    (status: string, color?: string, wait: boolean = true) => {
+      if (statusTimeoutRef.current) {
+        clearTimeout(statusTimeoutRef.current);
+      }
+      if (wait) {
+        statusTimeoutRef.current = setTimeout(() => {
+          navigation.setParams({
+            subTitle: status,
+            subTitleColor: color,
+          });
+        }, MINIMUM_STATUS_DURATION);
+      } else {
+        navigation.setParams({
+          subTitle: status,
+          subTitleColor: color,
+        });
+      }
     },
     [navigation]
   );
 
   const showSavingStatus = useCallback(() => {
-    setStatus('Saving...');
+    setStatus('Saving...', undefined, false);
   }, [setStatus]);
 
   const showAllChangesSavedStatus = useCallback(() => {
@@ -376,14 +389,14 @@ export const Compose = (): JSX.Element => {
         isUserModified
       );
 
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
       }
       const noDebounce = bypassDebouncer || application?.noAccount();
       const syncDebouceMs = noDebounce
         ? SAVE_TIMEOUT_NO_DEBOUNCE
         : SAVE_TIMEOUT_DEBOUNCE;
-      timeoutRef.current = setTimeout(() => {
+      saveTimeoutRef.current = setTimeout(() => {
         application?.sync();
         if (closeAfterSync) {
           application?.getAppState().closeEditor(editor!);
