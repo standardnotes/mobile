@@ -229,17 +229,18 @@ export const useSyncStatus = () => {
           setLoading(false);
           updateLocalDataStatus();
         } else if (eventName === ApplicationEvent.WillSync) {
-          if (!completedInitialSync) {
-            setStatus('Syncing...');
+          setStatus('Syncing...');
+          if (completedInitialSync) {
+            setRefreshing(true);
           }
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
+          setStatus();
           if (!completedInitialSync) {
-            setStatus();
             setCompletedInitialSync(true);
             setLoading(false);
+          } else {
             setRefreshing(false);
           }
-          setStatus();
         } else if (eventName === ApplicationEvent.LocalDatabaseReadError) {
           application!.alertService!.alert(
             'Unable to load local storage. Please restart the app and try again.'

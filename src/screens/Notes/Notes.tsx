@@ -1,5 +1,5 @@
 import { AppStateType } from '@Lib/ApplicationState';
-import { useSyncStatus } from '@Lib/snjsHooks';
+import { useSignedIn, useSyncStatus } from '@Lib/snjsHooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -36,7 +36,8 @@ export const Notes: React.FC<Props> = props => {
   /**
    * Update sync status
    */
-  const [loading, decrypting] = useSyncStatus();
+  const [loading, decrypting, refreshing] = useSyncStatus();
+  const signedIn = useSignedIn();
 
   // State
   const [sortBy] = useState<CollectionSort>(CollectionSort.UpdatedAt);
@@ -145,6 +146,10 @@ export const Notes: React.FC<Props> = props => {
     };
   }, [application, reloadNotes, reloadNotesDisplayOptions]);
 
+  const onRefresh = useCallback(() => {
+    application?.sync();
+  }, [application]);
+
   const onSearchChange = (filter: string) => {
     setSearchText(filter);
     reloadNotesDisplayOptions(filter);
@@ -179,10 +184,10 @@ export const Notes: React.FC<Props> = props => {
     <>
       {/* @ts-ignore TODO: fix notelist */}
       <NoteList
-        // onRefresh={this._onRefresh.bind(this)}
-        // hasRefreshControl={!Auth.get().offline()}
+        onRefresh={onRefresh}
+        hasRefreshControl={signedIn}
         onPressItem={props.onNoteSelect}
-        // refreshing={this.state.refreshing}
+        refreshing={refreshing}
         searchText={searchText}
         onSearchChange={onSearchChange}
         onSearchCancel={() => onSearchChange('')}

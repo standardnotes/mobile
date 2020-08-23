@@ -180,6 +180,7 @@ export const NoteList = (props: Props): JSX.Element => {
         refreshControl={
           !props.hasRefreshControl ? undefined : (
             <RefreshControl
+              tintColor={theme.stylekitContrastForegroundColor}
               refreshing={props.refreshing}
               onRefresh={props.onRefresh}
             />
