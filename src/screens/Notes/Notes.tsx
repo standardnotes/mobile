@@ -36,7 +36,7 @@ export const Notes: React.FC<Props> = props => {
   /**
    * Update sync status
    */
-  const [loading, decrypting, refreshing] = useSyncStatus();
+  const [loading, decrypting, refreshing, startRefreshing] = useSyncStatus();
   const signedIn = useSignedIn();
 
   // State
@@ -147,8 +147,9 @@ export const Notes: React.FC<Props> = props => {
   }, [application, reloadNotes, reloadNotesDisplayOptions]);
 
   const onRefresh = useCallback(() => {
+    startRefreshing();
     application?.sync();
-  }, [application]);
+  }, [application, startRefreshing]);
 
   const onSearchChange = (filter: string) => {
     setSearchText(filter);

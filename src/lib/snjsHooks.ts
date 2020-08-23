@@ -230,9 +230,6 @@ export const useSyncStatus = () => {
           updateLocalDataStatus();
         } else if (eventName === ApplicationEvent.WillSync) {
           setStatus('Syncing...');
-          if (completedInitialSync) {
-            setRefreshing(true);
-          }
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
           setStatus();
           if (!completedInitialSync) {
@@ -262,5 +259,14 @@ export const useSyncStatus = () => {
     updateSyncStatus,
   ]);
 
-  return [loading, decrypting, refreshing];
+  const startRefreshing = () => {
+    setRefreshing(true);
+  };
+
+  return [loading, decrypting, refreshing, startRefreshing] as [
+    boolean,
+    boolean,
+    boolean,
+    () => void
+  ];
 };
