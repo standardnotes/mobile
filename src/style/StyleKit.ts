@@ -81,7 +81,7 @@ export class StyleKit {
     this.application.streamItems(ContentType.Theme, items => {
       const themes = items as SNTheme[];
       const activeTheme = themes.find(el => {
-        return !el.deleted && el.isMobileActive();
+        return !el.deleted && !el.errorDecrypting && el.isMobileActive();
       });
 
       if (activeTheme && activeTheme.uuid !== this.activeThemeId) {
