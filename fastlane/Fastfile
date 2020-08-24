@@ -109,7 +109,7 @@ platform :android do
     )
     # code here runs in the parent directory
     Dir.chdir("..") do
-      sh("bugsnag-sourcemaps upload --api-key=#{ENV['BUGSNAG_APIKEY']} --app-version=#{versionCode} --minifiedFile=android/app/build/generated/assets/react/#{variant}/release/index.android.bundle --source-map=android/app/build/generated/sourcemaps/react/#{variant}/release/index.android.bundle.map --minified-url=index.android.bundle --upload-sources")
+      sh("yarn bugsnag-sourcemaps upload --api-key=#{ENV['BUGSNAG_APIKEY']} --app-version=#{versionCode} --minifiedFile=android/app/build/generated/assets/react/#{variant}/release/index.android.bundle --source-map=android/app/build/generated/sourcemaps/react/#{variant}/release/index.android.bundle.map --minified-url=index.android.bundle --upload-sources")
     end
   end
 
