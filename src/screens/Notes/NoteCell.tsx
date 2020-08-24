@@ -5,7 +5,7 @@ import {
 } from '@Style/useCustomActionSheet';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { ButtonType, NoteMutator, SNNote } from 'snjs';
+import { ButtonType, isNullOrUndefined, NoteMutator, SNNote } from 'snjs';
 import {
   Container,
   DateText,
@@ -229,6 +229,8 @@ export const NoteCell = ({
   const showPreview =
     // !this.state.options.hidePreviews &&
     !note.protected && !note.hidePreview;
+  const hasPlainPreview =
+    !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
   // const showTagsString =
   //   props.renderTags &&
   //   // !this.state.options.hideTags &&
@@ -256,13 +258,13 @@ export const NoteCell = ({
           <TitleText selected={highlight}>{note.title}</TitleText>
         )}
 
-        {note.preview_plain != null && showPreview && (
+        {hasPlainPreview && showPreview && (
           <NoteText selected={highlight} numberOfLines={2}>
             {note.preview_plain}
           </NoteText>
         )}
 
-        {!note.preview_plain && showPreview && note.safeText().length > 0 && (
+        {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
           <NoteText selected={highlight} numberOfLines={2}>
             {note.text}
           </NoteText>
