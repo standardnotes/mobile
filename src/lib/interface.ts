@@ -91,7 +91,7 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
   openDatabase(): Promise<{ isNewDatabase?: boolean | undefined } | undefined> {
     // TODO: check if items do not have to be redownloaded in case of a failure
-    return Promise.resolve({ isNewDatabase: true });
+    return Promise.resolve({ isNewDatabase: false });
   }
 
   async getAllRawDatabasePayloads(): Promise<any[]> {

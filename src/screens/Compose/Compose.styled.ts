@@ -98,12 +98,10 @@ export const StyledTextView = styled(SNTextView)`
   padding-right: ${({ theme }) =>
     theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   /* padding-bottom: 10px; */
-  ${
-    Platform.OS === 'ios' &&
-    css`
-      font-size: 17px;
-    `
-  }
+  ${Platform.OS === 'ios' &&
+  css`
+    font-size: 17px;
+  `}
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   /* ${Platform.OS === 'ios' && 'padding-bottom: 10px'}; */
 `;
