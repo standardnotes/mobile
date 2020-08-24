@@ -115,6 +115,7 @@ export const AuthSection = (props: Props) => {
         result?.error.tag === 'mfa-invalid'
       ) {
         setMfa(result?.error);
+        setMfaCode('');
       } else if (result?.error.message) {
         application?.alertService?.alert(result?.error.message, 'Oops', 'OK');
         setMfa(undefined);
