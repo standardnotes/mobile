@@ -175,6 +175,9 @@ export const NoteSideMenu = (props: Props) => {
 
   const onEditorPress = useCallback(
     async (component?: SNComponent) => {
+      if (editor?.isTemplateNote) {
+        await editor?.insertTemplatedNote();
+      }
       const activeEditorComponent = application?.componentManager!.editorForNote(
         note!
       );
