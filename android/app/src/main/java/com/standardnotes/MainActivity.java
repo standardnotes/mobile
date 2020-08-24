@@ -9,6 +9,11 @@ import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 
 public class MainActivity extends ReactActivity {
 
+     @Override
+    protected void onCreate(Bundle savedInstance) {
+         super.onCreate(null);
+    }
+
     public static class SNReactActivityDelegate extends ReactActivityDelegate {
         public SNReactActivityDelegate(ReactActivity activity, String mainComponentName) {
             super(activity, mainComponentName);
