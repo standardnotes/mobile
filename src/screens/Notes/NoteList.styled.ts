@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 // no support for generic types in Flatlist
@@ -15,7 +14,7 @@ export const styles = StyleSheet.create({
   },
 });
 
-export const Container = styled(SafeAreaView)`
+export const Container = styled.SafeAreaView`
   background-color: ${props => props.theme.stylekitBackgroundColor};
   flex: 1;
 `;
