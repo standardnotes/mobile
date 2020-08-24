@@ -212,6 +212,7 @@ export const NoteSideMenu = (props: Props) => {
       application,
       associateComponentWithCurrentNote,
       disassociateComponentWithCurrentNote,
+      editor,
       note,
     ]
   );
