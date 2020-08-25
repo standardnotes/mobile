@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import IosSearchBar from 'react-native-search-bar';
 import AndroidSearchBar from 'react-native-search-box';
-import { SNNote, SNTag } from 'snjs';
+import { CollectionSort, SNNote, SNTag } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteCell } from './NoteCell';
 import {
@@ -37,7 +37,10 @@ type Props = {
   onPressItem: (noteUuid: SNNote['uuid']) => void;
   selectedTags: SNTag[];
   selectedNoteId: string | null;
-  sortType: string;
+  sortType: CollectionSort;
+  hideDates: boolean;
+  hideTags: boolean;
+  hidePreviews: boolean;
   decrypting: boolean;
   loading: boolean;
   hasRefreshControl: boolean;
@@ -106,7 +109,9 @@ export const NoteList = (props: Props): JSX.Element => {
         // tagsString={item.tagsString()}
         sortType={props.sortType}
         renderTags={renderTags}
-        // options={props.options}
+        hideTags={props.hideTags}
+        hideDates={props.hideDates}
+        hidePreviews={props.hidePreviews}
         highlighted={item.uuid === props.selectedNoteId}
       />
     );

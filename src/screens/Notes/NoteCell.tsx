@@ -5,7 +5,13 @@ import {
 } from '@Style/useCustomActionSheet';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { ButtonType, isNullOrUndefined, NoteMutator, SNNote } from 'snjs';
+import {
+  ButtonType,
+  CollectionSort,
+  isNullOrUndefined,
+  NoteMutator,
+  SNNote,
+} from 'snjs';
 import {
   Container,
   DateText,
@@ -23,7 +29,10 @@ type Props = {
   highlighted?: boolean;
   onPressItem: (itemUuid: SNNote['uuid']) => void;
   renderTags: boolean;
-  sortType: string;
+  hideDates: boolean;
+  hideTags: boolean;
+  hidePreviews: boolean;
+  sortType: CollectionSort;
   tagsString: string;
 };
 
@@ -33,6 +42,9 @@ export const NoteCell = ({
   highlighted,
   sortType,
   tagsString,
+  hideTags,
+  hideDates,
+  hidePreviews,
 }: Props): JSX.Element => {
   // Context
   const application = useContext(ApplicationContext);
@@ -226,14 +238,12 @@ export const NoteCell = ({
   };
 
   const padding = 14;
-  const showPreview =
-    // !this.state.options.hidePreviews &&
-    !note.protected && !note.hidePreview;
+  const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
   const hasPlainPreview =
     !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
   // const showTagsString =
   //   props.renderTags &&
-  //   // !this.state.options.hideTags &&
+  //   // !hideTags &&
   //   note.tags.length > 0 &&
   //   !note.protected;
   return (
@@ -270,9 +280,9 @@ export const NoteCell = ({
           </NoteText>
         )}
 
-        {true && (
+        {!hideDates && (
           <DateText numberOfLines={1} selected={highlight}>
-            {sortType === 'client_updated_at'
+            {sortType === CollectionSort.UpdatedAt
               ? 'Modified ' + note.updatedAtString
               : note.createdAtString}
           </DateText>
@@ -285,8 +295,6 @@ export const NoteCell = ({
             </TagText>
           </TagsContainter>
         )}
-
-        {/* {this.state.actionSheet && this.state.actionSheet} */}
       </Container>
     </TouchableContainer>
   );

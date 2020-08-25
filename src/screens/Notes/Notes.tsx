@@ -11,6 +11,7 @@ import FAB from 'react-native-fab';
 import {
   CollectionSort,
   ContentType,
+  MobilePrefKey,
   Platform,
   SNNote,
   SNSmartTag,
@@ -18,7 +19,7 @@ import {
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';
-import { notePassesFilter } from './utils';
+import { notePassesFilter, NoteSortKey } from './utils';
 
 type Props = {
   onNoteSelect: (noteUuid: SNNote['uuid']) => void;
@@ -40,8 +41,27 @@ export const Notes: React.FC<Props> = props => {
   const signedIn = useSignedIn();
 
   // State
-  const [sortBy] = useState<CollectionSort>(CollectionSort.UpdatedAt);
-  const [sortReverse] = useState<string>();
+  const [sortBy, setSortBy] = useState<CollectionSort>(() =>
+    application!
+      .getPrefsService()
+      .getValue(MobilePrefKey.SortNotesBy, CollectionSort.UpdatedAt)
+  );
+  const [sortReverse, setSortReverse] = useState<boolean>(() =>
+    application!
+      .getPrefsService()
+      .getValue(MobilePrefKey.SortNotesReverse, false)
+  );
+  const [hideDates, setHideDates] = useState<boolean>(() =>
+    application!.getPrefsService().getValue(MobilePrefKey.NotesHideDate, false)
+  );
+  const [hideTags, setHideTags] = useState<boolean>(() =>
+    application!.getPrefsService().getValue(MobilePrefKey.NotesHideTags, false)
+  );
+  const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
+    application!
+      .getPrefsService()
+      .getValue(MobilePrefKey.NotesHideNotePreview, false)
+  );
   const [notes, setNotes] = useState<SNNote[]>([]);
   // State
   const [searchText, setSearchText] = useState('');
@@ -72,15 +92,22 @@ export const Notes: React.FC<Props> = props => {
    * Note that reloading display options destroys the current index and rebuilds it,
    * so call sparingly. The runtime complexity of destroying and building
    * an index is roughly O(n^2).
+   * There are optional parameters to force using the new values,
+   * use when React is too slow when updating the state.
    */
   const reloadNotesDisplayOptions = useCallback(
-    (searchFilter?: string) => {
+    (
+      searchFilter?: string,
+      sortOptions?: {
+        sortBy?: CollectionSort;
+        sortReverse: boolean;
+      }
+    ) => {
       const tag = application!.getAppState().selectedTag!;
-
       application!.setDisplayOptions(
         ContentType.Note,
-        sortBy! as CollectionSort,
-        sortReverse! ? 'asc' : 'dsc',
+        sortOptions?.sortBy ?? (sortBy! as CollectionSort),
+        sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
         (note: SNNote) => {
           const matchesTag = tag.isSmartTag()
             ? note.satisfiesPredicate((tag as SNSmartTag).predicate)
@@ -91,8 +118,8 @@ export const Notes: React.FC<Props> = props => {
             notePassesFilter(
               note,
               tag,
-              false, // application?.getAppState().showArchived!,
-              false, // application?.getAppState().hidePinned!,
+              true,
+              false,
               searchFilter?.toLowerCase() || searchText.toLowerCase()
             )
           );
@@ -118,7 +145,7 @@ export const Notes: React.FC<Props> = props => {
     ) as SNNote[];
     setNotes(newNotes);
     reloadTitle(newNotes);
-  }, [application, haveDisplayOptions, reloadNotesDisplayOptions, reloadTitle]);
+  }, [application, reloadNotesDisplayOptions, reloadTitle]);
 
   const streamNotesAndTags = useCallback(() => {
     const removeStreamNotes = application!.streamItems(
@@ -146,6 +173,71 @@ export const Notes: React.FC<Props> = props => {
     };
   }, [application, reloadNotes, reloadNotesDisplayOptions]);
 
+  const reloadPreferences = useCallback(async () => {
+    let newSortBy = application
+      ?.getPrefsService()
+      .getValue(MobilePrefKey.SortNotesBy, NoteSortKey.UserUpdatedAt);
+    if (
+      newSortBy === NoteSortKey.UpdatedAt ||
+      newSortBy === NoteSortKey.ClientUpdatedAt
+    ) {
+      /** Use UserUpdatedAt instead */
+      newSortBy = NoteSortKey.UserUpdatedAt;
+    }
+    let displayOptionsChanged = false;
+
+    const newSortReverse = application
+      ?.getPrefsService()
+      .getValue(MobilePrefKey.SortNotesReverse, false);
+    const newHidePreview = application!
+      .getPrefsService()
+      .getValue(MobilePrefKey.NotesHideNotePreview, false);
+    const newHideDate = application!
+      .getPrefsService()
+      .getValue(MobilePrefKey.NotesHideDate, false);
+    const newHideTags = application!
+      .getPrefsService()
+      .getValue(MobilePrefKey.NotesHideTags, false);
+    console.log(newHideDate);
+    if (sortBy !== newSortBy) {
+      setSortBy(newSortBy);
+      displayOptionsChanged = true;
+    }
+    if (sortReverse !== newSortReverse) {
+      setSortReverse(newSortReverse);
+      displayOptionsChanged = true;
+    }
+    if (hidePreviews !== newHidePreview) {
+      setHidePreviews(newHidePreview);
+      displayOptionsChanged = true;
+    }
+    if (hideDates !== newHideDate) {
+      setHideDates(newHideDate);
+      displayOptionsChanged = true;
+    }
+    if (hideTags !== newHideTags) {
+      setHideTags(newHideTags);
+      displayOptionsChanged = true;
+    }
+
+    if (displayOptionsChanged) {
+      reloadNotesDisplayOptions(undefined, {
+        sortBy: newSortBy,
+        sortReverse: newSortReverse,
+      });
+    }
+    reloadNotes();
+  }, [
+    application,
+    sortBy,
+    sortReverse,
+    hidePreviews,
+    hideDates,
+    hideTags,
+    reloadNotes,
+    reloadNotesDisplayOptions,
+  ]);
+
   const onRefresh = useCallback(() => {
     startRefreshing();
     application?.sync();
@@ -159,12 +251,17 @@ export const Notes: React.FC<Props> = props => {
 
   useFocusEffect(
     useCallback(() => {
+      reloadPreferences();
       const removeAppStateChangeHandler = application!
         .getAppState()
         .addStateChangeObserver(state => {
           if (state === AppStateType.TagChanged) {
             reloadNotesDisplayOptions();
             reloadNotes();
+          }
+          if (state === AppStateType.PreferencesChanged) {
+            console.log('pref changed');
+            reloadPreferences();
           }
         });
       const removeStreams = streamNotesAndTags();
@@ -177,6 +274,7 @@ export const Notes: React.FC<Props> = props => {
       application,
       reloadNotes,
       reloadNotesDisplayOptions,
+      reloadPreferences,
       streamNotesAndTags,
     ])
   );
@@ -193,9 +291,12 @@ export const Notes: React.FC<Props> = props => {
         onSearchChange={onSearchChange}
         onSearchCancel={() => onSearchChange('')}
         notes={notes}
-        // sortType={this.options.sortBy}
+        sortType={sortBy}
         decrypting={decrypting}
         loading={loading}
+        hidePreviews={hidePreviews}
+        hideDates={hideDates}
+        hideTags={hideTags}
         // selectedTags={this.state.tags}
         selectedNoteId={
           application?.getAppState().isInTabletMode

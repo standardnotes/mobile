@@ -95,12 +95,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
           onPress={destroyLocalData}
         />
       )}
-      {/* some types don't exist on component */}
       <SectionedOptionsTableCell
         testID="exportData"
-        // last={!signedIn}
         first={false}
-        // disabled={this.state.loadingExport}
         leftAligned
         options={exportOptions}
         title={exporting ? 'Processing...' : 'Export Data'}
@@ -110,7 +107,6 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       {!signedIn && (
         <SectionedAccessoryTableCell
           testID="lastExportDate"
-          // last={true}
           onPress={() => {
             // TODO:
             Alert.alert('TODO', 'Not implemented yet');

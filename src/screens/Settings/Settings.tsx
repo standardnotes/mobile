@@ -9,6 +9,7 @@ import { CompanySection } from './Sections/CompanySection';
 import { EncryptionSection } from './Sections/EncryptionSection';
 import { OptionsSection } from './Sections/OptionsSection';
 import { PasscodeSection } from './Sections/PasscodeSection';
+import { PreferencesSection } from './Sections/PreferencesSection';
 import { Container } from './Settings.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_SETTINGS>;
@@ -61,6 +62,7 @@ export const Settings = (props: Props) => {
         encryptionAvailable={encryptionAvailable}
         title="Options"
       />
+      <PreferencesSection />
       <PasscodeSection
         encryptionAvailable={encryptionAvailable}
         hasPasscode={hasPasscode}

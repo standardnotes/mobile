@@ -17,6 +17,8 @@ type Props = {
   tinted?: boolean;
   dimmed?: boolean;
   text: string;
+  first?: boolean;
+  last?: boolean;
 };
 
 const TouchableContainer = styled(SectionedTableCellTouchableHighlight).attrs(
@@ -122,7 +124,12 @@ export const SectionedAccessoryTableCell: React.FC<Props> = props => {
   const textWrapper = <Label key={1}>{props.text}</Label>;
 
   return (
-    <TouchableContainer onPress={onPress} onLongPress={onLongPress}>
+    <TouchableContainer
+      first={props.first}
+      last={props.last}
+      onPress={onPress}
+      onLongPress={onLongPress}
+    >
       <ContentContainer>
         {props.leftAlignIcon ? [icon, textWrapper] : [textWrapper, icon]}
       </ContentContainer>
