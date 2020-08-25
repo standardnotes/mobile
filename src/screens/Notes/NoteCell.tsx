@@ -42,7 +42,8 @@ export const NoteCell = ({
   highlighted,
   sortType,
   tagsString,
-  hideTags,
+  // renderTags,
+  // hideTags,
   hideDates,
   hidePreviews,
 }: Props): JSX.Element => {
@@ -241,11 +242,7 @@ export const NoteCell = ({
   const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
   const hasPlainPreview =
     !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
-  // const showTagsString =
-  //   props.renderTags &&
-  //   // !hideTags &&
-  //   note.tags.length > 0 &&
-  //   !note.protected;
+  const showTagsString = false; // renderTags && !hideTags && !note.protected;
   return (
     <TouchableContainer
       onPress={_onPress}
@@ -288,7 +285,7 @@ export const NoteCell = ({
           </DateText>
         )}
 
-        {false && (
+        {showTagsString && (
           <TagsContainter>
             <TagText numberOfLines={1} selected={highlight}>
               {tagsString}

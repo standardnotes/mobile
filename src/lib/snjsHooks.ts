@@ -170,14 +170,11 @@ export const useSyncStatus = () => {
 
   useEffect(() => {
     let mounted = true;
-    const setInitialValues = async () => {
-      const isEncryptionAvailable = await application!.isEncryptionAvailable();
-      if (mounted) {
-        setDecrypting(!completedInitialSync && isEncryptionAvailable);
-        setLoading(!completedInitialSync && !isEncryptionAvailable);
-      }
-    };
-    setInitialValues();
+    const isEncryptionAvailable = application!.isEncryptionAvailable();
+    if (mounted) {
+      setDecrypting(!completedInitialSync && isEncryptionAvailable);
+      setLoading(!completedInitialSync && !isEncryptionAvailable);
+    }
     return () => {
       mounted = false;
     };

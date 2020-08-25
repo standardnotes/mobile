@@ -21,27 +21,20 @@ export const Settings = (props: Props) => {
   const [hasPasscode, setHasPasscode] = useState(() =>
     Boolean(application?.hasPasscode())
   );
-  const [encryptionAvailable, setEncryptionAvailable] = useState(false);
+  const [encryptionAvailable, setEncryptionAvailable] = useState(() =>
+    application?.isEncryptionAvailable()
+  );
 
   useEffect(() => {
-    let isMounted = true;
-    const getEncryptionAvailable = async () => {
-      const isEncryptionAvailable = await application?.isEncryptionAvailable();
-      if (isMounted) {
-        setEncryptionAvailable(Boolean(isEncryptionAvailable));
-      }
-    };
-    getEncryptionAvailable();
     const removeApplicationEventSubscriber = application?.addEventObserver(
       async event => {
         if (event === ApplicationEvent.KeyStatusChanged) {
           setHasPasscode(Boolean(application?.hasPasscode()));
-          getEncryptionAvailable();
+          setEncryptionAvailable(() => application?.isEncryptionAvailable());
         }
       }
     );
     return () => {
-      isMounted = false;
       removeApplicationEventSubscriber && removeApplicationEventSubscriber();
     };
   }, [application]);
@@ -59,17 +52,17 @@ export const Settings = (props: Props) => {
     >
       <AuthSection title="Account" signedIn={signedIn} />
       <OptionsSection
-        encryptionAvailable={encryptionAvailable}
+        encryptionAvailable={!!encryptionAvailable}
         title="Options"
       />
       <PreferencesSection />
       <PasscodeSection
-        encryptionAvailable={encryptionAvailable}
+        encryptionAvailable={!!encryptionAvailable}
         hasPasscode={hasPasscode}
         title="Security"
       />
       <EncryptionSection
-        encryptionAvailable={encryptionAvailable}
+        encryptionAvailable={!!encryptionAvailable}
         title={'Encryption Status'}
       />
       <CompanySection title="Standard Notes" />
