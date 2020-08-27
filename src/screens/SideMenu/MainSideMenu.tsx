@@ -4,7 +4,6 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
 import { StyleKit, StyleKitContext, ThemeContent } from '@Style/StyleKit';
-import _ from 'lodash';
 import React, {
   Fragment,
   useCallback,
@@ -115,12 +114,12 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
       currentTheme.package_info && currentTheme.package_info.dock_icon;
 
     if (dockIcon && dockIcon.type === 'circle') {
-      _.merge(desc, {
+      Object.assign(desc, {
         backgroundColor: dockIcon.background_color,
         borderColor: dockIcon.border_color,
       });
     } else {
-      _.merge(desc, {
+      Object.assign(desc, {
         backgroundColor: theme.stylekitInfoColor,
         borderColor: theme.stylekitInfoColor,
       });

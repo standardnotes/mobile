@@ -6,7 +6,6 @@ import {
   LIGHT_CONTENT,
   statusBarColorForTheme,
 } from '@Style/utils';
-import _ from 'lodash';
 import React from 'react';
 import {
   Alert,
@@ -17,12 +16,21 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native';
-import { ContentType, removeFromArray, SNComponent, SNTheme } from 'snjs';
+import {
+  ContentType,
+  removeFromArray,
+  SNComponent,
+  SNTheme,
+  StorageValueModes,
+} from 'snjs';
 import { UuidString } from 'snjs/dist/@types/types';
 import THEME_DARK_JSON from './Themes/blue-dark.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 import THEME_RED_JSON from './Themes/red.json';
 import { StyleKitTheme } from './Themes/styled-components';
+
+const LIGHT_THEME_KEY = 'lightTheme';
+const DARK_THEME_KEY = 'darkTheme';
 
 type ThemeChangeObserver = () => Promise<void> | void;
 
@@ -168,8 +176,7 @@ export class StyleKit {
 
   assignThemeForMode(themeId: string) {
     const currentMode = Appearance.getColorScheme() || 'light'; // set to light in case of no support for dark theme
-    // TODO: Save theme to storage
-    // ThemeManager.get().setThemeForMode({ mode: mode, theme: theme });
+    this.setThemeForMode(currentMode, themeId);
 
     /**
      * If we're changing the theme for a specific mode and we're currently on
@@ -183,6 +190,21 @@ export class StyleKit {
     }
   }
 
+  private async setThemeForMode(mode: 'light' | 'dark', themeId: string) {
+    return this.application.setValue(
+      mode === 'dark' ? DARK_THEME_KEY : LIGHT_THEME_KEY,
+      themeId,
+      StorageValueModes.Nonwrapped
+    );
+  }
+
+  private async getThemeForMode(mode: 'light' | 'dark') {
+    return this.application.getValue(
+      mode === 'dark' ? DARK_THEME_KEY : LIGHT_THEME_KEY,
+      StorageValueModes.Nonwrapped
+    );
+  }
+
   /**
    * When downloading an external theme, we can't depend on it having all the
    * variables present. So we will merge them with this template variable list
@@ -190,7 +212,7 @@ export class StyleKit {
    * copy as the result may be modified before use.
    */
   templateVariables() {
-    return _.clone(THEME_BLUE_JSON);
+    return Object.assign({}, THEME_BLUE_JSON);
   }
 
   private resetToSystemTheme() {
@@ -198,39 +220,31 @@ export class StyleKit {
   }
 
   private async resolveInitialTheme() {
-    // const currentMode = Appearance.getColorScheme();
+    const currentMode = Appearance.getColorScheme() || 'light';
     const runDefaultTheme = () => {
-      const defaultTheme = SystemThemes.Dark;
-
-      // TODO: save to starege
+      const defaultTheme =
+        Appearance.getColorScheme() === 'light'
+          ? SystemThemes.Dark
+          : SystemThemes.Blue;
 
       this.setActiveTheme(defaultTheme);
     };
 
-    // TODO: load from storage
+    const savedThemeId = await this.getThemeForMode(currentMode);
 
-    // TODO:  get theme for mode
-    // const themeData = ThemeManager.get().getThemeForMode(currentMode);
-
-    return runDefaultTheme();
-
-    // try {
-    //   const matchingTheme = _.find(this.systemThemes, { uuid: themeData.uuid });
-    //   let newTheme;
-
-    //   /** Use latest app theme data if preference is a previous system theme. */
-    //   if (matchingTheme) {
-    //     newTheme = matchingTheme;
-    //   } else {
-    //     newTheme = new SNTheme(themeData);
-    //     newTheme.isSwapIn = true;
-    //   }
-
-    //   this.setActiveTheme(newTheme);
-    // } catch (e) {
-    //   console.error('Error parsing initial theme', e);
-    //   return runDefaultTheme();
-    // }
+    try {
+      const matchingTheme = this.systemThemes().find(
+        systemTheme => systemTheme.uuid === savedThemeId
+      );
+      if (matchingTheme) {
+        this.setActiveTheme(matchingTheme.uuid);
+      } else {
+        runDefaultTheme();
+      }
+    } catch (e) {
+      console.error('Error parsing initial theme', e);
+      return runDefaultTheme();
+    }
   }
 
   keyboardColorForActiveTheme() {
@@ -257,7 +271,7 @@ export class StyleKit {
     /** Merge default variables to ensure this theme has all the variables. */
     const themeData = this.findOrCreateDataForTheme(themeId);
     const variables = themeData.variables;
-    themeData.variables = _.merge(this.templateVariables(), variables);
+    themeData.variables = Object.assign(this.templateVariables(), variables);
 
     this.activeThemeId = themeId;
 
@@ -364,7 +378,7 @@ export class StyleKit {
       return;
     }
     let data = this.findOrCreateDataForTheme(theme.uuid);
-    const appliedVariables = _.merge(this.templateVariables(), variables);
+    const appliedVariables = Object.assign(this.templateVariables(), variables);
     data.variables = {
       ...appliedVariables,
       ...StyleKit.constants,
@@ -372,9 +386,9 @@ export class StyleKit {
     this.activateTheme(theme.uuid);
   }
 
-  activateTheme(themeId: string) {
+  private activateTheme(themeId: string) {
     this.setActiveTheme(themeId);
-    // this.assignThemeForMode(themeId);
+    this.assignThemeForMode(themeId);
   }
 
   // activatePreferredTheme() {
@@ -402,7 +416,7 @@ export class StyleKit {
     const updatedVariables = await this.downloadTheme(theme);
 
     /** Merge default variables to ensure this theme has all the variables. */
-    const appliedVariables = _.merge(
+    const appliedVariables = Object.assign(
       this.templateVariables(),
       updatedVariables
     );
