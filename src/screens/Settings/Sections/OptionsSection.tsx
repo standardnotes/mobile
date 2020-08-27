@@ -4,7 +4,10 @@ import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { useSignedIn } from '@Lib/snjsHooks';
+import { useNavigation } from '@react-navigation/native';
+import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_MANAGE_PRIVILEGES, SCREEN_SETTINGS } from '@Screens/screens';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 import { ButtonType } from 'snjs';
@@ -18,6 +21,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
   const signedIn = useSignedIn();
+  const navigation = useNavigation<
+    ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
+  >();
 
   // State
   const [exporting, setExporting] = useState(false);
@@ -74,6 +80,10 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     [application, encryptionAvailable]
   );
 
+  const openManagePrivileges = () => {
+    navigation.push(SCREEN_MANAGE_PRIVILEGES);
+  };
+
   return (
     <TableSection>
       <SectionHeader title={title} />
@@ -82,9 +92,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         first={true}
         leftAligned={true}
         title={'Manage Privileges'}
-        onPress={() => {
-          Alert.alert('TODO', 'Not implemented yet');
-        }}
+        onPress={openManagePrivileges}
       />
 
       {signedIn && (

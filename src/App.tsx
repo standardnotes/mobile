@@ -24,6 +24,7 @@ import { Compose } from '@Screens/Compose/Compose';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
 import { Root } from '@Screens/Root';
+import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
 import { Settings } from '@Screens/Settings/Settings';
 import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
 import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
@@ -57,6 +58,7 @@ import {
   SCREEN_COMPOSE,
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_INPUT_MODAL_TAG,
+  SCREEN_MANAGE_PRIVILEGES,
   SCREEN_NOTES,
   SCREEN_SETTINGS,
 } from './screens/screens';
@@ -75,6 +77,7 @@ type AppStackNavigatorParamList = {
 type ModalStackNavigatorParamList = {
   AppStack: undefined;
   [SCREEN_SETTINGS]: undefined;
+  [SCREEN_MANAGE_PRIVILEGES]: undefined;
   [SCREEN_INPUT_MODAL_TAG]: HeaderTitleParams & {
     tagUuid?: string;
     noteUuid?: string;
@@ -345,6 +348,31 @@ const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
             ),
         })}
         component={Settings}
+      />
+      <MainStack.Screen
+        name={SCREEN_MANAGE_PRIVILEGES}
+        options={() => ({
+          title: 'Privileges',
+          headerTitle: ({ children }) => {
+            return <HeaderTitleView title={children || ''} />;
+          },
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Done' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : StyleKit.nameForIcon(ICON_CHECKMARK)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
+        })}
+        component={ManagePrivileges}
       />
       <MainStack.Screen
         name={SCREEN_INPUT_MODAL_PASSCODE}
