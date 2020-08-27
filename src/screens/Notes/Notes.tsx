@@ -198,7 +198,7 @@ export const Notes: React.FC<Props> = props => {
     const newHideTags = application!
       .getPrefsService()
       .getValue(MobilePrefKey.NotesHideTags, false);
-    console.log(newHideDate);
+
     if (sortBy !== newSortBy) {
       setSortBy(newSortBy);
       displayOptionsChanged = true;
@@ -260,7 +260,6 @@ export const Notes: React.FC<Props> = props => {
             reloadNotes();
           }
           if (state === AppStateType.PreferencesChanged) {
-            console.log('pref changed');
             reloadPreferences();
           }
         });

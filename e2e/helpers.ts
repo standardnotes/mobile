@@ -51,7 +51,7 @@ export const openComposeNewNoteScreen = async () => {
   await waitFor(element(by.id('newNoteButton')))
     .toBeVisible()
     .withTimeout(2000);
-  console.log(element(by.id('newNoteButton')));
+
   await element(by.id('newNoteButton')).tap();
 };
 
