@@ -18,13 +18,13 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@bugsnag/react-native": "^7.3.3",
     "@expo/react-native-action-sheet": "^3.8.0",
     "@react-native-community/async-storage": "1.12.0",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.7.3",
     "@react-navigation/stack": "^5.9.0",
     "base64-arraybuffer": "^0.2.0",
-    "bugsnag-react-native": "^2.23.10",
     "js-base64": "^3.4.5",
     "lodash": "^4.17.20",
     "moment": "^2.27.0",

@@ -2,7 +2,7 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-#import <BugsnagReactNative/BugsnagReactNative.h>
+#import <Bugsnag/Bugsnag.h>
 #import <WebKit/WKWebsiteDataStore.h>
 #import <TrustKit/TrustKit.h>
 
@@ -24,7 +24,7 @@
 {
   [self initializeFlipper:application];
 
-  [BugsnagReactNative start];
+  [Bugsnag start];
 
   [self configurePinning];
 

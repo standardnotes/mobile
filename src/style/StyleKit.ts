@@ -342,7 +342,6 @@ export class StyleKit {
         const response = await fetch(url, {
           method: 'GET',
         });
-        // console.log(JSON.parse(response));
         const data = await response.text();
         // @ts-ignore TODO: check response type
         let variables = CSSParser.cssToObject(data);

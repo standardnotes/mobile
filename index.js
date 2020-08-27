@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import { Client } from 'bugsnag-react-native';
+import Bugsnag from '@bugsnag/react-native';
 import { enableScreens } from 'react-native-screens';
 
 import { AppRegistry, YellowBox } from 'react-native';
@@ -18,7 +18,7 @@ enableScreens();
 
 if (__DEV__ === false) {
   // eslint-disable-next-line no-new
-  new Client();
+  new Bugsnag.start();
 }
 
 AppRegistry.registerComponent(appName, () => App);

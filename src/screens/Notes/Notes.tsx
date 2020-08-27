@@ -118,7 +118,7 @@ export const Notes: React.FC<Props> = props => {
             notePassesFilter(
               note,
               tag,
-              true,
+              false,
               false,
               searchFilter?.toLowerCase() || searchText.toLowerCase()
             )
