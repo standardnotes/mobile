@@ -3829,7 +3829,7 @@ index 2b6e23a..c2df02e 100644
  @property (nonatomic, assign) CGFloat decelerationRate;
  @property (nonatomic, assign) BOOL allowsInlineMediaPlayback;
 diff --git a/node_modules/react-native-webview/apple/RNCWebView.m b/node_modules/react-native-webview/apple/RNCWebView.m
-index bdbce7e..cdcfdb4 100644
+index 7107b6b..b664f1f 100644
 --- a/node_modules/react-native-webview/apple/RNCWebView.m
 +++ b/node_modules/react-native-webview/apple/RNCWebView.m
 @@ -125,6 +125,7 @@ - (instancetype)initWithFrame:(CGRect)frame
@@ -3863,10 +3863,10 @@ index 2d1125c..3fd1aff 100644
  RCT_EXPORT_VIEW_PROPERTY(allowsBackForwardNavigationGestures, BOOL)
  RCT_EXPORT_VIEW_PROPERTY(incognito, BOOL)
 diff --git a/node_modules/react-native-webview/lib/WebViewTypes.d.ts b/node_modules/react-native-webview/lib/WebViewTypes.d.ts
-index 1178663..b86a242 100644
+index 838ac1f..3010f7f 100644
 --- a/node_modules/react-native-webview/lib/WebViewTypes.d.ts
 +++ b/node_modules/react-native-webview/lib/WebViewTypes.d.ts
-@@ -219,6 +219,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
+@@ -216,6 +216,7 @@ export interface IOSNativeWebViewProps extends CommonNativeWebViewProps {
      allowsInlineMediaPlayback?: boolean;
      allowsLinkPreview?: boolean;
      automaticallyAdjustContentInsets?: boolean;
@@ -3874,7 +3874,7 @@ index 1178663..b86a242 100644
      bounces?: boolean;
      contentInset?: ContentInsetProp;
      contentInsetAdjustmentBehavior?: ContentInsetAdjustmentBehavior;
-@@ -353,6 +354,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
+@@ -350,6 +351,12 @@ export interface IOSWebViewProps extends WebViewSharedProps {
       * @platform ios
       */
      allowsInlineMediaPlayback?: boolean;
