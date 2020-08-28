@@ -41,7 +41,7 @@ export const EncryptionSection = (props: Props) => {
     if (isLocked) {
       return { title: '', text: '' };
     } else {
-      sourceString = application?.getUser() ? 'Account Keys' : 'Passcode';
+      sourceString = application?.hasAccount() ? 'Account Keys' : 'Passcode';
     }
 
     const items = application!.getItems([ContentType.Note, ContentType.Tag]);

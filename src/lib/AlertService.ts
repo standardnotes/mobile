@@ -3,7 +3,7 @@ import { ButtonType, DismissBlockingDialog, SNAlertService } from 'snjs';
 
 export class AlertService implements SNAlertService {
   blockingDialog(_text: string): DismissBlockingDialog {
-    throw new Error('Method not implemented.');
+    return () => {};
   }
   alert(text: string, title: string, closeButtonText?: string) {
     return new Promise<void>(resolve => {

@@ -17,6 +17,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import {
+  ApplicationEvent,
   ContentType,
   removeFromArray,
   SNComponent,
@@ -68,6 +69,8 @@ export class StyleKit {
   theme?: StyleKitTheme;
   application: MobileApplication;
   unregisterComponentHandler?: () => void;
+  unsubscribeStreamThemes?: () => void;
+  unsubsribeAppEventObserver?: () => void;
 
   constructor(application: MobileApplication) {
     this.application = application;
@@ -75,7 +78,11 @@ export class StyleKit {
   }
 
   async init() {
-    await this.resolveInitialTheme();
+    this.setActiveTheme(
+      Appearance.getColorScheme() === 'dark'
+        ? SystemThemes.Dark
+        : SystemThemes.Blue
+    );
     Appearance.addChangeListener(this.setModeTo);
     this.registerObservers();
   }
@@ -83,19 +90,32 @@ export class StyleKit {
   deinit() {
     Appearance.removeChangeListener(this.setModeTo.bind(this));
     this.unregisterComponentHandler && this.unregisterComponentHandler();
+    this.unsubscribeStreamThemes && this.unsubscribeStreamThemes();
+    this.unsubsribeAppEventObserver && this.unsubsribeAppEventObserver();
   }
 
   private registerObservers() {
-    this.application.streamItems(ContentType.Theme, items => {
-      const themes = items as SNTheme[];
-      const activeTheme = themes.find(el => {
-        return !el.deleted && !el.errorDecrypting && el.isMobileActive();
-      });
+    this.unsubscribeStreamThemes = this.application.streamItems(
+      ContentType.Theme,
+      items => {
+        const themes = items as SNTheme[];
+        const activeTheme = themes.find(el => {
+          return !el.deleted && !el.errorDecrypting && el.isMobileActive();
+        });
 
-      if (activeTheme && activeTheme.uuid !== this.activeThemeId) {
-        this.activateExternalTheme(activeTheme);
+        if (activeTheme && activeTheme.uuid !== this.activeThemeId) {
+          this.activateExternalTheme(activeTheme);
+        }
       }
-    });
+    );
+    this.unsubsribeAppEventObserver = this.application.addEventObserver(
+      async event => {
+        if (event === ApplicationEvent.Launched) {
+          // Resolve initial theme after app launched
+          this.resolveInitialTheme();
+        }
+      }
+    );
   }
 
   private findOrCreateDataForTheme(themeId: string) {
@@ -223,7 +243,7 @@ export class StyleKit {
     const currentMode = Appearance.getColorScheme() || 'light';
     const runDefaultTheme = () => {
       const defaultTheme =
-        Appearance.getColorScheme() === 'light'
+        Appearance.getColorScheme() === 'dark'
           ? SystemThemes.Dark
           : SystemThemes.Blue;
 

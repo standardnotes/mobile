@@ -20,7 +20,7 @@ import React, {
 } from 'react';
 import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import { ChallengeType, ChallengeValue } from 'snjs';
+import { ChallengeReason, ChallengeType, ChallengeValue } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   Container,
@@ -339,23 +339,28 @@ export const Authenticate = ({
   useEffect(() => {
     let mounted = true;
     const setBiometricsAsync = async () => {
-      const hasBiometrics = await checkForBiometrics();
-      if (mounted) {
-        setSupportsBiometrics(hasBiometrics);
+      if (challenge.reason !== ChallengeReason.Migration) {
+        console.log('ssadasfsdfsdfsdfsf');
+        const hasBiometrics = await checkForBiometrics();
+        if (mounted) {
+          setSupportsBiometrics(hasBiometrics);
+        }
       }
     };
     setBiometricsAsync();
     const setInitialKeyboardType = async () => {
-      const initialKeyboardType = await checkPasscodeKeyboardType();
-      if (mounted) {
-        setKeyboardType(initialKeyboardType);
+      if (challenge.reason !== ChallengeReason.Migration) {
+        const initialKeyboardType = await checkPasscodeKeyboardType();
+        if (mounted) {
+          setKeyboardType(initialKeyboardType);
+        }
       }
     };
     setInitialKeyboardType();
     return () => {
       mounted = false;
     };
-  }, [checkForBiometrics, checkPasscodeKeyboardType]);
+  }, [challenge.reason, checkForBiometrics, checkPasscodeKeyboardType]);
 
   useEffect(() => {
     beginAuthenticatingForNextChallengeReason();

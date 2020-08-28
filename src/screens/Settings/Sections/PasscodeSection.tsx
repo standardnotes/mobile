@@ -128,7 +128,7 @@ export const PasscodeSection = (props: Props) => {
 
   const passcodeOnPress = async () => {
     if (props.hasPasscode) {
-      const hasAccount = Boolean(application?.getUser());
+      const hasAccount = Boolean(application?.hasAccount());
       let message;
       if (hasAccount) {
         message =

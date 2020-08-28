@@ -333,7 +333,8 @@ const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
             </HeaderButtons>
           ),
           headerRight: () =>
-            env === 'dev' && (
+            env === 'dev' ||
+            (__DEV__ && (
               <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
                 <Item
                   testID="headerButton"
@@ -345,7 +346,7 @@ const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
                   }}
                 />
               </HeaderButtons>
-            ),
+            )),
         })}
         component={Settings}
       />
@@ -448,7 +449,6 @@ const AppComponent: React.FC<{
   application: MobileApplication;
   env: 'prod' | 'dev';
 }> = ({ application, env }) => {
-  const [ready, setReady] = useState(false);
   const styleKit = useRef<StyleKit>();
   const [activeTheme, setActiveTheme] = useState<StyleKitTheme | undefined>();
 
@@ -466,18 +466,18 @@ const AppComponent: React.FC<{
   useEffect(() => {
     let styleKitInstance: StyleKit;
     const loadApplication = async () => {
+      styleKitInstance = new StyleKit(application);
+      await styleKitInstance.init();
+      setStyleKitRef(styleKitInstance);
+      setActiveTheme(styleKitInstance.theme);
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
           application!.promptForChallenge(challenge);
         },
       });
-      styleKitInstance = new StyleKit(application);
-      await styleKitInstance.init();
-      setStyleKitRef(styleKitInstance);
-      setActiveTheme(styleKitInstance.theme);
-      setReady(true);
+      await application?.launch();
     };
-    setReady(false);
+
     loadApplication();
 
     return () => {
@@ -486,7 +486,7 @@ const AppComponent: React.FC<{
     };
   }, [application, env, setStyleKitRef]);
 
-  if (!ready || !styleKit.current || !activeTheme) {
+  if (!styleKit.current || !activeTheme) {
     return null;
   }
 
@@ -501,7 +501,7 @@ const AppComponent: React.FC<{
         },
       }}
       onReady={() => {
-        application?.launch(false);
+        // application?.launch(false);
       }}
       ref={navigationRef}
     >
