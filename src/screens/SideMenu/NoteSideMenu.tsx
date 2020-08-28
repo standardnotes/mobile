@@ -8,6 +8,7 @@ import {
   ICON_BOOKMARK,
   ICON_FINGER_PRINT,
   ICON_LOCK,
+  ICON_MEDICAL,
   ICON_PRICE_TAG,
   ICON_SHARE,
   ICON_TRASH,
@@ -31,6 +32,7 @@ import {
   ComponentMutator,
   ContentType,
   NoteMutator,
+  PayloadSource,
   SNComponent,
   SNNote,
   SNSmartTag,
@@ -106,9 +108,11 @@ export const NoteSideMenu = (props: Props) => {
       }
     );
     const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
-      newNote => {
+      (newNote, source) => {
         if (mounted) {
-          setNote(newNote);
+          if (source !== PayloadSource.ComponentRetrieved) {
+            setNote(newNote);
+          }
         }
       }
     );
@@ -121,6 +125,7 @@ export const NoteSideMenu = (props: Props) => {
   }, [editor]);
 
   useEffect(() => {
+    let isMounted = true;
     const removeComponentsObserver = application?.streamItems(
       ContentType.Component,
       async () => {
@@ -130,12 +135,16 @@ export const NoteSideMenu = (props: Props) => {
         const displayComponents = sortAlphabetically(
           application!.componentManager!.componentsForArea(ComponentArea.Editor)
         );
-
-        setComponents(displayComponents);
+        if (isMounted) {
+          setComponents(displayComponents);
+        }
       }
     );
 
-    return removeComponentsObserver;
+    return () => {
+      isMounted = false;
+      removeComponentsObserver && removeComponentsObserver();
+    };
   }, [application, note]);
 
   const disassociateComponentWithCurrentNote = useCallback(
@@ -166,13 +175,14 @@ export const NoteSideMenu = (props: Props) => {
 
   const onEditorPress = useCallback(
     async (component?: SNComponent) => {
+      if (editor?.isTemplateNote) {
+        await editor?.insertTemplatedNote();
+      }
       const activeEditorComponent = application?.componentManager!.editorForNote(
         note!
       );
       if (!component) {
-        console.log('plain click', note?.prefersPlainEditor);
         if (!note?.prefersPlainEditor) {
-          console.log('prefers plain');
           await application?.changeItem(note!.uuid, mutator => {
             const noteMutator = mutator as NoteMutator;
             noteMutator.prefersPlainEditor = true;
@@ -202,6 +212,7 @@ export const NoteSideMenu = (props: Props) => {
       application,
       associateComponentWithCurrentNote,
       disassociateComponentWithCurrentNote,
+      editor,
       note,
     ]
   );
@@ -305,11 +316,28 @@ export const NoteSideMenu = (props: Props) => {
         },
       });
     });
-
+    if (options.length === 1) {
+      options.push({
+        text: 'Get More Editors',
+        key: 'get-editors',
+        iconDesc: {
+          type: 'icon',
+          name: StyleKit.nameForIcon(ICON_MEDICAL),
+          side: 'right',
+          size: 17,
+        },
+        onSelect: () => {
+          application?.deviceInterface?.openUrl(
+            'https://standardnotes.org/extensions'
+          );
+        },
+      });
+    }
     return options;
   }, [
     note,
     application?.componentManager,
+    application?.deviceInterface,
     components,
     onEditorPress,
     onEdtiorLongPress,
@@ -505,7 +533,9 @@ export const NoteSideMenu = (props: Props) => {
             if (confirmed) {
               await application?.deleteItem(note);
               props.drawerRef?.closeDrawer();
-              navigation.popToTop();
+              if (!application?.getAppState().isInTabletMode) {
+                navigation.popToTop();
+              }
             }
           },
         },
@@ -524,7 +554,9 @@ export const NoteSideMenu = (props: Props) => {
             if (confirmed) {
               await application?.emptyTrash();
               props.drawerRef?.closeDrawer();
-              navigation.popToTop();
+              if (!application?.getAppState().isInTabletMode) {
+                navigation.popToTop();
+              }
               application?.sync();
             }
           },

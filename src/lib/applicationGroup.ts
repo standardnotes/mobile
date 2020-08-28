@@ -3,6 +3,7 @@ import { removeFromArray } from 'snjs';
 import { MobileApplication } from './application';
 import { ApplicationState } from './ApplicationState';
 import { BackupsService } from './BackupsService';
+import { InstallationService } from './InstallationService';
 import { PreferencesManager } from './PreferencesManager';
 import { ReviewService } from './reviewService';
 
@@ -42,12 +43,14 @@ export class ApplicationGroup {
     const backupsService = new BackupsService(application);
     const themeService = new StyleKit(application);
     const prefsService = new PreferencesManager(application);
+    const installationService = new InstallationService(application);
     application.setMobileServices({
       applicationState,
       reviewService,
       backupsService,
       themeService,
       prefsService,
+      installationService,
     });
     return application;
   }

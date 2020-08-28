@@ -1,10 +1,10 @@
+import { Base64 } from 'js-base64';
 import { Alert, Share } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
+import Mailer from 'react-native-mail';
 import { ApplicationService, ButtonType, Platform } from 'snjs';
 import { MobileApplication } from './application';
-
-const Mailer = 'react-native-mail';
 
 export class BackupsService extends ApplicationService {
   /*
@@ -32,7 +32,10 @@ export class BackupsService extends ApplicationService {
       } else {
         return this._showAndroidEmailOrSaveOption().then(async result => {
           if (result === 'email') {
-            return this._exportViaEmailAndroid(data, filename);
+            return this._exportViaEmailAndroid(
+              Base64.encodeURI(data),
+              filename
+            );
           } else {
             let filepath = await this._exportAndroid(filename, jsonString);
             return this._showFileSavePromptAndroid(filepath);
@@ -45,13 +48,15 @@ export class BackupsService extends ApplicationService {
   private async _showAndroidEmailOrSaveOption() {
     const confirmed = await this.application!.alertService?.confirm(
       'Choose Export Method',
+      '',
       'Email',
+      ButtonType.Info,
       'Save to Disk'
     );
     if (confirmed) {
-      return 'save';
-    } else {
       return 'email';
+    } else {
+      return 'save';
     }
   }
 
@@ -97,9 +102,9 @@ export class BackupsService extends ApplicationService {
     const confirmed = await this.application!.alertService?.confirm(
       'Backup Saved',
       `Your backup file has been saved to your local disk at this location:\n\n${filepath}`,
-      'Done',
+      'Open File',
       ButtonType.Info,
-      'Open File'
+      'Done'
     );
     if (confirmed) {
       this._openFileAndroid(filepath);
@@ -112,8 +117,6 @@ export class BackupsService extends ApplicationService {
       const fileType = '.json'; // Android creates a tmp file and expects dot with extension
 
       let resolved = false;
-      // TODO: fix mail types
-      // @ts-ignore
       Mailer.mail(
         {
           subject: 'Standard Notes Backup',

@@ -1,10 +1,15 @@
 import { ButtonCell } from '@Components/ButtonCell';
+import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
-import { useSignedIn } from '@Lib/customHooks';
+import { useSignedIn } from '@Lib/snjsHooks';
+import { useNavigation } from '@react-navigation/native';
+import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_MANAGE_PRIVILEGES, SCREEN_SETTINGS } from '@Screens/screens';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { Alert } from 'react-native';
 import { ButtonType } from 'snjs';
 
 type Props = {
@@ -16,6 +21,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
   const signedIn = useSignedIn();
+  const navigation = useNavigation<
+    ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
+  >();
 
   // State
   const [exporting, setExporting] = useState(false);
@@ -72,16 +80,20 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     [application, encryptionAvailable]
   );
 
+  const openManagePrivileges = () => {
+    navigation.push(SCREEN_MANAGE_PRIVILEGES);
+  };
+
   return (
     <TableSection>
       <SectionHeader title={title} />
 
-      {/* <ButtonCell
+      <ButtonCell
         first={true}
         leftAligned={true}
         title={'Manage Privileges'}
-        onPress={onManagePrivileges}
-      /> */}
+        onPress={openManagePrivileges}
+      />
 
       {signedIn && (
         <ButtonCell
@@ -91,29 +103,26 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
           onPress={destroyLocalData}
         />
       )}
-      {/* some types don't exist on component */}
       <SectionedOptionsTableCell
         testID="exportData"
-        // last={!signedIn}
         first={false}
-        // disabled={this.state.loadingExport}
-        // leftAligned={true}
+        leftAligned
         options={exportOptions}
         title={exporting ? 'Processing...' : 'Export Data'}
         onPress={onExportPress}
       />
 
-      {/* {!signedIn && (
+      {!signedIn && (
         <SectionedAccessoryTableCell
           testID="lastExportDate"
-          // last={true}
           onPress={() => {
-            (!this.state.lastExportDate || stale) && this.showDataBackupAlert();
+            // TODO:
+            Alert.alert('TODO', 'Not implemented yet');
           }}
-          tinted={!this.state.lastExportDate || stale}
-          text={lastExportString}
+          tinted={true}
+          text={'Your data has not yet been backed up.'}
         />
-      )} */}
+      )}
     </TableSection>
   );
 };

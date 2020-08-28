@@ -1,4 +1,3 @@
-import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
 
@@ -8,7 +7,7 @@ type Props = {
   borderColor: ViewStyle['borderColor'];
 };
 
-export const Circle = styled(SectionedTableCell)<Props>`
+export const Circle = styled.View<Props>`
   width: ${props => props.size ?? 12}px;
   height: ${props => props.size ?? 12}px;
   border-radius: ${props => (props.size ?? 12) / 2}px;

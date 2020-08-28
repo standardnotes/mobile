@@ -1,5 +1,9 @@
+import { AppStateEventType } from '@Lib/ApplicationState';
 import { Editor } from '@Lib/Editor';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { SCREEN_COMPOSE } from '@Screens/screens';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import { lighten } from '@Style/utils';
@@ -10,13 +14,16 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { TextInput } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import SNTextView from 'sn-textview';
 import {
+  ApplicationEvent,
   ComponentArea,
   ContentType,
   isPayloadSourceRetrieved,
   NoteMutator,
+  PayloadSource,
   Platform,
   SNComponent,
   SNNote,
@@ -36,24 +43,26 @@ import {
   WebViewReloadButton,
   WebViewReloadButtonText,
 } from './Compose.styled';
-
 const NOTE_PREVIEW_CHAR_LIMIT = 80;
-// const MINIMUM_STATUS_DURATION = 400;
+const MINIMUM_STATUS_DURATION = 400;
 const SAVE_TIMEOUT_DEBOUNCE = 350;
 const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
-// const EDITOR_DEBOUNCE = 100;
 
 export const Compose = (): JSX.Element => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
   const styleKit = useContext(StyleKitContext);
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+  >();
 
   //State
   const [title, setTitle] = useState<string | undefined>();
   const [noteText, setNoteText] = useState<string | undefined>(undefined);
   const [editor, setEditor] = useState<Editor | undefined>();
   const [note, setNote] = useState<SNNote | undefined>();
+  const [saveError, setSaveError] = useState(false);
   const [editorComponent, setEditorComponent] = useState<
     SNComponent | undefined
   >();
@@ -61,8 +70,120 @@ export const Compose = (): JSX.Element => {
   const [loadingWebview, setLoadingWebview] = useState(false);
 
   // Ref
-  const editorViewRef = useRef<TextInput>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const editorViewRef = useRef<SNTextView>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const statusTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const dissmissKeybard = () => {
+    Keyboard.dismiss();
+    editorViewRef.current?.blur();
+  };
+
+  const setStatus = useCallback(
+    (status: string, color?: string, wait: boolean = true) => {
+      if (statusTimeoutRef.current) {
+        clearTimeout(statusTimeoutRef.current);
+      }
+      if (wait) {
+        statusTimeoutRef.current = setTimeout(() => {
+          navigation.setParams({
+            subTitle: status,
+            subTitleColor: color,
+          });
+        }, MINIMUM_STATUS_DURATION);
+      } else {
+        navigation.setParams({
+          subTitle: status,
+          subTitleColor: color,
+        });
+      }
+    },
+    [navigation]
+  );
+
+  const showSavingStatus = useCallback(() => {
+    setStatus('Saving...', undefined, false);
+  }, [setStatus]);
+
+  const showAllChangesSavedStatus = useCallback(() => {
+    setSaveError(false);
+    setStatus('All changes saved');
+  }, [setStatus]);
+
+  const showErrorStatus = useCallback(
+    (message: string) => {
+      setSaveError(true);
+      setStatus(message, theme.stylekitWarningColor);
+    },
+    [setStatus, theme.stylekitWarningColor]
+  );
+
+  useEffect(() => {
+    const unsubscribeStateEventObserver = application
+      ?.getAppState()
+      .addStateEventObserver(state => {
+        if (state === AppStateEventType.DrawerOpen) {
+          dissmissKeybard();
+        }
+      });
+
+    const unsubscribeAppEventObserver = application?.addEventObserver(
+      async eventName => {
+        if (eventName === ApplicationEvent.HighLatencySync) {
+          // this.setState({ syncTakingTooLong: true });
+        } else if (eventName === ApplicationEvent.CompletedFullSync) {
+          // this.setState({ syncTakingTooLong: false });
+          // const isInErrorState = this.state.saveError;
+          /** if we're still dirty, don't change status, a sync is likely upcoming. */
+          if (!note?.dirty && saveError) {
+            showAllChangesSavedStatus();
+          }
+        } else if (eventName === ApplicationEvent.FailedSync) {
+          /**
+           * Only show error status in editor if the note is dirty.
+           * Otherwise, it means the originating sync came from somewhere else
+           * and we don't want to display an error here.
+           */
+          if (note?.dirty) {
+            showErrorStatus('Sync Unavailable (changes saved offline)');
+          }
+        } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
+          showErrorStatus('Offline Saving Issue (changes not saved)');
+        }
+      }
+    );
+
+    return () => {
+      unsubscribeAppEventObserver && unsubscribeAppEventObserver();
+      unsubscribeStateEventObserver && unsubscribeStateEventObserver();
+    };
+  }, [
+    application,
+    note?.dirty,
+    saveError,
+    setStatus,
+    showAllChangesSavedStatus,
+    showErrorStatus,
+    theme.stylekitWarningColor,
+  ]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (mounted && editor && editor.isTemplateNote) {
+      if (application?.platform === Platform.Ios) {
+        editorViewRef.current?.focus();
+      }
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [application?.platform, editor, editor?.note?.uuid]);
+
+  useFocusEffect(
+    useCallback(() => {
+      return dissmissKeybard;
+    }, [])
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -80,72 +201,30 @@ export const Compose = (): JSX.Element => {
     };
   }, [application, editor]);
 
-  const reloadComponentContext = useCallback(() => {
-    if (note) {
-      if (editorComponent?.active) {
-        application!.componentManager!.setComponentHidden(
-          editorComponent,
-          !editorComponent.isExplicitlyEnabledForItem(note.uuid)
-        );
-      }
-    }
-    application?.componentManager!.contextItemDidChangeInArea(
-      ComponentArea.Editor
-    );
-  }, [application, editorComponent, note]);
-
   const reloadComponentEditorState = useCallback(async () => {
     const associatedEditor = application?.componentManager!.editorForNote(
       note!
     );
     if (!associatedEditor) {
       /** No editor */
-      let changed = false;
       if (editorComponent) {
         await application?.componentGroup.deactivateComponentForArea(
           ComponentArea.Editor
         );
-        changed = true;
       }
-      return { updatedEditor: undefined, changed };
+      return;
     }
 
     if (associatedEditor.uuid === editorComponent?.uuid) {
       /** Same editor, no change */
-      return { updatedEditor: associatedEditor, changed: false };
+      return;
     }
-
     await application?.componentGroup.activateComponent(associatedEditor);
-    return { updatedEditor: associatedEditor, changed: true };
-  }, [application, editorComponent, note]);
-
-  const streamItems = useCallback(() => {
-    const removeComponentsObserver = application?.streamItems(
-      ContentType.Component,
-      async items => {
-        const components = items as SNComponent[];
-        if (!note) {
-          return;
-        }
-        /** Reload componentStack in case new ones were added or removed */
-        reloadComponentContext();
-        // await this.reloadComponentStack();
-        /** Observe editor changes to see if the current note should update its editor */
-        const editors = components.filter(component => {
-          return component.isEditor();
-        });
-        if (editors.length === 0) {
-          return;
-        }
-        /** Find the most recent editor for note */
-        reloadComponentEditorState();
-      }
+    application?.componentManager!.contextItemDidChangeInArea(
+      ComponentArea.Editor
     );
-
-    return () => {
-      removeComponentsObserver && removeComponentsObserver();
-    };
-  }, [application, note, reloadComponentContext, reloadComponentEditorState]);
+    return;
+  }, [application, editorComponent, note]);
 
   useEffect(() => {
     let mounted = true;
@@ -164,41 +243,47 @@ export const Compose = (): JSX.Element => {
 
     const removeComponentGroupObserver = application?.componentGroup.addChangeObserver(
       async () => {
-        const currentEditor = editorComponent;
         const newEditor = application?.componentGroup.activeComponentForArea(
           ComponentArea.Editor
         );
-        if (
-          currentEditor &&
-          newEditor &&
-          currentEditor.uuid !== newEditor.uuid
-        ) {
-          /** Unload current component view so that we create a new one,
-           * then change the active editor */
-          // await this.setEditorState({
-          //   editorComponentUnloading: true,
-          // });
-        }
         if (mounted) {
           setEditorComponent(newEditor);
         }
-
-        /** Stop unloading, if we were already unloading */
-        // await this.setEditorState({
-        //   editorComponentUnloading: false,
-        // });
       }
     );
-
-    const removeStreamItems = streamItems();
 
     return () => {
       mounted = false;
       removeEditorObserver && removeEditorObserver();
       removeComponentGroupObserver && removeComponentGroupObserver();
-      removeStreamItems();
     };
-  }, [application, editorComponent, streamItems]);
+  }, [application, editorComponent]);
+
+  useEffect(() => {
+    const removeComponentsObserver = application?.streamItems(
+      ContentType.Component,
+      async items => {
+        const components = items as SNComponent[];
+        if (!note) {
+          return;
+        }
+        /** Reload componentStack in case new ones were added or removed */
+        // reloadComponentContext();
+        // await this.reloadComponentStack();
+        /** Observe editor changes to see if the current note should update its editor */
+        const editors = components.filter(component => {
+          return component.isEditor();
+        });
+        if (editors.length === 0) {
+          return;
+        }
+        /** Find the most recent editor for note */
+        reloadComponentEditorState();
+      }
+    );
+
+    return removeComponentsObserver;
+  }, [application, note, reloadComponentEditorState]);
 
   useEffect(() => {
     const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
@@ -211,19 +296,30 @@ export const Compose = (): JSX.Element => {
     const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
       (newNote, source) => {
         if (isPayloadSourceRetrieved(source!)) {
-          setNote(newNote);
+          if (
+            !editorComponent ||
+            (editorComponent && source !== PayloadSource.ComponentRetrieved)
+          ) {
+            setNote(newNote);
+          }
+
           setTitle(newNote.title);
           setNoteText(newNote.text);
+        }
+        if (newNote.locked !== note?.locked) {
+          if (note) {
+            setNote(newNote);
+          }
         }
         if (newNote.lastSyncBegan && newNote.lastSyncEnd) {
           if (
             newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
           ) {
-            // this.showSavingStatus();
+            showSavingStatus();
           } else if (
             newNote.lastSyncEnd!.getTime() > newNote.lastSyncBegan!.getTime()
           ) {
-            // this.showAllChangesSavedStatus();
+            showAllChangesSavedStatus();
           }
         }
       }
@@ -234,7 +330,15 @@ export const Compose = (): JSX.Element => {
       removeEditorNoteValueChangeObserver &&
         removeEditorNoteValueChangeObserver();
     };
-  }, [editor]);
+  }, [
+    editor,
+    editorComponent,
+    note,
+    note?.locked,
+    setStatus,
+    showAllChangesSavedStatus,
+    showSavingStatus,
+  ]);
 
   const saveNote = useCallback(
     async (
@@ -247,7 +351,6 @@ export const Compose = (): JSX.Element => {
       if (!note) {
         return;
       }
-
       if (note?.deleted) {
         application!.alertService!.alert('deteled replace this');
         return;
@@ -286,14 +389,14 @@ export const Compose = (): JSX.Element => {
         isUserModified
       );
 
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
       }
       const noDebounce = bypassDebouncer || application?.noAccount();
       const syncDebouceMs = noDebounce
         ? SAVE_TIMEOUT_NO_DEBOUNCE
         : SAVE_TIMEOUT_DEBOUNCE;
-      timeoutRef.current = setTimeout(() => {
+      saveTimeoutRef.current = setTimeout(() => {
         application?.sync();
         if (closeAfterSync) {
           application?.getAppState().closeEditor(editor!);
@@ -311,13 +414,30 @@ export const Compose = (): JSX.Element => {
     });
   };
 
-  const onContentChange = (newNoteText: string) => {
-    setNoteText(newNoteText);
-    saveNote(false, true, true, false, {
-      newTitle: title,
-      newNoteText,
-    });
-  };
+  const onContentChange = useCallback(
+    (newNoteText: string) => {
+      if (application?.platform === Platform.Android && note?.locked) {
+        application.alertService?.alert(
+          'This note is locked. Please unlock this note to make changes.',
+          'Note Locked',
+          'OK'
+        );
+        return;
+      }
+      setNoteText(newNoteText);
+      saveNote(false, true, false, false, {
+        newTitle: title,
+        newNoteText,
+      });
+    },
+    [
+      application?.alertService,
+      application?.platform,
+      note?.locked,
+      saveNote,
+      title,
+    ]
+  );
 
   const shouldDisplayEditor = editorComponent && Boolean(note) && !webViewError;
 
@@ -362,7 +482,7 @@ export const Compose = (): JSX.Element => {
         keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
         autoCorrect={true}
         autoCapitalize={'sentences'}
-        editable={note?.locked}
+        editable={!note?.locked}
       />
       {loadingWebview && (
         <LoadingWebViewContainer>
@@ -398,25 +518,30 @@ export const Compose = (): JSX.Element => {
             multiline
             ref={editorViewRef}
             autoFocus={false}
-            value={noteText}
+            value={note?.text}
+            textAlignVertical="top"
+            autoCapitalize={'sentences'}
             selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
-            // handlesColor={theme.stylekitInfoColor}
+            handlesColor={theme.stylekitInfoColor}
             onChangeText={onContentChange}
           />
         </TextContainer>
       )}
+      {/* Empty wrapping view fixes native textview crashing */}
       {!shouldDisplayEditor && application?.platform === Platform.Ios && (
-        <StyledTextView
-          ref={editorViewRef}
-          autoFocus={false}
-          multiline
-          value={noteText}
-          keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
-          selectionColor={lighten(theme.stylekitInfoColor)}
-          onChangeText={onContentChange}
-          editable={!note?.locked}
-          scrollEnabled
-        />
+        <View>
+          <StyledTextView
+            testID="noteContentField"
+            ref={editorViewRef}
+            autoFocus={false}
+            multiline
+            value={note?.text}
+            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            selectionColor={lighten(theme.stylekitInfoColor)}
+            onChangeText={onContentChange}
+            editable={!note?.locked}
+          />
+        </View>
       )}
     </Container>
   );

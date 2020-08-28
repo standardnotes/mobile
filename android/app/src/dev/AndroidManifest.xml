@@ -2,5 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.standardnotes">
-    <application tools:replace="android:icon,label" android:icon="@drawable/icon" android:label="SN Dev" />
+    <application tools:replace="android:icon,label" android:icon="@drawable/icon" android:label="SN Dev" tools:node="merge">
+     <meta-data android:name="com.bugsnag.android.RELEASE_STAGE"
+             android:value="dev"/>
+    </application>
 </manifest>

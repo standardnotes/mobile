@@ -96,7 +96,7 @@ export const ComponentView = ({
               );
             }
           },
-          contextRequestHandler: () => note,
+          contextRequestHandler: () => application?.findItem(noteUuid),
         }
       );
     }
@@ -196,13 +196,6 @@ export const ComponentView = ({
       return true;
     })()`;
   };
-
-  // const setRef = ref => {
-  //   if (ref) {
-  //     console.log(ref);
-  //     webViewRef.current = { postMessage: ref.postMessage };
-  //   }
-  // };
 
   return (
     <FlexContainer>

@@ -2,14 +2,21 @@ import { AppStateType } from '@Lib/ApplicationState';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
-import { ICON_SETTINGS } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
+import { StyleKit, StyleKitContext, ThemeContent } from '@Style/StyleKit';
+import React, {
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Platform } from 'react-native';
 import FAB from 'react-native-fab';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ContentType, SNTag } from 'snjs';
+import { ContentType, SNTag, SNTheme, ThemeMutator } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   FirstSafeAreaView,
@@ -17,7 +24,7 @@ import {
   SideMenuSectionContainer,
 } from './MainSideMenu.styled';
 import { SideMenuHero } from './SideMenuHero';
-import { SideMenuSection } from './SideMenuSection';
+import { SideMenuOption, SideMenuSection } from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
 type Props = {
@@ -27,6 +34,7 @@ type Props = {
 export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   // Context
   const theme = useContext(ThemeContext);
+  const styleKit = useContext(StyleKitContext);
   const application = useContext(ApplicationContext);
   const navigation = useNavigation();
 
@@ -35,6 +43,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   const [selectedTag, setSelectedTag] = useState(() =>
     application!.getAppState().getSelectedTag()
   );
+  const [themes, setThemes] = useState<SNTheme[]>([]);
 
   useEffect(() => {
     const removeTagChangeObserver = application!
@@ -47,6 +56,132 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
     return removeTagChangeObserver;
   });
 
+  const onSystemThemeSelect = useCallback(
+    async (selectedTheme: ThemeContent) => {
+      const oldTheme = application!.findItem(styleKit!.activeThemeId!) as
+        | SNTheme
+        | undefined;
+
+      styleKit?.activateSystemTheme(selectedTheme.uuid);
+      if (oldTheme?.isTheme() && oldTheme.isMobileActive()) {
+        await application?.changeAndSaveItem(oldTheme.uuid, mutator => {
+          const themeMutator = mutator as ThemeMutator;
+          themeMutator.setMobileActive(false);
+        });
+      }
+    },
+    [application, styleKit]
+  );
+
+  const onThemeSelect = useCallback(
+    async (selectedTheme: SNTheme) => {
+      if (!selectedTheme.isMobileActive()) {
+        await application?.changeItem(selectedTheme.uuid, mutator => {
+          const themeMutator = mutator as ThemeMutator;
+          themeMutator.setMobileActive(true);
+        });
+        if (application!.findItem(styleKit!.activeThemeId!)) {
+          await application?.changeItem(styleKit!.activeThemeId!, mutator => {
+            const themeMutator = mutator as ThemeMutator;
+            themeMutator.setMobileActive(false);
+          });
+        }
+        await application?.sync();
+      }
+    },
+    [application, styleKit]
+  );
+
+  useEffect(() => {
+    const unsubscribeStreamThemes = application?.streamItems(
+      ContentType.Theme,
+      () => {
+        const newItems = application.getItems(ContentType.Theme);
+        setThemes(newItems as SNTheme[]);
+      }
+    );
+
+    return unsubscribeStreamThemes;
+  }, [application]);
+
+  const iconDescriptorForTheme = (currentTheme: SNTheme | ThemeContent) => {
+    const desc = {
+      type: 'circle',
+      side: 'right' as 'right',
+    };
+
+    const dockIcon =
+      currentTheme.package_info && currentTheme.package_info.dock_icon;
+
+    if (dockIcon && dockIcon.type === 'circle') {
+      Object.assign(desc, {
+        backgroundColor: dockIcon.background_color,
+        borderColor: dockIcon.border_color,
+      });
+    } else {
+      Object.assign(desc, {
+        backgroundColor: theme.stylekitInfoColor,
+        borderColor: theme.stylekitInfoColor,
+      });
+    }
+
+    return desc;
+  };
+
+  const themeOptions = useMemo(() => {
+    const options: SideMenuOption[] = styleKit!
+      .systemThemes()
+      .map(systemTheme => ({
+        text: systemTheme?.name,
+        key: systemTheme?.uuid,
+        iconDesc: iconDescriptorForTheme(systemTheme),
+        dimmed: false,
+        onSelect: () => onSystemThemeSelect(systemTheme),
+        selected: styleKit!.activeThemeId === systemTheme?.uuid,
+      }))
+      .concat(
+        themes
+          .filter(el => !el.errorDecrypting)
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(mapTheme => ({
+            text: mapTheme.name,
+            key: mapTheme.uuid,
+            iconDesc: iconDescriptorForTheme(mapTheme),
+            dimmed: mapTheme.getNotAvailOnMobile(),
+            onSelect: () => onThemeSelect(mapTheme),
+            selected: styleKit!.activeThemeId === mapTheme.uuid,
+          }))
+      );
+
+    if (options.length === styleKit!.systemThemes().length) {
+      options.push({
+        text: 'Get More Themes',
+        key: 'get-theme',
+        iconDesc: {
+          type: 'icon',
+          name: StyleKit.nameForIcon(ICON_BRUSH),
+          side: 'right',
+          size: 17,
+        },
+        onSelect: () => {
+          application?.deviceInterface?.openUrl(
+            'https://standardnotes.org/extensions'
+          );
+        },
+      });
+    }
+
+    return options;
+    // We want to also track activeThemeId
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    styleKit,
+    styleKit?.activeThemeId,
+    themes,
+    onSystemThemeSelect,
+    onThemeSelect,
+  ]);
+
   const onTagSelect = async (tag: SNTag) => {
     if (tag.conflictOf) {
       application!.changeAndSaveItem(tag.uuid, mutator => {
@@ -54,6 +189,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
       });
     }
     application!.getAppState().setSelectedTag(tag);
+    drawerRef?.closeDrawer();
   };
 
   const openSettings = () => {
@@ -76,7 +212,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   return (
     <Fragment>
       <FirstSafeAreaView />
-      <MainSafeAreaView edges={['bottom', 'left']}>
+      <MainSafeAreaView>
         <SideMenuHero
           testID="settingsButton"
           onPress={openSettings}
@@ -85,6 +221,12 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
 
         <SideMenuSectionContainer
           data={[
+            <SideMenuSection
+              title="Themes"
+              key="themes-section"
+              options={themeOptions}
+              collapsed={true}
+            />,
             <SideMenuSection title="Views" key="views-section">
               <TagSelectionList
                 key="views-section-list"

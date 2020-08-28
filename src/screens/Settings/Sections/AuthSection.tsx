@@ -5,7 +5,8 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { StyleKitContext } from '@Style/StyleKit';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Keyboard } from 'react-native';
 import {
   RegistrationDescription,
   RegistrationInput,
@@ -21,6 +22,15 @@ type Props = {
   signedIn: boolean;
 };
 
+type MfaResponse = {
+  message: string;
+  payload: {
+    mfa_key: string;
+  };
+  tag: string;
+  status: number;
+};
+
 export const AuthSection = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -31,50 +41,128 @@ export const AuthSection = (props: Props) => {
   const [signingIn, setSigningIn] = useState(false);
   const [strictSignIn, setStrictSignIn] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [mfa, setMfa] = useState(false);
-  const [mfaText, setMfaText] = useState('');
-  const [mfaMessage] = useState<string | undefined>(undefined);
+  const [mfa, setMfa] = useState<MfaResponse | undefined>();
+  const [mfaCode, setMfaCode] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [server, setServer] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [confirmRegistration, setConfirmRegistration] = useState(false);
 
-  const signIn = async () => {
-    setSigningIn(true);
-    await application!.signIn(
-      email,
-      password,
-      strictSignIn,
-      undefined,
-      undefined,
-      undefined,
-      true,
-      false
-    );
-    setSigningIn(false);
-    setPassword('');
-    setPasswordConfirmation('');
-  };
-
-  const register = async () => {
-    setRegistering(true);
-    await application!.register(email, password, undefined, true);
-    setRegistering(false);
-  };
-
   // set initial server
   useEffect(() => {
     const getServer = async () => {
-      const host = await application!.getHost();
+      const host = await application?.getHost();
       setServer(host!);
     };
     getServer();
   }, [application]);
 
+  const updateServer = useCallback(
+    async (host: string) => {
+      setServer(host);
+      await application?.setHost(host);
+    },
+    [application]
+  );
   if (props.signedIn) {
     return null;
   }
+
+  const validate = () => {
+    if (!email) {
+      application?.alertService?.alert(
+        'Please enter a valid email address.',
+        'Missing Email',
+        'OK'
+      );
+      return false;
+    }
+
+    if (!password) {
+      application?.alertService?.alert(
+        'Please enter your password.',
+        'Missing Password',
+        'OK'
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const signIn = async () => {
+    setSigningIn(true);
+    if (!validate()) {
+      setSigningIn(false);
+      return;
+    }
+    Keyboard.dismiss();
+    const result = await application!.signIn(
+      email,
+      password,
+      strictSignIn,
+      undefined,
+      mfa?.payload.mfa_key,
+      mfaCode || undefined,
+      true,
+      false
+    );
+
+    if (result?.error) {
+      if (
+        result?.error.tag === 'mfa-required' ||
+        result?.error.tag === 'mfa-invalid'
+      ) {
+        setMfa(result?.error);
+        setMfaCode('');
+      } else if (result?.error.message) {
+        application?.alertService?.alert(result?.error.message, 'Oops', 'OK');
+        setMfa(undefined);
+      }
+      setSigningIn(false);
+      return;
+    }
+
+    setSigningIn(false);
+    setMfa(undefined);
+    setPassword('');
+    setPasswordConfirmation('');
+  };
+
+  const onRegisterPress = () => {
+    if (!validate()) {
+      return;
+    }
+    setConfirmRegistration(true);
+  };
+
+  const register = async () => {
+    setRegistering(true);
+    if (password !== passwordConfirmation) {
+      application?.alertService?.alert(
+        'The passwords you entered do not match. Please try again.',
+        "Passwords Don't Match",
+        'OK'
+      );
+    } else {
+      Keyboard.dismiss();
+      const result = await application!.register(
+        email,
+        password,
+        undefined,
+        true
+      );
+      if (result?.error) {
+        application?.alertService?.alert(
+          'Registration failed. Please try again.',
+          'Registration failed',
+          'OK'
+        );
+      }
+    }
+    setRegistering(false);
+  };
 
   const _renderRegistrationConfirm = () => {
     return (
@@ -123,16 +211,16 @@ export const AuthSection = (props: Props) => {
     const renderMfaSubcontent = () => {
       return (
         <RegularView>
-          <RegistrationDescription>{mfaMessage}</RegistrationDescription>
+          <RegistrationDescription>{mfa?.message}</RegistrationDescription>
           <SectionedTableCell textInputCell first>
             <RegistrationInput
               placeholder=""
-              onChangeText={setMfaText}
-              value={mfaText}
+              onChangeText={setMfaCode}
+              value={mfaCode}
               keyboardType={'numeric'}
               keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
               autoFocus
-              onSubmitEditing={() => {}}
+              onSubmitEditing={signIn}
             />
           </SectionedTableCell>
         </RegularView>
@@ -178,7 +266,7 @@ export const AuthSection = (props: Props) => {
                 <RegistrationInput
                   testID="syncServerField"
                   placeholder={'Sync Server'}
-                  onChangeText={setServer}
+                  onChangeText={updateServer}
                   value={server}
                   autoCorrect={false}
                   autoCapitalize={'none'}
@@ -220,7 +308,7 @@ export const AuthSection = (props: Props) => {
           <ButtonCell
             title={'Cancel'}
             disabled={signingIn}
-            onPress={() => setMfa(false)}
+            onPress={() => setMfa(undefined)}
           />
         )}
 
@@ -230,7 +318,7 @@ export const AuthSection = (props: Props) => {
             title={DEFAULT_REGISTER_TEXT}
             disabled={registering}
             bold
-            onPress={() => setConfirmRegistration(true)}
+            onPress={onRegisterPress}
           />
         )}
 

@@ -12,7 +12,7 @@ import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import com.bugsnag.BugsnagReactNative;
+import com.bugsnag.android.Bugsnag;
 import com.facebook.react.modules.network.OkHttpClientProvider;
 
 import android.annotation.SuppressLint;
@@ -59,6 +59,8 @@ public class MainApplication extends Application implements ReactApplication {
 
     rebuildOkHtttp();
 
+    Bugsnag.start(this /* app context */);
+
     SoLoader.init(this, /* native exopackage */ false);
 
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
@@ -99,10 +101,6 @@ public class MainApplication extends Application implements ReactApplication {
       }
 
     });
-
-    if(!BuildConfig.DEBUG) {
-      BugsnagReactNative.start(this);
-    }
   }
 
   private void rebuildOkHtttp() {

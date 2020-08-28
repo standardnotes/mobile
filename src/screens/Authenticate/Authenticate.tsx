@@ -2,7 +2,7 @@ import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
-import { AppStateType } from '@Lib/ApplicationState';
+import { AppStateType, PasscodeKeyboardType } from '@Lib/ApplicationState';
 import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
@@ -20,7 +20,7 @@ import React, {
 } from 'react';
 import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import { ChallengeType, ChallengeValue } from 'snjs';
+import { ChallengeReason, ChallengeType, ChallengeValue } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   Container,
@@ -53,6 +53,9 @@ export const Authenticate = ({
   // State
   const [supportsBiometrics, setSupportsBiometrics] = useState<
     boolean | undefined
+  >(undefined);
+  const [keyboardType, setKeyboardType] = useState<
+    PasscodeKeyboardType | undefined
   >(undefined);
   const [{ challengeValues, challengeValueStates }, dispatch] = useReducer(
     authenticationReducer,
@@ -120,6 +123,11 @@ export const Authenticate = ({
     [application]
   );
 
+  const checkPasscodeKeyboardType = useCallback(
+    async () => application?.getAppState().getPasscodeKeyboardType(),
+    [application]
+  );
+
   const authenticateBiometrics = useCallback(
     async (challengeValue: ChallengeValue) => {
       let hasBiometrics = supportsBiometrics;
@@ -183,10 +191,14 @@ export const Authenticate = ({
       } else {
         // iOS
         try {
-          await FingerprintScanner.authenticate({
-            fallbackEnabled: true,
-            description: 'This is required to access your notes.',
-          });
+          await application
+            ?.getAppState()
+            .performActionWithoutStateChangeImpact(async () => {
+              await FingerprintScanner.authenticate({
+                fallbackEnabled: true,
+                description: 'This is required to access your notes.',
+              });
+            });
           FingerprintScanner.release();
           const newChallengeValue = { ...challengeValue, value: true };
           onValueChange(newChallengeValue);
@@ -202,6 +214,11 @@ export const Authenticate = ({
               'Authentication failed. Tap to try again.'
             );
           }
+          dispatch({
+            type: 'setState',
+            valueType: challengeValue.type,
+            state: ChallengeValueStateType.Fail,
+          });
         }
       }
     },
@@ -291,6 +308,20 @@ export const Authenticate = ({
       state: ChallengeValueStateType.Fail,
     });
   };
+  useEffect(() => {
+    const removeAppStateSubscriber = application
+      ?.getAppState()
+      .addStateChangeObserver(state => {
+        if (state === AppStateType.ResumingFromBackground) {
+          beginAuthenticatingForNextChallengeReason();
+        }
+        if (state === AppStateType.EnteringBackground) {
+          FingerprintScanner.release();
+        }
+      });
+
+    return removeAppStateSubscriber;
+  }, [application, beginAuthenticatingForNextChallengeReason]);
 
   useEffect(() => {
     if (application?.setChallengeCallbacks) {
@@ -308,16 +339,28 @@ export const Authenticate = ({
   useEffect(() => {
     let mounted = true;
     const setBiometricsAsync = async () => {
-      const hasBiometrics = await checkForBiometrics();
-      if (mounted) {
-        setSupportsBiometrics(hasBiometrics);
+      if (challenge.reason !== ChallengeReason.Migration) {
+        console.log('ssadasfsdfsdfsdfsf');
+        const hasBiometrics = await checkForBiometrics();
+        if (mounted) {
+          setSupportsBiometrics(hasBiometrics);
+        }
       }
     };
     setBiometricsAsync();
+    const setInitialKeyboardType = async () => {
+      if (challenge.reason !== ChallengeReason.Migration) {
+        const initialKeyboardType = await checkPasscodeKeyboardType();
+        if (mounted) {
+          setKeyboardType(initialKeyboardType);
+        }
+      }
+    };
+    setInitialKeyboardType();
     return () => {
       mounted = false;
     };
-  }, [checkForBiometrics]);
+  }, [challenge.reason, checkForBiometrics, checkPasscodeKeyboardType]);
 
   useEffect(() => {
     beginAuthenticatingForNextChallengeReason();
@@ -359,6 +402,30 @@ export const Authenticate = ({
     }, [])
   );
 
+  const onSubmitPress = () => {
+    const challengeValue = challengeValues[firstNotSuccessful];
+    const index = findMatchingValueIndex(challengeValues, challengeValue.type);
+    const state = challengeValueStates[index];
+    if (
+      challengeValue.type === ChallengeType.Biometric &&
+      (state === ChallengeValueStateType.Locked ||
+        state === ChallengeValueStateType.Fail)
+    ) {
+      beginAuthenticatingForNextChallengeReason();
+      return;
+    }
+
+    validateChallengeValue(challengeValue);
+  };
+
+  const switchKeyboard = () => {
+    if (keyboardType === PasscodeKeyboardType.Default) {
+      setKeyboardType(PasscodeKeyboardType.Numeric);
+    } else if (keyboardType === PasscodeKeyboardType.Numeric) {
+      setKeyboardType(PasscodeKeyboardType.Default);
+    }
+  };
+
   const renderAuthenticationSource = (
     challengeValue: ChallengeValue,
     index: number
@@ -384,7 +451,7 @@ export const Authenticate = ({
               ? 'Change Keyboard'
               : undefined
           }
-          buttonAction={() => {}} // TODO: change keyboard
+          buttonAction={switchKeyboard}
           buttonStyles={
             challengeValue.type === ChallengeType.LocalPasscode
               ? {
@@ -398,6 +465,7 @@ export const Authenticate = ({
           <SectionContainer last={last}>
             <SectionedTableCell textInputCell={true} first={true}>
               <Input
+                key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={
                   challengeValue.type === ChallengeType.LocalPasscode
                     ? localPasscodeRef
@@ -416,7 +484,7 @@ export const Authenticate = ({
                 autoFocus={false}
                 autoCapitalize={'none'}
                 secureTextEntry={true}
-                // keyboardType={inputSource.keyboardType || 'default'}
+                keyboardType={keyboardType}
                 keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 onSubmitEditing={() => {
@@ -464,9 +532,7 @@ export const Authenticate = ({
             : 'Next'
         }
         bold={true}
-        onPress={() =>
-          validateChallengeValue(challengeValues[firstNotSuccessful])
-        }
+        onPress={onSubmitPress}
       />
     </Container>
   );

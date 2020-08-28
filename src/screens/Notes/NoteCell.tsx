@@ -1,7 +1,27 @@
-import { hexToRGBA } from '@Style/utils';
-import React, { useRef, useState } from 'react';
-import { SNNote } from 'snjs';
-import styled from 'styled-components/native';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import {
+  CustomActionSheetOption,
+  useCustomActionSheet,
+} from '@Style/useCustomActionSheet';
+import React, { useCallback, useContext, useRef, useState } from 'react';
+import { View } from 'react-native';
+import {
+  ButtonType,
+  CollectionSort,
+  isNullOrUndefined,
+  NoteMutator,
+  SNNote,
+} from 'snjs';
+import {
+  Container,
+  DateText,
+  DeletedText,
+  NoteText,
+  TagsContainter,
+  TagText,
+  TitleText,
+  TouchableContainer,
+} from './NoteCell.styled';
 import { NoteCellFlags } from './NoteCellFlags';
 
 type Props = {
@@ -9,64 +29,41 @@ type Props = {
   highlighted?: boolean;
   onPressItem: (itemUuid: SNNote['uuid']) => void;
   renderTags: boolean;
-  sortType: string;
+  hideDates: boolean;
+  hideTags: boolean;
+  hidePreviews: boolean;
+  sortType: CollectionSort;
   tagsString: string;
 };
 
-const TouchableContainer = styled.TouchableWithoutFeedback``;
-const Container = styled.View<{ selected: boolean; padding: number }>`
-  padding: ${props => props.padding}px;
-  padding-right: ${props => props.padding * 2}px;
-  border-bottom-color: ${({ theme }) =>
-    hexToRGBA(theme.stylekitBorderColor, 0.75)};
-  border-bottom-width: 1px;
-  background-color: ${({ theme, selected }) =>
-    selected ? theme.stylekitInfoColor : theme.stylekitBackgroundColor};
-`;
-const DeletedText = styled.Text`
-  color: ${({ theme }) => theme.stylekitInfoColor};
-  margin-bottom: 5px;
-`;
-const NoteText = styled.Text<{ selected: boolean }>`
-  font-size: 15px;
-  margin-top: 4px;
-  color: ${({ theme, selected }) =>
-    selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
-  opacity: 0.8;
-  line-height: 21px;
-`;
-const TitleText = styled.Text<{ selected: boolean }>`
-  font-weight: bold;
-  font-size: 16px;
-  color: ${({ theme, selected }) =>
-    selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
-`;
-const TagsContainter = styled.View`
-  flex: 1;
-  flex-direction: row;
-  margin-top: 7px;
-`;
-const TagText = styled.Text<{ selected: boolean }>`
-  margin-right: 2px;
-  font-size: 12px;
-  color: ${({ theme, selected }) =>
-    selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
-  opacity: ${props => (props.selected ? 0.8 : 0.5)};
-`;
-const DateText = styled(TagText)`
-  margin-right: 0px;
-  margin-top: 5px;
-`;
+export const NoteCell = ({
+  note,
+  onPressItem,
+  highlighted,
+  sortType,
+  tagsString,
+  // renderTags,
+  // hideTags,
+  hideDates,
+  hidePreviews,
+}: Props): JSX.Element => {
+  // Context
+  const application = useContext(ApplicationContext);
 
-export const NoteCell = (props: Props): JSX.Element => {
+  // State
   const [selected, setSelected] = useState(false);
-  const selectionTimeout = useRef<NodeJS.Timeout>();
 
-  const highlight = Boolean(selected || props.highlighted);
+  // Ref
+  const selectionTimeout = useRef<NodeJS.Timeout>();
+  const elementRef = useRef<View>(null);
+
+  const { showActionSheet } = useCustomActionSheet();
+
+  const highlight = Boolean(selected || highlighted);
 
   const _onPress = () => {
     setSelected(true);
-    props.onPressItem(props.note.uuid);
+    onPressItem(note.uuid);
     setSelected(false);
   };
 
@@ -85,25 +82,176 @@ export const NoteCell = (props: Props): JSX.Element => {
     setSelected(false);
   };
 
+  const changeNote = useCallback(
+    async (mutate: (mutator: NoteMutator) => void) => {
+      if (!note) {
+        return;
+      }
+
+      if (note.deleted) {
+        application?.alertService?.alert(
+          'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
+        );
+        return;
+      }
+
+      if (!application?.findItem(note.uuid)) {
+        application?.alertService!.alert(
+          "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
+        );
+        return;
+      }
+
+      await application?.changeAndSaveItem(note.uuid, mutator => {
+        const noteMutator = mutator as NoteMutator;
+        mutate(noteMutator);
+      });
+    },
+    [application, note]
+  );
+
+  const onLongPress = () => {
+    if (note.errorDecrypting) {
+      return;
+    }
+
+    if (note.protected) {
+      showActionSheet(
+        note.safeTitle(),
+        [
+          {
+            text: 'Note protected',
+          },
+        ],
+        undefined,
+        elementRef.current ?? undefined
+      );
+    } else {
+      let options: CustomActionSheetOption[] = [];
+
+      options.push({
+        text: note.pinned ? 'Unpin' : 'Pin',
+        key: 'pin',
+        callback: () =>
+          changeNote(mutator => {
+            mutator.pinned = !note.pinned;
+          }),
+      });
+
+      options.push({
+        text: note.archived ? 'Unarchive' : 'Archive',
+        key: 'archive',
+        callback: () => {
+          changeNote(mutator => {
+            mutator.archived = !note.archived;
+          });
+        },
+      });
+
+      options.push({
+        text: note.locked ? 'Unlock' : 'Lock',
+        key: 'lock',
+        callback: () =>
+          changeNote(mutator => {
+            mutator.locked = !note.locked;
+          }),
+      });
+
+      options.push({
+        text: note.protected ? 'Unprotect' : 'Protect',
+        key: 'protect',
+        callback: () =>
+          changeNote(mutator => {
+            mutator.protected = !note.protected;
+          }),
+      });
+
+      if (!note.trashed) {
+        options.push({
+          text: 'Move to Trash',
+          key: 'trash',
+          destructive: true,
+          callback: async () => {
+            const title = 'Move to Trash';
+            const message =
+              'Are you sure you want to move this note to the trash?';
+
+            const confirmed = await application?.alertService?.confirm(
+              message,
+              title,
+              'Confirm',
+              ButtonType.Danger,
+              'Cancel'
+            );
+            if (confirmed) {
+              changeNote(mutator => {
+                mutator.trashed = true;
+              });
+            }
+          },
+        });
+      } else {
+        options = options.concat([
+          {
+            text: 'Restore',
+            key: 'restore-note',
+            callback: () => {
+              changeNote(mutator => {
+                mutator.trashed = false;
+              });
+            },
+          },
+          {
+            text: 'Delete Permanently',
+            key: 'delete-forever',
+            destructive: true,
+            callback: async () => {
+              const title = `Delete ${note.safeTitle()}`;
+              const message =
+                'Are you sure you want to permanently delete this nite}?';
+              if (note.locked) {
+                application?.alertService!.alert(
+                  "This note is locked. If you'd like to delete it, unlock it, and try again."
+                );
+                return;
+              }
+              const confirmed = await application?.alertService?.confirm(
+                message,
+                title,
+                'Delete',
+                ButtonType.Danger,
+                'Cancel'
+              );
+              if (confirmed) {
+                await application?.deleteItem(note);
+              }
+            },
+          },
+        ]);
+      }
+      showActionSheet(
+        note.safeTitle(),
+        options,
+        undefined,
+        elementRef.current ?? undefined
+      );
+    }
+  };
+
   const padding = 14;
-  const { note } = props;
-  const showPreview =
-    // !this.state.options.hidePreviews &&
-    !note.protected && !note.hidePreview;
-  // const showTagsString =
-  //   props.renderTags &&
-  //   // !this.state.options.hideTags &&
-  //   note.tags.length > 0 &&
-  //   !note.protected;
+  const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
+  const hasPlainPreview =
+    !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
+  const showTagsString = false; // renderTags && !hideTags && !note.protected;
   return (
     <TouchableContainer
       onPress={_onPress}
       onPressIn={_onPressIn}
       onPressOut={_onPressOut}
-      // onLongPress={this.showActionSheet}
+      onLongPress={onLongPress}
     >
-      <Container selected={highlight} padding={padding}>
-        {props.note.deleted && <DeletedText>Deleting...</DeletedText>}
+      <Container ref={elementRef} selected={highlight} padding={padding}>
+        {note.deleted && <DeletedText>Deleting...</DeletedText>}
 
         <NoteCellFlags note={note} highlight={highlight} />
 
@@ -117,35 +265,33 @@ export const NoteCell = (props: Props): JSX.Element => {
           <TitleText selected={highlight}>{note.title}</TitleText>
         )}
 
-        {note.preview_plain != null && showPreview && (
+        {hasPlainPreview && showPreview && (
           <NoteText selected={highlight} numberOfLines={2}>
             {note.preview_plain}
           </NoteText>
         )}
 
-        {!note.preview_plain && showPreview && note.safeText().length > 0 && (
+        {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
           <NoteText selected={highlight} numberOfLines={2}>
             {note.text}
           </NoteText>
         )}
 
-        {true && (
+        {!hideDates && (
           <DateText numberOfLines={1} selected={highlight}>
-            {props.sortType === 'client_updated_at'
+            {sortType === CollectionSort.UpdatedAt
               ? 'Modified ' + note.updatedAtString
               : note.createdAtString}
           </DateText>
         )}
 
-        {false && (
+        {showTagsString && (
           <TagsContainter>
             <TagText numberOfLines={1} selected={highlight}>
-              {props.tagsString}
+              {tagsString}
             </TagText>
           </TagsContainter>
         )}
-
-        {/* {this.state.actionSheet && this.state.actionSheet} */}
       </Container>
     </TouchableContainer>
   );

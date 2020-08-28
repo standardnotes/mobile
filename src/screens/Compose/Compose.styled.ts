@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
-import styled from 'styled-components/native';
+import SNTextView from 'sn-textview';
+import styled, { css } from 'styled-components/native';
 
 const PADDING = 14;
 const NOTE_TITLE_HEIGHT = 50;
@@ -81,20 +82,26 @@ export const ContentContainer = styled.View`
   flex-grow: 1;
 `;
 export const TextContainer = styled.View`
-  flex-grow: 1;
   flex: 1;
 `;
-export const StyledTextView = styled.TextInput`
-height: 90%;
-  /* margin-top: 0px; */
-  /* padding-top: 10px; */
+export const StyledKeyboardAvoidngView = styled.KeyboardAvoidingView`
+  flex: 1;
+  ${({ theme }) => theme.stylekitBackgroundColor};
+`;
+
+export const StyledTextView = styled(SNTextView)`
+  height: 90%;
+  padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   padding-left: ${({ theme }) =>
     theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   padding-right: ${({ theme }) =>
     theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   /* padding-bottom: 10px; */
+  ${Platform.OS === 'ios' &&
+  css`
+    font-size: 17px;
+  `}
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
-  ${Platform.OS === 'ios' && 'padding-bottom: 10px'};
-  /* ${Platform.OS === 'android' && 'flex: 1'}; */
+  /* ${Platform.OS === 'ios' && 'padding-bottom: 10px'}; */
 `;

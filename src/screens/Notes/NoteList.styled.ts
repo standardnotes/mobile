@@ -9,10 +9,14 @@ export const styles = StyleSheet.create({
   inputStyle: {
     height: 30,
   },
+  androidSearch: {
+    height: 30,
+  },
 });
 
-export const Container = styled.View`
+export const Container = styled.SafeAreaView`
   background-color: ${props => props.theme.stylekitBackgroundColor};
+  flex: 1;
 `;
 
 export const LoadingContainer = styled.View`

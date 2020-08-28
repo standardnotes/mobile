@@ -7,5 +7,4 @@ export const SCREEN_INPUT_MODAL_PASSCODE = 'InputModalPasscode' as 'InputModalPa
 export const SCREEN_INPUT_MODAL_TAG = 'InputModalTag' as 'InputModalTag';
 
 export const SCREEN_SETTINGS = 'Settings';
-export const SCREEN_MANAGE_PRIVILEGES = 'ManagePrivileges';
-export const SCREEN_KEY_RECOVERY = 'KeyRecovery';
+export const SCREEN_MANAGE_PRIVILEGES = 'ManagePrivileges' as 'ManagePrivileges';

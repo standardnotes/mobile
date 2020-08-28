@@ -2,21 +2,29 @@ import {
   ApplicationService,
   ContentType,
   FillItemContent,
+  MobilePrefKey,
   SNPredicate,
   SNUserPrefs,
   UserPrefsMutator,
-  WebPrefKey,
 } from 'snjs';
 import { MobileApplication } from './application';
+
+export const LAST_EXPORT_DATE_KEY = 'LastExportDateKey';
 
 export class PreferencesManager extends ApplicationService {
   private userPreferences!: SNUserPrefs;
   private loadingPrefs = false;
+  private unubscribeStreamItems?: () => void;
 
   /** @override */
   async onAppLaunch() {
     super.onAppLaunch();
+    this.loadSingleton();
     this.streamPreferences();
+  }
+
+  deinit() {
+    this.unubscribeStreamItems && this.unubscribeStreamItems();
   }
 
   get mobileApplication() {
@@ -24,12 +32,15 @@ export class PreferencesManager extends ApplicationService {
   }
 
   streamPreferences() {
-    this.application!.streamItems(ContentType.UserPrefs, () => {
-      this.loadSingleton();
-    });
+    this.unubscribeStreamItems = this.application!.streamItems(
+      ContentType.UserPrefs,
+      () => {
+        this.loadSingleton();
+      }
+    );
   }
 
-  private async loadSingleton() {
+  private async loadSingleton(forceSave?: boolean) {
     if (this.loadingPrefs) {
       return;
     }
@@ -47,7 +58,7 @@ export class PreferencesManager extends ApplicationService {
       !previousRef ||
       this.userPreferences.lastSyncBegan?.getTime() !==
         previousRef?.lastSyncBegan?.getTime();
-    if (didChange) {
+    if (forceSave || didChange) {
       this.mobileApplication
         .getAppState()
         .setUserPreferences(this.userPreferences);
@@ -60,7 +71,7 @@ export class PreferencesManager extends ApplicationService {
     }
   }
 
-  getValue(key: WebPrefKey, defaultValue?: any) {
+  getValue(key: MobilePrefKey, defaultValue?: any) {
     if (!this.userPreferences) {
       return defaultValue;
     }
@@ -68,10 +79,10 @@ export class PreferencesManager extends ApplicationService {
     return value !== undefined && value !== null ? value : defaultValue;
   }
 
-  async setUserPrefValue(key: WebPrefKey, value: any, sync = false) {
+  async setUserPrefValue(key: MobilePrefKey, value: any, sync = false) {
     await this.application!.changeItem(this.userPreferences.uuid, m => {
       const mutator = m as UserPrefsMutator;
-      mutator.setWebPref(key, value);
+      mutator.setMobilePref(key, value);
     });
     if (sync) {
       this.syncUserPreferences();

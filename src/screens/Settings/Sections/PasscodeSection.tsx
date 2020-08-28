@@ -128,7 +128,7 @@ export const PasscodeSection = (props: Props) => {
 
   const passcodeOnPress = async () => {
     if (props.hasPasscode) {
-      const hasAccount = Boolean(application?.getUser());
+      const hasAccount = Boolean(application?.hasAccount());
       let message;
       if (hasAccount) {
         message =
@@ -146,6 +146,7 @@ export const PasscodeSection = (props: Props) => {
       );
       if (confirmed) {
         await application?.removePasscode();
+        await application?.getAppState().setScreenshotPrivacy();
       }
     } else {
       navigation.push(SCREEN_INPUT_MODAL_PASSCODE);
@@ -169,12 +170,13 @@ export const PasscodeSection = (props: Props) => {
   const onBiometricsPress = async () => {
     if (hasBiometrics) {
       setHasBiometrics(false);
-      application?.disableBiometrics();
+      await application?.disableBiometrics();
     } else {
       setHasBiometrics(true);
       await application?.enableBiometrics();
       await setBiometricsTiming(UnlockTiming.OnQuit);
     }
+    await application?.getAppState().setScreenshotPrivacy();
   };
 
   let biometricTitle = hasBiometrics
@@ -205,6 +207,7 @@ export const PasscodeSection = (props: Props) => {
 
       {props.hasPasscode && (
         <SectionedOptionsTableCell
+          leftAligned
           title={'Require Passcode'}
           options={passcodeTimingOptions}
           onPress={(option: Option) =>
@@ -215,6 +218,7 @@ export const PasscodeSection = (props: Props) => {
 
       {hasBiometrics && (
         <SectionedOptionsTableCell
+          leftAligned
           title={'Require Biometrics'}
           options={biometricsTimingOptions}
           onPress={(option: Option) =>

@@ -8,13 +8,13 @@ export const StyledSectionedTableCell = styled(SectionedTableCell)`
 `;
 
 export const Title = styled.Text`
-  ${({ theme }) => theme.stylekitForegroundColor};
+  color: ${({ theme }) => theme.stylekitForegroundColor};
   font-size: 16px;
   font-weight: bold;
 `;
 
 export const Subtitle = styled.Text`
-  ${({ theme }) => theme.stylekitNeutralColor};
+  color: ${({ theme }) => theme.stylekitNeutralColor};
   font-size: 14px;
   margin-top: 4px;
 `;

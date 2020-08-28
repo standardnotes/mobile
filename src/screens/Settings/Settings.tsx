@@ -1,4 +1,4 @@
-import { useSignedIn } from '@Lib/customHooks';
+import { useSignedIn } from '@Lib/snjsHooks';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
@@ -9,6 +9,7 @@ import { CompanySection } from './Sections/CompanySection';
 import { EncryptionSection } from './Sections/EncryptionSection';
 import { OptionsSection } from './Sections/OptionsSection';
 import { PasscodeSection } from './Sections/PasscodeSection';
+import { PreferencesSection } from './Sections/PreferencesSection';
 import { Container } from './Settings.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_SETTINGS>;
@@ -20,27 +21,20 @@ export const Settings = (props: Props) => {
   const [hasPasscode, setHasPasscode] = useState(() =>
     Boolean(application?.hasPasscode())
   );
-  const [encryptionAvailable, setEncryptionAvailable] = useState(false);
+  const [encryptionAvailable, setEncryptionAvailable] = useState(() =>
+    application?.isEncryptionAvailable()
+  );
 
   useEffect(() => {
-    let isMounted = true;
-    const getEncryptionAvailable = async () => {
-      const isEncryptionAvailable = await application?.isEncryptionAvailable();
-      if (isMounted) {
-        setEncryptionAvailable(Boolean(isEncryptionAvailable));
-      }
-    };
-    getEncryptionAvailable();
     const removeApplicationEventSubscriber = application?.addEventObserver(
       async event => {
         if (event === ApplicationEvent.KeyStatusChanged) {
           setHasPasscode(Boolean(application?.hasPasscode()));
-          getEncryptionAvailable();
+          setEncryptionAvailable(() => application?.isEncryptionAvailable());
         }
       }
     );
     return () => {
-      isMounted = false;
       removeApplicationEventSubscriber && removeApplicationEventSubscriber();
     };
   }, [application]);
@@ -58,16 +52,17 @@ export const Settings = (props: Props) => {
     >
       <AuthSection title="Account" signedIn={signedIn} />
       <OptionsSection
-        encryptionAvailable={encryptionAvailable}
+        encryptionAvailable={!!encryptionAvailable}
         title="Options"
       />
+      <PreferencesSection />
       <PasscodeSection
-        encryptionAvailable={encryptionAvailable}
+        encryptionAvailable={!!encryptionAvailable}
         hasPasscode={hasPasscode}
         title="Security"
       />
       <EncryptionSection
-        encryptionAvailable={encryptionAvailable}
+        encryptionAvailable={!!encryptionAvailable}
         title={'Encryption Status'}
       />
       <CompanySection title="Standard Notes" />

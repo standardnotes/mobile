@@ -69,10 +69,17 @@ export const NoteCellFlags = ({
   }
 
   if (note.errorDecrypting) {
-    flags.push({
-      text: 'Missing Keys',
-      color: theme.stylekitDangerColor,
-    });
+    if (note.waitingForKey) {
+      flags.push({
+        text: 'Waiting For Keys',
+        color: theme.stylekitInfoColor,
+      });
+    } else {
+      flags.push({
+        text: 'Missing Keys',
+        color: theme.stylekitDangerColor,
+      });
+    }
   }
 
   if (note.conflictOf) {

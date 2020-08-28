@@ -25,6 +25,7 @@ jobs:
         uses: maierj/fastlane-action@v1.4.0
         env:
           BUILD_NUMBER: ${{ github.run_number }}
+          BUGSNAG_APIKEY: ${{ secrets.BUGSNAG_APIKEY }}
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -67,6 +68,7 @@ jobs:
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
+          APPLE_APP_ID: ${{ secrets.APP_APPLE_ID }}
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}

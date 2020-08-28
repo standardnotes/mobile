@@ -1,5 +1,5 @@
 import { Circle } from '@Components/Circle';
-import { useOutOfSync, useSignedIn } from '@Lib/customHooks';
+import { useOutOfSync, useSignedIn } from '@Lib/snjsHooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ViewProps } from 'react-native';
@@ -46,12 +46,15 @@ export const SideMenuHero: React.FC<Props> = props => {
   }, [application, itemsLength]);
 
   useEffect(() => {
+    let mounted = true;
     const getIsLocked = async () => {
       const locked = await application?.isLocked();
-      if (locked === undefined) {
-        setIsLocked(true);
-      } else {
-        setIsLocked(Boolean(locked));
+      if (mounted) {
+        if (locked === undefined) {
+          setIsLocked(true);
+        } else {
+          setIsLocked(Boolean(locked));
+        }
       }
     };
 
@@ -59,15 +62,20 @@ export const SideMenuHero: React.FC<Props> = props => {
       async event => {
         if (
           event === ApplicationEvent.Launched ||
-          event === ApplicationEvent.SignedIn ||
-          event === ApplicationEvent.SignedOut
+          event === ApplicationEvent.SignedIn
         ) {
+          setIsLocked(false);
+        }
+        if (event === ApplicationEvent.SignedOut) {
           getIsLocked();
         }
       }
     );
 
-    return removeSignedInObserver;
+    return () => {
+      mounted = false;
+      removeSignedInObserver && removeSignedInObserver();
+    };
   }, [application]);
 
   const textData = useMemo(() => {

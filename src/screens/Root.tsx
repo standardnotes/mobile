@@ -3,7 +3,7 @@ import {
   AppStateType,
   TabletModeChangeData,
 } from '@Lib/ApplicationState';
-import { useHasEditor } from '@Lib/customHooks';
+import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
@@ -26,10 +26,11 @@ import {
 
 type Props = AppStackNavigationProp<typeof SCREEN_NOTES>;
 
-export const Root = (props: Props): JSX.Element => {
+export const Root = (props: Props): JSX.Element | null => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
+  const isLocked = useIsLocked();
 
   // State
   const [, setWidth] = useState<number | undefined>(undefined);
@@ -122,20 +123,22 @@ export const Root = (props: Props): JSX.Element => {
     setKeyboardHeight(application?.getAppState().getKeyboardHeight());
   };
 
-  const openCompose = () => {
+  const openCompose = (newNote: boolean) => {
     if (!shouldSplitLayout) {
-      props.navigation.navigate(SCREEN_COMPOSE);
+      props.navigation.navigate(SCREEN_COMPOSE, {
+        title: newNote ? 'Compose' : 'Note',
+      });
     }
   };
 
   const onNoteSelect = async (noteUuid: SNNote['uuid']) => {
     await application!.getAppState().openEditor(noteUuid);
-    openCompose();
+    openCompose(false);
   };
 
   const onNoteCreate = async () => {
     await application!.getAppState().createEditor();
-    openCompose();
+    openCompose(true);
   };
 
   const toggleNoteList = () => {
@@ -145,15 +148,15 @@ export const Root = (props: Props): JSX.Element => {
   const collapseIconBottomPosition =
     (keyboardHeight ?? 0) > (height ?? 0) / 2 ? keyboardHeight : '50%';
 
+  if (isLocked) {
+    return null;
+  }
+
   return (
     <Container testID="rootView" onLayout={onLayout}>
       {!noteListCollapsed && (
         <NotesContainer shouldSplitLayout={shouldSplitLayout}>
-          <Notes
-            // onUnlockPress={this.onUnlockPress}
-            onNoteSelect={onNoteSelect}
-            onNoteCreate={onNoteCreate}
-          />
+          <Notes onNoteSelect={onNoteSelect} onNoteCreate={onNoteCreate} />
         </NotesContainer>
       )}
 
@@ -161,7 +164,6 @@ export const Root = (props: Props): JSX.Element => {
         <ComposeContainer>
           <Compose
           // selectedTagId={this.state.selectedTagId}
-          // navigation={this.props.navigation}
           />
 
           <ExpandTouchable

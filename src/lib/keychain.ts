@@ -22,7 +22,7 @@ export default class Keychain {
           console.log('===Keychain value missing===');
           return null;
         } else {
-          var keys = JSON.parse(credentials.password);
+          const keys = JSON.parse(credentials.password);
           return keys;
         }
       })

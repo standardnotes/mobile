@@ -3,9 +3,9 @@ import { ButtonType, DismissBlockingDialog, SNAlertService } from 'snjs';
 
 export class AlertService implements SNAlertService {
   blockingDialog(_text: string): DismissBlockingDialog {
-    throw new Error('Method not implemented.');
+    return () => {};
   }
-  alert(title: string, text: string, closeButtonText?: string) {
+  alert(text: string, title: string, closeButtonText?: string) {
     return new Promise<void>(resolve => {
       // On iOS, confirm should go first. On Android, cancel should go first.
       let buttons = [

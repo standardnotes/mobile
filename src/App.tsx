@@ -8,9 +8,13 @@ import {
   AppStateType,
   TabletModeChangeData,
 } from '@Lib/ApplicationState';
-import { useHasEditor, useIsLocked } from '@Lib/customHooks';
 import { navigationRef } from '@Lib/NavigationService';
-import { NavigationContainer, RouteProp } from '@react-navigation/native';
+import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
+import {
+  DefaultTheme,
+  NavigationContainer,
+  RouteProp,
+} from '@react-navigation/native';
 import {
   createStackNavigator,
   StackNavigationProp,
@@ -20,13 +24,21 @@ import { Compose } from '@Screens/Compose/Compose';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
 import { Root } from '@Screens/Root';
+import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
 import { Settings } from '@Screens/Settings/Settings';
 import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
 import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
 import { ICON_CHECKMARK, ICON_CLOSE, ICON_MENU } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
+import { StyleKitTheme } from '@Style/Themes/styled-components';
 import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Dimensions,
   Keyboard,
@@ -34,7 +46,9 @@ import {
   ScaledSize,
   StatusBar,
 } from 'react-native';
-import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
+import DrawerLayout, {
+  DrawerState,
+} from 'react-native-gesture-handler/DrawerLayout';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { Challenge } from 'snjs';
 import { ThemeContext, ThemeProvider } from 'styled-components/native';
@@ -44,13 +58,14 @@ import {
   SCREEN_COMPOSE,
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_INPUT_MODAL_TAG,
+  SCREEN_MANAGE_PRIVILEGES,
   SCREEN_NOTES,
   SCREEN_SETTINGS,
 } from './screens/screens';
 
 type HeaderTitleParams = {
   title?: string;
-  subTitle: string;
+  subTitle?: string;
   subTitleColor?: string;
 };
 
@@ -62,6 +77,7 @@ type AppStackNavigatorParamList = {
 type ModalStackNavigatorParamList = {
   AppStack: undefined;
   [SCREEN_SETTINGS]: undefined;
+  [SCREEN_MANAGE_PRIVILEGES]: undefined;
   [SCREEN_INPUT_MODAL_TAG]: HeaderTitleParams & {
     tagUuid?: string;
     noteUuid?: string;
@@ -147,12 +163,22 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
     return remoteTabletModeSubscription;
   }, [application]);
 
+  const handleDrawerStateChange = useCallback(
+    (newState: DrawerState, drawerWillShow: boolean) => {
+      if (newState !== 'Idle' && drawerWillShow) {
+        application?.getAppState().onDrawerOpen();
+      }
+    },
+    [application]
+  );
+
   return (
     <DrawerLayout
       ref={drawerRef}
       drawerWidth={getDefaultDrawerWidth(dimensions)}
       drawerPosition={'left'}
       drawerType="slide"
+      onDrawerStateChanged={handleDrawerStateChange}
       renderNavigationView={() =>
         !isLocked && <MainSideMenu drawerRef={drawerRef.current} />
       }
@@ -160,6 +186,7 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
       <DrawerLayout
         ref={noteDrawerRef}
         drawerWidth={getDefaultDrawerWidth(dimensions)}
+        onDrawerStateChanged={handleDrawerStateChange}
         drawerPosition={'right'}
         drawerType="slide"
         drawerLockMode="locked-closed"
@@ -171,8 +198,6 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
           screenOptions={() => ({
             headerStyle: {
               backgroundColor: theme.stylekitContrastBackgroundColor,
-              borderBottomColor: theme.stylekitContrastBorderColor,
-              borderBottomWidth: 1,
             },
             headerTintColor: theme.stylekitInfoColor,
             headerTitle: ({ children }) => {
@@ -263,13 +288,17 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
   );
 };
 
-const MainStackComponent = () => {
+const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
   const application = useContext(ApplicationContext);
+  const theme = useContext(ThemeContext);
 
   return (
     <MainStack.Navigator
       screenOptions={{
         gestureEnabled: false,
+        headerStyle: {
+          backgroundColor: theme.stylekitContrastBackgroundColor,
+        },
       }}
       mode="modal"
       initialRouteName="AppStack"
@@ -304,7 +333,8 @@ const MainStackComponent = () => {
             </HeaderButtons>
           ),
           headerRight: () =>
-            __DEV__ && (
+            env === 'dev' ||
+            (__DEV__ && (
               <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
                 <Item
                   testID="headerButton"
@@ -316,9 +346,34 @@ const MainStackComponent = () => {
                   }}
                 />
               </HeaderButtons>
-            ),
+            )),
         })}
         component={Settings}
+      />
+      <MainStack.Screen
+        name={SCREEN_MANAGE_PRIVILEGES}
+        options={() => ({
+          title: 'Privileges',
+          headerTitle: ({ children }) => {
+            return <HeaderTitleView title={children || ''} />;
+          },
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Done' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : StyleKit.nameForIcon(ICON_CHECKMARK)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
+        })}
+        component={ManagePrivileges}
       />
       <MainStack.Screen
         name={SCREEN_INPUT_MODAL_PASSCODE}
@@ -394,49 +449,69 @@ const AppComponent: React.FC<{
   application: MobileApplication;
   env: 'prod' | 'dev';
 }> = ({ application, env }) => {
-  const [ready, setReady] = useState(false);
-  const styleKit = useRef<StyleKit | undefined>(undefined);
+  const styleKit = useRef<StyleKit>();
+  const [activeTheme, setActiveTheme] = useState<StyleKitTheme | undefined>();
+
+  const setStyleKitRef = useCallback((node: StyleKit | undefined) => {
+    if (node) {
+      node.addThemeChangeObserver(() => {
+        setActiveTheme(node.theme);
+      });
+    }
+
+    // Save a reference to the node
+    styleKit.current = node;
+  }, []);
 
   useEffect(() => {
+    let styleKitInstance: StyleKit;
     const loadApplication = async () => {
+      styleKitInstance = new StyleKit(application);
+      await styleKitInstance.init();
+      setStyleKitRef(styleKitInstance);
+      setActiveTheme(styleKitInstance.theme);
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
           application!.promptForChallenge(challenge);
         },
       });
-      if (env === 'dev') {
-        await application?.setHost(
-          'https://syncing-server-dev.standardnotes.org/'
-        );
-      } else {
-        await application?.setHost('https://sync.standardnotes.org');
-      }
-      styleKit.current = new StyleKit(application);
-      await styleKit.current.initialize();
-      setReady(true);
+      await application?.launch();
     };
-    setReady(false);
-    loadApplication();
-  }, [application, env]);
 
-  if (!ready || !styleKit.current) {
+    loadApplication();
+
+    return () => {
+      styleKitInstance?.deinit();
+      setStyleKitRef(undefined);
+    };
+  }, [application, env, setStyleKitRef]);
+
+  if (!styleKit.current || !activeTheme) {
     return null;
   }
 
   return (
     <NavigationContainer
+      theme={{
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          background: activeTheme.stylekitBackgroundColor,
+          border: activeTheme.stylekitBorderColor,
+        },
+      }}
       onReady={() => {
-        application?.launch(false);
+        // application?.launch(false);
       }}
       ref={navigationRef}
     >
       <StatusBar translucent />
       {styleKit.current && (
         <>
-          <ThemeProvider theme={styleKit.current.theme!}>
+          <ThemeProvider theme={activeTheme}>
             <ActionSheetProvider>
               <StyleKitContext.Provider value={styleKit.current}>
-                <MainStackComponent />
+                <MainStackComponent env={env} />
               </StyleKitContext.Provider>
             </ActionSheetProvider>
           </ThemeProvider>

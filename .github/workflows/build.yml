@@ -3,7 +3,7 @@ name: Build Development
 on:
   push:
     branches:
-      - 004
+      - develop
 
 jobs:
   android:
@@ -28,6 +28,7 @@ jobs:
         uses: maierj/fastlane-action@v1.4.0
         env:
           BUILD_NUMBER: ${{ github.run_number }}
+          BUGSNAG_APIKEY: ${{ secrets.BUGSNAG_APIKEY }}
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.DEV_ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.DEV_ANDROID_KEYSTORE_PASSWORD }}
@@ -63,9 +64,10 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         with:
           lane: 'ios setup'
-      - name: Build & deploy development build
+      - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
+          APPLE_APP_ID: ${{ secrets.DEV_APP_APPLE_ID }}
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}

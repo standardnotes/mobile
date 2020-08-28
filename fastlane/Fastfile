@@ -34,7 +34,7 @@ platform :ios do
     sign_ios
     build_ios(scheme)
     upload_to_testflight(
-      apple_id: ENV["FASTLANE_USER"],
+      apple_id: ENV["APPLE_APP_ID"],
       skip_waiting_for_build_processing: true,
     )
     # refresh_dsyms
@@ -107,6 +107,10 @@ platform :android do
       apk_output_path: "android/app/build/outputs/apk/#{variant}/release/app-#{variant}-release.apk",
       verbose: true,
     )
+    # code here runs in the parent directory
+    Dir.chdir("..") do
+      sh("yarn bugsnag-sourcemaps upload --api-key=#{ENV['BUGSNAG_APIKEY']} --app-version=#{versionCode} --minifiedFile=android/app/build/generated/assets/react/#{variant}/release/index.android.bundle --source-map=android/app/build/generated/sourcemaps/react/#{variant}/release/index.android.bundle.map --minified-url=index.android.bundle --upload-sources")
+    end
   end
 
   desc "Deploy dev app"

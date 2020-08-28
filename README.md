@@ -16,20 +16,20 @@ This is a React Native implementation of Standard Notes. React Native allows us 
 
 ### Building from source
 
-1. Make sure you can run an example React Native project, setup your environment according to [official docs](https://reactnative.dev/docs/environment-setup)
-2. If you would like to build an Android app, you need to install Android NDK. We use a native code from libsodium encryption library to ensure we archieve the best performance. You can install NDK in Android Studio, you need to pick version listed [here](https://github.com/standardnotes/react-native-sodium/blob/refactor/android/build.gradle#L47)
-3. Install [yarn](https://yarnpkg.com/) if you don't have it already.
-3. Install project dependencies
+1. Setup your environment according to [official docs](https://reactnative.dev/docs/environment-setup) and be sure you can run an example React Native project.
+2. If you would like to build the Android app, you'll need to install the Android NDK. We use native code from the Libsodium encryption library to achieve high performance. You can install the NDK inside of Android Studio. You'll need to pick the version listed [here](https://github.com/standardnotes/react-native-sodium/blob/refactor/android/build.gradle#L47).
+3. Install [yarn](https://yarnpkg.com/) if you haven't already.
+4. Install project dependencies via:
 
-```shell
-yarn run init
-```
+  ```shell
+  yarn run init
+  ```
 
-We have to flavours of the app:
+We have two flavors of the app:
 * `dev` which runs connects to development syncing server. To run locally use `yarn ios-dev` or `yarn android-dev` for Android.
-* `prod` which is an equivalent of a regular production app. To run locall use `yarn ios-prod` or `yarn android-prod` for Android.
+* `prod` which is the equivalent of our production application. To run local use `yarn ios-prod` or `yarn android-prod` for Android.
 
-If you would like to run on your iOS device, you need to do it using Xcode.
+If you would like to run the application on your iOS device, you'll need to do so using Xcode.
 
 ## Contributing
 Before contributing, please read our [Longevity Statement](https://standardnotes.org/longevity) to better understand how we approach adding new features. Unlike other projects, adding new features is something we prefer *not* to do, so if you have a feature which you think is absolutely essential, please create a discussion issue first before coding.

@@ -52,6 +52,7 @@ export class MobileDeviceInterface extends DeviceInterface {
           console.log('Error getting item', key, e);
         }
       }
+      return results;
     } else {
       try {
         const items = await AsyncStorage.multiGet(keys);
@@ -90,7 +91,7 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
   openDatabase(): Promise<{ isNewDatabase?: boolean | undefined } | undefined> {
     // TODO: check if items do not have to be redownloaded in case of a failure
-    return Promise.resolve({ isNewDatabase: true });
+    return Promise.resolve({ isNewDatabase: false });
   }
 
   async getAllRawDatabasePayloads(): Promise<any[]> {
@@ -118,7 +119,7 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
   async removeAllRawDatabasePayloads(): Promise<void> {
     const keys = await this.getAllDatabaseKeys();
-    return AsyncStorage.multiRemove(keys.map(key => this.keyForPayloadId(key)));
+    return AsyncStorage.multiRemove(keys);
   }
   async getKeychainValue(): Promise<any> {
     const keys = await Keychain.getKeys();

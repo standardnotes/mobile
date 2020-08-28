@@ -7,6 +7,9 @@ import {
   NativeModules,
   Platform,
 } from 'react-native';
+import FlagSecure from 'react-native-flag-secure-android';
+import { enabled } from 'react-native-privacy-snapshot';
+import VersionInfo from 'react-native-version-info';
 import {
   ApplicationEvent,
   ApplicationService,
@@ -47,6 +50,7 @@ export enum AppStateType {
 export enum AppStateEventType {
   KeyboardChangeEvent = 1,
   TabletModeChange = 2,
+  DrawerOpen = 3,
 }
 
 export type TabletModeChangeData = {
@@ -57,6 +61,15 @@ export type TabletModeChangeData = {
 export enum UnlockTiming {
   Immediately = 'immediately',
   OnQuit = 'on-quit',
+}
+
+export enum PasscodeKeyboardType {
+  Default = 'default',
+  Numeric = 'numeric',
+}
+
+export enum MobileStorageKey {
+  PasscodeKeyboardTypeKey = 'passcodeKeyboardType',
 }
 
 type EventObserverCallback = (
@@ -125,6 +138,7 @@ export class ApplicationState extends ApplicationService {
 
   async onAppLaunch() {
     await this.getUnlockTiming();
+    this.setScreenshotPrivacy();
   }
 
   /**
@@ -180,6 +194,23 @@ export class ApplicationState extends ApplicationService {
   private async getUnlockTiming() {
     this.passcodeTiming = await this.getPasscodeTiming();
     this.biometricsTiming = await this.getBiometricsTiming();
+  }
+
+  public async setScreenshotPrivacy() {
+    const hasBiometrics = await this.application.hasBiometrics();
+    const hasPasscode = this.application.hasPasscode();
+    const hasImmediateLock =
+      (hasBiometrics && this.biometricsTiming === UnlockTiming.Immediately) ||
+      (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately);
+    if (Platform.OS === 'ios') {
+      enabled(hasImmediateLock);
+    } else {
+      if (hasImmediateLock) {
+        FlagSecure.activate();
+      } else {
+        FlagSecure.deactivate();
+      }
+    }
   }
 
   /**
@@ -391,12 +422,12 @@ export class ApplicationState extends ApplicationService {
     return this.tabletMode;
   }
 
-  setTabletModeEnabled(enabled: boolean) {
-    if (enabled !== this.tabletMode) {
-      this.tabletMode = enabled;
+  setTabletModeEnabled(enabledTabletMode: boolean) {
+    if (enabledTabletMode !== this.tabletMode) {
+      this.tabletMode = enabledTabletMode;
       this.notifyEventObservers(AppStateEventType.TabletModeChange, {
-        new_isInTabletMode: enabled,
-        old_isInTabletMode: !enabled,
+        new_isInTabletMode: enabledTabletMode,
+        old_isInTabletMode: !enabledTabletMode,
       });
     }
   }
@@ -431,6 +462,27 @@ export class ApplicationState extends ApplicationService {
     ];
   }
 
+  private async checkAndLockApplication() {
+    const isLocked = await this.application.isLocked();
+    if (!isLocked) {
+      const hasBiometrics = await this.application.hasBiometrics();
+      const hasPasscode = this.application.hasPasscode();
+      if (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately) {
+        await this.application.lock();
+      } else if (
+        hasBiometrics &&
+        this.biometricsTiming === UnlockTiming.Immediately
+      ) {
+        const challenge = new Challenge(
+          [ChallengeType.Biometric],
+          ChallengeReason.ApplicationUnlock
+        );
+        this.application.promptForCustomChallenge(challenge);
+        this.application.promptForChallenge(challenge);
+      }
+    }
+  }
+
   /**
    * handles App State change from React Native
    */
@@ -451,25 +503,8 @@ export class ApplicationState extends ApplicationService {
     const isLosingFocus = nextAppState === 'inactive';
     if (isEnteringBackground) {
       this.notifyOfStateChange(AppStateType.EnteringBackground);
-      const isLocked = await this.application.isLocked();
 
-      if (!isLocked) {
-        const hasBiometrics = await this.application.hasBiometrics();
-        const hasPasscode = this.application.hasPasscode();
-        if (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately) {
-          await this.application.lock();
-        } else if (
-          hasBiometrics &&
-          this.biometricsTiming === UnlockTiming.Immediately
-        ) {
-          const challenge = new Challenge(
-            [ChallengeType.Biometric],
-            ChallengeReason.ApplicationUnlock
-          );
-          this.application.promptForCustomChallenge(challenge);
-          this.application.promptForChallenge(challenge);
-        }
-      }
+      this.checkAndLockApplication();
     }
 
     if (isResumingFromBackground || isResuming) {
@@ -489,6 +524,7 @@ export class ApplicationState extends ApplicationService {
       // notifications, causing the app to lock. If the user backgrouds the app during privilege authentication,
       // it will still be locked via the Backgrounding event.
       // TODO: check this
+      this.checkAndLockApplication();
     }
 
     /*
@@ -535,6 +571,7 @@ export class ApplicationState extends ApplicationService {
       StorageValueModes.Nonwrapped
     );
     this.passcodeTiming = timing;
+    this.setScreenshotPrivacy();
   }
 
   public async setBiometricsTiming(timing: UnlockTiming) {
@@ -544,6 +581,26 @@ export class ApplicationState extends ApplicationService {
       StorageValueModes.Nonwrapped
     );
     this.biometricsTiming = timing;
+    this.setScreenshotPrivacy();
+  }
+
+  public async getPasscodeKeyboardType(): Promise<PasscodeKeyboardType> {
+    return this.application.getValue(
+      MobileStorageKey.PasscodeKeyboardTypeKey,
+      StorageValueModes.Nonwrapped
+    );
+  }
+
+  public async setPasscodeKeyboardType(type: PasscodeKeyboardType) {
+    await this.application.setValue(
+      MobileStorageKey.PasscodeKeyboardTypeKey,
+      type,
+      StorageValueModes.Nonwrapped
+    );
+  }
+
+  public onDrawerOpen() {
+    this.notifyEventObservers(AppStateEventType.DrawerOpen);
   }
 
   /*
@@ -564,11 +621,8 @@ export class ApplicationState extends ApplicationService {
     return this.mostRecentState;
   }
 
-  setAuthenticationInProgress(inProgress: boolean) {
-    this.authenticationInProgress = inProgress;
-  }
-
-  isAuthenticationInProgress() {
-    return this.authenticationInProgress;
+  public getEnvironment() {
+    const bundleId = VersionInfo.bundleIdentifier();
+    return bundleId === 'com.standardnotes.dev' ? 'dev' : 'prod';
   }
 }

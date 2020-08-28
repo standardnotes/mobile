@@ -1,17 +1,21 @@
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { StyleKit } from '@Style/StyleKit';
 import { Platform } from 'react-native';
+import VersionInfo from 'react-native-version-info';
 import {
   Challenge,
   Environment,
   platformFromString,
   SNApplication,
+  SNComponentManager,
 } from 'snjs';
 import { AlertService } from './AlertService';
 import { ApplicationState } from './ApplicationState';
 import { BackupsService } from './BackupsService';
 import { ComponentGroup } from './componentGroup';
+import ComponentManager from './ComponentManager';
 import { EditorGroup } from './EditorGroup';
+import { InstallationService } from './InstallationService';
 import { MobileDeviceInterface } from './interface';
 import { navigate } from './NavigationService';
 import { PreferencesManager } from './PreferencesManager';
@@ -22,6 +26,7 @@ type MobileServices = {
   applicationState: ApplicationState;
   reviewService: ReviewService;
   backupsService: BackupsService;
+  installationService: InstallationService;
   themeService: StyleKit;
   prefsService: PreferencesManager;
 };
@@ -42,7 +47,17 @@ export class MobileApplication extends SNApplication {
       deviceInterface,
       new SNReactNativeCrypto(),
       new AlertService(),
-      namespace
+      namespace,
+      [
+        {
+          swap: SNComponentManager,
+          with: ComponentManager,
+        },
+      ],
+      undefined,
+      VersionInfo.bundleIdentifier?.includes('dev')
+        ? 'https://syncing-server-dev.standardnotes.org/'
+        : 'https://sync.standardnotes.org'
     );
     this.Uuid = Math.random().toString();
     this.onDeinit = onDeinit;
