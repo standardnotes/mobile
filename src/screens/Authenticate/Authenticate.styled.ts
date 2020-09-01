@@ -23,3 +23,7 @@ export const SectionContainer = styled.View<{ last: boolean }>`
 `;
 
 export const SourceContainer = styled.View``;
+
+export const SessionLengthContainer = styled.View`
+  margin-top: 10px;
+`;

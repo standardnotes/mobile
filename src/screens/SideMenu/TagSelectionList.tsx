@@ -69,7 +69,6 @@ export const TagSelectionList = (props: Props): JSX.Element => {
       {
         text: 'Rename',
         callback: () =>
-          // @ts-expect-error
           navigation.navigate(SCREEN_INPUT_MODAL_TAG, { tagUuid: tag.uuid }),
       },
       {

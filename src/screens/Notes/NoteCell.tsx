@@ -1,3 +1,4 @@
+import { useDeleteNoteWithPrivileges } from '@Lib/snjsHooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
   CustomActionSheetOption,
@@ -5,13 +6,7 @@ import {
 } from '@Style/useCustomActionSheet';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View } from 'react-native';
-import {
-  ButtonType,
-  CollectionSort,
-  isNullOrUndefined,
-  NoteMutator,
-  SNNote,
-} from 'snjs';
+import { CollectionSort, isNullOrUndefined, NoteMutator, SNNote } from 'snjs';
 import {
   Container,
   DateText,
@@ -58,6 +53,19 @@ export const NoteCell = ({
   const elementRef = useRef<View>(null);
 
   const { showActionSheet } = useCustomActionSheet();
+
+  const [deleteNote] = useDeleteNoteWithPrivileges(
+    note,
+    async () => {
+      await application?.deleteItem(note);
+    },
+    () => {
+      changeNote(mutator => {
+        mutator.trashed = true;
+      });
+    },
+    undefined
+  );
 
   const highlight = Boolean(selected || highlighted);
 
@@ -171,24 +179,7 @@ export const NoteCell = ({
           text: 'Move to Trash',
           key: 'trash',
           destructive: true,
-          callback: async () => {
-            const title = 'Move to Trash';
-            const message =
-              'Are you sure you want to move this note to the trash?';
-
-            const confirmed = await application?.alertService?.confirm(
-              message,
-              title,
-              'Confirm',
-              ButtonType.Danger,
-              'Cancel'
-            );
-            if (confirmed) {
-              changeNote(mutator => {
-                mutator.trashed = true;
-              });
-            }
-          },
+          callback: async () => deleteNote(false),
         });
       } else {
         options = options.concat([
@@ -205,27 +196,7 @@ export const NoteCell = ({
             text: 'Delete Permanently',
             key: 'delete-forever',
             destructive: true,
-            callback: async () => {
-              const title = `Delete ${note.safeTitle()}`;
-              const message =
-                'Are you sure you want to permanently delete this nite}?';
-              if (note.locked) {
-                application?.alertService!.alert(
-                  "This note is locked. If you'd like to delete it, unlock it, and try again."
-                );
-                return;
-              }
-              const confirmed = await application?.alertService?.confirm(
-                message,
-                title,
-                'Delete',
-                ButtonType.Danger,
-                'Cancel'
-              );
-              if (confirmed) {
-                await application?.deleteItem(note);
-              }
-            },
+            callback: async () => deleteNote(true),
           },
         ]);
       }

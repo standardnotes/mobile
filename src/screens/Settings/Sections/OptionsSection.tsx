@@ -4,13 +4,18 @@ import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { useSignedIn } from '@Lib/snjsHooks';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_MANAGE_PRIVILEGES, SCREEN_SETTINGS } from '@Screens/screens';
+import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
+import {
+  SCREEN_AUTHENTICATE_PRIVILEGES,
+  SCREEN_MANAGE_PRIVILEGES,
+  SCREEN_SETTINGS,
+} from '@Screens/screens';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
-import { ButtonType } from 'snjs';
+import { ButtonType, ProtectedAction } from 'snjs';
 
 type Props = {
   title: string;
@@ -27,6 +32,8 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
 
   // State
   const [exporting, setExporting] = useState(false);
+  const [awaitingUnlock, setAwaitingUnlock] = useState(false);
+  const [encryptedBackup, setEncryptedBackp] = useState(false);
 
   const email = useMemo(() => {
     if (signedIn) {
@@ -59,6 +66,30 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     }
   };
 
+  const openPrivilegeModal = useCallback(
+    async (protectedAction: ProtectedAction) => {
+      setAwaitingUnlock(true);
+      const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
+        protectedAction
+      );
+      navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
+        action: protectedAction,
+        privilegeCredentials,
+        previousScreen: SCREEN_SETTINGS,
+      });
+    },
+    [application, navigation]
+  );
+
+  const exportData = useCallback(
+    async (encrypted: boolean) => {
+      setExporting(true);
+      await application?.getBackupsService().export(encrypted);
+      setExporting(false);
+    },
+    [application]
+  );
+
   const onExportPress = useCallback(
     async (option: { key: string }) => {
       let encrypted = option.key === 'encrypted';
@@ -70,19 +101,80 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         );
         return;
       }
-
-      setExporting(true);
-
-      await application?.getBackupsService().export(encrypted);
-
-      setExporting(false);
+      if (
+        await application?.privilegesService!.actionRequiresPrivilege(
+          ProtectedAction.ManageBackups
+        )
+      ) {
+        setEncryptedBackp(encrypted);
+        await openPrivilegeModal(ProtectedAction.ManageBackups);
+      } else {
+        exportData(encrypted);
+      }
     },
-    [application, encryptionAvailable]
+    [
+      application?.alertService,
+      application?.privilegesService,
+      encryptionAvailable,
+      exportData,
+      openPrivilegeModal,
+    ]
   );
 
-  const openManagePrivileges = () => {
+  const openManagePrivileges = useCallback(() => {
     navigation.push(SCREEN_MANAGE_PRIVILEGES);
-  };
+  }, [navigation]);
+
+  const onManagePrivilegesPress = useCallback(async () => {
+    if (
+      await application?.privilegesService!.actionRequiresPrivilege(
+        ProtectedAction.ManagePrivileges
+      )
+    ) {
+      await openPrivilegeModal(ProtectedAction.ManagePrivileges);
+    } else {
+      openManagePrivileges();
+    }
+  }, [
+    application?.privilegesService,
+    openManagePrivileges,
+    openPrivilegeModal,
+  ]);
+
+  /*
+   * After screen is focused read if a requested privilage was unlocked
+   */
+  useFocusEffect(
+    useCallback(() => {
+      const readPrivilegesUnlockResponse = async () => {
+        if (application?.isLaunched() && awaitingUnlock) {
+          const result = await application?.getValue(PRIVILEGES_UNLOCK_PAYLOAD);
+          if (result && result.previousScreen === SCREEN_SETTINGS) {
+            setAwaitingUnlock(false);
+            if (result.unlockedAction === ProtectedAction.ManagePrivileges) {
+              openManagePrivileges();
+            } else if (
+              result.unlockedAction === ProtectedAction.ManageBackups
+            ) {
+              exportData(encryptedBackup);
+              setEncryptedBackp(false);
+            }
+            application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
+          } else {
+            setAwaitingUnlock(false);
+          }
+        }
+      };
+
+      readPrivilegesUnlockResponse();
+    }, [
+      application,
+      awaitingUnlock,
+      encryptedBackup,
+      exportData,
+      openManagePrivileges,
+    ])
+  );
 
   return (
     <TableSection>
@@ -92,7 +184,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         first={true}
         leftAligned={true}
         title={'Manage Privileges'}
-        onPress={openManagePrivileges}
+        onPress={onManagePrivilegesPress}
       />
 
       {signedIn && (

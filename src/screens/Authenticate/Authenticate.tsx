@@ -30,7 +30,7 @@ import {
 } from './Authenticate.styled';
 import {
   authenticationReducer,
-  ChallengeValueStateType,
+  AuthenticationValueStateType,
   findMatchingValueIndex,
   getLabelForStateAndType,
   getTitleForStateAndType,
@@ -65,7 +65,7 @@ export const Authenticate = ({
         type: challengeType,
       })),
       challengeValueStates: challenge.types.map(
-        () => ChallengeValueStateType.WaitingTurn
+        () => AuthenticationValueStateType.WaitingTurn
       ),
     },
     undefined
@@ -84,8 +84,8 @@ export const Authenticate = ({
       const state = challengeValueStates[index];
 
       if (
-        state === ChallengeValueStateType.Locked ||
-        state === ChallengeValueStateType.Success
+        state === AuthenticationValueStateType.Locked ||
+        state === AuthenticationValueStateType.Success
       ) {
         return;
       }
@@ -93,7 +93,7 @@ export const Authenticate = ({
       dispatch({
         type: 'setState',
         valueType: challengeValue.type,
-        state: ChallengeValueStateType.Pending,
+        state: AuthenticationValueStateType.Pending,
       });
 
       await application?.submitValuesForChallenge(challenge, [challengeValue]);
@@ -105,14 +105,14 @@ export const Authenticate = ({
     dispatch({
       type: 'setState',
       valueType: challengeValue.type,
-      state: ChallengeValueStateType.Locked,
+      state: AuthenticationValueStateType.Locked,
     });
 
     setTimeout(() => {
       dispatch({
         type: 'setState',
         valueType: challengeValue.type,
-        state: ChallengeValueStateType.WaitingTurn,
+        state: AuthenticationValueStateType.WaitingTurn,
       });
     }, 30 * 1000);
   }, []);
@@ -140,7 +140,7 @@ export const Authenticate = ({
         dispatch({
           type: 'setState',
           valueType: challengeValue.type,
-          state: ChallengeValueStateType.Fail,
+          state: AuthenticationValueStateType.Fail,
         });
         Alert.alert(
           'Unsuccessful',
@@ -180,7 +180,7 @@ export const Authenticate = ({
             dispatch({
               type: 'setState',
               valueType: challengeValue.type,
-              state: ChallengeValueStateType.Fail,
+              state: AuthenticationValueStateType.Fail,
             });
             Alert.alert(
               'Unsuccessful',
@@ -217,7 +217,7 @@ export const Authenticate = ({
           dispatch({
             type: 'setState',
             valueType: challengeValue.type,
-            state: ChallengeValueStateType.Fail,
+            state: AuthenticationValueStateType.Fail,
           });
         }
       }
@@ -234,7 +234,7 @@ export const Authenticate = ({
   const firstNotSuccessful = useMemo(
     () =>
       challengeValueStates.findIndex(
-        state => state !== ChallengeValueStateType.Success
+        state => state !== AuthenticationValueStateType.Success
       ),
     [challengeValueStates]
   );
@@ -283,7 +283,7 @@ export const Authenticate = ({
       dispatch({
         type: 'setState',
         valueType: challengeValue.type,
-        state: ChallengeValueStateType.WaitingInput,
+        state: AuthenticationValueStateType.WaitingInput,
       });
     },
     [application, authenticateBiometrics, challengeValues, firstNotSuccessful]
@@ -294,7 +294,7 @@ export const Authenticate = ({
       dispatch({
         type: 'setState',
         valueType: value.type,
-        state: ChallengeValueStateType.Success,
+        state: AuthenticationValueStateType.Success,
       });
       beginAuthenticatingForNextChallengeReason(value);
     },
@@ -305,7 +305,7 @@ export const Authenticate = ({
     dispatch({
       type: 'setState',
       valueType: value.type,
-      state: ChallengeValueStateType.Fail,
+      state: AuthenticationValueStateType.Fail,
     });
   };
   useEffect(() => {
@@ -340,7 +340,6 @@ export const Authenticate = ({
     let mounted = true;
     const setBiometricsAsync = async () => {
       if (challenge.reason !== ChallengeReason.Migration) {
-        console.log('ssadasfsdfsdfsdfsf');
         const hasBiometrics = await checkForBiometrics();
         if (mounted) {
           setSupportsBiometrics(hasBiometrics);
@@ -373,7 +372,7 @@ export const Authenticate = ({
       ChallengeType.Biometric
     );
     const state = challengeValueStates[index];
-    if (state === ChallengeValueStateType.Locked) {
+    if (state === AuthenticationValueStateType.Locked) {
       return;
     }
 
@@ -408,8 +407,8 @@ export const Authenticate = ({
     const state = challengeValueStates[index];
     if (
       challengeValue.type === ChallengeType.Biometric &&
-      (state === ChallengeValueStateType.Locked ||
-        state === ChallengeValueStateType.Fail)
+      (state === AuthenticationValueStateType.Locked ||
+        state === AuthenticationValueStateType.Fail)
     ) {
       beginAuthenticatingForNextChallengeReason();
       return;
@@ -447,7 +446,7 @@ export const Authenticate = ({
           tinted={active}
           buttonText={
             challengeValue.type === ChallengeType.LocalPasscode &&
-            state === ChallengeValueStateType.WaitingInput
+            state === AuthenticationValueStateType.WaitingInput
               ? 'Change Keyboard'
               : undefined
           }
@@ -512,7 +511,7 @@ export const Authenticate = ({
   const isPending = useMemo(
     () =>
       challengeValueStates.findIndex(
-        state => state === ChallengeValueStateType.Pending
+        state => state === AuthenticationValueStateType.Pending
       ) >= 0,
     [challengeValueStates]
   );

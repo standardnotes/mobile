@@ -6741,6 +6741,13 @@ react-navigation-header-buttons@^5.0.2:
     invariant ">=2"
     react-native-platform-touchable "^1.1.1"
 
+react-navigation-props-mapper@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/react-navigation-props-mapper/-/react-navigation-props-mapper-1.0.4.tgz#0c5026aeb51469f9cb9034e6dc9a4db3701e768c"
+  integrity sha512-uwGCzz6AYDHLEaCrACaTUrQD7e5YEUC6XFr0ooq2ZJ+tAkPQcHJqDtO3mw50FFs8KWwO37B+SBcgf9kKWyOwQQ==
+  dependencies:
+    hoist-non-react-statics "^3.3.0"
+
 react-refresh@^0.4.0:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.4.2.tgz#54a277a6caaac2803d88f1d6f13c1dcfbd81e334"

@@ -62,7 +62,8 @@ export const SideMenuHero: React.FC<Props> = props => {
       async event => {
         if (
           event === ApplicationEvent.Launched ||
-          event === ApplicationEvent.SignedIn
+          event === ApplicationEvent.SignedIn ||
+          event === ApplicationEvent.WillSync
         ) {
           setIsLocked(false);
         }

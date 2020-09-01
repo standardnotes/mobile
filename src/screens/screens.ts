@@ -1,4 +1,5 @@
 export const SCREEN_AUTHENTICATE = 'Authenticate';
+export const SCREEN_AUTHENTICATE_PRIVILEGES = 'AuthenticatePrivileges' as 'AuthenticatePrivileges';
 
 export const SCREEN_HOME = 'Home';
 export const SCREEN_NOTES = 'Notes' as 'Notes';
