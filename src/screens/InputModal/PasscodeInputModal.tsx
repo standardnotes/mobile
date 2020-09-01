@@ -129,6 +129,7 @@ export const PasscodeInputModal = (props: Props) => {
 
         <SectionedOptionsTableCell
           title={'Keyboard Type'}
+          leftAligned
           options={keyboardOptions}
           onPress={onKeyboardTypeSelect}
         />

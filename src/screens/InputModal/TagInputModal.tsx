@@ -1,6 +1,7 @@
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
+import { useFocusEffect } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
@@ -35,6 +36,14 @@ export const TagInputModal = (props: Props) => {
       setText(tag.title);
     }
   }, [application, props.route.params.tagUuid]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setTimeout(() => {
+        textRef.current?.focus();
+      }, 1);
+    }, [])
+  );
 
   const onSubmit = useCallback(async () => {
     if (props.route.params.tagUuid) {
@@ -86,7 +95,6 @@ export const TagInputModal = (props: Props) => {
             autoCorrect={false}
             autoCapitalize={'none'}
             keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
-            autoFocus
             underlineColorAndroid={'transparent'}
             onSubmitEditing={onSubmit}
           />

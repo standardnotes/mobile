@@ -309,7 +309,7 @@ export const useDeleteNoteWithPrivileges = (
 
   const deleteNotePermanently = useCallback(async () => {
     const title = `Delete ${note!.safeTitle()}`;
-    const message = 'Are you sure you want to permanently delete this nite}?';
+    const message = 'Are you sure you want to permanently delete this note?';
     if (editor?.isTemplateNote) {
       application?.alertService!.alert(
         'This note is a placeholder and cannot be deleted. To remove from your list, simply navigate to a different note.'
