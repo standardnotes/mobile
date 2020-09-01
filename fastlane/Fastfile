@@ -41,9 +41,8 @@ platform :ios do
     )
     upload_to_testflight(
       apple_id: ENV["APPLE_APP_ID"],
-      # skip_waiting_for_build_processing: true,
     )
-    # refresh_dsyms
+    refresh_dsyms
   end
 
   desc "Deploy dev app"
@@ -73,9 +72,13 @@ platform :ios do
   end
 
   lane :refresh_dsyms do
-    download_dsyms(version: ENV["PACKAGE_VERSION"])     # Download dSYM files from iTC
-    upload_symbols_to_bugsnag              # Upload them to Bugsnag
-    clean_build_artifacts                  # Delete the local dSYM files
+    download_dsyms(
+      wait_for_dsym_processing: true,
+      wait_timeout: 900,
+      version: ENV["PACKAGE_VERSION"],
+      build_number: ENV["BUILD_NUMBER"]
+    ) # Download dSYM files from iTC
+    upload_symbols_to_bugsnag   # Upload them to Bugsnag
   end
 
 end
