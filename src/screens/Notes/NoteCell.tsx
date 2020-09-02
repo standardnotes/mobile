@@ -240,7 +240,7 @@ export const NoteCell = ({
           </NoteText>
         )}
 
-        {!hideDates && (
+        {!note.errorDecrypting && !hideDates && (
           <DateText numberOfLines={1} selected={highlight}>
             {sortType === CollectionSort.UpdatedAt
               ? 'Modified ' + note.updatedAtString

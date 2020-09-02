@@ -15,3 +15,4 @@ export const ICON_SHARE = 'share';
 export const ICON_TRASH = 'trash';
 export const ICON_USER = 'person-circle';
 export const ICON_FORWARD = 'arrow-forward';
+export const ICON_HISTORY = 'time';

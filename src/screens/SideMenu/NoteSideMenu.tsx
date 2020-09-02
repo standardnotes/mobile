@@ -3,11 +3,16 @@ import { useDeleteNoteWithPrivileges } from '@Lib/snjsHooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
+import {
+  SCREEN_COMPOSE,
+  SCREEN_INPUT_MODAL_TAG,
+  SCREEN_NOTE_HISTORY,
+} from '@Screens/screens';
 import {
   ICON_ARCHIVE,
   ICON_BOOKMARK,
   ICON_FINGER_PRINT,
+  ICON_HISTORY,
   ICON_LOCK,
   ICON_MEDICAL,
   ICON_PRICE_TAG,
@@ -455,6 +460,11 @@ export const NoteSideMenu = (props: Props) => {
         mutator.protected = !note.protected;
       });
 
+    const openSessionHistory = () => {
+      props.drawerRef?.closeDrawer();
+      navigation.push(SCREEN_NOTE_HISTORY, { noteUuid: note.uuid });
+    };
+
     const shareNote = () => {
       if (note) {
         application?.getAppState().performActionWithoutStateChangeImpact(() => {
@@ -471,6 +481,11 @@ export const NoteSideMenu = (props: Props) => {
       { text: archiveOption, onSelect: archiveEvent, icon: ICON_ARCHIVE },
       { text: lockOption, onSelect: lockEvent, icon: ICON_LOCK },
       { text: protectOption, onSelect: protectEvent, icon: ICON_FINGER_PRINT },
+      {
+        text: 'Show History',
+        onSelect: openSessionHistory,
+        icon: ICON_HISTORY,
+      },
       { text: 'Share', onSelect: shareNote, icon: ICON_SHARE },
     ];
 

@@ -25,6 +25,7 @@ import { AuthenticatePrivileges } from '@Screens/Authenticate/AuthenticatePrivil
 import { Compose } from '@Screens/Compose/Compose';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
+import { NoteHistory } from '@Screens/NoteHistory/NoteHistory';
 import { Root } from '@Screens/Root';
 import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
 import { Settings } from '@Screens/Settings/Settings';
@@ -33,7 +34,7 @@ import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
 import { ICON_CHECKMARK, ICON_CLOSE, ICON_MENU } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import { StyleKitTheme } from '@Style/Themes/styled-components';
-import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
+import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDrawerWidth';
 import React, {
   useCallback,
   useContext,
@@ -63,6 +64,7 @@ import {
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_MANAGE_PRIVILEGES,
   SCREEN_NOTES,
+  SCREEN_NOTE_HISTORY,
   SCREEN_SETTINGS,
 } from './screens/screens';
 
@@ -75,6 +77,9 @@ type HeaderTitleParams = {
 type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
   [SCREEN_COMPOSE]: HeaderTitleParams | undefined;
+  [SCREEN_NOTE_HISTORY]:
+    | (HeaderTitleParams & { noteUuid: string })
+    | (undefined & { noteUuid: string });
 };
 
 type ModalStackNavigatorParamList = {
@@ -293,6 +298,22 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
                 ),
             })}
             component={Compose}
+          />
+          <AppStack.Screen
+            name={SCREEN_NOTE_HISTORY}
+            options={({ route }) => ({
+              title: 'Note history',
+              headerTitle: ({ children }) => {
+                return (
+                  <HeaderTitleView
+                    title={route.params?.title ?? (children || '')}
+                    subtitle={route.params?.subTitle}
+                    subtitleColor={route.params?.subTitleColor}
+                  />
+                );
+              },
+            })}
+            component={NoteHistory}
           />
         </AppStack.Navigator>
       </DrawerLayout>
