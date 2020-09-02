@@ -23,10 +23,13 @@ import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { ChallengeReason, ChallengeType, ChallengeValue } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
+  BaseView,
   Container,
   Input,
   SectionContainer,
   SourceContainer,
+  StyledSectionedTableCell,
+  Subtitle,
 } from './Authenticate.styled';
 import {
   authenticationReducer,
@@ -38,6 +41,11 @@ import {
 } from './helpers';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_AUTHENTICATE>;
+
+export const STRING_ENTER_PASSCODE_FOR_MIGRATION =
+  'Your application passcode is required to perform an upgrade of your local data storage structure.';
+export const STRING_AUTHENTICATION_REQUIRED =
+  'Authentication is required to unlock application.';
 
 export const Authenticate = ({
   route: {
@@ -517,12 +525,24 @@ export const Authenticate = ({
     [challengeValueStates]
   );
 
+  const textData = useMemo(
+    () =>
+      challenge.reason === ChallengeReason.Migration
+        ? STRING_ENTER_PASSCODE_FOR_MIGRATION
+        : STRING_AUTHENTICATION_REQUIRED,
+    [challenge.reason]
+  );
+
   return (
     <Container>
+      <StyledSectionedTableCell first>
+        <BaseView>
+          <Subtitle>{textData}</Subtitle>
+        </BaseView>
+      </StyledSectionedTableCell>
       {challengeValues.map((challengeValue, index) =>
         renderAuthenticationSource(challengeValue, index)
       )}
-
       <ButtonCell
         maxHeight={45}
         disabled={isPending}
