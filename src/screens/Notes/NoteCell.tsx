@@ -226,7 +226,7 @@ export const NoteCell = ({
 
         <NoteCellFlags note={note} highlight={highlight} />
 
-        {note.errorDecrypting && (
+        {note.errorDecrypting && !note.waitingForKey && (
           <NoteText selected={highlight} numberOfLines={2}>
             {'Please sign in to restore your decryption keys and notes.'}
           </NoteText>

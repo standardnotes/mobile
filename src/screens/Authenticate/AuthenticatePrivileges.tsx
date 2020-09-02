@@ -309,6 +309,7 @@ export const AuthenticatePrivileges = ({
     privilegeValue: PrivilegeLockValue,
     index: number
   ) => {
+    const first = index === 0;
     const last = index === privilegeValues.length - 1;
     const state = privilegeValueStates[index];
     const active = isInActiveState(state);
@@ -348,7 +349,7 @@ export const AuthenticatePrivileges = ({
         />
         {isInput && (
           <SectionContainer last={last}>
-            <SectionedTableCell textInputCell={true} first={true}>
+            <SectionedTableCell textInputCell={true} first={first}>
               <Input
                 key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={

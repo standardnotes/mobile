@@ -429,6 +429,7 @@ export const Authenticate = ({
     challengeValue: ChallengeValue,
     index: number
   ) => {
+    const first = index === 0;
     const last = index === challengeValues.length - 1;
     const state = challengeValueStates[index];
     const active = isInActiveState(state);
@@ -462,7 +463,7 @@ export const Authenticate = ({
         />
         {isInput && (
           <SectionContainer last={last}>
-            <SectionedTableCell textInputCell={true} first={true}>
+            <SectionedTableCell textInputCell={true} first={first}>
               <Input
                 key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={
@@ -496,7 +497,7 @@ export const Authenticate = ({
         {challengeValue.type === ChallengeType.Biometric && (
           <SectionContainer last={last}>
             <SectionedAccessoryTableCell
-              // first
+              first={first}
               dimmed={active}
               tinted={active}
               text={stateLabel}

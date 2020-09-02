@@ -536,9 +536,6 @@ const AppComponent: React.FC<{
           border: activeTheme.stylekitBorderColor,
         },
       }}
-      onReady={() => {
-        // application?.launch(false);
-      }}
       ref={navigationRef}
     >
       <StatusBar translucent />
