@@ -4,21 +4,16 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_NOTES } from '@Screens/screens';
-import { ICON_ADD } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
 import React, { useCallback, useContext, useRef, useState } from 'react';
-import FAB from 'react-native-fab';
 import {
   CollectionSort,
   ContentType,
   MobilePrefKey,
-  Platform,
   SNNote,
   SNSmartTag,
 } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
-import { StyledIcon } from './Notes.styled';
 import { notePassesFilter, NoteSortKey } from './utils';
 
 type Props = {
@@ -53,9 +48,6 @@ export const Notes: React.FC<Props> = props => {
   );
   const [hideDates, setHideDates] = useState<boolean>(() =>
     application!.getPrefsService().getValue(MobilePrefKey.NotesHideDate, false)
-  );
-  const [hideTags, setHideTags] = useState<boolean>(() =>
-    application!.getPrefsService().getValue(MobilePrefKey.NotesHideTags, false)
   );
   const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
     application!
@@ -195,9 +187,6 @@ export const Notes: React.FC<Props> = props => {
     const newHideDate = application!
       .getPrefsService()
       .getValue(MobilePrefKey.NotesHideDate, false);
-    const newHideTags = application!
-      .getPrefsService()
-      .getValue(MobilePrefKey.NotesHideTags, false);
 
     if (sortBy !== newSortBy) {
       setSortBy(newSortBy);
@@ -215,10 +204,6 @@ export const Notes: React.FC<Props> = props => {
       setHideDates(newHideDate);
       displayOptionsChanged = true;
     }
-    if (hideTags !== newHideTags) {
-      setHideTags(newHideTags);
-      displayOptionsChanged = true;
-    }
 
     if (displayOptionsChanged) {
       reloadNotesDisplayOptions(undefined, {
@@ -233,7 +218,6 @@ export const Notes: React.FC<Props> = props => {
     sortReverse,
     hidePreviews,
     hideDates,
-    hideTags,
     reloadNotes,
     reloadNotesDisplayOptions,
   ]);
@@ -280,7 +264,6 @@ export const Notes: React.FC<Props> = props => {
 
   return (
     <>
-      {/* @ts-ignore TODO: fix notelist */}
       <NoteList
         onRefresh={onRefresh}
         hasRefreshControl={signedIn}
@@ -295,15 +278,13 @@ export const Notes: React.FC<Props> = props => {
         loading={loading}
         hidePreviews={hidePreviews}
         hideDates={hideDates}
-        hideTags={hideTags}
-        // selectedTags={this.state.tags}
         selectedNoteId={
           application?.getAppState().isInTabletMode
             ? null // selectedNoteId
             : null
         }
       />
-      <FAB
+      {/* <FAB
         // @ts-ignore style prop does not exist for types
         style={
           application?.getAppState().isInTabletMode
@@ -322,7 +303,7 @@ export const Notes: React.FC<Props> = props => {
             name={StyleKit.nameForIcon(ICON_ADD)}
           />
         }
-      />
+      /> */}
     </>
   );
 };

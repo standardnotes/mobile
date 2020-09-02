@@ -377,7 +377,6 @@ export class StyleKit {
           method: 'GET',
         });
         const data = await response.text();
-        // @ts-ignore TODO: check response type
         let variables = CSSParser.cssToObject(data);
 
         resolve(variables);

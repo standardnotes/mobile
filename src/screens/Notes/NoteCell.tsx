@@ -12,8 +12,6 @@ import {
   DateText,
   DeletedText,
   NoteText,
-  TagsContainter,
-  TagText,
   TitleText,
   TouchableContainer,
 } from './NoteCell.styled';
@@ -23,12 +21,9 @@ type Props = {
   note: SNNote;
   highlighted?: boolean;
   onPressItem: (itemUuid: SNNote['uuid']) => void;
-  renderTags: boolean;
   hideDates: boolean;
-  hideTags: boolean;
   hidePreviews: boolean;
   sortType: CollectionSort;
-  tagsString: string;
 };
 
 export const NoteCell = ({
@@ -36,9 +31,6 @@ export const NoteCell = ({
   onPressItem,
   highlighted,
   sortType,
-  tagsString,
-  // renderTags,
-  // hideTags,
   hideDates,
   hidePreviews,
 }: Props): JSX.Element => {
@@ -213,7 +205,7 @@ export const NoteCell = ({
   const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
   const hasPlainPreview =
     !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
-  const showTagsString = false; // renderTags && !hideTags && !note.protected;
+
   return (
     <TouchableContainer
       onPress={_onPress}
@@ -254,14 +246,6 @@ export const NoteCell = ({
               ? 'Modified ' + note.updatedAtString
               : note.createdAtString}
           </DateText>
-        )}
-
-        {showTagsString && (
-          <TagsContainter>
-            <TagText numberOfLines={1} selected={highlight}>
-              {tagsString}
-            </TagText>
-          </TagsContainter>
         )}
       </Container>
     </TouchableContainer>

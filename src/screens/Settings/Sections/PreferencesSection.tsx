@@ -28,9 +28,6 @@ export const PreferencesSection = () => {
       .getPrefsService()
       .getValue(MobilePrefKey.NotesHideNotePreview, false)
   );
-  const [hideTags, setHideTags] = useState<boolean>(() =>
-    application!.getPrefsService().getValue(MobilePrefKey.NotesHideTags, false)
-  );
 
   const sortOptions = useMemo(() => {
     return [
@@ -52,13 +49,6 @@ export const PreferencesSection = () => {
       ?.getPrefsService()
       .setUserPrefValue(MobilePrefKey.SortNotesBy, key, true);
     setSortBy(key);
-  };
-
-  const toggleNotesTagsHidden = () => {
-    application
-      ?.getPrefsService()
-      .setUserPrefValue(MobilePrefKey.NotesHideTags, !hideTags, true);
-    setHideTags(value => !value);
   };
   const toggleNotesPreviewHidden = () => {
     application
@@ -111,12 +101,6 @@ export const PreferencesSection = () => {
           text={'Hide note previews'}
           first
           selected={() => hidePreviews}
-        />
-
-        <SectionedAccessoryTableCell
-          onPress={toggleNotesTagsHidden}
-          text={'Hide note tags'}
-          selected={() => hideTags}
         />
 
         <SectionedAccessoryTableCell
