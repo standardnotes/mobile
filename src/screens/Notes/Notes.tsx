@@ -4,16 +4,21 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_NOTES } from '@Screens/screens';
+import { ICON_ADD } from '@Style/icons';
+import { StyleKit } from '@Style/StyleKit';
 import React, { useCallback, useContext, useRef, useState } from 'react';
+import FAB from 'react-native-fab';
 import {
   CollectionSort,
   ContentType,
   MobilePrefKey,
+  Platform,
   SNNote,
   SNSmartTag,
 } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
+import { StyledIcon } from './Notes.styled';
 import { notePassesFilter, NoteSortKey } from './utils';
 
 type Props = {
@@ -284,7 +289,7 @@ export const Notes: React.FC<Props> = props => {
             : null
         }
       />
-      {/* <FAB
+      <FAB
         // @ts-ignore style prop does not exist for types
         style={
           application?.getAppState().isInTabletMode
@@ -303,7 +308,7 @@ export const Notes: React.FC<Props> = props => {
             name={StyleKit.nameForIcon(ICON_ADD)}
           />
         }
-      /> */}
+      />
     </>
   );
 };
