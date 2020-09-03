@@ -3,9 +3,15 @@ import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
 import { useCustomActionSheet } from '@Style/useCustomActionSheet';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
-import { ContentType, SNSmartTag, SNTag } from 'snjs';
+import { CollectionSort, ContentType, SNSmartTag, SNTag } from 'snjs';
 import { SideMenuCell } from './SideMenuCell';
 import { EmptyPlaceholder } from './TagSelectionList.styled';
 
@@ -18,17 +24,20 @@ type Props = {
 };
 
 export const TagSelectionList = (props: Props): JSX.Element => {
+  // Context
   const application = useContext(ApplicationContext);
   const navigation = useNavigation<
     AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
   >();
-
   const { showActionSheet } = useCustomActionSheet();
+
+  // State
   const [tags, setTags] = useState<SNTag[] | SNSmartTag[]>(() =>
     props.contentType === ContentType.SmartTag
       ? application!.getSmartTags()
       : []
   );
+  const displayOptionsSet = useRef<boolean>(false);
 
   const reloadTags = useCallback(() => {
     if (props.contentType === ContentType.SmartTag) {
@@ -58,11 +67,21 @@ export const TagSelectionList = (props: Props): JSX.Element => {
       }),
     [application, props.contentType, reloadTags]
   );
+
   useEffect(() => {
+    if (!displayOptionsSet.current) {
+      application!.setDisplayOptions(
+        ContentType.Tag,
+        CollectionSort.Title,
+        'dsc'
+      );
+      displayOptionsSet.current = true;
+    }
+
     const removeStreamTags = streamTags();
 
     return removeStreamTags;
-  }, [streamTags]);
+  }, [application, streamTags]);
 
   const onTagLongPress = (tag: SNTag | SNSmartTag) => {
     showActionSheet(tag.title, [
