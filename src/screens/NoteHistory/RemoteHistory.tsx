@@ -110,6 +110,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, restoreNote }) => {
 
   if (
     fetchingRemoteHistory ||
+    !remoteHistoryList ||
     (remoteHistoryList && remoteHistoryList.length === 0)
   ) {
     const placeholderText = fetchingRemoteHistory

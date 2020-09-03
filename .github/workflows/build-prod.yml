@@ -1,7 +1,6 @@
 name: Build Production
 
-on:
-  release:
+on: [workflow_dispatch, release]
 
 jobs:
   android:

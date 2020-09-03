@@ -2,13 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>bugsnag</key>
-  <dict>
-    <key>apiKey</key>
-    <string>ba1cad5922ac743322c4051f0249e999</string>
-    <key>releaseStage</key>
-    <string>dev</string>
-  </dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -114,6 +107,13 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>bugsnag</key>
+	<dict>
+		<key>apiKey</key>
+		<string>ba1cad5922ac743322c4051f0249e999</string>
+		<key>releaseStage</key>
+		<string>dev</string>
+	</dict>
 	<key>supportsAlternateIcons</key>
 	<true/>
 </dict>

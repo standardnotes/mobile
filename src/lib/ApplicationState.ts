@@ -385,10 +385,7 @@ export class ApplicationState extends ApplicationService {
   }
 
   static get version() {
-    return Platform.select({
-      ios: pjson.version,
-      android: pjson.version,
-    });
+    return `${pjson['user-version']} (${VersionInfo.buildVersion})`;
   }
 
   get isTabletDevice() {
