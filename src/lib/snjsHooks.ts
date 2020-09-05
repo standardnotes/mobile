@@ -1,9 +1,15 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_NOTES } from '@Screens/screens';
+import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
+import {
+  SCREEN_AUTHENTICATE_PRIVILEGES,
+  SCREEN_COMPOSE,
+  SCREEN_NOTES,
+} from '@Screens/screens';
 import React, { useCallback, useEffect } from 'react';
-import { ApplicationEvent } from 'snjs';
+import { ApplicationEvent, ButtonType, ProtectedAction, SNNote } from 'snjs';
+import { Editor } from './Editor';
 
 export const useSignedIn = (
   signedInCallback?: () => void,
@@ -226,7 +232,9 @@ export const useSyncStatus = () => {
           setLoading(false);
           updateLocalDataStatus();
         } else if (eventName === ApplicationEvent.WillSync) {
-          setStatus('Syncing...');
+          if (!completedInitialSync) {
+            setStatus('Syncing...');
+          }
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
           setStatus();
           if (!completedInitialSync) {
@@ -266,4 +274,141 @@ export const useSyncStatus = () => {
     boolean,
     () => void
   ];
+};
+
+export const useDeleteNoteWithPrivileges = (
+  note: SNNote,
+  onDeleteCallback: () => void,
+  onTrashCallback: () => void,
+  editor?: Editor
+) => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
+  >();
+
+  // State
+  const [deleteAction, setDeleteAction] = React.useState<'trash' | 'delete'>();
+
+  const trashNote = useCallback(async () => {
+    const title = 'Move to Trash';
+    const message = 'Are you sure you want to move this note to the trash?';
+
+    const confirmed = await application?.alertService?.confirm(
+      message,
+      title,
+      'Confirm',
+      ButtonType.Danger,
+      'Cancel'
+    );
+    if (confirmed) {
+      onTrashCallback();
+    }
+  }, [application?.alertService, onTrashCallback]);
+
+  const deleteNotePermanently = useCallback(async () => {
+    const title = `Delete ${note!.safeTitle()}`;
+    const message = 'Are you sure you want to permanently delete this note?';
+    if (editor?.isTemplateNote) {
+      application?.alertService!.alert(
+        'This note is a placeholder and cannot be deleted. To remove from your list, simply navigate to a different note.'
+      );
+      return;
+    }
+    if (note!.locked) {
+      application?.alertService!.alert(
+        "This note is locked. If you'd like to delete it, unlock it, and try again."
+      );
+      return;
+    }
+    const confirmed = await application?.alertService?.confirm(
+      message,
+      title,
+      'Delete',
+      ButtonType.Danger,
+      'Cancel'
+    );
+    if (confirmed) {
+      onDeleteCallback();
+    }
+  }, [
+    application?.alertService,
+    editor?.isTemplateNote,
+    note,
+    onDeleteCallback,
+  ]);
+
+  const deleteNote = useCallback(
+    async (permanently: boolean) => {
+      if (
+        await application?.privilegesService!.actionRequiresPrivilege(
+          ProtectedAction.DeleteNote
+        )
+      ) {
+        const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
+          ProtectedAction.DeleteNote
+        );
+        const activeScreen = application!.getAppState().isInTabletMode
+          ? SCREEN_NOTES
+          : SCREEN_COMPOSE;
+        setDeleteAction(permanently ? 'delete' : 'trash');
+        navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
+          action: ProtectedAction.DeleteNote,
+          privilegeCredentials,
+          unlockedItemId: note.uuid,
+          previousScreen: activeScreen,
+        });
+      } else {
+        if (permanently) {
+          deleteNotePermanently();
+        } else {
+          trashNote();
+        }
+      }
+    },
+    [application, deleteNotePermanently, navigation, note?.uuid, trashNote]
+  );
+
+  /*
+   * After screen is focused read if a requested privilage was unlocked
+   */
+  useFocusEffect(
+    useCallback(() => {
+      const readPrivilegesUnlockResponse = async () => {
+        if (deleteAction && application?.isLaunched()) {
+          const activeScreen = application.getAppState().isInTabletMode
+            ? SCREEN_NOTES
+            : SCREEN_COMPOSE;
+          const result = await application?.getValue(PRIVILEGES_UNLOCK_PAYLOAD);
+          if (
+            result &&
+            result.previousScreen === activeScreen &&
+            result.unlockedAction === ProtectedAction.DeleteNote &&
+            result.unlockedItemId === note.uuid
+          ) {
+            setDeleteAction(undefined);
+            application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
+            if (deleteAction === 'trash') {
+              trashNote();
+            } else if (deleteAction === 'delete') {
+              deleteNotePermanently();
+            }
+          } else {
+            setDeleteAction(undefined);
+          }
+        }
+      };
+
+      readPrivilegesUnlockResponse();
+    }, [
+      application,
+      deleteAction,
+      deleteNotePermanently,
+      note?.uuid,
+      trashNote,
+    ])
+  );
+
+  return [deleteNote];
 };

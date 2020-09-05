@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
   },
 });
 
-export const Container = styled.SafeAreaView`
+export const Container = styled.View`
   background-color: ${props => props.theme.stylekitBackgroundColor};
   flex: 1;
 `;

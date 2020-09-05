@@ -54,9 +54,6 @@ export const Notes: React.FC<Props> = props => {
   const [hideDates, setHideDates] = useState<boolean>(() =>
     application!.getPrefsService().getValue(MobilePrefKey.NotesHideDate, false)
   );
-  const [hideTags, setHideTags] = useState<boolean>(() =>
-    application!.getPrefsService().getValue(MobilePrefKey.NotesHideTags, false)
-  );
   const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
     application!
       .getPrefsService()
@@ -195,9 +192,6 @@ export const Notes: React.FC<Props> = props => {
     const newHideDate = application!
       .getPrefsService()
       .getValue(MobilePrefKey.NotesHideDate, false);
-    const newHideTags = application!
-      .getPrefsService()
-      .getValue(MobilePrefKey.NotesHideTags, false);
 
     if (sortBy !== newSortBy) {
       setSortBy(newSortBy);
@@ -215,10 +209,6 @@ export const Notes: React.FC<Props> = props => {
       setHideDates(newHideDate);
       displayOptionsChanged = true;
     }
-    if (hideTags !== newHideTags) {
-      setHideTags(newHideTags);
-      displayOptionsChanged = true;
-    }
 
     if (displayOptionsChanged) {
       reloadNotesDisplayOptions(undefined, {
@@ -233,7 +223,6 @@ export const Notes: React.FC<Props> = props => {
     sortReverse,
     hidePreviews,
     hideDates,
-    hideTags,
     reloadNotes,
     reloadNotesDisplayOptions,
   ]);
@@ -280,7 +269,6 @@ export const Notes: React.FC<Props> = props => {
 
   return (
     <>
-      {/* @ts-ignore TODO: fix notelist */}
       <NoteList
         onRefresh={onRefresh}
         hasRefreshControl={signedIn}
@@ -295,8 +283,6 @@ export const Notes: React.FC<Props> = props => {
         loading={loading}
         hidePreviews={hidePreviews}
         hideDates={hideDates}
-        hideTags={hideTags}
-        // selectedTags={this.state.tags}
         selectedNoteId={
           application?.getAppState().isInTabletMode
             ? null // selectedNoteId

@@ -1,3 +1,4 @@
+import { useDeleteNoteWithPrivileges } from '@Lib/snjsHooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
   CustomActionSheetOption,
@@ -5,20 +6,12 @@ import {
 } from '@Style/useCustomActionSheet';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View } from 'react-native';
-import {
-  ButtonType,
-  CollectionSort,
-  isNullOrUndefined,
-  NoteMutator,
-  SNNote,
-} from 'snjs';
+import { CollectionSort, isNullOrUndefined, NoteMutator, SNNote } from 'snjs';
 import {
   Container,
   DateText,
   DeletedText,
   NoteText,
-  TagsContainter,
-  TagText,
   TitleText,
   TouchableContainer,
 } from './NoteCell.styled';
@@ -28,12 +21,9 @@ type Props = {
   note: SNNote;
   highlighted?: boolean;
   onPressItem: (itemUuid: SNNote['uuid']) => void;
-  renderTags: boolean;
   hideDates: boolean;
-  hideTags: boolean;
   hidePreviews: boolean;
   sortType: CollectionSort;
-  tagsString: string;
 };
 
 export const NoteCell = ({
@@ -41,9 +31,6 @@ export const NoteCell = ({
   onPressItem,
   highlighted,
   sortType,
-  tagsString,
-  // renderTags,
-  // hideTags,
   hideDates,
   hidePreviews,
 }: Props): JSX.Element => {
@@ -58,6 +45,19 @@ export const NoteCell = ({
   const elementRef = useRef<View>(null);
 
   const { showActionSheet } = useCustomActionSheet();
+
+  const [deleteNote] = useDeleteNoteWithPrivileges(
+    note,
+    async () => {
+      await application?.deleteItem(note);
+    },
+    () => {
+      changeNote(mutator => {
+        mutator.trashed = true;
+      });
+    },
+    undefined
+  );
 
   const highlight = Boolean(selected || highlighted);
 
@@ -171,24 +171,7 @@ export const NoteCell = ({
           text: 'Move to Trash',
           key: 'trash',
           destructive: true,
-          callback: async () => {
-            const title = 'Move to Trash';
-            const message =
-              'Are you sure you want to move this note to the trash?';
-
-            const confirmed = await application?.alertService?.confirm(
-              message,
-              title,
-              'Confirm',
-              ButtonType.Danger,
-              'Cancel'
-            );
-            if (confirmed) {
-              changeNote(mutator => {
-                mutator.trashed = true;
-              });
-            }
-          },
+          callback: async () => deleteNote(false),
         });
       } else {
         options = options.concat([
@@ -205,27 +188,7 @@ export const NoteCell = ({
             text: 'Delete Permanently',
             key: 'delete-forever',
             destructive: true,
-            callback: async () => {
-              const title = `Delete ${note.safeTitle()}`;
-              const message =
-                'Are you sure you want to permanently delete this nite}?';
-              if (note.locked) {
-                application?.alertService!.alert(
-                  "This note is locked. If you'd like to delete it, unlock it, and try again."
-                );
-                return;
-              }
-              const confirmed = await application?.alertService?.confirm(
-                message,
-                title,
-                'Delete',
-                ButtonType.Danger,
-                'Cancel'
-              );
-              if (confirmed) {
-                await application?.deleteItem(note);
-              }
-            },
+            callback: async () => deleteNote(true),
           },
         ]);
       }
@@ -242,7 +205,7 @@ export const NoteCell = ({
   const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
   const hasPlainPreview =
     !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
-  const showTagsString = false; // renderTags && !hideTags && !note.protected;
+
   return (
     <TouchableContainer
       onPress={_onPress}
@@ -255,7 +218,7 @@ export const NoteCell = ({
 
         <NoteCellFlags note={note} highlight={highlight} />
 
-        {note.errorDecrypting && (
+        {note.errorDecrypting && !note.waitingForKey && (
           <NoteText selected={highlight} numberOfLines={2}>
             {'Please sign in to restore your decryption keys and notes.'}
           </NoteText>
@@ -277,20 +240,12 @@ export const NoteCell = ({
           </NoteText>
         )}
 
-        {!hideDates && (
+        {!note.errorDecrypting && !hideDates && (
           <DateText numberOfLines={1} selected={highlight}>
             {sortType === CollectionSort.UpdatedAt
               ? 'Modified ' + note.updatedAtString
               : note.createdAtString}
           </DateText>
-        )}
-
-        {showTagsString && (
-          <TagsContainter>
-            <TagText numberOfLines={1} selected={highlight}>
-              {tagsString}
-            </TagText>
-          </TagsContainter>
         )}
       </Container>
     </TouchableContainer>

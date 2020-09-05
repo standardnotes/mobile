@@ -1,12 +1,18 @@
 import { Editor } from '@Lib/Editor';
+import { useDeleteNoteWithPrivileges } from '@Lib/snjsHooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
+import {
+  SCREEN_COMPOSE,
+  SCREEN_INPUT_MODAL_TAG,
+  SCREEN_NOTE_HISTORY,
+} from '@Screens/screens';
 import {
   ICON_ARCHIVE,
   ICON_BOOKMARK,
   ICON_FINGER_PRINT,
+  ICON_HISTORY,
   ICON_LOCK,
   ICON_MEDICAL,
   ICON_PRICE_TAG,
@@ -67,6 +73,23 @@ export const NoteSideMenu = (props: Props) => {
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
   const [components, setComponents] = useState<SNComponent[]>([]);
+
+  const [deleteNote] = useDeleteNoteWithPrivileges(
+    note!,
+    async () => {
+      await application?.deleteItem(note!);
+      props.drawerRef?.closeDrawer();
+      if (!application?.getAppState().isInTabletMode) {
+        navigation.popToTop();
+      }
+    },
+    () => {
+      changeNote(mutator => {
+        mutator.trashed = true;
+      });
+    },
+    editor
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -437,6 +460,11 @@ export const NoteSideMenu = (props: Props) => {
         mutator.protected = !note.protected;
       });
 
+    const openSessionHistory = () => {
+      props.drawerRef?.closeDrawer();
+      navigation.push(SCREEN_NOTE_HISTORY, { noteUuid: note.uuid });
+    };
+
     const shareNote = () => {
       if (note) {
         application?.getAppState().performActionWithoutStateChangeImpact(() => {
@@ -453,30 +481,18 @@ export const NoteSideMenu = (props: Props) => {
       { text: archiveOption, onSelect: archiveEvent, icon: ICON_ARCHIVE },
       { text: lockOption, onSelect: lockEvent, icon: ICON_LOCK },
       { text: protectOption, onSelect: protectEvent, icon: ICON_FINGER_PRINT },
+      {
+        text: 'Show History',
+        onSelect: openSessionHistory,
+        icon: ICON_HISTORY,
+      },
       { text: 'Share', onSelect: shareNote, icon: ICON_SHARE },
     ];
 
     if (!note.safeContent.trashed) {
       rawOptions.push({
         text: 'Move to Trash',
-        onSelect: async () => {
-          const title = 'Move to Trash';
-          const message =
-            'Are you sure you want to move this note to the trash?';
-
-          const confirmed = await application?.alertService?.confirm(
-            message,
-            title,
-            'Confirm',
-            ButtonType.Danger,
-            'Cancel'
-          );
-          if (confirmed) {
-            changeNote(mutator => {
-              mutator.trashed = true;
-            });
-          }
-        },
+        onSelect: async () => deleteNote(false),
         icon: ICON_TRASH,
       });
     }
@@ -507,37 +523,7 @@ export const NoteSideMenu = (props: Props) => {
           text: 'Delete Permanently',
           textClass: 'danger' as 'danger',
           key: 'delete-forever',
-          onSelect: async () => {
-            const title = `Delete ${note.safeTitle()}`;
-            const message =
-              'Are you sure you want to permanently delete this nite}?';
-            if (editor?.isTemplateNote) {
-              application?.alertService!.alert(
-                'This note is a placeholder and cannot be deleted. To remove from your list, simply navigate to a different note.'
-              );
-              return;
-            }
-            if (note.locked) {
-              application?.alertService!.alert(
-                "This note is locked. If you'd like to delete it, unlock it, and try again."
-              );
-              return;
-            }
-            const confirmed = await application?.alertService?.confirm(
-              message,
-              title,
-              'Delete',
-              ButtonType.Danger,
-              'Cancel'
-            );
-            if (confirmed) {
-              await application?.deleteItem(note);
-              props.drawerRef?.closeDrawer();
-              if (!application?.getAppState().isInTabletMode) {
-                navigation.popToTop();
-              }
-            }
-          },
+          onSelect: async () => deleteNote(true),
         },
         {
           text: 'Empty Trash',
@@ -570,7 +556,7 @@ export const NoteSideMenu = (props: Props) => {
     changeNote,
     leaveEditor,
     application,
-    editor?.isTemplateNote,
+    deleteNote,
     props.drawerRef,
     navigation,
   ]);
@@ -640,7 +626,6 @@ export const NoteSideMenu = (props: Props) => {
         buttonColor={theme.stylekitInfoColor}
         iconTextColor={theme.stylekitInfoContrastColor}
         onClickAction={() =>
-          // @ts-expect-error
           navigation.navigate(SCREEN_INPUT_MODAL_TAG, { noteUuid: note.uuid })
         }
         visible={true}

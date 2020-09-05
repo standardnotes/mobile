@@ -10,9 +10,14 @@ import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_INPUT_MODAL_PASSCODE, SCREEN_SETTINGS } from '@Screens/screens';
+import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
+import {
+  SCREEN_AUTHENTICATE_PRIVILEGES,
+  SCREEN_INPUT_MODAL_PASSCODE,
+  SCREEN_SETTINGS,
+} from '@Screens/screens';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { StorageEncryptionPolicies } from 'snjs';
+import { ProtectedAction, StorageEncryptionPolicies } from 'snjs';
 import { Title } from './PasscodeSection.styled';
 
 type Props = {
@@ -44,6 +49,7 @@ export const PasscodeSection = (props: Props) => {
     encryptionPolictChangeInProgress,
     setEncryptionPolictChangeInProgress,
   ] = useState(false);
+  const [lockedMethod, setLockedMethod] = useState<'passcode' | 'biometrics'>();
 
   useEffect(() => {
     let mounted = true;
@@ -128,26 +134,7 @@ export const PasscodeSection = (props: Props) => {
 
   const passcodeOnPress = async () => {
     if (props.hasPasscode) {
-      const hasAccount = Boolean(application?.hasAccount());
-      let message;
-      if (hasAccount) {
-        message =
-          'Are you sure you want to disable your local passcode? This will not affect your encryption status, as your data is currently being encrypted through your sync account keys.';
-      } else {
-        message =
-          'Are you sure you want to disable your local passcode? This will disable encryption on your data.';
-      }
-
-      const confirmed = await application?.alertService?.confirm(
-        message,
-        'Disable Passcode',
-        'Disable Passcode',
-        undefined
-      );
-      if (confirmed) {
-        await application?.removePasscode();
-        await application?.getAppState().setScreenshotPrivacy();
-      }
+      disableAuthentication('passcode');
     } else {
       navigation.push(SCREEN_INPUT_MODAL_PASSCODE);
     }
@@ -169,8 +156,7 @@ export const PasscodeSection = (props: Props) => {
 
   const onBiometricsPress = async () => {
     if (hasBiometrics) {
-      setHasBiometrics(false);
-      await application?.disableBiometrics();
+      disableAuthentication('biometrics');
     } else {
       setHasBiometrics(true);
       await application?.enableBiometrics();
@@ -178,6 +164,92 @@ export const PasscodeSection = (props: Props) => {
     }
     await application?.getAppState().setScreenshotPrivacy();
   };
+
+  const disableBiometrics = useCallback(async () => {
+    setHasBiometrics(false);
+    await application?.disableBiometrics();
+  }, [application]);
+
+  const disablePasscode = useCallback(async () => {
+    const hasAccount = Boolean(application?.hasAccount());
+    let message;
+    if (hasAccount) {
+      message =
+        'Are you sure you want to disable your local passcode? This will not affect your encryption status, as your data is currently being encrypted through your sync account keys.';
+    } else {
+      message =
+        'Are you sure you want to disable your local passcode? This will disable encryption on your data.';
+    }
+
+    const confirmed = await application?.alertService?.confirm(
+      message,
+      'Disable Passcode',
+      'Disable Passcode',
+      undefined
+    );
+    if (confirmed) {
+      await application?.removePasscode();
+      await application?.getAppState().setScreenshotPrivacy();
+    }
+  }, [application]);
+
+  const disableAuthentication = useCallback(
+    async (authenticationMethod: 'passcode' | 'biometrics') => {
+      if (
+        await application?.privilegesService!.actionRequiresPrivilege(
+          ProtectedAction.ManagePasscode
+        )
+      ) {
+        const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
+          ProtectedAction.ManagePasscode
+        );
+        setLockedMethod(authenticationMethod);
+        navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
+          action: ProtectedAction.ManagePasscode,
+          privilegeCredentials,
+          previousScreen: SCREEN_SETTINGS,
+        });
+      } else {
+        if (authenticationMethod === 'biometrics') {
+          disableBiometrics();
+        } else if (authenticationMethod === 'passcode') {
+          disablePasscode();
+        }
+      }
+    },
+    [application, disableBiometrics, disablePasscode, navigation]
+  );
+
+  /*
+   * After screen is focused read if a requested privilage was unlocked
+   */
+  useFocusEffect(
+    useCallback(() => {
+      const readPrivilegesUnlockResponse = async () => {
+        if (application?.isLaunched() && lockedMethod) {
+          const result = await application?.getValue(PRIVILEGES_UNLOCK_PAYLOAD);
+          if (
+            result &&
+            result.previousScreen === SCREEN_SETTINGS &&
+            result.unlockedAction === ProtectedAction.ManagePasscode
+          ) {
+            if (lockedMethod === 'biometrics') {
+              disableBiometrics();
+            } else if (lockedMethod === 'passcode') {
+              disablePasscode();
+            }
+            setLockedMethod(undefined);
+            application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
+            application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
+          } else {
+            setLockedMethod(undefined);
+          }
+        }
+      };
+
+      readPrivilegesUnlockResponse();
+    }, [application, disableBiometrics, disablePasscode, lockedMethod])
+  );
 
   let biometricTitle = hasBiometrics
     ? 'Disable Biometrics Lock'

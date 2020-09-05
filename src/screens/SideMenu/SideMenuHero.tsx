@@ -3,7 +3,7 @@ import { useOutOfSync, useSignedIn } from '@Lib/snjsHooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ViewProps } from 'react-native';
-import { ApplicationEvent, ContentType, StorageEncryptionPolicies } from 'snjs';
+import { ApplicationEvent, ContentType } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   Cell,
@@ -62,7 +62,8 @@ export const SideMenuHero: React.FC<Props> = props => {
       async event => {
         if (
           event === ApplicationEvent.Launched ||
-          event === ApplicationEvent.SignedIn
+          event === ApplicationEvent.SignedIn ||
+          event === ApplicationEvent.WillSync
         ) {
           setIsLocked(false);
         }
@@ -79,9 +80,7 @@ export const SideMenuHero: React.FC<Props> = props => {
   }, [application]);
 
   const textData = useMemo(() => {
-    const hasEncryption =
-      application?.getStorageEncryptionPolicy() ===
-      StorageEncryptionPolicies.Default; // TODO: check this
+    const hasEncryption = application?.isEncryptionAvailable();
     if (!signedIn) {
       return {
         title: 'Data Not Backed Up',

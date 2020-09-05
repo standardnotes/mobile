@@ -88,7 +88,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   ): Promise<string> {
     const result = await Sodium.crypto_pwhash(
       length,
-      Base64.encode(password),
+      password,
       this.hexToBase64(salt),
       iterations,
       bytes,
@@ -104,10 +104,10 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     assocData: string
   ): Promise<string> {
     return Sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-      Base64.encode(plaintext),
+      plaintext,
       this.hexToBase64(nonce),
       this.hexToBase64(key),
-      Base64.encode(assocData)
+      assocData
     );
   }
 
@@ -122,9 +122,9 @@ export class SNReactNativeCrypto implements SNPureCrypto {
         this.base64DecodeUrl(ciphertext),
         this.hexToBase64(nonce),
         this.hexToBase64(key),
-        Base64.encode(assocData)
+        assocData
       );
-      return Base64.decode(result);
+      return result;
     } catch (e) {
       return null;
     }

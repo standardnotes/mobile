@@ -4,16 +4,28 @@ import {
   TabletModeChangeData,
 } from '@Lib/ApplicationState';
 import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
+import { useFocusEffect } from '@react-navigation/native';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
+import {
+  SCREEN_AUTHENTICATE_PRIVILEGES,
+  SCREEN_COMPOSE,
+  SCREEN_NOTES,
+} from '@Screens/screens';
 import { StyleKit } from '@Style/StyleKit';
 import { hexToRGBA } from '@Style/utils';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { LayoutChangeEvent } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { SNNote } from 'snjs/';
+import { ProtectedAction, SNNote } from 'snjs/';
 import { ThemeContext } from 'styled-components/native';
+import { PRIVILEGES_UNLOCK_PAYLOAD } from './Authenticate/AuthenticatePrivileges';
 import { Compose } from './Compose/Compose';
 import { Notes } from './Notes/Notes';
 import {
@@ -45,6 +57,7 @@ export const Root = (props: Props): JSX.Element | null => {
   const [keyboardHeight, setKeyboardHeight] = useState<number | undefined>(
     undefined
   );
+  const [expectsUnlock, setExpectsUnlock] = useState(false);
 
   /**
    * Register observers
@@ -123,18 +136,75 @@ export const Root = (props: Props): JSX.Element | null => {
     setKeyboardHeight(application?.getAppState().getKeyboardHeight());
   };
 
-  const openCompose = (newNote: boolean) => {
-    if (!shouldSplitLayout) {
-      props.navigation.navigate(SCREEN_COMPOSE, {
-        title: newNote ? 'Compose' : 'Note',
-      });
+  const openCompose = useCallback(
+    (newNote: boolean) => {
+      if (!shouldSplitLayout) {
+        props.navigation.navigate(SCREEN_COMPOSE, {
+          title: newNote ? 'Compose' : 'Note',
+        });
+      }
+    },
+    [props.navigation, shouldSplitLayout]
+  );
+
+  const openNote = useCallback(
+    async (noteUuid: SNNote['uuid']) => {
+      await application!.getAppState().openEditor(noteUuid);
+      openCompose(false);
+    },
+    [application, openCompose]
+  );
+
+  const onNoteSelect = async (noteUuid: SNNote['uuid']) => {
+    const note = application?.findItem(noteUuid) as SNNote;
+    if (note) {
+      if (
+        note.safeContent.protected &&
+        (await application?.privilegesService!.actionRequiresPrivilege(
+          ProtectedAction.ViewProtectedNotes
+        ))
+      ) {
+        const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
+          ProtectedAction.ViewProtectedNotes
+        );
+        setExpectsUnlock(true);
+        props.navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
+          action: ProtectedAction.ViewProtectedNotes,
+          privilegeCredentials,
+          unlockedItemId: noteUuid,
+          previousScreen: SCREEN_NOTES,
+        });
+      } else {
+        openNote(noteUuid);
+      }
     }
   };
 
-  const onNoteSelect = async (noteUuid: SNNote['uuid']) => {
-    await application!.getAppState().openEditor(noteUuid);
-    openCompose(false);
-  };
+  /*
+   * After screen is focused read if a requested privilage was unlocked
+   */
+  useFocusEffect(
+    useCallback(() => {
+      const readPrivilegesUnlockResponse = async () => {
+        if (application?.isLaunched() && expectsUnlock) {
+          const result = await application?.getValue(PRIVILEGES_UNLOCK_PAYLOAD);
+          if (
+            result &&
+            result.previousScreen === SCREEN_NOTES &&
+            result.unlockedItemId
+          ) {
+            setExpectsUnlock(false);
+            application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
+            openNote(result.unlockedItemId);
+          } else {
+            setExpectsUnlock(false);
+          }
+        }
+      };
+
+      readPrivilegesUnlockResponse();
+    }, [application, expectsUnlock, openNote])
+  );
 
   const onNoteCreate = async () => {
     await application!.getAppState().createEditor();

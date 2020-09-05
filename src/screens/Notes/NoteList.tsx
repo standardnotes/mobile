@@ -16,9 +16,10 @@ import {
   Platform,
   RefreshControl,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IosSearchBar from 'react-native-search-bar';
 import AndroidSearchBar from 'react-native-search-box';
-import { CollectionSort, SNNote, SNTag } from 'snjs';
+import { CollectionSort, SNNote } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteCell } from './NoteCell';
 import {
@@ -35,11 +36,9 @@ type Props = {
   onSearchCancel: () => void;
   searchText: string;
   onPressItem: (noteUuid: SNNote['uuid']) => void;
-  selectedTags: SNTag[];
   selectedNoteId: string | null;
   sortType: CollectionSort;
   hideDates: boolean;
-  hideTags: boolean;
   hidePreviews: boolean;
   decrypting: boolean;
   loading: boolean;
@@ -55,6 +54,7 @@ export const NoteList = (props: Props): JSX.Element => {
   const application = useContext(ApplicationContext);
   const styleKit = useContext(StyleKitContext);
   const theme = useContext(ThemeContext);
+  const insets = useSafeAreaInsets();
 
   // State
   const [searchText, setSearchText] = useState(' ');
@@ -94,22 +94,12 @@ export const NoteList = (props: Props): JSX.Element => {
      * On Android, only one tag is selected at a time. If it is selected, we
      * don't need to display the tags string above the note cell.
      */
-    const selectedTags = props.selectedTags || [];
-    const renderTags = Platform.OS === 'ios' || selectedTags.length === 0;
-    // || !item.tags.includes(selectedTags[0]);
 
     return (
       <NoteCell
         note={item}
         onPressItem={props.onPressItem}
-        // @ts-ignore TODO: not used props for extra data
-        title={item.title}
-        text={item.text}
-        // tags={item.tags}
-        // tagsString={item.tagsString()}
         sortType={props.sortType}
-        renderTags={renderTags}
-        hideTags={props.hideTags}
         hideDates={props.hideDates}
         hidePreviews={props.hidePreviews}
         highlighted={item.uuid === props.selectedNoteId}
@@ -177,6 +167,7 @@ export const NoteList = (props: Props): JSX.Element => {
       <FlatList
         style={styles.list}
         keyExtractor={item => item.uuid}
+        contentContainerStyle={{ paddingBottom: insets.bottom }}
         initialNumToRender={6}
         windowSize={6}
         maxToRenderPerBatch={6}

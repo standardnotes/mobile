@@ -1,6 +1,5 @@
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -139,11 +138,11 @@ export const ManagePrivileges = () => {
         {sessionExpirey && !sessionExpired && (
           <Section>
             <SectionHeader title={'Current Session'} />
-            <SectionedTableCell first={true}>
+            <StyledSectionedTableCell first={true}>
               <CellText>
                 You will not be asked to authenticate until {sessionExpirey}.
               </CellText>
-            </SectionedTableCell>
+            </StyledSectionedTableCell>
             <ButtonCell
               last={true}
               leftAligned={true}

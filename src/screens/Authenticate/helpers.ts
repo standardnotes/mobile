@@ -1,4 +1,4 @@
-import { ChallengeType, ChallengeValue } from 'snjs';
+import { ChallengeType, ChallengeValue, PrivilegeCredential } from 'snjs';
 
 export const findMatchingValueIndex = (
   values: ChallengeValue[],
@@ -7,11 +7,18 @@ export const findMatchingValueIndex = (
   return values.findIndex(arrayValue => type === arrayValue.type);
 };
 
-export const isInActiveState = (state: ChallengeValueStateType) =>
-  state !== ChallengeValueStateType.WaitingInput &&
-  state !== ChallengeValueStateType.Success;
+export const findMatchingPrivilegeValueIndex = (
+  values: PrivilegeLockValue[],
+  type: PrivilegeCredential
+) => {
+  return values.findIndex(arrayValue => type === arrayValue.type);
+};
 
-export enum ChallengeValueStateType {
+export const isInActiveState = (state: AuthenticationValueStateType) =>
+  state !== AuthenticationValueStateType.WaitingInput &&
+  state !== AuthenticationValueStateType.Success;
+
+export enum AuthenticationValueStateType {
   WaitingTurn = 0,
   WaitingInput = 1,
   Success = 2,
@@ -22,18 +29,72 @@ export enum ChallengeValueStateType {
 
 type ChallengeValueState = {
   challengeValues: ChallengeValue[];
-  challengeValueStates: ChallengeValueStateType[];
+  challengeValueStates: AuthenticationValueStateType[];
 };
 type SetChallengeValueState = {
   type: 'setState';
   valueType: ChallengeValue['type'];
-  state: ChallengeValueStateType;
+  state: AuthenticationValueStateType;
 };
 type SetChallengeValue = {
   type: 'setValue';
   valueType: ChallengeValue['type'];
   value: ChallengeValue['value'];
 };
+
+export type PrivilegeLockValue = {
+  type: PrivilegeCredential;
+  value: string;
+};
+
+type SetPrivilegesValueState = {
+  type: 'setState';
+  valueType: PrivilegeLockValue['type'];
+  state: AuthenticationValueStateType;
+};
+type SetPrivilegesValue = {
+  type: 'setValue';
+  valueType: PrivilegeLockValue['type'];
+  value: PrivilegeLockValue['value'];
+};
+
+type PrivilegeValueState = {
+  privilegeValues: PrivilegeLockValue[];
+  privilegeValueStates: AuthenticationValueStateType[];
+};
+
+type PrivilegesAction = SetPrivilegesValueState | SetPrivilegesValue;
+export const privilegesAuthenticationReducer = (
+  state: PrivilegeValueState,
+  action: PrivilegesAction
+): PrivilegeValueState => {
+  switch (action.type) {
+    case 'setState': {
+      const tempArray = state.privilegeValueStates.slice();
+      const index = findMatchingPrivilegeValueIndex(
+        state.privilegeValues,
+        action.valueType
+      );
+      tempArray[index] = action.state;
+      return { ...state, privilegeValueStates: tempArray };
+    }
+    case 'setValue': {
+      const tempArray = state.privilegeValues.slice();
+      const index = findMatchingPrivilegeValueIndex(
+        state.privilegeValues,
+        action.valueType
+      );
+      tempArray[index] = {
+        type: state.privilegeValues[index].type,
+        value: action.value,
+      };
+      return { ...state, privilegeValues: tempArray };
+    }
+    default:
+      return state;
+  }
+};
+
 type Action = SetChallengeValueState | SetChallengeValue;
 export const authenticationReducer = (
   state: ChallengeValueState,
@@ -66,28 +127,63 @@ export const authenticationReducer = (
   }
 };
 
+const mapPrivilageCredentialToChallengeType = (
+  credential: PrivilegeCredential
+) => {
+  switch (credential) {
+    case PrivilegeCredential.AccountPassword:
+      return ChallengeType.AccountPassword;
+    case PrivilegeCredential.LocalPasscode:
+      return ChallengeType.LocalPasscode;
+  }
+};
+
+export const getTitleForPrivilegeLockStateAndType = (
+  privilegeValue: PrivilegeLockValue,
+  state: AuthenticationValueStateType
+) =>
+  getTitleForStateAndType(
+    {
+      ...privilegeValue,
+      type: mapPrivilageCredentialToChallengeType(privilegeValue.type),
+    },
+    state
+  );
+
+export const getLabelForPrivilegeLockStateAndType = (
+  privilegeValue: PrivilegeLockValue,
+  state: AuthenticationValueStateType
+) =>
+  getLabelForStateAndType(
+    {
+      ...privilegeValue,
+      type: mapPrivilageCredentialToChallengeType(privilegeValue.type),
+    },
+    state
+  );
+
 export const getTitleForStateAndType = (
   challengeValue: ChallengeValue,
-  state: ChallengeValueStateType
+  state: AuthenticationValueStateType
 ) => {
   switch (challengeValue.type) {
     case ChallengeType.AccountPassword: {
       const title = 'Account Password';
       switch (state) {
-        case ChallengeValueStateType.WaitingTurn:
+        case AuthenticationValueStateType.WaitingTurn:
           return title.concat(' ', '- Waiting.');
-        case ChallengeValueStateType.Locked:
+        case AuthenticationValueStateType.Locked:
           return title.concat(' ', '- Locked.');
         default:
           return title;
       }
     }
     case ChallengeType.LocalPasscode: {
-      const title = 'Local Password';
+      const title = 'Local Passcode';
       switch (state) {
-        case ChallengeValueStateType.WaitingTurn:
+        case AuthenticationValueStateType.WaitingTurn:
           return title.concat(' ', '- Waiting.');
-        case ChallengeValueStateType.Locked:
+        case AuthenticationValueStateType.Locked:
           return title.concat(' ', '- Locked.');
         default:
           return title;
@@ -96,9 +192,9 @@ export const getTitleForStateAndType = (
     case ChallengeType.Biometric: {
       const title = 'Biometrics';
       switch (state) {
-        case ChallengeValueStateType.WaitingTurn:
+        case AuthenticationValueStateType.WaitingTurn:
           return title.concat(' ', '- Waiting.');
-        case ChallengeValueStateType.Locked:
+        case AuthenticationValueStateType.Locked:
           return title.concat(' ', '- Locked.');
         default:
           return title;
@@ -109,19 +205,19 @@ export const getTitleForStateAndType = (
 
 export const getLabelForStateAndType = (
   challengeValue: ChallengeValue,
-  state: ChallengeValueStateType
+  state: AuthenticationValueStateType
 ) => {
   switch (challengeValue.type) {
     case ChallengeType.AccountPassword: {
       switch (state) {
-        case ChallengeValueStateType.WaitingTurn:
-        case ChallengeValueStateType.WaitingInput:
+        case AuthenticationValueStateType.WaitingTurn:
+        case AuthenticationValueStateType.WaitingInput:
           return 'Enter your account password';
-        case ChallengeValueStateType.Pending:
+        case AuthenticationValueStateType.Pending:
           return 'Verifying keys...';
-        case ChallengeValueStateType.Success:
+        case AuthenticationValueStateType.Success:
           return 'Success | Account Password';
-        case ChallengeValueStateType.Fail:
+        case AuthenticationValueStateType.Fail:
           return 'Invalid account password. Please try again.';
         default:
           return '';
@@ -129,31 +225,31 @@ export const getLabelForStateAndType = (
     }
     case ChallengeType.LocalPasscode: {
       switch (state) {
-        case ChallengeValueStateType.WaitingTurn:
-        case ChallengeValueStateType.WaitingInput:
+        case AuthenticationValueStateType.WaitingTurn:
+        case AuthenticationValueStateType.WaitingInput:
           return 'Enter your local passcode';
-        case ChallengeValueStateType.Pending:
+        case AuthenticationValueStateType.Pending:
           return 'Verifying keys...';
-        case ChallengeValueStateType.Success:
+        case AuthenticationValueStateType.Success:
           return 'Success | Local Passcode';
-        case ChallengeValueStateType.Fail:
-          return 'Invalid local password. Please try again.';
+        case AuthenticationValueStateType.Fail:
+          return 'Invalid local passcode. Please try again.';
         default:
           return '';
       }
     }
     case ChallengeType.Biometric: {
       switch (state) {
-        case ChallengeValueStateType.WaitingTurn:
-        case ChallengeValueStateType.WaitingInput:
+        case AuthenticationValueStateType.WaitingTurn:
+        case AuthenticationValueStateType.WaitingInput:
           return 'Please use biometrics to unlock.';
-        case ChallengeValueStateType.Pending:
+        case AuthenticationValueStateType.Pending:
           return 'Waiting for unlock.';
-        case ChallengeValueStateType.Success:
+        case AuthenticationValueStateType.Success:
           return 'Success | Biometrics.';
-        case ChallengeValueStateType.Fail:
+        case AuthenticationValueStateType.Fail:
           return 'Biometrics failed. Tap to try again.';
-        case ChallengeValueStateType.Locked:
+        case AuthenticationValueStateType.Locked:
           return 'Biometrics locked. Try again in 30 seconds.';
         default:
           return '';

@@ -1,7 +1,6 @@
 name: Build Production
 
-on:
-  release:
+on: [workflow_dispatch, release]
 
 jobs:
   android:
@@ -57,6 +56,8 @@ jobs:
         uses: webfactory/ssh-agent@v0.4.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Export Apple AppStore Connect API key
+        run: echo "${{ secrets.APPSTORE_CONNECT_KEY }}" > ios/Authkey.p8
       - name: Setup fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
@@ -69,14 +70,32 @@ jobs:
         uses: maierj/fastlane-action@v1.4.0
         env:
           APPLE_APP_ID: ${{ secrets.APP_APPLE_ID }}
+          APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+          APPSTORE_CONNECT_KEY_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ISSUER_ID }}
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           MATCH_CERTIFICATES_URL: ${{ secrets.MATCH_CERTIFICATES_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ github.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           BUILD_NUMBER: ${{ github.run_number }}
         with:
           lane: 'ios prod'
+      - name: Upload sourcemaps to bugsnag
+        run: |
+          yarn react-native bundle \
+            --platform ios \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output ios-release.bundle \
+            --sourcemap-output ios-release.bundle.map
+          curl --http1.1 https://upload.bugsnag.com/react-native-source-map \
+            -F apiKey="${{ secrets.BUGSNAG_APIKEY }}" \
+            -F appVersion="${{ env.PACKAGE_VERSION }}" \
+            -F appBundleVersion="${{ github.run_number }}" \
+            -F dev=false \
+            -F platform=ios \
+            -F sourceMap=@ios-release.bundle.map \
+            -F bundle=@ios-release.bundle \
+            -F projectRoot=`pwd`

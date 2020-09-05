@@ -11,6 +11,7 @@ import {
 import { navigationRef } from '@Lib/NavigationService';
 import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
 import {
+  CompositeNavigationProp,
   DefaultTheme,
   NavigationContainer,
   RouteProp,
@@ -20,9 +21,11 @@ import {
   StackNavigationProp,
 } from '@react-navigation/stack';
 import { Authenticate } from '@Screens/Authenticate/Authenticate';
+import { AuthenticatePrivileges } from '@Screens/Authenticate/AuthenticatePrivileges';
 import { Compose } from '@Screens/Compose/Compose';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
+import { NoteHistory } from '@Screens/NoteHistory/NoteHistory';
 import { Root } from '@Screens/Root';
 import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
 import { Settings } from '@Screens/Settings/Settings';
@@ -31,7 +34,7 @@ import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
 import { ICON_CHECKMARK, ICON_CLOSE, ICON_MENU } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import { StyleKitTheme } from '@Style/Themes/styled-components';
-import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDraerWidth';
+import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDrawerWidth';
 import React, {
   useCallback,
   useContext,
@@ -50,16 +53,18 @@ import DrawerLayout, {
   DrawerState,
 } from 'react-native-gesture-handler/DrawerLayout';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { Challenge } from 'snjs';
+import { Challenge, PrivilegeCredential, ProtectedAction } from 'snjs';
 import { ThemeContext, ThemeProvider } from 'styled-components/native';
 import { ApplicationContext } from './ApplicationContext';
 import {
   SCREEN_AUTHENTICATE,
+  SCREEN_AUTHENTICATE_PRIVILEGES,
   SCREEN_COMPOSE,
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_MANAGE_PRIVILEGES,
   SCREEN_NOTES,
+  SCREEN_NOTE_HISTORY,
   SCREEN_SETTINGS,
 } from './screens/screens';
 
@@ -72,6 +77,9 @@ type HeaderTitleParams = {
 type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
   [SCREEN_COMPOSE]: HeaderTitleParams | undefined;
+  [SCREEN_NOTE_HISTORY]:
+    | (HeaderTitleParams & { noteUuid: string })
+    | (undefined & { noteUuid: string });
 };
 
 type ModalStackNavigatorParamList = {
@@ -86,11 +94,20 @@ type ModalStackNavigatorParamList = {
   [SCREEN_AUTHENTICATE]: {
     challenge: Challenge;
   };
+  [SCREEN_AUTHENTICATE_PRIVILEGES]: {
+    action: ProtectedAction;
+    privilegeCredentials: PrivilegeCredential[];
+    previousScreen: string;
+    unlockedItemId?: string;
+  };
 };
 export type AppStackNavigationProp<
   T extends keyof AppStackNavigatorParamList
 > = {
-  navigation: StackNavigationProp<AppStackNavigatorParamList, T>;
+  navigation: CompositeNavigationProp<
+    ModalStackNavigationProp<'AppStack'>['navigation'],
+    StackNavigationProp<AppStackNavigatorParamList, T>
+  >;
   route: RouteProp<AppStackNavigatorParamList, T>;
 };
 export type ModalStackNavigationProp<
@@ -282,6 +299,22 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
             })}
             component={Compose}
           />
+          <AppStack.Screen
+            name={SCREEN_NOTE_HISTORY}
+            options={({ route }) => ({
+              title: 'Note history',
+              headerTitle: ({ children }) => {
+                return (
+                  <HeaderTitleView
+                    title={route.params?.title ?? (children || '')}
+                    subtitle={route.params?.subTitle}
+                    subtitleColor={route.params?.subTitleColor}
+                  />
+                );
+              },
+            })}
+            component={NoteHistory}
+          />
         </AppStack.Navigator>
       </DrawerLayout>
     </DrawerLayout>
@@ -333,8 +366,7 @@ const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
             </HeaderButtons>
           ),
           headerRight: () =>
-            env === 'dev' ||
-            (__DEV__ && (
+            (env === 'dev' || __DEV__) && (
               <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
                 <Item
                   testID="headerButton"
@@ -346,7 +378,7 @@ const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
                   }}
                 />
               </HeaderButtons>
-            )),
+            ),
         })}
         component={Settings}
       />
@@ -441,6 +473,31 @@ const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
         })}
         component={Authenticate}
       />
+      <MainStack.Screen
+        name={SCREEN_AUTHENTICATE_PRIVILEGES}
+        options={() => ({
+          title: 'Authenticate',
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Cancel' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : StyleKit.nameForIcon(ICON_CLOSE)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
+          headerTitle: ({ children }) => {
+            return <HeaderTitleView title={children || ''} />;
+          },
+        })}
+        component={AuthenticatePrivileges}
+      />
     </MainStack.Navigator>
   );
 };
@@ -499,9 +556,6 @@ const AppComponent: React.FC<{
           background: activeTheme.stylekitBackgroundColor,
           border: activeTheme.stylekitBorderColor,
         },
-      }}
-      onReady={() => {
-        // application?.launch(false);
       }}
       ref={navigationRef}
     >

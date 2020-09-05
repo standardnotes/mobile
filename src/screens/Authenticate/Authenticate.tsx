@@ -23,14 +23,17 @@ import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { ChallengeReason, ChallengeType, ChallengeValue } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
+  BaseView,
   Container,
   Input,
   SectionContainer,
   SourceContainer,
+  StyledSectionedTableCell,
+  Subtitle,
 } from './Authenticate.styled';
 import {
   authenticationReducer,
-  ChallengeValueStateType,
+  AuthenticationValueStateType,
   findMatchingValueIndex,
   getLabelForStateAndType,
   getTitleForStateAndType,
@@ -38,6 +41,11 @@ import {
 } from './helpers';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_AUTHENTICATE>;
+
+export const STRING_ENTER_PASSCODE_FOR_MIGRATION =
+  'Your application passcode is required to perform an upgrade of your local data storage structure.';
+export const STRING_AUTHENTICATION_REQUIRED =
+  'Authentication is required to unlock application.';
 
 export const Authenticate = ({
   route: {
@@ -65,7 +73,7 @@ export const Authenticate = ({
         type: challengeType,
       })),
       challengeValueStates: challenge.types.map(
-        () => ChallengeValueStateType.WaitingTurn
+        () => AuthenticationValueStateType.WaitingTurn
       ),
     },
     undefined
@@ -84,8 +92,8 @@ export const Authenticate = ({
       const state = challengeValueStates[index];
 
       if (
-        state === ChallengeValueStateType.Locked ||
-        state === ChallengeValueStateType.Success
+        state === AuthenticationValueStateType.Locked ||
+        state === AuthenticationValueStateType.Success
       ) {
         return;
       }
@@ -93,7 +101,7 @@ export const Authenticate = ({
       dispatch({
         type: 'setState',
         valueType: challengeValue.type,
-        state: ChallengeValueStateType.Pending,
+        state: AuthenticationValueStateType.Pending,
       });
 
       await application?.submitValuesForChallenge(challenge, [challengeValue]);
@@ -105,14 +113,14 @@ export const Authenticate = ({
     dispatch({
       type: 'setState',
       valueType: challengeValue.type,
-      state: ChallengeValueStateType.Locked,
+      state: AuthenticationValueStateType.Locked,
     });
 
     setTimeout(() => {
       dispatch({
         type: 'setState',
         valueType: challengeValue.type,
-        state: ChallengeValueStateType.WaitingTurn,
+        state: AuthenticationValueStateType.WaitingTurn,
       });
     }, 30 * 1000);
   }, []);
@@ -140,7 +148,7 @@ export const Authenticate = ({
         dispatch({
           type: 'setState',
           valueType: challengeValue.type,
-          state: ChallengeValueStateType.Fail,
+          state: AuthenticationValueStateType.Fail,
         });
         Alert.alert(
           'Unsuccessful',
@@ -180,7 +188,7 @@ export const Authenticate = ({
             dispatch({
               type: 'setState',
               valueType: challengeValue.type,
-              state: ChallengeValueStateType.Fail,
+              state: AuthenticationValueStateType.Fail,
             });
             Alert.alert(
               'Unsuccessful',
@@ -217,7 +225,7 @@ export const Authenticate = ({
           dispatch({
             type: 'setState',
             valueType: challengeValue.type,
-            state: ChallengeValueStateType.Fail,
+            state: AuthenticationValueStateType.Fail,
           });
         }
       }
@@ -234,7 +242,7 @@ export const Authenticate = ({
   const firstNotSuccessful = useMemo(
     () =>
       challengeValueStates.findIndex(
-        state => state !== ChallengeValueStateType.Success
+        state => state !== AuthenticationValueStateType.Success
       ),
     [challengeValueStates]
   );
@@ -283,7 +291,7 @@ export const Authenticate = ({
       dispatch({
         type: 'setState',
         valueType: challengeValue.type,
-        state: ChallengeValueStateType.WaitingInput,
+        state: AuthenticationValueStateType.WaitingInput,
       });
     },
     [application, authenticateBiometrics, challengeValues, firstNotSuccessful]
@@ -294,7 +302,7 @@ export const Authenticate = ({
       dispatch({
         type: 'setState',
         valueType: value.type,
-        state: ChallengeValueStateType.Success,
+        state: AuthenticationValueStateType.Success,
       });
       beginAuthenticatingForNextChallengeReason(value);
     },
@@ -305,7 +313,7 @@ export const Authenticate = ({
     dispatch({
       type: 'setState',
       valueType: value.type,
-      state: ChallengeValueStateType.Fail,
+      state: AuthenticationValueStateType.Fail,
     });
   };
   useEffect(() => {
@@ -340,7 +348,6 @@ export const Authenticate = ({
     let mounted = true;
     const setBiometricsAsync = async () => {
       if (challenge.reason !== ChallengeReason.Migration) {
-        console.log('ssadasfsdfsdfsdfsf');
         const hasBiometrics = await checkForBiometrics();
         if (mounted) {
           setSupportsBiometrics(hasBiometrics);
@@ -373,7 +380,7 @@ export const Authenticate = ({
       ChallengeType.Biometric
     );
     const state = challengeValueStates[index];
-    if (state === ChallengeValueStateType.Locked) {
+    if (state === AuthenticationValueStateType.Locked) {
       return;
     }
 
@@ -408,8 +415,8 @@ export const Authenticate = ({
     const state = challengeValueStates[index];
     if (
       challengeValue.type === ChallengeType.Biometric &&
-      (state === ChallengeValueStateType.Locked ||
-        state === ChallengeValueStateType.Fail)
+      (state === AuthenticationValueStateType.Locked ||
+        state === AuthenticationValueStateType.Fail)
     ) {
       beginAuthenticatingForNextChallengeReason();
       return;
@@ -430,6 +437,7 @@ export const Authenticate = ({
     challengeValue: ChallengeValue,
     index: number
   ) => {
+    const first = index === 0;
     const last = index === challengeValues.length - 1;
     const state = challengeValueStates[index];
     const active = isInActiveState(state);
@@ -447,7 +455,7 @@ export const Authenticate = ({
           tinted={active}
           buttonText={
             challengeValue.type === ChallengeType.LocalPasscode &&
-            state === ChallengeValueStateType.WaitingInput
+            state === AuthenticationValueStateType.WaitingInput
               ? 'Change Keyboard'
               : undefined
           }
@@ -463,7 +471,7 @@ export const Authenticate = ({
         />
         {isInput && (
           <SectionContainer last={last}>
-            <SectionedTableCell textInputCell={true} first={true}>
+            <SectionedTableCell textInputCell={true} first={first}>
               <Input
                 key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={
@@ -497,7 +505,7 @@ export const Authenticate = ({
         {challengeValue.type === ChallengeType.Biometric && (
           <SectionContainer last={last}>
             <SectionedAccessoryTableCell
-              // first
+              first={first}
               dimmed={active}
               tinted={active}
               text={stateLabel}
@@ -512,17 +520,29 @@ export const Authenticate = ({
   const isPending = useMemo(
     () =>
       challengeValueStates.findIndex(
-        state => state === ChallengeValueStateType.Pending
+        state => state === AuthenticationValueStateType.Pending
       ) >= 0,
     [challengeValueStates]
   );
 
+  const textData = useMemo(
+    () =>
+      challenge.reason === ChallengeReason.Migration
+        ? STRING_ENTER_PASSCODE_FOR_MIGRATION
+        : STRING_AUTHENTICATION_REQUIRED,
+    [challenge.reason]
+  );
+
   return (
     <Container>
+      <StyledSectionedTableCell first>
+        <BaseView>
+          <Subtitle>{textData}</Subtitle>
+        </BaseView>
+      </StyledSectionedTableCell>
       {challengeValues.map((challengeValue, index) =>
         renderAuthenticationSource(challengeValue, index)
       )}
-
       <ButtonCell
         maxHeight={45}
         disabled={isPending}

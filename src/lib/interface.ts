@@ -40,33 +40,65 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   private async getRawStorageKeyValues(keys: string[]) {
+    const results: { key: string; value: unknown }[] = [];
     if (Platform.OS === 'android') {
-      const results = [];
       for (const key of keys) {
         try {
           const item = await AsyncStorage.getItem(key);
           if (item) {
-            results.push(JSON.parse(item));
+            results.push({ key, value: item });
           }
         } catch (e) {
           console.log('Error getting item', key, e);
         }
       }
-      return results;
     } else {
       try {
-        const items = await AsyncStorage.multiGet(keys);
-        return items.map(item => {
+        for (const item of await AsyncStorage.multiGet(keys)) {
           if (item[1]) {
-            return JSON.parse(item[1]);
+            results.push({ key: item[0], value: item[1] });
           }
-        });
+        }
       } catch (e) {
-        console.log('Error getting items', keys, e);
+        console.log('Error getting items', e);
       }
     }
+    return results;
+  }
 
-    return [];
+  private async getDatabaseKeyValues(keys: string[]) {
+    const results: unknown[] = [];
+    if (Platform.OS === 'android') {
+      for (const key of keys) {
+        try {
+          const item = await AsyncStorage.getItem(key);
+          if (item) {
+            try {
+              results.push(JSON.parse(item));
+            } catch (e) {
+              results.push(item);
+            }
+          }
+        } catch (e) {
+          console.error('Error getting item', key, e);
+        }
+      }
+    } else {
+      try {
+        for (const item of await AsyncStorage.multiGet(keys)) {
+          if (item[1]) {
+            try {
+              results.push(JSON.parse(item[1]));
+            } catch (e) {
+              results.push(item[1]);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error getting items', e);
+      }
+    }
+    return results;
   }
 
   async getRawStorageValue(key: string) {
@@ -90,13 +122,12 @@ export class MobileDeviceInterface extends DeviceInterface {
     return AsyncStorage.clear();
   }
   openDatabase(): Promise<{ isNewDatabase?: boolean | undefined } | undefined> {
-    // TODO: check if items do not have to be redownloaded in case of a failure
     return Promise.resolve({ isNewDatabase: false });
   }
 
-  async getAllRawDatabasePayloads(): Promise<any[]> {
+  async getAllRawDatabasePayloads(): Promise<unknown[]> {
     const keys = await this.getAllDatabaseKeys();
-    return this.getRawStorageKeyValues(keys);
+    return this.getDatabaseKeyValues(keys);
   }
   saveRawDatabasePayload(payload: any): Promise<void> {
     return this.saveRawDatabasePayloads([payload]);
