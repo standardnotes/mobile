@@ -75,7 +75,7 @@ export class InstallationService extends ApplicationService {
     if (confirmed) {
       await this.application?.deviceInterface?.removeAllRawStorageValues();
       await this.application?.deviceInterface?.removeAllRawDatabasePayloads();
-      await this.application?.deviceInterface?.clearKeychainValue();
+      await this.application?.deviceInterface?.clearRawKeychainValue();
     } else {
       SNReactNative.exitApp();
     }
