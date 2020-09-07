@@ -39,15 +39,14 @@ export class MobileApplication extends SNApplication {
   public Uuid: string; // UI remounts when Uuid changes
 
   constructor(onDeinit: (app: MobileApplication) => void) {
-    const namespace = '';
-    const deviceInterface = new MobileDeviceInterface(namespace);
+    const deviceInterface = new MobileDeviceInterface();
     super(
       Environment.Mobile,
       platformFromString(Platform.OS),
       deviceInterface,
       new SNReactNativeCrypto(),
       new AlertService(),
-      namespace,
+      undefined,
       [
         {
           swap: SNComponentManager,

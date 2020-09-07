@@ -11,8 +11,8 @@ export type BiometricsType =
   | 'Touch ID';
 
 export class MobileDeviceInterface extends DeviceInterface {
-  constructor(namespace: string) {
-    super(namespace, setTimeout, setInterval);
+  constructor() {
+    super(setTimeout, setInterval);
   }
 
   deinit() {
@@ -20,8 +20,8 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   private getDatabaseKeyPrefix() {
-    if (this.namespace) {
-      return `${this.namespace}-Item-`;
+    if (this.namespace!.identifier) {
+      return `${this.namespace!.identifier}-Item-`;
     } else {
       return 'Item-';
     }
@@ -152,14 +152,33 @@ export class MobileDeviceInterface extends DeviceInterface {
     const keys = await this.getAllDatabaseKeys();
     return AsyncStorage.multiRemove(keys);
   }
-  getKeychainValue(): Promise<any> {
-    return Keychain.getKeys();
+
+  async getNamespacedKeychainValue() {
+    const keychain = await this.getRawKeychainValue();
+    if (!keychain) {
+      return;
+    }
+    return keychain[this.namespace!.identifier];
   }
-  setKeychainValue(value: any): Promise<void> {
-    return Keychain.setKeys(value);
+
+  async setNamespacedKeychainValue(value: any) {
+    let keychain = await this.getRawKeychainValue();
+    if (!keychain) {
+      keychain = {};
+    }
+    return Keychain.setKeys({
+      ...keychain,
+      [this.namespace!.identifier]: value,
+    });
   }
-  clearKeychainValue(): Promise<void> {
-    return Keychain.clearKeys();
+
+  async clearNamespacedKeychainValue() {
+    const keychain = await this.getRawKeychainValue();
+    if (!keychain) {
+      return;
+    }
+    delete keychain[this.namespace!.identifier];
+    return Keychain.setKeys(keychain);
   }
 
   async getDeviceBiometricsAvailability() {
@@ -180,6 +199,14 @@ export class MobileDeviceInterface extends DeviceInterface {
     } catch (e) {
       return false;
     }
+  }
+
+  getRawKeychainValue(): Promise<any> {
+    return Keychain.getKeys();
+  }
+
+  clearRawKeychainValue() {
+    return Keychain.clearKeys();
   }
 
   openUrl(url: string) {
