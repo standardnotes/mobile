@@ -1,6 +1,5 @@
 /* eslint-disable no-bitwise */
 import { decode as decodeBase64toArrayBuffer } from 'base64-arraybuffer';
-import { Base64 } from 'js-base64';
 import Aes from 'react-native-aes-crypto';
 import Sodium from 'react-native-sodium';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
@@ -36,7 +35,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   public async generateRandomKey(bits: number): Promise<string> {
     const bytes = bits / 8;
     const result = await Sodium.randombytes_buf(bytes);
-    return this.base64ToHex(result);
+    return result;
   }
 
   public async aes256CbcEncrypt(
@@ -89,12 +88,12 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     const result = await Sodium.crypto_pwhash(
       length,
       password,
-      this.hexToBase64(salt),
+      salt,
       iterations,
       bytes,
       Sodium.crypto_pwhash_ALG_DEFAULT
     );
-    return this.base64ToHex(result);
+    return result;
   }
 
   public async xchacha20Encrypt(
@@ -105,8 +104,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   ): Promise<string> {
     return Sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
       plaintext,
-      this.hexToBase64(nonce),
-      this.hexToBase64(key),
+      nonce,
+      key,
       assocData
     );
   }
@@ -119,9 +118,9 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   ): Promise<string | null> {
     try {
       const result = await Sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
-        this.base64DecodeUrl(ciphertext),
-        this.hexToBase64(nonce),
-        this.hexToBase64(key),
+        ciphertext,
+        nonce,
+        key,
         assocData
       );
       return result;
@@ -138,7 +137,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   }
 
   public async generateUUID() {
-    const randomBuf = await Sodium.randombytes_buf(16);
+    const randomBuf = await Sodium.randombytes_buf_b64(16);
     const buf = new Uint32Array(decodeBase64toArrayBuffer(randomBuf));
     let idx = -1;
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (
@@ -152,15 +151,11 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   }
 
   public async base64Encode(text: string) {
-    return new Promise<string>(resolve => {
-      resolve(Base64.encode(text));
-    });
+    return Sodium.to_base64(text, Sodium.base64_variant_ORIGINAL);
   }
 
   public async base64Decode(base64String: string) {
-    return new Promise<string>(resolve => {
-      resolve(Base64.decode(base64String));
-    });
+    return Sodium.from_base64(base64String, Sodium.base64_variant_ORIGINAL);
   }
 
   /**
@@ -179,35 +174,29 @@ export class SNReactNativeCrypto implements SNPureCrypto {
    * @param hexString - hex string
    * @returns A string key in base64 format
    */
-  hexToBase64(hexString: string) {
-    let base64 = '';
-    for (let i = 0; i < hexString.length; i++) {
-      base64 += !((i - 1) & 1)
-        ? String.fromCharCode(parseInt(hexString.substring(i - 1, i + 1), 16))
-        : '';
-    }
-    return Base64.btoa(base64);
-  }
+  // async hexToBase64(hexString: string) {
+  //   const rawString = await Sodium.sodium_hex2bin(hexString);
+  //   console.log();
+  //   return Sodium.sodium_bin2base64(
+  //     rawString,
+  //     Sodium.base64_variant_VARIANT_URLSAFE
+  //   );
+  // }
 
   /**
    * Converts hex string to base64 string
    * @param string - base64 string
    * @returns A string key in hex format
    */
-  base64ToHex(base64String: string) {
-    for (
-      var i = 0,
-        bin = Base64.atob(base64String.replace(/[ \r\n]+$/, '')),
-        hex = [];
-      i < bin.length;
-      ++i
-    ) {
-      let tmp = bin.charCodeAt(i).toString(16);
-      if (tmp.length === 1) {
-        tmp = '0' + tmp;
-      }
-      hex[hex.length] = tmp;
-    }
-    return hex.join('');
-  }
+  // async base64ToHex(base64String: string) {
+  //   console.log(base64String);
+  //   const rawString = await Sodium.sodium_base642bin(
+  //     base64String,
+  //     Sodium.base64_variant_VARIANT_URLSAFE
+  //   );
+  //   console.log('base64String', rawString);
+  //   const s = await Sodium.sodium_bin2hex(rawString);
+  //   console.log('res', s);
+  //   return s;
+  // }
 }

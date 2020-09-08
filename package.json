@@ -47,7 +47,7 @@
     "react-native-screens": "^2.10.1",
     "react-native-search-bar": "^3.5.1",
     "react-native-search-box": "standardnotes/react-native-search-box#f61a2b5",
-    "react-native-sodium": "standardnotes/react-native-sodium#5e69b2d",
+    "react-native-sodium": "standardnotes/react-native-sodium#e97cfd6",
     "react-native-store-review": "^0.1.5",
     "react-native-tab-view": "^2.15.1",
     "react-native-vector-icons": "^7.0.0",
