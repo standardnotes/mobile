@@ -1,5 +1,4 @@
 /* eslint-disable no-bitwise */
-import { decode as decodeBase64toArrayBuffer } from 'base64-arraybuffer';
 import Aes from 'react-native-aes-crypto';
 import Sodium from 'react-native-sodium';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
@@ -137,8 +136,14 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   }
 
   public async generateUUID() {
-    const randomBuf = await Sodium.randombytes_buf_b64(16);
-    const buf = new Uint32Array(decodeBase64toArrayBuffer(randomBuf));
+    const randomBuf = await Sodium.randombytes_buf(16);
+    const tempBuf = new Uint8Array(randomBuf.length / 2);
+
+    for (let i = 0; i < randomBuf.length; i += 2) {
+      tempBuf[i / 2] = parseInt(randomBuf.substring(i, i + 2), 16);
+    }
+
+    const buf = new Uint32Array(tempBuf.buffer);
     let idx = -1;
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (
       c

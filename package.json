@@ -26,7 +26,6 @@
     "@react-native-community/segmented-control": "^2.1.1",
     "@react-navigation/native": "^5.7.3",
     "@react-navigation/stack": "^5.9.0",
-    "base64-arraybuffer": "^0.2.0",
     "js-base64": "^3.4.5",
     "moment": "^2.27.0",
     "react": "16.11.0",
