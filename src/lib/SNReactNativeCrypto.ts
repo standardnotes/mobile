@@ -156,52 +156,16 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   }
 
   public async base64Encode(text: string) {
-    return Sodium.to_base64(text, Sodium.base64_variant_ORIGINAL);
+    return Sodium.to_base64(
+      text,
+      Sodium.base64_variant_VARIANT_ORIGINAL_NO_PADDING
+    );
   }
 
   public async base64Decode(base64String: string) {
-    return Sodium.from_base64(base64String, Sodium.base64_variant_ORIGINAL);
+    return Sodium.from_base64(
+      base64String,
+      Sodium.base64_variant_VARIANT_ORIGINAL_NO_PADDING
+    );
   }
-
-  /**
-   * Converts base64URL to regular base64
-   * @param str - base64URL or base64 string
-   * @returns A string key in base64 format
-   */
-  private base64DecodeUrl(str: string) {
-    return (str + '==='.slice((str.length + 3) % 4))
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-  }
-
-  /**
-   * Converts hex string to base64 string
-   * @param hexString - hex string
-   * @returns A string key in base64 format
-   */
-  // async hexToBase64(hexString: string) {
-  //   const rawString = await Sodium.sodium_hex2bin(hexString);
-  //   console.log();
-  //   return Sodium.sodium_bin2base64(
-  //     rawString,
-  //     Sodium.base64_variant_VARIANT_URLSAFE
-  //   );
-  // }
-
-  /**
-   * Converts hex string to base64 string
-   * @param string - base64 string
-   * @returns A string key in hex format
-   */
-  // async base64ToHex(base64String: string) {
-  //   console.log(base64String);
-  //   const rawString = await Sodium.sodium_base642bin(
-  //     base64String,
-  //     Sodium.base64_variant_VARIANT_URLSAFE
-  //   );
-  //   console.log('base64String', rawString);
-  //   const s = await Sodium.sodium_bin2hex(rawString);
-  //   console.log('res', s);
-  //   return s;
-  // }
 }

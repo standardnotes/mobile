@@ -46,7 +46,7 @@
     "react-native-screens": "^2.10.1",
     "react-native-search-bar": "^3.5.1",
     "react-native-search-box": "standardnotes/react-native-search-box#f61a2b5",
-    "react-native-sodium": "standardnotes/react-native-sodium#9855a42",
+    "react-native-sodium": "standardnotes/react-native-sodium#21d0739",
     "react-native-store-review": "^0.1.5",
     "react-native-tab-view": "^2.15.1",
     "react-native-vector-icons": "^7.0.0",
@@ -88,7 +88,7 @@
     "prettier-plugin-organize-imports": "^1.1.1",
     "react-test-renderer": "16.11.0",
     "replace-in-file": "^6.1.0",
-    "sncrypto": "standardnotes/sncrypto#7e76ab9",
+    "sncrypto": "standardnotes/sncrypto#49732d8",
     "typescript": "^3.9.2"
   },
   "resolutions": {
