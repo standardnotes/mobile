@@ -461,8 +461,10 @@ export const NoteSideMenu = (props: Props) => {
       });
 
     const openSessionHistory = () => {
-      props.drawerRef?.closeDrawer();
-      navigation.push(SCREEN_NOTE_HISTORY, { noteUuid: note.uuid });
+      if (!editor?.isTemplateNote) {
+        props.drawerRef?.closeDrawer();
+        navigation.push(SCREEN_NOTE_HISTORY, { noteUuid: note.uuid });
+      }
     };
 
     const shareNote = () => {
