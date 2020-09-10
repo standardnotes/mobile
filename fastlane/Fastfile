@@ -42,7 +42,7 @@ platform :ios do
     upload_to_testflight(
       apple_id: ENV["APPLE_APP_ID"],
     )
-    refresh_dsyms
+    # refresh_dsyms
   end
 
   desc "Deploy dev app"
