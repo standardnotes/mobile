@@ -26,7 +26,6 @@
     "@react-native-community/segmented-control": "^2.1.1",
     "@react-navigation/native": "^5.7.3",
     "@react-navigation/stack": "^5.9.0",
-    "base64-arraybuffer": "^0.2.0",
     "js-base64": "^3.4.5",
     "moment": "^2.27.0",
     "react": "16.11.0",
@@ -47,7 +46,7 @@
     "react-native-screens": "^2.10.1",
     "react-native-search-bar": "^3.5.1",
     "react-native-search-box": "standardnotes/react-native-search-box#f61a2b5",
-    "react-native-sodium": "standardnotes/react-native-sodium#5e69b2d",
+    "react-native-sodium": "standardnotes/react-native-sodium#f9e7501",
     "react-native-store-review": "^0.1.5",
     "react-native-tab-view": "^2.15.1",
     "react-native-vector-icons": "^7.0.0",
@@ -89,7 +88,7 @@
     "prettier-plugin-organize-imports": "^1.1.1",
     "react-test-renderer": "16.11.0",
     "replace-in-file": "^6.1.0",
-    "sncrypto": "standardnotes/sncrypto#7e76ab9",
+    "sncrypto": "standardnotes/sncrypto#8794c88",
     "typescript": "^3.9.2"
   },
   "resolutions": {

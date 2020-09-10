@@ -1,9 +1,12 @@
 /* eslint-disable no-bitwise */
-import { decode as decodeBase64toArrayBuffer } from 'base64-arraybuffer';
-import { Base64 } from 'js-base64';
 import Aes from 'react-native-aes-crypto';
 import Sodium from 'react-native-sodium';
-import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
+import {
+  Base64String,
+  HexString,
+  SNPureCrypto,
+  Utf8String,
+} from 'sncrypto/lib/common/pure_crypto';
 
 export class SNReactNativeCrypto implements SNPureCrypto {
   deinit(): void {}
@@ -24,9 +27,10 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
     return result === 0;
   }
-  public async pbkdf2(
-    password: string,
-    salt: string,
+
+  pbkdf2(
+    password: Utf8String,
+    salt: Utf8String,
     iterations: number,
     length: number
   ): Promise<string | null> {
@@ -36,26 +40,22 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   public async generateRandomKey(bits: number): Promise<string> {
     const bytes = bits / 8;
     const result = await Sodium.randombytes_buf(bytes);
-    return this.base64ToHex(result);
+    return result;
   }
 
-  public async aes256CbcEncrypt(
-    plaintext: string,
-    iv: string,
-    key: string
-  ): Promise<string | null> {
-    try {
-      return Aes.encrypt(plaintext, key, iv);
-    } catch (e) {
-      return null;
-    }
+  aes256CbcEncrypt(
+    plaintext: Utf8String,
+    iv: HexString,
+    key: HexString
+  ): Promise<Base64String> {
+    return Aes.encrypt(plaintext, key, iv);
   }
 
-  public async aes256CbcDecrypt(
-    ciphertext: string,
-    iv: string,
-    key: string
-  ): Promise<string | null> {
+  async aes256CbcDecrypt(
+    ciphertext: Base64String,
+    iv: HexString,
+    key: HexString
+  ): Promise<Utf8String | null> {
     try {
       return Aes.decrypt(ciphertext, key, iv);
     } catch (e) {
@@ -63,7 +63,10 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     }
   }
 
-  public async hmac256(message: string, key: string): Promise<string | null> {
+  async hmac256(
+    message: Utf8String,
+    key: HexString
+  ): Promise<HexString | null> {
     try {
       return Aes.hmac256(message, key);
     } catch (e) {
@@ -80,48 +83,47 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   }
 
   public async argon2(
-    password: string,
-    salt: string,
+    password: Utf8String,
+    salt: HexString,
     iterations: number,
     bytes: number,
     length: number
-  ): Promise<string> {
-    const result = await Sodium.crypto_pwhash(
+  ): Promise<HexString> {
+    return Sodium.crypto_pwhash(
       length,
       password,
-      this.hexToBase64(salt),
+      salt,
       iterations,
       bytes,
       Sodium.crypto_pwhash_ALG_DEFAULT
     );
-    return this.base64ToHex(result);
   }
 
-  public async xchacha20Encrypt(
-    plaintext: string,
-    nonce: string,
-    key: string,
-    assocData: string
-  ): Promise<string> {
+  xchacha20Encrypt(
+    plaintext: Utf8String,
+    nonce: HexString,
+    key: HexString,
+    assocData: Utf8String
+  ): Promise<Base64String> {
     return Sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
       plaintext,
-      this.hexToBase64(nonce),
-      this.hexToBase64(key),
+      nonce,
+      key,
       assocData
     );
   }
 
   public async xchacha20Decrypt(
-    ciphertext: string,
-    nonce: string,
-    key: string,
-    assocData: string
+    ciphertext: Base64String,
+    nonce: HexString,
+    key: HexString,
+    assocData: Utf8String
   ): Promise<string | null> {
     try {
       const result = await Sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
-        this.base64DecodeUrl(ciphertext),
-        this.hexToBase64(nonce),
-        this.hexToBase64(key),
+        ciphertext,
+        nonce,
+        key,
         assocData
       );
       return result;
@@ -139,7 +141,13 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
   public async generateUUID() {
     const randomBuf = await Sodium.randombytes_buf(16);
-    const buf = new Uint32Array(decodeBase64toArrayBuffer(randomBuf));
+    const tempBuf = new Uint8Array(randomBuf.length / 2);
+
+    for (let i = 0; i < randomBuf.length; i += 2) {
+      tempBuf[i / 2] = parseInt(randomBuf.substring(i, i + 2), 16);
+    }
+
+    const buf = new Uint32Array(tempBuf.buffer);
     let idx = -1;
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (
       c
@@ -151,63 +159,11 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     });
   }
 
-  public async base64Encode(text: string) {
-    return new Promise<string>(resolve => {
-      resolve(Base64.encode(text));
-    });
+  public async base64Encode(text: Utf8String): Promise<string> {
+    return Sodium.to_base64(text, Sodium.base64_variant_ORIGINAL);
   }
 
-  public async base64Decode(base64String: string) {
-    return new Promise<string>(resolve => {
-      resolve(Base64.decode(base64String));
-    });
-  }
-
-  /**
-   * Converts base64URL to regular base64
-   * @param str - base64URL or base64 string
-   * @returns A string key in base64 format
-   */
-  private base64DecodeUrl(str: string) {
-    return (str + '==='.slice((str.length + 3) % 4))
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-  }
-
-  /**
-   * Converts hex string to base64 string
-   * @param hexString - hex string
-   * @returns A string key in base64 format
-   */
-  hexToBase64(hexString: string) {
-    let base64 = '';
-    for (let i = 0; i < hexString.length; i++) {
-      base64 += !((i - 1) & 1)
-        ? String.fromCharCode(parseInt(hexString.substring(i - 1, i + 1), 16))
-        : '';
-    }
-    return Base64.btoa(base64);
-  }
-
-  /**
-   * Converts hex string to base64 string
-   * @param string - base64 string
-   * @returns A string key in hex format
-   */
-  base64ToHex(base64String: string) {
-    for (
-      var i = 0,
-        bin = Base64.atob(base64String.replace(/[ \r\n]+$/, '')),
-        hex = [];
-      i < bin.length;
-      ++i
-    ) {
-      let tmp = bin.charCodeAt(i).toString(16);
-      if (tmp.length === 1) {
-        tmp = '0' + tmp;
-      }
-      hex[hex.length] = tmp;
-    }
-    return hex.join('');
+  public async base64Decode(base64String: Base64String): Promise<string> {
+    return Sodium.from_base64(base64String, Sodium.base64_variant_ORIGINAL);
   }
 }
