@@ -135,8 +135,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   /**
    * Not implemented in SNReactNativeCrypto
    */
-  public generateUUIDSync() {
-    return '';
+  public generateUUIDSync(): never {
+    throw new Error('generateUUIDSync not implemented on mobile');
   }
 
   public async generateUUID() {

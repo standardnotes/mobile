@@ -23,8 +23,12 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   [self initializeFlipper:application];
+  
+  BugsnagConfiguration *config = [BugsnagConfiguration loadConfig];
+  config.enabledBreadcrumbTypes = BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeLog
+  | BSGEnabledBreadcrumbTypeUser | BSGEnabledBreadcrumbTypeState | BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeProcess;
 
-  [Bugsnag start];
+  [Bugsnag startWithConfiguration:config];
 
   [self configurePinning];
 

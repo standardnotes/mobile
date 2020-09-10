@@ -3,6 +3,9 @@ package com.standardnotes;
 import android.app.Application;
 import android.app.Activity;
 import android.content.Context;
+
+import com.bugsnag.android.BreadcrumbType;
+import com.bugsnag.android.Configuration;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
@@ -10,6 +13,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
 import java.util.List;
 
 import com.bugsnag.android.Bugsnag;
@@ -59,7 +63,18 @@ public class MainApplication extends Application implements ReactApplication {
 
     rebuildOkHtttp();
 
-    Bugsnag.start(this /* app context */);
+    Configuration config = Configuration.load(this);
+    config.setEnabledBreadcrumbTypes(new HashSet<BreadcrumbType>() {{
+      add(BreadcrumbType.NAVIGATION);
+      add(BreadcrumbType.STATE);
+      add(BreadcrumbType.PROCESS);
+      add(BreadcrumbType.MANUAL);
+      add(BreadcrumbType.USER);
+      add(BreadcrumbType.LOG);
+      add(BreadcrumbType.ERROR);
+    }});
+
+    Bugsnag.start(this, config);
 
     SoLoader.init(this, /* native exopackage */ false);
 

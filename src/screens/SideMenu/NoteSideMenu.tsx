@@ -557,10 +557,11 @@ export const NoteSideMenu = (props: Props) => {
     note,
     changeNote,
     leaveEditor,
-    application,
-    deleteNote,
+    editor?.isTemplateNote,
     props.drawerRef,
     navigation,
+    application,
+    deleteNote,
   ]);
 
   const onTagSelect = useCallback(
