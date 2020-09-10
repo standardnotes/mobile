@@ -82,13 +82,6 @@ export const PasscodeInputModal = (props: Props) => {
       .setPasscodeKeyboardType(option.key as PasscodeKeyboardType);
   };
 
-  const mapKeyboardTypeForOS = useMemo(() => {
-    if (keyboardType === 'numeric') {
-      return 'number-pad';
-    }
-    return keyboardType;
-  }, [keyboardType]);
-
   return (
     <Container>
       <TableSection>
@@ -102,7 +95,7 @@ export const PasscodeInputModal = (props: Props) => {
             secureTextEntry
             autoCorrect={false}
             autoCapitalize={'none'}
-            keyboardType={mapKeyboardTypeForOS}
+            keyboardType={keyboardType}
             keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
             autoFocus={true}
             underlineColorAndroid={'transparent'}
@@ -120,7 +113,7 @@ export const PasscodeInputModal = (props: Props) => {
             secureTextEntry
             autoCorrect={false}
             autoCapitalize={'none'}
-            keyboardType={mapKeyboardTypeForOS}
+            keyboardType={keyboardType}
             keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
             onSubmitEditing={onSubmit}
