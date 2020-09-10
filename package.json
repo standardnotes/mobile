@@ -46,7 +46,7 @@
     "react-native-screens": "^2.10.1",
     "react-native-search-bar": "^3.5.1",
     "react-native-search-box": "standardnotes/react-native-search-box#f61a2b5",
-    "react-native-sodium": "standardnotes/react-native-sodium#f9e7501",
+    "react-native-sodium": "standardnotes/react-native-sodium#bff558a",
     "react-native-store-review": "^0.1.5",
     "react-native-tab-view": "^2.15.1",
     "react-native-vector-icons": "^7.0.0",
@@ -54,7 +54,7 @@
     "react-native-webview": "^10.8.3",
     "react-navigation-header-buttons": "^5.0.2",
     "sn-textview": "standardnotes/sn-textview#f42f0bf",
-    "snjs": "standardnotes/snjs#1bc64dc",
+    "snjs": "standardnotes/snjs#cd53979",
     "standard-notes-rn": "standardnotes/standard-notes-rn",
     "styled-components": "^5.1.1"
   },
