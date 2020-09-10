@@ -99,7 +99,7 @@ export const AuthSection = (props: Props) => {
     }
     Keyboard.dismiss();
     const result = await application!.signIn(
-      email,
+      email.trim(),
       password,
       strictSignIn,
       undefined,
@@ -148,7 +148,7 @@ export const AuthSection = (props: Props) => {
     } else {
       Keyboard.dismiss();
       const result = await application!.register(
-        email,
+        email.trim(),
         password,
         undefined,
         true
