@@ -5,7 +5,6 @@ import {
   StorageValueModes,
 } from 'snjs';
 import SNReactNative from 'standard-notes-rn';
-import Keychain from './keychain';
 
 const FIRST_RUN_KEY = 'first_run';
 
@@ -47,8 +46,8 @@ export class InstallationService extends ApplicationService {
     const hasNormalKeys =
       this.application?.hasAccount() || this.application?.hasPasscode();
 
-    const rawKeychainKey = await Keychain.getKeys();
-    const hasKeychainValue = !isNullOrUndefined(rawKeychainKey);
+    const keychainKey = await this.application?.deviceInterface?.getNamespacedKeychainValue();
+    const hasKeychainValue = !isNullOrUndefined(keychainKey);
 
     let firstRunKey = await this.application?.getValue(
       FIRST_RUN_KEY,
