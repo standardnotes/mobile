@@ -108,7 +108,7 @@ export class MobileDeviceInterface extends DeviceInterface {
     }
   }
 
-  async getAllRawStorageKeyValues(): Promise<Record<string, any>[]> {
+  async getAllRawStorageKeyValues() {
     const keys = await AsyncStorage.getAllKeys();
     return this.getRawStorageKeyValues(keys);
   }
