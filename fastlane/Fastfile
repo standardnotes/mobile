@@ -1,4 +1,4 @@
-fastlane_version "2.152.0"
+fastlane_version "2.158.0"
 
 platform :ios do
   def sign_ios(type = 'appstore')
@@ -42,7 +42,7 @@ platform :ios do
     upload_to_testflight(
       apple_id: ENV["APPLE_APP_ID"],
     )
-    # refresh_dsyms
+    refresh_dsyms
   end
 
   desc "Deploy dev app"
