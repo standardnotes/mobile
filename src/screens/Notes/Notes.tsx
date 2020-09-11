@@ -14,7 +14,6 @@ import {
   MobilePrefKey,
   Platform,
   SNNote,
-  SNSmartTag,
 } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
@@ -101,24 +100,16 @@ export const Notes: React.FC<Props> = props => {
       }
     ) => {
       const tag = application!.getAppState().selectedTag!;
-      application!.setDisplayOptions(
-        ContentType.Note,
+      application!.setNotesDisplayOptions(
+        tag,
         sortOptions?.sortBy ?? (sortBy! as CollectionSort),
         sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
         (note: SNNote) => {
-          const matchesTag = tag.isSmartTag()
-            ? note.satisfiesPredicate((tag as SNSmartTag).predicate)
-            : tag.hasRelationshipWithItem(note);
-
-          return (
-            matchesTag &&
-            notePassesFilter(
-              note,
-              tag,
-              false,
-              false,
-              searchFilter?.toLowerCase() || searchText.toLowerCase()
-            )
+          return notePassesFilter(
+            note,
+            false,
+            false,
+            searchFilter?.toLowerCase() || searchText.toLowerCase()
           );
         }
       );

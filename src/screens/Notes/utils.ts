@@ -1,4 +1,4 @@
-import { SNNote, SNTag } from 'snjs';
+import { SNNote } from 'snjs';
 
 export enum NoteSortKey {
   CreatedAt = 'created_at',
@@ -13,21 +13,12 @@ export enum NoteSortKey {
 
 export function notePassesFilter(
   note: SNNote,
-  selectedTag: SNTag,
   showArchived: boolean,
   hidePinned: boolean,
   filterText: string
 ) {
   let canShowArchived = showArchived;
   const canShowPinned = !hidePinned;
-  if (!selectedTag.isTrashTag && note.trashed) {
-    return false;
-  }
-  const isSmartTag = selectedTag.isSmartTag();
-  if (isSmartTag) {
-    canShowArchived =
-      canShowArchived || selectedTag.isArchiveTag || selectedTag.isTrashTag;
-  }
   if ((note.archived && !canShowArchived) || (note.pinned && !canShowPinned)) {
     return false;
   }

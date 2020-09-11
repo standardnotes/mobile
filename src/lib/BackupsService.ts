@@ -27,7 +27,7 @@ export class BackupsService extends ApplicationService {
     const modifier = encrypted ? 'Encrypted' : 'Decrypted';
     const filename = `Standard Notes ${modifier} Backup - ${this._formattedDate()}.txt`;
     if (data) {
-      if (this.application!.platform === Platform.Ios) {
+      if (this.application?.platform === Platform.Ios) {
         return this._exportIOS(filename, jsonString);
       } else {
         return this._showAndroidEmailOrSaveOption().then(async result => {

@@ -2,7 +2,10 @@ import { Alert, AlertButton } from 'react-native';
 import { ButtonType, DismissBlockingDialog, SNAlertService } from 'snjs';
 
 export class AlertService implements SNAlertService {
-  blockingDialog(_text: string): DismissBlockingDialog {
+  blockingDialog(
+    _text: string,
+    _title?: string
+  ): DismissBlockingDialog | Promise<DismissBlockingDialog> {
     return () => {};
   }
   alert(text: string, title: string, closeButtonText?: string) {
