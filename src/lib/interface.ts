@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { Alert, Linking, Platform } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import { DeviceInterface } from 'snjs';
+import { ApplicationIdentifier, DeviceInterface } from 'snjs';
 import Keychain from './keychain';
 
 export type BiometricsType =
@@ -19,22 +19,22 @@ export class MobileDeviceInterface extends DeviceInterface {
     super.deinit();
   }
 
-  private getDatabaseKeyPrefix() {
-    if (this.namespace!.identifier) {
-      return `${this.namespace!.identifier}-Item-`;
+  private getDatabaseKeyPrefix(identifier: ApplicationIdentifier) {
+    if (identifier) {
+      return `${identifier}-Item-`;
     } else {
       return 'Item-';
     }
   }
 
-  private keyForPayloadId(id: string) {
-    return `${this.getDatabaseKeyPrefix()}${id}`;
+  private keyForPayloadId(id: string, identifier: ApplicationIdentifier) {
+    return `${this.getDatabaseKeyPrefix(identifier)}${id}`;
   }
 
-  private async getAllDatabaseKeys() {
+  private async getAllDatabaseKeys(identifier: ApplicationIdentifier) {
     const keys = await AsyncStorage.getAllKeys();
     const filtered = keys.filter(key => {
-      return key.includes(this.getDatabaseKeyPrefix());
+      return key.includes(this.getDatabaseKeyPrefix(identifier));
     });
     return filtered;
   }
@@ -125,59 +125,75 @@ export class MobileDeviceInterface extends DeviceInterface {
     return Promise.resolve({ isNewDatabase: false });
   }
 
-  async getAllRawDatabasePayloads(): Promise<unknown[]> {
-    const keys = await this.getAllDatabaseKeys();
+  async getAllRawDatabasePayloads(
+    identifier: ApplicationIdentifier
+  ): Promise<unknown[]> {
+    const keys = await this.getAllDatabaseKeys(identifier);
     return this.getDatabaseKeyValues(keys);
   }
-  saveRawDatabasePayload(payload: any): Promise<void> {
-    return this.saveRawDatabasePayloads([payload]);
+  saveRawDatabasePayload(
+    payload: any,
+    identifier: ApplicationIdentifier
+  ): Promise<void> {
+    return this.saveRawDatabasePayloads([payload], identifier);
   }
-  async saveRawDatabasePayloads(payloads: any[]): Promise<void> {
+  async saveRawDatabasePayloads(
+    payloads: any[],
+    identifier: ApplicationIdentifier
+  ): Promise<void> {
     if (payloads.length === 0) {
       return;
     }
     await Promise.all(
       payloads.map(item => {
         return AsyncStorage.setItem(
-          this.keyForPayloadId(item.uuid),
+          this.keyForPayloadId(item.uuid, identifier),
           JSON.stringify(item)
         );
       })
     );
   }
-  removeRawDatabasePayloadWithId(id: string): Promise<void> {
-    return this.removeRawStorageValue(this.keyForPayloadId(id));
+  removeRawDatabasePayloadWithId(
+    id: string,
+    identifier: ApplicationIdentifier
+  ): Promise<void> {
+    return this.removeRawStorageValue(this.keyForPayloadId(id, identifier));
   }
-  async removeAllRawDatabasePayloads(): Promise<void> {
-    const keys = await this.getAllDatabaseKeys();
+  async removeAllRawDatabasePayloads(
+    identifier: ApplicationIdentifier
+  ): Promise<void> {
+    const keys = await this.getAllDatabaseKeys(identifier);
     return AsyncStorage.multiRemove(keys);
   }
 
-  async getNamespacedKeychainValue() {
+  async getNamespacedKeychainValue(identifier: ApplicationIdentifier) {
     const keychain = await this.getRawKeychainValue();
     if (!keychain) {
       return;
     }
-    return keychain[this.namespace!.identifier];
+    return keychain[identifier];
   }
 
-  async setNamespacedKeychainValue(value: any) {
+  async setNamespacedKeychainValue(
+    value: any,
+    identifier: ApplicationIdentifier
+  ) {
     let keychain = await this.getRawKeychainValue();
     if (!keychain) {
       keychain = {};
     }
     return Keychain.setKeys({
       ...keychain,
-      [this.namespace!.identifier]: value,
+      [identifier]: value,
     });
   }
 
-  async clearNamespacedKeychainValue() {
+  async clearNamespacedKeychainValue(identifier: ApplicationIdentifier) {
     const keychain = await this.getRawKeychainValue();
     if (!keychain) {
       return;
     }
-    delete keychain[this.namespace!.identifier];
+    delete keychain[identifier];
     return Keychain.setKeys(keychain);
   }
 

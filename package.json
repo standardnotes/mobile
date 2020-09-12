@@ -54,7 +54,7 @@
     "react-native-webview": "^10.8.3",
     "react-navigation-header-buttons": "^5.0.2",
     "sn-textview": "standardnotes/sn-textview#f42f0bf",
-    "snjs": "standardnotes/snjs#28df386",
+    "snjs": "standardnotes/snjs#e179f19",
     "standard-notes-rn": "standardnotes/standard-notes-rn",
     "styled-components": "^5.2.0"
   },
