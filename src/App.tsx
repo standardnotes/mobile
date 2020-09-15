@@ -579,10 +579,23 @@ const AppComponent: React.FC<{
 };
 
 const AppGroupInstance = new ApplicationGroup();
+AppGroupInstance.initialize();
 
 export const App = (props: { env: 'prod' | 'dev' }) => {
-  AppGroupInstance.initialize();
-  const application = AppGroupInstance.primaryApplication as MobileApplication;
+  const applicationGroupRef = useRef(AppGroupInstance);
+  const [application, setApplication] = useState<
+    MobileApplication | undefined
+  >();
+  useEffect(() => {
+    const removeAppChangeObserver = applicationGroupRef.current.addApplicationChangeObserver(
+      () => {
+        const mobileApplication = applicationGroupRef.current
+          .primaryApplication as MobileApplication;
+        setApplication(mobileApplication);
+      }
+    );
+    return removeAppChangeObserver;
+  }, [applicationGroupRef.current.primaryApplication]);
   return (
     <ApplicationContext.Provider value={application}>
       {application && (
