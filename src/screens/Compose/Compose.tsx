@@ -488,7 +488,7 @@ export const Compose = (): JSX.Element => {
         <LoadingWebViewContainer>
           <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
           <LoadingWebViewSubtitle>
-            {/* {noteEditor && noteEditor.content.name} */}
+            {editorComponent?.name}
           </LoadingWebViewSubtitle>
         </LoadingWebViewContainer>
       )}

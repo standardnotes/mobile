@@ -13,10 +13,10 @@ export const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {
   const theme = useContext(ThemeContext);
   return (
     <HeaderButton
-      {...passMeFurther}
       IconComponent={Icon}
       iconSize={30}
       color={theme.stylekitInfoColor}
+      {...passMeFurther}
     />
   );
 };

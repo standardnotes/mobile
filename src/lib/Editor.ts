@@ -33,8 +33,8 @@ export class Editor {
 
     this.removeStreamObserver = this.application.streamItems(
       ContentType.Note,
-      async (items, source) => {
-        await this.handleNoteStream(items as SNNote[], source);
+      (items, source) => {
+        this.handleNoteStream(items as SNNote[], source);
       }
     );
   }
@@ -49,7 +49,7 @@ export class Editor {
     (this.application as any) = undefined;
   }
 
-  private async handleNoteStream(notes: SNNote[], source?: PayloadSource) {
+  private handleNoteStream(notes: SNNote[], source?: PayloadSource) {
     /** Update our note object reference whenever it changes */
     const matchingNote = notes.find(item => {
       return item.uuid === this.note?.uuid;
