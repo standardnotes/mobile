@@ -7516,13 +7516,13 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-sncrypto@standardnotes/sncrypto#8794c88:
+sncrypto@standardnotes/sncrypto#5f8cd36:
   version "1.2.0"
-  resolved "https://codeload.github.com/standardnotes/sncrypto/tar.gz/8794c88daa967eaae493cd5fdec7506d52b257ad"
+  resolved "https://codeload.github.com/standardnotes/sncrypto/tar.gz/5f8cd369773cec7f342c23ecaa659d932b35cd31"
 
-snjs@standardnotes/snjs#28df386:
+snjs@standardnotes/snjs#d1f61cd:
   version "1.0.5"
-  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/28df386a01c9d11ca3baddecbcf08a209c9f8ce6"
+  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/d1f61cdd7eebe65071823ef1ba2bd95cfd9f0500"
 
 source-map-resolve@^0.5.0:
   version "0.5.3"

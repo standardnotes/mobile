@@ -53,7 +53,8 @@
     "react-native-webview": "^10.9.0",
     "react-navigation-header-buttons": "^5.0.2",
     "sn-textview": "standardnotes/sn-textview#f42f0bf",
-    "snjs": "standardnotes/snjs#28df386",
+    "sncrypto": "standardnotes/sncrypto#5f8cd36",
+    "snjs": "standardnotes/snjs#d1f61cd",
     "standard-notes-rn": "standardnotes/standard-notes-rn",
     "styled-components": "^5.2.0"
   },
@@ -86,7 +87,7 @@
     "prettier-plugin-organize-imports": "^1.1.1",
     "react-test-renderer": "16.11.0",
     "replace-in-file": "^6.1.0",
-    "sncrypto": "standardnotes/sncrypto#8794c88",
+
     "typescript": "^3.9.2"
   },
   "resolutions": {
