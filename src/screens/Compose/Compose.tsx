@@ -107,8 +107,9 @@ export const Compose = (): JSX.Element => {
 
   const showAllChangesSavedStatus = useCallback(() => {
     setSaveError(false);
-    setStatus('All changes saved');
-  }, [setStatus]);
+    const offlineStatus = application?.hasAccount() ? '' : ' (offline)';
+    setStatus('All changes saved' + offlineStatus);
+  }, [application, setStatus]);
 
   const showErrorStatus = useCallback(
     (message: string) => {
