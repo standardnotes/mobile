@@ -1,25 +1,18 @@
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ItemSessionHistory, SNNote } from 'snjs';
-import { PayloadContent } from 'snjs/dist/@types/protocol/payloads/generator';
 import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { NoteHistoryCell } from './NoteHistoryCell';
 
 type Props = {
   note: SNNote;
-  restoreNote: (
-    asCopy: boolean,
-    uuid: string,
-    content: PayloadContent
-  ) => Promise<void>;
+  onPress: (uuid: string, revision: NoteHistoryEntry, title: string) => void;
 };
-export const SessionHistory: React.FC<Props> = ({ note, restoreNote }) => {
+export const SessionHistory: React.FC<Props> = ({ note, onPress }) => {
   // Context
   const application = useContext(ApplicationContext);
-  const { showActionSheet } = useCustomActionSheet();
   const insets = useSafeAreaInsets();
 
   // State
@@ -33,22 +26,11 @@ export const SessionHistory: React.FC<Props> = ({ note, restoreNote }) => {
     }
   }, [application?.historyManager, note]);
 
-  const onPress = useCallback(
+  const onItemPress = useCallback(
     (item: NoteHistoryEntry) => {
-      showActionSheet(item.previewTitle(), [
-        {
-          text: 'Restore',
-          callback: () =>
-            restoreNote(false, item.payload.uuid, item.payload.safeContent),
-        },
-        {
-          text: 'Restore as copy',
-          callback: async () =>
-            restoreNote(true, item.payload.uuid, item.payload.safeContent),
-        },
-      ]);
+      onPress(item.payload.uuid, item, item.previewTitle());
     },
-    [restoreNote, showActionSheet]
+    [onPress]
   );
 
   const RenderItem: ListRenderItem<NoteHistoryEntry> | null | undefined = ({
@@ -56,7 +38,7 @@ export const SessionHistory: React.FC<Props> = ({ note, restoreNote }) => {
   }) => {
     return (
       <NoteHistoryCell
-        onPress={() => onPress(item)}
+        onPress={() => onItemPress(item)}
         title={item.previewTitle()}
         subTitle={item.previewSubTitle()}
       />

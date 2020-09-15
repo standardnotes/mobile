@@ -42,10 +42,12 @@ import {
 
 type Props = ModalStackNavigationProp<typeof SCREEN_AUTHENTICATE>;
 
-export const STRING_ENTER_PASSCODE_FOR_MIGRATION =
+const STRING_ENTER_PASSCODE_FOR_MIGRATION =
   'Your application passcode is required to perform an upgrade of your local data storage structure.';
-export const STRING_AUTHENTICATION_REQUIRED =
+const STRING_AUTHENTICATION_REQUIRED =
   'Authentication is required to unlock application.';
+const STRING_ENTER_PASSCODE_FOR_LOGIN_REGISTER =
+  'Enter your application passcode before signing in or registering.';
 
 export const Authenticate = ({
   route: {
@@ -525,13 +527,16 @@ export const Authenticate = ({
     [challengeValueStates]
   );
 
-  const textData = useMemo(
-    () =>
-      challenge.reason === ChallengeReason.Migration
-        ? STRING_ENTER_PASSCODE_FOR_MIGRATION
-        : STRING_AUTHENTICATION_REQUIRED,
-    [challenge.reason]
-  );
+  const textData = useMemo(() => {
+    switch (challenge.reason) {
+      case ChallengeReason.Migration:
+        return STRING_ENTER_PASSCODE_FOR_MIGRATION;
+      case ChallengeReason.ResaveRootKey:
+        return STRING_ENTER_PASSCODE_FOR_LOGIN_REGISTER;
+      default:
+        return STRING_AUTHENTICATION_REQUIRED;
+    }
+  }, [challenge.reason]);
 
   return (
     <Container>
