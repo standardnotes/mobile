@@ -54,6 +54,7 @@ import DrawerLayout, {
 } from 'react-native-gesture-handler/DrawerLayout';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { Challenge, PrivilegeCredential, ProtectedAction } from 'snjs';
+import { DeinitSource } from 'snjs/dist/@types/types';
 import { ThemeContext, ThemeProvider } from 'styled-components/native';
 import { ApplicationContext } from './ApplicationContext';
 import {
@@ -373,8 +374,10 @@ const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
                   title={'Destroy Data'}
                   onPress={async () => {
                     await application?.deviceInterface?.removeAllRawStorageValues();
-                    await application?.deviceInterface?.removeAllRawDatabasePayloads();
-                    application?.deinit();
+                    await application?.deviceInterface?.removeAllRawDatabasePayloads(
+                      application?.identifier
+                    );
+                    application?.deinit(DeinitSource.SignOut);
                   }}
                 />
               </HeaderButtons>
@@ -578,19 +581,8 @@ const AppComponent: React.FC<{
 const AppGroupInstance = new ApplicationGroup();
 
 export const App = (props: { env: 'prod' | 'dev' }) => {
-  const applicationGroupRef = useRef(AppGroupInstance);
-  const [application, setApplication] = useState<
-    MobileApplication | undefined
-  >();
-  useEffect(() => {
-    const removeAppChangeObserver = applicationGroupRef.current.addApplicationChangeObserver(
-      () => {
-        setApplication(applicationGroupRef.current.application);
-      }
-    );
-
-    return removeAppChangeObserver;
-  }, [applicationGroupRef.current.application]);
+  AppGroupInstance.initialize();
+  const application = AppGroupInstance.primaryApplication as MobileApplication;
   return (
     <ApplicationContext.Provider value={application}>
       {application && (
