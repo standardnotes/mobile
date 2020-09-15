@@ -1,11 +1,10 @@
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled';
-import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SNNote } from 'snjs';
-import { PayloadContent } from 'snjs/dist/@types/protocol/payloads/generator';
+import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import {
   RemoteHistoryList,
   RemoteHistoryListEntry,
@@ -14,16 +13,11 @@ import { NoteHistoryCell } from './NoteHistoryCell';
 
 type Props = {
   note: SNNote;
-  restoreNote: (
-    asCopy: boolean,
-    uuid: string,
-    content: PayloadContent
-  ) => Promise<void>;
+  onPress: (uuid: string, revision: NoteHistoryEntry, title: string) => void;
 };
-export const RemoteHistory: React.FC<Props> = ({ note, restoreNote }) => {
+export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   // Context
   const application = useContext(ApplicationContext);
-  const { showActionSheet } = useCustomActionSheet();
   const insets = useSafeAreaInsets();
 
   // State
@@ -54,46 +48,27 @@ export const RemoteHistory: React.FC<Props> = ({ note, restoreNote }) => {
     };
   }, [application?.historyManager, note]);
 
-  const onPress = useCallback(
+  const onItemPress = useCallback(
     async (item: RemoteHistoryListEntry) => {
-      const fetchAndRestoreRevision = async (asCopy: boolean) => {
-        const remoteRevision = await application?.historyManager!.fetchRemoteRevision(
-          note.uuid,
-          item
+      const remoteRevision = await application?.historyManager!.fetchRemoteRevision(
+        note.uuid,
+        item
+      );
+      if (remoteRevision) {
+        onPress(
+          item.uuid,
+          remoteRevision as NoteHistoryEntry,
+          new Date(item.updated_at).toLocaleString()
         );
-        if (remoteRevision) {
-          restoreNote(
-            asCopy,
-            remoteRevision.payload.uuid,
-            remoteRevision.payload.safeContent
-          );
-        } else {
-          application?.alertService!.alert(
-            'The remote revision could not be loaded. Please try again later.',
-            'Error'
-          );
-          return;
-        }
-      };
-
-      showActionSheet(item.updated_at.toLocaleString(), [
-        {
-          text: 'Restore',
-          callback: () => fetchAndRestoreRevision(false),
-        },
-        {
-          text: 'Restore as copy',
-          callback: async () => fetchAndRestoreRevision(true),
-        },
-      ]);
+      } else {
+        application?.alertService!.alert(
+          'The remote revision could not be loaded. Please try again later.',
+          'Error'
+        );
+        return;
+      }
     },
-    [
-      application?.alertService,
-      application?.historyManager,
-      note.uuid,
-      restoreNote,
-      showActionSheet,
-    ]
+    [application?.alertService, application?.historyManager, note.uuid, onPress]
   );
 
   const RenderItem:
@@ -102,7 +77,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, restoreNote }) => {
     | undefined = ({ item }) => {
     return (
       <NoteHistoryCell
-        onPress={() => onPress(item)}
+        onPress={() => onItemPress(item)}
         title={new Date(item.updated_at).toLocaleString()}
       />
     );

@@ -26,6 +26,7 @@ import { Compose } from '@Screens/Compose/Compose';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
 import { NoteHistory } from '@Screens/NoteHistory/NoteHistory';
+import { NoteHistoryPreview } from '@Screens/NoteHistory/NoteHistoryPreview';
 import { Root } from '@Screens/Root';
 import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
 import { Settings } from '@Screens/Settings/Settings';
@@ -55,6 +56,7 @@ import DrawerLayout, {
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { Challenge, PrivilegeCredential, ProtectedAction } from 'snjs';
 import { DeinitSource } from 'snjs/dist/@types/types';
+import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { ThemeContext, ThemeProvider } from 'styled-components/native';
 import { ApplicationContext } from './ApplicationContext';
 import {
@@ -66,6 +68,7 @@ import {
   SCREEN_MANAGE_PRIVILEGES,
   SCREEN_NOTES,
   SCREEN_NOTE_HISTORY,
+  SCREEN_NOTE_HISTORY_PREVIEW,
   SCREEN_SETTINGS,
 } from './screens/screens';
 
@@ -81,6 +84,10 @@ type AppStackNavigatorParamList = {
   [SCREEN_NOTE_HISTORY]:
     | (HeaderTitleParams & { noteUuid: string })
     | (undefined & { noteUuid: string });
+  [SCREEN_NOTE_HISTORY_PREVIEW]: HeaderTitleParams & {
+    revisionUuid: string;
+    revision: NoteHistoryEntry;
+  };
 };
 
 type ModalStackNavigatorParamList = {
@@ -315,6 +322,23 @@ const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
               },
             })}
             component={NoteHistory}
+          />
+          <AppStack.Screen
+            name={SCREEN_NOTE_HISTORY_PREVIEW}
+            options={({ route }) => ({
+              title: 'Preview',
+              headerBackTitleVisible: false,
+              headerTitle: ({ children }) => {
+                return (
+                  <HeaderTitleView
+                    title={route.params?.title ?? (children || '')}
+                    subtitle={route.params?.subTitle || undefined}
+                    subtitleColor={route.params?.subTitleColor || undefined}
+                  />
+                );
+              },
+            })}
+            component={NoteHistoryPreview}
           />
         </AppStack.Navigator>
       </DrawerLayout>

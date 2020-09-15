@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
 import Aes from 'react-native-aes-crypto';
 import Sodium from 'react-native-sodium';
+import { timingSafeEqual } from 'sncrypto/lib/common';
 import {
   Base64String,
   HexString,
@@ -11,21 +12,7 @@ import {
 export class SNReactNativeCrypto implements SNPureCrypto {
   deinit(): void {}
   public timingSafeEqual(a: string, b: string) {
-    const strA = String(a);
-    let strB = String(b);
-    const lenA = strA.length;
-    let result = 0;
-
-    if (lenA !== strB.length) {
-      strB = strA;
-      result = 1;
-    }
-
-    for (let i = 0; i < lenA; i++) {
-      result |= strA.charCodeAt(i) ^ strB.charCodeAt(i);
-    }
-
-    return result === 0;
+    return timingSafeEqual(a, b);
   }
 
   pbkdf2(

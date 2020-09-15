@@ -1,9 +1,12 @@
 import SegmentedControl from '@react-native-community/segmented-control';
 import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_NOTE_HISTORY } from '@Screens/screens';
+import {
+  SCREEN_NOTE_HISTORY,
+  SCREEN_NOTE_HISTORY_PREVIEW,
+} from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Dimensions, Platform } from 'react-native';
 import {
   NavigationState,
@@ -12,8 +15,8 @@ import {
   TabBar,
   TabView,
 } from 'react-native-tab-view';
-import { ButtonType, ContentType, PayloadSource, SNNote } from 'snjs';
-import { PayloadContent } from 'snjs/dist/@types/protocol/payloads/generator';
+import { SNNote } from 'snjs';
+import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { ThemeContext } from 'styled-components/native';
 import { IosTabBarContainer } from './NoteHistory.styled';
 import { RemoteHistory } from './RemoteHistory';
@@ -38,49 +41,17 @@ export const NoteHistory = (props: Props) => {
   ]);
   const [index, setIndex] = useState(0);
 
-  const restore = useCallback(
-    async (asCopy: boolean, revisionUuid: string, content: PayloadContent) => {
-      const run = async () => {
-        if (asCopy) {
-          const contentCopy = Object.assign({}, content);
-          if (contentCopy.title) {
-            contentCopy.title += ' (copy)';
-          }
-          await application?.createManagedItem(
-            ContentType.Note,
-            contentCopy,
-            true
-          );
-          props.navigation.popToTop();
-        } else {
-          await application?.changeAndSaveItem(
-            revisionUuid,
-            mutator => {
-              mutator.setContent(content);
-            },
-            true,
-            PayloadSource.RemoteActionRetrieved
-          );
-          props.navigation.goBack();
-        }
-      };
-
-      if (!asCopy) {
-        const confirmed = await application?.alertService?.confirm(
-          "Are you sure you want to replace the current note's contents with what you see in this preview?",
-          'Restore note',
-          'Restore',
-          ButtonType.Info
-        );
-        if (confirmed) {
-          run();
-        }
-      } else {
-        run();
-      }
-    },
-    [application, props.navigation]
-  );
+  const openPreview = (
+    uuid: string,
+    revision: NoteHistoryEntry,
+    title: string
+  ) => {
+    props.navigation.navigate(SCREEN_NOTE_HISTORY_PREVIEW, {
+      title,
+      revisionUuid: uuid,
+      revision,
+    });
+  };
 
   const renderScene = ({
     route,
@@ -89,9 +60,9 @@ export const NoteHistory = (props: Props) => {
   }) => {
     switch (route.key) {
       case 'session':
-        return <SessionHistory restoreNote={restore} note={note} />;
+        return <SessionHistory onPress={openPreview} note={note} />;
       case 'remote':
-        return <RemoteHistory restoreNote={restore} note={note} />;
+        return <RemoteHistory onPress={openPreview} note={note} />;
       default:
         return null;
     }
