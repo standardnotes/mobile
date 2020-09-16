@@ -7,7 +7,6 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Keyboard } from 'react-native';
-import { HttpResponse } from 'snjs/dist/@types/services/api/http_service';
 import {
   RegistrationDescription,
   RegistrationInput,
@@ -23,6 +22,15 @@ type Props = {
   signedIn: boolean;
 };
 
+type MfaResponse = {
+  message: string;
+  payload: {
+    mfa_key: string;
+  };
+  tag: string;
+  status: number;
+};
+
 export const AuthSection = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -33,7 +41,7 @@ export const AuthSection = (props: Props) => {
   const [signingIn, setSigningIn] = useState(false);
   const [strictSignIn, setStrictSignIn] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [mfa, setMfa] = useState<HttpResponse['error'] | undefined>();
+  const [mfa, setMfa] = useState<MfaResponse | undefined>();
   const [mfaCode, setMfaCode] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -95,7 +103,7 @@ export const AuthSection = (props: Props) => {
       password,
       strictSignIn,
       undefined,
-      mfa?.payload?.mfa_key,
+      mfa?.payload.mfa_key,
       mfaCode || undefined,
       true,
       false
@@ -106,7 +114,7 @@ export const AuthSection = (props: Props) => {
         result?.error.tag === 'mfa-required' ||
         result?.error.tag === 'mfa-invalid'
       ) {
-        setMfa(result.error);
+        setMfa(result?.error);
         setMfaCode('');
       } else if (result?.error.message) {
         application?.alertService?.alert(result?.error.message, 'Oops', 'OK');
