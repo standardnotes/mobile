@@ -54,8 +54,12 @@ import DrawerLayout, {
   DrawerState,
 } from 'react-native-gesture-handler/DrawerLayout';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { Challenge, PrivilegeCredential, ProtectedAction } from 'snjs';
-import { DeinitSource } from 'snjs/dist/@types/types';
+import {
+  Challenge,
+  DeinitSource,
+  PrivilegeCredential,
+  ProtectedAction,
+} from 'snjs';
 import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { ThemeContext, ThemeProvider } from 'styled-components/native';
 import { ApplicationContext } from './ApplicationContext';
