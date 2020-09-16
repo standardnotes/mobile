@@ -46,9 +46,7 @@ export class InstallationService extends ApplicationService {
     const hasNormalKeys =
       this.application?.hasAccount() || this.application?.hasPasscode();
 
-    const keychainKey = await this.application?.deviceInterface?.getNamespacedKeychainValue(
-      this.application?.identifier
-    );
+    const keychainKey = await this.application?.deviceInterface?.getNamespacedKeychainValue();
     const hasKeychainValue = !isNullOrUndefined(keychainKey);
 
     let firstRunKey = await this.application?.getValue(
@@ -75,9 +73,7 @@ export class InstallationService extends ApplicationService {
 
     if (confirmed) {
       await this.application?.deviceInterface?.removeAllRawStorageValues();
-      await this.application?.deviceInterface?.removeAllRawDatabasePayloads(
-        this.application?.identifier
-      );
+      await this.application?.deviceInterface?.removeAllRawDatabasePayloads();
       await this.application?.deviceInterface?.clearRawKeychainValue();
     } else {
       SNReactNative.exitApp();
