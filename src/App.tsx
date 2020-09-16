@@ -54,7 +54,12 @@ import DrawerLayout, {
   DrawerState,
 } from 'react-native-gesture-handler/DrawerLayout';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { Challenge, PrivilegeCredential, ProtectedAction } from 'snjs';
+import {
+  Challenge,
+  DeinitSource,
+  PrivilegeCredential,
+  ProtectedAction,
+} from 'snjs';
 import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { ThemeContext, ThemeProvider } from 'styled-components/native';
 import { ApplicationContext } from './ApplicationContext';
@@ -397,8 +402,10 @@ const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
                   title={'Destroy Data'}
                   onPress={async () => {
                     await application?.deviceInterface?.removeAllRawStorageValues();
-                    await application?.deviceInterface?.removeAllRawDatabasePayloads();
-                    application?.deinit();
+                    await application?.deviceInterface?.removeAllRawDatabasePayloads(
+                      application?.identifier
+                    );
+                    application?.deinit(DeinitSource.SignOut);
                   }}
                 />
               </HeaderButtons>
@@ -600,6 +607,7 @@ const AppComponent: React.FC<{
 };
 
 const AppGroupInstance = new ApplicationGroup();
+AppGroupInstance.initialize();
 
 export const App = (props: { env: 'prod' | 'dev' }) => {
   const applicationGroupRef = useRef(AppGroupInstance);
@@ -609,12 +617,13 @@ export const App = (props: { env: 'prod' | 'dev' }) => {
   useEffect(() => {
     const removeAppChangeObserver = applicationGroupRef.current.addApplicationChangeObserver(
       () => {
-        setApplication(applicationGroupRef.current.application);
+        const mobileApplication = applicationGroupRef.current
+          .primaryApplication as MobileApplication;
+        setApplication(mobileApplication);
       }
     );
-
     return removeAppChangeObserver;
-  }, [applicationGroupRef.current.application]);
+  }, [applicationGroupRef.current.primaryApplication]);
   return (
     <ApplicationContext.Provider value={application}>
       {application && (
