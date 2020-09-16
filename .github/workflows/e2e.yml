@@ -1,12 +1,7 @@
 name: e2e
 
-on:
-  push:
-    branches: 
-      - master
-      - dev
-  pull_request:
-    
+on: [workflow_dispatch]
+
 
 jobs:
   android:
