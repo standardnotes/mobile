@@ -19,11 +19,12 @@ export class MobileDeviceInterface extends DeviceInterface {
     super.deinit();
   }
 
-  private getDatabaseKeyPrefix(_identifier: ApplicationIdentifier) {
-    /**
-     * The default identifier (standardnotes) is used, but we don't want to prefix items with it just yet.
-     */
-    return 'Item-';
+  private getDatabaseKeyPrefix(identifier: ApplicationIdentifier) {
+    if (identifier && identifier !== 'standardnotes') {
+      return `${identifier}-Item-`;
+    } else {
+      return 'Item-';
+    }
   }
 
   private keyForPayloadId(id: string, identifier: ApplicationIdentifier) {
