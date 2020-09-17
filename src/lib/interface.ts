@@ -20,7 +20,7 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   private getDatabaseKeyPrefix(identifier: ApplicationIdentifier) {
-    if (identifier && identifier !== 'standardnotes') {
+    if (identifier && !this.isLegacyIdentifier(identifier)) {
       return `${identifier}-Item-`;
     } else {
       return 'Item-';
@@ -168,7 +168,7 @@ export class MobileDeviceInterface extends DeviceInterface {
 
   async getNamespacedKeychainValue(identifier: ApplicationIdentifier) {
     const keychain = await this.getRawKeychainValue();
-    if (identifier && identifier === 'standardnotes') {
+    if (this.isLegacyIdentifier(identifier)) {
       return keychain;
     }
     if (!keychain) {
@@ -181,7 +181,7 @@ export class MobileDeviceInterface extends DeviceInterface {
     value: any,
     identifier: ApplicationIdentifier
   ) {
-    if (identifier && identifier === 'standardnotes') {
+    if (this.isLegacyIdentifier(identifier)) {
       return Keychain.setKeys(value);
     }
     let keychain = await this.getRawKeychainValue();
@@ -195,7 +195,7 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   async clearNamespacedKeychainValue(identifier: ApplicationIdentifier) {
-    if (identifier && identifier === 'standardnotes') {
+    if (this.isLegacyIdentifier(identifier)) {
       return this.clearRawKeychainValue();
     }
     const keychain = await this.getRawKeychainValue();
@@ -248,5 +248,14 @@ export class MobileDeviceInterface extends DeviceInterface {
         }
       })
       .catch(() => showAlert());
+  }
+
+  /**
+   * We use this function to decide if we need to prefix the identifier in getDatabaseKeyPrefix or not.
+   * And to decide if the raw/namespaced keychain needs to be used.
+   * @param identifier The ApplicationIdentifier
+   */
+  private isLegacyIdentifier(identifier: ApplicationIdentifier) {
+    return identifier && identifier === 'standardnotes';
   }
 }
