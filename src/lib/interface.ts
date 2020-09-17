@@ -168,6 +168,9 @@ export class MobileDeviceInterface extends DeviceInterface {
 
   async getNamespacedKeychainValue(identifier: ApplicationIdentifier) {
     const keychain = await this.getRawKeychainValue();
+    if (identifier && identifier === 'standardnotes') {
+      return keychain;
+    }
     if (!keychain) {
       return;
     }
@@ -178,6 +181,9 @@ export class MobileDeviceInterface extends DeviceInterface {
     value: any,
     identifier: ApplicationIdentifier
   ) {
+    if (identifier && identifier === 'standardnotes') {
+      return Keychain.setKeys(value);
+    }
     let keychain = await this.getRawKeychainValue();
     if (!keychain) {
       keychain = {};
@@ -189,6 +195,9 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   async clearNamespacedKeychainValue(identifier: ApplicationIdentifier) {
+    if (identifier && identifier === 'standardnotes') {
+      return this.clearRawKeychainValue();
+    }
     const keychain = await this.getRawKeychainValue();
     if (!keychain) {
       return;
