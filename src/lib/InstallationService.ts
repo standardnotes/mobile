@@ -46,7 +46,9 @@ export class InstallationService extends ApplicationService {
     const hasNormalKeys =
       this.application?.hasAccount() || this.application?.hasPasscode();
 
-    const keychainKey = await this.application?.deviceInterface?.getRawKeychainValue();
+    const keychainKey = await this.application?.deviceInterface?.getNamespacedKeychainValue(
+      this.application?.identifier
+    );
     const hasKeychainValue = !isNullOrUndefined(keychainKey);
 
     let firstRunKey = await this.application?.getValue(
