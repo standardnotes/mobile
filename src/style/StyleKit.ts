@@ -32,6 +32,7 @@ import { StyleKitTheme } from './Themes/styled-components';
 
 const LIGHT_THEME_KEY = 'lightTheme';
 const DARK_THEME_KEY = 'darkTheme';
+const CACHED_THEMES_KEY = 'cachedThemes';
 
 type ThemeChangeObserver = () => Promise<void> | void;
 
@@ -78,12 +79,9 @@ export class StyleKit {
   }
 
   async init() {
-    this.setActiveTheme(
-      Appearance.getColorScheme() === 'dark'
-        ? SystemThemes.Dark
-        : SystemThemes.Blue
-    );
-    Appearance.addChangeListener(this.setModeTo);
+    await this.setExternalThemes();
+    await this.resolveInitialThemeForMode();
+    Appearance.addChangeListener(this.setModeTo.bind(this));
     this.registerObservers();
   }
 
@@ -112,7 +110,7 @@ export class StyleKit {
       async event => {
         if (event === ApplicationEvent.Launched) {
           // Resolve initial theme after app launched
-          this.resolveInitialTheme();
+          this.resolveInitialThemeForMode();
         }
       }
     );
@@ -175,6 +173,7 @@ export class StyleKit {
 
   setModeTo(preferences: Appearance.AppearancePreferences) {
     this.currentDarkMode = preferences.colorScheme;
+    this.resolveInitialThemeForMode();
   }
 
   /**
@@ -235,11 +234,7 @@ export class StyleKit {
     return Object.assign({}, THEME_BLUE_JSON);
   }
 
-  private resetToSystemTheme() {
-    this.activateTheme(Object.keys(this.themeData)[0]);
-  }
-
-  private async resolveInitialTheme() {
+  private async resolveInitialThemeForMode() {
     const currentMode = Appearance.getColorScheme() || 'light';
     const runDefaultTheme = () => {
       const defaultTheme =
@@ -253,11 +248,11 @@ export class StyleKit {
     const savedThemeId = await this.getThemeForMode(currentMode);
 
     try {
-      const matchingTheme = this.systemThemes().find(
-        systemTheme => systemTheme.uuid === savedThemeId
+      const matchingThemeId = Object.keys(this.themeData).find(
+        themeId => themeId === savedThemeId
       );
-      if (matchingTheme) {
-        this.setActiveTheme(matchingTheme.uuid);
+      if (matchingThemeId) {
+        this.setActiveTheme(matchingThemeId);
       } else {
         runDefaultTheme();
       }
@@ -276,6 +271,20 @@ export class StyleKit {
   systemThemes() {
     return Object.values(this.themeData)
       .filter(th => th.isSystemTheme)
+      .sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        }
+        if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      });
+  }
+
+  externalThemes() {
+    return Object.values(this.themeData)
+      .filter(th => !th.isSystemTheme)
       .sort((a, b) => {
         if (a.name < b.name) {
           return -1;
@@ -307,7 +316,6 @@ export class StyleKit {
    *
    * This includes:
    *     - Status Bar color
-   *     - Local App Icon color
    */
   updateDeviceForTheme(themeId: string) {
     const theme = this.findOrCreateDataForTheme(themeId);
@@ -335,24 +343,6 @@ export class StyleKit {
       },
       isAndroid ? 100 : 0
     );
-
-    // if (theme.isSystemTheme && !isAndroid) {
-    //   IconChanger.supportDevice(supported => {
-    //     if (supported) {
-    //       IconChanger.getIconName(currentName => {
-    //         if (theme.isInitial && currentName !== 'default') {
-    //           /** Clear the icon to default. */
-    //           IconChanger.setIconName(null);
-    //         } else {
-    //           const newName = theme.name;
-    //           if (newName !== currentName) {
-    //             IconChanger.setIconName(newName);
-    //           }
-    //         }
-    //       });
-    //     }
-    //   });
-    // }
   }
 
   private async downloadTheme(theme: SNTheme) {
@@ -398,11 +388,27 @@ export class StyleKit {
     }
     let data = this.findOrCreateDataForTheme(theme.uuid);
     const appliedVariables = Object.assign(this.templateVariables(), variables);
-    data.variables = {
+    const finalVariables = {
       ...appliedVariables,
       ...StyleKit.constants,
     };
+    data = {
+      isSystemTheme: false,
+      isInitial: false,
+      name: theme.name,
+      uuid: theme.uuid,
+      variables: finalVariables,
+      package_info: {
+        dock_icon: {
+          type: 'circle',
+          background_color: finalVariables.stylekitInfoColor,
+          border_color: finalVariables.stylekitInfoColor,
+        },
+      },
+    };
+    this.themeData[theme.uuid] = data;
     this.activateTheme(theme.uuid);
+    this.cacheThemes();
   }
 
   private activateTheme(themeId: string) {
@@ -410,26 +416,39 @@ export class StyleKit {
     this.assignThemeForMode(themeId);
   }
 
-  // activatePreferredTheme() {
-  //   const uuid = ThemeManager.get().getThemeUuidForMode(this.currentDarkMode);
-  //   const matchingTheme = _.find(this.themes(), { uuid: uuid });
+  private async setExternalThemes() {
+    const cachedThemes = await this.loadCachedThemes();
+    if (cachedThemes) {
+      for (const theme of cachedThemes) {
+        this.themeData[theme.uuid] = theme;
+      }
+    }
+  }
 
-  //   if (matchingTheme) {
-  //     if (matchingTheme.uuid === this.activeTheme.uuid) {
-  //       /** Found a match and it's already active, no need to switch. */
-  //       return;
-  //     }
+  private async loadCachedThemes(): Promise<ThemeContent[] | undefined> {
+    return this.application!.getValue(
+      CACHED_THEMES_KEY,
+      StorageValueModes.Nonwrapped
+    );
+  }
 
-  //     /** found a matching theme for user preference, switch to that theme. */
-  //     this.activateTheme(matchingTheme);
-  //   } else {
-  //     /** No matching theme found, set currently active theme as the default. */
-  //     this.assignThemeForMode({
-  //       theme: this.activeTheme,
-  //       mode: this.currentDarkMode,
-  //     });
-  //   }
-  // }
+  private async cacheThemes() {
+    const themes = this.externalThemes();
+    return this.application!.setValue(
+      CACHED_THEMES_KEY,
+      themes,
+      StorageValueModes.Nonwrapped
+    );
+  }
+
+  private async decacheThemes() {
+    if (this.application) {
+      return this.application.removeValue(
+        CACHED_THEMES_KEY,
+        StorageValueModes.Nonwrapped
+      );
+    }
+  }
 
   async downloadThemeAndReload(theme: SNTheme) {
     const updatedVariables = await this.downloadTheme(theme);
@@ -444,7 +463,7 @@ export class StyleKit {
       ...appliedVariables,
       ...StyleKit.constants,
     };
-
+    this.cacheThemes();
     if (theme.uuid === this.activeThemeId) {
       this.setActiveTheme(theme.uuid);
     }

@@ -555,7 +555,7 @@ const AppComponent: React.FC<{
     let styleKitInstance: StyleKit;
     const loadApplication = async () => {
       styleKitInstance = new StyleKit(application);
-      await styleKitInstance.init();
+
       setStyleKitRef(styleKitInstance);
       setActiveTheme(styleKitInstance.theme);
       await application?.prepareForLaunch({
@@ -563,7 +563,7 @@ const AppComponent: React.FC<{
           application!.promptForChallenge(challenge);
         },
       });
-      await application?.launch();
+      await styleKitInstance.init();
     };
 
     loadApplication();
@@ -572,7 +572,7 @@ const AppComponent: React.FC<{
       styleKitInstance?.deinit();
       setStyleKitRef(undefined);
     };
-  }, [application, env, setStyleKitRef]);
+  }, [application, application.Uuid, env, setStyleKitRef]);
 
   if (!styleKit.current || !activeTheme) {
     return null;
@@ -580,6 +580,7 @@ const AppComponent: React.FC<{
 
   return (
     <NavigationContainer
+      onReady={() => application?.launch()}
       theme={{
         ...DefaultTheme,
         colors: {
