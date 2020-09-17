@@ -1,4 +1,3 @@
-import { StyleKit } from '@Style/StyleKit';
 import {
   ApplicationDescriptor,
   DeviceInterface,
@@ -34,14 +33,12 @@ export class ApplicationGroup extends SNApplicationGroup {
     const applicationState = new ApplicationState(application);
     const reviewService = new ReviewService(application);
     const backupsService = new BackupsService(application);
-    const themeService = new StyleKit(application);
     const prefsService = new PreferencesManager(application);
     const installationService = new InstallationService(application);
     application.setMobileServices({
       applicationState,
       reviewService,
       backupsService,
-      themeService,
       prefsService,
       installationService,
     });

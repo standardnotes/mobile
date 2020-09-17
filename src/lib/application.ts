@@ -1,5 +1,4 @@
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
-import { StyleKit } from '@Style/StyleKit';
 import { Platform } from 'react-native';
 import VersionInfo from 'react-native-version-info';
 import {
@@ -28,7 +27,6 @@ type MobileServices = {
   reviewService: ReviewService;
   backupsService: BackupsService;
   installationService: InstallationService;
-  themeService: StyleKit;
   prefsService: PreferencesManager;
 };
 
