@@ -6639,9 +6639,9 @@ react-is@^16.12.0, react-is@^16.13.0, react-is@^16.7.0, react-is@^16.8.1, react-
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-native-aes-crypto@standardnotes/react-native-aes#d156762:
+react-native-aes-crypto@standardnotes/react-native-aes#6430299:
   version "1.3.9"
-  resolved "https://codeload.github.com/standardnotes/react-native-aes/tar.gz/d156762424897aaf1e020462edecbe52c492c056"
+  resolved "https://codeload.github.com/standardnotes/react-native-aes/tar.gz/64302996fc8bfe098d34e785190d36519c5fa270"
 
 react-native-alternate-icons@standardnotes/react-native-alternate-icons#1d335d:
   version "0.3.0"
@@ -6658,9 +6658,9 @@ react-native-file-viewer@^2.1.1:
   resolved "https://registry.yarnpkg.com/react-native-file-viewer/-/react-native-file-viewer-2.1.1.tgz#d0b4c51e9b38870ba2b9fb1d436df844e974f087"
   integrity sha512-Q5OtfA+VlprLaXmKk1tH/IFzMHwa2B5YnR4xfoEKOJ53UI5BKvYc67Y/ammUUog7bUwPkUBWenwd4MxBTi1R+g==
 
-react-native-fingerprint-scanner@standardnotes/react-native-fingerprint-scanner#ddec061:
+react-native-fingerprint-scanner@standardnotes/react-native-fingerprint-scanner#14311e2:
   version "4.0.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-fingerprint-scanner/tar.gz/ddec061776d040c08f1ef34d3df3a92c9ffef2a3"
+  resolved "https://codeload.github.com/standardnotes/react-native-fingerprint-scanner/tar.gz/14311e2dc1090da65998e007f74483c3002a290b"
 
 react-native-flag-secure-android@standardnotes/react-native-flag-secure-android#cb08e74:
   version "1.0.0"
@@ -6694,18 +6694,18 @@ react-native-keychain@^4.0.5:
   resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-4.0.5.tgz#6d3aef8f2789fc0dfa8149b8400d82ff77be361a"
   integrity sha512-TbiO8AO055EPjaxIuKxrCEOB4r81uQCVDFbtcs+e4pEOHxf6z3JgDC0UU0poJElKfCh37b+TFRxQhg6DbsYJBA==
 
-react-native-mail@standardnotes/react-native-mail#9862c76:
+react-native-mail@standardnotes/react-native-mail#f7f74be:
   version "4.1.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-mail/tar.gz/9862c76c1b94016d68e9d703d1cf48446fa5e09f"
+  resolved "https://codeload.github.com/standardnotes/react-native-mail/tar.gz/f7f74be22edef77bef6901ca2e2cd4eddc15bbc0"
 
 react-native-platform-touchable@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/react-native-platform-touchable/-/react-native-platform-touchable-1.1.1.tgz#fde4acc65eea585d28b164d0c3716a42129a68e4"
   integrity sha1-/eSsxl7qWF0osWTQw3FqQhKaaOQ=
 
-react-native-privacy-snapshot@rhdeck/react-native-privacy-snapshot#529e462:
+react-native-privacy-snapshot@standardnotes/react-native-privacy-snapshot#653e904:
   version "1.0.0"
-  resolved "https://codeload.github.com/rhdeck/react-native-privacy-snapshot/tar.gz/529e4627d93f67752a27e82a040ff7b64dca0783"
+  resolved "https://codeload.github.com/standardnotes/react-native-privacy-snapshot/tar.gz/653e904c90fc6f2b578da59138f2bfe5d7f942fe"
 
 react-native-reanimated@^1.13.0:
   version "1.13.0"
@@ -6737,9 +6737,9 @@ react-native-search-box@standardnotes/react-native-search-box#f61a2b5:
   dependencies:
     prop-types "^15.5.10"
 
-react-native-sodium@standardnotes/react-native-sodium#2c0d473:
+react-native-sodium@standardnotes/react-native-sodium#67a5574:
   version "0.4.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-sodium/tar.gz/2c0d473a190e3027290733dd311258b22c72ab43"
+  resolved "https://codeload.github.com/standardnotes/react-native-sodium/tar.gz/67a55740bf36d34f35e61752ac72bced3413673d"
 
 react-native-store-review@^0.1.5:
   version "0.1.5"

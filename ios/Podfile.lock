@@ -236,17 +236,17 @@ PODS:
     - React-jsi (= 0.62.2)
   - React-jsinspector (0.62.2)
   - react-native-aes (1.3.9):
-    - React
+    - React-Core
   - react-native-fingerprint-scanner (4.0.0):
-    - React
+    - React-Core
   - react-native-mail (4.1.0):
-    - React
+    - React-Core
   - react-native-safe-area-context (3.1.7):
     - React
   - react-native-segmented-control (2.1.1):
     - React
   - react-native-sodium (0.4.0):
-    - React
+    - React-Core
   - react-native-version-info (1.0.1):
     - React
   - react-native-webview (10.9.0):
@@ -325,7 +325,7 @@ PODS:
   - RNKeychain (4.0.5):
     - React
   - RNPrivacySnapshot (1.0.0):
-    - React
+    - React-Core
   - RNReanimated (1.13.0):
     - React
   - RNScreens (2.11.0):
@@ -548,12 +548,12 @@ SPEC CHECKSUMS:
   React-jsi: b6dc94a6a12ff98e8877287a0b7620d365201161
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
-  react-native-aes: ff31f0dd4c791eb423a631ee04570fcf3c618924
-  react-native-fingerprint-scanner: f0d8190ceaf0b9e1893e3379d78724375b8f6ea7
-  react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
+  react-native-aes: a13199300208e4eda1df14506a276415561e02bd
+  react-native-fingerprint-scanner: e32be0405a6d766909a11436c0868ec4c08598f6
+  react-native-mail: 5fe7239a5b5c1e858d425501c03d1ab977434122
   react-native-safe-area-context: 955ecfce672683b495d9294d2f154a9ad1d9796b
   react-native-segmented-control: 05d93c1c7576b53189720012a3e8a3c23608d849
-  react-native-sodium: ef43e28fdf8d866e68ed06890c32f8d86a570cc7
+  react-native-sodium: dd3c708254bb924d96f2d80768f114fa4bfe1c3f
   react-native-version-info: f95938832bdb2ce94c3d045c2e44fabcc88f796a
   react-native-webview: bfe5436586b214759bd5043658863549fffc8e92
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
@@ -573,7 +573,7 @@ SPEC CHECKSUMS:
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
-  RNPrivacySnapshot: 71919dde3c6a29dd332115409c2aec564afee8f4
+  RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
   RNScreens: 0e91da98ab26d5d04c7b59a9b6bd694124caf88c
   RNSearchBar: 9860431356b7d12a8449d2fddb2b5f3c78d1e99f
