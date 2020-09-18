@@ -564,6 +564,7 @@ const AppComponent: React.FC<{
         },
       });
       await styleKitInstance.init();
+      await application?.launch();
     };
 
     loadApplication();
@@ -580,7 +581,6 @@ const AppComponent: React.FC<{
 
   return (
     <NavigationContainer
-      onReady={() => application?.launch()}
       theme={{
         ...DefaultTheme,
         colors: {
