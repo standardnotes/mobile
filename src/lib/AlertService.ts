@@ -1,12 +1,16 @@
+import { MODAL_BLOCKING_ALERT } from '@Screens/screens';
 import { Alert, AlertButton } from 'react-native';
 import { ButtonType, DismissBlockingDialog, SNAlertService } from 'snjs';
+import { goBack, navigate } from './NavigationService';
 
 export class AlertService implements SNAlertService {
   blockingDialog(
-    _text: string,
-    _title?: string
+    text: string,
+    title?: string
   ): DismissBlockingDialog | Promise<DismissBlockingDialog> {
-    return () => {};
+    navigate(MODAL_BLOCKING_ALERT, { text, title });
+
+    return goBack;
   }
   alert(text: string, title: string, closeButtonText?: string) {
     return new Promise<void>(resolve => {
