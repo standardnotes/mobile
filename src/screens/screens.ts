@@ -11,3 +11,5 @@ export const SCREEN_NOTE_HISTORY_PREVIEW = 'NoteSessionHistoryPreview' as 'NoteS
 
 export const SCREEN_SETTINGS = 'Settings';
 export const SCREEN_MANAGE_PRIVILEGES = 'ManagePrivileges' as 'ManagePrivileges';
+
+export const MODAL_BLOCKING_ALERT = 'ModalBlockingAlert' as 'ModalBlockingAlert';

@@ -1,3 +1,4 @@
+import { BlockingModal } from '@Components/BlockingModal';
 import { HeaderTitleView } from '@Components/HeaderTitleView';
 import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
@@ -64,6 +65,7 @@ import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note
 import { ThemeContext, ThemeProvider } from 'styled-components/native';
 import { ApplicationContext } from './ApplicationContext';
 import {
+  MODAL_BLOCKING_ALERT,
   SCREEN_AUTHENTICATE,
   SCREEN_AUTHENTICATE_PRIVILEGES,
   SCREEN_COMPOSE,
@@ -111,6 +113,10 @@ type ModalStackNavigatorParamList = {
     privilegeCredentials: PrivilegeCredential[];
     previousScreen: string;
     unlockedItemId?: string;
+  };
+  [MODAL_BLOCKING_ALERT]: {
+    title?: string;
+    text: string;
   };
 };
 export type AppStackNavigationProp<
@@ -528,6 +534,30 @@ const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
           },
         })}
         component={AuthenticatePrivileges}
+      />
+      <MainStack.Screen
+        name={MODAL_BLOCKING_ALERT}
+        options={() => ({
+          headerShown: false,
+          cardStyle: { backgroundColor: 'rgba(0, 0, 0, 0.15)' },
+          cardOverlayEnabled: true,
+          cardStyleInterpolator: ({ current: { progress } }) => ({
+            cardStyle: {
+              opacity: progress.interpolate({
+                inputRange: [0, 0.5, 0.9, 1],
+                outputRange: [0, 0.25, 0.7, 1],
+              }),
+            },
+            overlayStyle: {
+              opacity: progress.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 0.5],
+                extrapolate: 'clamp',
+              }),
+            },
+          }),
+        })}
+        component={BlockingModal}
       />
     </MainStack.Navigator>
   );
