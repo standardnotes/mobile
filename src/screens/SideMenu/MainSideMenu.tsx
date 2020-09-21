@@ -4,6 +4,10 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
 import { StyleKit, StyleKitContext, ThemeContent } from '@Style/StyleKit';
+import {
+  CustomActionSheetOption,
+  useCustomActionSheet,
+} from '@Style/useCustomActionSheet';
 import React, {
   Fragment,
   useCallback,
@@ -37,8 +41,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   const styleKit = useContext(StyleKitContext);
   const application = useContext(ApplicationContext);
   const navigation = useNavigation();
-
-  // const { showActionSheet } = useCustomActionSheet();
+  const { showActionSheet } = useCustomActionSheet();
   // State
   const [selectedTag, setSelectedTag] = useState(() =>
     application!.getAppState().getSelectedTag()
@@ -92,6 +95,74 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
     [application, styleKit]
   );
 
+  const onThemeLongPress = useCallback(
+    async (themeId: string, name: string, snTheme?: SNTheme) => {
+      const options: CustomActionSheetOption[] = [];
+      /**
+       * If this theme is a mobile theme, allow it to be set as the preferred
+       * option for light/dark mode.
+       */
+      if ((snTheme && !snTheme.getNotAvailOnMobile()) || !snTheme) {
+        const activeLightTheme = await styleKit?.getThemeForMode('light');
+        const lightThemeAction =
+          activeLightTheme === themeId ? 'Current' : 'Set as';
+        const lightName = StyleKit.doesDeviceSupportDarkMode()
+          ? 'Light'
+          : 'Active';
+        const text = `${lightThemeAction} ${lightName} Theme`;
+        options.push({
+          text,
+          callback: () => {
+            if (snTheme) {
+              styleKit?.assignExternalThemeForMode(snTheme, 'light');
+            } else {
+              styleKit?.assignThemeForMode(themeId, 'light');
+            }
+          },
+        });
+      }
+      /**
+       * Only display a dark mode option if this device supports dark mode.
+       */
+      if (StyleKit.doesDeviceSupportDarkMode()) {
+        const activeDarkTheme = await styleKit?.getThemeForMode('dark');
+        const darkThemeAction =
+          activeDarkTheme === themeId ? 'Current' : 'Set as';
+        const text = `${darkThemeAction} Dark Theme`;
+        options.push({
+          text,
+          callback: () => {
+            if (snTheme) {
+              styleKit?.assignExternalThemeForMode(snTheme, 'dark');
+            } else {
+              styleKit?.assignThemeForMode(themeId, 'dark');
+            }
+          },
+        });
+      }
+      /**
+       * System themes cannot be redownloaded.
+       */
+      if (snTheme) {
+        options.push({
+          text: 'Redownload',
+          callback: async () => {
+            const confirmed = await application?.alertService.confirm(
+              'Themes are cached when downloaded. To retrieve the latest version, press Redownload.',
+              'Redownload Theme',
+              'Redownload'
+            );
+            if (confirmed) {
+              styleKit?.downloadThemeAndReload(snTheme);
+            }
+          },
+        });
+      }
+      showActionSheet(name, options);
+    },
+    [application?.alertService, showActionSheet, styleKit]
+  );
+
   useEffect(() => {
     const unsubscribeStreamThemes = application?.streamItems(
       ContentType.Theme,
@@ -137,6 +208,8 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
         iconDesc: iconDescriptorForTheme(systemTheme),
         dimmed: false,
         onSelect: () => onSystemThemeSelect(systemTheme),
+        onLongPress: () =>
+          onThemeLongPress(systemTheme?.uuid, systemTheme?.name),
         selected: styleKit!.activeThemeId === systemTheme?.uuid,
       }))
       .concat(
@@ -149,6 +222,8 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
             iconDesc: iconDescriptorForTheme(mapTheme),
             dimmed: mapTheme.getNotAvailOnMobile(),
             onSelect: () => onThemeSelect(mapTheme),
+            onLongPress: () =>
+              onThemeLongPress(mapTheme?.uuid, mapTheme?.name, mapTheme),
             selected: styleKit!.activeThemeId === mapTheme.uuid,
           }))
       );
