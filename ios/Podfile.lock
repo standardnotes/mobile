@@ -241,14 +241,14 @@ PODS:
     - React-Core
   - react-native-mail (4.1.0):
     - React-Core
-  - react-native-safe-area-context (3.1.7):
-    - React
-  - react-native-segmented-control (2.1.1):
+  - react-native-safe-area-context (3.1.8):
+    - React-Core
+  - react-native-segmented-control (2.1.2):
     - React
   - react-native-sodium (0.4.0):
     - React-Core
-  - react-native-version-info (1.0.1):
-    - React
+  - react-native-version-info (1.1.0):
+    - React-Core
   - react-native-webview (10.9.0):
     - React
   - React-RCTActionSheet (0.62.2):
@@ -551,10 +551,10 @@ SPEC CHECKSUMS:
   react-native-aes: a13199300208e4eda1df14506a276415561e02bd
   react-native-fingerprint-scanner: e32be0405a6d766909a11436c0868ec4c08598f6
   react-native-mail: 5fe7239a5b5c1e858d425501c03d1ab977434122
-  react-native-safe-area-context: 955ecfce672683b495d9294d2f154a9ad1d9796b
-  react-native-segmented-control: 05d93c1c7576b53189720012a3e8a3c23608d849
+  react-native-safe-area-context: 79fea126c6830c85f65947c223a5e3058a666937
+  react-native-segmented-control: e257b39e80733b848d7d040e07c29eee99396aff
   react-native-sodium: dd3c708254bb924d96f2d80768f114fa4bfe1c3f
-  react-native-version-info: f95938832bdb2ce94c3d045c2e44fabcc88f796a
+  react-native-version-info: 36490da17d2c6b5cc21321c70e433784dee7ed0b
   react-native-webview: bfe5436586b214759bd5043658863549fffc8e92
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0

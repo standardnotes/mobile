@@ -173,7 +173,7 @@ export class StyleKit {
     }
   }
 
-  setModeTo(preferences: Appearance.AppearancePreferences) {
+  private setModeTo(preferences: Appearance.AppearancePreferences) {
     this.currentDarkMode = preferences.colorScheme;
     this.resolveInitialThemeForMode();
   }
@@ -195,18 +195,27 @@ export class StyleKit {
     }
   }
 
-  assignThemeForMode(themeId: string) {
-    const currentMode = Appearance.getColorScheme() || 'light'; // set to light in case of no support for dark theme
-    this.setThemeForMode(currentMode, themeId);
+  public async assignExternalThemeForMode(
+    theme: SNTheme,
+    mode: 'light' | 'dark'
+  ) {
+    const data = this.findOrCreateDataForTheme(theme.uuid);
+    if (!data.hasOwnProperty('variables')) {
+      if ((await this.downloadThemeAndReload(theme)) === false) {
+        return;
+      }
+    }
+    this.assignThemeForMode(theme.uuid, mode);
+  }
+
+  public async assignThemeForMode(themeId: string, mode: 'light' | 'dark') {
+    this.setThemeForMode(mode, themeId);
 
     /**
      * If we're changing the theme for a specific mode and we're currently on
      * that mode, then activate this theme.
      */
-    if (
-      this.currentDarkMode === currentMode &&
-      this.activeThemeId !== themeId
-    ) {
+    if (this.currentDarkMode === mode && this.activeThemeId !== themeId) {
       this.activateTheme(themeId);
     }
   }
@@ -219,7 +228,7 @@ export class StyleKit {
     );
   }
 
-  private async getThemeForMode(mode: 'light' | 'dark') {
+  public async getThemeForMode(mode: 'light' | 'dark') {
     return this.application.getValue(
       mode === 'dark' ? DARK_THEME_KEY : LIGHT_THEME_KEY,
       StorageValueModes.Nonwrapped
@@ -318,7 +327,7 @@ export class StyleKit {
    * This includes:
    *     - Status Bar color
    */
-  updateDeviceForTheme(themeId: string) {
+  private updateDeviceForTheme(themeId: string) {
     const theme = this.findOrCreateDataForTheme(themeId);
     const isAndroid = Platform.OS === 'android';
     /** On Android, a time out is required, especially during app startup. */
@@ -414,7 +423,8 @@ export class StyleKit {
 
   private activateTheme(themeId: string) {
     this.setActiveTheme(themeId);
-    this.assignThemeForMode(themeId);
+    const currentMode = Appearance.getColorScheme() || 'light'; // set to light in case of no support for dark theme
+    this.assignThemeForMode(themeId, currentMode);
   }
 
   private async setExternalThemes() {
@@ -451,9 +461,11 @@ export class StyleKit {
     }
   }
 
-  async downloadThemeAndReload(theme: SNTheme) {
+  public async downloadThemeAndReload(theme: SNTheme) {
     const updatedVariables = await this.downloadTheme(theme);
-
+    if (updatedVariables === null) {
+      return false;
+    }
     /** Merge default variables to ensure this theme has all the variables. */
     const appliedVariables = Object.assign(
       this.templateVariables(),
@@ -468,6 +480,7 @@ export class StyleKit {
     if (theme.uuid === this.activeThemeId) {
       this.setActiveTheme(theme.uuid);
     }
+    return true;
   }
 
   reloadStyles() {

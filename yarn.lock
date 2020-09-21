@@ -1378,10 +1378,10 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.10.tgz#5dda643e19e587793bc2034dd9bf7398ad43d401"
   integrity sha512-rk4sWFsmtOw8oyx8SD3KSvawwaK7gRBSEIy2TAwURyGt+3TizssXP1r8nx3zY+R7v2vYYHXZ+k2/GULAT/bcaQ==
 
-"@react-native-community/segmented-control@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@react-native-community/segmented-control/-/segmented-control-2.1.1.tgz#e3a0934b79e7bd64b84215366989bb26b850ca06"
-  integrity sha512-vSrg+DIqX0zGeOb1o6oFLoWFFW8l1UEX/f7/9dXXzWHChF3rIqEpNHC4ONmsLJqWePN4E/n+k+q29z+GbqrqsQ==
+"@react-native-community/segmented-control@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/segmented-control/-/segmented-control-2.1.2.tgz#13dd38a2f1972f7c9061f74b9e8e9fd35cbfa6a8"
+  integrity sha512-2UEr+Dqk+VHcMaZPOcKSo0GqFZG91DjngeACy+DOB2gRvph/FGKjABV6HlQJqdhQeQs/4NgoycCjAH+Z8ilIVg==
 
 "@react-navigation/core@^5.12.3":
   version "5.12.3"
@@ -1570,10 +1570,10 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
   integrity sha512-KfRL3PuHmqQLOG+2tGpRO26Ctg+Cq1E01D2DMriKEATHgWLfeNDmq9e29Q9WIky0dQ3NPkd1mzYH8Lm936Z9qw==
 
-"@types/react-native-vector-icons@^6.4.5":
-  version "6.4.5"
-  resolved "https://registry.yarnpkg.com/@types/react-native-vector-icons/-/react-native-vector-icons-6.4.5.tgz#74cbfc564bd8435e43ad6728572a0e5b49c335d1"
-  integrity sha512-JBpcjWQE4n0GlE0p6HpDDclT+uXpFC453T5k4h+B38q0utlGJhvgNr8899BoJGc1xOktA2cgqFKmFMJd0h7YaA==
+"@types/react-native-vector-icons@^6.4.6":
+  version "6.4.6"
+  resolved "https://registry.yarnpkg.com/@types/react-native-vector-icons/-/react-native-vector-icons-6.4.6.tgz#848e3b14572def56212cafbf5cb1254b445bfb41"
+  integrity sha512-lAyxNfMd5L1xZvXWsGcJmNegDf61TAp40uL6ashNNWj9W3IrDJO59L9+9inh0Y2MsEZpLTdxzVU8Unb4/0FQng==
   dependencies:
     "@types/react" "*"
     "@types/react-native" "*"
@@ -3006,10 +3006,10 @@ detect-newline@^3.0.0:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
 
-detox@^17.5.4:
-  version "17.5.4"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-17.5.4.tgz#9c02c1e0107da704cdeb16422663df49f11d8f16"
-  integrity sha512-cByAGQHyDpdDDBN0Yt600fhUKzzCe8s43mismzr3uGuzB+kukdQgczb2/s7ivoGojT7RW9HBE851nD3Ree2tjg==
+detox@^17.5.6:
+  version "17.5.6"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-17.5.6.tgz#b50131628a7a950e924115195abecb7242b43ddf"
+  integrity sha512-OTbkJah+L4YiYtPJRCCwA/MoAaOLezJmlNuuickr5lX8gvcuezn2m7QBl3ndaSBCRNSMcdid1Q1au4X95QG/dQ==
   dependencies:
     bunyan "^1.8.12"
     bunyan-debug-stream "^1.1.0"
@@ -6714,10 +6714,10 @@ react-native-reanimated@^1.13.0:
   dependencies:
     fbjs "^1.0.0"
 
-react-native-safe-area-context@^3.1.7:
-  version "3.1.7"
-  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.1.7.tgz#fc9e636dfb168f992a2172d363509ce0611a8403"
-  integrity sha512-qSyg/pVMwVPgAy8yCvw349Q+uEUhtRBV33eVXHHkfoou1vCChJxI7SmNR47/6M3BLdjWcyc4lcd018Kx+jhQCw==
+react-native-safe-area-context@^3.1.8:
+  version "3.1.8"
+  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.1.8.tgz#7a9883aa0f38f9c77d4bef2b89e4e285bc1024a3"
+  integrity sha512-9gUlsDZ96QwT9AKzA6aVWM/NX5rlJgauZ9HgCDVzKbe29UQYT1740QJnnaI2GExmkFGp6o7ZLNhCXZW95eYVFA==
 
 react-native-screens@^2.11.0:
   version "2.11.0"
@@ -6765,10 +6765,10 @@ react-native-vector-icons@^7.1.0:
     prop-types "^15.7.2"
     yargs "^15.0.2"
 
-react-native-version-info@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/react-native-version-info/-/react-native-version-info-1.0.1.tgz#6d1740f741e40adbc09dabfe2fe9049b59a0a6ab"
-  integrity sha512-8OnKRYncEBMYsmCEuj/v349KwEIldKrV7Y+yeSceBOsEJba2rH1wRLyA5gbkmfRnxzOWLGfY5hkxmpE+zv3c+Q==
+react-native-version-info@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-version-info/-/react-native-version-info-1.1.0.tgz#1407de863cae4dbbeeadb9c173a295a7774b6884"
+  integrity sha512-0QmJjdKyaW+G/TiOWkwzGVv1G3FPnWrPH5SYWloUpv8WA7onuQESYHdLyjfCUInYI/FHVeEynE2VomOOsda8wQ==
 
 react-native-webview@^10.9.0:
   version "10.9.0"
