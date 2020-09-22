@@ -1,6 +1,6 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
 import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
 import {
   SCREEN_AUTHENTICATE_PRIVILEGES,

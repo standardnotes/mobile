@@ -6,8 +6,8 @@ import {
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
 import { PasscodeKeyboardType, UnlockTiming } from '@Lib/ApplicationState';
-import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_PASSCODE } from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, { useContext, useMemo, useRef, useState } from 'react';

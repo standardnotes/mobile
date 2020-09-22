@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
 import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, {

@@ -1,6 +1,6 @@
 import SegmentedControl from '@react-native-community/segmented-control';
-import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
 import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,

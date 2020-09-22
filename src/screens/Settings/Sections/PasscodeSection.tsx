@@ -8,8 +8,8 @@ import { TableSection } from '@Components/TableSection';
 import { UnlockTiming } from '@Lib/ApplicationState';
 import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
 import {
   SCREEN_AUTHENTICATE_PRIVILEGES,

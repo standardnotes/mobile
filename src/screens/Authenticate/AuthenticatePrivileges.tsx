@@ -3,8 +3,8 @@ import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTable
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { AppStateType, PasscodeKeyboardType } from '@Lib/ApplicationState';
-import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE_PRIVILEGES } from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, {

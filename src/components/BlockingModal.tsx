@@ -1,4 +1,4 @@
-import { ModalStackNavigationProp } from '@Root/App';
+import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { MODAL_BLOCKING_ALERT } from '@Screens/screens';
 import React from 'react';
 import { Container, Content, Subtitle, Title } from './BlockingModal.styled';

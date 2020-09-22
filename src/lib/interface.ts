@@ -22,7 +22,7 @@ const legacyIdentifier = 'standardnotes';
  */
 const isLegacyIdentifier = function (identifier: ApplicationIdentifier) {
   return identifier && identifier === legacyIdentifier;
-}
+};
 
 export class MobileDeviceInterface extends DeviceInterface {
   constructor() {
@@ -263,5 +263,4 @@ export class MobileDeviceInterface extends DeviceInterface {
       })
       .catch(() => showAlert());
   }
-
 }

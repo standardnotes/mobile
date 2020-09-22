@@ -2,8 +2,8 @@ import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
 import { useFocusEffect } from '@react-navigation/native';
-import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, {

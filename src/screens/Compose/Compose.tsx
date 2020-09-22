@@ -1,8 +1,8 @@
 import { AppStateEventType } from '@Lib/ApplicationState';
 import { Editor } from '@Lib/Editor';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { StyleKit, StyleKitContext } from '@Style/StyleKit';

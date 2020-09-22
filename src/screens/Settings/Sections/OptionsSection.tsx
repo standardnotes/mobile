@@ -5,8 +5,8 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { useSignedIn } from '@Lib/snjsHooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
 import {
   SCREEN_AUTHENTICATE_PRIVILEGES,

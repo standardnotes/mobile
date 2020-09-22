@@ -5,8 +5,8 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { AppStateType, PasscodeKeyboardType } from '@Lib/ApplicationState';
 import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect } from '@react-navigation/native';
-import { ModalStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, {

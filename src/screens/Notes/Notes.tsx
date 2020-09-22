@@ -1,8 +1,8 @@
 import { AppStateType } from '@Lib/ApplicationState';
 import { useSignedIn, useSyncStatus } from '@Lib/snjsHooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
 import { ICON_ADD } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';

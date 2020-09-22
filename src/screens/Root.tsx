@@ -5,8 +5,8 @@ import {
 } from '@Lib/ApplicationState';
 import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
 import { useFocusEffect } from '@react-navigation/native';
-import { AppStackNavigationProp } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
 import {
   SCREEN_AUTHENTICATE_PRIVILEGES,
   SCREEN_COMPOSE,
