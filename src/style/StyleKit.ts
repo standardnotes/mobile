@@ -10,7 +10,6 @@ import React from 'react';
 import {
   Alert,
   Appearance,
-  ColorSchemeName,
   Platform,
   StatusBar,
   TextStyle,
@@ -32,7 +31,7 @@ import { StyleKitTheme } from './Themes/styled-components';
 
 const LIGHT_THEME_KEY = 'lightTheme';
 const DARK_THEME_KEY = 'darkTheme';
-const CACHED_THEMES_KEY = 'cachedThemes';
+const CACHED_THEMES_KEY = 'cachedThemesKey';
 
 type ThemeChangeObserver = () => Promise<void> | void;
 
@@ -61,7 +60,6 @@ export class StyleKit {
   observers: ThemeChangeObserver[] = [];
   private themeData: Record<UuidString, ThemeContent> = {};
   activeThemeId?: string;
-  currentDarkMode: ColorSchemeName;
   static constants = {
     mainTextFontSize: 16,
     paddingLeft: 14,
@@ -83,12 +81,12 @@ export class StyleKit {
   async init() {
     await this.setExternalThemes();
     await this.resolveInitialThemeForMode();
-    Appearance.addChangeListener(this.setModeTo.bind(this));
+    Appearance.addChangeListener(this.onColorSchemeChange.bind(this));
     this.registerObservers();
   }
 
   deinit() {
-    Appearance.removeChangeListener(this.setModeTo.bind(this));
+    Appearance.removeChangeListener(this.onColorSchemeChange.bind(this));
     this.unregisterComponentHandler && this.unregisterComponentHandler();
     this.unsubscribeStreamThemes && this.unsubscribeStreamThemes();
     this.unsubsribeAppEventObserver && this.unsubsribeAppEventObserver();
@@ -133,13 +131,13 @@ export class StyleKit {
         uuid: SystemThemes.Blue,
         variables: THEME_BLUE_JSON,
         name: SystemThemes.Blue,
-        isInitial: Appearance.getColorScheme() === 'light',
+        isInitial: this.getColorScheme() === 'light',
       },
       {
         uuid: SystemThemes.Dark,
         variables: THEME_DARK_JSON,
         name: SystemThemes.Dark,
-        isInitial: Appearance.getColorScheme() === 'dark',
+        isInitial: this.getColorScheme() === 'dark',
       },
       {
         uuid: SystemThemes.Red,
@@ -173,9 +171,15 @@ export class StyleKit {
     }
   }
 
-  private setModeTo(preferences: Appearance.AppearancePreferences) {
-    this.currentDarkMode = preferences.colorScheme;
+  private onColorSchemeChange() {
     this.resolveInitialThemeForMode();
+  }
+
+  /**
+   * Returns color scheme or light scheme as a default
+   */
+  private getColorScheme() {
+    return Appearance.getColorScheme() || 'light';
   }
 
   /**
@@ -215,7 +219,7 @@ export class StyleKit {
      * If we're changing the theme for a specific mode and we're currently on
      * that mode, then activate this theme.
      */
-    if (this.currentDarkMode === mode && this.activeThemeId !== themeId) {
+    if (this.getColorScheme() === mode && this.activeThemeId !== themeId) {
       this.activateTheme(themeId);
     }
   }
@@ -246,18 +250,15 @@ export class StyleKit {
   }
 
   private setDefaultTheme() {
-    const defaultTheme =
-      Appearance.getColorScheme() === 'dark'
-        ? SystemThemes.Dark
-        : SystemThemes.Blue;
+    const defaultThemeId =
+      this.getColorScheme() === 'dark' ? SystemThemes.Dark : SystemThemes.Blue;
 
-    this.setActiveTheme(defaultTheme);
+    this.setActiveTheme(defaultThemeId);
   }
 
   private async resolveInitialThemeForMode() {
-    const currentMode = Appearance.getColorScheme() || 'light';
     try {
-      const savedThemeId = await this.getThemeForMode(currentMode);
+      const savedThemeId = await this.getThemeForMode(this.getColorScheme());
       const matchingThemeId = Object.keys(this.themeData).find(
         themeId => themeId === savedThemeId
       );
@@ -423,8 +424,7 @@ export class StyleKit {
 
   private activateTheme(themeId: string) {
     this.setActiveTheme(themeId);
-    const currentMode = Appearance.getColorScheme() || 'light'; // set to light in case of no support for dark theme
-    this.assignThemeForMode(themeId, currentMode);
+    this.assignThemeForMode(themeId, this.getColorScheme());
   }
 
   private async setExternalThemes() {
