@@ -5,8 +5,7 @@ import { enableScreens } from 'react-native-screens';
 import { AppRegistry, YellowBox } from 'react-native';
 import { App } from './src/App';
 import { name as appName } from './app.json';
-// TODO: this breaks typescript and has to be fixed
-// import 'style/AndroidTextFix';
+import { enableAndroidFontFix } from './src/style/AndroidTextFix';
 
 require('react-native').unstable_enableLogBox();
 
@@ -17,8 +16,13 @@ YellowBox.ignoreWarnings([
 enableScreens();
 
 if (__DEV__ === false) {
+  console.log = () => {};
+  console.warn = () => {};
+  console.error = () => {};
   // eslint-disable-next-line no-new
   new Bugsnag.start();
 }
+
+enableAndroidFontFix();
 
 AppRegistry.registerComponent(appName, () => App);

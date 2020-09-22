@@ -55,7 +55,7 @@
     "sn-textview": "standardnotes/sn-textview#d62eee0",
     "sncrypto": "standardnotes/sncrypto#5f8cd36",
     "snjs": "standardnotes/snjs#efd524f",
-    "standard-notes-rn": "standardnotes/standard-notes-rn#03cf9ac",
+    "standard-notes-rn": "standardnotes/standard-notes-rn#996b016",
     "styled-components": "^5.2.0"
   },
   "devDependencies": {
@@ -74,7 +74,7 @@
     "babel-jest": "^26.3.0",
     "bugsnag-sourcemaps": "^1.3.0",
     "concurrently": "^5.3.0",
-    "detox": "^17.5.6",
+    "detox": "^17.5.7",
     "eslint": "^7.9.0",
     "eslint-plugin-prettier": "^3.1.4",
     "faker": "^5.1.0",
