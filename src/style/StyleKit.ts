@@ -76,6 +76,8 @@ export class StyleKit {
   constructor(application: MobileApplication) {
     this.application = application;
     this.buildSystemThemesAndData();
+    // set default theme in case of migration is run
+    this.setDefaultTheme();
   }
 
   async init() {
@@ -243,31 +245,30 @@ export class StyleKit {
     return Object.assign({}, THEME_BLUE_JSON);
   }
 
+  private setDefaultTheme() {
+    const defaultTheme =
+      Appearance.getColorScheme() === 'dark'
+        ? SystemThemes.Dark
+        : SystemThemes.Blue;
+
+    this.setActiveTheme(defaultTheme);
+  }
+
   private async resolveInitialThemeForMode() {
     const currentMode = Appearance.getColorScheme() || 'light';
-    const runDefaultTheme = () => {
-      const defaultTheme =
-        Appearance.getColorScheme() === 'dark'
-          ? SystemThemes.Dark
-          : SystemThemes.Blue;
-
-      this.setActiveTheme(defaultTheme);
-    };
-
-    const savedThemeId = await this.getThemeForMode(currentMode);
-
     try {
+      const savedThemeId = await this.getThemeForMode(currentMode);
       const matchingThemeId = Object.keys(this.themeData).find(
         themeId => themeId === savedThemeId
       );
       if (matchingThemeId) {
         this.setActiveTheme(matchingThemeId);
       } else {
-        runDefaultTheme();
+        this.setDefaultTheme();
       }
     } catch (e) {
       console.error('Error parsing initial theme', e);
-      return runDefaultTheme();
+      return this.setDefaultTheme();
     }
   }
 

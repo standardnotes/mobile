@@ -10,6 +10,20 @@ export type BiometricsType =
   | 'Biometrics'
   | 'Touch ID';
 
+/**
+ * This identifier was the database name used in Standard Notes web/desktop.
+ */
+const legacyIdentifier = 'standardnotes';
+
+/**
+ * We use this function to decide if we need to prefix the identifier in getDatabaseKeyPrefix or not.
+ * It is also used to decide if the raw or the namespaced keychain is used.
+ * @param identifier The ApplicationIdentifier
+ */
+const isLegacyIdentifier = function (identifier: ApplicationIdentifier) {
+  return identifier && identifier === legacyIdentifier;
+}
+
 export class MobileDeviceInterface extends DeviceInterface {
   constructor() {
     super(setTimeout, setInterval);
@@ -19,11 +33,12 @@ export class MobileDeviceInterface extends DeviceInterface {
     super.deinit();
   }
 
-  private getDatabaseKeyPrefix(_identifier: ApplicationIdentifier) {
-    /**
-     * The default identifier (standardnotes) is used, but we don't want to prefix items with it just yet.
-     */
-    return 'Item-';
+  private getDatabaseKeyPrefix(identifier: ApplicationIdentifier) {
+    if (identifier && !isLegacyIdentifier(identifier)) {
+      return `${identifier}-Item-`;
+    } else {
+      return 'Item-';
+    }
   }
 
   private keyForPayloadId(id: string, identifier: ApplicationIdentifier) {
@@ -167,6 +182,9 @@ export class MobileDeviceInterface extends DeviceInterface {
 
   async getNamespacedKeychainValue(identifier: ApplicationIdentifier) {
     const keychain = await this.getRawKeychainValue();
+    if (isLegacyIdentifier(identifier)) {
+      return keychain;
+    }
     if (!keychain) {
       return;
     }
@@ -177,6 +195,9 @@ export class MobileDeviceInterface extends DeviceInterface {
     value: any,
     identifier: ApplicationIdentifier
   ) {
+    if (isLegacyIdentifier(identifier)) {
+      return Keychain.setKeys(value);
+    }
     let keychain = await this.getRawKeychainValue();
     if (!keychain) {
       keychain = {};
@@ -188,6 +209,9 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   async clearNamespacedKeychainValue(identifier: ApplicationIdentifier) {
+    if (isLegacyIdentifier(identifier)) {
+      return this.clearRawKeychainValue();
+    }
     const keychain = await this.getRawKeychainValue();
     if (!keychain) {
       return;
@@ -239,4 +263,5 @@ export class MobileDeviceInterface extends DeviceInterface {
       })
       .catch(() => showAlert());
   }
+
 }
