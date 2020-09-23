@@ -79,7 +79,9 @@ export const NoteList = (props: Props): JSX.Element => {
   }, [application]);
 
   useEffect(() => {
-    // Android workaound to fix clear search not working
+    /**
+     * Android workaound to fix clear search not working
+     */
     setSearchText('');
   }, []);
 
@@ -90,11 +92,6 @@ export const NoteList = (props: Props): JSX.Element => {
   );
 
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
-    /**
-     * On Android, only one tag is selected at a time. If it is selected, we
-     * don't need to display the tags string above the note cell.
-     */
-
     return (
       <NoteCell
         note={item}

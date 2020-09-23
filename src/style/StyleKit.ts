@@ -74,15 +74,13 @@ export class StyleKit {
   constructor(application: MobileApplication) {
     this.application = application;
     this.buildSystemThemesAndData();
-    // set default theme in case of migration is run
-    this.setDefaultTheme();
+    this.registerObservers();
   }
 
   async init() {
     await this.setExternalThemes();
     await this.resolveInitialThemeForMode();
     Appearance.addChangeListener(this.onColorSchemeChange.bind(this));
-    this.registerObservers();
   }
 
   deinit() {
@@ -108,6 +106,14 @@ export class StyleKit {
     );
     this.unsubsribeAppEventObserver = this.application.addEventObserver(
       async event => {
+        /**
+         * If there are any migrations we need to set default theme to start UI
+         */
+        if (event === ApplicationEvent.MigrationsLoaded) {
+          if (await this.application.hasPendingMigrations()) {
+            this.setDefaultTheme();
+          }
+        }
         if (event === ApplicationEvent.Launched) {
           // Resolve initial theme after app launched
           this.resolveInitialThemeForMode();

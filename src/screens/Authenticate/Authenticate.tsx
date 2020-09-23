@@ -165,7 +165,7 @@ export const Authenticate = ({
             ?.getAppState()
             .performActionWithoutStateChangeImpact(async () => {
               await FingerprintScanner.authenticate({
-                // @ts-ignore TODO: check deviceCredentialAllowed
+                // @ts-ignore ts type does not exist for deviceCredentialAllowed
                 deviceCredentialAllowed: true,
                 description: 'Biometrics are required to access your notes.',
               });

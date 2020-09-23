@@ -22,6 +22,8 @@ const AppComponent: React.FC<{
   env: 'prod' | 'dev';
 }> = ({ application, env }) => {
   const styleKit = useRef<StyleKit>();
+  const appReady = useRef(false);
+  const navigationReady = useRef(false);
   const [activeTheme, setActiveTheme] = useState<StyleKitTheme | undefined>();
 
   const setStyleKitRef = useCallback((node: StyleKit | undefined) => {
@@ -31,9 +33,29 @@ const AppComponent: React.FC<{
       });
     }
 
-    // Save a reference to the node
+    /**
+     * We check if both application and navigation are ready and launch application afterwads
+     */
     styleKit.current = node;
   }, []);
+
+  /**
+   * We check if both application and navigation are ready and launch application afterwads
+   */
+  const launchApp = useCallback(
+    (setAppReady: boolean, setNavigationReady: boolean) => {
+      if (setAppReady) {
+        appReady.current = true;
+      }
+      if (setNavigationReady) {
+        navigationReady.current = true;
+      }
+      if (navigationReady.current && appReady.current) {
+        application.launch();
+      }
+    },
+    [application]
+  );
 
   useEffect(() => {
     let styleKitInstance: StyleKit;
@@ -41,14 +63,13 @@ const AppComponent: React.FC<{
       styleKitInstance = new StyleKit(application);
 
       setStyleKitRef(styleKitInstance);
-      setActiveTheme(styleKitInstance.theme);
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
           application!.promptForChallenge(challenge);
         },
       });
       await styleKitInstance.init();
-      await application?.launch();
+      launchApp(true, false);
     };
 
     loadApplication();
@@ -57,7 +78,7 @@ const AppComponent: React.FC<{
       styleKitInstance?.deinit();
       setStyleKitRef(undefined);
     };
-  }, [application, application.Uuid, env, setStyleKitRef]);
+  }, [application, application.Uuid, env, launchApp, setStyleKitRef]);
 
   if (!styleKit.current || !activeTheme) {
     return null;
@@ -65,6 +86,7 @@ const AppComponent: React.FC<{
 
   return (
     <NavigationContainer
+      onReady={() => launchApp(false, true)}
       theme={{
         ...DefaultTheme,
         colors: {

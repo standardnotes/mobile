@@ -13,7 +13,7 @@ export type BiometricsType =
 /**
  * This identifier was the database name used in Standard Notes web/desktop.
  */
-const legacyIdentifier = 'standardnotes';
+const LEGACY_IDENTIFIER = 'standardnotes';
 
 /**
  * We use this function to decide if we need to prefix the identifier in getDatabaseKeyPrefix or not.
@@ -21,7 +21,7 @@ const legacyIdentifier = 'standardnotes';
  * @param identifier The ApplicationIdentifier
  */
 const isLegacyIdentifier = function (identifier: ApplicationIdentifier) {
-  return identifier && identifier === legacyIdentifier;
+  return identifier && identifier === LEGACY_IDENTIFIER;
 };
 
 export class MobileDeviceInterface extends DeviceInterface {
