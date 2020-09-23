@@ -61,7 +61,7 @@ export class BackupsService extends ApplicationService {
   }
 
   private async _exportIOS(filename: string, data: string) {
-    return new Promise(resolve => {
+    return new Promise<boolean>(resolve => {
       (this.application! as MobileApplication)
         .getAppState()
         .performActionWithoutStateChangeImpact(async () => {
@@ -113,7 +113,7 @@ export class BackupsService extends ApplicationService {
   }
 
   private async _exportViaEmailAndroid(data: string, filename: string) {
-    return new Promise(resolve => {
+    return new Promise<boolean>(resolve => {
       const fileType = '.json'; // Android creates a tmp file and expects dot with extension
 
       let resolved = false;
@@ -130,7 +130,7 @@ export class BackupsService extends ApplicationService {
             Alert.alert('Error', 'Unable to send email.');
           }
           resolved = true;
-          resolve();
+          resolve(false);
         }
       );
 

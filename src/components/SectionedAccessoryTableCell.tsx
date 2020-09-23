@@ -121,7 +121,18 @@ export const SectionedAccessoryTableCell: React.FC<Props> = props => {
     );
   }
 
-  const textWrapper = <Label key={1}>{props.text}</Label>;
+  const textWrapper = (
+    <Label
+      tinted={props.tinted}
+      dimmed={props.dimmed}
+      bold={props.bold}
+      selected={props.selected}
+      color={props.color}
+      key={1}
+    >
+      {props.text}
+    </Label>
+  );
 
   return (
     <TouchableContainer

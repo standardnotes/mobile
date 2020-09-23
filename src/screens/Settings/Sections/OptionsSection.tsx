@@ -13,9 +13,9 @@ import {
   SCREEN_MANAGE_PRIVILEGES,
   SCREEN_SETTINGS,
 } from '@Screens/screens';
+import moment from 'moment';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
-import { Alert } from 'react-native';
-import { ButtonType, ProtectedAction } from 'snjs';
+import { ButtonType, MobilePrefKey, ProtectedAction } from 'snjs';
 
 type Props = {
   title: string;
@@ -34,6 +34,33 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   const [exporting, setExporting] = useState(false);
   const [awaitingUnlock, setAwaitingUnlock] = useState(false);
   const [encryptedBackup, setEncryptedBackp] = useState(false);
+  const [lastExportDate, setLastExportDate] = useState<Date | undefined>(() =>
+    application
+      ?.getPrefsService()
+      .getValue(MobilePrefKey.LastExportDate, undefined)
+  );
+
+  const lastExportData = useMemo(() => {
+    if (lastExportDate) {
+      let formattedDate = moment(lastExportDate).format('lll');
+      const lastExportString = `Last exported on ${formattedDate}`;
+
+      // Date is stale if more than 7 days ago
+      let staleThreshold = 7 * 86400;
+      // @ts-ignore date type issue
+      const stale =
+        // @ts-ignore date type issue
+        (new Date() - new Date(lastExportDate)) / 1000 > staleThreshold;
+      return {
+        lastExportString,
+        stale,
+      };
+    }
+    return {
+      lastExportString: 'Your data has not yet been backed up.',
+      stale: false,
+    };
+  }, [lastExportDate]);
 
   const email = useMemo(() => {
     if (signedIn) {
@@ -84,7 +111,14 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   const exportData = useCallback(
     async (encrypted: boolean) => {
       setExporting(true);
-      await application?.getBackupsService().export(encrypted);
+      const result = await application?.getBackupsService().export(encrypted);
+      if (result) {
+        const exportDate = new Date();
+        setLastExportDate(exportDate);
+        application
+          ?.getPrefsService()
+          .setUserPrefValue(MobilePrefKey.LastExportDate, exportDate);
+      }
       setExporting(false);
     },
     [application]
@@ -176,6 +210,14 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     ])
   );
 
+  const showDataBackupAlert = useCallback(() => {
+    application?.alertService.alert(
+      'Because you are using the app offline without a sync account, it is your responsibility to keep your data safe and backed up. It is recommended you export a backup of your data at least once a week, or, to sign up for a sync account so that your data is backed up automatically.',
+      'No Backups Created',
+      'OK'
+    );
+  }, [application?.alertService]);
+  console.log(lastExportData.stale);
   return (
     <TableSection>
       <SectionHeader title={title} />
@@ -208,11 +250,10 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         <SectionedAccessoryTableCell
           testID="lastExportDate"
           onPress={() => {
-            // TODO:
-            Alert.alert('TODO', 'Not implemented yet');
+            (!lastExportDate || lastExportData.stale) && showDataBackupAlert();
           }}
-          tinted={true}
-          text={'Your data has not yet been backed up.'}
+          tinted={!lastExportDate || lastExportData.stale}
+          text={lastExportData.lastExportString}
         />
       )}
     </TableSection>
