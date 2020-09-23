@@ -20,7 +20,7 @@ import { Platform } from 'react-native';
 import FAB from 'react-native-fab';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ContentType, SNTag, SNTheme, ThemeMutator } from 'snjs';
+import { ContentType, SNTag, SNTheme } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   FirstSafeAreaView,
@@ -61,38 +61,16 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
 
   const onSystemThemeSelect = useCallback(
     async (selectedTheme: ThemeContent) => {
-      const oldTheme = application!.findItem(styleKit!.activeThemeId!) as
-        | SNTheme
-        | undefined;
-
       styleKit?.activateSystemTheme(selectedTheme.uuid);
-      if (oldTheme?.isTheme() && oldTheme.isMobileActive()) {
-        await application?.changeAndSaveItem(oldTheme.uuid, mutator => {
-          const themeMutator = mutator as ThemeMutator;
-          themeMutator.setMobileActive(false);
-        });
-      }
     },
-    [application, styleKit]
+    [styleKit]
   );
 
   const onThemeSelect = useCallback(
     async (selectedTheme: SNTheme) => {
-      if (!selectedTheme.isMobileActive()) {
-        await application?.changeItem(selectedTheme.uuid, mutator => {
-          const themeMutator = mutator as ThemeMutator;
-          themeMutator.setMobileActive(true);
-        });
-        if (application!.findItem(styleKit!.activeThemeId!)) {
-          await application?.changeItem(styleKit!.activeThemeId!, mutator => {
-            const themeMutator = mutator as ThemeMutator;
-            themeMutator.setMobileActive(false);
-          });
-        }
-        await application?.sync();
-      }
+      styleKit?.activateExternalTheme(selectedTheme);
     },
-    [application, styleKit]
+    [styleKit]
   );
 
   const onThemeLongPress = useCallback(

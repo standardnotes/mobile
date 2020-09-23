@@ -217,7 +217,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       'OK'
     );
   }, [application?.alertService]);
-  console.log(lastExportData.stale);
+
   return (
     <TableSection>
       <SectionHeader title={title} />

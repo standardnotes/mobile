@@ -17,7 +17,6 @@ import {
 } from 'react-native';
 import {
   ApplicationEvent,
-  ContentType,
   removeFromArray,
   SNComponent,
   SNTheme,
@@ -91,19 +90,6 @@ export class StyleKit {
   }
 
   private registerObservers() {
-    this.unsubscribeStreamThemes = this.application.streamItems(
-      ContentType.Theme,
-      items => {
-        const themes = items as SNTheme[];
-        const activeTheme = themes.find(el => {
-          return !el.deleted && !el.errorDecrypting && el.isMobileActive();
-        });
-
-        if (activeTheme && activeTheme.uuid !== this.activeThemeId) {
-          this.activateExternalTheme(activeTheme);
-        }
-      }
-    );
     this.unsubsribeAppEventObserver = this.application.addEventObserver(
       async event => {
         /**

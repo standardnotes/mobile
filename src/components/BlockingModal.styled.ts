@@ -11,6 +11,7 @@ export const Content = styled.View`
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   padding: 20px;
   border-radius: 10px;
+  width: 80%;
 `;
 
 export const Title = styled.Text`
