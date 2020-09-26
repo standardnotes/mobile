@@ -26,20 +26,17 @@ export enum AuthenticationValueStateType {
 }
 
 type ChallengeValueState = {
-  challengeValues: Record<ChallengePrompt['id'], ChallengeValue>;
-  challengeValueStates: Record<
-    ChallengePrompt['id'],
-    AuthenticationValueStateType
-  >;
+  challengeValues: Record<string, ChallengeValue>;
+  challengeValueStates: Record<string, AuthenticationValueStateType>;
 };
 type SetChallengeValueState = {
   type: 'setState';
-  id: ChallengePrompt['id'];
+  id: string;
   state: AuthenticationValueStateType;
 };
 type SetChallengeValue = {
   type: 'setValue';
-  id: ChallengePrompt['id'];
+  id: string;
   value: ChallengeValue['value'];
 };
 
@@ -177,6 +174,15 @@ export const getTitleForPrivilegeLockStateAndType = (
       }
     }
   }
+};
+
+export const findIndexInObject = (
+  map:
+    | ChallengeValueState['challengeValues']
+    | ChallengeValueState['challengeValueStates'],
+  id: string
+) => {
+  return Object.keys(map).indexOf(id);
 };
 
 export const getChallengePromptTitle = (

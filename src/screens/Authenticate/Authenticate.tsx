@@ -39,6 +39,7 @@ import {
 import {
   authenticationReducer,
   AuthenticationValueStateType,
+  findIndexInObject,
   getChallengePromptTitle,
   getLabelForStateAndType,
   isInActiveState,
@@ -106,7 +107,7 @@ export const Authenticate = ({
 
       dispatch({
         type: 'setState',
-        id: challengeValue.prompt.id,
+        id: challengeValue.prompt.id.toString(),
         state: AuthenticationValueStateType.Pending,
       });
 
@@ -118,14 +119,14 @@ export const Authenticate = ({
   const onValueLocked = useCallback((challengeValue: ChallengeValue) => {
     dispatch({
       type: 'setState',
-      id: challengeValue.prompt.id,
+      id: challengeValue.prompt.id.toString(),
       state: AuthenticationValueStateType.Locked,
     });
 
     setTimeout(() => {
       dispatch({
         type: 'setState',
-        id: challengeValue.prompt.id,
+        id: challengeValue.prompt.id.toString(),
         state: AuthenticationValueStateType.WaitingTurn,
       });
     }, 30 * 1000);
@@ -153,7 +154,7 @@ export const Authenticate = ({
         FingerprintScanner.release();
         dispatch({
           type: 'setState',
-          id: challengeValue.prompt.id,
+          id: challengeValue.prompt.id.toString(),
           state: AuthenticationValueStateType.Fail,
         });
         Alert.alert(
@@ -193,7 +194,7 @@ export const Authenticate = ({
           } else {
             dispatch({
               type: 'setState',
-              id: challengeValue.prompt.id,
+              id: challengeValue.prompt.id.toString(),
               state: AuthenticationValueStateType.Fail,
             });
             Alert.alert(
@@ -230,7 +231,7 @@ export const Authenticate = ({
           }
           dispatch({
             type: 'setState',
-            id: challengeValue.prompt.id,
+            id: challengeValue.prompt.id.toString(),
             state: AuthenticationValueStateType.Fail,
           });
         }
@@ -245,29 +246,30 @@ export const Authenticate = ({
     ]
   );
 
-  const firstNotSuccessful = useMemo(
-    () =>
-      challengeValueStates.findIndex(
-        state => state !== AuthenticationValueStateType.Success
-      ),
-    [challengeValueStates]
-  );
+  const firstNotSuccessful = useMemo(() => {
+    for (const id in challengeValueStates) {
+      if (challengeValueStates[id] !== AuthenticationValueStateType.Success) {
+        return (id as unknown) as number;
+      }
+    }
+  }, [challengeValueStates]);
 
   const beginAuthenticatingForNextChallengeReason = useCallback(
     (completedChallengeValue?: ChallengeValue) => {
       let challengeValue;
       if (completedChallengeValue === undefined) {
-        challengeValue = challengeValues[firstNotSuccessful];
+        challengeValue = challengeValues[firstNotSuccessful!];
       } else {
-        const index = findMatchingValueIndex(
+        const index = findIndexInObject(
           challengeValues,
-          completedChallengeValue.type
+          completedChallengeValue.prompt.id.toString()
         );
 
-        if (!challengeValues.hasOwnProperty(index + 1)) {
+        if (!Object.keys(challengeValues).hasOwnProperty(index + 1)) {
           return;
         }
-        challengeValue = challengeValues[index + 1];
+        const nextItemId = Object.keys(challengeValues)[index + 1];
+        challengeValue = challengeValues[nextItemId];
       }
 
       /**
@@ -300,7 +302,7 @@ export const Authenticate = ({
 
       dispatch({
         type: 'setState',
-        id: challengeValue.prompt.id,
+        id: challengeValue.prompt.id.toString(),
         state: AuthenticationValueStateType.WaitingInput,
       });
     },
@@ -311,7 +313,7 @@ export const Authenticate = ({
     (value: ChallengeValue) => {
       dispatch({
         type: 'setState',
-        id: value.prompt.id,
+        id: value.prompt.id.toString(),
         state: AuthenticationValueStateType.Success,
       });
       beginAuthenticatingForNextChallengeReason(value);
@@ -322,7 +324,7 @@ export const Authenticate = ({
   const onInvalidValue = (value: ChallengeValue) => {
     dispatch({
       type: 'setState',
-      id: value.prompt.id,
+      id: value.prompt.id.toString(),
       state: AuthenticationValueStateType.Fail,
     });
   };
@@ -342,16 +344,16 @@ export const Authenticate = ({
   }, [application, beginAuthenticatingForNextChallengeReason]);
 
   useEffect(() => {
-    if (application?.setChallengeCallbacks) {
-      application?.setChallengeCallbacks({
-        challenge,
-        onValidValue,
-        onInvalidValue,
-        onComplete: () => {
-          navigation.goBack();
-        },
-      });
-    }
+    application?.addChallengeObserver(challenge, {
+      onValidValue,
+      onInvalidValue,
+      onComplete: () => {
+        navigation.goBack();
+      },
+      onCancel: () => {
+        navigation.goBack();
+      },
+    });
   }, [application, challenge, navigation, onValidValue]);
 
   useEffect(() => {
@@ -385,11 +387,10 @@ export const Authenticate = ({
   }, []);
 
   const onBiometricDirectPress = () => {
-    const index = findMatchingValueIndex(
-      challengeValues,
-      ChallengeValidation.Biometric
+    const biometricChallengeValue = Object.values(challengeValues).find(
+      value => value.prompt.validation === ChallengeValidation.Biometric
     );
-    const state = challengeValueStates[index];
+    const state = challengeValueStates[biometricChallengeValue?.prompt.id!];
     if (state === AuthenticationValueStateType.Locked) {
       return;
     }
@@ -400,7 +401,7 @@ export const Authenticate = ({
   const onValueChange = (newValue: ChallengeValue) => {
     dispatch({
       type: 'setValue',
-      id: newValue.prompt.id,
+      id: newValue.prompt.id.toString(),
       value: newValue.value,
     });
   };
@@ -420,9 +421,8 @@ export const Authenticate = ({
   );
 
   const onSubmitPress = () => {
-    const challengeValue = challengeValues[firstNotSuccessful];
-    const index = findMatchingValueIndex(challengeValues, challengeValue.type);
-    const state = challengeValueStates[index];
+    const challengeValue = challengeValues[firstNotSuccessful!];
+    const state = challengeValueStates[firstNotSuccessful!];
     if (
       challengeValue.prompt.validation === ChallengeValidation.Biometric &&
       (state === AuthenticationValueStateType.Locked ||
@@ -448,8 +448,8 @@ export const Authenticate = ({
     index: number
   ) => {
     const first = index === 0;
-    const last = index === challengeValues.length - 1;
-    const state = challengeValueStates[index];
+    const last = index === Object.keys(challengeValues).length - 1;
+    const state = challengeValueStates[challengeValue.prompt.id];
     const active = isInActiveState(state);
     const isInput =
       challengeValue.prompt.validation === ChallengeValidation.LocalPasscode ||
@@ -458,6 +458,7 @@ export const Authenticate = ({
       challengeValue.prompt.validation,
       state
     );
+
     const stateTitle = getChallengePromptTitle(challengeValue.prompt, state);
 
     return (
@@ -536,7 +537,7 @@ export const Authenticate = ({
 
   const isPending = useMemo(
     () =>
-      challengeValueStates.findIndex(
+      Object.values(challengeValueStates).findIndex(
         state => state === AuthenticationValueStateType.Pending
       ) >= 0,
     [challengeValueStates]
@@ -560,7 +561,7 @@ export const Authenticate = ({
           <Subtitle>{textData}</Subtitle>
         </BaseView>
       </StyledSectionedTableCell>
-      {challengeValues.map((challengeValue, index) =>
+      {Object.values(challengeValues).map((challengeValue, index) =>
         renderAuthenticationSource(challengeValue, index)
       )}
       <ButtonCell
