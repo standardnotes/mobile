@@ -1,11 +1,9 @@
-import { ChallengeType, ChallengeValue, PrivilegeCredential } from 'snjs';
-
-export const findMatchingValueIndex = (
-  values: ChallengeValue[],
-  type: ChallengeValue['type']
-) => {
-  return values.findIndex(arrayValue => type === arrayValue.type);
-};
+import {
+  ChallengePrompt,
+  ChallengeValidation,
+  ChallengeValue,
+  PrivilegeCredential,
+} from 'snjs';
 
 export const findMatchingPrivilegeValueIndex = (
   values: PrivilegeLockValue[],
@@ -28,17 +26,20 @@ export enum AuthenticationValueStateType {
 }
 
 type ChallengeValueState = {
-  challengeValues: ChallengeValue[];
-  challengeValueStates: AuthenticationValueStateType[];
+  challengeValues: Record<ChallengePrompt['id'], ChallengeValue>;
+  challengeValueStates: Record<
+    ChallengePrompt['id'],
+    AuthenticationValueStateType
+  >;
 };
 type SetChallengeValueState = {
   type: 'setState';
-  valueType: ChallengeValue['type'];
+  id: ChallengePrompt['id'];
   state: AuthenticationValueStateType;
 };
 type SetChallengeValue = {
   type: 'setValue';
-  valueType: ChallengeValue['type'];
+  id: ChallengePrompt['id'];
   value: ChallengeValue['value'];
 };
 
@@ -102,72 +103,58 @@ export const authenticationReducer = (
 ): ChallengeValueState => {
   switch (action.type) {
     case 'setState': {
-      const tempArray = state.challengeValueStates.slice();
-      const index = findMatchingValueIndex(
-        state.challengeValues,
-        action.valueType
-      );
-      tempArray[index] = action.state;
-      return { ...state, challengeValueStates: tempArray };
+      return {
+        ...state,
+        challengeValueStates: {
+          ...state.challengeValueStates,
+          [action.id]: action.state,
+        },
+      };
     }
     case 'setValue': {
-      const tempArray = state.challengeValues.slice();
-      const index = findMatchingValueIndex(
-        state.challengeValues,
-        action.valueType
-      );
-      tempArray[index] = {
-        type: state.challengeValues[index].type,
-        value: action.value,
+      const updatedChallengeValue = state.challengeValues[action.id];
+      return {
+        ...state,
+        challengeValues: {
+          ...state.challengeValues,
+          [action.id]: {
+            ...updatedChallengeValue,
+            value: action.value,
+          },
+        },
       };
-      return { ...state, challengeValues: tempArray };
     }
     default:
       return state;
   }
 };
 
-const mapPrivilageCredentialToChallengeType = (
+const mapPrivilageCredentialToChallengeValidation = (
   credential: PrivilegeCredential
 ) => {
   switch (credential) {
     case PrivilegeCredential.AccountPassword:
-      return ChallengeType.AccountPassword;
+      return ChallengeValidation.AccountPassword;
     case PrivilegeCredential.LocalPasscode:
-      return ChallengeType.LocalPasscode;
+      return ChallengeValidation.LocalPasscode;
   }
 };
-
-export const getTitleForPrivilegeLockStateAndType = (
-  privilegeValue: PrivilegeLockValue,
-  state: AuthenticationValueStateType
-) =>
-  getTitleForStateAndType(
-    {
-      ...privilegeValue,
-      type: mapPrivilageCredentialToChallengeType(privilegeValue.type),
-    },
-    state
-  );
 
 export const getLabelForPrivilegeLockStateAndType = (
   privilegeValue: PrivilegeLockValue,
   state: AuthenticationValueStateType
 ) =>
   getLabelForStateAndType(
-    {
-      ...privilegeValue,
-      type: mapPrivilageCredentialToChallengeType(privilegeValue.type),
-    },
+    mapPrivilageCredentialToChallengeValidation(privilegeValue.type),
     state
   );
 
-export const getTitleForStateAndType = (
-  challengeValue: ChallengeValue,
+export const getTitleForPrivilegeLockStateAndType = (
+  privilegeValue: PrivilegeLockValue,
   state: AuthenticationValueStateType
 ) => {
-  switch (challengeValue.type) {
-    case ChallengeType.AccountPassword: {
+  switch (privilegeValue.type) {
+    case PrivilegeCredential.AccountPassword: {
       const title = 'Account Password';
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
@@ -178,19 +165,8 @@ export const getTitleForStateAndType = (
           return title;
       }
     }
-    case ChallengeType.LocalPasscode: {
+    case PrivilegeCredential.LocalPasscode: {
       const title = 'Local Passcode';
-      switch (state) {
-        case AuthenticationValueStateType.WaitingTurn:
-          return title.concat(' ', '- Waiting.');
-        case AuthenticationValueStateType.Locked:
-          return title.concat(' ', '- Locked.');
-        default:
-          return title;
-      }
-    }
-    case ChallengeType.Biometric: {
-      const title = 'Biometrics';
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
           return title.concat(' ', '- Waiting.');
@@ -203,12 +179,27 @@ export const getTitleForStateAndType = (
   }
 };
 
-export const getLabelForStateAndType = (
-  challengeValue: ChallengeValue,
+export const getChallengePromptTitle = (
+  prompt: ChallengePrompt,
   state: AuthenticationValueStateType
 ) => {
-  switch (challengeValue.type) {
-    case ChallengeType.AccountPassword: {
+  const title = prompt.title!;
+  switch (state) {
+    case AuthenticationValueStateType.WaitingTurn:
+      return title.concat(' ', '- Waiting.');
+    case AuthenticationValueStateType.Locked:
+      return title.concat(' ', '- Locked.');
+    default:
+      return title;
+  }
+};
+
+export const getLabelForStateAndType = (
+  validation: ChallengeValidation,
+  state: AuthenticationValueStateType
+) => {
+  switch (validation) {
+    case ChallengeValidation.AccountPassword: {
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
         case AuthenticationValueStateType.WaitingInput:
@@ -223,7 +214,7 @@ export const getLabelForStateAndType = (
           return '';
       }
     }
-    case ChallengeType.LocalPasscode: {
+    case ChallengeValidation.LocalPasscode: {
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
         case AuthenticationValueStateType.WaitingInput:
@@ -238,7 +229,7 @@ export const getLabelForStateAndType = (
           return '';
       }
     }
-    case ChallengeType.Biometric: {
+    case ChallengeValidation.Biometric: {
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
         case AuthenticationValueStateType.WaitingInput:

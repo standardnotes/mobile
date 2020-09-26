@@ -20,7 +20,12 @@ import React, {
 } from 'react';
 import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import { ChallengeReason, ChallengeType, ChallengeValue } from 'snjs';
+import {
+  ChallengePrompt,
+  ChallengeReason,
+  ChallengeValidation,
+  ChallengeValue,
+} from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   BaseView,
@@ -34,9 +39,8 @@ import {
 import {
   authenticationReducer,
   AuthenticationValueStateType,
-  findMatchingValueIndex,
+  getChallengePromptTitle,
   getLabelForStateAndType,
-  getTitleForStateAndType,
   isInActiveState,
 } from './helpers';
 
@@ -70,13 +74,17 @@ export const Authenticate = ({
   const [{ challengeValues, challengeValueStates }, dispatch] = useReducer(
     authenticationReducer,
     {
-      challengeValues: challenge.types.map(challengeType => ({
-        value: false,
-        type: challengeType,
-      })),
-      challengeValueStates: challenge.types.map(
-        () => AuthenticationValueStateType.WaitingTurn
-      ),
+      challengeValues: challenge.prompts.reduce((map, current) => {
+        map[current.id] = {
+          prompt: current,
+          value: false,
+        } as ChallengeValue;
+        return map;
+      }, {} as Record<ChallengePrompt['id'], ChallengeValue>),
+      challengeValueStates: challenge.prompts.reduce((map, current) => {
+        map[current.id] = AuthenticationValueStateType.WaitingInput;
+        return map;
+      }, {} as Record<ChallengePrompt['id'], AuthenticationValueStateType>),
     },
     undefined
   );
@@ -87,11 +95,7 @@ export const Authenticate = ({
 
   const validateChallengeValue = useCallback(
     async (challengeValue: ChallengeValue) => {
-      const index = findMatchingValueIndex(
-        challengeValues,
-        challengeValue.type
-      );
-      const state = challengeValueStates[index];
+      const state = challengeValueStates[challengeValue.prompt.id];
 
       if (
         state === AuthenticationValueStateType.Locked ||
@@ -102,26 +106,26 @@ export const Authenticate = ({
 
       dispatch({
         type: 'setState',
-        valueType: challengeValue.type,
+        id: challengeValue.prompt.id,
         state: AuthenticationValueStateType.Pending,
       });
 
       await application?.submitValuesForChallenge(challenge, [challengeValue]);
     },
-    [challengeValues, challengeValueStates, application, challenge]
+    [challengeValueStates, application, challenge]
   );
 
   const onValueLocked = useCallback((challengeValue: ChallengeValue) => {
     dispatch({
       type: 'setState',
-      valueType: challengeValue.type,
+      id: challengeValue.prompt.id,
       state: AuthenticationValueStateType.Locked,
     });
 
     setTimeout(() => {
       dispatch({
         type: 'setState',
-        valueType: challengeValue.type,
+        id: challengeValue.prompt.id,
         state: AuthenticationValueStateType.WaitingTurn,
       });
     }, 30 * 1000);
@@ -149,7 +153,7 @@ export const Authenticate = ({
         FingerprintScanner.release();
         dispatch({
           type: 'setState',
-          valueType: challengeValue.type,
+          id: challengeValue.prompt.id,
           state: AuthenticationValueStateType.Fail,
         });
         Alert.alert(
@@ -189,7 +193,7 @@ export const Authenticate = ({
           } else {
             dispatch({
               type: 'setState',
-              valueType: challengeValue.type,
+              id: challengeValue.prompt.id,
               state: AuthenticationValueStateType.Fail,
             });
             Alert.alert(
@@ -226,7 +230,7 @@ export const Authenticate = ({
           }
           dispatch({
             type: 'setState',
-            valueType: challengeValue.type,
+            id: challengeValue.prompt.id,
             state: AuthenticationValueStateType.Fail,
           });
         }
@@ -278,21 +282,25 @@ export const Authenticate = ({
           AppStateType.EnteringBackground;
 
       if (
-        challengeValue.type === ChallengeType.Biometric &&
+        challengeValue.prompt.validation === ChallengeValidation.Biometric &&
         !isLosingFocusOrInBackground
       ) {
         /** Begin authentication right away, we're not waiting for any input */
         authenticateBiometrics(challengeValue);
       }
-      if (challengeValue.type === ChallengeType.LocalPasscode) {
+      if (
+        challengeValue.prompt.validation === ChallengeValidation.LocalPasscode
+      ) {
         localPasscodeRef.current?.focus();
-      } else if (challengeValue.type === ChallengeType.AccountPassword) {
+      } else if (
+        challengeValue.prompt.validation === ChallengeValidation.AccountPassword
+      ) {
         accountPasswordRef.current?.focus();
       }
 
       dispatch({
         type: 'setState',
-        valueType: challengeValue.type,
+        id: challengeValue.prompt.id,
         state: AuthenticationValueStateType.WaitingInput,
       });
     },
@@ -303,7 +311,7 @@ export const Authenticate = ({
     (value: ChallengeValue) => {
       dispatch({
         type: 'setState',
-        valueType: value.type,
+        id: value.prompt.id,
         state: AuthenticationValueStateType.Success,
       });
       beginAuthenticatingForNextChallengeReason(value);
@@ -314,7 +322,7 @@ export const Authenticate = ({
   const onInvalidValue = (value: ChallengeValue) => {
     dispatch({
       type: 'setState',
-      valueType: value.type,
+      id: value.prompt.id,
       state: AuthenticationValueStateType.Fail,
     });
   };
@@ -379,7 +387,7 @@ export const Authenticate = ({
   const onBiometricDirectPress = () => {
     const index = findMatchingValueIndex(
       challengeValues,
-      ChallengeType.Biometric
+      ChallengeValidation.Biometric
     );
     const state = challengeValueStates[index];
     if (state === AuthenticationValueStateType.Locked) {
@@ -392,7 +400,7 @@ export const Authenticate = ({
   const onValueChange = (newValue: ChallengeValue) => {
     dispatch({
       type: 'setValue',
-      valueType: newValue.type,
+      id: newValue.prompt.id,
       value: newValue.value,
     });
   };
@@ -416,7 +424,7 @@ export const Authenticate = ({
     const index = findMatchingValueIndex(challengeValues, challengeValue.type);
     const state = challengeValueStates[index];
     if (
-      challengeValue.type === ChallengeType.Biometric &&
+      challengeValue.prompt.validation === ChallengeValidation.Biometric &&
       (state === AuthenticationValueStateType.Locked ||
         state === AuthenticationValueStateType.Fail)
     ) {
@@ -444,26 +452,31 @@ export const Authenticate = ({
     const state = challengeValueStates[index];
     const active = isInActiveState(state);
     const isInput =
-      challengeValue.type === ChallengeType.LocalPasscode ||
-      challengeValue.type === ChallengeType.AccountPassword;
-    const stateLabel = getLabelForStateAndType(challengeValue, state);
-    const stateTitle = getTitleForStateAndType(challengeValue, state);
+      challengeValue.prompt.validation === ChallengeValidation.LocalPasscode ||
+      challengeValue.prompt.validation === ChallengeValidation.AccountPassword;
+    const stateLabel = getLabelForStateAndType(
+      challengeValue.prompt.validation,
+      state
+    );
+    const stateTitle = getChallengePromptTitle(challengeValue.prompt, state);
 
     return (
-      <SourceContainer key={challengeValue.type}>
+      <SourceContainer key={challengeValue.prompt.id}>
         <SectionHeader
           title={stateTitle}
           subtitle={isInput ? stateLabel : undefined}
           tinted={active}
           buttonText={
-            challengeValue.type === ChallengeType.LocalPasscode &&
+            challengeValue.prompt.validation ===
+              ChallengeValidation.LocalPasscode &&
             state === AuthenticationValueStateType.WaitingInput
               ? 'Change Keyboard'
               : undefined
           }
           buttonAction={switchKeyboard}
           buttonStyles={
-            challengeValue.type === ChallengeType.LocalPasscode
+            challengeValue.prompt.validation ===
+            ChallengeValidation.LocalPasscode
               ? {
                   color: theme.stylekitNeutralColor,
                   fontSize: theme.mainTextFontSize - 5,
@@ -477,12 +490,14 @@ export const Authenticate = ({
               <Input
                 key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={
-                  challengeValue.type === ChallengeType.LocalPasscode
+                  challengeValue.prompt.validation ===
+                  ChallengeValidation.LocalPasscode
                     ? localPasscodeRef
                     : accountPasswordRef
                 }
                 placeholder={
-                  challengeValue.type === ChallengeType.LocalPasscode
+                  challengeValue.prompt.validation ===
+                  ChallengeValidation.LocalPasscode
                     ? 'Local Passcode'
                     : 'Account password'
                 }
@@ -504,7 +519,7 @@ export const Authenticate = ({
             </SectionedTableCell>
           </SectionContainer>
         )}
-        {challengeValue.type === ChallengeType.Biometric && (
+        {challengeValue.prompt.validation === ChallengeValidation.Biometric && (
           <SectionContainer last={last}>
             <SectionedAccessoryTableCell
               first={first}
