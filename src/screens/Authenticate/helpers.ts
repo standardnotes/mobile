@@ -182,7 +182,7 @@ export const getLabelForStateAndType = (
         case AuthenticationValueStateType.Success:
           return 'Success';
         case AuthenticationValueStateType.Fail:
-          return 'Invalid account password. Please try again.';
+          return 'Invalid value. Please try again.';
         default:
           return '';
       }

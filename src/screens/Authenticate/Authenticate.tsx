@@ -87,27 +87,27 @@ export const Authenticate = ({
   const accountPasswordRef = useRef<TextInput>(null);
 
   React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: challenge.cancelable
-        ? ({ disabled }) => (
-            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-              <Item
-                testID="headerButton"
-                disabled={disabled}
-                title={Platform.OS === 'ios' ? 'Cancel' : ''}
-                iconName={
-                  Platform.OS === 'ios'
-                    ? undefined
-                    : StyleKit.nameForIcon(ICON_CLOSE)
-                }
-                onPress={() => {
-                  application?.cancelChallenge(challenge);
-                }}
-              />
-            </HeaderButtons>
-          )
-        : undefined,
-    });
+    if (challenge.cancelable) {
+      navigation.setOptions({
+        headerLeft: ({ disabled }) => (
+          <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+            <Item
+              testID="headerButton"
+              disabled={disabled}
+              title={Platform.OS === 'ios' ? 'Cancel' : ''}
+              iconName={
+                Platform.OS === 'ios'
+                  ? undefined
+                  : StyleKit.nameForIcon(ICON_CLOSE)
+              }
+              onPress={() => {
+                application?.cancelChallenge(challenge);
+              }}
+            />
+          </HeaderButtons>
+        ),
+      });
+    }
   }, [navigation, challenge, application]);
 
   const validateChallengeValue = useCallback(
