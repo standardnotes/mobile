@@ -14,8 +14,9 @@ import {
   ApplicationEvent,
   ApplicationService,
   Challenge,
+  ChallengePrompt,
   ChallengeReason,
-  ChallengeType,
+  ChallengeValidation,
   ContentType,
   PayloadSource,
   removeFromArray,
@@ -449,7 +450,7 @@ export class ApplicationState extends ApplicationService {
         this.biometricsTiming === UnlockTiming.Immediately
       ) {
         const challenge = new Challenge(
-          [ChallengeType.Biometric],
+          [new ChallengePrompt(ChallengeValidation.Biometric)],
           ChallengeReason.ApplicationUnlock
         );
         this.application.promptForCustomChallenge(challenge);

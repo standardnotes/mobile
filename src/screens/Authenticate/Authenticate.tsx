@@ -20,12 +20,7 @@ import React, {
 } from 'react';
 import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import {
-  ChallengePrompt,
-  ChallengeReason,
-  ChallengeValidation,
-  ChallengeValue,
-} from 'snjs';
+import { ChallengeReason, ChallengeValidation, ChallengeValue } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   BaseView,
@@ -46,13 +41,6 @@ import {
 } from './helpers';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_AUTHENTICATE>;
-
-const STRING_ENTER_PASSCODE_FOR_MIGRATION =
-  'Your application passcode is required to perform an upgrade of your local data storage structure.';
-const STRING_AUTHENTICATION_REQUIRED =
-  'Authentication is required to unlock application.';
-const STRING_ENTER_PASSCODE_FOR_LOGIN_REGISTER =
-  'Enter your application passcode before signing in or registering.';
 
 export const Authenticate = ({
   route: {
@@ -81,11 +69,11 @@ export const Authenticate = ({
           value: false,
         } as ChallengeValue;
         return map;
-      }, {} as Record<ChallengePrompt['id'], ChallengeValue>),
+      }, {} as Record<string, ChallengeValue>),
       challengeValueStates: challenge.prompts.reduce((map, current) => {
         map[current.id] = AuthenticationValueStateType.WaitingInput;
         return map;
-      }, {} as Record<ChallengePrompt['id'], AuthenticationValueStateType>),
+      }, {} as Record<string, AuthenticationValueStateType>),
     },
     undefined
   );
@@ -290,8 +278,10 @@ export const Authenticate = ({
         /** Begin authentication right away, we're not waiting for any input */
         authenticateBiometrics(challengeValue);
       }
+      /** Focus the first field by default */
       if (
-        challengeValue.prompt.validation === ChallengeValidation.LocalPasscode
+        challengeValue.prompt.validation !== ChallengeValidation.Biometric &&
+        challengeValue.prompt.validation !== ChallengeValidation.AccountPassword
       ) {
         localPasscodeRef.current?.focus();
       } else if (
@@ -344,16 +334,20 @@ export const Authenticate = ({
   }, [application, beginAuthenticatingForNextChallengeReason]);
 
   useEffect(() => {
-    application?.addChallengeObserver(challenge, {
-      onValidValue,
-      onInvalidValue,
-      onComplete: () => {
-        navigation.goBack();
-      },
-      onCancel: () => {
-        navigation.goBack();
-      },
-    });
+    let removeObserver: () => void = () => {};
+    if (application?.addChallengeObserver) {
+      removeObserver = application?.addChallengeObserver(challenge, {
+        onValidValue,
+        onInvalidValue,
+        onComplete: () => {
+          navigation.goBack();
+        },
+        onCancel: () => {
+          navigation.goBack();
+        },
+      });
+    }
+    return removeObserver;
   }, [application, challenge, navigation, onValidValue]);
 
   useEffect(() => {
@@ -452,8 +446,7 @@ export const Authenticate = ({
     const state = challengeValueStates[challengeValue.prompt.id];
     const active = isInActiveState(state);
     const isInput =
-      challengeValue.prompt.validation === ChallengeValidation.LocalPasscode ||
-      challengeValue.prompt.validation === ChallengeValidation.AccountPassword;
+      challengeValue.prompt.validation !== ChallengeValidation.Biometric;
     const stateLabel = getLabelForStateAndType(
       challengeValue.prompt.validation,
       state
@@ -491,17 +484,12 @@ export const Authenticate = ({
               <Input
                 key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={
-                  challengeValue.prompt.validation ===
-                  ChallengeValidation.LocalPasscode
+                  challengeValue.prompt.validation !==
+                  ChallengeValidation.AccountPassword
                     ? localPasscodeRef
                     : accountPasswordRef
                 }
-                placeholder={
-                  challengeValue.prompt.validation ===
-                  ChallengeValidation.LocalPasscode
-                    ? 'Local Passcode'
-                    : 'Account password'
-                }
+                placeholder={challengeValue.prompt.placeholder}
                 onChangeText={text => {
                   onValueChange({ ...challengeValue, value: text });
                 }}
@@ -509,7 +497,7 @@ export const Authenticate = ({
                 autoCorrect={false}
                 autoFocus={false}
                 autoCapitalize={'none'}
-                secureTextEntry={true}
+                secureTextEntry={challengeValue.prompt.secureTextEntry}
                 keyboardType={keyboardType}
                 keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
@@ -543,22 +531,11 @@ export const Authenticate = ({
     [challengeValueStates]
   );
 
-  const textData = useMemo(() => {
-    switch (challenge.reason) {
-      case ChallengeReason.Migration:
-        return STRING_ENTER_PASSCODE_FOR_MIGRATION;
-      case ChallengeReason.ResaveRootKey:
-        return STRING_ENTER_PASSCODE_FOR_LOGIN_REGISTER;
-      default:
-        return STRING_AUTHENTICATION_REQUIRED;
-    }
-  }, [challenge.reason]);
-
   return (
     <Container>
       <StyledSectionedTableCell first>
         <BaseView>
-          <Subtitle>{textData}</Subtitle>
+          <Subtitle>{challenge.heading + '.'}</Subtitle>
         </BaseView>
       </StyledSectionedTableCell>
       {Object.values(challengeValues).map((challengeValue, index) =>

@@ -126,25 +126,68 @@ export const authenticationReducer = (
   }
 };
 
-const mapPrivilageCredentialToChallengeValidation = (
-  credential: PrivilegeCredential
+export const findIndexInObject = (
+  map:
+    | ChallengeValueState['challengeValues']
+    | ChallengeValueState['challengeValueStates'],
+  id: string
 ) => {
-  switch (credential) {
-    case PrivilegeCredential.AccountPassword:
-      return ChallengeValidation.AccountPassword;
-    case PrivilegeCredential.LocalPasscode:
-      return ChallengeValidation.LocalPasscode;
+  return Object.keys(map).indexOf(id);
+};
+
+export const getChallengePromptTitle = (
+  prompt: ChallengePrompt,
+  state: AuthenticationValueStateType
+) => {
+  const title = prompt.title!;
+  switch (state) {
+    case AuthenticationValueStateType.WaitingTurn:
+      return title.concat(' ', '- Waiting.');
+    case AuthenticationValueStateType.Locked:
+      return title.concat(' ', '- Locked.');
+    default:
+      return title;
   }
 };
 
-export const getLabelForPrivilegeLockStateAndType = (
-  privilegeValue: PrivilegeLockValue,
+export const getLabelForStateAndType = (
+  validation: ChallengeValidation,
   state: AuthenticationValueStateType
-) =>
-  getLabelForStateAndType(
-    mapPrivilageCredentialToChallengeValidation(privilegeValue.type),
-    state
-  );
+) => {
+  switch (validation) {
+    case ChallengeValidation.Biometric: {
+      switch (state) {
+        case AuthenticationValueStateType.WaitingTurn:
+        case AuthenticationValueStateType.WaitingInput:
+          return 'Please use biometrics to unlock.';
+        case AuthenticationValueStateType.Pending:
+          return 'Waiting for unlock.';
+        case AuthenticationValueStateType.Success:
+          return 'Success | Biometrics.';
+        case AuthenticationValueStateType.Fail:
+          return 'Biometrics failed. Tap to try again.';
+        case AuthenticationValueStateType.Locked:
+          return 'Biometrics locked. Try again in 30 seconds.';
+        default:
+          return '';
+      }
+    }
+    default:
+      switch (state) {
+        case AuthenticationValueStateType.WaitingTurn:
+        case AuthenticationValueStateType.WaitingInput:
+          return 'Waiting';
+        case AuthenticationValueStateType.Pending:
+          return 'Verifying keys...';
+        case AuthenticationValueStateType.Success:
+          return 'Success';
+        case AuthenticationValueStateType.Fail:
+          return 'Invalid account password. Please try again.';
+        default:
+          return '';
+      }
+  }
+};
 
 export const getTitleForPrivilegeLockStateAndType = (
   privilegeValue: PrivilegeLockValue,
@@ -176,36 +219,12 @@ export const getTitleForPrivilegeLockStateAndType = (
   }
 };
 
-export const findIndexInObject = (
-  map:
-    | ChallengeValueState['challengeValues']
-    | ChallengeValueState['challengeValueStates'],
-  id: string
-) => {
-  return Object.keys(map).indexOf(id);
-};
-
-export const getChallengePromptTitle = (
-  prompt: ChallengePrompt,
+export const getLabelForPrivilegeLockStateAndType = (
+  credential: PrivilegeCredential,
   state: AuthenticationValueStateType
 ) => {
-  const title = prompt.title!;
-  switch (state) {
-    case AuthenticationValueStateType.WaitingTurn:
-      return title.concat(' ', '- Waiting.');
-    case AuthenticationValueStateType.Locked:
-      return title.concat(' ', '- Locked.');
-    default:
-      return title;
-  }
-};
-
-export const getLabelForStateAndType = (
-  validation: ChallengeValidation,
-  state: AuthenticationValueStateType
-) => {
-  switch (validation) {
-    case ChallengeValidation.AccountPassword: {
+  switch (credential) {
+    case PrivilegeCredential.AccountPassword: {
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
         case AuthenticationValueStateType.WaitingInput:
@@ -220,7 +239,7 @@ export const getLabelForStateAndType = (
           return '';
       }
     }
-    case ChallengeValidation.LocalPasscode: {
+    case PrivilegeCredential.LocalPasscode: {
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
         case AuthenticationValueStateType.WaitingInput:
@@ -235,24 +254,5 @@ export const getLabelForStateAndType = (
           return '';
       }
     }
-    case ChallengeValidation.Biometric: {
-      switch (state) {
-        case AuthenticationValueStateType.WaitingTurn:
-        case AuthenticationValueStateType.WaitingInput:
-          return 'Please use biometrics to unlock.';
-        case AuthenticationValueStateType.Pending:
-          return 'Waiting for unlock.';
-        case AuthenticationValueStateType.Success:
-          return 'Success | Biometrics.';
-        case AuthenticationValueStateType.Fail:
-          return 'Biometrics failed. Tap to try again.';
-        case AuthenticationValueStateType.Locked:
-          return 'Biometrics locked. Try again in 30 seconds.';
-        default:
-          return '';
-      }
-    }
-    default:
-      return '';
   }
 };
