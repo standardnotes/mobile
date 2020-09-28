@@ -7529,9 +7529,9 @@ sncrypto@standardnotes/sncrypto#5f8cd36:
   version "1.2.0"
   resolved "https://codeload.github.com/standardnotes/sncrypto/tar.gz/5f8cd369773cec7f342c23ecaa659d932b35cd31"
 
-snjs@standardnotes/snjs#242e055:
+snjs@standardnotes/snjs#ebb7a3a:
   version "1.0.5"
-  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/242e055c83c8bab5e862add30206ca3dc3dce7e5"
+  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/ebb7a3a2d55e697d356c7bc7dd5a83d028f0e516"
 
 source-map-resolve@^0.5.0:
   version "0.5.3"

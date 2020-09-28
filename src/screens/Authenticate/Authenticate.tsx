@@ -1,4 +1,5 @@
 import { ButtonCell } from '@Components/ButtonCell';
+import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
@@ -8,7 +9,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
-import { StyleKitContext } from '@Style/StyleKit';
+import { ICON_CLOSE } from '@Style/icons';
+import { StyleKit, StyleKitContext } from '@Style/StyleKit';
 import React, {
   useCallback,
   useContext,
@@ -20,6 +22,7 @@ import React, {
 } from 'react';
 import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ChallengeReason, ChallengeValidation, ChallengeValue } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
@@ -30,6 +33,7 @@ import {
   SourceContainer,
   StyledSectionedTableCell,
   Subtitle,
+  Title,
 } from './Authenticate.styled';
 import {
   authenticationReducer,
@@ -81,6 +85,30 @@ export const Authenticate = ({
   // Refs
   const localPasscodeRef = useRef<TextInput>(null);
   const accountPasswordRef = useRef<TextInput>(null);
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: challenge.cancelable
+        ? ({ disabled }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Cancel' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : StyleKit.nameForIcon(ICON_CLOSE)
+                }
+                onPress={() => {
+                  application?.cancelChallenge(challenge);
+                }}
+              />
+            </HeaderButtons>
+          )
+        : undefined,
+    });
+  }, [navigation, challenge, application]);
 
   const validateChallengeValue = useCallback(
     async (challengeValue: ChallengeValue) => {
@@ -533,11 +561,16 @@ export const Authenticate = ({
 
   return (
     <Container>
-      <StyledSectionedTableCell first>
-        <BaseView>
-          <Subtitle>{challenge.heading + '.'}</Subtitle>
-        </BaseView>
-      </StyledSectionedTableCell>
+      {(challenge.heading || challenge.subheading) && (
+        <StyledSectionedTableCell first>
+          <BaseView>
+            {challenge.heading && <Title>{challenge.heading}</Title>}
+            {challenge.subheading && (
+              <Subtitle>{challenge.subheading}</Subtitle>
+            )}
+          </BaseView>
+        </StyledSectionedTableCell>
+      )}
       {Object.values(challengeValues).map((challengeValue, index) =>
         renderAuthenticationSource(challengeValue, index)
       )}

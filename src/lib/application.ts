@@ -76,7 +76,7 @@ export class MobileApplication extends SNApplication {
   }
 
   promptForChallenge(challenge: Challenge) {
-    navigate(SCREEN_AUTHENTICATE, { challenge });
+    navigate(SCREEN_AUTHENTICATE, { challenge, title: challenge.modalTitle });
   }
 
   setMobileServices(services: MobileServices) {

@@ -48,6 +48,7 @@ type ModalStackNavigatorParamList = {
   [SCREEN_INPUT_MODAL_PASSCODE]: undefined;
   [SCREEN_AUTHENTICATE]: {
     challenge: Challenge;
+    title?: string;
   };
   [SCREEN_AUTHENTICATE_PRIVILEGES]: {
     action: ProtectedAction;
@@ -215,12 +216,12 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
       />
       <MainStack.Screen
         name={SCREEN_AUTHENTICATE}
-        options={() => ({
+        options={({ route }) => ({
           title: 'Authenticate',
           headerLeft: () => undefined,
-          headerTitle: ({ children }) => {
-            return <HeaderTitleView title={children || ''} />;
-          },
+          headerTitle: ({ children }) => (
+            <HeaderTitleView title={route.params?.title ?? (children || '')} />
+          ),
         })}
         component={Authenticate}
       />

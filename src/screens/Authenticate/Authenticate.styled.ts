@@ -12,6 +12,13 @@ export const StyledSectionedTableCell = styled(SectionedTableCell)`
   padding-top: 12px;
 `;
 
+export const Title = styled.Text`
+  color: ${({ theme }) => theme.stylekitNeutralColor};
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 4px;
+`;
+
 export const Subtitle = styled.Text`
   color: ${({ theme }) => theme.stylekitNeutralColor};
   font-size: 14px;

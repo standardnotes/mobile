@@ -3,7 +3,7 @@ import { Platform, TextStyle, ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
 
 type Props = {
-  title: string;
+  title?: string;
   subtitle?: string;
   buttonText?: string;
   buttonAction?: () => void;
@@ -61,12 +61,14 @@ const Button = styled.Text`
 export const SectionHeader: React.FC<Props> = props => (
   <Container>
     <TitleContainer>
-      <Title>
-        {Platform.select({
-          ios: props.title.toUpperCase(),
-          android: props.title,
-        })}
-      </Title>
+      {props.title && (
+        <Title>
+          {Platform.select({
+            ios: props.title.toUpperCase(),
+            android: props.title,
+          })}
+        </Title>
+      )}
       {props.subtitle && <SubTitle>{props.subtitle}</SubTitle>}
     </TitleContainer>
     {props.buttonText && (
