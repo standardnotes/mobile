@@ -327,10 +327,11 @@ export class StyleKit {
       });
   }
 
-  private buildTheme(theme: MobileTheme, variables: StyleKitTheme) {
-    variables = {
+  private buildTheme(theme: MobileTheme) {
+    /** Merge default variables to ensure this theme has all the variables. */
+    const variables = {
+      ...this.templateVariables(),
       ...theme.mobileContent.variables,
-      ...variables,
     };
     const luminosity =
       theme.mobileContent.luminosity ||
@@ -347,9 +348,8 @@ export class StyleKit {
   }
 
   setActiveTheme(themeId: string) {
-    /** Merge default variables to ensure this theme has all the variables. */
     const theme = this.findOrCreateTheme(themeId);
-    const updatedTheme = this.buildTheme(theme, this.templateVariables());
+    const updatedTheme = this.buildTheme(theme);
     this.themes[themeId] = updatedTheme;
     this.variables = updatedTheme.mobileContent.variables;
     this.activeThemeId = themeId;
