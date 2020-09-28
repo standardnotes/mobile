@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
-import { StyleKit, StyleKitContext, ThemeContent } from '@Style/StyleKit';
+import { MobileTheme, StyleKit, StyleKitContext } from '@Style/StyleKit';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
@@ -60,7 +60,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   });
 
   const onSystemThemeSelect = useCallback(
-    async (selectedTheme: ThemeContent) => {
+    async (selectedTheme: MobileTheme) => {
       styleKit?.activateSystemTheme(selectedTheme.uuid);
     },
     [styleKit]
@@ -153,7 +153,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
     return unsubscribeStreamThemes;
   }, [application]);
 
-  const iconDescriptorForTheme = (currentTheme: SNTheme | ThemeContent) => {
+  const iconDescriptorForTheme = (currentTheme: SNTheme | MobileTheme) => {
     const desc = {
       type: 'circle',
       side: 'right' as 'right',

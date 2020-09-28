@@ -1,19 +1,16 @@
-import { ThemeContent } from './StyleKit';
+import { MobileTheme } from './StyleKit';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';
 export const DARK_MODE_KEY = 'dark';
 export const LIGHT_CONTENT = 'light-content';
 export const DARK_CONTENT = 'dark-content';
 
-export function statusBarColorForTheme(themeData: ThemeContent) {
-  // The main nav bar uses contrast background color
-  if (!themeData.luminosity) {
-    themeData.luminosity = getColorLuminosity(
-      themeData.variables.stylekitContrastBackgroundColor
-    );
+export function statusBarColorForTheme(theme: MobileTheme) {
+  if (!theme.mobileContent.luminosity) {
+    throw Error('Theme luminocity should not be null');
   }
-
-  if (themeData.luminosity < 130) {
+  // The main nav bar uses contrast background color
+  if (theme.mobileContent.luminosity < 130) {
     // is dark color, return white status bar
     return LIGHT_CONTENT;
   } else {
@@ -21,14 +18,11 @@ export function statusBarColorForTheme(themeData: ThemeContent) {
   }
 }
 
-export function keyboardColorForTheme(themeData: ThemeContent) {
-  if (!themeData.luminosity) {
-    themeData.luminosity = getColorLuminosity(
-      themeData.variables.stylekitContrastBackgroundColor
-    );
+export function keyboardColorForTheme(theme: MobileTheme) {
+  if (!theme.mobileContent.luminosity) {
+    throw Error('Theme luminocity should not be null');
   }
-
-  if (themeData.luminosity < 130) {
+  if (theme.mobileContent.luminosity < 130) {
     // is dark color, return dark keyboard
     return DARK_MODE_KEY;
   } else {

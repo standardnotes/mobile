@@ -29,7 +29,7 @@ const AppComponent: React.FC<{
   const setStyleKitRef = useCallback((node: StyleKit | undefined) => {
     if (node) {
       node.addThemeChangeObserver(() => {
-        setActiveTheme(node.theme);
+        setActiveTheme(node.variables);
       });
     }
 
