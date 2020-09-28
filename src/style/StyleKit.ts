@@ -28,8 +28,8 @@ import THEME_BLUE_JSON from './Themes/blue.json';
 import THEME_RED_JSON from './Themes/red.json';
 import { StyleKitTheme } from './Themes/styled-components';
 
-const LIGHT_THEME_KEY = 'lightTheme';
-const DARK_THEME_KEY = 'darkTheme';
+const LIGHT_THEME_KEY = 'lightThemeKey';
+const DARK_THEME_KEY = 'darkThemeKey';
 const CACHED_THEMES_KEY = 'cachedThemesKey';
 
 type ThemeChangeObserver = () => Promise<void> | void;

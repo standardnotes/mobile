@@ -7,7 +7,6 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { StyleKitContext } from '@Style/StyleKit';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Keyboard } from 'react-native';
-import { HttpResponse } from 'snjs/dist/@types/services/api/http_service';
 import {
   RegistrationDescription,
   RegistrationInput,
@@ -33,8 +32,6 @@ export const AuthSection = (props: Props) => {
   const [signingIn, setSigningIn] = useState(false);
   const [strictSignIn, setStrictSignIn] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [mfa, setMfa] = useState<HttpResponse['error'] | undefined>();
-  const [mfaCode, setMfaCode] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [server, setServer] = useState('');
@@ -95,29 +92,19 @@ export const AuthSection = (props: Props) => {
       password,
       strictSignIn,
       undefined,
-      mfa?.payload?.mfa_key,
-      mfaCode || undefined,
       true,
       false
     );
 
     if (result?.error) {
-      if (
-        result?.error.tag === 'mfa-required' ||
-        result?.error.tag === 'mfa-invalid'
-      ) {
-        setMfa(result.error);
-        setMfaCode('');
-      } else if (result?.error.message) {
+      if (result?.error.message) {
         application?.alertService?.alert(result?.error.message, 'Oops', 'OK');
-        setMfa(undefined);
       }
       setSigningIn(false);
       return;
     }
 
     setSigningIn(false);
-    setMfa(undefined);
     setPassword('');
     setPasswordConfirmation('');
   };
@@ -200,28 +187,12 @@ export const AuthSection = (props: Props) => {
   };
 
   const _renderDefaultContent = () => {
-    const renderMfaSubcontent = () => {
-      return (
-        <RegularView>
-          <RegistrationDescription>{mfa?.message}</RegistrationDescription>
-          <SectionedTableCell textInputCell first>
-            <RegistrationInput
-              placeholder=""
-              onChangeText={setMfaCode}
-              value={mfaCode}
-              keyboardType={'numeric'}
-              keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
-              autoFocus
-              onSubmitEditing={signIn}
-            />
-          </SectionedTableCell>
-        </RegularView>
-      );
-    };
+    const keyboardApperance = styleKit?.keyboardColorForActiveTheme();
 
-    const renderNonMfaSubcontent = () => {
-      const keyboardApperance = styleKit?.keyboardColorForActiveTheme();
-      return (
+    return (
+      <TableSection>
+        {props.title && <SectionHeader title={props.title} />}
+
         <>
           <RegularView>
             <SectionedTableCell textInputCell first>
@@ -277,16 +248,6 @@ export const AuthSection = (props: Props) => {
             </RegularView>
           )}
         </>
-      );
-    };
-
-    return (
-      <TableSection>
-        {props.title && <SectionHeader title={props.title} />}
-
-        {mfa && renderMfaSubcontent()}
-
-        {!mfa && renderNonMfaSubcontent()}
 
         <ButtonCell
           testID="signInButton"
@@ -296,25 +257,15 @@ export const AuthSection = (props: Props) => {
           onPress={signIn}
         />
 
-        {mfa && (
-          <ButtonCell
-            title={'Cancel'}
-            disabled={signingIn}
-            onPress={() => setMfa(undefined)}
-          />
-        )}
+        <ButtonCell
+          testID="registerButton"
+          title={DEFAULT_REGISTER_TEXT}
+          disabled={registering}
+          bold
+          onPress={onRegisterPress}
+        />
 
-        {!mfa && (
-          <ButtonCell
-            testID="registerButton"
-            title={DEFAULT_REGISTER_TEXT}
-            disabled={registering}
-            bold
-            onPress={onRegisterPress}
-          />
-        )}
-
-        {!showAdvanced && !mfa && (
+        {!showAdvanced && (
           <ButtonCell
             testID="otherOptionsButton"
             title="Other Options"

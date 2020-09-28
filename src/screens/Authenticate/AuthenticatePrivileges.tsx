@@ -317,7 +317,7 @@ export const AuthenticatePrivileges = ({
       privilegeValue.type === PrivilegeCredential.LocalPasscode ||
       privilegeValue.type === PrivilegeCredential.AccountPassword;
     const stateLabel = getLabelForPrivilegeLockStateAndType(
-      privilegeValue,
+      privilegeValue.type,
       state
     );
     const stateTitle = getTitleForPrivilegeLockStateAndType(
