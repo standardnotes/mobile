@@ -451,7 +451,8 @@ export class ApplicationState extends ApplicationService {
       ) {
         const challenge = new Challenge(
           [new ChallengePrompt(ChallengeValidation.Biometric)],
-          ChallengeReason.ApplicationUnlock
+          ChallengeReason.ApplicationUnlock,
+          false
         );
         this.application.promptForCustomChallenge(challenge);
         this.application.promptForChallenge(challenge);
