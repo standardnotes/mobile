@@ -1,4 +1,5 @@
 import { MobileApplication } from '@Lib/application';
+import ComponentManager from '@Lib/ComponentManager';
 import CSSParser from '@Style/Util/CSSParser';
 import {
   DARK_CONTENT,
@@ -133,8 +134,8 @@ export class StyleKit {
   private findOrCreateTheme(themeId: string, variables?: StyleKitTheme) {
     let theme = this.themes[themeId];
     if (!theme) {
-      theme = MobileTheme.BuildTheme(variables);
-      this.themes[themeId] = theme;
+      theme = this.buildTheme(undefined, variables);
+      this.addTheme(theme);
     }
     return theme;
   }
@@ -186,9 +187,18 @@ export class StyleKit {
         } as MobileThemeContent),
       });
       const theme = new MobileTheme(payload);
-      this.application.componentManager!.addTemporaryTemplateComponent(theme);
-      this.themes[option.uuid] = theme;
+      this.addTheme(theme);
     }
+  }
+
+  addTheme(theme: MobileTheme) {
+    this.themes[theme.uuid] = theme;
+    this.application.componentManager!.removeTemporaryTemplateComponent(theme);
+    this.application.componentManager!.addTemporaryTemplateComponent(theme);
+  }
+
+  public getActiveTheme() {
+    return this.activeThemeId && this.themes[this.activeThemeId];
   }
 
   private onColorSchemeChange() {
@@ -327,11 +337,13 @@ export class StyleKit {
       });
   }
 
-  private buildTheme(theme: MobileTheme) {
+  private buildTheme(base?: MobileTheme, baseVariables?: StyleKitTheme) {
+    const theme = base || MobileTheme.BuildTheme();
     /** Merge default variables to ensure this theme has all the variables. */
     const variables = {
       ...this.templateVariables(),
       ...theme.mobileContent.variables,
+      ...baseVariables,
     };
     const luminosity =
       theme.mobileContent.luminosity ||
@@ -350,8 +362,10 @@ export class StyleKit {
   setActiveTheme(themeId: string) {
     const theme = this.findOrCreateTheme(themeId);
     const updatedTheme = this.buildTheme(theme);
-    this.themes[themeId] = updatedTheme;
+    this.addTheme(updatedTheme);
     this.variables = updatedTheme.mobileContent.variables;
+    (this.application
+      .componentManager as ComponentManager).setMobileActiveTheme(updatedTheme);
     this.activeThemeId = themeId;
     this.updateDeviceForTheme(themeId);
     this.notifyObserversOfThemeChange();
@@ -459,7 +473,7 @@ export class StyleKit {
         } as MobileThemeContent,
       })
     );
-    this.themes[theme.uuid] = mobileTheme;
+    this.addTheme(mobileTheme);
     this.activateTheme(theme.uuid);
     this.cacheThemes();
   }
@@ -480,7 +494,7 @@ export class StyleKit {
       return new MobileTheme(payload);
     });
     for (const theme of themes) {
-      this.themes[theme.uuid] = theme;
+      this.addTheme(theme);
     }
   }
 
@@ -513,7 +527,7 @@ export class StyleKit {
       ...appliedVariables,
       ...StyleKit.constants,
     });
-    this.themes[theme.uuid] = mobileTheme;
+    this.addTheme(mobileTheme);
     this.cacheThemes();
     if (theme.uuid === this.activeThemeId) {
       this.setActiveTheme(theme.uuid);
