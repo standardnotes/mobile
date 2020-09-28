@@ -193,8 +193,6 @@ export class StyleKit {
 
   addTheme(theme: MobileTheme) {
     this.themes[theme.uuid] = theme;
-    this.application.componentManager!.removeTemporaryTemplateComponent(theme);
-    this.application.componentManager!.addTemporaryTemplateComponent(theme);
   }
 
   public getActiveTheme() {
