@@ -126,7 +126,8 @@ export const NoteList = (props: Props): JSX.Element => {
             placeholder="Search"
             text={searchText}
             hideBackground
-            barTintColor={theme.stylekitBackgroundColor}
+            appearance={styleKit?.keyboardColorForActiveTheme()}
+            barTintColor={theme.stylekitInfoColor}
             textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
             textColor={theme.stylekitForegroundColor}
             onChangeText={props.onSearchChange}

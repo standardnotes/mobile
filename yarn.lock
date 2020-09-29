@@ -6744,10 +6744,9 @@ react-native-screens@^2.11.0:
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.11.0.tgz#34b30b07c2d04aa100cba984b944b303bfa43ea6"
   integrity sha512-vJzJE3zI1XUtqthrX3Dh2TBQWB+xFyaGhF52KBq9FjJUN5ws4xpLZJxBWa1KbGV3DilmcSZ4jmZR5LGordwE7w==
 
-react-native-search-bar@^3.5.1:
+react-native-search-bar@standardnotes/react-native-search-bar#7d2139d:
   version "3.5.1"
-  resolved "https://registry.yarnpkg.com/react-native-search-bar/-/react-native-search-bar-3.5.1.tgz#b05e12ecbe747e0fa43d19084b06db006f7b8097"
-  integrity sha512-L+y2gQZstApb2DavE8se6Mzj3CgxZiHxM0DezAdT4kb6+kV4+WeTN8jPxvrP6zgwbGcjuYKaHrASKnBmhuWmhA==
+  resolved "https://codeload.github.com/standardnotes/react-native-search-bar/tar.gz/7d2139daf9b7663b570403f21f520deceba9bb09"
   dependencies:
     prop-types "^15.5.10"
 

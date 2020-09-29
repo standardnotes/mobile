@@ -36,6 +36,7 @@ export const LoadingText = styled.Text`
 `;
 
 export const HeaderContainer = styled.View`
+  padding-top: 3px;
   padding-left: 5px;
   padding-right: 5px;
 `;

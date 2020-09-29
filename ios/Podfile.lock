@@ -331,7 +331,7 @@ PODS:
   - RNScreens (2.11.0):
     - React
   - RNSearchBar (3.5.1):
-    - React
+    - React-Core
   - RNStoreReview (0.1.5):
     - React
   - RNVectorIcons (7.1.0):
@@ -576,7 +576,7 @@ SPEC CHECKSUMS:
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: dd8c286ab5dd4ba36d3a7fef8bff7e08711b5476
   RNScreens: 0e91da98ab26d5d04c7b59a9b6bd694124caf88c
-  RNSearchBar: 9860431356b7d12a8449d2fddb2b5f3c78d1e99f
+  RNSearchBar: 5ed8e13ba8a6c701fbd2afdfe4164493d24b2aee
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   sn-textview: f478ee79531da2c7b129c4ea3b20c665e75e1f4b
