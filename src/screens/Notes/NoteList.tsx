@@ -129,7 +129,6 @@ export const NoteList = (props: Props): JSX.Element => {
             appearance={styleKit?.keyboardColorForActiveTheme()}
             barTintColor={theme.stylekitInfoColor}
             textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
-            textColor={theme.stylekitForegroundColor}
             onChangeText={props.onSearchChange}
             onSearchButtonPress={() => {
               searchBoxInputRef.current?.blur();
