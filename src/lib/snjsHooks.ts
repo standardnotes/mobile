@@ -204,6 +204,7 @@ export const useSyncStatus = () => {
     const syncStatus = application!.getSyncStatus();
     const stats = syncStatus.getStats();
     if (syncStatus.hasError()) {
+      setRefreshing(false);
       setStatus('Unable to Sync');
     } else if (stats.downloadCount > 20) {
       const text = `Downloading ${stats.downloadCount} items. Keep app open.`;
