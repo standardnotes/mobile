@@ -83,8 +83,10 @@ export const Authenticate = ({
   );
 
   // Refs
-  const localPasscodeRef = useRef<TextInput>(null);
-  const accountPasswordRef = useRef<TextInput>(null);
+  const firstInputRef = useRef<TextInput>(null);
+  const secondInputRef = useRef<TextInput>(null);
+  const thirdInputRef = useRef<TextInput>(null);
+  const fourthInputRef = useRef<TextInput>(null);
 
   React.useLayoutEffect(() => {
     if (challenge.cancelable) {
@@ -265,7 +267,7 @@ export const Authenticate = ({
   const firstNotSuccessful = useMemo(() => {
     for (const id in challengeValueStates) {
       if (challengeValueStates[id] !== AuthenticationValueStateType.Success) {
-        return (id as unknown) as number;
+        return id;
       }
     }
   }, [challengeValueStates]);
@@ -305,17 +307,25 @@ export const Authenticate = ({
       ) {
         /** Begin authentication right away, we're not waiting for any input */
         authenticateBiometrics(challengeValue);
-      }
-      /** Focus the first field by default */
-      if (
-        challengeValue.prompt.validation !== ChallengeValidation.Biometric &&
-        challengeValue.prompt.validation !== ChallengeValidation.AccountPassword
-      ) {
-        localPasscodeRef.current?.focus();
-      } else if (
-        challengeValue.prompt.validation === ChallengeValidation.AccountPassword
-      ) {
-        accountPasswordRef.current?.focus();
+      } else {
+        const index = findIndexInObject(
+          challengeValues,
+          challengeValue.prompt.id.toString()
+        );
+        switch (index) {
+          case 0:
+            firstInputRef.current?.focus();
+            break;
+          case 1:
+            secondInputRef.current?.focus();
+            break;
+          case 2:
+            thirdInputRef.current?.focus();
+            break;
+          case 3:
+            fourthInputRef.current?.focus();
+            break;
+        }
       }
 
       dispatch({
@@ -508,14 +518,16 @@ export const Authenticate = ({
         />
         {isInput && (
           <SectionContainer last={last}>
-            <SectionedTableCell textInputCell={true} first={first}>
+            <SectionedTableCell textInputCell={true} first={true}>
               <Input
                 key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={
-                  challengeValue.prompt.validation !==
-                  ChallengeValidation.AccountPassword
-                    ? localPasscodeRef
-                    : accountPasswordRef
+                  Array.of(
+                    firstInputRef,
+                    secondInputRef,
+                    thirdInputRef,
+                    fourthInputRef
+                  )[index]
                 }
                 placeholder={challengeValue.prompt.placeholder}
                 onChangeText={text => {
@@ -578,7 +590,9 @@ export const Authenticate = ({
         maxHeight={45}
         disabled={isPending}
         title={
-          firstNotSuccessful === challengeValueStates.length - 1
+          !!firstNotSuccessful &&
+          findIndexInObject(challengeValueStates, firstNotSuccessful) ===
+            Object.keys(challengeValueStates).length - 1
             ? 'Submit'
             : 'Next'
         }
