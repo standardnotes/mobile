@@ -2,6 +2,24 @@ const PREFIX_GENERIC = '--';
 const PREFIX_STANDARD_NOTES = '--sn-stylekit';
 const PREFIX_STANDARD_NOTES_BURN = '--sn-';
 
+function camelCaseToDashed(camel: string) {
+  return camel.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+}
+
+export function objectToCss(object: any) {
+  let result = '';
+  for (const key of Object.keys(object)) {
+    const dashed = `sn-${camelCaseToDashed(key).toLowerCase()}`;
+    const line = `--${dashed}: ${object[key]};\n`;
+    result += line;
+  }
+  return `
+    :root {
+      ${result}
+    }
+  `;
+}
+
 export default class CSSParser {
   /**
    * @param css: CSS file contents in string format

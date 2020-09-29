@@ -1,7 +1,9 @@
 import { MobileApplication } from '@Lib/application';
+import ComponentManager from '@Lib/ComponentManager';
 import CSSParser from '@Style/Util/CSSParser';
 import {
   DARK_CONTENT,
+  getColorLuminosity,
   keyboardColorForTheme,
   LIGHT_CONTENT,
   statusBarColorForTheme,
@@ -17,11 +19,15 @@ import {
 } from 'react-native';
 import {
   ApplicationEvent,
+  ContentType,
+  CopyPayload,
+  CreateMaxPayloadFromAnyObject,
+  FillItemContent,
   removeFromArray,
-  SNComponent,
   SNTheme,
   StorageValueModes,
 } from 'snjs';
+import { RawPayload } from 'snjs/dist/@types/protocol/payloads/generator';
 import { UuidString } from 'snjs/dist/@types/types';
 import THEME_DARK_JSON from './Themes/blue-dark.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
@@ -34,18 +40,35 @@ const CACHED_THEMES_KEY = 'cachedThemesKey';
 
 type ThemeChangeObserver = () => Promise<void> | void;
 
-export interface ThemeContent {
+type MobileThemeContent = {
+  variables: StyleKitTheme;
   isSystemTheme: boolean;
   isInitial: boolean;
-  name: string;
   luminosity?: number;
   isSwapIn?: boolean;
-  uuid: string;
-  variables: StyleKitTheme;
-  package_info: SNComponent['package_info'];
+};
+
+export class MobileTheme extends SNTheme {
+  get mobileContent() {
+    return (this.safeContent as any) as MobileThemeContent;
+  }
+
+  static BuildTheme(variables?: StyleKitTheme) {
+    return new MobileTheme(
+      CreateMaxPayloadFromAnyObject({
+        uuid: `${Math.random()}`,
+        content_type: ContentType.Theme,
+        content: FillItemContent({
+          variables: variables || ({} as StyleKitTheme),
+          isSystemTheme: false,
+          isInitial: false,
+        } as MobileThemeContent),
+      })
+    );
+  }
 }
 
-enum SystemThemes {
+enum SystemThemeTint {
   Blue = 'Blue',
   Dark = 'Dark',
   Red = 'Red',
@@ -57,14 +80,14 @@ export const StyleKitContext = React.createContext<StyleKit | undefined>(
 
 export class StyleKit {
   observers: ThemeChangeObserver[] = [];
-  private themeData: Record<UuidString, ThemeContent> = {};
+  private themes: Record<UuidString, MobileTheme> = {};
   activeThemeId?: string;
   static constants = {
     mainTextFontSize: 16,
     paddingLeft: 14,
   };
   styles: Record<string, ViewStyle | TextStyle> = {};
-  theme?: StyleKitTheme;
+  variables?: StyleKitTheme;
   application: MobileApplication;
   unregisterComponentHandler?: () => void;
   unsubscribeStreamThemes?: () => void;
@@ -77,7 +100,7 @@ export class StyleKit {
   }
 
   async init() {
-    await this.setExternalThemes();
+    await this.loadCachedThemes();
     await this.resolveInitialThemeForMode();
     Appearance.addChangeListener(this.onColorSchemeChange.bind(this));
   }
@@ -108,33 +131,33 @@ export class StyleKit {
     );
   }
 
-  private findOrCreateDataForTheme(themeId: string) {
-    let data = this.themeData[themeId];
-    if (!data) {
-      data = {} as ThemeContent;
-      this.themeData[themeId] = data;
+  private findOrCreateTheme(themeId: string, variables?: StyleKitTheme) {
+    let theme = this.themes[themeId];
+    if (!theme) {
+      theme = this.buildTheme(undefined, variables);
+      this.addTheme(theme);
     }
-    return data;
+    return theme;
   }
 
   private buildSystemThemesAndData() {
     const themeData = [
       {
-        uuid: SystemThemes.Blue,
+        uuid: SystemThemeTint.Blue,
         variables: THEME_BLUE_JSON,
-        name: SystemThemes.Blue,
+        name: SystemThemeTint.Blue,
         isInitial: this.getColorScheme() === 'light',
       },
       {
-        uuid: SystemThemes.Dark,
+        uuid: SystemThemeTint.Dark,
         variables: THEME_DARK_JSON,
-        name: SystemThemes.Dark,
+        name: SystemThemeTint.Dark,
         isInitial: this.getColorScheme() === 'dark',
       },
       {
-        uuid: SystemThemes.Red,
+        uuid: SystemThemeTint.Red,
         variables: THEME_RED_JSON,
-        name: SystemThemes.Red,
+        name: SystemThemeTint.Red,
       },
     ];
 
@@ -146,21 +169,34 @@ export class StyleKit {
       variables.statusBar =
         Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
 
-      this.themeData[option.uuid] = {
-        isSystemTheme: true,
-        isInitial: Boolean(option.isInitial),
-        name: option.name,
+      const payload = CreateMaxPayloadFromAnyObject({
         uuid: option.uuid,
-        variables: variables,
-        package_info: {
-          dock_icon: {
-            type: 'circle',
-            background_color: variables.stylekitInfoColor,
-            border_color: variables.stylekitInfoColor,
+        content_type: ContentType.Theme,
+        content: FillItemContent({
+          package_info: {
+            dock_icon: {
+              type: 'circle',
+              background_color: variables.stylekitInfoColor,
+              border_color: variables.stylekitInfoColor,
+            },
           },
-        },
-      };
+          name: option.name,
+          variables: variables,
+          isSystemTheme: true,
+          isInitial: Boolean(option.isInitial),
+        } as MobileThemeContent),
+      });
+      const theme = new MobileTheme(payload);
+      this.addTheme(theme);
     }
+  }
+
+  addTheme(theme: MobileTheme) {
+    this.themes[theme.uuid] = theme;
+  }
+
+  public getActiveTheme() {
+    return this.activeThemeId && this.themes[this.activeThemeId];
   }
 
   private onColorSchemeChange() {
@@ -195,7 +231,7 @@ export class StyleKit {
     theme: SNTheme,
     mode: 'light' | 'dark'
   ) {
-    const data = this.findOrCreateDataForTheme(theme.uuid);
+    const data = this.findOrCreateTheme(theme.uuid);
     if (!data.hasOwnProperty('variables')) {
       if ((await this.downloadThemeAndReload(theme)) === false) {
         return;
@@ -238,12 +274,14 @@ export class StyleKit {
    * copy as the result may be modified before use.
    */
   templateVariables() {
-    return Object.assign({}, THEME_BLUE_JSON);
+    return Object.assign({}, THEME_BLUE_JSON) as StyleKitTheme;
   }
 
   private setDefaultTheme() {
     const defaultThemeId =
-      this.getColorScheme() === 'dark' ? SystemThemes.Dark : SystemThemes.Blue;
+      this.getColorScheme() === 'dark'
+        ? SystemThemeTint.Dark
+        : SystemThemeTint.Blue;
 
     this.setActiveTheme(defaultThemeId);
   }
@@ -251,7 +289,7 @@ export class StyleKit {
   private async resolveInitialThemeForMode() {
     try {
       const savedThemeId = await this.getThemeForMode(this.getColorScheme());
-      const matchingThemeId = Object.keys(this.themeData).find(
+      const matchingThemeId = Object.keys(this.themes).find(
         themeId => themeId === savedThemeId
       );
       if (matchingThemeId) {
@@ -266,14 +304,12 @@ export class StyleKit {
   }
 
   keyboardColorForActiveTheme() {
-    return keyboardColorForTheme(
-      this.findOrCreateDataForTheme(this.activeThemeId!)
-    );
+    return keyboardColorForTheme(this.findOrCreateTheme(this.activeThemeId!));
   }
 
   systemThemes() {
-    return Object.values(this.themeData)
-      .filter(th => th.isSystemTheme)
+    return Object.values(this.themes)
+      .filter(theme => theme.mobileContent.isSystemTheme)
       .sort((a, b) => {
         if (a.name < b.name) {
           return -1;
@@ -285,9 +321,9 @@ export class StyleKit {
       });
   }
 
-  externalThemes() {
-    return Object.values(this.themeData)
-      .filter(th => !th.isSystemTheme)
+  nonSystemThemes() {
+    return Object.values(this.themes)
+      .filter(theme => !theme.mobileContent.isSystemTheme)
       .sort((a, b) => {
         if (a.name < b.name) {
           return -1;
@@ -297,20 +333,39 @@ export class StyleKit {
         }
         return 0;
       });
+  }
+
+  private buildTheme(base?: MobileTheme, baseVariables?: StyleKitTheme) {
+    const theme = base || MobileTheme.BuildTheme();
+    /** Merge default variables to ensure this theme has all the variables. */
+    const variables = {
+      ...this.templateVariables(),
+      ...theme.mobileContent.variables,
+      ...baseVariables,
+    };
+    const luminosity =
+      theme.mobileContent.luminosity ||
+      getColorLuminosity(variables.stylekitContrastBackgroundColor);
+    return new MobileTheme(
+      CopyPayload(theme.payload, {
+        content: {
+          ...theme.mobileContent,
+          variables: variables,
+          luminosity: luminosity,
+        } as MobileThemeContent,
+      })
+    );
   }
 
   setActiveTheme(themeId: string) {
-    /** Merge default variables to ensure this theme has all the variables. */
-    const themeData = this.findOrCreateDataForTheme(themeId);
-    const variables = themeData.variables;
-    themeData.variables = Object.assign(this.templateVariables(), variables);
-
+    const theme = this.findOrCreateTheme(themeId);
+    const updatedTheme = this.buildTheme(theme);
+    this.addTheme(updatedTheme);
+    this.variables = updatedTheme.mobileContent.variables;
+    (this.application
+      .componentManager as ComponentManager).setMobileActiveTheme(updatedTheme);
     this.activeThemeId = themeId;
-
     this.updateDeviceForTheme(themeId);
-
-    this.reloadStyles();
-
     this.notifyObserversOfThemeChange();
   }
 
@@ -321,7 +376,7 @@ export class StyleKit {
    *     - Status Bar color
    */
   private updateDeviceForTheme(themeId: string) {
-    const theme = this.findOrCreateDataForTheme(themeId);
+    const theme = this.findOrCreateTheme(themeId);
     const isAndroid = Platform.OS === 'android';
     /** On Android, a time out is required, especially during app startup. */
     setTimeout(
@@ -339,7 +394,7 @@ export class StyleKit {
             StatusBar.setBackgroundColor('#000000');
           } else {
             StatusBar.setBackgroundColor(
-              theme.variables.stylekitContrastBackgroundColor
+              theme.mobileContent.variables.stylekitContrastBackgroundColor
             );
           }
         }
@@ -384,32 +439,39 @@ export class StyleKit {
   }
 
   async activateExternalTheme(theme: SNTheme) {
+    const existing = this.themes[theme.uuid];
+    if (existing && existing.mobileContent.variables) {
+      this.activateTheme(theme.uuid);
+      return;
+    }
     const variables = await this.downloadTheme(theme);
     if (!variables) {
       Alert.alert('Not Available', 'This theme is not available on mobile.');
       return;
     }
-    let data = this.findOrCreateDataForTheme(theme.uuid);
     const appliedVariables = Object.assign(this.templateVariables(), variables);
     const finalVariables = {
       ...appliedVariables,
       ...StyleKit.constants,
     };
-    data = {
-      isSystemTheme: false,
-      isInitial: false,
-      name: theme.name,
-      uuid: theme.uuid,
-      variables: finalVariables,
-      package_info: {
-        dock_icon: {
-          type: 'circle',
-          background_color: finalVariables.stylekitInfoColor,
-          border_color: finalVariables.stylekitInfoColor,
-        },
-      },
-    };
-    this.themeData[theme.uuid] = data;
+    const mobileTheme = new MobileTheme(
+      CreateMaxPayloadFromAnyObject(theme.payload, {
+        content: {
+          ...theme.payload.safeContent,
+          variables: finalVariables,
+          isSystemTheme: false,
+          isInitial: false,
+          package_info: {
+            dock_icon: {
+              type: 'circle',
+              background_color: finalVariables.stylekitInfoColor,
+              border_color: finalVariables.stylekitInfoColor,
+            },
+          },
+        } as MobileThemeContent,
+      })
+    );
+    this.addTheme(mobileTheme);
     this.activateTheme(theme.uuid);
     this.cacheThemes();
   }
@@ -419,27 +481,26 @@ export class StyleKit {
     this.assignThemeForMode(themeId, this.getColorScheme());
   }
 
-  private async setExternalThemes() {
-    const cachedThemes = await this.loadCachedThemes();
-    if (cachedThemes) {
-      for (const theme of cachedThemes) {
-        this.themeData[theme.uuid] = theme;
-      }
+  private async loadCachedThemes() {
+    const rawValue =
+      (await this.application!.getValue(
+        CACHED_THEMES_KEY,
+        StorageValueModes.Nonwrapped
+      )) || [];
+    const themes = rawValue.map((rawPayload: RawPayload) => {
+      const payload = CreateMaxPayloadFromAnyObject(rawPayload);
+      return new MobileTheme(payload);
+    });
+    for (const theme of themes) {
+      this.addTheme(theme);
     }
   }
 
-  private async loadCachedThemes(): Promise<ThemeContent[] | undefined> {
-    return this.application!.getValue(
-      CACHED_THEMES_KEY,
-      StorageValueModes.Nonwrapped
-    );
-  }
-
   private async cacheThemes() {
-    const themes = this.externalThemes();
+    const themes = this.nonSystemThemes();
     return this.application!.setValue(
       CACHED_THEMES_KEY,
-      themes,
+      themes.map(t => t.payloadRepresentation()),
       StorageValueModes.Nonwrapped
     );
   }
@@ -454,31 +515,22 @@ export class StyleKit {
   }
 
   public async downloadThemeAndReload(theme: SNTheme) {
-    const updatedVariables = await this.downloadTheme(theme);
-    if (updatedVariables === null) {
+    const variables = await this.downloadTheme(theme);
+    if (!variables) {
       return false;
     }
     /** Merge default variables to ensure this theme has all the variables. */
-    const appliedVariables = Object.assign(
-      this.templateVariables(),
-      updatedVariables
-    );
-    let data = this.findOrCreateDataForTheme(theme.uuid);
-    data.variables = {
+    const appliedVariables = Object.assign(this.templateVariables(), variables);
+    const mobileTheme = this.findOrCreateTheme(theme.uuid, {
       ...appliedVariables,
       ...StyleKit.constants,
-    };
+    });
+    this.addTheme(mobileTheme);
     this.cacheThemes();
     if (theme.uuid === this.activeThemeId) {
       this.setActiveTheme(theme.uuid);
     }
     return true;
-  }
-
-  reloadStyles() {
-    const { variables } = this.findOrCreateDataForTheme(this.activeThemeId!);
-
-    this.theme = variables;
   }
 
   static doesDeviceSupportDarkMode() {
