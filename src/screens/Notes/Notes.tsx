@@ -107,7 +107,7 @@ export const Notes: React.FC<Props> = props => {
         (note: SNNote) => {
           return notePassesFilter(
             note,
-            false,
+            tag?.isArchiveTag,
             false,
             searchFilter?.toLowerCase() || searchText.toLowerCase()
           );
@@ -276,7 +276,7 @@ export const Notes: React.FC<Props> = props => {
         hideDates={hideDates}
         selectedNoteId={
           application?.getAppState().isInTabletMode
-            ? null // selectedNoteId
+            ? null // TODO: selectedNoteId
             : null
         }
       />
