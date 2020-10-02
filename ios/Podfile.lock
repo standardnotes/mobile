@@ -1,6 +1,6 @@
 PODS:
   - boost-for-react-native (1.63.0)
-  - BugsnagReactNative (7.3.5):
+  - BugsnagReactNative (7.4.0):
     - React
   - CocoaAsyncSocket (7.6.4)
   - CocoaLibEvent (1.0.0)
@@ -249,8 +249,8 @@ PODS:
     - React-Core
   - react-native-version-info (1.1.0):
     - React-Core
-  - react-native-webview (10.9.0):
-    - React
+  - react-native-webview (10.9.1):
+    - React-Core
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
   - React-RCTAnimation (0.62.2):
@@ -523,7 +523,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BugsnagReactNative: fc7d6fb2127e53a8bfc79130b58263da363bb94b
+  BugsnagReactNative: fee60d898e05e2ac29e081f3808f1cf3f3bcbe6c
   CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
@@ -555,7 +555,7 @@ SPEC CHECKSUMS:
   react-native-segmented-control: e257b39e80733b848d7d040e07c29eee99396aff
   react-native-sodium: dd3c708254bb924d96f2d80768f114fa4bfe1c3f
   react-native-version-info: 36490da17d2c6b5cc21321c70e433784dee7ed0b
-  react-native-webview: bfe5436586b214759bd5043658863549fffc8e92
+  react-native-webview: c981c0de33cdc842884469b008f067d6132ad7a5
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71

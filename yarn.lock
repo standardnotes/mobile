@@ -733,20 +733,20 @@
   resolved "https://registry.yarnpkg.com/@bugsnag/cuid/-/cuid-3.0.0.tgz#2ee7642a30aee6dc86f5e7f824653741e42e5c35"
   integrity sha512-LOt8aaBI+KvOQGneBtpuCz3YqzyEAehd1f3nC5yr9TIYW1+IzYKa2xWS4EiMz5pPOnRPHkyyS5t/wmSmN51Gjg==
 
-"@bugsnag/delivery-react-native@^7.3.5":
-  version "7.3.5"
-  resolved "https://registry.yarnpkg.com/@bugsnag/delivery-react-native/-/delivery-react-native-7.3.5.tgz#a9386d51584d604cb0696d2a0521c21271b50d13"
-  integrity sha512-k1TBehv4LnsN/9DhS8t/758oCWyVPFR7neFvKKW5RcUIG9Rwtkbvoji5nDYYqwcxr08GXv+hEg/DkLMcSuhpSw==
+"@bugsnag/delivery-react-native@^7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@bugsnag/delivery-react-native/-/delivery-react-native-7.4.0.tgz#62971ff2941aa2df65852d6683df8a0c6b946158"
+  integrity sha512-lJdn45osxVjcR0Maj6YUzk2bVbFInMlF/oZS2gXe1KszgCd3AXHhtNh1yaxDMrgrKQ4de9zDm19CY4l5DQi2XA==
 
 "@bugsnag/plugin-console-breadcrumbs@^7.3.5":
   version "7.3.5"
   resolved "https://registry.yarnpkg.com/@bugsnag/plugin-console-breadcrumbs/-/plugin-console-breadcrumbs-7.3.5.tgz#e29c859845108f2362ebbd3838e62ffe7ebc58f0"
   integrity sha512-7TaOi20or+aleUdJGNZKfaBWtrTwXeIMbYZ3hQUdWhExD9kuGpxBcXgZbJ4Gml60VG4emZ3x1d4fP6F7AzvBSg==
 
-"@bugsnag/plugin-network-breadcrumbs@^7.3.5":
-  version "7.3.5"
-  resolved "https://registry.yarnpkg.com/@bugsnag/plugin-network-breadcrumbs/-/plugin-network-breadcrumbs-7.3.5.tgz#215c8dafd6d320988572de977ee214d119465ac7"
-  integrity sha512-PE+Yu1+Gg1SMkm8l7PqdqhFPTYKmdQlRuKTrfn/+ZS197emiylBdAyKVnwD6y1kHoBO2X5sVXx/5SzpptBTj9w==
+"@bugsnag/plugin-network-breadcrumbs@^7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@bugsnag/plugin-network-breadcrumbs/-/plugin-network-breadcrumbs-7.4.0.tgz#ac7adda8f92a2a7840a72f7bceef6595cf6c76af"
+  integrity sha512-KQLsSR9kj6ivI0GxC2dGmycrt18nidiE5dXBp2jsrr68sJY9T9GpuHFLnDrrSptsmJKV9BqdeDfJzfzUCzlYng==
 
 "@bugsnag/plugin-react-native-client-sync@^7.3.5":
   version "7.3.5"
@@ -758,20 +758,20 @@
   resolved "https://registry.yarnpkg.com/@bugsnag/plugin-react-native-event-sync/-/plugin-react-native-event-sync-7.3.5.tgz#3517df2299b509e14f7cf9ef5bbd9253a6455965"
   integrity sha512-+kwwbfnRdHmwaTqNp8Aexv00pCHwYSYdEh/dG20Ew1Z9I/vtF76tOqVfv3RWZz7XBmn/MLF7buHgcSNho8BQWw==
 
-"@bugsnag/plugin-react-native-global-error-handler@^7.3.5":
-  version "7.3.5"
-  resolved "https://registry.yarnpkg.com/@bugsnag/plugin-react-native-global-error-handler/-/plugin-react-native-global-error-handler-7.3.5.tgz#26f2c4e17365f2e2a80f3e955e3d331b7a865300"
-  integrity sha512-c39hld1lzRlRBJIvXM0CR+qLQM6twDfbbojbFuY9J9HP6iQ86uKQEHSV2AR3I2T48vCE3eb09E7G8ifwHyYDmA==
+"@bugsnag/plugin-react-native-global-error-handler@^7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@bugsnag/plugin-react-native-global-error-handler/-/plugin-react-native-global-error-handler-7.4.0.tgz#446605ac90fa85188e6aaa2781e50bff30f485fb"
+  integrity sha512-iJmK1qE2Rj79liTeIoB3YVeRHfV+eram7MTIRvHA8qeVvRoREOPqO+aCGIsJWS1q/v43sKN9InSPdIhhKBfguw==
 
 "@bugsnag/plugin-react-native-hermes@^7.3.5":
   version "7.3.5"
   resolved "https://registry.yarnpkg.com/@bugsnag/plugin-react-native-hermes/-/plugin-react-native-hermes-7.3.5.tgz#7565b265395c7f5ad641ecf606383d66a5eb97b9"
   integrity sha512-/zl7/eQOLJ9U2fG3PW615oiSlf7/iuWPcAa14+xkPhPqFFMlVaeYDvPCsqCeTjtmyCh7QueEPA1ZyWFNKW+uGg==
 
-"@bugsnag/plugin-react-native-session@^7.3.5":
-  version "7.3.5"
-  resolved "https://registry.yarnpkg.com/@bugsnag/plugin-react-native-session/-/plugin-react-native-session-7.3.5.tgz#ca6f37601de37b3d7b6262c6c5108297e016a27d"
-  integrity sha512-m72MgisOS4Kth07jTJXzSXUu++pwrUn+f1a5r5DLV2j75a/AFqgNjhYFOss5dschmq35zOM+HmQ5+GEqRPLCLg==
+"@bugsnag/plugin-react-native-session@^7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@bugsnag/plugin-react-native-session/-/plugin-react-native-session-7.4.0.tgz#0d7cfa1d4ccce9e023cc6638e73a8a96d47a6dfe"
+  integrity sha512-HoH+5EKK5FS2bq5WE1pb2ksCewWn0qnjgzRm8/tfkvROPLPDgt71rF7u0br26rXjz2J4wZtzu19Ty9t00vFBmQ==
 
 "@bugsnag/plugin-react-native-unhandled-rejection@^7.3.5":
   version "7.3.5"
@@ -783,21 +783,21 @@
   resolved "https://registry.yarnpkg.com/@bugsnag/plugin-react/-/plugin-react-7.3.5.tgz#0bdb462c274fdbe02cf43698aca4ae0035dbf2e3"
   integrity sha512-y9J9hRJXwuQ+IqoURtbYpW4WRcku2PPE1JYyRFzKEN9YEPXEkG6ZPTBfa+MydoIF+hey1rsJ10OLukJZlFv3BQ==
 
-"@bugsnag/react-native@^7.3.5":
-  version "7.3.5"
-  resolved "https://registry.yarnpkg.com/@bugsnag/react-native/-/react-native-7.3.5.tgz#3ff2eda577be12acff0180f5c1540e48de57d5b0"
-  integrity sha512-aOFjCdFK/QcBC92qz+0vpT34Bo9zNM1MgFpi/fKz7MEDT3KN3lUHnJg9tUL4zSkOtIgjHkhxhLIBzREL8TaZ6w==
+"@bugsnag/react-native@^7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@bugsnag/react-native/-/react-native-7.4.0.tgz#58e4d698b3e34b0927ae7f80769a642632a72310"
+  integrity sha512-CSNy1ZL/3gTYmvrESjbAn4ewChAk93/9SEVxiQQH6UM8VcPDR7wRa6UDxA3Yj+y/f2BZ/hiRgZ6SKogk6jhrWg==
   dependencies:
     "@bugsnag/core" "^7.3.5"
-    "@bugsnag/delivery-react-native" "^7.3.5"
+    "@bugsnag/delivery-react-native" "^7.4.0"
     "@bugsnag/plugin-console-breadcrumbs" "^7.3.5"
-    "@bugsnag/plugin-network-breadcrumbs" "^7.3.5"
+    "@bugsnag/plugin-network-breadcrumbs" "^7.4.0"
     "@bugsnag/plugin-react" "^7.3.5"
     "@bugsnag/plugin-react-native-client-sync" "^7.3.5"
     "@bugsnag/plugin-react-native-event-sync" "^7.3.5"
-    "@bugsnag/plugin-react-native-global-error-handler" "^7.3.5"
+    "@bugsnag/plugin-react-native-global-error-handler" "^7.4.0"
     "@bugsnag/plugin-react-native-hermes" "^7.3.5"
-    "@bugsnag/plugin-react-native-session" "^7.3.5"
+    "@bugsnag/plugin-react-native-session" "^7.4.0"
     "@bugsnag/plugin-react-native-unhandled-rejection" "^7.3.5"
     iserror "^0.0.2"
 
@@ -2832,10 +2832,10 @@ detect-newline@^3.0.0:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
 
-detox@^17.6.1:
-  version "17.6.1"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-17.6.1.tgz#3bdd8cbdcc079b1c4b604181fe505615db563832"
-  integrity sha512-NPZabH3ixOdXCbDDQeRToUxXTN1kHiK7WhCCjH4YHtKNaprcYiYqPgIloEykauHvpgynebmyTBxOY6hDtsiO4Q==
+detox@^17.8.0:
+  version "17.8.0"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-17.8.0.tgz#10093adb943ba51bd8cb95a2f409ea6da96d4726"
+  integrity sha512-o/ylVT55IP6ykqftw9sXP4EUqgjibOrctqcPiI+R2T0ZLOvQEwbXDcvrP9WzzVQiWCGGuDpnuRPehrlY6JdCGQ==
   dependencies:
     bunyan "^1.8.12"
     bunyan-debug-stream "^1.1.0"
@@ -6621,10 +6621,10 @@ react-native-version-info@^1.1.0:
   resolved "https://registry.yarnpkg.com/react-native-version-info/-/react-native-version-info-1.1.0.tgz#1407de863cae4dbbeeadb9c173a295a7774b6884"
   integrity sha512-0QmJjdKyaW+G/TiOWkwzGVv1G3FPnWrPH5SYWloUpv8WA7onuQESYHdLyjfCUInYI/FHVeEynE2VomOOsda8wQ==
 
-react-native-webview@^10.9.0:
-  version "10.9.0"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-10.9.0.tgz#a45998f82ab1bbbbfde22b8b155394772610157a"
-  integrity sha512-zYZfmdJca/xRbwvvOfPhzL59SQC4L0W9rPWVF4zMi7BMDdCVHXVp0wKZ9KzmqxZNwadZNTxl5s0pvd6p3S34Fg==
+react-native-webview@^10.9.1:
+  version "10.9.1"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-10.9.1.tgz#8c64ac51cf04f5e63a4ade2536fac8e79170bd07"
+  integrity sha512-hqUvca0+jHbQBRFl0trAgEpLUGcEebLDAvwDo7K5pnwtgBfu9UsbBUg/kqC7IVSNXS94rjwp1Dw4f/Pf91kqZQ==
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
@@ -7372,9 +7372,9 @@ sncrypto@standardnotes/sncrypto#5f8cd36:
   version "1.2.0"
   resolved "https://codeload.github.com/standardnotes/sncrypto/tar.gz/5f8cd369773cec7f342c23ecaa659d932b35cd31"
 
-snjs@standardnotes/snjs#ebb7a3a2d55e697d356c7bc7dd5a83d028f0e516:
+snjs@standardnotes/snjs#c06610acf71a18a90f7af67a23f7cce4ef60c9e1:
   version "1.0.5"
-  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/ebb7a3a2d55e697d356c7bc7dd5a83d028f0e516"
+  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/c06610acf71a18a90f7af67a23f7cce4ef60c9e1"
 
 source-map-resolve@^0.5.0:
   version "0.5.3"
