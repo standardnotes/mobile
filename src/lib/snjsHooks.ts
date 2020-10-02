@@ -214,7 +214,9 @@ export const useSyncStatus = () => {
         `Syncing ${stats.uploadCompletionCount}/${stats.uploadTotalCount} items...`
       );
     } else {
-      setStatus();
+      if (!application?.getAppState().isInTabletMode) {
+        setStatus();
+      }
     }
   }, [application, setStatus]);
 
@@ -237,7 +239,12 @@ export const useSyncStatus = () => {
             setStatus('Syncing...');
           }
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
-          setStatus();
+          if (
+            !completedInitialSync ||
+            !application?.getAppState().isInTabletMode
+          ) {
+            setStatus();
+          }
           if (!completedInitialSync) {
             setCompletedInitialSync(true);
             setLoading(false);
