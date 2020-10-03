@@ -1,9 +1,10 @@
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
+import { PrefKey } from '@Lib/PreferencesManager';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext, useMemo, useState } from 'react';
-import { CollectionSort, MobilePrefKey } from 'snjs';
+import { CollectionSort } from 'snjs';
 
 export const PreferencesSection = () => {
   // Context
@@ -13,20 +14,16 @@ export const PreferencesSection = () => {
   const [sortBy, setSortBy] = useState<CollectionSort>(() =>
     application!
       .getPrefsService()
-      .getValue(MobilePrefKey.SortNotesBy, CollectionSort.UpdatedAt)
+      .getValue(PrefKey.SortNotesBy, CollectionSort.UpdatedAt)
   );
   const [sortReverse, setSortReverse] = useState<boolean>(() =>
-    application!
-      .getPrefsService()
-      .getValue(MobilePrefKey.SortNotesReverse, false)
+    application!.getPrefsService().getValue(PrefKey.SortNotesReverse, false)
   );
   const [hideDates, setHideDates] = useState<boolean>(() =>
-    application!.getPrefsService().getValue(MobilePrefKey.NotesHideDate, false)
+    application!.getPrefsService().getValue(PrefKey.NotesHideDate, false)
   );
   const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
-    application!
-      .getPrefsService()
-      .getValue(MobilePrefKey.NotesHideNotePreview, false)
+    application!.getPrefsService().getValue(PrefKey.NotesHideNotePreview, false)
   );
 
   const sortOptions = useMemo(() => {
@@ -40,30 +37,24 @@ export const PreferencesSection = () => {
   const toggleReverseSort = () => {
     application
       ?.getPrefsService()
-      .setUserPrefValue(MobilePrefKey.SortNotesReverse, !sortReverse, true);
+      .setUserPrefValue(PrefKey.SortNotesReverse, !sortReverse);
     setSortReverse(value => !value);
   };
 
   const changeSortOption = (key: CollectionSort) => {
-    application
-      ?.getPrefsService()
-      .setUserPrefValue(MobilePrefKey.SortNotesBy, key, true);
+    application?.getPrefsService().setUserPrefValue(PrefKey.SortNotesBy, key);
     setSortBy(key);
   };
   const toggleNotesPreviewHidden = () => {
     application
       ?.getPrefsService()
-      .setUserPrefValue(
-        MobilePrefKey.NotesHideNotePreview,
-        !hidePreviews,
-        true
-      );
+      .setUserPrefValue(PrefKey.NotesHideNotePreview, !hidePreviews);
     setHidePreviews(value => !value);
   };
   const toggleNotesDateHidden = () => {
     application
       ?.getPrefsService()
-      .setUserPrefValue(MobilePrefKey.NotesHideDate, !hideDates, true);
+      .setUserPrefValue(PrefKey.NotesHideDate, !hideDates);
     setHideDates(value => !value);
   };
 

@@ -1,4 +1,5 @@
 import { AppStateType } from '@Lib/ApplicationState';
+import { PrefKey } from '@Lib/PreferencesManager';
 import { useSignedIn, useSyncStatus } from '@Lib/snjsHooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -8,13 +9,7 @@ import { ICON_ADD } from '@Style/icons';
 import { StyleKit } from '@Style/StyleKit';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import FAB from 'react-native-fab';
-import {
-  CollectionSort,
-  ContentType,
-  MobilePrefKey,
-  Platform,
-  SNNote,
-} from 'snjs';
+import { CollectionSort, ContentType, Platform, SNNote } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';
@@ -43,20 +38,16 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
   const [sortBy, setSortBy] = useState<CollectionSort>(() =>
     application!
       .getPrefsService()
-      .getValue(MobilePrefKey.SortNotesBy, CollectionSort.UpdatedAt)
+      .getValue(PrefKey.SortNotesBy, CollectionSort.UpdatedAt)
   );
   const [sortReverse, setSortReverse] = useState<boolean>(() =>
-    application!
-      .getPrefsService()
-      .getValue(MobilePrefKey.SortNotesReverse, false)
+    application!.getPrefsService().getValue(PrefKey.SortNotesReverse, false)
   );
   const [hideDates, setHideDates] = useState<boolean>(() =>
-    application!.getPrefsService().getValue(MobilePrefKey.NotesHideDate, false)
+    application!.getPrefsService().getValue(PrefKey.NotesHideDate, false)
   );
   const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
-    application!
-      .getPrefsService()
-      .getValue(MobilePrefKey.NotesHideNotePreview, false)
+    application!.getPrefsService().getValue(PrefKey.NotesHideNotePreview, false)
   );
   const [notes, setNotes] = useState<SNNote[]>([]);
   const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
@@ -238,7 +229,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
   const reloadPreferences = useCallback(async () => {
     let newSortBy = application
       ?.getPrefsService()
-      .getValue(MobilePrefKey.SortNotesBy, NoteSortKey.UserUpdatedAt);
+      .getValue(PrefKey.SortNotesBy, NoteSortKey.UserUpdatedAt);
     if (
       newSortBy === NoteSortKey.UpdatedAt ||
       newSortBy === NoteSortKey.ClientUpdatedAt
@@ -250,13 +241,13 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
 
     const newSortReverse = application
       ?.getPrefsService()
-      .getValue(MobilePrefKey.SortNotesReverse, false);
+      .getValue(PrefKey.SortNotesReverse, false);
     const newHidePreview = application!
       .getPrefsService()
-      .getValue(MobilePrefKey.NotesHideNotePreview, false);
+      .getValue(PrefKey.NotesHideNotePreview, false);
     const newHideDate = application!
       .getPrefsService()
-      .getValue(MobilePrefKey.NotesHideDate, false);
+      .getValue(PrefKey.NotesHideDate, false);
 
     if (sortBy !== newSortBy) {
       setSortBy(newSortBy);

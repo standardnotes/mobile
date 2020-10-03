@@ -3,6 +3,7 @@ import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTable
 import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
+import { PrefKey } from '@Lib/PreferencesManager';
 import { useSignedIn } from '@Lib/snjsHooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -15,7 +16,7 @@ import {
 } from '@Screens/screens';
 import moment from 'moment';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
-import { ButtonType, MobilePrefKey, ProtectedAction } from 'snjs';
+import { ButtonType, ProtectedAction } from 'snjs';
 
 type Props = {
   title: string;
@@ -35,9 +36,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   const [awaitingUnlock, setAwaitingUnlock] = useState(false);
   const [encryptedBackup, setEncryptedBackp] = useState(false);
   const [lastExportDate, setLastExportDate] = useState<Date | undefined>(() =>
-    application
-      ?.getPrefsService()
-      .getValue(MobilePrefKey.LastExportDate, undefined)
+    application?.getPrefsService().getValue(PrefKey.LastExportDate, undefined)
   );
 
   const lastExportData = useMemo(() => {
@@ -117,7 +116,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         setLastExportDate(exportDate);
         application
           ?.getPrefsService()
-          .setUserPrefValue(MobilePrefKey.LastExportDate, exportDate);
+          .setUserPrefValue(PrefKey.LastExportDate, exportDate);
       }
       setExporting(false);
     },
