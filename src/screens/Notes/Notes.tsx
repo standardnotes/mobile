@@ -118,9 +118,11 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
   );
 
   const selectNote = useCallback(
-    (noteUuid: SNNote['uuid']) => {
-      setSelectedNoteId(noteUuid);
-      onNoteSelect(noteUuid);
+    (note: SNNote) => {
+      if (!note.errorDecrypting) {
+        setSelectedNoteId(note.uuid);
+      }
+      onNoteSelect(note.uuid);
     },
     [onNoteSelect]
   );
@@ -139,7 +141,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
     (newNotes: SNNote[]) => {
       const note = getFirstNonProtectedNote(newNotes);
       if (note) {
-        selectNote(note.uuid);
+        selectNote(note);
       }
     },
     [getFirstNonProtectedNote, selectNote]
@@ -149,7 +151,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
     (newNotes: SNNote[]) => {
       const note = getFirstNonProtectedNote(newNotes);
       if (note) {
-        selectNote(note.uuid);
+        selectNote(note);
       } else {
         application?.getAppState().closeActiveEditor();
       }

@@ -35,7 +35,7 @@ type Props = {
   onSearchChange: (text: string) => void;
   onSearchCancel: () => void;
   searchText: string;
-  onPressItem: (noteUuid: SNNote['uuid']) => void;
+  onPressItem: (note: SNNote) => void;
   selectedNoteId: string | undefined;
   sortType: CollectionSort;
   hideDates: boolean;

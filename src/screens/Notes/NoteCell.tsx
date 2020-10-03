@@ -20,7 +20,7 @@ import { NoteCellFlags } from './NoteCellFlags';
 type Props = {
   note: SNNote;
   highlighted?: boolean;
-  onPressItem: (itemUuid: SNNote['uuid']) => void;
+  onPressItem: (item: SNNote) => void;
   hideDates: boolean;
   hidePreviews: boolean;
   sortType: CollectionSort;
@@ -63,7 +63,7 @@ export const NoteCell = ({
 
   const _onPress = () => {
     setSelected(true);
-    onPressItem(note.uuid);
+    onPressItem(note);
     setSelected(false);
   };
 

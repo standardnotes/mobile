@@ -159,6 +159,16 @@ export const Root = (props: Props): JSX.Element | null => {
     async (noteUuid: SNNote['uuid']) => {
       const note = application?.findItem(noteUuid) as SNNote;
       if (note) {
+        if (note.errorDecrypting) {
+          if (note.waitingForKey) {
+            return application?.presentKeyRecoveryWizard();
+          } else {
+            return application?.alertService.alert(
+              'Standard Notes was unable to decrypt this item. Please sign out of your account and back in to attempt to resolve this issue.',
+              'Unable to Decrypt'
+            );
+          }
+        }
         if (
           note.safeContent.protected &&
           (await application?.privilegesService!.actionRequiresPrivilege(
