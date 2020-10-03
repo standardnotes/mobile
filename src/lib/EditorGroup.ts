@@ -40,6 +40,7 @@ export class EditorGroup {
     const activeEditor = this.activeEditor;
     if (activeEditor) {
       this.deleteEditor(activeEditor);
+      this.notifyObservers();
     }
   }
 

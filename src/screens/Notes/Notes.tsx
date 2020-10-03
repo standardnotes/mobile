@@ -25,7 +25,7 @@ type Props = {
   onNoteCreate: () => void;
 };
 
-export const Notes: React.FC<Props> = props => {
+export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
@@ -59,7 +59,7 @@ export const Notes: React.FC<Props> = props => {
       .getValue(MobilePrefKey.NotesHideNotePreview, false)
   );
   const [notes, setNotes] = useState<SNNote[]>([]);
-  // State
+  const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
   const [searchText, setSearchText] = useState('');
 
   // Ref
@@ -117,23 +117,95 @@ export const Notes: React.FC<Props> = props => {
     [application, sortBy, sortReverse, searchText]
   );
 
-  const reloadNotes = useCallback(() => {
-    const tag = application!.getAppState().selectedTag;
-    if (!tag) {
-      return;
-    }
+  const selectNote = useCallback(
+    (noteUuid: SNNote['uuid']) => {
+      setSelectedNoteId(noteUuid);
+      onNoteSelect(noteUuid);
+    },
+    [onNoteSelect]
+  );
 
-    /** If no display options we set them initially */
-    if (!haveDisplayOptions.current) {
-      haveDisplayOptions.current = true;
-      reloadNotesDisplayOptions();
-    }
-    const newNotes = application!.getDisplayableItems(
-      ContentType.Note
-    ) as SNNote[];
-    setNotes(newNotes);
-    reloadTitle(newNotes);
-  }, [application, reloadNotesDisplayOptions, reloadTitle]);
+  const createNote = useCallback(() => {
+    setSelectedNoteId(undefined);
+    onNoteCreate();
+  }, [onNoteCreate]);
+
+  const getFirstNonProtectedNote = useCallback(
+    (newNotes: SNNote[]) => newNotes.find(note => !note.protected),
+    []
+  );
+
+  const selectFirstNote = useCallback(
+    (newNotes: SNNote[]) => {
+      const note = getFirstNonProtectedNote(newNotes);
+      if (note) {
+        selectNote(note.uuid);
+      }
+    },
+    [getFirstNonProtectedNote, selectNote]
+  );
+
+  const selectNextOrCreateNew = useCallback(
+    (newNotes: SNNote[]) => {
+      const note = getFirstNonProtectedNote(newNotes);
+      if (note) {
+        selectNote(note.uuid);
+      } else {
+        application?.getAppState().closeActiveEditor();
+      }
+    },
+    [application, getFirstNonProtectedNote, selectNote]
+  );
+
+  const reloadNotes = useCallback(
+    (reselectNote?: boolean, tagChanged?: boolean) => {
+      const tag = application!.getAppState().selectedTag;
+      if (!tag) {
+        return;
+      }
+
+      /** If no display options we set them initially */
+      if (!haveDisplayOptions.current) {
+        haveDisplayOptions.current = true;
+        reloadNotesDisplayOptions();
+      }
+      const newNotes = application!.getDisplayableItems(
+        ContentType.Note
+      ) as SNNote[];
+      setNotes(newNotes);
+      reloadTitle(newNotes);
+
+      if (reselectNote) {
+        if (tagChanged) {
+          if (newNotes.length > 0) {
+            selectFirstNote(newNotes);
+          } else {
+            application?.getAppState().closeActiveEditor();
+          }
+        } else {
+          const activeNote = application?.getAppState().getActiveEditor()?.note;
+          if (activeNote) {
+            const discarded = activeNote.deleted || activeNote.trashed;
+            if (
+              discarded &&
+              !application?.getAppState().selectedTag?.isTrashTag
+            ) {
+              selectNextOrCreateNew(newNotes);
+            }
+          } else {
+            selectFirstNote(newNotes);
+          }
+        }
+      }
+    },
+    [
+      application,
+      reloadNotesDisplayOptions,
+      reloadTitle,
+      selectFirstNote,
+      selectNextOrCreateNew,
+    ]
+  );
 
   const streamNotesAndTags = useCallback(() => {
     const removeStreamNotes = application!.streamItems(
@@ -141,7 +213,7 @@ export const Notes: React.FC<Props> = props => {
       async () => {
         /** If a note changes, it will be queried against the existing filter;
          * we dont need to reload display options */
-        reloadNotes();
+        reloadNotes(true);
       }
     );
 
@@ -237,7 +309,7 @@ export const Notes: React.FC<Props> = props => {
         .addStateChangeObserver(state => {
           if (state === AppStateType.TagChanged) {
             reloadNotesDisplayOptions();
-            reloadNotes();
+            reloadNotes(true, true);
           }
           if (state === AppStateType.PreferencesChanged) {
             reloadPreferences();
@@ -263,7 +335,7 @@ export const Notes: React.FC<Props> = props => {
       <NoteList
         onRefresh={onRefresh}
         hasRefreshControl={signedIn}
-        onPressItem={props.onNoteSelect}
+        onPressItem={selectNote}
         refreshing={refreshing}
         searchText={searchText}
         onSearchChange={onSearchChange}
@@ -275,9 +347,7 @@ export const Notes: React.FC<Props> = props => {
         hidePreviews={hidePreviews}
         hideDates={hideDates}
         selectedNoteId={
-          application?.getAppState().isInTabletMode
-            ? null // TODO: selectedNoteId
-            : null
+          application?.getAppState().isInTabletMode ? selectedNoteId : undefined
         }
       />
       <FAB
@@ -289,7 +359,7 @@ export const Notes: React.FC<Props> = props => {
         }
         buttonColor={theme.stylekitInfoColor}
         iconTextColor={theme.stylekitInfoContrastColor}
-        onClickAction={props.onNoteCreate}
+        onClickAction={createNote}
         visible={true}
         size={30}
         paddingTop={application!.platform === Platform.Ios ? 1 : 0}

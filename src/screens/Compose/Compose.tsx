@@ -14,7 +14,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Keyboard, View } from 'react-native';
+import { Keyboard, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SNTextView from 'sn-textview';
 import {
@@ -24,7 +24,6 @@ import {
   isPayloadSourceRetrieved,
   NoteMutator,
   PayloadSource,
-  Platform,
   SNComponent,
   SNNote,
 } from 'snjs';
@@ -171,7 +170,7 @@ export const Compose = (): JSX.Element => {
   useEffect(() => {
     let mounted = true;
     if (mounted && editor && editor.isTemplateNote) {
-      if (application?.platform === Platform.Ios) {
+      if (Platform.OS === 'ios') {
         editorViewRef.current?.focus();
       }
     }
@@ -417,8 +416,8 @@ export const Compose = (): JSX.Element => {
 
   const onContentChange = useCallback(
     (newNoteText: string) => {
-      if (application?.platform === Platform.Android && note?.locked) {
-        application.alertService?.alert(
+      if (Platform.OS === 'android' && note?.locked) {
+        application?.alertService?.alert(
           'This note is locked. Please unlock this note to make changes.',
           'Note Locked',
           'OK'
@@ -431,13 +430,7 @@ export const Compose = (): JSX.Element => {
         newNoteText,
       });
     },
-    [
-      application?.alertService,
-      application?.platform,
-      note?.locked,
-      saveNote,
-      title,
-    ]
+    [application?.alertService, note?.locked, saveNote, title]
   );
 
   const shouldDisplayEditor = editorComponent && Boolean(note) && !webViewError;
@@ -512,7 +505,7 @@ export const Compose = (): JSX.Element => {
           }}
         />
       )}
-      {!shouldDisplayEditor && application?.platform === Platform.Android && (
+      {!shouldDisplayEditor && Platform.OS === 'android' && (
         <TextContainer>
           <StyledTextView
             testID="noteContentField"
@@ -529,8 +522,8 @@ export const Compose = (): JSX.Element => {
         </TextContainer>
       )}
       {/* Empty wrapping view fixes native textview crashing */}
-      {!shouldDisplayEditor && application?.platform === Platform.Ios && (
-        <View>
+      {!shouldDisplayEditor && Platform.OS === 'ios' && (
+        <View key={note?.uuid}>
           <StyledTextView
             testID="noteContentField"
             ref={editorViewRef}

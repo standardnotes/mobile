@@ -8,11 +8,11 @@ export const NotesContainer = styled.View<{
   shouldSplitLayout?: boolean;
   notesListCollapsed?: boolean;
 }>`
-  ${({ shouldSplitLayout, notesListCollapsed }) =>
+  ${({ shouldSplitLayout, notesListCollapsed, theme }) =>
     shouldSplitLayout
       ? css`
-          border-right-color: black;
-          border-right-width: 1px;
+          border-right-color: ${theme.stylekitBorderColor};
+          border-right-width: ${notesListCollapsed ? 0 : 1}px;
           width: ${notesListCollapsed ? 0 : '40%'};
         `
       : css`

@@ -155,30 +155,33 @@ export const Root = (props: Props): JSX.Element | null => {
     [application, openCompose]
   );
 
-  const onNoteSelect = async (noteUuid: SNNote['uuid']) => {
-    const note = application?.findItem(noteUuid) as SNNote;
-    if (note) {
-      if (
-        note.safeContent.protected &&
-        (await application?.privilegesService!.actionRequiresPrivilege(
-          ProtectedAction.ViewProtectedNotes
-        ))
-      ) {
-        const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
-          ProtectedAction.ViewProtectedNotes
-        );
-        setExpectsUnlock(true);
-        props.navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
-          action: ProtectedAction.ViewProtectedNotes,
-          privilegeCredentials,
-          unlockedItemId: noteUuid,
-          previousScreen: SCREEN_NOTES,
-        });
-      } else {
-        openNote(noteUuid);
+  const onNoteSelect = useCallback(
+    async (noteUuid: SNNote['uuid']) => {
+      const note = application?.findItem(noteUuid) as SNNote;
+      if (note) {
+        if (
+          note.safeContent.protected &&
+          (await application?.privilegesService!.actionRequiresPrivilege(
+            ProtectedAction.ViewProtectedNotes
+          ))
+        ) {
+          const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
+            ProtectedAction.ViewProtectedNotes
+          );
+          setExpectsUnlock(true);
+          props.navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
+            action: ProtectedAction.ViewProtectedNotes,
+            privilegeCredentials,
+            unlockedItemId: noteUuid,
+            previousScreen: SCREEN_NOTES,
+          });
+        } else {
+          openNote(noteUuid);
+        }
       }
-    }
-  };
+    },
+    [application, openNote, props.navigation]
+  );
 
   /*
    * After screen is focused read if a requested privilage was unlocked
@@ -206,10 +209,10 @@ export const Root = (props: Props): JSX.Element | null => {
     }, [application, expectsUnlock, openNote])
   );
 
-  const onNoteCreate = async () => {
+  const onNoteCreate = useCallback(async () => {
     await application!.getAppState().createEditor();
     openCompose(true);
-  };
+  }, [application, openCompose]);
 
   const toggleNoteList = () => {
     setNoteListCollapsed(value => !value);
@@ -224,18 +227,15 @@ export const Root = (props: Props): JSX.Element | null => {
 
   return (
     <Container testID="rootView" onLayout={onLayout}>
-      {!noteListCollapsed && (
-        <NotesContainer shouldSplitLayout={shouldSplitLayout}>
-          <Notes onNoteSelect={onNoteSelect} onNoteCreate={onNoteCreate} />
-        </NotesContainer>
-      )}
-
+      <NotesContainer
+        notesListCollapsed={noteListCollapsed}
+        shouldSplitLayout={shouldSplitLayout}
+      >
+        <Notes onNoteSelect={onNoteSelect} onNoteCreate={onNoteCreate} />
+      </NotesContainer>
       {hasEditor && shouldSplitLayout && (
         <ComposeContainer>
-          <Compose
-          // selectedTagId={this.state.selectedTagId}
-          />
-
+          <Compose />
           <ExpandTouchable
             style={{ bottom: collapseIconBottomPosition }}
             onPress={toggleNoteList}
