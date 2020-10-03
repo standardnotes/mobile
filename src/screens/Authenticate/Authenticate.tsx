@@ -64,6 +64,9 @@ export const Authenticate = ({
   const [keyboardType, setKeyboardType] = useState<
     PasscodeKeyboardType | undefined
   >(undefined);
+  const [singleValidation] = useState(
+    () => !(challenge.prompts.filter(prompt => prompt.validates).length > 0)
+  );
   const [{ challengeValues, challengeValueStates }, dispatch] = useReducer(
     authenticationReducer,
     {
@@ -114,24 +117,32 @@ export const Authenticate = ({
 
   const validateChallengeValue = useCallback(
     async (challengeValue: ChallengeValue) => {
-      const state = challengeValueStates[challengeValue.prompt.id];
+      if (singleValidation) {
+        return application?.submitValuesForChallenge(
+          challenge,
+          Object.values(challengeValues)
+        );
+      } else {
+        const state = challengeValueStates[challengeValue.prompt.id];
 
-      if (
-        state === AuthenticationValueStateType.Locked ||
-        state === AuthenticationValueStateType.Success
-      ) {
-        return;
+        if (
+          state === AuthenticationValueStateType.Locked ||
+          state === AuthenticationValueStateType.Success
+        ) {
+          return;
+        }
+        return application?.submitValuesForChallenge(challenge, [
+          challengeValue,
+        ]);
       }
-
-      dispatch({
-        type: 'setState',
-        id: challengeValue.prompt.id.toString(),
-        state: AuthenticationValueStateType.Pending,
-      });
-
-      await application?.submitValuesForChallenge(challenge, [challengeValue]);
     },
-    [challengeValueStates, application, challenge]
+    [
+      challengeValueStates,
+      singleValidation,
+      challengeValues,
+      application,
+      challenge,
+    ]
   );
 
   const onValueLocked = useCallback((challengeValue: ChallengeValue) => {
@@ -454,17 +465,21 @@ export const Authenticate = ({
 
   const onSubmitPress = () => {
     const challengeValue = challengeValues[firstNotSuccessful!];
-    const state = challengeValueStates[firstNotSuccessful!];
-    if (
-      challengeValue.prompt.validation === ChallengeValidation.Biometric &&
-      (state === AuthenticationValueStateType.Locked ||
-        state === AuthenticationValueStateType.Fail)
-    ) {
-      beginAuthenticatingForNextChallengeReason();
-      return;
-    }
+    if (singleValidation) {
+      validateChallengeValue(challengeValue);
+    } else {
+      const state = challengeValueStates[firstNotSuccessful!];
+      if (
+        challengeValue.prompt.validation === ChallengeValidation.Biometric &&
+        (state === AuthenticationValueStateType.Locked ||
+          state === AuthenticationValueStateType.Fail)
+      ) {
+        beginAuthenticatingForNextChallengeReason();
+        return;
+      }
 
-    validateChallengeValue(challengeValue);
+      validateChallengeValue(challengeValue);
+    }
   };
 
   const switchKeyboard = () => {
@@ -474,6 +489,14 @@ export const Authenticate = ({
       setKeyboardType(PasscodeKeyboardType.Default);
     }
   };
+
+  const readyToSubmit = useMemo(
+    () =>
+      Object.values(challengeValues)
+        .map(challengeValue => challengeValue.value)
+        .filter(value => !value).length === 0,
+    [challengeValues]
+  );
 
   const renderAuthenticationSource = (
     challengeValue: ChallengeValue,
@@ -541,9 +564,13 @@ export const Authenticate = ({
                 keyboardType={keyboardType}
                 keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
-                onSubmitEditing={() => {
-                  validateChallengeValue(challengeValue);
-                }}
+                onSubmitEditing={
+                  !singleValidation
+                    ? () => {
+                        validateChallengeValue(challengeValue);
+                      }
+                    : undefined
+                }
               />
             </SectionedTableCell>
           </SectionContainer>
@@ -588,11 +615,12 @@ export const Authenticate = ({
       )}
       <ButtonCell
         maxHeight={45}
-        disabled={isPending}
+        disabled={singleValidation ? !readyToSubmit : isPending}
         title={
-          !!firstNotSuccessful &&
-          findIndexInObject(challengeValueStates, firstNotSuccessful) ===
-            Object.keys(challengeValueStates).length - 1
+          singleValidation ||
+          (!!firstNotSuccessful &&
+            findIndexInObject(challengeValueStates, firstNotSuccessful) ===
+              Object.keys(challengeValueStates).length - 1)
             ? 'Submit'
             : 'Next'
         }

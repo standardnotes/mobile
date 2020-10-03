@@ -17,7 +17,7 @@ import ComponentManager from './ComponentManager';
 import { EditorGroup } from './EditorGroup';
 import { InstallationService } from './InstallationService';
 import { MobileDeviceInterface } from './interface';
-import { navigate } from './NavigationService';
+import { push } from './NavigationService';
 import { PreferencesManager } from './PreferencesManager';
 import { ReviewService } from './reviewService';
 import { SNReactNativeCrypto } from './SNReactNativeCrypto';
@@ -76,7 +76,7 @@ export class MobileApplication extends SNApplication {
   }
 
   promptForChallenge(challenge: Challenge) {
-    navigate(SCREEN_AUTHENTICATE, { challenge, title: challenge.modalTitle });
+    push(SCREEN_AUTHENTICATE, { challenge, title: challenge.modalTitle });
   }
 
   setMobileServices(services: MobileServices) {
