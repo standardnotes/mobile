@@ -13,7 +13,7 @@ export const StyledSectionedTableCell = styled(SectionedTableCell)`
 `;
 
 export const Title = styled.Text`
-  color: ${({ theme }) => theme.stylekitNeutralColor};
+  color: ${({ theme }) => theme.stylekitForegroundColor};
   font-size: 14px;
   font-weight: bold;
   margin-top: 4px;
