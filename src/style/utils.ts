@@ -1,3 +1,4 @@
+import { isNullOrUndefined } from 'snjs';
 import { MobileTheme } from './StyleKit';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';
@@ -6,7 +7,7 @@ export const LIGHT_CONTENT = 'light-content';
 export const DARK_CONTENT = 'dark-content';
 
 export function statusBarColorForTheme(theme: MobileTheme) {
-  if (!theme.mobileContent.luminosity) {
+  if (isNullOrUndefined(theme.mobileContent.luminosity)) {
     throw Error('Theme luminocity should not be null');
   }
   // The main nav bar uses contrast background color
@@ -19,7 +20,7 @@ export function statusBarColorForTheme(theme: MobileTheme) {
 }
 
 export function keyboardColorForTheme(theme: MobileTheme) {
-  if (!theme.mobileContent.luminosity) {
+  if (isNullOrUndefined(theme.mobileContent.luminosity)) {
     throw Error('Theme luminocity should not be null');
   }
   if (theme.mobileContent.luminosity < 130) {

@@ -44,7 +44,7 @@ type MobileThemeContent = {
   variables: StyleKitTheme;
   isSystemTheme: boolean;
   isInitial: boolean;
-  luminosity?: number;
+  luminosity: number;
   isSwapIn?: boolean;
 };
 
@@ -181,7 +181,10 @@ export class StyleKit {
             },
           },
           name: option.name,
-          variables: variables,
+          variables,
+          luminosity: getColorLuminosity(
+            variables.stylekitContrastBackgroundColor
+          ),
           isSystemTheme: true,
           isInitial: Boolean(option.isInitial),
         } as MobileThemeContent),
@@ -350,8 +353,8 @@ export class StyleKit {
       CopyPayload(theme.payload, {
         content: {
           ...theme.mobileContent,
-          variables: variables,
-          luminosity: luminosity,
+          variables,
+          luminosity,
         } as MobileThemeContent,
       })
     );
@@ -459,6 +462,9 @@ export class StyleKit {
         content: {
           ...theme.payload.safeContent,
           variables: finalVariables,
+          luminosity: getColorLuminosity(
+            finalVariables.stylekitContrastBackgroundColor
+          ),
           isSystemTheme: false,
           isInitial: false,
           package_info: {
