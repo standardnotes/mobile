@@ -23,6 +23,8 @@ export const SubTitle = styled.Text`
 `;
 export const OutOfSyncContainer = styled.TouchableOpacity`
   flex: 1;
+  margin-top: 5px;
+  margin-bottom: 5px;
   flex-direction: row;
   align-items: center;
 `;
@@ -33,6 +35,7 @@ export const IconCircle = styled.View`
 export const OutOfSyncLabel = styled.Text`
   margin-top: 10px;
   font-size: 13px;
+  height: 15px;
   color: ${({ theme }) => theme.stylekitWarningColor};
   font-weight: bold;
 `;
