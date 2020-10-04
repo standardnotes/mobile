@@ -33,6 +33,7 @@ export default class ComponentManager extends SNComponentManager {
 
   public setMobileActiveTheme(theme: MobileTheme) {
     this.mobileActiveTheme = theme;
+    this.postActiveThemesToAllComponents();
   }
 
   /** @override */
