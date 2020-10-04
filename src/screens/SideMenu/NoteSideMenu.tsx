@@ -491,7 +491,7 @@ export const NoteSideMenu = (props: Props) => {
       { text: 'Share', onSelect: shareNote, icon: ICON_SHARE },
     ];
 
-    if (!note.safeContent.trashed) {
+    if (!note.trashed) {
       rawOptions.push({
         text: 'Move to Trash',
         onSelect: async () => deleteNote(false),
@@ -510,7 +510,7 @@ export const NoteSideMenu = (props: Props) => {
       onSelect: rawOption.onSelect,
     }));
 
-    if (note.safeContent.trashed) {
+    if (note.trashed) {
       options = options.concat([
         {
           text: 'Restore',

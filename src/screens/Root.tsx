@@ -170,7 +170,7 @@ export const Root = (props: Props): JSX.Element | null => {
           }
         }
         if (
-          note.safeContent.protected &&
+          note.protected &&
           (await application?.privilegesService!.actionRequiresPrivilege(
             ProtectedAction.ViewProtectedNotes
           ))
