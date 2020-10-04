@@ -500,7 +500,6 @@ export class ApplicationState extends ApplicationService {
       // or return any sources. That's because while authenticating, Face ID prompts may trigger losing focus
       // notifications, causing the app to lock. If the user backgrouds the app during privilege authentication,
       // it will still be locked via the Backgrounding event.
-      // TODO: check this
       this.checkAndLockApplication();
     }
 
