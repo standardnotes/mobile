@@ -130,10 +130,7 @@ export const Compose = (): JSX.Element => {
     const unsubscribeAppEventObserver = application?.addEventObserver(
       async eventName => {
         if (eventName === ApplicationEvent.HighLatencySync) {
-          // this.setState({ syncTakingTooLong: true });
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
-          // this.setState({ syncTakingTooLong: false });
-          // const isInErrorState = this.state.saveError;
           /** if we're still dirty, don't change status, a sync is likely upcoming. */
           if (!note?.dirty && saveError) {
             showAllChangesSavedStatus();
@@ -267,9 +264,6 @@ export const Compose = (): JSX.Element => {
         if (!note) {
           return;
         }
-        /** Reload componentStack in case new ones were added or removed */
-        // reloadComponentContext();
-        // await this.reloadComponentStack();
         /** Observe editor changes to see if the current note should update its editor */
         const editors = components.filter(component => {
           return component.isEditor();

@@ -221,17 +221,6 @@ export class MobileDeviceInterface extends DeviceInterface {
   }
 
   async getDeviceBiometricsAvailability() {
-    // if (__DEV__) {
-    //   const isAndroid = Platform.OS === 'android';
-    //   if (isAndroid && Platform.Version < 23) {
-    //     callback(true, 'Fingerprint', 'Fingerprint (Dev)');
-    //   } else if (isAndroid) {
-    //     callback(true, 'Biometrics', 'Biometrics');
-    //   } else {
-    //     callback(true, 'Face ID', 'Face ID');
-    //   }
-    //   return;
-    // }
     try {
       await FingerprintScanner.isSensorAvailable();
       return true;

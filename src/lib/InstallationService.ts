@@ -17,20 +17,6 @@ export class InstallationService extends ApplicationService {
     }
   }
 
-  // shouldPresentKeyRecoveryWizard() {
-  //   let hasKeys =
-  //     this.application?.hasAccount() || this.application?.hasPasscode();
-  //   if (
-  //     !this.accountAuthParams &&
-  //     this.offlineAuthParams &&
-  //     !this.offlineKeys
-  //   ) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
-
   async markApplicationAsRan() {
     return this.application?.setValue(
       FIRST_RUN_KEY,

@@ -143,11 +143,6 @@ export const ComponentView = ({
   }, [application, liveComponent, noteUuid]);
 
   const onMessage = (event: WebViewMessageEvent) => {
-    // if (!this.note) {
-    //   /** May be the case in tablet mode on app launch */
-    //   return;
-    // }
-
     let data;
     try {
       data = JSON.parse(event.nativeEvent.data);

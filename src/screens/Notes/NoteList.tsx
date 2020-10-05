@@ -126,6 +126,9 @@ export const NoteList = (props: Props): JSX.Element => {
             placeholder="Search"
             text={searchText}
             hideBackground
+            /**
+             * keyboardColorForActiveTheme returns the same value as apperance
+             */
             appearance={styleKit?.keyboardColorForActiveTheme()}
             barTintColor={theme.stylekitInfoColor}
             textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
@@ -155,7 +158,6 @@ export const NoteList = (props: Props): JSX.Element => {
               styles.androidSearch,
               {
                 backgroundColor: theme.stylekitContrastBackgroundColor,
-                // color: theme.stylekitForegroundColor,
               },
             ]}
           />

@@ -213,7 +213,6 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
     const removeStreamTags = application!.streamItems(
       [ContentType.Tag],
       async () => {
-        // const tags = items as SNTag[];
         /** A tag could have changed its relationships, so we need to reload the filter */
         reloadNotesDisplayOptions();
         reloadNotes();

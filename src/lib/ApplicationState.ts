@@ -495,27 +495,14 @@ export class ApplicationState extends ApplicationService {
 
     if (isLosingFocus) {
       this.notifyOfStateChange(AppStateType.LosingFocus);
-
-      // If a privileges authentication session is in progress, we don't want to lock the application
-      // or return any sources. That's because while authenticating, Face ID prompts may trigger losing focus
-      // notifications, causing the app to lock. If the user backgrouds the app during privilege authentication,
-      // it will still be locked via the Backgrounding event.
       this.checkAndLockApplication();
     }
-
-    /*
-      Presumabely we added previous event tracking in case an app event was triggered before observers got the chance to register.
-      If we are backgrounding or losing focus, I assume we no longer care about previous events that occurred.
-      (This was added in relation to the issue where pressing the Android back button would reconstruct App and cause all events to be re-forwarded)
-     */
-    // if (isEnteringBackground || isLosingFocus) {
-    //   this.clearPreviousState();
-    // }
   };
 
-  // Visibility change events are like active, inactive, background,
-  // while non-app cycle events are custom events like locking and unlocking
-
+  /**
+   * Visibility change events are like active, inactive, background,
+   * while non-app cycle events are custom events like locking and unlocking
+   */
   isAppVisibilityChange(state: AppStateType) {
     return ([
       AppStateType.Launching,
