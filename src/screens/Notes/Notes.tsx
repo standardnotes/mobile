@@ -168,7 +168,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
       setNotes(newNotes);
       reloadTitle(newNotes);
 
-      if (reselectNote) {
+      if (reselectNote && application?.getAppState().isTabletDevice) {
         if (tagChanged) {
           if (newNotes.length > 0) {
             selectFirstNote(newNotes);

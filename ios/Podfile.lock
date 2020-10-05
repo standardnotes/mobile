@@ -316,8 +316,8 @@ PODS:
     - React
   - RNCMaskedView (0.1.10):
     - React
-  - RNFileViewer (2.1.1):
-    - React
+  - RNFileViewer (2.1.3):
+    - React-Core
   - RNFS (2.16.6):
     - React
   - RNGestureHandler (1.8.0):
@@ -569,7 +569,7 @@ SPEC CHECKSUMS:
   ReactNativeAlternateIcons: b2a8a729d9d9756ed0652c352694f190407f297f
   RNCAsyncStorage: 2a692bcb9b69b76a2f1a95f33db057129700af64
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
-  RNFileViewer: db62d60dd19007c54b2c959b5e675a46d59f8a43
+  RNFileViewer: b29d05e460b0b39bb60003c252f16d8c4f5ee050
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
