@@ -6,7 +6,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
 import { ICON_ADD } from '@Style/icons';
-import { StyleKit } from '@Style/stylekit';
+import { ThemeService } from '@Style/theme_service';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import FAB from 'react-native-fab';
 import { CollectionSort, ContentType, Platform, SNNote } from 'snjs';
@@ -358,7 +358,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
         iconTextComponent={
           <StyledIcon
             testID="newNoteButton"
-            name={StyleKit.nameForIcon(ICON_ADD)}
+            name={ThemeService.nameForIcon(ICON_ADD)}
           />
         }
       />

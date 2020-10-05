@@ -1,5 +1,5 @@
 import { objectToCss } from '@Style/css_parser';
-import { MobileTheme } from '@Style/stylekit';
+import { MobileTheme } from '@Style/theme_service';
 import { Base64 } from 'js-base64';
 import { SNAlertService, SNComponent, SNComponentManager } from 'snjs';
 import { PermissionDialog } from 'snjs/dist/@types/services/component_manager';

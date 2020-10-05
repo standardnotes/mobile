@@ -1,10 +1,10 @@
 import theme from './blue.json';
 
-export type StyleKitTheme = typeof theme & {
+export type MobileThemeVariables = typeof theme & {
   paddingLeft: number;
   mainTextFontSize: number;
 };
 
 declare module 'styled-components' {
-  export interface DefaultTheme extends StyleKitTheme {}
+  export interface DefaultTheme extends MobileThemeVariables {}
 }

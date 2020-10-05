@@ -1,5 +1,5 @@
 import { ICON_LOCK } from '@Style/icons';
-import { StyleKit } from '@Style/stylekit';
+import { ThemeService } from '@Style/theme_service';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import WebView from 'react-native-webview';
@@ -37,5 +37,5 @@ export const StyledWebview = styled(WebView)`
 export const StyledIcon = styled(Icon).attrs(({ theme }) => ({
   color: theme.stylekitBackgroundColor,
   size: 16,
-  name: StyleKit.nameForIcon(ICON_LOCK),
+  name: ThemeService.nameForIcon(ICON_LOCK),
 }))``;

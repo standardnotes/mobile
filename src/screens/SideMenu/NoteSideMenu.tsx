@@ -19,7 +19,7 @@ import {
   ICON_SHARE,
   ICON_TRASH,
 } from '@Style/icons';
-import { StyleKit } from '@Style/stylekit';
+import { ThemeService } from '@Style/theme_service';
 import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, {
   useCallback,
@@ -345,7 +345,7 @@ export const NoteSideMenu = (props: Props) => {
         key: 'get-editors',
         iconDesc: {
           type: 'icon',
-          name: StyleKit.nameForIcon(ICON_MEDICAL),
+          name: ThemeService.nameForIcon(ICON_MEDICAL),
           side: 'right',
           size: 17,
         },
@@ -505,7 +505,7 @@ export const NoteSideMenu = (props: Props) => {
       iconDesc: {
         type: 'icon',
         side: 'right' as 'right',
-        name: StyleKit.nameForIcon(rawOption.icon),
+        name: ThemeService.nameForIcon(rawOption.icon),
       },
       onSelect: rawOption.onSelect,
     }));
@@ -634,7 +634,9 @@ export const NoteSideMenu = (props: Props) => {
         visible={true}
         size={30}
         paddingTop={Platform.OS === 'ios' ? 1 : 0}
-        iconTextComponent={<Icon name={StyleKit.nameForIcon(ICON_PRICE_TAG)} />}
+        iconTextComponent={
+          <Icon name={ThemeService.nameForIcon(ICON_PRICE_TAG)} />
+        }
       />
     </SafeAreaContainer>
   );

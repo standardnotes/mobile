@@ -10,7 +10,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { ICON_CLOSE } from '@Style/icons';
-import { StyleKit, StyleKitContext } from '@Style/stylekit';
+import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
   useContext,
@@ -54,7 +54,7 @@ export const Authenticate = ({
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
-  const styleKit = useContext(StyleKitContext);
+  const themeService = useContext(ThemeServiceContext);
   const theme = useContext(ThemeContext);
 
   // State
@@ -103,7 +103,7 @@ export const Authenticate = ({
               iconName={
                 Platform.OS === 'ios'
                   ? undefined
-                  : StyleKit.nameForIcon(ICON_CLOSE)
+                  : ThemeService.nameForIcon(ICON_CLOSE)
               }
               onPress={() => {
                 application?.cancelChallenge(challenge);
@@ -562,7 +562,7 @@ export const Authenticate = ({
                 autoCapitalize={'none'}
                 secureTextEntry={challengeValue.prompt.secureTextEntry}
                 keyboardType={keyboardType}
-                keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+                keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 onSubmitEditing={
                   !singleValidation

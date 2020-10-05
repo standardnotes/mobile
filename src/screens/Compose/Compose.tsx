@@ -5,7 +5,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
-import { StyleKit, StyleKitContext } from '@Style/stylekit';
+import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import { lighten } from '@Style/utils';
 import React, {
   useCallback,
@@ -51,7 +51,7 @@ export const Compose = (): JSX.Element => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
-  const styleKit = useContext(StyleKitContext);
+  const themeService = useContext(ThemeServiceContext);
   const navigation = useNavigation<
     AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
   >();
@@ -434,7 +434,7 @@ export const Compose = (): JSX.Element => {
       {note?.locked && (
         <LockedContainer>
           <Icon
-            name={StyleKit.nameForIcon(ICON_LOCK)}
+            name={ThemeService.nameForIcon(ICON_LOCK)}
             size={16}
             color={theme.stylekitBackgroundColor}
           />
@@ -444,7 +444,7 @@ export const Compose = (): JSX.Element => {
       {webViewError && (
         <LockedContainer>
           <Icon
-            name={StyleKit.nameForIcon(ICON_ALERT)}
+            name={ThemeService.nameForIcon(ICON_ALERT)}
             size={16}
             color={theme.stylekitBackgroundColor}
           />
@@ -467,7 +467,7 @@ export const Compose = (): JSX.Element => {
         selectionColor={theme.stylekitInfoColor}
         underlineColorAndroid={'transparent'}
         placeholderTextColor={theme.stylekitNeutralColor}
-        keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+        keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
         autoCorrect={true}
         autoCapitalize={'sentences'}
         editable={!note?.locked}
@@ -524,7 +524,7 @@ export const Compose = (): JSX.Element => {
             autoFocus={false}
             multiline
             value={note?.text}
-            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
             selectionColor={lighten(theme.stylekitInfoColor)}
             onChangeText={onContentChange}
             editable={!note?.locked}

@@ -4,7 +4,7 @@ import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { StyleKitContext } from '@Style/stylekit';
+import { ThemeServiceContext } from '@Style/theme_service';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Keyboard } from 'react-native';
 import {
@@ -25,7 +25,7 @@ type Props = {
 export const AuthSection = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
-  const styleKit = useContext(StyleKitContext);
+  const themeService = useContext(ThemeServiceContext);
 
   // State
   const [registering, setRegistering] = useState(false);
@@ -162,7 +162,7 @@ export const AuthSection = (props: Props) => {
             value={passwordConfirmation}
             secureTextEntry
             autoFocus
-            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
           />
         </SectionedTableCell>
 
@@ -187,7 +187,7 @@ export const AuthSection = (props: Props) => {
   };
 
   const _renderDefaultContent = () => {
-    const keyboardApperance = styleKit?.keyboardColorForActiveTheme();
+    const keyboardApperance = themeService?.keyboardColorForActiveTheme();
 
     return (
       <TableSection>
