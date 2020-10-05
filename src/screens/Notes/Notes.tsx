@@ -38,7 +38,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
   const [sortBy, setSortBy] = useState<CollectionSort>(() =>
     application!
       .getPrefsService()
-      .getValue(PrefKey.SortNotesBy, CollectionSort.UpdatedAt)
+      .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
   );
   const [sortReverse, setSortReverse] = useState<boolean>(() =>
     application!.getPrefsService().getValue(PrefKey.SortNotesReverse, false)
@@ -228,7 +228,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
   const reloadPreferences = useCallback(async () => {
     let newSortBy = application
       ?.getPrefsService()
-      .getValue(PrefKey.SortNotesBy, NoteSortKey.UserUpdatedAt);
+      .getValue(PrefKey.SortNotesBy, NoteSortKey.CreatedAt);
     if (
       newSortBy === NoteSortKey.UpdatedAt ||
       newSortBy === NoteSortKey.ClientUpdatedAt
