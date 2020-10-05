@@ -8,6 +8,7 @@ import {
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_NOTE_HISTORY,
 } from '@Screens/screens';
+import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import {
   ICON_ARCHIVE,
   ICON_BOOKMARK,
@@ -20,7 +21,6 @@ import {
   ICON_TRASH,
 } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
-import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, {
   useCallback,
   useContext,

@@ -3,7 +3,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
-} from '@Style/useCustomActionSheet';
+} from '@Style/custom_action_sheet';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { CollectionSort, isNullOrUndefined, NoteMutator, SNNote } from 'snjs';

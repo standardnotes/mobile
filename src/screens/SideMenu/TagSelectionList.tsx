@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
-import { useCustomActionSheet } from '@Style/useCustomActionSheet';
+import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import React, {
   useCallback,
   useContext,

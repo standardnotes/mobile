@@ -2,16 +2,16 @@ import { AppStateType } from '@Lib/application_state';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
+import {
+  CustomActionSheetOption,
+  useCustomActionSheet,
+} from '@Style/custom_action_sheet';
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
 import {
   MobileTheme,
   ThemeService,
   ThemeServiceContext,
 } from '@Style/theme_service';
-import {
-  CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Style/useCustomActionSheet';
 import React, {
   Fragment,
   useCallback,
