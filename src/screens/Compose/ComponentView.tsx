@@ -1,3 +1,4 @@
+import { PrefKey } from '@Lib/PreferencesManager';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, {
   useCallback,
@@ -12,7 +13,13 @@ import {
   OnShouldStartLoadWithRequest,
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
-import { ComponentAction, ComponentArea, LiveItem, SNComponent } from 'snjs';
+import {
+  ButtonType,
+  ComponentAction,
+  ComponentArea,
+  LiveItem,
+  SNComponent,
+} from 'snjs';
 import {
   FlexContainer,
   LockedContainer,
@@ -54,6 +61,35 @@ export const ComponentView = ({
       setLiveComponent(new LiveItem(componentUuid, application!));
     }
   }, [application, liveComponent?.item.uuid, componentUuid]);
+
+  useEffect(() => {
+    const warnUnsupportedEditors = async () => {
+      const doNotShowAgainUnsupportedEditors = application
+        ?.getPrefsService()
+        .getValue(PrefKey.DoNotShowAgainUnsupportedEditors, false);
+      if (!doNotShowAgainUnsupportedEditors) {
+        const confirmed = await application?.alertService?.confirm(
+          'Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.',
+          'Editors Not Supported',
+          "Don't show again",
+          ButtonType.Info,
+          'OK'
+        );
+        if (confirmed) {
+          application
+            ?.getPrefsService()
+            .setUserPrefValue(PrefKey.DoNotShowAgainUnsupportedEditors, true);
+        }
+      }
+    };
+    if (Platform.OS === 'android' && Platform.Version <= 23) {
+      /**
+       * postMessage doesn't work on Android <= 6 (API version 23)
+       * https://github.com/facebook/react-native/issues/11594
+       */
+      warnUnsupportedEditors();
+    }
+  }, [application]);
 
   useEffect(() => {
     if (liveComponent) {

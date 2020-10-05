@@ -7,6 +7,7 @@ export enum PrefKey {
   NotesHideNotePreview = 'hideNotePreview',
   NotesHideDate = 'hideDate',
   LastExportDate = 'lastExportDate',
+  DoNotShowAgainUnsupportedEditors = 'doNotShowAgainUnsupportedEditors',
 }
 
 export const LAST_EXPORT_DATE_KEY = 'LastExportDateKey';
