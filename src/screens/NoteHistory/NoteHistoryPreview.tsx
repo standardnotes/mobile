@@ -3,7 +3,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTE_HISTORY_PREVIEW } from '@Screens/screens';
 import { ELIPSIS } from '@Style/icons';
-import { StyleKit } from '@Style/stylekit';
+import { ThemeService } from '@Style/theme_service';
 import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, { useCallback, useContext, useLayoutEffect } from 'react';
 import { YellowBox } from 'react-native';
@@ -100,7 +100,7 @@ export const NoteHistoryPreview = ({
             disabled={false}
             iconSize={25}
             title={''}
-            iconName={StyleKit.nameForIcon(ELIPSIS)}
+            iconName={ThemeService.nameForIcon(ELIPSIS)}
             onPress={onPress}
           />
         </HeaderButtons>

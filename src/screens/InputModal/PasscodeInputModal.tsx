@@ -9,7 +9,7 @@ import { PasscodeKeyboardType, UnlockTiming } from '@Lib/application_state';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_PASSCODE } from '@Screens/screens';
-import { StyleKitContext } from '@Style/stylekit';
+import { ThemeServiceContext } from '@Style/theme_service';
 import React, { useContext, useMemo, useRef, useState } from 'react';
 import { Keyboard, KeyboardType, Platform, TextInput } from 'react-native';
 import { Container, Input } from './InputModal.styled';
@@ -18,7 +18,7 @@ type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_PASSCODE>;
 export const PasscodeInputModal = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
-  const styleKit = useContext(StyleKitContext);
+  const themeService = useContext(ThemeServiceContext);
 
   // State
   const [settingPassocode, setSettingPassocode] = useState(false);
@@ -96,7 +96,7 @@ export const PasscodeInputModal = (props: Props) => {
             autoCorrect={false}
             autoCapitalize={'none'}
             keyboardType={keyboardType}
-            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
             autoFocus={true}
             underlineColorAndroid={'transparent'}
             onSubmitEditing={onTextSubmit}
@@ -114,7 +114,7 @@ export const PasscodeInputModal = (props: Props) => {
             autoCorrect={false}
             autoCapitalize={'none'}
             keyboardType={keyboardType}
-            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
             onSubmitEditing={onSubmit}
           />

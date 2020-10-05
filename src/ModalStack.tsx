@@ -22,7 +22,7 @@ import {
 import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
 import { Settings } from '@Screens/Settings/Settings';
 import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
-import { StyleKit } from '@Style/stylekit';
+import { ThemeService } from '@Style/theme_service';
 import React, { useContext } from 'react';
 import { Platform } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -109,7 +109,7 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
                 iconName={
                   Platform.OS === 'ios'
                     ? undefined
-                    : StyleKit.nameForIcon(ICON_CHECKMARK)
+                    : ThemeService.nameForIcon(ICON_CHECKMARK)
                 }
                 onPress={onPress}
               />
@@ -150,7 +150,7 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
                 iconName={
                   Platform.OS === 'ios'
                     ? undefined
-                    : StyleKit.nameForIcon(ICON_CHECKMARK)
+                    : ThemeService.nameForIcon(ICON_CHECKMARK)
                 }
                 onPress={onPress}
               />
@@ -175,7 +175,7 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
                 iconName={
                   Platform.OS === 'ios'
                     ? undefined
-                    : StyleKit.nameForIcon(ICON_CLOSE)
+                    : ThemeService.nameForIcon(ICON_CLOSE)
                 }
                 onPress={onPress}
               />
@@ -205,7 +205,7 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
                 iconName={
                   Platform.OS === 'ios'
                     ? undefined
-                    : StyleKit.nameForIcon(ICON_CLOSE)
+                    : ThemeService.nameForIcon(ICON_CLOSE)
                 }
                 onPress={onPress}
               />
@@ -238,7 +238,7 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
                 iconName={
                   Platform.OS === 'ios'
                     ? undefined
-                    : StyleKit.nameForIcon(ICON_CLOSE)
+                    : ThemeService.nameForIcon(ICON_CLOSE)
                 }
                 onPress={onPress}
               />

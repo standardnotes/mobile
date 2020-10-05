@@ -3,7 +3,11 @@ import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
-import { MobileTheme, StyleKit, StyleKitContext } from '@Style/stylekit';
+import {
+  MobileTheme,
+  ThemeService,
+  ThemeServiceContext,
+} from '@Style/theme_service';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
@@ -38,7 +42,7 @@ type Props = {
 export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   // Context
   const theme = useContext(ThemeContext);
-  const styleKit = useContext(StyleKitContext);
+  const themeService = useContext(ThemeServiceContext);
   const application = useContext(ApplicationContext);
   const navigation = useNavigation();
   const { showActionSheet } = useCustomActionSheet();
@@ -61,16 +65,16 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
 
   const onSystemThemeSelect = useCallback(
     async (selectedTheme: MobileTheme) => {
-      styleKit?.activateSystemTheme(selectedTheme.uuid);
+      themeService?.activateSystemTheme(selectedTheme.uuid);
     },
-    [styleKit]
+    [themeService]
   );
 
   const onThemeSelect = useCallback(
     async (selectedTheme: SNTheme) => {
-      styleKit?.activateExternalTheme(selectedTheme);
+      themeService?.activateExternalTheme(selectedTheme);
     },
-    [styleKit]
+    [themeService]
   );
 
   const onThemeLongPress = useCallback(
@@ -81,10 +85,10 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
        * option for light/dark mode.
        */
       if ((snTheme && !snTheme.getNotAvailOnMobile()) || !snTheme) {
-        const activeLightTheme = await styleKit?.getThemeForMode('light');
+        const activeLightTheme = await themeService?.getThemeForMode('light');
         const lightThemeAction =
           activeLightTheme === themeId ? 'Current' : 'Set as';
-        const lightName = StyleKit.doesDeviceSupportDarkMode()
+        const lightName = ThemeService.doesDeviceSupportDarkMode()
           ? 'Light'
           : 'Active';
         const text = `${lightThemeAction} ${lightName} Theme`;
@@ -92,9 +96,9 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
           text,
           callback: () => {
             if (snTheme) {
-              styleKit?.assignExternalThemeForMode(snTheme, 'light');
+              themeService?.assignExternalThemeForMode(snTheme, 'light');
             } else {
-              styleKit?.assignThemeForMode(themeId, 'light');
+              themeService?.assignThemeForMode(themeId, 'light');
             }
           },
         });
@@ -102,8 +106,8 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
       /**
        * Only display a dark mode option if this device supports dark mode.
        */
-      if (StyleKit.doesDeviceSupportDarkMode()) {
-        const activeDarkTheme = await styleKit?.getThemeForMode('dark');
+      if (ThemeService.doesDeviceSupportDarkMode()) {
+        const activeDarkTheme = await themeService?.getThemeForMode('dark');
         const darkThemeAction =
           activeDarkTheme === themeId ? 'Current' : 'Set as';
         const text = `${darkThemeAction} Dark Theme`;
@@ -111,9 +115,9 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
           text,
           callback: () => {
             if (snTheme) {
-              styleKit?.assignExternalThemeForMode(snTheme, 'dark');
+              themeService?.assignExternalThemeForMode(snTheme, 'dark');
             } else {
-              styleKit?.assignThemeForMode(themeId, 'dark');
+              themeService?.assignThemeForMode(themeId, 'dark');
             }
           },
         });
@@ -131,14 +135,14 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
               'Redownload'
             );
             if (confirmed) {
-              styleKit?.downloadThemeAndReload(snTheme);
+              themeService?.downloadThemeAndReload(snTheme);
             }
           },
         });
       }
       showActionSheet(name, options);
     },
-    [application?.alertService, showActionSheet, styleKit]
+    [application?.alertService, showActionSheet, themeService]
   );
 
   useEffect(() => {
@@ -178,7 +182,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
   };
 
   const themeOptions = useMemo(() => {
-    const options: SideMenuOption[] = styleKit!
+    const options: SideMenuOption[] = themeService!
       .systemThemes()
       .map(systemTheme => ({
         text: systemTheme?.name,
@@ -188,7 +192,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
         onSelect: () => onSystemThemeSelect(systemTheme),
         onLongPress: () =>
           onThemeLongPress(systemTheme?.uuid, systemTheme?.name),
-        selected: styleKit!.activeThemeId === systemTheme?.uuid,
+        selected: themeService!.activeThemeId === systemTheme?.uuid,
       }))
       .concat(
         themes
@@ -202,17 +206,17 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
             onSelect: () => onThemeSelect(mapTheme),
             onLongPress: () =>
               onThemeLongPress(mapTheme?.uuid, mapTheme?.name, mapTheme),
-            selected: styleKit!.activeThemeId === mapTheme.uuid,
+            selected: themeService!.activeThemeId === mapTheme.uuid,
           }))
       );
 
-    if (options.length === styleKit!.systemThemes().length) {
+    if (options.length === themeService!.systemThemes().length) {
       options.push({
         text: 'Get More Themes',
         key: 'get-theme',
         iconDesc: {
           type: 'icon',
-          name: StyleKit.nameForIcon(ICON_BRUSH),
+          name: ThemeService.nameForIcon(ICON_BRUSH),
           side: 'right',
           size: 17,
         },
@@ -228,8 +232,8 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
     // We want to also track activeThemeId
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    styleKit,
-    styleKit?.activeThemeId,
+    themeService,
+    themeService?.activeThemeId,
     themes,
     onSystemThemeSelect,
     onThemeSelect,
@@ -312,7 +316,7 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
           size={29}
           paddingTop={Platform.OS ? 2 : 0}
           iconTextComponent={
-            <Icon name={StyleKit.nameForIcon(ICON_SETTINGS)} />
+            <Icon name={ThemeService.nameForIcon(ICON_SETTINGS)} />
           }
         />
       </MainSafeAreaView>

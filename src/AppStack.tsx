@@ -24,7 +24,7 @@ import {
 import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
 import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
 import { ICON_MENU } from '@Style/icons';
-import { StyleKit } from '@Style/stylekit';
+import { ThemeService } from '@Style/theme_service';
 import { getDefaultDrawerWidth } from '@Style/utils';
 import React, {
   useCallback,
@@ -192,7 +192,7 @@ export const AppStackComponent = (
                     testID="drawerButton"
                     disabled={false}
                     title={''}
-                    iconName={StyleKit.nameForIcon(ICON_MENU)}
+                    iconName={ThemeService.nameForIcon(ICON_MENU)}
                     onPress={() => {
                       Keyboard.dismiss();
                       drawerRef.current?.openDrawer();
@@ -208,7 +208,7 @@ export const AppStackComponent = (
                       testID="noteDrawerButton"
                       disabled={false}
                       title={''}
-                      iconName={StyleKit.nameForIcon(ICON_MENU)}
+                      iconName={ThemeService.nameForIcon(ICON_MENU)}
                       onPress={() => {
                         Keyboard.dismiss();
                         noteDrawerRef.current?.openDrawer();
@@ -238,7 +238,7 @@ export const AppStackComponent = (
                       testID="noteDrawerButton"
                       disabled={false}
                       title={''}
-                      iconName={StyleKit.nameForIcon(ICON_MENU)}
+                      iconName={ThemeService.nameForIcon(ICON_MENU)}
                       onPress={() => {
                         Keyboard.dismiss();
                         noteDrawerRef.current?.openDrawer();

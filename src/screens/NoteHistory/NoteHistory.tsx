@@ -5,7 +5,7 @@ import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens';
-import { StyleKitContext } from '@Style/stylekit';
+import { ThemeServiceContext } from '@Style/theme_service';
 import React, { useContext, useState } from 'react';
 import { Dimensions, Platform } from 'react-native';
 import {
@@ -29,7 +29,7 @@ export const NoteHistory = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
-  const styleKit = useContext(StyleKitContext);
+  const themeService = useContext(ThemeServiceContext);
 
   // State
   const [note] = useState<SNNote>(
@@ -78,7 +78,7 @@ export const NoteHistory = (props: Props) => {
       <IosTabBarContainer>
         <SegmentedControl
           backgroundColor={theme.stylekitContrastBackgroundColor}
-          appearance={styleKit?.keyboardColorForActiveTheme()}
+          appearance={themeService?.keyboardColorForActiveTheme()}
           fontStyle={{
             color: theme.stylekitForegroundColor,
           }}

@@ -1,6 +1,6 @@
 import { Platform, ScaledSize } from 'react-native';
 import { isNullOrUndefined } from 'snjs';
-import { MobileTheme } from './stylekit';
+import { MobileTheme } from './theme_service';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';
 export const DARK_MODE_KEY = 'dark';

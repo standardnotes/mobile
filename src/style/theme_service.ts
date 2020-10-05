@@ -32,7 +32,7 @@ import { UuidString } from 'snjs/dist/@types/types';
 import THEME_DARK_JSON from './Themes/blue-dark.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 import THEME_RED_JSON from './Themes/red.json';
-import { StyleKitTheme } from './Themes/styled-components';
+import { MobileThemeVariables } from './Themes/styled-components';
 
 const LIGHT_THEME_KEY = 'lightThemeKey';
 const DARK_THEME_KEY = 'darkThemeKey';
@@ -41,7 +41,7 @@ const CACHED_THEMES_KEY = 'cachedThemesKey';
 type ThemeChangeObserver = () => Promise<void> | void;
 
 type MobileThemeContent = {
-  variables: StyleKitTheme;
+  variables: MobileThemeVariables;
   isSystemTheme: boolean;
   isInitial: boolean;
   luminosity: number;
@@ -53,13 +53,13 @@ export class MobileTheme extends SNTheme {
     return (this.safeContent as any) as MobileThemeContent;
   }
 
-  static BuildTheme(variables?: StyleKitTheme) {
+  static BuildTheme(variables?: MobileThemeVariables) {
     return new MobileTheme(
       CreateMaxPayloadFromAnyObject({
         uuid: `${Math.random()}`,
         content_type: ContentType.Theme,
         content: FillItemContent({
-          variables: variables || ({} as StyleKitTheme),
+          variables: variables || ({} as MobileThemeVariables),
           isSystemTheme: false,
           isInitial: false,
         } as MobileThemeContent),
@@ -74,11 +74,16 @@ enum SystemThemeTint {
   Red = 'Red',
 }
 
-export const StyleKitContext = React.createContext<StyleKit | undefined>(
-  undefined
-);
+export const ThemeServiceContext = React.createContext<
+  ThemeService | undefined
+>(undefined);
 
-export class StyleKit {
+/**
+ * Components might use current theme by using of two ways:
+ * - use ThemeServiceContext
+ * - use current theme injected into styled components
+ */
+export class ThemeService {
   observers: ThemeChangeObserver[] = [];
   private themes: Record<UuidString, MobileTheme> = {};
   activeThemeId?: string;
@@ -87,7 +92,7 @@ export class StyleKit {
     paddingLeft: 14,
   };
   styles: Record<string, ViewStyle | TextStyle> = {};
-  variables?: StyleKitTheme;
+  variables?: MobileThemeVariables;
   application: MobileApplication;
   unregisterComponentHandler?: () => void;
   unsubscribeStreamThemes?: () => void;
@@ -131,7 +136,7 @@ export class StyleKit {
     );
   }
 
-  private findOrCreateTheme(themeId: string, variables?: StyleKitTheme) {
+  private findOrCreateTheme(themeId: string, variables?: MobileThemeVariables) {
     let theme = this.themes[themeId];
     if (!theme) {
       theme = this.buildTheme(undefined, variables);
@@ -162,9 +167,9 @@ export class StyleKit {
     ];
 
     for (const option of themeData) {
-      const variables: StyleKitTheme = {
+      const variables: MobileThemeVariables = {
         ...option.variables,
-        ...StyleKit.constants,
+        ...ThemeService.constants,
       };
       variables.statusBar =
         Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
@@ -277,7 +282,7 @@ export class StyleKit {
    * copy as the result may be modified before use.
    */
   templateVariables() {
-    return Object.assign({}, THEME_BLUE_JSON) as StyleKitTheme;
+    return Object.assign({}, THEME_BLUE_JSON) as MobileThemeVariables;
   }
 
   private setDefaultTheme() {
@@ -338,7 +343,7 @@ export class StyleKit {
       });
   }
 
-  private buildTheme(base?: MobileTheme, baseVariables?: StyleKitTheme) {
+  private buildTheme(base?: MobileTheme, baseVariables?: MobileThemeVariables) {
     const theme = base || MobileTheme.BuildTheme();
     /** Merge default variables to ensure this theme has all the variables. */
     const variables = {
@@ -455,7 +460,7 @@ export class StyleKit {
     const appliedVariables = Object.assign(this.templateVariables(), variables);
     const finalVariables = {
       ...appliedVariables,
-      ...StyleKit.constants,
+      ...ThemeService.constants,
     };
     const mobileTheme = new MobileTheme(
       CreateMaxPayloadFromAnyObject(theme.payload, {
@@ -529,7 +534,7 @@ export class StyleKit {
     const appliedVariables = Object.assign(this.templateVariables(), variables);
     const mobileTheme = this.findOrCreateTheme(theme.uuid, {
       ...appliedVariables,
-      ...StyleKit.constants,
+      ...ThemeService.constants,
     });
     this.addTheme(mobileTheme);
     this.cacheThemes();
@@ -562,6 +567,6 @@ export class StyleKit {
   }
 
   static nameForIcon(iconName: string) {
-    return StyleKit.platformIconPrefix() + '-' + iconName;
+    return ThemeService.platformIconPrefix() + '-' + iconName;
   }
 }

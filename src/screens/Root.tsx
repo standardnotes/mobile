@@ -12,7 +12,7 @@ import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
 } from '@Screens/screens';
-import { StyleKit } from '@Style/stylekit';
+import { ThemeService } from '@Style/theme_service';
 import { hexToRGBA } from '@Style/utils';
 import React, {
   useCallback,
@@ -105,7 +105,7 @@ export const Root = (props: Props): JSX.Element | null => {
   }, [application]);
 
   const collapseIconName = useMemo(() => {
-    const collapseIconPrefix = StyleKit.platformIconPrefix();
+    const collapseIconPrefix = ThemeService.platformIconPrefix();
 
     return (
       collapseIconPrefix +

@@ -3,8 +3,8 @@ import { MobileApplication } from '@Lib/application';
 import { ApplicationGroup } from '@Lib/application_group';
 import { navigationRef } from '@Lib/navigation_service';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { StyleKit, StyleKitContext } from '@Style/stylekit';
-import { StyleKitTheme } from '@Style/Themes/styled-components';
+import { MobileThemeVariables } from '@Style/Themes/styled-components';
+import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'react-native';
 import { ThemeProvider } from 'styled-components/native';
@@ -21,12 +21,14 @@ const AppComponent: React.FC<{
   application: MobileApplication;
   env: 'prod' | 'dev';
 }> = ({ application, env }) => {
-  const styleKit = useRef<StyleKit>();
+  const themeService = useRef<ThemeService>();
   const appReady = useRef(false);
   const navigationReady = useRef(false);
-  const [activeTheme, setActiveTheme] = useState<StyleKitTheme | undefined>();
+  const [activeTheme, setActiveTheme] = useState<
+    MobileThemeVariables | undefined
+  >();
 
-  const setStyleKitRef = useCallback((node: StyleKit | undefined) => {
+  const setThemeServiceRef = useCallback((node: ThemeService | undefined) => {
     if (node) {
       node.addThemeChangeObserver(() => {
         setActiveTheme(node.variables);
@@ -36,7 +38,7 @@ const AppComponent: React.FC<{
     /**
      * We check if both application and navigation are ready and launch application afterwads
      */
-    styleKit.current = node;
+    themeService.current = node;
   }, []);
 
   /**
@@ -58,29 +60,29 @@ const AppComponent: React.FC<{
   );
 
   useEffect(() => {
-    let styleKitInstance: StyleKit;
+    let themeServiceInstance: ThemeService;
     const loadApplication = async () => {
-      styleKitInstance = new StyleKit(application);
+      themeServiceInstance = new ThemeService(application);
 
-      setStyleKitRef(styleKitInstance);
+      setThemeServiceRef(themeServiceInstance);
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
           application!.promptForChallenge(challenge);
         },
       });
-      await styleKitInstance.init();
+      await themeServiceInstance.init();
       launchApp(true, false);
     };
 
     loadApplication();
 
     return () => {
-      styleKitInstance?.deinit();
-      setStyleKitRef(undefined);
+      themeServiceInstance?.deinit();
+      setThemeServiceRef(undefined);
     };
-  }, [application, application.Uuid, env, launchApp, setStyleKitRef]);
+  }, [application, application.Uuid, env, launchApp, setThemeServiceRef]);
 
-  if (!styleKit.current || !activeTheme) {
+  if (!themeService.current || !activeTheme) {
     return null;
   }
 
@@ -98,13 +100,13 @@ const AppComponent: React.FC<{
       ref={navigationRef}
     >
       <StatusBar translucent />
-      {styleKit.current && (
+      {themeService.current && (
         <>
           <ThemeProvider theme={activeTheme}>
             <ActionSheetProvider>
-              <StyleKitContext.Provider value={styleKit.current}>
+              <ThemeServiceContext.Provider value={themeService.current}>
                 <MainStackComponent env={env} />
-              </StyleKitContext.Provider>
+              </ThemeServiceContext.Provider>
             </ActionSheetProvider>
           </ThemeProvider>
         </>

@@ -26,7 +26,6 @@ export const ComposeContainer = styled.View`
 export const ExpandTouchable = styled.TouchableHighlight.attrs(({ theme }) => ({
   underlayColor: theme.stylekitBackgroundColor,
 }))`
-  /* background-color: black; */
   justify-content: center;
   position: absolute;
   left: 0px;

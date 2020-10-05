@@ -5,7 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
-import { StyleKitContext } from '@Style/stylekit';
+import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
   useContext,
@@ -22,7 +22,7 @@ type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_TAG>;
 export const TagInputModal = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
-  const styleKit = useContext(StyleKitContext);
+  const themeService = useContext(ThemeServiceContext);
 
   // State
   const [text, setText] = useState('');
@@ -94,7 +94,7 @@ export const TagInputModal = (props: Props) => {
             value={text}
             autoCorrect={false}
             autoCapitalize={'none'}
-            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
             underlineColorAndroid={'transparent'}
             onSubmitEditing={onSubmit}
           />

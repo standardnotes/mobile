@@ -2,7 +2,7 @@ import { AppStateEventType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { StyleKitContext } from '@Style/stylekit';
+import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
   useContext,
@@ -52,7 +52,7 @@ export const NoteList = (props: Props): JSX.Element => {
   // Context
   const signedIn = useSignedIn();
   const application = useContext(ApplicationContext);
-  const styleKit = useContext(StyleKitContext);
+  const themeService = useContext(ThemeServiceContext);
   const theme = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
 
@@ -122,14 +122,14 @@ export const NoteList = (props: Props): JSX.Element => {
         {Platform.OS === 'ios' && (
           <IosSearchBar
             ref={searchBoxInputRef}
-            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
             placeholder="Search"
             text={searchText}
             hideBackground
             /**
              * keyboardColorForActiveTheme returns the same value as apperance
              */
-            appearance={styleKit?.keyboardColorForActiveTheme()}
+            appearance={themeService?.keyboardColorForActiveTheme()}
             barTintColor={theme.stylekitInfoColor}
             textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
             onChangeText={props.onSearchChange}
@@ -151,7 +151,7 @@ export const NoteList = (props: Props): JSX.Element => {
             backgroundColor={theme.stylekitBackgroundColor}
             titleCancelColor={theme.stylekitInfoColor}
             keyboardDismissMode={'interactive'}
-            keyboardAppearance={styleKit?.keyboardColorForActiveTheme()}
+            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
             inputBorderRadius={4}
             tintColorSearch={theme.stylekitForegroundColor}
             inputStyle={[

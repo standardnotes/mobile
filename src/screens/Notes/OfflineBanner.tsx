@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_FORWARD, ICON_USER } from '@Style/icons';
-import { StyleKit } from '@Style/stylekit';
+import { ThemeService } from '@Style/theme_service';
 import React from 'react';
 import {
   BoldText,
@@ -27,14 +27,14 @@ export const OfflineBanner: React.FC = () => {
     <Touchable onPress={onPress}>
       <Container>
         <CenterContainer>
-          <UserIcon name={StyleKit.nameForIcon(ICON_USER)} />
+          <UserIcon name={ThemeService.nameForIcon(ICON_USER)} />
         </CenterContainer>
         <TextContainer>
           <BoldText>{NOT_BACKED_UP_TEXT}</BoldText>
           <SubText>{SIGN_IN_TEXT}</SubText>
         </TextContainer>
         <CenterContainer>
-          <ForwardIcon name={StyleKit.nameForIcon(ICON_FORWARD)} />
+          <ForwardIcon name={ThemeService.nameForIcon(ICON_FORWARD)} />
         </CenterContainer>
       </Container>
     </Touchable>
