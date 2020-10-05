@@ -5,7 +5,7 @@ import { enableScreens } from 'react-native-screens';
 import { AppRegistry, YellowBox } from 'react-native';
 import { App } from './src/App';
 import { name as appName } from './app.json';
-import { enableAndroidFontFix } from './src/style/AndroidTextFix';
+import { enableAndroidFontFix } from './src/style/android_text_fix';
 
 require('react-native').unstable_enableLogBox();
 

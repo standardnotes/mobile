@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_FORWARD, ICON_USER } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
+import { StyleKit } from '@Style/stylekit';
 import React from 'react';
 import {
   BoldText,

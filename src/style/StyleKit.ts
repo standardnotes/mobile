@@ -1,6 +1,6 @@
 import { MobileApplication } from '@Lib/application';
-import ComponentManager from '@Lib/ComponentManager';
-import CSSParser from '@Style/Util/CSSParser';
+import { ComponentManager } from '@Lib/component_manager';
+import CSSParser from '@Style/css_parser';
 import {
   DARK_CONTENT,
   getColorLuminosity,

@@ -5,7 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
-import { StyleKitContext } from '@Style/StyleKit';
+import { StyleKitContext } from '@Style/stylekit';
 import React, {
   useCallback,
   useContext,

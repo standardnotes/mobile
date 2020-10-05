@@ -9,18 +9,18 @@ import {
   SNComponentManager,
 } from 'snjs';
 import { DeinitSource } from 'snjs/dist/@types/types';
-import { AlertService } from './AlertService';
-import { ApplicationState } from './ApplicationState';
-import { BackupsService } from './BackupsService';
-import { ComponentGroup } from './componentGroup';
-import ComponentManager from './ComponentManager';
-import { EditorGroup } from './EditorGroup';
-import { InstallationService } from './InstallationService';
+import { AlertService } from './alert_service';
+import { ApplicationState } from './application_state';
+import { BackupsService } from './backups_service';
+import { ComponentGroup } from './component_group';
+import { ComponentManager } from './component_manager';
+import { EditorGroup } from './editor_group';
+import { InstallationService } from './installation_service';
 import { MobileDeviceInterface } from './interface';
-import { push } from './NavigationService';
-import { PreferencesManager } from './PreferencesManager';
-import { ReviewService } from './reviewService';
-import { SNReactNativeCrypto } from './SNReactNativeCrypto';
+import { push } from './navigation_service';
+import { PreferencesManager } from './preferences_manager';
+import { SNReactNativeCrypto } from './react_native_crypto';
+import { ReviewService } from './review_service';
 
 type MobileServices = {
   applicationState: ApplicationState;

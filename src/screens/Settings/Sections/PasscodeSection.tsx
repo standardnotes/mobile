@@ -5,7 +5,7 @@ import {
 } from '@Components/SectionedOptionsTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
-import { UnlockTiming } from '@Lib/ApplicationState';
+import { UnlockTiming } from '@Lib/application_state';
 import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';

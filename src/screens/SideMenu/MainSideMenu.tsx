@@ -1,9 +1,9 @@
-import { AppStateType } from '@Lib/ApplicationState';
+import { AppStateType } from '@Lib/application_state';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
-import { MobileTheme, StyleKit, StyleKitContext } from '@Style/StyleKit';
+import { MobileTheme, StyleKit, StyleKitContext } from '@Style/stylekit';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,

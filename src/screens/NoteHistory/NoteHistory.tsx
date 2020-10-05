@@ -5,7 +5,7 @@ import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens';
-import { StyleKitContext } from '@Style/StyleKit';
+import { StyleKitContext } from '@Style/stylekit';
 import React, { useContext, useState } from 'react';
 import { Dimensions, Platform } from 'react-native';
 import {

@@ -22,7 +22,7 @@ import {
 import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
 import { Settings } from '@Screens/Settings/Settings';
 import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
+import { StyleKit } from '@Style/stylekit';
 import React, { useContext } from 'react';
 import { Platform } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';

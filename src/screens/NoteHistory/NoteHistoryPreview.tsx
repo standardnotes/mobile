@@ -3,7 +3,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTE_HISTORY_PREVIEW } from '@Screens/screens';
 import { ELIPSIS } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
+import { StyleKit } from '@Style/stylekit';
 import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, { useCallback, useContext, useLayoutEffect } from 'react';
 import { YellowBox } from 'react-native';

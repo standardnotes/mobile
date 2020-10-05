@@ -1,4 +1,4 @@
-import { useDeleteNoteWithPrivileges } from '@Lib/snjsHooks';
+import { useDeleteNoteWithPrivileges } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
   CustomActionSheetOption,

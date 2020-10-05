@@ -4,7 +4,7 @@ import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { StyleKitContext } from '@Style/StyleKit';
+import { StyleKitContext } from '@Style/stylekit';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Keyboard } from 'react-native';
 import {

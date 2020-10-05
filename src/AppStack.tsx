@@ -4,8 +4,8 @@ import {
   AppStateEventType,
   AppStateType,
   TabletModeChangeData,
-} from '@Lib/ApplicationState';
-import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
+} from '@Lib/application_state';
+import { useHasEditor, useIsLocked } from '@Lib/snjs_helper_hooks';
 import { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
 import {
   createStackNavigator,
@@ -24,8 +24,8 @@ import {
 import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
 import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
 import { ICON_MENU } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
-import { getDefaultDrawerWidth } from '@Style/Util/getDefaultDrawerWidth';
+import { StyleKit } from '@Style/stylekit';
+import { getDefaultDrawerWidth } from '@Style/utils';
 import React, {
   useCallback,
   useContext,

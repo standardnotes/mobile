@@ -1,5 +1,5 @@
-import { Editor } from '@Lib/Editor';
-import { useDeleteNoteWithPrivileges } from '@Lib/snjsHooks';
+import { Editor } from '@Lib/editor';
+import { useDeleteNoteWithPrivileges } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
@@ -19,7 +19,7 @@ import {
   ICON_SHARE,
   ICON_TRASH,
 } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
+import { StyleKit } from '@Style/stylekit';
 import { useCustomActionSheet } from '@Style/useCustomActionSheet';
 import React, {
   useCallback,

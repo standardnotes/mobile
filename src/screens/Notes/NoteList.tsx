@@ -1,8 +1,8 @@
-import { AppStateEventType } from '@Lib/ApplicationState';
-import { useSignedIn } from '@Lib/snjsHooks';
+import { AppStateEventType } from '@Lib/application_state';
+import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { StyleKitContext } from '@Style/StyleKit';
+import { StyleKitContext } from '@Style/stylekit';
 import React, {
   useCallback,
   useContext,

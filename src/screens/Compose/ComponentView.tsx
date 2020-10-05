@@ -1,4 +1,4 @@
-import { PrefKey } from '@Lib/PreferencesManager';
+import { PrefKey } from '@Lib/preferences_manager';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, {
   useCallback,

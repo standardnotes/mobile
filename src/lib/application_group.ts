@@ -4,12 +4,12 @@ import {
   SNApplicationGroup,
 } from 'snjs';
 import { MobileApplication } from './application';
-import { ApplicationState } from './ApplicationState';
-import { BackupsService } from './BackupsService';
-import { InstallationService } from './InstallationService';
+import { ApplicationState } from './application_state';
+import { BackupsService } from './backups_service';
+import { InstallationService } from './installation_service';
 import { MobileDeviceInterface } from './interface';
-import { PreferencesManager } from './PreferencesManager';
-import { ReviewService } from './reviewService';
+import { PreferencesManager } from './preferences_manager';
+import { ReviewService } from './review_service';
 
 export class ApplicationGroup extends SNApplicationGroup {
   constructor() {

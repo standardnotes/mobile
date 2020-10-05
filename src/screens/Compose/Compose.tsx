@@ -1,11 +1,11 @@
-import { AppStateEventType } from '@Lib/ApplicationState';
-import { Editor } from '@Lib/Editor';
+import { AppStateEventType } from '@Lib/application_state';
+import { Editor } from '@Lib/editor';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
-import { StyleKit, StyleKitContext } from '@Style/StyleKit';
+import { StyleKit, StyleKitContext } from '@Style/stylekit';
 import { lighten } from '@Style/utils';
 import React, {
   useCallback,

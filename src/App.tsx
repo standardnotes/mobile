@@ -1,9 +1,9 @@
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { MobileApplication } from '@Lib/application';
-import { ApplicationGroup } from '@Lib/applicationGroup';
-import { navigationRef } from '@Lib/NavigationService';
+import { ApplicationGroup } from '@Lib/application_group';
+import { navigationRef } from '@Lib/navigation_service';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { StyleKit, StyleKitContext } from '@Style/StyleKit';
+import { StyleKit, StyleKitContext } from '@Style/stylekit';
 import { StyleKitTheme } from '@Style/Themes/styled-components';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'react-native';

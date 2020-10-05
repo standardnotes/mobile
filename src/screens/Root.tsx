@@ -2,8 +2,8 @@ import {
   AppStateEventType,
   AppStateType,
   TabletModeChangeData,
-} from '@Lib/ApplicationState';
-import { useHasEditor, useIsLocked } from '@Lib/snjsHooks';
+} from '@Lib/application_state';
+import { useHasEditor, useIsLocked } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
@@ -12,7 +12,7 @@ import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
 } from '@Screens/screens';
-import { StyleKit } from '@Style/StyleKit';
+import { StyleKit } from '@Style/stylekit';
 import { hexToRGBA } from '@Style/utils';
 import React, {
   useCallback,

@@ -2,11 +2,11 @@ import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
-import { AppStateType, PasscodeKeyboardType } from '@Lib/ApplicationState';
+import { AppStateType, PasscodeKeyboardType } from '@Lib/application_state';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE_PRIVILEGES } from '@Screens/screens';
-import { StyleKitContext } from '@Style/StyleKit';
+import { StyleKitContext } from '@Style/stylekit';
 import React, {
   useCallback,
   useContext,

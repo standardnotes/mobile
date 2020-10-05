@@ -1,7 +1,7 @@
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
-import { PrefKey } from '@Lib/PreferencesManager';
+import { PrefKey } from '@Lib/preferences_manager';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext, useMemo, useState } from 'react';
 import { CollectionSort } from 'snjs';

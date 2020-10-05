@@ -1,12 +1,12 @@
-import { AppStateType } from '@Lib/ApplicationState';
-import { PrefKey } from '@Lib/PreferencesManager';
-import { useSignedIn, useSyncStatus } from '@Lib/snjsHooks';
+import { AppStateType } from '@Lib/application_state';
+import { PrefKey } from '@Lib/preferences_manager';
+import { useSignedIn, useSyncStatus } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
 import { ICON_ADD } from '@Style/icons';
-import { StyleKit } from '@Style/StyleKit';
+import { StyleKit } from '@Style/stylekit';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import FAB from 'react-native-fab';
 import { CollectionSort, ContentType, Platform, SNNote } from 'snjs';

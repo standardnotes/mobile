@@ -9,7 +9,7 @@ import {
 } from '@Screens/screens';
 import React, { useCallback, useEffect } from 'react';
 import { ApplicationEvent, ButtonType, ProtectedAction, SNNote } from 'snjs';
-import { Editor } from './Editor';
+import { Editor } from './editor';
 
 export const useSignedIn = (
   signedInCallback?: () => void,

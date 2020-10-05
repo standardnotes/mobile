@@ -1,7 +1,7 @@
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
-import { ApplicationState } from '@Lib/ApplicationState';
+import { ApplicationState } from '@Lib/application_state';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext } from 'react';
 import { Platform, Share } from 'react-native';

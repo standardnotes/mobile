@@ -3,8 +3,8 @@ import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTable
 import { SectionedOptionsTableCell } from '@Components/SectionedOptionsTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
-import { PrefKey } from '@Lib/PreferencesManager';
-import { useSignedIn } from '@Lib/snjsHooks';
+import { PrefKey } from '@Lib/preferences_manager';
+import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';

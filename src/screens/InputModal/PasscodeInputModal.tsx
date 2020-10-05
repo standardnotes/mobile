@@ -5,11 +5,11 @@ import {
 } from '@Components/SectionedOptionsTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
-import { PasscodeKeyboardType, UnlockTiming } from '@Lib/ApplicationState';
+import { PasscodeKeyboardType, UnlockTiming } from '@Lib/application_state';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_PASSCODE } from '@Screens/screens';
-import { StyleKitContext } from '@Style/StyleKit';
+import { StyleKitContext } from '@Style/stylekit';
 import React, { useContext, useMemo, useRef, useState } from 'react';
 import { Keyboard, KeyboardType, Platform, TextInput } from 'react-native';
 import { Container, Input } from './InputModal.styled';

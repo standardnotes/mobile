@@ -3,14 +3,14 @@ import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
-import { AppStateType, PasscodeKeyboardType } from '@Lib/ApplicationState';
+import { AppStateType, PasscodeKeyboardType } from '@Lib/application_state';
 import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { ICON_CLOSE } from '@Style/icons';
-import { StyleKit, StyleKitContext } from '@Style/StyleKit';
+import { StyleKit, StyleKitContext } from '@Style/stylekit';
 import React, {
   useCallback,
   useContext,

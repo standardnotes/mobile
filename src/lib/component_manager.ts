@@ -1,10 +1,10 @@
-import { MobileTheme } from '@Style/StyleKit';
-import { objectToCss } from '@Style/Util/CSSParser';
+import { objectToCss } from '@Style/css_parser';
+import { MobileTheme } from '@Style/stylekit';
 import { Base64 } from 'js-base64';
 import { SNAlertService, SNComponent, SNComponentManager } from 'snjs';
 import { PermissionDialog } from 'snjs/dist/@types/services/component_manager';
 
-export default class ComponentManager extends SNComponentManager {
+export class ComponentManager extends SNComponentManager {
   private mobileActiveTheme?: MobileTheme;
 
   async presentPermissionsDialog(dialog: PermissionDialog) {
