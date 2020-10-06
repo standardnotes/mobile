@@ -1,6 +1,6 @@
 import SegmentedControl from '@react-native-community/segmented-control';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { AppStackNavigationProp } from '@Root/AppStack';
+import { HistoryStackNavigationProp } from '@Root/HistoryStack';
 import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
@@ -24,7 +24,7 @@ import { SessionHistory } from './SessionHistory';
 
 const initialLayout = { width: Dimensions.get('window').width };
 
-type Props = AppStackNavigationProp<typeof SCREEN_NOTE_HISTORY>;
+type Props = HistoryStackNavigationProp<typeof SCREEN_NOTE_HISTORY>;
 export const NoteHistory = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);

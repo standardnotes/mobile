@@ -463,7 +463,11 @@ export const NoteSideMenu = (props: Props) => {
     const openSessionHistory = () => {
       if (!editor?.isTemplateNote) {
         props.drawerRef?.closeDrawer();
-        navigation.push(SCREEN_NOTE_HISTORY, { noteUuid: note.uuid });
+        // @ts-expect-error
+        navigation.navigate('HistoryStack', {
+          screen: SCREEN_NOTE_HISTORY,
+          params: { noteUuid: note.uuid },
+        });
       }
     };
 

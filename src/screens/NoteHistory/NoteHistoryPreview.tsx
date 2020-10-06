@@ -1,7 +1,11 @@
 import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { AppStackNavigationProp } from '@Root/AppStack';
-import { SCREEN_NOTE_HISTORY_PREVIEW } from '@Screens/screens';
+import { HistoryStackNavigationProp } from '@Root/HistoryStack';
+import {
+  SCREEN_COMPOSE,
+  SCREEN_NOTES,
+  SCREEN_NOTE_HISTORY_PREVIEW,
+} from '@Screens/screens';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import { ELIPSIS } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
@@ -21,7 +25,7 @@ YellowBox.ignoreWarnings([
   'Non-serializable values were found in the navigation state',
 ]);
 
-type Props = AppStackNavigationProp<typeof SCREEN_NOTE_HISTORY_PREVIEW>;
+type Props = HistoryStackNavigationProp<typeof SCREEN_NOTE_HISTORY_PREVIEW>;
 export const NoteHistoryPreview = ({
   navigation,
   route: {
@@ -47,7 +51,8 @@ export const NoteHistoryPreview = ({
             contentCopy,
             true
           );
-          navigation.popToTop();
+          // @ts-expect-error
+          navigation.navigate(SCREEN_NOTES);
         } else {
           await application?.changeAndSaveItem(
             revisionUuid,
@@ -57,7 +62,13 @@ export const NoteHistoryPreview = ({
             true,
             PayloadSource.RemoteActionRetrieved
           );
-          navigation.pop(2);
+          if (application?.getAppState().isTabletDevice) {
+            // @ts-expect-error
+            navigation.navigate(SCREEN_NOTES);
+          } else {
+            // @ts-expect-error
+            navigation.navigate(SCREEN_COMPOSE);
+          }
         }
       };
 

@@ -12,15 +12,8 @@ import {
   StackNavigationProp,
 } from '@react-navigation/stack';
 import { Compose } from '@Screens/Compose/Compose';
-import { NoteHistory } from '@Screens/NoteHistory/NoteHistory';
-import { NoteHistoryPreview } from '@Screens/NoteHistory/NoteHistoryPreview';
 import { Root } from '@Screens/Root';
-import {
-  SCREEN_COMPOSE,
-  SCREEN_NOTES,
-  SCREEN_NOTE_HISTORY,
-  SCREEN_NOTE_HISTORY_PREVIEW,
-} from '@Screens/screens';
+import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
 import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
 import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
 import { ICON_MENU } from '@Style/icons';
@@ -38,7 +31,6 @@ import DrawerLayout, {
   DrawerState,
 } from 'react-native-gesture-handler/DrawerLayout';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { ThemeContext } from 'styled-components';
 import { HeaderTitleParams } from './App';
 import { ApplicationContext } from './ApplicationContext';
@@ -47,13 +39,6 @@ import { ModalStackNavigationProp } from './ModalStack';
 type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
   [SCREEN_COMPOSE]: HeaderTitleParams | undefined;
-  [SCREEN_NOTE_HISTORY]:
-    | (HeaderTitleParams & { noteUuid: string })
-    | (undefined & { noteUuid: string });
-  [SCREEN_NOTE_HISTORY_PREVIEW]: HeaderTitleParams & {
-    revisionUuid: string;
-    revision: NoteHistoryEntry;
-  };
 };
 
 export type AppStackNavigationProp<
@@ -248,39 +233,6 @@ export const AppStackComponent = (
                 ),
             })}
             component={Compose}
-          />
-          <AppStack.Screen
-            name={SCREEN_NOTE_HISTORY}
-            options={({ route }) => ({
-              title: 'Note history',
-              headerTitle: ({ children }) => {
-                return (
-                  <HeaderTitleView
-                    title={route.params?.title ?? (children || '')}
-                    subtitle={route.params?.subTitle}
-                    subtitleColor={route.params?.subTitleColor}
-                  />
-                );
-              },
-            })}
-            component={NoteHistory}
-          />
-          <AppStack.Screen
-            name={SCREEN_NOTE_HISTORY_PREVIEW}
-            options={({ route }) => ({
-              title: 'Preview',
-              headerBackTitleVisible: false,
-              headerTitle: ({ children }) => {
-                return (
-                  <HeaderTitleView
-                    title={route.params?.title ?? (children || '')}
-                    subtitle={route.params?.subTitle || undefined}
-                    subtitleColor={route.params?.subTitleColor || undefined}
-                  />
-                );
-              },
-            })}
-            component={NoteHistoryPreview}
           />
         </AppStack.Navigator>
       </DrawerLayout>

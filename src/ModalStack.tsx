@@ -36,9 +36,11 @@ import { ThemeContext } from 'styled-components';
 import { HeaderTitleParams } from './App';
 import { ApplicationContext } from './ApplicationContext';
 import { AppStackComponent } from './AppStack';
+import { HistoryStack } from './HistoryStack';
 
 type ModalStackNavigatorParamList = {
   AppStack: undefined;
+  HistoryStack: undefined;
   [SCREEN_SETTINGS]: undefined;
   [SCREEN_MANAGE_PRIVILEGES]: undefined;
   [SCREEN_INPUT_MODAL_TAG]: HeaderTitleParams & {
@@ -92,6 +94,13 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
           headerShown: false,
         }}
         component={AppStackComponent}
+      />
+      <MainStack.Screen
+        options={{
+          headerShown: false,
+        }}
+        name="HistoryStack"
+        component={HistoryStack}
       />
       <MainStack.Screen
         name={SCREEN_SETTINGS}
