@@ -52,7 +52,7 @@ export const NoteTitleInput = styled.TextInput`
   padding-left: ${PADDING}px;
   padding-right: ${PADDING}px;
 `;
-export const LoadingWebViewContainer = styled.View<{ locked: boolean }>`
+export const LoadingWebViewContainer = styled.View<{ locked?: boolean }>`
   position: absolute;
   height: 100%;
   width: 100%;

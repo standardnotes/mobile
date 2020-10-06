@@ -11,7 +11,7 @@ export enum PrefKey {
 }
 
 export const LAST_EXPORT_DATE_KEY = 'LastExportDateKey';
-const PREFS_KEY = 'preferencesKey';
+const PREFS_KEY = 'preferences';
 
 export class PreferencesManager extends ApplicationService {
   private userPreferences!: Record<PrefKey, any>;

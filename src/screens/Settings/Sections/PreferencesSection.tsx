@@ -14,7 +14,7 @@ export const PreferencesSection = () => {
   const [sortBy, setSortBy] = useState<CollectionSort>(() =>
     application!
       .getPrefsService()
-      .getValue(PrefKey.SortNotesBy, CollectionSort.UpdatedAt)
+      .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
   );
   const [sortReverse, setSortReverse] = useState<boolean>(() =>
     application!.getPrefsService().getValue(PrefKey.SortNotesReverse, false)
