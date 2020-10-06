@@ -31,7 +31,7 @@ export const Root = (): JSX.Element | null => {
   const [, setWidth] = useState<number | undefined>(undefined);
   const [height, setHeight] = useState<number | undefined>(undefined);
   const [, setX] = useState<number | undefined>(undefined);
-  const hasEditor = useHasEditor();
+  const [hasEditor] = useHasEditor();
   const [noteListCollapsed, setNoteListCollapsed] = useState<boolean>(false);
   const [shouldSplitLayout, setShouldSplitLayout] = useState<
     boolean | undefined

@@ -98,7 +98,7 @@ export const AppStackComponent = (
     return removeObserver;
   }, [application, props.navigation, isInTabletMode]);
 
-  const hasEditor = useHasEditor();
+  const [hasEditor] = useHasEditor();
 
   useEffect(() => {
     const updateDimensions = ({ window }: { window: ScaledSize }) => {

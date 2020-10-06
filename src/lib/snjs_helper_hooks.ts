@@ -146,9 +146,9 @@ export const useHasEditor = () => {
       }
     );
     return removeEditorObserver;
-  });
+  }, [application]);
 
-  return hasEditor;
+  return [hasEditor];
 };
 
 export const useSyncStatus = () => {
