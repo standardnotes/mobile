@@ -1,26 +1,43 @@
 import { AppStateType } from '@Lib/application_state';
+import { Editor } from '@Lib/editor';
 import { PrefKey } from '@Lib/preferences_manager';
 import { useSignedIn, useSyncStatus } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
-import { SCREEN_NOTES } from '@Screens/screens';
+import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
+import {
+  SCREEN_AUTHENTICATE_PRIVILEGES,
+  SCREEN_COMPOSE,
+  SCREEN_NOTES,
+} from '@Screens/screens';
 import { ICON_ADD } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import FAB from 'react-native-fab';
-import { CollectionSort, ContentType, Platform, SNNote } from 'snjs';
+import {
+  CollectionSort,
+  ContentType,
+  Platform,
+  ProtectedAction,
+  SNNote,
+} from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';
 import { notePassesFilter, NoteSortKey } from './utils';
 
-type Props = {
-  onNoteSelect: (noteUuid: SNNote['uuid']) => void;
-  onNoteCreate: () => void;
-};
-
-export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
+export const Notes = ({
+  shouldSplitLayout,
+}: {
+  shouldSplitLayout: boolean | undefined;
+}) => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
@@ -52,6 +69,8 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
   const [notes, setNotes] = useState<SNNote[]>([]);
   const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
   const [searchText, setSearchText] = useState('');
+  const [expectsUnlock, setExpectsUnlock] = useState(false);
+  const [editor, setEditor] = useState<Editor | undefined>(undefined);
 
   // Ref
   const haveDisplayOptions = useRef(false);
@@ -73,6 +92,114 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
       }
     },
     [application, navigation, searchText.length]
+  );
+
+  const openCompose = useCallback(
+    (newNote: boolean) => {
+      if (!shouldSplitLayout) {
+        navigation.navigate(SCREEN_COMPOSE, {
+          title: newNote ? 'Compose' : 'Note',
+        });
+      }
+    },
+    [navigation, shouldSplitLayout]
+  );
+
+  const openNote = useCallback(
+    async (noteUuid: SNNote['uuid']) => {
+      await application!.getAppState().openEditor(noteUuid);
+      openCompose(false);
+    },
+    [application, openCompose]
+  );
+
+  const onNoteSelect = useCallback(
+    async (noteUuid: SNNote['uuid']) => {
+      const note = application?.findItem(noteUuid) as SNNote;
+      if (note) {
+        if (note.errorDecrypting) {
+          if (note.waitingForKey) {
+            return application?.presentKeyRecoveryWizard();
+          } else {
+            return application?.alertService.alert(
+              'Standard Notes was unable to decrypt this item. Please sign out of your account and back in to attempt to resolve this issue.',
+              'Unable to Decrypt'
+            );
+          }
+        }
+        if (
+          note.protected &&
+          (await application?.privilegesService!.actionRequiresPrivilege(
+            ProtectedAction.ViewProtectedNotes
+          ))
+        ) {
+          const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
+            ProtectedAction.ViewProtectedNotes
+          );
+          setExpectsUnlock(true);
+          navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
+            action: ProtectedAction.ViewProtectedNotes,
+            privilegeCredentials,
+            unlockedItemId: noteUuid,
+            previousScreen: SCREEN_NOTES,
+          });
+        } else {
+          openNote(noteUuid);
+        }
+      }
+    },
+    [application, openNote, navigation]
+  );
+
+  useEffect(() => {
+    let mounted = true;
+    const removeEditorObserver = application?.editorGroup.addChangeObserver(
+      activeEditor => {
+        if (mounted) {
+          setEditor(activeEditor);
+          setSelectedNoteId(activeEditor?.note?.uuid);
+        }
+      }
+    );
+    const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
+      newNote => {
+        if (mounted) {
+          setSelectedNoteId(newNote?.uuid);
+        }
+      }
+    );
+
+    return () => {
+      mounted = false;
+      removeEditorObserver && removeEditorObserver();
+      removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
+    };
+  }, [application, editor]);
+
+  /*
+   * After screen is focused read if a requested privilage was unlocked
+   */
+  useFocusEffect(
+    useCallback(() => {
+      const readPrivilegesUnlockResponse = async () => {
+        if (application?.isLaunched() && expectsUnlock) {
+          const result = await application?.getValue(PRIVILEGES_UNLOCK_PAYLOAD);
+          if (
+            result &&
+            result.previousScreen === SCREEN_NOTES &&
+            result.unlockedItemId
+          ) {
+            setExpectsUnlock(false);
+            application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
+            openNote(result.unlockedItemId);
+          } else {
+            setExpectsUnlock(false);
+          }
+        }
+      };
+
+      readPrivilegesUnlockResponse();
+    }, [application, expectsUnlock, openNote])
   );
 
   /**
@@ -98,7 +225,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
         (note: SNNote) => {
           return notePassesFilter(
             note,
-            tag?.isArchiveTag,
+            tag?.isArchiveTag || tag?.isTrashTag,
             false,
             searchFilter?.toLowerCase() || searchText.toLowerCase()
           );
@@ -107,21 +234,6 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
     },
     [application, sortBy, sortReverse, searchText]
   );
-
-  const selectNote = useCallback(
-    (note: SNNote) => {
-      if (!note.errorDecrypting) {
-        setSelectedNoteId(note.uuid);
-      }
-      onNoteSelect(note.uuid);
-    },
-    [onNoteSelect]
-  );
-
-  const createNote = useCallback(() => {
-    setSelectedNoteId(undefined);
-    onNoteCreate();
-  }, [onNoteCreate]);
 
   const getFirstNonProtectedNote = useCallback(
     (newNotes: SNNote[]) => newNotes.find(note => !note.protected),
@@ -132,23 +244,28 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
     (newNotes: SNNote[]) => {
       const note = getFirstNonProtectedNote(newNotes);
       if (note) {
-        selectNote(note);
+        onNoteSelect(note.uuid);
       }
     },
-    [getFirstNonProtectedNote, selectNote]
+    [getFirstNonProtectedNote, onNoteSelect]
   );
 
   const selectNextOrCreateNew = useCallback(
     (newNotes: SNNote[]) => {
       const note = getFirstNonProtectedNote(newNotes);
       if (note) {
-        selectNote(note);
+        onNoteSelect(note.uuid);
       } else {
         application?.getAppState().closeActiveEditor();
       }
     },
-    [application, getFirstNonProtectedNote, selectNote]
+    [application, getFirstNonProtectedNote, onNoteSelect]
   );
+
+  const currentTagCanHavePlaceholderNotes = useCallback(() => {
+    const selectedTag = application!.getAppState().getSelectedTag()!;
+    return selectedTag.isAllTag || !selectedTag.isSmartTag();
+  }, [application]);
 
   const reloadNotes = useCallback(
     (reselectNote?: boolean, tagChanged?: boolean) => {
@@ -165,13 +282,39 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
       const newNotes = application!.getDisplayableItems(
         ContentType.Note
       ) as SNNote[];
-      setNotes(newNotes);
-      reloadTitle(newNotes);
+      let renderedNotes: SNNote[] = newNotes;
+
+      /**
+       * In case a template note is created we add it to
+       * the top of the list manually
+       */
+      if (
+        application?.getAppState().isTabletDevice &&
+        application?.getAppState().getActiveEditor()?.isTemplateNote &&
+        currentTagCanHavePlaceholderNotes()
+      ) {
+        /**
+         * We only add the template note in case the note is not already there
+         */
+        if (
+          newNotes.length === 0 ||
+          (newNotes.length > 0 &&
+            newNotes[0].uuid !==
+              application!.getAppState().getActiveEditor().note!.uuid)
+        ) {
+          renderedNotes = [
+            application!.getAppState().getActiveEditor().note!,
+          ].concat(newNotes);
+        }
+      }
+
+      setNotes(renderedNotes);
+      reloadTitle(renderedNotes);
 
       if (reselectNote && application?.getAppState().isTabletDevice) {
         if (tagChanged) {
-          if (newNotes.length > 0) {
-            selectFirstNote(newNotes);
+          if (renderedNotes.length > 0) {
+            selectFirstNote(renderedNotes);
           } else {
             application?.getAppState().closeActiveEditor();
           }
@@ -183,22 +326,32 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
               discarded &&
               !application?.getAppState().selectedTag?.isTrashTag
             ) {
-              selectNextOrCreateNew(newNotes);
+              selectNextOrCreateNew(renderedNotes);
             }
           } else {
-            selectFirstNote(newNotes);
+            selectFirstNote(renderedNotes);
           }
         }
       }
     },
     [
       application,
+      currentTagCanHavePlaceholderNotes,
       reloadNotesDisplayOptions,
       reloadTitle,
       selectFirstNote,
       selectNextOrCreateNew,
     ]
   );
+
+  const onNoteCreate = useCallback(async () => {
+    let title = application!.getAppState().isTabletDevice
+      ? `Note ${notes.length + 1}`
+      : undefined;
+    await application!.getAppState().createEditor(title);
+    openCompose(true);
+    reloadNotes(true);
+  }, [application, notes.length, openCompose, reloadNotes]);
 
   const streamNotesAndTags = useCallback(() => {
     const removeStreamNotes = application!.streamItems(
@@ -327,7 +480,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
       <NoteList
         onRefresh={onRefresh}
         hasRefreshControl={signedIn}
-        onPressItem={selectNote}
+        onPressItem={onNoteSelect}
         refreshing={refreshing}
         searchText={searchText}
         onSearchChange={onSearchChange}
@@ -343,7 +496,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
         }
       />
       <FAB
-        // @ts-ignore style prop does not exist for types
+        // @ts-ignore style prop does not exist in types
         style={
           application?.getAppState().isInTabletMode
             ? { bottom: application?.getAppState().getKeyboardHeight() }
@@ -351,7 +504,7 @@ export const Notes: React.FC<Props> = ({ onNoteCreate, onNoteSelect }) => {
         }
         buttonColor={theme.stylekitInfoColor}
         iconTextColor={theme.stylekitInfoContrastColor}
-        onClickAction={createNote}
+        onClickAction={onNoteCreate}
         visible={true}
         size={30}
         paddingTop={application!.platform === Platform.Ios ? 1 : 0}
