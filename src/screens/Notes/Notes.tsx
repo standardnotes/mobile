@@ -235,31 +235,32 @@ export const Notes = ({
     [application, sortBy, sortReverse, searchText]
   );
 
-  const getFirstNonProtectedNote = useCallback(
-    (newNotes: SNNote[]) => newNotes.find(note => !note.protected),
+  const getFirstSelectableNote = useCallback(
+    (newNotes: SNNote[]) =>
+      newNotes.find(note => !note.protected && !note.errorDecrypting),
     []
   );
 
   const selectFirstNote = useCallback(
     (newNotes: SNNote[]) => {
-      const note = getFirstNonProtectedNote(newNotes);
-      if (note) {
+      const note = getFirstSelectableNote(newNotes);
+      if (note && !loading && !decrypting) {
         onNoteSelect(note.uuid);
       }
     },
-    [getFirstNonProtectedNote, onNoteSelect]
+    [decrypting, getFirstSelectableNote, loading, onNoteSelect]
   );
 
   const selectNextOrCreateNew = useCallback(
     (newNotes: SNNote[]) => {
-      const note = getFirstNonProtectedNote(newNotes);
+      const note = getFirstSelectableNote(newNotes);
       if (note) {
         onNoteSelect(note.uuid);
       } else {
         application?.getAppState().closeActiveEditor();
       }
     },
-    [application, getFirstNonProtectedNote, onNoteSelect]
+    [application, getFirstSelectableNote, onNoteSelect]
   );
 
   const currentTagCanHavePlaceholderNotes = useCallback(() => {
