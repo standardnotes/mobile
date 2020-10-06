@@ -10,7 +10,6 @@ export const Container = styled.View`
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
 `;
 export const LockedContainer = styled.View`
-  flex: 1;
   justify-content: flex-start;
   flex-direction: row;
   align-items: center;
@@ -53,11 +52,12 @@ export const NoteTitleInput = styled.TextInput`
   padding-left: ${PADDING}px;
   padding-right: ${PADDING}px;
 `;
-export const LoadingWebViewContainer = styled.View`
+export const LoadingWebViewContainer = styled.View<{ locked: boolean }>`
   position: absolute;
   height: 100%;
   width: 100%;
-  top: ${NOTE_TITLE_HEIGHT}px;
+  top: ${({ locked }) =>
+    locked ? NOTE_TITLE_HEIGHT + 26 : NOTE_TITLE_HEIGHT}px;
   bottom: 0px;
   z-index: 300;
   display: flex;

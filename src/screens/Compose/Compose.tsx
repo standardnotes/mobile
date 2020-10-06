@@ -473,7 +473,7 @@ export const Compose = (): JSX.Element => {
         editable={!note?.locked}
       />
       {loadingWebview && (
-        <LoadingWebViewContainer>
+        <LoadingWebViewContainer locked={note?.locked}>
           <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
           <LoadingWebViewSubtitle>
             {editorComponent?.name}
