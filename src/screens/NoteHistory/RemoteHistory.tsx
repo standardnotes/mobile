@@ -4,11 +4,8 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SNNote } from 'snjs';
+import { RevisionListEntry } from 'snjs/dist/@types/services/api/responses';
 import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
-import {
-  RemoteHistoryList,
-  RemoteHistoryListEntry,
-} from 'snjs/dist/@types/services/history/history_manager';
 import { NoteHistoryCell } from './NoteHistoryCell';
 
 type Props = {
@@ -22,7 +19,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
 
   // State
   const [remoteHistoryList, setRemoteHistoryList] = useState<
-    RemoteHistoryList
+    RevisionListEntry[]
   >();
   const [fetchingRemoteHistory, setFetchingRemoteHistory] = useState(false);
 
@@ -49,7 +46,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   }, [application?.historyManager, note]);
 
   const onItemPress = useCallback(
-    async (item: RemoteHistoryListEntry) => {
+    async (item: RevisionListEntry) => {
       const remoteRevision = await application?.historyManager!.fetchRemoteRevision(
         note.uuid,
         item
@@ -71,10 +68,9 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
     [application?.alertService, application?.historyManager, note.uuid, onPress]
   );
 
-  const RenderItem:
-    | ListRenderItem<RemoteHistoryListEntry>
-    | null
-    | undefined = ({ item }) => {
+  const renderItem: ListRenderItem<RevisionListEntry> | null | undefined = ({
+    item,
+  }) => {
     return (
       <NoteHistoryCell
         onPress={() => onItemPress(item)}
@@ -99,14 +95,14 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   }
 
   return (
-    <FlatList<RemoteHistoryListEntry>
+    <FlatList<RevisionListEntry>
       keyExtractor={item => item.uuid}
       contentContainerStyle={{ paddingBottom: insets.bottom }}
       initialNumToRender={10}
       windowSize={10}
       keyboardShouldPersistTaps={'never'}
       data={remoteHistoryList}
-      renderItem={RenderItem}
+      renderItem={renderItem}
     />
   );
 };
