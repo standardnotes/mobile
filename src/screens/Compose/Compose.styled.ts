@@ -90,7 +90,7 @@ export const StyledKeyboardAvoidngView = styled.KeyboardAvoidingView`
 `;
 
 export const StyledTextView = styled(SNTextView)`
-  height: 90%;
+  height: 96%;
   padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   padding-left: ${({ theme }) =>
