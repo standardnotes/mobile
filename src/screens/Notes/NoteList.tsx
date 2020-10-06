@@ -157,6 +157,7 @@ export const NoteList = (props: Props): JSX.Element => {
             inputStyle={[
               styles.androidSearch,
               {
+                color: theme.stylekitForegroundColor,
                 backgroundColor: theme.stylekitContrastBackgroundColor,
               },
             ]}
