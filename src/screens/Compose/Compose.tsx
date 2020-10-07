@@ -305,15 +305,19 @@ export const Compose = (): JSX.Element => {
             setNote(newNote);
           }
         }
-        if (newNote.lastSyncBegan && newNote.lastSyncEnd) {
-          if (
-            newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
-          ) {
+        if (newNote.lastSyncBegan) {
+          if (newNote.lastSyncEnd) {
+            if (
+              newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
+            ) {
+              showSavingStatus();
+            } else if (
+              newNote.lastSyncEnd!.getTime() > newNote.lastSyncBegan!.getTime()
+            ) {
+              showAllChangesSavedStatus();
+            }
+          } else {
             showSavingStatus();
-          } else if (
-            newNote.lastSyncEnd!.getTime() > newNote.lastSyncBegan!.getTime()
-          ) {
-            showAllChangesSavedStatus();
           }
         }
       }
