@@ -312,8 +312,8 @@ PODS:
     - ReactCommon/callinvoker (= 0.62.2)
   - ReactNativeAlternateIcons (0.3.0):
     - React
-  - RNCAsyncStorage (1.12.0):
-    - React
+  - RNCAsyncStorage (1.12.1):
+    - React-Core
   - RNCMaskedView (0.1.10):
     - React
   - RNFileViewer (2.1.3):
@@ -567,7 +567,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
   ReactNativeAlternateIcons: b2a8a729d9d9756ed0652c352694f190407f297f
-  RNCAsyncStorage: 2a692bcb9b69b76a2f1a95f33db057129700af64
+  RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNFileViewer: b29d05e460b0b39bb60003c252f16d8c4f5ee050
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df

@@ -2,7 +2,7 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { useIsLocked } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ContentType, StorageEncryptionPolicies } from 'snjs';
 import {
   BaseView,
@@ -19,11 +19,28 @@ type Props = {
 export const EncryptionSection = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
-
   const isLocked = useIsLocked();
 
+  // State
+  const [protocolDisplayName, setProtocolDisplayName] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+    const getProtocolDisplayName = async () => {
+      const displayName =
+        (await application?.getProtocolEncryptionDisplayName()) ?? '';
+      if (mounted) {
+        setProtocolDisplayName(displayName);
+      }
+    };
+    getProtocolDisplayName();
+    return () => {
+      mounted = false;
+    };
+  }, [application, props.encryptionAvailable]);
+
   const textData = useMemo(() => {
-    const encryptionType = application?.getProtocolEncryptionDisplayName();
+    const encryptionType = protocolDisplayName;
     let encryptionStatus = props.encryptionAvailable
       ? 'Enabled'
       : 'Not Enabled';
@@ -53,7 +70,7 @@ export const EncryptionSection = (props: Props) => {
       sourceString,
       itemsStatus,
     };
-  }, [application, props.encryptionAvailable, isLocked]);
+  }, [application, props.encryptionAvailable, isLocked, protocolDisplayName]);
 
   return (
     <TableSection>
