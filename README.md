@@ -1,4 +1,14 @@
 # Standard Notes
+
+<div align="center">
+
+[![Latest release version](https://img.shields.io/github/v/release/standardnotes/mobile)](https://github.com/standardnotes/mobile/releases)
+[![License](https://img.shields.io/github/license/standardnotes/mobile?color=blue)](https://github.com/standardnotes/mobile/blob/master/LICENSE)
+[![Slack](https://img.shields.io/badge/slack-standardnotes-CC2B5E.svg?style=flat&logo=slack)](https://standardnotes.org/slack)
+[![Twitter Follow](https://img.shields.io/badge/follow-%40standardnotes-blue.svg?style=flat&logo=twitter)](https://twitter.com/standardnotes)
+
+</div>
+
 ## iOS & Android App
 
 [Standard Notes](https://standardnotes.org) is a safe place for your notes, thoughts, and life's work. It focuses on being simple, so you don't have to fight with endless features that slow you down. It encrypts your notes to protect your privacy. And, it's extensible, so you can backup your notes to Dropbox, Google Drive, and other services, as well as install themes, editors, and more.
