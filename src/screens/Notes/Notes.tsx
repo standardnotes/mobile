@@ -76,9 +76,9 @@ export const Notes = ({
   const haveDisplayOptions = useRef(false);
 
   const reloadTitle = useCallback(
-    (newNotes?: SNNote[]) => {
+    (newNotes?: SNNote[], newFilter?: string) => {
       let title = '';
-      if (newNotes && searchText.length > 0) {
+      if (newNotes && (newFilter ?? searchText).length > 0) {
         const resultCount = newNotes.length;
         title = `${resultCount} search results`;
       } else if (application?.getAppState().selectedTag) {
@@ -91,7 +91,7 @@ export const Notes = ({
         });
       }
     },
-    [application, navigation, searchText.length]
+    [application, navigation, searchText]
   );
 
   const openCompose = useCallback(
@@ -227,7 +227,7 @@ export const Notes = ({
             note,
             tag?.isArchiveTag || tag?.isTrashTag,
             false,
-            searchFilter?.toLowerCase() || searchText.toLowerCase()
+            searchFilter?.toLowerCase() ?? searchText.toLowerCase()
           );
         }
       );
@@ -269,7 +269,7 @@ export const Notes = ({
   }, [application]);
 
   const reloadNotes = useCallback(
-    (reselectNote?: boolean, tagChanged?: boolean) => {
+    (reselectNote?: boolean, tagChanged?: boolean, searchFilter?: string) => {
       const tag = application!.getAppState().selectedTag;
       if (!tag) {
         return;
@@ -310,7 +310,7 @@ export const Notes = ({
       }
 
       setNotes(renderedNotes);
-      reloadTitle(renderedNotes);
+      reloadTitle(renderedNotes, searchFilter);
 
       if (reselectNote && application?.getAppState().isTabletDevice) {
         if (tagChanged) {
@@ -441,11 +441,14 @@ export const Notes = ({
     application?.sync();
   }, [application, startRefreshing]);
 
-  const onSearchChange = (filter: string) => {
-    setSearchText(filter);
-    reloadNotesDisplayOptions(filter);
-    reloadNotes();
-  };
+  const onSearchChange = useCallback(
+    (filter: string) => {
+      reloadNotesDisplayOptions(filter);
+      setSearchText(filter);
+      reloadNotes(undefined, undefined, filter);
+    },
+    [reloadNotes, reloadNotesDisplayOptions]
+  );
 
   useFocusEffect(
     useCallback(() => {
