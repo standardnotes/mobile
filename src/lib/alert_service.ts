@@ -58,7 +58,7 @@ export class AlertService implements SNAlertService {
       Alert.alert(title, text, buttons, {
         cancelable: true,
         onDismiss: async () => {
-          reject(false);
+          reject();
         },
       });
     });

@@ -30,33 +30,35 @@ export class BackupsService extends ApplicationService {
       if (this.application?.platform === Platform.Ios) {
         return this._exportIOS(filename, jsonString);
       } else {
-        return this._showAndroidEmailOrSaveOption().then(async result => {
-          if (result === 'email') {
-            return this._exportViaEmailAndroid(
-              Base64.encodeURI(data),
-              filename
-            );
-          } else {
-            let filepath = await this._exportAndroid(filename, jsonString);
-            return this._showFileSavePromptAndroid(filepath);
-          }
-        });
+        const result = await this._showAndroidEmailOrSaveOption();
+        if (result === 'email') {
+          return this._exportViaEmailAndroid(Base64.encodeURI(data), filename);
+        } else if (result === 'save') {
+          let filepath = await this._exportAndroid(filename, jsonString);
+          return this._showFileSavePromptAndroid(filepath);
+        } else {
+          return;
+        }
       }
     }
   }
 
   private async _showAndroidEmailOrSaveOption() {
-    const confirmed = await this.application!.alertService?.confirm(
-      'Choose Export Method',
-      '',
-      'Email',
-      ButtonType.Info,
-      'Save to Disk'
-    );
-    if (confirmed) {
-      return 'email';
-    } else {
-      return 'save';
+    try {
+      const confirmed = await this.application!.alertService?.confirm(
+        'Choose Export Method',
+        '',
+        'Email',
+        ButtonType.Info,
+        'Save to Disk'
+      );
+      if (confirmed) {
+        return 'email';
+      } else {
+        return 'save';
+      }
+    } catch (e) {
+      return undefined;
     }
   }
 
