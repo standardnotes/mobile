@@ -69,7 +69,7 @@ export const Compose = (): JSX.Element => {
   const editorViewRef = useRef<SNTextView>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const statusTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const alredySaved = useRef(false);
+  const alreadySaved = useRef(false);
 
   const dissmissKeybard = () => {
     Keyboard.dismiss();
@@ -97,7 +97,7 @@ export const Compose = (): JSX.Element => {
   );
 
   const showSavingStatus = useCallback(() => {
-    alredySaved.current = true;
+    alreadySaved.current = true;
     setStatus('Saving...', undefined, false);
   }, [setStatus]);
 
@@ -174,7 +174,7 @@ export const Compose = (): JSX.Element => {
 
   useEffect(() => {
     return () => {
-      alredySaved.current = false;
+      alreadySaved.current = false;
       application?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
     };
   }, [application, note?.uuid]);
@@ -324,7 +324,7 @@ export const Compose = (): JSX.Element => {
               showSavingStatus();
             } else if (
               newNote.lastSyncEnd.getTime() > newNote.lastSyncBegan.getTime() &&
-              alredySaved.current
+              alreadySaved.current
             ) {
               showAllChangesSavedStatus();
             }
