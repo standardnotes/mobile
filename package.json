@@ -18,7 +18,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@bugsnag/react-native": "^7.4.0",
+    "@bugsnag/react-native": "^7.5.0",
     "@expo/react-native-action-sheet": "^3.8.0",
     "@react-native-community/async-storage": "1.12.1",
     "@react-native-community/masked-view": "^0.1.10",
@@ -32,7 +32,7 @@
     "react-native-aes-crypto": "standardnotes/react-native-aes#6430299",
     "react-native-alternate-icons": "standardnotes/react-native-alternate-icons#1d335d",
     "react-native-fab": "standardnotes/react-native-fab#cb60e00",
-    "react-native-file-viewer": "^2.1.3",
+    "react-native-file-viewer": "^2.1.4",
     "react-native-fingerprint-scanner": "standardnotes/react-native-fingerprint-scanner#14311e2",
     "react-native-flag-secure-android": "standardnotes/react-native-flag-secure-android#cb08e74",
     "react-native-fs": "^2.16.6",
@@ -68,7 +68,7 @@
     "@types/js-base64": "^3.0.0",
     "@types/react-native": "0.62.18",
     "@types/react-native-vector-icons": "^6.4.6",
-    "@types/styled-components": "^5.1.3",
+    "@types/styled-components": "^5.1.4",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
     "babel-jest": "^26.5.2",
