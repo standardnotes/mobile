@@ -20,6 +20,7 @@ import {
   ApplicationEvent,
   ComponentArea,
   ContentType,
+  isPayloadSourceInternalChange,
   isPayloadSourceRetrieved,
   NoteMutator,
   PayloadSource,
@@ -200,30 +201,34 @@ export const Compose = (): JSX.Element => {
     };
   }, [application, editor]);
 
-  const reloadComponentEditorState = useCallback(async () => {
-    const associatedEditor = application?.componentManager!.editorForNote(
-      note!
-    );
-    if (!associatedEditor) {
-      /** No editor */
-      if (editorComponent) {
-        await application?.componentGroup.deactivateComponentForArea(
-          ComponentArea.Editor
-        );
+  const reloadComponentEditorState = useCallback(
+    async (updatedNote?: SNNote) => {
+      if (!updatedNote) {
+        return;
       }
-      return;
-    }
-
-    if (associatedEditor.uuid === editorComponent?.uuid) {
-      /** Same editor, no change */
-      return;
-    }
-    await application?.componentGroup.activateComponent(associatedEditor);
-    application?.componentManager!.contextItemDidChangeInArea(
-      ComponentArea.Editor
-    );
-    return;
-  }, [application, editorComponent, note]);
+      const associatedEditor = application?.componentManager!.editorForNote(
+        updatedNote
+      );
+      if (!associatedEditor) {
+        /** No editor */
+        if (editorComponent) {
+          await application?.componentGroup.deactivateComponentForArea(
+            ComponentArea.Editor
+          );
+        }
+      } else if (associatedEditor.uuid !== editorComponent?.uuid) {
+        await application?.componentGroup.activateComponent(associatedEditor);
+      }
+      application?.componentManager!.contextItemDidChangeInArea(
+        ComponentArea.Editor
+      );
+    },
+    [
+      application?.componentGroup,
+      application?.componentManager,
+      editorComponent,
+    ]
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -261,25 +266,23 @@ export const Compose = (): JSX.Element => {
   useEffect(() => {
     const removeComponentsObserver = application?.streamItems(
       ContentType.Component,
-      async items => {
-        const components = items as SNComponent[];
-        if (!note) {
+      async (_items, source) => {
+        if (
+          isPayloadSourceInternalChange(source!) ||
+          note?.uuid === undefined
+        ) {
           return;
         }
-        /** Observe editor changes to see if the current note should update its editor */
-        const editors = components.filter(component => {
-          return component.isEditor();
-        });
-        if (editors.length === 0) {
-          return;
-        }
-        /** Find the most recent editor for note */
-        reloadComponentEditorState();
+        /** hook updated only when note uuid changes
+         * to avoid running reloadComponentEditorState too often
+         */
+        const updatedNote = application.findItem(note.uuid) as SNNote;
+        await reloadComponentEditorState(updatedNote!);
       }
     );
 
     return removeComponentsObserver;
-  }, [application, note, reloadComponentEditorState]);
+  }, [application, reloadComponentEditorState, note?.uuid]);
 
   useEffect(() => {
     const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
@@ -287,10 +290,11 @@ export const Compose = (): JSX.Element => {
         setNote(newNote);
         setTitle(newNote.title);
         setNoteText(newNote.text);
+        reloadComponentEditorState(newNote);
       }
     );
     return removeEditorNoteChangeObserver;
-  }, [editor]);
+  }, [editor, reloadComponentEditorState]);
 
   useEffect(() => {
     let mounted = true;
