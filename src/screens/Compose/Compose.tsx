@@ -44,7 +44,7 @@ import {
 } from './Compose.styled';
 const NOTE_PREVIEW_CHAR_LIMIT = 80;
 const MINIMUM_STATUS_DURATION = 400;
-const SAVE_TIMEOUT_DEBOUNCE = 350;
+const SAVE_TIMEOUT_DEBOUNCE = 250;
 const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
 
 export const Compose = (): JSX.Element => {
