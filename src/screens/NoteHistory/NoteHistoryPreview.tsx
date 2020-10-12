@@ -12,7 +12,7 @@ import { ThemeService } from '@Style/theme_service';
 import React, { useCallback, useContext, useLayoutEffect } from 'react';
 import { YellowBox } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ButtonType, ContentType, PayloadSource } from 'snjs';
+import { ButtonType, PayloadSource, SNNote } from 'snjs';
 import {
   Container,
   StyledTextView,
@@ -29,7 +29,7 @@ type Props = HistoryStackNavigationProp<typeof SCREEN_NOTE_HISTORY_PREVIEW>;
 export const NoteHistoryPreview = ({
   navigation,
   route: {
-    params: { revision, revisionUuid, title },
+    params: { revision, title, originalNoteUuid },
   },
 }: Props) => {
   // Context
@@ -42,20 +42,21 @@ export const NoteHistoryPreview = ({
     async (asCopy: boolean) => {
       const run = async () => {
         if (asCopy) {
-          const contentCopy = Object.assign({}, revision.payload.safeContent);
-          if (contentCopy.title) {
-            contentCopy.title += ' (copy)';
-          }
-          await application?.createManagedItem(
-            ContentType.Note,
-            contentCopy,
-            true
-          );
+          const originalNote = application?.findItem(
+            originalNoteUuid
+          ) as SNNote;
+          await application?.duplicateItem(originalNote!, {
+            ...revision.payload.safeContent,
+            title: revision.payload.safeContent.title
+              ? revision.payload.safeContent.title + ' (copy)'
+              : undefined,
+          });
+
           // @ts-expect-error
           navigation.navigate(SCREEN_NOTES);
         } else {
           await application?.changeAndSaveItem(
-            revisionUuid,
+            originalNoteUuid,
             mutator => {
               mutator.setContent(revision.payload.safeContent);
             },
@@ -86,7 +87,7 @@ export const NoteHistoryPreview = ({
         run();
       }
     },
-    [application, navigation, revision.payload.safeContent, revisionUuid]
+    [application, navigation, originalNoteUuid, revision.payload.safeContent]
   );
 
   const onPress = useCallback(() => {

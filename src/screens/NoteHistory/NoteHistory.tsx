@@ -48,8 +48,8 @@ export const NoteHistory = (props: Props) => {
   ) => {
     props.navigation.navigate(SCREEN_NOTE_HISTORY_PREVIEW, {
       title,
-      revisionUuid: uuid,
       revision,
+      originalNoteUuid: note.uuid,
     });
   };
 

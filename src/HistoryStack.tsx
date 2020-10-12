@@ -1,4 +1,5 @@
 import { HeaderTitleView } from '@Components/HeaderTitleView';
+import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 import { RouteProp } from '@react-navigation/native';
 import {
   createStackNavigator,
@@ -10,7 +11,11 @@ import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens';
+import { ICON_CHECKMARK } from '@Style/icons';
+import { ThemeService } from '@Style/theme_service';
 import React, { useContext } from 'react';
+import { Platform } from 'react-native';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { ThemeContext } from 'styled-components';
 import { HeaderTitleParams } from './App';
@@ -20,8 +25,8 @@ type HistoryStackNavigatorParamList = {
     | (HeaderTitleParams & { noteUuid: string })
     | (undefined & { noteUuid: string });
   [SCREEN_NOTE_HISTORY_PREVIEW]: HeaderTitleParams & {
-    revisionUuid: string;
     revision: NoteHistoryEntry;
+    originalNoteUuid: string;
   };
 };
 
@@ -43,7 +48,6 @@ export const HistoryStack = () => {
         headerStyle: {
           backgroundColor: theme.stylekitContrastBackgroundColor,
         },
-        headerBackTitleVisible: false,
       }}
       initialRouteName={SCREEN_NOTE_HISTORY}
     >
@@ -51,6 +55,22 @@ export const HistoryStack = () => {
         name={SCREEN_NOTE_HISTORY}
         options={({ route }) => ({
           title: 'Note history',
+          headerBackTitleVisible: false,
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Done' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : ThemeService.nameForIcon(ICON_CHECKMARK)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
           headerTitle: ({ children }) => {
             return (
               <HeaderTitleView
@@ -67,6 +87,7 @@ export const HistoryStack = () => {
         name={SCREEN_NOTE_HISTORY_PREVIEW}
         options={({ route }) => ({
           title: 'Preview',
+          headerBackTitleVisible: false,
           headerTitle: ({ children }) => {
             return (
               <HeaderTitleView
