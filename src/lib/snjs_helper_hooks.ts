@@ -154,9 +154,6 @@ export const useHasEditor = () => {
 export const useSyncStatus = () => {
   // Context
   const application = React.useContext(ApplicationContext);
-  const navigation = useNavigation<
-    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
-  >();
 
   // State
   const [completedInitialSync, setCompletedInitialSync] = React.useState(false);
@@ -166,12 +163,11 @@ export const useSyncStatus = () => {
 
   const setStatus = useCallback(
     (status?: string, color?: string) => {
-      navigation.setParams({
-        subTitle: status,
-        subTitleColor: color,
-      });
+      application
+        ?.getStatusManager()
+        .setMessage(SCREEN_NOTES, status ?? '', color);
     },
-    [navigation]
+    [application]
   );
 
   useEffect(() => {
@@ -214,9 +210,7 @@ export const useSyncStatus = () => {
         `Syncing ${stats.uploadCompletionCount}/${stats.uploadTotalCount} items...`
       );
     } else {
-      if (!application?.getAppState().isInTabletMode) {
-        setStatus();
-      }
+      setStatus();
     }
   }, [application, setStatus]);
 

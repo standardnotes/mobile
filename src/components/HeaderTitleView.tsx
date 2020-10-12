@@ -35,8 +35,8 @@ const SubTitle = styled.Text.attrs(() => ({
 export const HeaderTitleView: React.FC<Props> = props => (
   <Container>
     <Title>{props.title}</Title>
-    {props.subtitle && (
+    {props.subtitle && props.subtitle.length > 0 ? (
       <SubTitle color={props.subtitleColor}>{props.subtitle}</SubTitle>
-    )}
+    ) : undefined}
   </Container>
 );

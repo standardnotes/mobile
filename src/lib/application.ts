@@ -21,6 +21,7 @@ import { push } from './navigation_service';
 import { PreferencesManager } from './preferences_manager';
 import { SNReactNativeCrypto } from './react_native_crypto';
 import { ReviewService } from './review_service';
+import { StatusManager } from './status_manager';
 
 type MobileServices = {
   applicationState: ApplicationState;
@@ -28,6 +29,7 @@ type MobileServices = {
   backupsService: BackupsService;
   installationService: InstallationService;
   prefsService: PreferencesManager;
+  statusManager: StatusManager;
 };
 
 export class MobileApplication extends SNApplication {
@@ -93,5 +95,9 @@ export class MobileApplication extends SNApplication {
 
   public getPrefsService() {
     return this.MobileServices.prefsService;
+  }
+
+  public getStatusManager() {
+    return this.MobileServices.statusManager;
   }
 }

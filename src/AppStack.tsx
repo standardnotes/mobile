@@ -6,6 +6,7 @@ import {
   TabletModeChangeData,
 } from '@Lib/application_state';
 import { useHasEditor, useIsLocked } from '@Lib/snjs_helper_hooks';
+import { ScreenStatus } from '@Lib/status_manager';
 import { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
 import {
   createStackNavigator,
@@ -56,17 +57,23 @@ const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 export const AppStackComponent = (
   props: ModalStackNavigationProp<'AppStack'>
 ) => {
+  // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
-  const drawerRef = useRef<DrawerLayout>(null);
-  const noteDrawerRef = useRef<DrawerLayout>(null);
+  const isLocked = useIsLocked();
+  const [hasEditor] = useHasEditor();
 
+  // State
   const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
   const [isInTabletMode, setIsInTabletMode] = useState(
     () => application?.getAppState().isInTabletMode
   );
+  const [notesStatus, setNotesStatus] = useState<ScreenStatus>();
+  const [composeStatus, setComposeStatus] = useState<ScreenStatus>();
 
-  const isLocked = useIsLocked();
+  // Ref
+  const drawerRef = useRef<DrawerLayout>(null);
+  const noteDrawerRef = useRef<DrawerLayout>(null);
 
   useEffect(() => {
     const removeObserver = application
@@ -83,7 +90,16 @@ export const AppStackComponent = (
     return removeObserver;
   }, [application, props.navigation, isInTabletMode]);
 
-  const [hasEditor] = useHasEditor();
+  useEffect(() => {
+    const removeObserver = application
+      ?.getStatusManager()
+      .addHeaderStatusObserver(messages => {
+        setNotesStatus(messages[SCREEN_NOTES]);
+        setComposeStatus(messages[SCREEN_COMPOSE]);
+      });
+
+    return removeObserver;
+  }, [application, isInTabletMode]);
 
   useEffect(() => {
     const updateDimensions = ({ window }: { window: ScaledSize }) => {
@@ -163,11 +179,14 @@ export const AppStackComponent = (
             options={({ route }) => ({
               title: 'All notes',
               headerTitle: ({ children }) => {
+                const screenStatus = isInTabletMode
+                  ? composeStatus || notesStatus
+                  : notesStatus;
                 return (
                   <HeaderTitleView
                     title={route.params?.title ?? (children || '')}
-                    subtitle={route.params?.subTitle}
-                    subtitleColor={route.params?.subTitleColor}
+                    subtitle={screenStatus?.status}
+                    subtitleColor={screenStatus?.color}
                   />
                 );
               },
@@ -211,8 +230,8 @@ export const AppStackComponent = (
                 return (
                   <HeaderTitleView
                     title={route.params?.title ?? (children || '')}
-                    subtitle={route.params?.subTitle}
-                    subtitleColor={route.params?.subTitleColor}
+                    subtitle={composeStatus?.status}
+                    subtitleColor={composeStatus?.color}
                   />
                 );
               },

@@ -1,8 +1,7 @@
 import { AppStateEventType } from '@Lib/application_state';
 import { Editor } from '@Lib/editor';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
@@ -52,9 +51,6 @@ export const Compose = (): JSX.Element => {
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
   const themeService = useContext(ThemeServiceContext);
-  const navigation = useNavigation<
-    AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
-  >();
 
   //State
   const [title, setTitle] = useState<string | undefined>();
@@ -72,6 +68,7 @@ export const Compose = (): JSX.Element => {
   const editorViewRef = useRef<SNTextView>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const statusTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const alredySaved = useRef(false);
 
   const dissmissKeybard = () => {
     Keyboard.dismiss();
@@ -85,22 +82,21 @@ export const Compose = (): JSX.Element => {
       }
       if (wait) {
         statusTimeoutRef.current = setTimeout(() => {
-          navigation.setParams({
-            subTitle: status,
-            subTitleColor: color,
-          });
+          application
+            ?.getStatusManager()
+            .setMessage(SCREEN_COMPOSE, status, color);
         }, MINIMUM_STATUS_DURATION);
       } else {
-        navigation.setParams({
-          subTitle: status,
-          subTitleColor: color,
-        });
+        application
+          ?.getStatusManager()
+          .setMessage(SCREEN_COMPOSE, status, color);
       }
     },
-    [navigation]
+    [application]
   );
 
   const showSavingStatus = useCallback(() => {
+    alredySaved.current = true;
     setStatus('Saving...', undefined, false);
   }, [setStatus]);
 
@@ -129,8 +125,7 @@ export const Compose = (): JSX.Element => {
 
     const unsubscribeAppEventObserver = application?.addEventObserver(
       async eventName => {
-        if (eventName === ApplicationEvent.HighLatencySync) {
-        } else if (eventName === ApplicationEvent.CompletedFullSync) {
+        if (eventName === ApplicationEvent.CompletedFullSync) {
           /** if we're still dirty, don't change status, a sync is likely upcoming. */
           if (!note?.dirty && saveError) {
             showAllChangesSavedStatus();
@@ -175,6 +170,13 @@ export const Compose = (): JSX.Element => {
       mounted = false;
     };
   }, [application?.platform, editor, editor?.note?.uuid]);
+
+  useEffect(() => {
+    return () => {
+      alredySaved.current = false;
+      application?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
+    };
+  }, [application, note?.uuid]);
 
   useFocusEffect(
     useCallback(() => {
@@ -287,6 +289,11 @@ export const Compose = (): JSX.Element => {
         setNoteText(newNote.text);
       }
     );
+    return removeEditorNoteChangeObserver;
+  }, [editor]);
+
+  useEffect(() => {
+    let mounted = true;
     const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
       (newNote, source) => {
         if (isPayloadSourceRetrieved(source!)) {
@@ -305,14 +312,15 @@ export const Compose = (): JSX.Element => {
             setNote(newNote);
           }
         }
-        if (newNote.lastSyncBegan) {
+        if (mounted && newNote.lastSyncBegan) {
           if (newNote.lastSyncEnd) {
             if (
-              newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd!.getTime()
+              newNote.lastSyncBegan.getTime() > newNote.lastSyncEnd.getTime()
             ) {
               showSavingStatus();
             } else if (
-              newNote.lastSyncEnd!.getTime() > newNote.lastSyncBegan!.getTime()
+              newNote.lastSyncEnd.getTime() > newNote.lastSyncBegan.getTime() &&
+              alredySaved.current
             ) {
               showAllChangesSavedStatus();
             }
@@ -324,16 +332,14 @@ export const Compose = (): JSX.Element => {
     );
 
     return () => {
-      removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
-      removeEditorNoteValueChangeObserver &&
-        removeEditorNoteValueChangeObserver();
+      mounted = false;
+      removeEditorNoteValueChangeObserver;
     };
   }, [
     editor,
     editorComponent,
     note,
     note?.locked,
-    setStatus,
     showAllChangesSavedStatus,
     showSavingStatus,
   ]);

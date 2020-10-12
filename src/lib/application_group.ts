@@ -10,6 +10,7 @@ import { InstallationService } from './installation_service';
 import { MobileDeviceInterface } from './interface';
 import { PreferencesManager } from './preferences_manager';
 import { ReviewService } from './review_service';
+import { StatusManager } from './status_manager';
 
 export class ApplicationGroup extends SNApplicationGroup {
   constructor() {
@@ -35,12 +36,14 @@ export class ApplicationGroup extends SNApplicationGroup {
     const backupsService = new BackupsService(application);
     const prefsService = new PreferencesManager(application);
     const installationService = new InstallationService(application);
+    const statusManager = new StatusManager(application);
     application.setMobileServices({
       applicationState,
       reviewService,
       backupsService,
       prefsService,
       installationService,
+      statusManager,
     });
     return application;
   };
