@@ -250,13 +250,15 @@ export const Authenticate = ({
         } catch (error_1) {
           onValueChange({ ...challengeValue, value: false });
           FingerprintScanner.release();
-          if (error_1.name !== 'UserCancel') {
-            Alert.alert('Unsuccessful');
-          } else {
-            Alert.alert(
-              'Unsuccessful',
-              'Authentication failed. Tap to try again.'
-            );
+          if (error_1.name !== 'SystemCancel') {
+            if (error_1.name !== 'UserCancel') {
+              Alert.alert('Unsuccessful');
+            } else {
+              Alert.alert(
+                'Unsuccessful',
+                'Authentication failed. Tap to try again.'
+              );
+            }
           }
           dispatch({
             type: 'setState',

@@ -447,7 +447,8 @@ export class ApplicationState extends ApplicationService {
         await this.application.lock();
       } else if (
         hasBiometrics &&
-        this.biometricsTiming === UnlockTiming.Immediately
+        this.biometricsTiming === UnlockTiming.Immediately &&
+        !this.locked
       ) {
         const challenge = new Challenge(
           [new ChallengePrompt(ChallengeValidation.Biometric)],
@@ -455,7 +456,13 @@ export class ApplicationState extends ApplicationService {
           false
         );
         this.application.promptForCustomChallenge(challenge);
-        this.application.promptForChallenge(challenge);
+
+        this.locked = true;
+        this.application.addChallengeObserver(challenge, {
+          onComplete: () => {
+            this.locked = false;
+          },
+        });
       }
     }
   }
@@ -478,10 +485,10 @@ export class ApplicationState extends ApplicationService {
       isResuming && this.mostRecentState === AppStateType.EnteringBackground;
     const isEnteringBackground = nextAppState === 'background';
     const isLosingFocus = nextAppState === 'inactive';
+
     if (isEnteringBackground) {
       this.notifyOfStateChange(AppStateType.EnteringBackground);
-
-      this.checkAndLockApplication();
+      return this.checkAndLockApplication();
     }
 
     if (isResumingFromBackground || isResuming) {
@@ -491,11 +498,12 @@ export class ApplicationState extends ApplicationService {
 
       // Notify of GainingFocus even if resuming from background
       this.notifyOfStateChange(AppStateType.GainingFocus);
+      return;
     }
 
     if (isLosingFocus) {
       this.notifyOfStateChange(AppStateType.LosingFocus);
-      this.checkAndLockApplication();
+      return this.checkAndLockApplication();
     }
   };
 
