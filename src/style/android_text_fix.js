@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleSheet, Text, TextStyle } from 'react-native';
+import { Platform, StyleSheet, Text } from 'react-native';
 import SNReactNative from 'standard-notes-rn';
 
 // This fixes this bug: https://github.com/facebook/react-native/issues/15114
@@ -29,10 +29,6 @@ import SNReactNative from 'standard-notes-rn';
 // different choices for the system default font, so it's unlikely to be easy
 // to correctly match that.
 //
-// What we choose to do is assume that users will choose the default system default
-// font for their phones, and then try to use that when we can, using Slate on OnePlus,
-// and falling back to Roboto for LG phones or Oppo phones.
-//
 
 export function enableAndroidFontFix() {
   // Bail if this isn't an Android device
@@ -53,8 +49,7 @@ export function enableAndroidFontFix() {
     case 'OnePlus':
       styles = StyleSheet.create({
         androidFontFixFontFamily: {
-          fontFamily: 'Slate',
-          // fontFamily: 'Roboto',
+          fontFamily: 'Roboto',
         },
       });
       break;
@@ -85,7 +80,7 @@ export function enableAndroidFontFix() {
   Text.render = function (...args) {
     let origin = __render.call(this, ...args);
     return React.cloneElement(origin, {
-      style: [styles.androidFontFixFontFamily, origin.props.style],
+      style: [origin.props.style, styles.androidFontFixFontFamily],
     });
   };
 }
