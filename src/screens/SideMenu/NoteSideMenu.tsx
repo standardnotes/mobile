@@ -204,6 +204,7 @@ export const NoteSideMenu = (props: Props) => {
       const activeEditorComponent = application?.componentManager!.editorForNote(
         note!
       );
+      props.drawerRef?.closeDrawer();
       if (!component) {
         if (!note?.prefersPlainEditor) {
           await application?.changeItem(note!.uuid, mutator => {
@@ -237,6 +238,7 @@ export const NoteSideMenu = (props: Props) => {
       disassociateComponentWithCurrentNote,
       editor,
       note,
+      props.drawerRef,
     ]
   );
 
