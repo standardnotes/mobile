@@ -349,7 +349,7 @@ export const AuthenticatePrivileges = ({
         />
         {isInput && (
           <SectionContainer last={last}>
-            <SectionedTableCell textInputCell={true} first={first}>
+            <SectionedTableCell textInputCell={true} first={true}>
               <Input
                 key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={
@@ -370,7 +370,11 @@ export const AuthenticatePrivileges = ({
                 autoFocus={false}
                 autoCapitalize={'none'}
                 secureTextEntry={true}
-                keyboardType={keyboardType}
+                keyboardType={
+                  privilegeValue.type === PrivilegeCredential.LocalPasscode
+                    ? keyboardType
+                    : undefined
+                }
                 keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 onSubmitEditing={() => {
