@@ -34,16 +34,13 @@ const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;
 
 export enum AppStateType {
-  Launching = 1,
-  LosingFocus = 2,
-  EnteringBackground = 3,
-  GainingFocus = 4,
-  EditorFocused = 5,
+  LosingFocus = 1,
+  EnteringBackground = 2,
+  GainingFocus = 3,
   ResumingFromBackground = 6,
-  Locking = 7,
-  Unlocking = 8,
+  Locked = 7,
+  Unlocked = 8,
   TagChanged = 9,
-  ActiveEditorChanged = 10,
   EditorClosed = 11,
   PreferencesChanged = 12,
 }
@@ -168,7 +165,11 @@ export class ApplicationState extends ApplicationService {
    * Notify observers of ApplicationState change
    */
   private notifyOfStateChange(state: AppStateType, data?: any) {
-    if (this.ignoreStateChanges) {
+    if (
+      this.ignoreStateChanges &&
+      state !== AppStateType.Locked &&
+      state !== AppStateType.Unlocked
+    ) {
       return;
     }
 
@@ -235,7 +236,6 @@ export class ApplicationState extends ApplicationService {
     } else {
       activeEditor.setNote(note);
     }
-    this.notifyOfStateChange(AppStateType.ActiveEditorChanged);
   }
 
   getActiveEditor() {
@@ -334,6 +334,7 @@ export class ApplicationState extends ApplicationService {
           this.locked = true;
         } else if (eventName === ApplicationEvent.Launched) {
           this.locked = false;
+          this.notifyOfStateChange(AppStateType.Unlocked);
         }
       }
     );
@@ -378,11 +379,6 @@ export class ApplicationState extends ApplicationService {
 
   public getSelectedTag() {
     return this.selectedTag;
-  }
-
-  setUserPreferences(preferences: SNUserPrefs) {
-    this.userPreferences = preferences;
-    this.notifyOfStateChange(AppStateType.PreferencesChanged);
   }
 
   static get version() {
@@ -458,9 +454,11 @@ export class ApplicationState extends ApplicationService {
         this.application.promptForCustomChallenge(challenge);
 
         this.locked = true;
+        this.notifyOfStateChange(AppStateType.Locked);
         this.application.addChallengeObserver(challenge, {
           onComplete: () => {
             this.locked = false;
+            this.notifyOfStateChange(AppStateType.Unlocked);
           },
         });
       }
@@ -513,7 +511,6 @@ export class ApplicationState extends ApplicationService {
    */
   isAppVisibilityChange(state: AppStateType) {
     return ([
-      AppStateType.Launching,
       AppStateType.LosingFocus,
       AppStateType.EnteringBackground,
       AppStateType.GainingFocus,

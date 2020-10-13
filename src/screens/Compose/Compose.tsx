@@ -273,8 +273,9 @@ export const Compose = (): JSX.Element => {
         ) {
           return;
         }
-        /** hook updated only when note uuid changes
-         * to avoid running reloadComponentEditorState too often
+        /**
+         * Hook updated only when note uuid changes
+         * to avoid running reloadComponentEditorState too often.
          */
         const updatedNote = application.findItem(note.uuid) as SNNote;
         await reloadComponentEditorState(updatedNote!);

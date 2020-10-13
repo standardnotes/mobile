@@ -9,6 +9,7 @@ import {
 } from '@Screens/screens';
 import React, { useCallback, useEffect } from 'react';
 import { ApplicationEvent, ButtonType, ProtectedAction, SNNote } from 'snjs';
+import { AppStateType } from './application_state';
 import { Editor } from './editor';
 
 export const useSignedIn = (
@@ -98,30 +99,24 @@ export const useIsLocked = () => {
   const application = React.useContext(ApplicationContext);
 
   // State
-  const [isLocked, setIsLocked] = React.useState<boolean>(true);
+  const [isLocked, setIsLocked] = React.useState<boolean>(() =>
+    Boolean(application?.getAppState().locked)
+  );
 
   useEffect(() => {
     let isMounted = true;
-    const getIsLocked = async () => {
-      const locked = await application?.isLocked();
-      if (isMounted) {
-        if (locked === undefined) {
-          setIsLocked(true);
-        } else {
-          setIsLocked(Boolean(locked));
-        }
-      }
-    };
-    getIsLocked();
-    const removeSignedInObserver = application?.addEventObserver(
-      async event => {
-        if (event === ApplicationEvent.Launched) {
-          if (isMounted) {
+    const removeSignedInObserver = application
+      ?.getAppState()
+      .addStateChangeObserver(event => {
+        if (isMounted) {
+          if (event === AppStateType.Locked) {
+            setIsLocked(true);
+          }
+          if (event === AppStateType.Unlocked) {
             setIsLocked(false);
           }
         }
-      }
-    );
+      });
 
     return () => {
       isMounted = false;
