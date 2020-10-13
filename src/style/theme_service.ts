@@ -434,7 +434,9 @@ export class ThemeService {
         });
         const data = await response.text();
         let variables = CSSParser.cssToObject(data);
-
+        if (!variables || Object.keys(variables).length === 0) {
+          resolve(undefined);
+        }
         resolve(variables);
       } catch (e) {
         resolve(null);
