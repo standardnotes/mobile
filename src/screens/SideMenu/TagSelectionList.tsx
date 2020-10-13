@@ -11,7 +11,13 @@ import React, {
   useState,
 } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
-import { CollectionSort, ContentType, SNSmartTag, SNTag } from 'snjs';
+import {
+  ButtonType,
+  CollectionSort,
+  ContentType,
+  SNSmartTag,
+  SNTag,
+} from 'snjs';
 import { SideMenuCell } from './SideMenuCell';
 import { EmptyPlaceholder } from './TagSelectionList.styled';
 
@@ -94,7 +100,16 @@ export const TagSelectionList = (props: Props): JSX.Element => {
         text: 'Delete',
         destructive: true,
         callback: async () => {
-          await application!.deleteItem(tag);
+          const confirmed = await application?.alertService.confirm(
+            'Are you sure you want to delete this tag? Deleting a tag will not delete its notes.',
+            undefined,
+            'Delete',
+            ButtonType.Danger,
+            'Cancel'
+          );
+          if (confirmed) {
+            await application!.deleteItem(tag);
+          }
         },
       },
     ]);
