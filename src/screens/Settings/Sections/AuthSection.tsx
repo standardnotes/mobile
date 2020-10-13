@@ -267,8 +267,8 @@ export const AuthSection = (props: Props) => {
 
         {!showAdvanced && (
           <ButtonCell
-            testID="otherOptionsButton"
-            title="Other Options"
+            testID="advancedOptionsButton"
+            title="Advanced Options"
             onPress={() => setShowAdvanced(true)}
           />
         )}
