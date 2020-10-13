@@ -309,7 +309,6 @@ export const AuthenticatePrivileges = ({
     privilegeValue: PrivilegeLockValue,
     index: number
   ) => {
-    const first = index === 0;
     const last = index === privilegeValues.length - 1;
     const state = privilegeValueStates[index];
     const active = isInActiveState(state);
