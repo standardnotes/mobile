@@ -72,7 +72,7 @@ export const NoteCellFlags = ({
     if (note.waitingForKey) {
       flags.push({
         text: 'Waiting For Keys',
-        color: theme.stylekitInfoColor,
+        color: theme.stylekitWarningColor,
       });
     } else {
       flags.push({
