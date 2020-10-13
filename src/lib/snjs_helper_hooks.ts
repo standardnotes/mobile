@@ -313,12 +313,6 @@ export const useDeleteNoteWithPrivileges = (
       );
       return;
     }
-    if (note!.locked) {
-      application?.alertService!.alert(
-        "This note is locked. If you'd like to delete it, unlock it, and try again."
-      );
-      return;
-    }
     const confirmed = await application?.alertService?.confirm(
       message,
       title,
@@ -338,6 +332,14 @@ export const useDeleteNoteWithPrivileges = (
 
   const deleteNote = useCallback(
     async (permanently: boolean) => {
+      if (note?.locked) {
+        application?.alertService.alert(
+          "This note is locked. If you'd like to delete it, unlock it, and try again.",
+          'Note locked',
+          'OK'
+        );
+        return;
+      }
       if (
         await application?.privilegesService!.actionRequiresPrivilege(
           ProtectedAction.DeleteNote
@@ -364,7 +366,14 @@ export const useDeleteNoteWithPrivileges = (
         }
       }
     },
-    [application, deleteNotePermanently, navigation, note?.uuid, trashNote]
+    [
+      application,
+      deleteNotePermanently,
+      navigation,
+      note?.locked,
+      note?.uuid,
+      trashNote,
+    ]
   );
 
   /*

@@ -444,6 +444,14 @@ export const NoteSideMenu = (props: Props) => {
 
     const archiveOption = note.archived ? 'Unarchive' : 'Archive';
     const archiveEvent = () => {
+      if (note.locked) {
+        application?.alertService.alert(
+          "This note is locked. If you'd like to archive it, unlock it, and try again.",
+          'Note locked',
+          'OK'
+        );
+        return;
+      }
       changeNote(mutator => {
         mutator.archived = !note.archived;
       });
