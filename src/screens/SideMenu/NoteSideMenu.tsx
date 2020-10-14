@@ -121,6 +121,13 @@ export const NoteSideMenu = (props: Props) => {
     };
   }, [application]);
 
+  const reloadTags = useCallback(() => {
+    if (note) {
+      const tags = application!.getAppState().getNoteTags(note);
+      setSelectedTags(tags);
+    }
+  }, [application, note]);
+
   useEffect(() => {
     let mounted = true;
     const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
@@ -145,7 +152,7 @@ export const NoteSideMenu = (props: Props) => {
       removeEditorNoteValueChangeObserver &&
         removeEditorNoteValueChangeObserver();
     };
-  }, [editor]);
+  }, [editor, reloadTags]);
 
   useEffect(() => {
     let isMounted = true;
@@ -169,6 +176,22 @@ export const NoteSideMenu = (props: Props) => {
       removeComponentsObserver && removeComponentsObserver();
     };
   }, [application, note]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const removeTagsObserver = application?.streamItems(ContentType.Tag, () => {
+      if (!note) {
+        return;
+      }
+      if (isMounted) {
+        reloadTags();
+      }
+      return () => {
+        isMounted = false;
+        removeTagsObserver && removeTagsObserver();
+      };
+    });
+  }, [application, note, reloadTags]);
 
   const disassociateComponentWithCurrentNote = useCallback(
     async (component: SNComponent) => {
@@ -367,13 +390,6 @@ export const NoteSideMenu = (props: Props) => {
     onEditorPress,
     onEdtiorLongPress,
   ]);
-
-  const reloadTags = useCallback(() => {
-    if (note) {
-      const tags = application!.getAppState().getNoteTags(note);
-      setSelectedTags(tags);
-    }
-  }, [application, note]);
 
   useFocusEffect(
     useCallback(() => {
