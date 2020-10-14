@@ -174,8 +174,9 @@ export const useSyncStatus = () => {
   useEffect(() => {
     let mounted = true;
     const isEncryptionAvailable =
+      application!.isEncryptionAvailable() &&
       application!.getStorageEncryptionPolicy() ===
-      StorageEncryptionPolicies.Default;
+        StorageEncryptionPolicies.Default;
     if (mounted) {
       setDecrypting(!completedInitialSync && isEncryptionAvailable);
       setLoading(!completedInitialSync && !isEncryptionAvailable);
@@ -189,8 +190,9 @@ export const useSyncStatus = () => {
     const syncStatus = application!.getSyncStatus();
     const stats = syncStatus.getStats();
     const encryption =
+      application!.isEncryptionAvailable() &&
       application!.getStorageEncryptionPolicy() ===
-      StorageEncryptionPolicies.Default;
+        StorageEncryptionPolicies.Default;
     if (stats.localDataDone) {
       setStatus();
     }
