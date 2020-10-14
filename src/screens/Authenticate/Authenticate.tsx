@@ -94,6 +94,7 @@ export const Authenticate = ({
 
   // Refs
   const appState = useRef(AppState.currentState);
+  const isAuthenticatingAndroid = useRef(false);
   const firstInputRef = useRef<TextInput>(null);
   const secondInputRef = useRef<TextInput>(null);
   const thirdInputRef = useRef<TextInput>(null);
@@ -206,6 +207,7 @@ export const Authenticate = ({
           await application
             ?.getAppState()
             .performActionWithoutStateChangeImpact(async () => {
+              isAuthenticatingAndroid.current = true;
               await FingerprintScanner.authenticate({
                 // @ts-ignore ts type does not exist for deviceCredentialAllowed
                 deviceCredentialAllowed: true,
@@ -220,10 +222,9 @@ export const Authenticate = ({
           return validateChallengeValue(newChallengeValue);
         } catch (error) {
           FingerprintScanner.release();
-
           if (error.name === 'DeviceLocked') {
+            isAuthenticatingAndroid.current = false;
             onValueLocked(challengeValue);
-            FingerprintScanner.release();
             Alert.alert(
               'Unsuccessful',
               'Authentication failed. Wait 30 seconds to try again.'
@@ -380,7 +381,11 @@ export const Authenticate = ({
 
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {
-      if (appState.current.match(/background/) && nextAppState === 'active') {
+      if (
+        !isAuthenticatingAndroid.current &&
+        appState.current.match(/background/) &&
+        nextAppState === 'active'
+      ) {
         beginAuthenticatingForNextChallengeReason();
       } else {
         FingerprintScanner.release();
