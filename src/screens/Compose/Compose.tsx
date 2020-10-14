@@ -520,7 +520,7 @@ export const Compose = (): JSX.Element => {
             testID="noteContentField"
             multiline
             ref={editorViewRef}
-            autoFocus={false}
+            autoFocus={editor && editor.isTemplateNote}
             value={note?.text}
             textAlignVertical="top"
             autoCapitalize={'sentences'}
