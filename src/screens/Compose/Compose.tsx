@@ -518,7 +518,7 @@ export const Compose = (): JSX.Element => {
             testID="noteContentField"
             multiline
             ref={editorViewRef}
-            autoFocus={editor && editor.isTemplateNote}
+            autoFocus={Boolean(editor && editor.isTemplateNote)}
             value={note?.text}
             textAlignVertical="top"
             autoCapitalize={'sentences'}
