@@ -17,7 +17,7 @@ export function enableAndroidFontFix() {
   Text.render = function (...args) {
     let origin = __render.call(this, ...args);
     return React.cloneElement(origin, {
-      style: [origin.props.style, styles.text],
+      style: [styles.text, origin.props.style],
     });
   };
 }
