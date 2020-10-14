@@ -10,7 +10,6 @@ export const Container = styled.View`
 `;
 
 export const StyledTextView = styled.Text`
-  height: 90%;
   padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   padding-left: ${({ theme }) =>
