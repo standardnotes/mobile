@@ -8,7 +8,13 @@ import {
   SCREEN_NOTES,
 } from '@Screens/screens';
 import React, { useCallback, useEffect } from 'react';
-import { ApplicationEvent, ButtonType, ProtectedAction, SNNote } from 'snjs';
+import {
+  ApplicationEvent,
+  ButtonType,
+  ProtectedAction,
+  SNNote,
+  StorageEncryptionPolicies,
+} from 'snjs';
 import { LockStateType } from './application_state';
 import { Editor } from './editor';
 
@@ -167,7 +173,9 @@ export const useSyncStatus = () => {
 
   useEffect(() => {
     let mounted = true;
-    const isEncryptionAvailable = application!.isEncryptionAvailable();
+    const isEncryptionAvailable =
+      application!.getStorageEncryptionPolicy() ===
+      StorageEncryptionPolicies.Default;
     if (mounted) {
       setDecrypting(!completedInitialSync && isEncryptionAvailable);
       setLoading(!completedInitialSync && !isEncryptionAvailable);
@@ -180,7 +188,9 @@ export const useSyncStatus = () => {
   const updateLocalDataStatus = useCallback(() => {
     const syncStatus = application!.getSyncStatus();
     const stats = syncStatus.getStats();
-    const encryption = application!.isEncryptionAvailable();
+    const encryption =
+      application!.getStorageEncryptionPolicy() ===
+      StorageEncryptionPolicies.Default;
     if (stats.localDataDone) {
       setStatus();
     }
