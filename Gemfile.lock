@@ -83,7 +83,7 @@ GEM
     fastlane-plugin-bugsnag (2.0.0)
       git
       xml-simple
-    fastlane-plugin-bundletool (1.0.2)
+    fastlane-plugin-bundletool (1.0.3)
     gh_inspector (1.1.3)
     git (1.7.0)
       rchardet (~> 1.8)
