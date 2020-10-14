@@ -584,7 +584,9 @@ export const Authenticate = ({
                 autoFocus={false}
                 autoCapitalize={'none'}
                 secureTextEntry={challengeValue.prompt.secureTextEntry}
-                keyboardType={keyboardType}
+                keyboardType={
+                  challengeValue.prompt.keyboardType ?? keyboardType
+                }
                 keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
                 underlineColorAndroid={'transparent'}
                 onSubmitEditing={
