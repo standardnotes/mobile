@@ -20,7 +20,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Alert, BackHandler, Platform, TextInput } from 'react-native';
+import {
+  Alert,
+  AppState,
+  AppStateStatus,
+  BackHandler,
+  Platform,
+  TextInput,
+} from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ChallengeReason, ChallengeValidation, ChallengeValue } from 'snjs';
@@ -86,6 +93,7 @@ export const Authenticate = ({
   );
 
   // Refs
+  const appState = useRef(AppState.currentState);
   const firstInputRef = useRef<TextInput>(null);
   const secondInputRef = useRef<TextInput>(null);
   const thirdInputRef = useRef<TextInput>(null);
@@ -369,20 +377,27 @@ export const Authenticate = ({
       state: AuthenticationValueStateType.Fail,
     });
   };
-  useEffect(() => {
-    const removeAppStateSubscriber = application
-      ?.getAppState()
-      .addStateChangeObserver(state => {
-        if (state === AppStateType.ResumingFromBackground) {
-          beginAuthenticatingForNextChallengeReason();
-        }
-        if (state === AppStateType.EnteringBackground) {
-          FingerprintScanner.release();
-        }
-      });
 
-    return removeAppStateSubscriber;
-  }, [application, beginAuthenticatingForNextChallengeReason]);
+  const handleAppStateChange = useCallback(
+    (nextAppState: AppStateStatus) => {
+      if (appState.current.match(/background/) && nextAppState === 'active') {
+        beginAuthenticatingForNextChallengeReason();
+      } else {
+        FingerprintScanner.release();
+      }
+
+      appState.current = nextAppState;
+    },
+    [beginAuthenticatingForNextChallengeReason]
+  );
+
+  useEffect(() => {
+    AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      AppState.removeEventListener('change', handleAppStateChange);
+    };
+  }, [handleAppStateChange]);
 
   useEffect(() => {
     let removeObserver: () => void = () => {};
@@ -526,7 +541,8 @@ export const Authenticate = ({
           buttonText={
             challengeValue.prompt.validation ===
               ChallengeValidation.LocalPasscode &&
-            state === AuthenticationValueStateType.WaitingInput
+            (state === AuthenticationValueStateType.WaitingInput ||
+              state === AuthenticationValueStateType.Fail)
               ? 'Change Keyboard'
               : undefined
           }

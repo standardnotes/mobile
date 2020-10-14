@@ -370,8 +370,12 @@ export class ThemeService {
     const updatedTheme = this.buildTheme(theme);
     this.addTheme(updatedTheme);
     this.variables = updatedTheme.mobileContent.variables;
-    (this.application
-      .componentManager as ComponentManager).setMobileActiveTheme(updatedTheme);
+    if (this.application.isLaunched() && this.application.componentManager) {
+      (this.application
+        .componentManager as ComponentManager).setMobileActiveTheme(
+        updatedTheme
+      );
+    }
     this.activeThemeId = themeId;
     this.updateDeviceForTheme(themeId);
     this.notifyObserversOfThemeChange();

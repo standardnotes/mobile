@@ -37,12 +37,15 @@ export enum AppStateType {
   LosingFocus = 1,
   EnteringBackground = 2,
   GainingFocus = 3,
-  ResumingFromBackground = 6,
-  Locked = 7,
-  Unlocked = 8,
-  TagChanged = 9,
-  EditorClosed = 11,
-  PreferencesChanged = 12,
+  ResumingFromBackground = 4,
+  TagChanged = 5,
+  EditorClosed = 6,
+  PreferencesChanged = 7,
+}
+
+export enum LockStateType {
+  Locked = 1,
+  Unlocked = 2,
 }
 
 export enum AppStateEventType {
@@ -78,11 +81,13 @@ type ObserverCallback = (
   event: AppStateType,
   data?: any
 ) => void | Promise<void>;
+type LockStateObserverCallback = (event: LockStateType) => void | Promise<void>;
 
 export class ApplicationState extends ApplicationService {
   application: MobileApplication;
   observers: ObserverCallback[] = [];
   private stateObservers: EventObserverCallback[] = [];
+  private lockStateObservers: LockStateObserverCallback[] = [];
   locked = true;
   keyboardDidShowListener?: EmitterSubscription;
   keyboardDidHideListener?: EmitterSubscription;
@@ -151,6 +156,17 @@ export class ApplicationState extends ApplicationService {
   }
 
   /**
+   * Registers an observer for lock state change
+   * @returns function that unregisters this observer
+   */
+  public addLockStateChangeObserver(callback: LockStateObserverCallback) {
+    this.lockStateObservers.push(callback);
+    return () => {
+      removeFromArray(this.lockStateObservers, callback);
+    };
+  }
+
+  /**
    * Registers an observer for App State Event change
    * @returns function that unregisters this observer
    */
@@ -165,11 +181,7 @@ export class ApplicationState extends ApplicationService {
    * Notify observers of ApplicationState change
    */
   private notifyOfStateChange(state: AppStateType, data?: any) {
-    if (
-      this.ignoreStateChanges &&
-      state !== AppStateType.Locked &&
-      state !== AppStateType.Unlocked
-    ) {
+    if (this.ignoreStateChanges) {
       return;
     }
 
@@ -190,6 +202,15 @@ export class ApplicationState extends ApplicationService {
   ) {
     for (const observer of this.stateObservers) {
       observer(event, data);
+    }
+  }
+
+  /**
+   * Notify observers of ApplicationState Events
+   */
+  private notifyLockStateObservers(event: LockStateType) {
+    for (const observer of this.lockStateObservers) {
+      observer(event);
     }
   }
 
@@ -334,7 +355,7 @@ export class ApplicationState extends ApplicationService {
           this.locked = true;
         } else if (eventName === ApplicationEvent.Launched) {
           this.locked = false;
-          this.notifyOfStateChange(AppStateType.Unlocked);
+          this.notifyLockStateObservers(LockStateType.Unlocked);
         }
       }
     );
@@ -454,11 +475,11 @@ export class ApplicationState extends ApplicationService {
         this.application.promptForCustomChallenge(challenge);
 
         this.locked = true;
-        this.notifyOfStateChange(AppStateType.Locked);
+        this.notifyLockStateObservers(LockStateType.Locked);
         this.application.addChallengeObserver(challenge, {
           onComplete: () => {
             this.locked = false;
-            this.notifyOfStateChange(AppStateType.Unlocked);
+            this.notifyLockStateObservers(LockStateType.Unlocked);
           },
         });
       }

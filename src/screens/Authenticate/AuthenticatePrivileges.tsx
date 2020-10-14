@@ -332,7 +332,8 @@ export const AuthenticatePrivileges = ({
           tinted={active}
           buttonText={
             privilegeValue.type === PrivilegeCredential.LocalPasscode &&
-            state === AuthenticationValueStateType.WaitingInput
+            (state === AuthenticationValueStateType.WaitingInput ||
+              state === AuthenticationValueStateType.Fail)
               ? 'Change Keyboard'
               : undefined
           }

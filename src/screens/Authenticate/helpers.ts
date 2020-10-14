@@ -159,7 +159,7 @@ export const getLabelForStateAndType = (
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
         case AuthenticationValueStateType.WaitingInput:
-          return 'Please use biometrics to unlock.';
+          return 'Press here to begin biometrics scan.';
         case AuthenticationValueStateType.Pending:
           return 'Waiting for unlock.';
         case AuthenticationValueStateType.Success:

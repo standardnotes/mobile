@@ -9,7 +9,7 @@ import {
 } from '@Screens/screens';
 import React, { useCallback, useEffect } from 'react';
 import { ApplicationEvent, ButtonType, ProtectedAction, SNNote } from 'snjs';
-import { AppStateType } from './application_state';
+import { LockStateType } from './application_state';
 import { Editor } from './editor';
 
 export const useSignedIn = (
@@ -107,12 +107,12 @@ export const useIsLocked = () => {
     let isMounted = true;
     const removeSignedInObserver = application
       ?.getAppState()
-      .addStateChangeObserver(event => {
+      .addLockStateChangeObserver(event => {
         if (isMounted) {
-          if (event === AppStateType.Locked) {
+          if (event === LockStateType.Locked) {
             setIsLocked(true);
           }
-          if (event === AppStateType.Unlocked) {
+          if (event === LockStateType.Unlocked) {
             setIsLocked(false);
           }
         }
