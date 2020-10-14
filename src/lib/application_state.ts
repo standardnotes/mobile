@@ -597,10 +597,15 @@ export class ApplicationState extends ApplicationService {
   This is useful on Android when you present a share sheet and dont want immediate authentication to appear.
   */
   async performActionWithoutStateChangeImpact(
-    block: () => void | Promise<void>
+    block: () => void | Promise<void>,
+    notAwaited?: boolean
   ) {
     this.ignoreStateChanges = true;
-    await block();
+    if (notAwaited) {
+      block();
+    } else {
+      await block();
+    }
     setTimeout(() => {
       this.ignoreStateChanges = false;
     }, 350);

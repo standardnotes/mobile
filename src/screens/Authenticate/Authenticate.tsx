@@ -20,14 +20,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  Alert,
-  AppState,
-  AppStateStatus,
-  BackHandler,
-  Platform,
-  TextInput,
-} from 'react-native';
+import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ChallengeReason, ChallengeValidation, ChallengeValue } from 'snjs';
@@ -93,7 +86,6 @@ export const Authenticate = ({
   );
 
   // Refs
-  const appState = useRef(AppState.currentState);
   const isAuthenticatingAndroid = useRef(false);
   const firstInputRef = useRef<TextInput>(null);
   const secondInputRef = useRef<TextInput>(null);
@@ -202,79 +194,86 @@ export const Authenticate = ({
         return;
       }
 
+      dispatch({
+        type: 'setState',
+        id: challengeValue.prompt.id.toString(),
+        state: AuthenticationValueStateType.Pending,
+      });
+
       if (Platform.OS === 'android') {
-        try {
-          await application
-            ?.getAppState()
-            .performActionWithoutStateChangeImpact(async () => {
-              isAuthenticatingAndroid.current = true;
-              await FingerprintScanner.authenticate({
-                // @ts-ignore ts type does not exist for deviceCredentialAllowed
-                deviceCredentialAllowed: true,
-                description: 'Biometrics are required to access your notes.',
+        await application
+          ?.getAppState()
+          .performActionWithoutStateChangeImpact(async () => {
+            isAuthenticatingAndroid.current = true;
+            FingerprintScanner.authenticate({
+              // @ts-ignore ts type does not exist for deviceCredentialAllowed
+              deviceCredentialAllowed: true,
+              description: 'Biometrics are required to access your notes.',
+            })
+              .then(() => {
+                FingerprintScanner.release();
+                const newChallengeValue = { ...challengeValue, value: true };
+
+                onValueChange(newChallengeValue);
+                return validateChallengeValue(newChallengeValue);
+              })
+              .catch(error => {
+                FingerprintScanner.release();
+                if (error.name === 'DeviceLocked') {
+                  isAuthenticatingAndroid.current = false;
+                  onValueLocked(challengeValue);
+                  Alert.alert(
+                    'Unsuccessful',
+                    'Authentication failed. Wait 30 seconds to try again.'
+                  );
+                } else {
+                  dispatch({
+                    type: 'setState',
+                    id: challengeValue.prompt.id.toString(),
+                    state: AuthenticationValueStateType.Fail,
+                  });
+                  Alert.alert(
+                    'Unsuccessful',
+                    'Authentication failed. Tap to try again.'
+                  );
+                }
               });
-            });
-
-          FingerprintScanner.release();
-          const newChallengeValue = { ...challengeValue, value: true };
-
-          onValueChange(newChallengeValue);
-          return validateChallengeValue(newChallengeValue);
-        } catch (error) {
-          FingerprintScanner.release();
-          if (error.name === 'DeviceLocked') {
-            isAuthenticatingAndroid.current = false;
-            onValueLocked(challengeValue);
-            Alert.alert(
-              'Unsuccessful',
-              'Authentication failed. Wait 30 seconds to try again.'
-            );
-          } else {
-            dispatch({
-              type: 'setState',
-              id: challengeValue.prompt.id.toString(),
-              state: AuthenticationValueStateType.Fail,
-            });
-            Alert.alert(
-              'Unsuccessful',
-              'Authentication failed. Tap to try again.'
-            );
-          }
-        }
+          }, true);
       } else {
         // iOS
-        try {
-          await application
-            ?.getAppState()
-            .performActionWithoutStateChangeImpact(async () => {
-              await FingerprintScanner.authenticate({
-                fallbackEnabled: true,
-                description: 'This is required to access your notes.',
+        await application
+          ?.getAppState()
+          .performActionWithoutStateChangeImpact(async () => {
+            FingerprintScanner.authenticate({
+              fallbackEnabled: true,
+              description: 'This is required to access your notes.',
+            })
+              .then(() => {
+                FingerprintScanner.release();
+                const newChallengeValue = { ...challengeValue, value: true };
+                onValueChange(newChallengeValue);
+                return validateChallengeValue(newChallengeValue);
+              })
+              .catch(error_1 => {
+                onValueChange({ ...challengeValue, value: false });
+                FingerprintScanner.release();
+                if (error_1.name !== 'SystemCancel') {
+                  if (error_1.name !== 'UserCancel') {
+                    Alert.alert('Unsuccessful');
+                  } else {
+                    Alert.alert(
+                      'Unsuccessful',
+                      'Authentication failed. Tap to try again.'
+                    );
+                  }
+                }
+                dispatch({
+                  type: 'setState',
+                  id: challengeValue.prompt.id.toString(),
+                  state: AuthenticationValueStateType.Fail,
+                });
               });
-            });
-          FingerprintScanner.release();
-          const newChallengeValue = { ...challengeValue, value: true };
-          onValueChange(newChallengeValue);
-          return validateChallengeValue(newChallengeValue);
-        } catch (error_1) {
-          onValueChange({ ...challengeValue, value: false });
-          FingerprintScanner.release();
-          if (error_1.name !== 'SystemCancel') {
-            if (error_1.name !== 'UserCancel') {
-              Alert.alert('Unsuccessful');
-            } else {
-              Alert.alert(
-                'Unsuccessful',
-                'Authentication failed. Tap to try again.'
-              );
-            }
-          }
-          dispatch({
-            type: 'setState',
-            id: challengeValue.prompt.id.toString(),
-            state: AuthenticationValueStateType.Fail,
-          });
-        }
+          }, true);
       }
     },
     [
@@ -359,6 +358,29 @@ export const Authenticate = ({
     [application, authenticateBiometrics, challengeValues, firstNotSuccessful]
   );
 
+  useEffect(() => {
+    const remove = application?.getAppState().addStateChangeObserver(state => {
+      if (state === AppStateType.ResumingFromBackground) {
+        if (!isAuthenticatingAndroid.current) {
+          beginAuthenticatingForNextChallengeReason();
+        }
+      } else if (state === AppStateType.EnteringBackground) {
+        dispatch({
+          type: 'setState',
+          id: firstNotSuccessful!,
+          state: AuthenticationValueStateType.WaitingInput,
+        });
+        FingerprintScanner.release();
+      }
+    });
+    return remove;
+  }, [
+    application,
+    beginAuthenticatingForNextChallengeReason,
+    challengeValueStates,
+    firstNotSuccessful,
+  ]);
+
   const onValidValue = useCallback(
     (value: ChallengeValue) => {
       dispatch({
@@ -378,31 +400,6 @@ export const Authenticate = ({
       state: AuthenticationValueStateType.Fail,
     });
   };
-
-  const handleAppStateChange = useCallback(
-    (nextAppState: AppStateStatus) => {
-      if (
-        !isAuthenticatingAndroid.current &&
-        appState.current.match(/background/) &&
-        nextAppState === 'active'
-      ) {
-        beginAuthenticatingForNextChallengeReason();
-      } else {
-        FingerprintScanner.release();
-      }
-
-      appState.current = nextAppState;
-    },
-    [beginAuthenticatingForNextChallengeReason]
-  );
-
-  useEffect(() => {
-    AppState.addEventListener('change', handleAppStateChange);
-
-    return () => {
-      AppState.removeEventListener('change', handleAppStateChange);
-    };
-  }, [handleAppStateChange]);
 
   useEffect(() => {
     let removeObserver: () => void = () => {};
@@ -487,6 +484,9 @@ export const Authenticate = ({
 
   const onSubmitPress = () => {
     const challengeValue = challengeValues[firstNotSuccessful!];
+    if (!challengeValue.value) {
+      return;
+    }
     if (singleValidation) {
       validateChallengeValue(challengeValue);
     } else {
