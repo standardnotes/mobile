@@ -144,9 +144,7 @@ export const NoteCell = ({
         callback: () => {
           if (note.locked) {
             application?.alertService.alert(
-              "This note is locked. If you'd like to archive it, unlock it, and try again.",
-              'Note locked',
-              'OK'
+              "This note is locked. If you'd like to archive it, unlock it, and try again."
             );
             return;
           }

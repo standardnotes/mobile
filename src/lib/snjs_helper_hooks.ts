@@ -308,8 +308,7 @@ export const useDeleteNoteWithPrivileges = (
       message,
       title,
       'Confirm',
-      ButtonType.Danger,
-      'Cancel'
+      ButtonType.Danger
     );
     if (confirmed) {
       onTrashCallback();
@@ -346,9 +345,7 @@ export const useDeleteNoteWithPrivileges = (
     async (permanently: boolean) => {
       if (note?.locked) {
         application?.alertService.alert(
-          "This note is locked. If you'd like to delete it, unlock it, and try again.",
-          'Note locked',
-          'OK'
+          "This note is locked. If you'd like to delete it, unlock it, and try again."
         );
         return;
       }

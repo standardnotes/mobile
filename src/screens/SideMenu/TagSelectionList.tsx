@@ -104,8 +104,7 @@ export const TagSelectionList = (props: Props): JSX.Element => {
             'Are you sure you want to delete this tag? Deleting a tag will not delete its notes.',
             undefined,
             'Delete',
-            ButtonType.Danger,
-            'Cancel'
+            ButtonType.Danger
           );
           if (confirmed) {
             await application!.deleteItem(tag);

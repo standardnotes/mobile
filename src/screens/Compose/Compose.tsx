@@ -427,9 +427,7 @@ export const Compose = (): JSX.Element => {
     (newNoteText: string) => {
       if (Platform.OS === 'android' && note?.locked) {
         application?.alertService?.alert(
-          'This note is locked. Please unlock this note to make changes.',
-          'Note Locked',
-          'OK'
+          'This note is locked. Please unlock this note to make changes.'
         );
         return;
       }
