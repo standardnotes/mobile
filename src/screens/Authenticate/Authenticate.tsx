@@ -603,7 +603,7 @@ export const Authenticate = ({
         {challengeValue.prompt.validation === ChallengeValidation.Biometric && (
           <SectionContainer last={last}>
             <SectionedAccessoryTableCell
-              first={first}
+              first={true}
               dimmed={active}
               tinted={active}
               text={stateLabel}
