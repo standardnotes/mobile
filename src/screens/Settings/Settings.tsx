@@ -43,7 +43,7 @@ export const Settings = (props: Props) => {
     props.navigation.goBack();
   }, [props.navigation]);
 
-  const signedIn = useSignedIn(goBack);
+  const [signedIn] = useSignedIn(goBack);
 
   return (
     <Container

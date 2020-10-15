@@ -49,7 +49,7 @@ export const Notes = ({
    * Update sync status
    */
   const [loading, decrypting, refreshing, startRefreshing] = useSyncStatus();
-  const signedIn = useSignedIn();
+  const [signedIn] = useSignedIn();
 
   // State
   const [sortBy, setSortBy] = useState<CollectionSort>(() =>

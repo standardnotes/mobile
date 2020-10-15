@@ -1,9 +1,9 @@
 import { Circle } from '@Components/Circle';
-import { useOutOfSync, useSignedIn } from '@Lib/snjs_helper_hooks';
+import { useIsLocked, useOutOfSync, useSignedIn } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ViewProps } from 'react-native';
-import { ApplicationEvent, ContentType } from 'snjs';
+import { ContentType } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   Cell,
@@ -27,9 +27,9 @@ export const SideMenuHero: React.FC<Props> = props => {
   const theme = useContext(ThemeContext);
 
   // State
-  const signedIn = useSignedIn();
-  const [isLocked, setIsLocked] = React.useState<boolean>(true);
-  const isOutOfSync = useOutOfSync();
+  const [signedIn] = useSignedIn();
+  const [isLocked] = useIsLocked();
+  const [isOutOfSync] = useOutOfSync();
   const [itemsLength, setItemsLength] = useState(0);
 
   useEffect(() => {
@@ -44,40 +44,6 @@ export const SideMenuHero: React.FC<Props> = props => {
 
     return removeStreamItems;
   }, [application, itemsLength]);
-
-  useEffect(() => {
-    let mounted = true;
-    const getIsLocked = async () => {
-      const locked = await application?.isLocked();
-      if (mounted) {
-        if (locked === undefined) {
-          setIsLocked(true);
-        } else {
-          setIsLocked(Boolean(locked));
-        }
-      }
-    };
-
-    const removeSignedInObserver = application?.addEventObserver(
-      async event => {
-        if (
-          event === ApplicationEvent.Launched ||
-          event === ApplicationEvent.SignedIn ||
-          event === ApplicationEvent.WillSync
-        ) {
-          setIsLocked(false);
-        }
-        if (event === ApplicationEvent.SignedOut) {
-          getIsLocked();
-        }
-      }
-    );
-
-    return () => {
-      mounted = false;
-      removeSignedInObserver && removeSignedInObserver();
-    };
-  }, [application]);
 
   const textData = useMemo(() => {
     const hasEncryption = application?.isEncryptionAvailable();

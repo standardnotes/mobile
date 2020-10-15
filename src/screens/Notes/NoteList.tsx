@@ -50,7 +50,7 @@ type Props = {
 
 export const NoteList = (props: Props): JSX.Element => {
   // Context
-  const signedIn = useSignedIn();
+  const [signedIn] = useSignedIn();
   const application = useContext(ApplicationContext);
   const themeService = useContext(ThemeServiceContext);
   const theme = useContext(ThemeContext);

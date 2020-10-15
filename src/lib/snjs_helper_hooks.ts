@@ -25,7 +25,7 @@ export const useSignedIn = (
   // Context
   const application = React.useContext(ApplicationContext);
 
-  const isLocked = useIsLocked();
+  const [isLocked] = useIsLocked();
 
   // State
   const [signedIn, setSignedIn] = React.useState(false);
@@ -59,7 +59,7 @@ export const useSignedIn = (
     };
   }, [application, signedInCallback, signedOutCallback, isLocked]);
 
-  return signedIn;
+  return [signedIn];
 };
 
 export const useOutOfSync = () => {
@@ -97,7 +97,7 @@ export const useOutOfSync = () => {
     return removeSignedInObserver;
   }, [application]);
 
-  return outOfSync;
+  return [outOfSync];
 };
 
 export const useIsLocked = () => {
@@ -130,7 +130,7 @@ export const useIsLocked = () => {
     };
   }, [application]);
 
-  return isLocked;
+  return [isLocked];
 };
 
 export const useHasEditor = () => {

@@ -19,7 +19,7 @@ type Props = {
 export const EncryptionSection = (props: Props) => {
   // Context
   const application = useContext(ApplicationContext);
-  const isLocked = useIsLocked();
+  const [isLocked] = useIsLocked();
 
   // State
   const [protocolDisplayName, setProtocolDisplayName] = useState('');

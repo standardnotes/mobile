@@ -60,7 +60,7 @@ export const AppStackComponent = (
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
-  const isLocked = useIsLocked();
+  const [isLocked] = useIsLocked();
   const [hasEditor] = useHasEditor();
 
   // State

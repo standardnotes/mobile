@@ -26,7 +26,7 @@ type Props = {
 export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
-  const signedIn = useSignedIn();
+  const [signedIn] = useSignedIn();
   const navigation = useNavigation<
     ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
   >();

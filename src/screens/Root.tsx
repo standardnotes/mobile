@@ -25,7 +25,7 @@ export const Root = (): JSX.Element | null => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
-  const isLocked = useIsLocked();
+  const [isLocked] = useIsLocked();
 
   // State
   const [, setWidth] = useState<number | undefined>(undefined);
