@@ -128,7 +128,8 @@ export const Authenticate = ({
 
         if (
           state === AuthenticationValueStateType.Locked ||
-          state === AuthenticationValueStateType.Success
+          state === AuthenticationValueStateType.Success ||
+          !challengeValue.value
         ) {
           return;
         }
@@ -524,7 +525,6 @@ export const Authenticate = ({
     challengeValue: ChallengeValue,
     index: number
   ) => {
-    const first = index === 0;
     const last = index === Object.keys(challengeValues).length - 1;
     const state = challengeValueStates[challengeValue.prompt.id];
     const active = isInActiveState(state);
