@@ -512,7 +512,7 @@ export const NoteSideMenu = (props: Props) => {
       { text: lockOption, onSelect: lockEvent, icon: ICON_LOCK },
       { text: protectOption, onSelect: protectEvent, icon: ICON_FINGER_PRINT },
       {
-        text: 'Show History',
+        text: 'History',
         onSelect: openSessionHistory,
         icon: ICON_HISTORY,
       },
