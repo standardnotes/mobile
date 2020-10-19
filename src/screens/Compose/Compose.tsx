@@ -1,5 +1,6 @@
 import { AppStateEventType } from '@Lib/application_state';
 import { Editor } from '@Lib/editor';
+import { isNullOrUndefined } from '@Lib/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
@@ -512,22 +513,21 @@ export const Compose = (): JSX.Element => {
           }}
         />
       )}
-      {!shouldDisplayEditor && Platform.OS === 'android' && (
-        <TextContainer>
-          <StyledTextView
-            testID="noteContentField"
-            multiline
-            ref={editorViewRef}
-            autoFocus={Boolean(editor && editor.isTemplateNote)}
-            value={note?.text}
-            textAlignVertical="top"
-            autoCapitalize={'sentences'}
-            selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
-            handlesColor={theme.stylekitInfoColor}
-            onChangeText={onContentChange}
-          />
-        </TextContainer>
-      )}
+      {!shouldDisplayEditor &&
+        !isNullOrUndefined(note) &&
+        Platform.OS === 'android' && (
+          <TextContainer>
+            <StyledTextView
+              testID="noteContentField"
+              ref={editorViewRef}
+              autoFocus={Boolean(editor && editor.isTemplateNote)}
+              value={note?.text}
+              selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
+              handlesColor={theme.stylekitInfoColor}
+              onChangeText={onContentChange}
+            />
+          </TextContainer>
+        )}
       {/* Empty wrapping view fixes native textview crashing */}
       {!shouldDisplayEditor && Platform.OS === 'ios' && (
         <View key={note?.uuid}>

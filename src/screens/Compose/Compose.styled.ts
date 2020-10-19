@@ -90,7 +90,6 @@ export const StyledKeyboardAvoidngView = styled.KeyboardAvoidingView`
 `;
 
 export const StyledTextView = styled(SNTextView)`
-  height: 96%;
   padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   padding-left: ${({ theme }) =>
@@ -101,6 +100,11 @@ export const StyledTextView = styled(SNTextView)`
   ${Platform.OS === 'ios' &&
   css`
     font-size: 17px;
+    height: 96%;
+  `}
+  ${Platform.OS === 'android' &&
+  css`
+    flex: 1;
   `}
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   /* ${Platform.OS === 'ios' && 'padding-bottom: 10px'}; */
