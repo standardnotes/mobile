@@ -1296,10 +1296,10 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.10.tgz#5dda643e19e587793bc2034dd9bf7398ad43d401"
   integrity sha512-rk4sWFsmtOw8oyx8SD3KSvawwaK7gRBSEIy2TAwURyGt+3TizssXP1r8nx3zY+R7v2vYYHXZ+k2/GULAT/bcaQ==
 
-"@react-native-community/segmented-control@^2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@react-native-community/segmented-control/-/segmented-control-2.1.2.tgz#13dd38a2f1972f7c9061f74b9e8e9fd35cbfa6a8"
-  integrity sha512-2UEr+Dqk+VHcMaZPOcKSo0GqFZG91DjngeACy+DOB2gRvph/FGKjABV6HlQJqdhQeQs/4NgoycCjAH+Z8ilIVg==
+"@react-native-community/segmented-control@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/segmented-control/-/segmented-control-2.2.0.tgz#be961036c4383359035b0aeb3603ac5fb186a236"
+  integrity sha512-y0VCahoVNNh8SWpIb9t01w/aHB0HdYscUkbY0KNdBlCELwvLVsF3sR3jjAjLM1jtoEbLxQkeK276yZo+PRr22g==
 
 "@react-navigation/core@^5.12.5":
   version "5.12.5"
@@ -6562,11 +6562,6 @@ react-native-mail@standardnotes/react-native-mail#f7f74be:
   version "4.1.0"
   resolved "https://codeload.github.com/standardnotes/react-native-mail/tar.gz/f7f74be22edef77bef6901ca2e2cd4eddc15bbc0"
 
-react-native-platform-touchable@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/react-native-platform-touchable/-/react-native-platform-touchable-1.1.1.tgz#fde4acc65eea585d28b164d0c3716a42129a68e4"
-  integrity sha1-/eSsxl7qWF0osWTQw3FqQhKaaOQ=
-
 react-native-privacy-snapshot@standardnotes/react-native-privacy-snapshot#653e904:
   version "1.0.0"
   resolved "https://codeload.github.com/standardnotes/react-native-privacy-snapshot/tar.gz/653e904c90fc6f2b578da59138f2bfe5d7f942fe"
@@ -6678,13 +6673,12 @@ react-native@0.62.2:
     use-subscription "^1.0.0"
     whatwg-fetch "^3.0.0"
 
-react-navigation-header-buttons@^5.0.2:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/react-navigation-header-buttons/-/react-navigation-header-buttons-5.0.2.tgz#e2701dc1d27637b73ab458033ee7c0f49992bf82"
-  integrity sha512-tr23aMc/Aakrp8J8+Py6qCg2gPqr+XtBLDuv0+CFdU521ersA4q0vLJjGtYTzP9Lg+bKhR29foWizK1Xl9ft+g==
+react-navigation-header-buttons@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/react-navigation-header-buttons/-/react-navigation-header-buttons-6.0.0.tgz#6e58d58b8aa6e2d058729ca8dad52c5ee5742f47"
+  integrity sha512-m9pbT7dpi0PWqInhepIovkyYatb08Oz4l9zDx6Qt43QqO/jPRhIHtS15NNGziam+XiAn/9gHyOTKe3Fsh0BqYA==
   dependencies:
     invariant ">=2"
-    react-native-platform-touchable "^1.1.1"
 
 react-refresh@^0.4.0:
   version "0.4.3"
