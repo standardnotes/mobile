@@ -54,7 +54,7 @@
     "react-navigation-header-buttons": "^6.0.0",
     "sn-textview": "standardnotes/sn-textview#440dbd60eedef4397b6272735e68d4579bb41ac8",
     "sncrypto": "standardnotes/sncrypto#5f8cd36",
-    "snjs": "standardnotes/snjs#93aa1eb0693bbebd8f0a52acc9067b7bdc18a6f6",
+    "snjs": "standardnotes/snjs#7d34b729ab4c45b82b711c3e1a91da63ab78aee4",
     "standard-notes-rn": "standardnotes/standard-notes-rn#996b016",
     "styled-components": "^5.2.0"
   },
