@@ -12,6 +12,8 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +22,7 @@ import com.bugsnag.android.Bugsnag;
 import com.facebook.react.modules.network.OkHttpClientProvider;
 
 import android.annotation.SuppressLint;
+import android.database.CursorWindow;
 import android.os.Bundle;
 import android.view.WindowManager;
 
@@ -79,6 +82,19 @@ public class MainApplication extends Application implements ReactApplication {
     SoLoader.init(this, /* native exopackage */ false);
 
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+
+    try {
+      /*
+       * This attempts to fix an error when loading big items fails so we try to change it to 10MB.
+       * This API is only available from API 28 so it might fail on older devices.
+       * Row too big to fit into CursorWindow requiredPos=0, totalRows=1
+       */
+      Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
+      field.setAccessible(true);
+      field.set(null, 10 * 1024 * 1024);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
       @Override

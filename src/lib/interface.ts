@@ -24,6 +24,21 @@ const isLegacyIdentifier = function (identifier: ApplicationIdentifier) {
   return identifier && identifier === LEGACY_IDENTIFIER;
 };
 
+const showLoadFailForItemIds = (failedItemIds: string[]) => {
+  let text =
+    'The following items could not be loaded. This may happen if you are in low-memory conditions, or if the note is very large in size. We recommend breaking up large notes into smaller chunks using the desktop or web app.\n\nItems:\n';
+  let index = 0;
+  text += failedItemIds.map(id => {
+    let result = id;
+    if (index !== failedItemIds.length - 1) {
+      result += '\n';
+    }
+    index++;
+    return result;
+  });
+  Alert.alert('Unable to load item(s)', text);
+};
+
 export class MobileDeviceInterface extends DeviceInterface {
   constructor() {
     super(setTimeout, setInterval);
@@ -83,6 +98,7 @@ export class MobileDeviceInterface extends DeviceInterface {
   private async getDatabaseKeyValues(keys: string[]) {
     const results: unknown[] = [];
     if (Platform.OS === 'android') {
+      const failedItemIds: string[] = [];
       for (const key of keys) {
         try {
           const item = await AsyncStorage.getItem(key);
@@ -95,7 +111,11 @@ export class MobileDeviceInterface extends DeviceInterface {
           }
         } catch (e) {
           console.error('Error getting item', key, e);
+          failedItemIds.push(key);
         }
+      }
+      if (failedItemIds.length > 0) {
+        showLoadFailForItemIds(failedItemIds);
       }
     } else {
       try {
