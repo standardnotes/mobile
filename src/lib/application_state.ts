@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/react-native';
 import {
   AppState,
   AppStateStatus,
@@ -140,6 +141,9 @@ export class ApplicationState extends ApplicationService {
   }
 
   async onAppLaunch() {
+    if (__DEV__ === false) {
+      this.setUserIdForBugsnag();
+    }
     await this.getUnlockTiming();
     this.setScreenshotPrivacy();
   }
@@ -256,6 +260,19 @@ export class ApplicationState extends ApplicationService {
       this.application.editorGroup.createEditor(noteUuid);
     } else {
       activeEditor.setNote(note);
+    }
+  }
+
+  setUserIdForBugsnag() {
+    if (this.application.hasAccount()) {
+      try {
+        const user = this.application.getUser();
+        if (user && user.uuid) {
+          Bugsnag.setUser(user.uuid);
+        }
+      } catch (e) {
+        console.warn('cannot read user');
+      }
     }
   }
 
