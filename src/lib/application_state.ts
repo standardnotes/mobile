@@ -373,6 +373,13 @@ export class ApplicationState extends ApplicationService {
         } else if (eventName === ApplicationEvent.Launched) {
           this.locked = false;
           this.notifyLockStateObservers(LockStateType.Unlocked);
+        } else if (eventName === ApplicationEvent.SignedIn) {
+          this.setUserIdForBugsnag();
+        } else if (eventName === ApplicationEvent.SignedOut) {
+          /**
+           * Reset user after sign out
+           */
+          Bugsnag.setUser();
         }
       }
     );
