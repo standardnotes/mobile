@@ -84,6 +84,7 @@ export const Authenticate = ({
     },
     undefined
   );
+  const [pending, setPending] = useState(false);
 
   // Refs
   const isAuthenticatingAndroid = useRef(false);
@@ -119,6 +120,7 @@ export const Authenticate = ({
   const validateChallengeValue = useCallback(
     async (challengeValue: ChallengeValue) => {
       if (singleValidation) {
+        setPending(true);
         return application?.submitValuesForChallenge(
           challenge,
           Object.values(challengeValues)
@@ -384,6 +386,7 @@ export const Authenticate = ({
 
   const onValidValue = useCallback(
     (value: ChallengeValue) => {
+      setPending(false);
       dispatch({
         type: 'setState',
         id: value.prompt.id.toString(),
@@ -395,6 +398,7 @@ export const Authenticate = ({
   );
 
   const onInvalidValue = (value: ChallengeValue) => {
+    setPending(true);
     dispatch({
       type: 'setState',
       id: value.prompt.id.toString(),
@@ -640,7 +644,7 @@ export const Authenticate = ({
       )}
       <ButtonCell
         maxHeight={45}
-        disabled={singleValidation ? !readyToSubmit : isPending}
+        disabled={singleValidation ? !readyToSubmit || pending : isPending}
         title={
           singleValidation ||
           (!!firstNotSuccessful &&
