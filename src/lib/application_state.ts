@@ -141,9 +141,7 @@ export class ApplicationState extends ApplicationService {
   }
 
   async onAppLaunch() {
-    if (__DEV__ === false) {
-      this.setUserIdForBugsnag();
-    }
+    this.setUserIdForBugsnag();
     await this.getUnlockTiming();
     this.setScreenshotPrivacy();
   }
@@ -264,7 +262,7 @@ export class ApplicationState extends ApplicationService {
   }
 
   setUserIdForBugsnag() {
-    if (this.application.hasAccount()) {
+    if (!__DEV__ && this.application.hasAccount()) {
       try {
         const user = this.application.getUser();
         if (user && user.uuid) {
@@ -379,7 +377,9 @@ export class ApplicationState extends ApplicationService {
           /**
            * Reset user after sign out
            */
-          Bugsnag.setUser();
+          if (__DEV__ === false) {
+            Bugsnag.setUser();
+          }
         }
       }
     );

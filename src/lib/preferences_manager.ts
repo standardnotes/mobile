@@ -6,6 +6,7 @@ export enum PrefKey {
   SortNotesReverse = 'sortReverse',
   NotesHideNotePreview = 'hideNotePreview',
   NotesHideDate = 'hideDate',
+  NotesHideTags = 'hideTags',
   LastExportDate = 'lastExportDate',
   DoNotShowAgainUnsupportedEditors = 'doNotShowAgainUnsupportedEditors',
 }
@@ -21,7 +22,7 @@ export class PreferencesManager extends ApplicationService {
   /** @override */
   async onAppLaunch() {
     super.onAppLaunch();
-    this.loadSingleton();
+    this.loadPreferences();
   }
 
   deinit() {
@@ -32,7 +33,7 @@ export class PreferencesManager extends ApplicationService {
     return this.application as MobileApplication;
   }
 
-  private async loadSingleton() {
+  private async loadPreferences() {
     if (this.loadingPrefs) {
       return;
     }

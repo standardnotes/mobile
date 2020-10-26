@@ -1,6 +1,6 @@
 PODS:
   - boost-for-react-native (1.63.0)
-  - BugsnagReactNative (7.5.0):
+  - BugsnagReactNative (7.5.1):
     - React
   - CocoaAsyncSocket (7.6.4)
   - CocoaLibEvent (1.0.0)
@@ -243,13 +243,13 @@ PODS:
     - React-Core
   - react-native-safe-area-context (3.1.8):
     - React-Core
-  - react-native-segmented-control (2.2.0):
+  - react-native-segmented-control (2.2.1):
     - React-Core
   - react-native-sodium (0.4.0):
     - React-Core
   - react-native-version-info (1.1.0):
     - React-Core
-  - react-native-webview (10.9.2):
+  - react-native-webview (10.9.3):
     - React-Core
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
@@ -523,7 +523,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BugsnagReactNative: 9966b45b3d88fe9d768bb76a67e4e5b41beb1aee
+  BugsnagReactNative: 153f9a475c537cd4097aef28229da9b590a69833
   CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
@@ -552,10 +552,10 @@ SPEC CHECKSUMS:
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-mail: 5fe7239a5b5c1e858d425501c03d1ab977434122
   react-native-safe-area-context: 79fea126c6830c85f65947c223a5e3058a666937
-  react-native-segmented-control: 949660ffafc2d4c13ac2bcb6024da1a816e01217
+  react-native-segmented-control: eb9e25fbfbce226ecf66d643428fbe97601e691a
   react-native-sodium: dd3c708254bb924d96f2d80768f114fa4bfe1c3f
   react-native-version-info: 36490da17d2c6b5cc21321c70e433784dee7ed0b
-  react-native-webview: 4e96d493f9f90ba4f03b28933f30b2964df07e39
+  react-native-webview: e263ff95f073a27180ca2a57e46edf156e555699
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
