@@ -77,7 +77,7 @@ export const TagSelectionList = (props: Props): JSX.Element => {
   useEffect(() => {
     if (!displayOptionsSet.current) {
       application!.setDisplayOptions(
-        ContentType.Tag,
+        props.contentType,
         CollectionSort.Title,
         'dsc'
       );
@@ -87,7 +87,7 @@ export const TagSelectionList = (props: Props): JSX.Element => {
     const removeStreamTags = streamTags();
 
     return removeStreamTags;
-  }, [application, streamTags]);
+  }, [application, props.contentType, streamTags]);
 
   const onTagLongPress = (tag: SNTag | SNSmartTag) => {
     showActionSheet(tag.title, [
