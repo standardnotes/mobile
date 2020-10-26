@@ -339,13 +339,13 @@ export const Compose = (): JSX.Element => {
 
     return () => {
       mounted = false;
-      removeEditorNoteValueChangeObserver;
+      removeEditorNoteValueChangeObserver &&
+        removeEditorNoteValueChangeObserver();
     };
   }, [
     editor,
     editorComponent,
     note,
-    note?.locked,
     showAllChangesSavedStatus,
     showSavingStatus,
   ]);
