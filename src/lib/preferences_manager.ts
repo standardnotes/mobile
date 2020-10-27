@@ -17,16 +17,11 @@ const PREFS_KEY = 'preferences';
 export class PreferencesManager extends ApplicationService {
   private userPreferences!: Record<PrefKey, any>;
   private loadingPrefs = false;
-  private unubscribeStreamItems?: () => void;
 
   /** @override */
   async onAppLaunch() {
     super.onAppLaunch();
     this.loadPreferences();
-  }
-
-  deinit() {
-    this.unubscribeStreamItems && this.unubscribeStreamItems();
   }
 
   get mobileApplication() {
