@@ -138,7 +138,11 @@ export class MobileDeviceInterface extends DeviceInterface {
   async getRawStorageValue(key: string) {
     const item = await AsyncStorage.getItem(key);
     if (item) {
-      return JSON.parse(item);
+      try {
+        return JSON.parse(item);
+      } catch (e) {
+        return item;
+      }
     }
   }
 
