@@ -206,7 +206,7 @@ export const getTitleForPrivilegeLockStateAndType = (
       }
     }
     case PrivilegeCredential.LocalPasscode: {
-      const title = 'Local Passcode';
+      const title = 'Application Passcode';
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
           return title.concat(' ', '- Waiting.');
@@ -243,7 +243,7 @@ export const getLabelForPrivilegeLockStateAndType = (
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
         case AuthenticationValueStateType.WaitingInput:
-          return 'Enter your local passcode';
+          return 'Enter your application passcode';
         case AuthenticationValueStateType.Pending:
           return 'Verifying keys...';
         case AuthenticationValueStateType.Success:

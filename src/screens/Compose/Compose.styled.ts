@@ -99,7 +99,6 @@ export const StyledTextView = styled(SNTextView)`
   /* padding-bottom: 10px; */
   ${Platform.OS === 'ios' &&
   css`
-    font-size: 17px;
     height: 96%;
   `}
   ${Platform.OS === 'android' &&
