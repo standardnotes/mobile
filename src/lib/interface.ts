@@ -212,7 +212,7 @@ export class MobileDeviceInterface extends DeviceInterface {
     if (!keychain) {
       return;
     }
-    return keychain[identifier];
+    return (keychain as any)[identifier];
   }
 
   async setNamespacedKeychainValue(
@@ -253,7 +253,7 @@ export class MobileDeviceInterface extends DeviceInterface {
     }
   }
 
-  getRawKeychainValue(): Promise<any> {
+  getRawKeychainValue() {
     return Keychain.getKeys();
   }
 
