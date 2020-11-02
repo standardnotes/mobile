@@ -53,7 +53,7 @@
     "react-native-version-info": "^1.1.0",
     "react-native-webview": "^10.10.0",
     "react-navigation-header-buttons": "^6.0.0",
-    "sn-textview": "standardnotes/sn-textview#2f35ab34c34683bcb5f485addcd2cd1439eb707d",
+    "sn-textview": "standardnotes/sn-textview#440dbd60eedef4397b6272735e68d4579bb41ac8",
     "sncrypto": "standardnotes/sncrypto#5f8cd36",
     "snjs": "standardnotes/snjs#d101b8e830e255b2d4e20d05d57d2bc0a3b9261d",
     "standard-notes-rn": "standardnotes/standard-notes-rn#996b016",
