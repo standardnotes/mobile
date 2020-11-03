@@ -1,7 +1,7 @@
 {
   "name": "StandardNotes",
-  "version": "3.5.1",
-  "user-version": "3.5.1",
+  "version": "3.5.2",
+  "user-version": "3.5.2",
   "private": true,
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -24,8 +24,8 @@
     "@react-native-community/async-storage": "1.12.1",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/segmented-control": "^2.2.1",
-    "@react-navigation/native": "^5.8.2",
-    "@react-navigation/stack": "^5.11.1",
+    "@react-navigation/native": "^5.8.4",
+    "@react-navigation/stack": "^5.12.1",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
     "react": "16.11.0",
@@ -55,7 +55,7 @@
     "react-navigation-header-buttons": "^6.0.0",
     "sn-textview": "standardnotes/sn-textview#440dbd60eedef4397b6272735e68d4579bb41ac8",
     "sncrypto": "standardnotes/sncrypto#5f8cd36",
-    "snjs": "standardnotes/snjs#d101b8e830e255b2d4e20d05d57d2bc0a3b9261d",
+    "snjs": "standardnotes/snjs#b07f37232029056699e7eae9af0820ca7cf536d1",
     "standard-notes-rn": "standardnotes/standard-notes-rn#996b016",
     "styled-components": "^5.2.1"
   },

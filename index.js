@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import Bugsnag from '@bugsnag/react-native';
 import { enableScreens } from 'react-native-screens';
+import { SNLog } from 'snjs';
 
 import { AppRegistry, YellowBox } from 'react-native';
 import { App } from './src/App';
@@ -21,6 +22,11 @@ if (__DEV__ === false) {
   console.error = () => {};
   // eslint-disable-next-line no-new
   new Bugsnag.start();
+  SNLog.onError = Bugsnag.notify;
+  SNLog.onLog = Bugsnag.leaveBreadcrumb;
+} else {
+  SNLog.onLog = console.log;
+  SNLog.onError = console.error;
 }
 
 enableAndroidFontFix();
