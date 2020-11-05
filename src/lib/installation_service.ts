@@ -38,7 +38,16 @@ export class InstallationService extends ApplicationService {
       FIRST_RUN_KEY,
       StorageValueModes.Nonwrapped
     );
-    const firstRunKeyMissing = isNullOrUndefined(firstRunKey);
+    let firstRunKeyMissing = isNullOrUndefined(firstRunKey);
+    /*
+     * Because of migration failure first run key might not be in non wrapped storage
+     */
+    if (firstRunKeyMissing) {
+      const fallbackFirstRunValue = await this.application?.deviceInterface?.getRawStorageValue(
+        FIRST_RUN_KEY
+      );
+      firstRunKeyMissing = isNullOrUndefined(fallbackFirstRunValue);
+    }
     return !hasNormalKeys && hasKeychainValue && firstRunKeyMissing;
   }
 
