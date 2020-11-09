@@ -19,13 +19,13 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@bugsnag/react-native": "^7.5.1",
+    "@bugsnag/react-native": "^7.5.2",
     "@expo/react-native-action-sheet": "^3.8.0",
     "@react-native-community/async-storage": "1.12.1",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/segmented-control": "^2.2.1",
-    "@react-navigation/native": "^5.8.4",
-    "@react-navigation/stack": "^5.12.1",
+    "@react-navigation/native": "^5.8.8",
+    "@react-navigation/stack": "^5.12.5",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
     "react": "16.11.0",
@@ -55,7 +55,7 @@
     "react-navigation-header-buttons": "^6.0.0",
     "sn-textview": "standardnotes/sn-textview#440dbd60eedef4397b6272735e68d4579bb41ac8",
     "sncrypto": "standardnotes/sncrypto#5f8cd36",
-    "snjs": "standardnotes/snjs#d6556503aae3d1ac6ca4c8f2c116430fe8f1a91b",
+    "snjs": "standardnotes/snjs#e99c63b766c2666de5a2201f4749fcc6a723e252",
     "standard-notes-rn": "standardnotes/standard-notes-rn#996b016",
     "styled-components": "^5.2.1"
   },
