@@ -68,8 +68,8 @@ export const Compose = (): JSX.Element => {
 
   // Ref
   const editorViewRef = useRef<SNTextView>(null);
-  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const statusTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const saveTimeoutRef = useRef<number | undefined>(undefined);
+  const statusTimeoutRef = useRef<number | undefined>(undefined);
   const alreadySaved = useRef(false);
 
   const dissmissKeybard = () => {

@@ -54,7 +54,7 @@ export const ComponentView = ({
 
   // Ref
   const webViewRef = useRef<WebView>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const timeoutRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     if (liveComponent?.item.uuid !== componentUuid) {
