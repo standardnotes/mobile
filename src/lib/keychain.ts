@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import * as RCTKeychain from 'react-native-keychain';
 
 type KeychainValue = Record<string, string>;
@@ -30,13 +29,9 @@ export default class Keychain {
         }
       })
       .catch(function (error) {
-        console.log(
+        console.error(
           "Keychain couldn't be accessed! Maybe no value set?",
           error
-        );
-        Alert.alert(
-          'Keychain failure',
-          'Reading data from Keychain failed. Please try again and contact support if the problem persists.'
         );
         return undefined;
       });

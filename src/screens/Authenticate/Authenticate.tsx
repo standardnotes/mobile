@@ -398,7 +398,7 @@ export const Authenticate = ({
   );
 
   const onInvalidValue = (value: ChallengeValue) => {
-    setPending(true);
+    setPending(false);
     dispatch({
       type: 'setState',
       id: value.prompt.id.toString(),
