@@ -41,7 +41,7 @@ export const NoteCell = ({
   const [selected, setSelected] = useState(false);
 
   // Ref
-  const selectionTimeout = useRef<NodeJS.Timeout>();
+  const selectionTimeout = useRef<number>();
   const elementRef = useRef<View>(null);
 
   const { showActionSheet } = useCustomActionSheet();

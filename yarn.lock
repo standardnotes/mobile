@@ -7229,10 +7229,10 @@ react-native-version-info@^1.1.0:
   resolved "https://registry.yarnpkg.com/react-native-version-info/-/react-native-version-info-1.1.0.tgz#1407de863cae4dbbeeadb9c173a295a7774b6884"
   integrity sha512-0QmJjdKyaW+G/TiOWkwzGVv1G3FPnWrPH5SYWloUpv8WA7onuQESYHdLyjfCUInYI/FHVeEynE2VomOOsda8wQ==
 
-react-native-webview@^10.10.0:
-  version "10.10.0"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-10.10.0.tgz#285703c35eac1eac5b4446df2cba8a146d3c8548"
-  integrity sha512-T0AnZ0LVhaFBqZpl5attDDYo83zqdFRsFVINbrgHaIm6w5r0d/QK/dJRgXRNyFhn1fSONhe0ejdcnCYCT73B6g==
+react-native-webview@^10.10.2:
+  version "10.10.2"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-10.10.2.tgz#13208aef17c9ccfd28355363688f4cbe2143f10a"
+  integrity sha512-98Dh7q1gEflicFZ8KNL3nK5XRjx50OZXqw87jHofVjKfjbK0LKmvI5X8ymgUMGg61JVgI3AF+g8qpDvqjgQsfg==
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
@@ -7987,9 +7987,9 @@ sncrypto@standardnotes/sncrypto#5f8cd36:
   version "1.2.0"
   resolved "https://codeload.github.com/standardnotes/sncrypto/tar.gz/5f8cd369773cec7f342c23ecaa659d932b35cd31"
 
-snjs@standardnotes/snjs#6388e30976c05a004a6c289b14d99058e349c018:
+snjs@standardnotes/snjs#def68479f53238c81096bc872a6823cd249d084d:
   version "1.0.5"
-  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/6388e30976c05a004a6c289b14d99058e349c018"
+  resolved "https://codeload.github.com/standardnotes/snjs/tar.gz/def68479f53238c81096bc872a6823cd249d084d"
 
 source-map-resolve@^0.5.0:
   version "0.5.3"
