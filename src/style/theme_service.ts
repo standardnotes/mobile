@@ -93,7 +93,7 @@ export class ThemeService {
   };
   styles: Record<string, ViewStyle | TextStyle> = {};
   variables?: MobileThemeVariables;
-  application: MobileApplication;
+  application?: MobileApplication;
   unregisterComponentHandler?: () => void;
   unsubscribeStreamThemes?: () => void;
   unsubsribeAppEventObserver?: () => void;
@@ -111,6 +111,7 @@ export class ThemeService {
   }
 
   deinit() {
+    this.application = undefined;
     Appearance.removeChangeListener(this.onColorSchemeChange.bind(this));
     this.unregisterComponentHandler && this.unregisterComponentHandler();
     this.unsubscribeStreamThemes && this.unsubscribeStreamThemes();
@@ -118,13 +119,13 @@ export class ThemeService {
   }
 
   private registerObservers() {
-    this.unsubsribeAppEventObserver = this.application.addEventObserver(
+    this.unsubsribeAppEventObserver = this.application?.addEventObserver(
       async event => {
         /**
          * If there are any migrations we need to set default theme to start UI
          */
         if (event === ApplicationEvent.MigrationsLoaded) {
-          if (await this.application.hasPendingMigrations()) {
+          if (await this.application?.hasPendingMigrations()) {
             this.setDefaultTheme();
           }
         }
@@ -261,7 +262,7 @@ export class ThemeService {
   }
 
   private async setThemeForMode(mode: 'light' | 'dark', themeId: string) {
-    return this.application.setValue(
+    return this.application?.setValue(
       mode === 'dark' ? DARK_THEME_KEY : LIGHT_THEME_KEY,
       themeId,
       StorageValueModes.Nonwrapped
@@ -269,7 +270,7 @@ export class ThemeService {
   }
 
   public async getThemeForMode(mode: 'light' | 'dark') {
-    return this.application.getValue(
+    return this.application?.getValue(
       mode === 'dark' ? DARK_THEME_KEY : LIGHT_THEME_KEY,
       StorageValueModes.Nonwrapped
     );
@@ -370,7 +371,7 @@ export class ThemeService {
     const updatedTheme = this.buildTheme(theme);
     this.addTheme(updatedTheme);
     this.variables = updatedTheme.mobileContent.variables;
-    if (this.application.isLaunched() && this.application.componentManager) {
+    if (this.application?.isLaunched() && this.application.componentManager) {
       (this.application
         .componentManager as ComponentManager).setMobileActiveTheme(
         updatedTheme

@@ -15,7 +15,7 @@ export const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {
     <HeaderButton
       IconComponent={Icon}
       iconSize={30}
-      color={theme.stylekitInfoColor}
+      color={passMeFurther.disabled ? 'gray' : theme.stylekitInfoColor}
       {...passMeFurther}
     />
   );

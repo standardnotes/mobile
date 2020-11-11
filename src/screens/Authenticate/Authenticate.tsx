@@ -100,7 +100,7 @@ export const Authenticate = ({
           <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
             <Item
               testID="headerButton"
-              disabled={disabled}
+              disabled={disabled || pending}
               title={Platform.OS === 'ios' ? 'Cancel' : ''}
               iconName={
                 Platform.OS === 'ios'
@@ -108,14 +108,16 @@ export const Authenticate = ({
                   : ThemeService.nameForIcon(ICON_CLOSE)
               }
               onPress={() => {
-                application?.cancelChallenge(challenge);
+                if (!pending) {
+                  application?.cancelChallenge(challenge);
+                }
               }}
             />
           </HeaderButtons>
         ),
       });
     }
-  }, [navigation, challenge, application]);
+  }, [navigation, challenge, application, pending]);
 
   const validateChallengeValue = useCallback(
     async (challengeValue: ChallengeValue) => {
