@@ -9,7 +9,7 @@ export type EditorNoteValueChangeObserver = (
 
 export class Editor {
   public note?: SNNote;
-  private application: MobileApplication;
+  private application?: MobileApplication;
   private noteChangeObservers: EditorNoteChangeObserver[] = [];
   private noteValueChangeObservers: EditorNoteValueChangeObserver[] = [];
   private removeStreamObserver?: () => void;
@@ -26,12 +26,12 @@ export class Editor {
 
   async init(noteUuid?: string, noteTitle?: string) {
     if (noteUuid) {
-      this.note = this.application.findItem(noteUuid) as SNNote;
+      this.note = this.application?.findItem(noteUuid) as SNNote;
     } else {
       await this.reset(noteTitle);
     }
 
-    this.removeStreamObserver = this.application.streamItems(
+    this.removeStreamObserver = this.application?.streamItems(
       ContentType.Note,
       (items, source) => {
         this.handleNoteStream(items as SNNote[], source);
@@ -43,10 +43,10 @@ export class Editor {
     if (this.removeStreamObserver) {
       this.removeStreamObserver();
     }
-    (this.removeStreamObserver as any) = undefined;
+    this.removeStreamObserver = undefined;
     this.noteChangeObservers.length = 0;
     this.noteValueChangeObservers.length = 0;
-    (this.application as any) = undefined;
+    this.application = undefined;
   }
 
   private handleNoteStream(notes: SNNote[], source?: PayloadSource) {
@@ -63,7 +63,7 @@ export class Editor {
   }
 
   async insertTemplatedNote() {
-    return this.application.insertItem(this.note!);
+    return this.application?.insertItem(this.note!);
   }
 
   /**
@@ -71,7 +71,7 @@ export class Editor {
    * and creating a placeholder note.
    */
   async reset(noteTitle?: string) {
-    const note = await this.application.createTemplateItem(ContentType.Note, {
+    const note = await this.application?.createTemplateItem(ContentType.Note, {
       text: '',
       title: noteTitle || '',
       references: [],

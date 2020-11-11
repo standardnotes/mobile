@@ -1,4 +1,10 @@
-import { addIfUnique, ComponentArea, removeFromArray, SNComponent } from 'snjs';
+import {
+  addIfUnique,
+  ComponentArea,
+  isNullOrUndefined,
+  removeFromArray,
+  SNComponent,
+} from 'snjs';
 import { UuidString } from 'snjs/dist/@types/types';
 import { MobileApplication } from './application';
 
@@ -6,7 +12,7 @@ import { MobileApplication } from './application';
 const SingleComponentAreas = [ComponentArea.Editor];
 
 export class ComponentGroup {
-  private application: MobileApplication;
+  private application?: MobileApplication;
   changeObservers: any[] = [];
   activeComponents: UuidString[] = [];
 
@@ -19,7 +25,9 @@ export class ComponentGroup {
   }
 
   public deinit() {
-    (this.application as any) = undefined;
+    this.changeObservers = [];
+    this.activeComponents = [];
+    this.application = undefined;
   }
 
   async activateComponent(component: SNComponent) {
@@ -62,11 +70,13 @@ export class ComponentGroup {
   }
 
   activeComponentForArea(area: ComponentArea) {
-    return this.activeComponentsForArea(area)[0];
+    return !isNullOrUndefined(this.activeComponentsForArea(area))
+      ? this.activeComponentsForArea(area)[0]
+      : undefined;
   }
 
   activeComponentsForArea(area: ComponentArea) {
-    return this.allActiveComponents().filter(c => c.area === area);
+    return this.allActiveComponents()?.filter(c => c.area === area);
   }
 
   allComponentsForArea(area: ComponentArea) {
@@ -74,7 +84,7 @@ export class ComponentGroup {
   }
 
   private allActiveComponents() {
-    return this.application.getAll(this.activeComponents) as SNComponent[];
+    return this.application?.getAll(this.activeComponents) as SNComponent[];
   }
 
   /**

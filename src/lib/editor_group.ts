@@ -6,7 +6,7 @@ type EditorGroupChangeCallback = (editor?: Editor) => void;
 
 export class EditorGroup {
   public editors: Editor[] = [];
-  private application: MobileApplication;
+  private application?: MobileApplication;
   changeObservers: EditorGroupChangeCallback[] = [];
 
   constructor(application: MobileApplication) {
@@ -14,16 +14,18 @@ export class EditorGroup {
   }
 
   public deinit() {
-    (this.application as any) = undefined;
+    this.application = undefined;
     for (const editor of this.editors) {
       this.deleteEditor(editor);
     }
   }
 
   createEditor(noteUuid?: string, noteTitle?: string) {
-    const editor = new Editor(this.application, noteUuid, noteTitle);
-    this.editors.push(editor);
-    this.notifyObservers();
+    if (this.application) {
+      const editor = new Editor(this.application, noteUuid, noteTitle);
+      this.editors.push(editor);
+      this.notifyObservers();
+    }
   }
 
   deleteEditor(editor: Editor) {
