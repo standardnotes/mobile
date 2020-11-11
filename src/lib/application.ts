@@ -1,5 +1,3 @@
-import Bugsnag from '@bugsnag/react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import { Platform } from 'react-native';
 import VersionInfo from 'react-native-version-info';
@@ -19,7 +17,6 @@ import { ComponentManager } from './component_manager';
 import { EditorGroup } from './editor_group';
 import { InstallationService } from './installation_service';
 import { MobileDeviceInterface } from './interface';
-import Keychain from './keychain';
 import { push } from './navigation_service';
 import { PreferencesManager } from './preferences_manager';
 import { SNReactNativeCrypto } from './react_native_crypto';
@@ -63,24 +60,6 @@ export class MobileApplication extends SNApplication {
     this.Uuid = Math.random().toString();
     this.editorGroup = new EditorGroup(this);
     this.componentGroup = new ComponentGroup(this);
-    setTimeout(() => {
-      this.logState();
-    }, 1000);
-
-    setTimeout(() => {
-      this.logState();
-    }, 5000);
-  }
-
-  async logState() {
-    const storageKeys = (await AsyncStorage.getAllKeys()).filter(
-      key => !key.startsWith('Item-')
-    );
-    const keychain = await Keychain.getKeys();
-    const values = await AsyncStorage.multiGet(storageKeys);
-    Bugsnag.leaveBreadcrumb('Storage values: ' + values);
-    Bugsnag.leaveBreadcrumb('keychain: ' + keychain);
-    console.log('storage values:', values, 'keychain', keychain);
   }
 
   /** @override */
