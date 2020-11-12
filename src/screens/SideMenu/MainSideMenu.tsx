@@ -275,39 +275,33 @@ export const MainSideMenu = ({ drawerRef }: Props): JSX.Element => {
           onPress={openSettings}
           onOutOfSyncPress={outOfSyncPressed}
         />
+        <SideMenuSectionContainer>
+          <SideMenuSection
+            title="Themes"
+            key="themes-section"
+            options={themeOptions}
+            collapsed={true}
+          />
+          <SideMenuSection title="Views" key="views-section">
+            <TagSelectionList
+              key="views-section-list"
+              contentType={ContentType.SmartTag}
+              onTagSelect={onTagSelect}
+              selectedTags={selectedTag ? [selectedTag] : []}
+            />
+          </SideMenuSection>
 
-        <SideMenuSectionContainer
-          data={[
-            <SideMenuSection
-              title="Themes"
-              key="themes-section"
-              options={themeOptions}
-              collapsed={true}
-            />,
-            <SideMenuSection title="Views" key="views-section">
-              <TagSelectionList
-                key="views-section-list"
-                contentType={ContentType.SmartTag}
-                onTagSelect={onTagSelect}
-                selectedTags={selectedTag ? [selectedTag] : []}
-              />
-            </SideMenuSection>,
-
-            <SideMenuSection title="Tags" key="tags-section">
-              <TagSelectionList
-                key="tags-section-list"
-                hasBottomPadding={Platform.OS === 'android'}
-                emptyPlaceholder={'No tags. Create one from the note composer.'}
-                contentType={ContentType.Tag}
-                onTagSelect={onTagSelect}
-                selectedTags={selectedTag ? [selectedTag] : []}
-              />
-            </SideMenuSection>,
-          ]}
-          // @ts-expect-error
-          renderItem={({ item }) => item}
-        />
-
+          <SideMenuSection title="Tags" key="tags-section">
+            <TagSelectionList
+              key="tags-section-list"
+              hasBottomPadding={Platform.OS === 'android'}
+              emptyPlaceholder={'No tags. Create one from the note composer.'}
+              contentType={ContentType.Tag}
+              onTagSelect={onTagSelect}
+              selectedTags={selectedTag ? [selectedTag] : []}
+            />
+          </SideMenuSection>
+        </SideMenuSectionContainer>
         <FAB
           buttonColor={theme.stylekitInfoColor}
           iconTextColor={theme.stylekitInfoContrastColor}

@@ -1,4 +1,4 @@
-import { FlatList } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
@@ -8,7 +8,7 @@ export const SafeAreaContainer = styled(SafeAreaView)`
   color: ${({ theme }) => theme.stylekitForegroundColor};
 `;
 
-export const StyledList = styled(FlatList)`
+export const StyledList = styled(ScrollView)`
   padding: 15px;
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
 `;
