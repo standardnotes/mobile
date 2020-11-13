@@ -60,7 +60,7 @@ type Props = {
   drawerOpen: boolean;
 };
 
-export const NoteSideMenu = (props: Props) => {
+export const NoteSideMenu = React.memo((props: Props) => {
   // Context
   const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
@@ -133,8 +133,10 @@ export const NoteSideMenu = (props: Props) => {
     let mounted = true;
     const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
       newNote => {
-        if (mounted && props.drawerOpen) {
-          setNote(newNote);
+        if (mounted) {
+          if (newNote.uuid !== note?.uuid || !newNote) {
+            setNote(newNote);
+          }
         }
       }
     );
@@ -153,7 +155,7 @@ export const NoteSideMenu = (props: Props) => {
       removeEditorNoteValueChangeObserver &&
         removeEditorNoteValueChangeObserver();
     };
-  }, [editor, props.drawerOpen, reloadTags]);
+  }, [editor, note?.uuid, props.drawerOpen, reloadTags]);
 
   useEffect(() => {
     let isMounted = true;
@@ -663,4 +665,4 @@ export const NoteSideMenu = (props: Props) => {
       />
     </SafeAreaContainer>
   );
-};
+});
