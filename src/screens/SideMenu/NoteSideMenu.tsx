@@ -57,9 +57,10 @@ function sortAlphabetically(array: SNComponent[]): SNComponent[] {
 
 type Props = {
   drawerRef: DrawerLayout | null;
+  drawerOpen: boolean;
 };
 
-export const NoteSideMenu = (props: Props) => {
+export const NoteSideMenu = React.memo((props: Props) => {
   // Context
   const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
@@ -93,7 +94,7 @@ export const NoteSideMenu = (props: Props) => {
 
   useEffect(() => {
     let mounted = true;
-    if (!editor && mounted) {
+    if ((!editor || props.drawerOpen) && mounted) {
       const initialEditor = application?.editorGroup.activeEditor;
       const tempNote = initialEditor?.note;
       setEditor(initialEditor);
@@ -102,7 +103,7 @@ export const NoteSideMenu = (props: Props) => {
     return () => {
       mounted = false;
     };
-  }, [application, editor]);
+  }, [application, editor, props.drawerOpen]);
 
   useEffect(() => {
     let mounted = true;
@@ -133,13 +134,15 @@ export const NoteSideMenu = (props: Props) => {
     const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
       newNote => {
         if (mounted) {
-          setNote(newNote);
+          if (newNote.uuid !== note?.uuid || !newNote) {
+            setNote(newNote);
+          }
         }
       }
     );
     const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
       (newNote, source) => {
-        if (mounted) {
+        if (mounted && props.drawerOpen) {
           if (source !== PayloadSource.ComponentRetrieved) {
             setNote(newNote);
           }
@@ -152,7 +155,7 @@ export const NoteSideMenu = (props: Props) => {
       removeEditorNoteValueChangeObserver &&
         removeEditorNoteValueChangeObserver();
     };
-  }, [editor, reloadTags]);
+  }, [editor, note?.uuid, props.drawerOpen, reloadTags]);
 
   useEffect(() => {
     let isMounted = true;
@@ -165,7 +168,7 @@ export const NoteSideMenu = (props: Props) => {
         const displayComponents = sortAlphabetically(
           application!.componentManager!.componentsForArea(ComponentArea.Editor)
         );
-        if (isMounted) {
+        if (isMounted && props.drawerOpen) {
           setComponents(displayComponents);
         }
       }
@@ -175,7 +178,7 @@ export const NoteSideMenu = (props: Props) => {
       isMounted = false;
       removeComponentsObserver && removeComponentsObserver();
     };
-  }, [application, note]);
+  }, [application, note, props.drawerOpen]);
 
   useEffect(() => {
     let isMounted = true;
@@ -183,7 +186,7 @@ export const NoteSideMenu = (props: Props) => {
       if (!note) {
         return;
       }
-      if (isMounted) {
+      if (isMounted && props.drawerOpen) {
         reloadTags();
       }
       return () => {
@@ -191,7 +194,7 @@ export const NoteSideMenu = (props: Props) => {
         removeTagsObserver && removeTagsObserver();
       };
     });
-  }, [application, note, reloadTags]);
+  }, [application, note, props.drawerOpen, reloadTags]);
 
   const disassociateComponentWithCurrentNote = useCallback(
     async (component: SNComponent) => {
@@ -621,37 +624,31 @@ export const NoteSideMenu = (props: Props) => {
 
   return (
     <SafeAreaContainer edges={['top', 'bottom', 'right']}>
-      <StyledList
-        data={[
-          <SideMenuSection
-            title="Options"
-            key="options-section"
-            options={noteOptions}
-          />,
-
-          <SideMenuSection
-            title="Editors"
-            key="editors-section"
-            options={editorComponents}
-            collapsed={true}
-          />,
-
-          <SideMenuSection title="Tags" key="tags-section">
-            <TagSelectionList
-              key="tags-section-list"
-              hasBottomPadding={Platform.OS === 'android'}
-              contentType={ContentType.Tag}
-              onTagSelect={onTagSelect}
-              selectedTags={selectedTags}
-              emptyPlaceholder={
-                'Create a new tag using the tag button in the bottom right corner.'
-              }
-            />
-          </SideMenuSection>,
-        ]}
-        // @ts-expect-error
-        renderItem={({ item }) => item}
-      />
+      <StyledList>
+        <SideMenuSection
+          title="Options"
+          key="options-section"
+          options={noteOptions}
+        />
+        <SideMenuSection
+          title="Editors"
+          key="editors-section"
+          options={editorComponents}
+          collapsed={true}
+        />
+        <SideMenuSection title="Tags" key="tags-section">
+          <TagSelectionList
+            key="tags-section-list"
+            hasBottomPadding={Platform.OS === 'android'}
+            contentType={ContentType.Tag}
+            onTagSelect={onTagSelect}
+            selectedTags={selectedTags}
+            emptyPlaceholder={
+              'Create a new tag using the tag button in the bottom right corner.'
+            }
+          />
+        </SideMenuSection>
+      </StyledList>
 
       <FAB
         buttonColor={theme.stylekitInfoColor}
@@ -668,4 +665,4 @@ export const NoteSideMenu = (props: Props) => {
       />
     </SafeAreaContainer>
   );
-};
+});

@@ -70,6 +70,7 @@ export const AppStackComponent = (
   );
   const [notesStatus, setNotesStatus] = useState<ScreenStatus>();
   const [composeStatus, setComposeStatus] = useState<ScreenStatus>();
+  const [noteDrawerOpen, setNoteDrawerOpen] = useState(false);
 
   // Ref
   const drawerRef = useRef<DrawerLayout>(null);
@@ -155,11 +156,18 @@ export const AppStackComponent = (
         ref={noteDrawerRef}
         drawerWidth={getDefaultDrawerWidth(dimensions)}
         onDrawerStateChanged={handleDrawerStateChange}
+        onDrawerOpen={() => setNoteDrawerOpen(true)}
+        onDrawerClose={() => setNoteDrawerOpen(false)}
         drawerPosition={'right'}
         drawerType="slide"
         drawerLockMode="locked-closed"
         renderNavigationView={() =>
-          hasEditor && <NoteSideMenu drawerRef={noteDrawerRef.current} />
+          hasEditor && (
+            <NoteSideMenu
+              drawerOpen={noteDrawerOpen}
+              drawerRef={noteDrawerRef.current}
+            />
+          )
         }
       >
         <AppStack.Navigator

@@ -3,7 +3,12 @@ import { Alert, Share } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 import Mailer from 'react-native-mail';
-import { ApplicationService, ButtonType, Platform } from 'snjs';
+import {
+  ApplicationService,
+  ButtonType,
+  EncryptionIntent,
+  Platform,
+} from 'snjs';
 import { MobileApplication } from './application';
 
 export class BackupsService extends ApplicationService {
@@ -19,7 +24,9 @@ export class BackupsService extends ApplicationService {
   async export(encrypted: boolean) {
     const data = await this.application!.createBackupFile(
       undefined,
-      undefined,
+      encrypted
+        ? EncryptionIntent.FileEncrypted
+        : EncryptionIntent.FileDecrypted,
       true
     );
 

@@ -3,6 +3,7 @@ import {
   AppState,
   AppStateStatus,
   EmitterSubscription,
+  InteractionManager,
   Keyboard,
   KeyboardEventListener,
   NativeModules,
@@ -258,6 +259,13 @@ export class ApplicationState extends ApplicationService {
       this.application.editorGroup.createEditor(noteUuid);
     } else {
       activeEditor.setNote(note);
+    }
+    if (note && note.conflictOf) {
+      InteractionManager.runAfterInteractions(() => {
+        this.application?.changeAndSaveItem(note.uuid, mutator => {
+          mutator.conflictOf = undefined;
+        });
+      });
     }
   }
 

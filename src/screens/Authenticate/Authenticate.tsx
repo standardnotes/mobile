@@ -428,7 +428,7 @@ export const Authenticate = ({
   useEffect(() => {
     let mounted = true;
     const setBiometricsAsync = async () => {
-      if (challenge.reason !== ChallengeReason.Migration) {
+      if (challenge.reason === ChallengeReason.ApplicationUnlock) {
         const hasBiometrics = await checkForBiometrics();
         if (mounted) {
           setSupportsBiometrics(hasBiometrics);
@@ -437,7 +437,7 @@ export const Authenticate = ({
     };
     setBiometricsAsync();
     const setInitialKeyboardType = async () => {
-      if (challenge.reason !== ChallengeReason.Migration) {
+      if (challenge.reason === ChallengeReason.ApplicationUnlock) {
         const initialKeyboardType = await checkPasscodeKeyboardType();
         if (mounted) {
           setKeyboardType(initialKeyboardType);
