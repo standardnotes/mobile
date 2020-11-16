@@ -56,7 +56,7 @@ jobs:
       - name: Install dependencies
         run: yarn run init
       - name: Set ssh connection to Github
-        uses: webfactory/ssh-agent@v0.4.0
+        uses: webfactory/ssh-agent@v0.4.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Export Apple AppStore Connect API key
