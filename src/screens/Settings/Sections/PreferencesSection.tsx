@@ -3,8 +3,8 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { PrefKey } from '@Lib/preferences_manager';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { CollectionSort } from '@standardnotes/snjs';
 import React, { useContext, useMemo, useState } from 'react';
-import { CollectionSort } from 'snjs';
 
 export const PreferencesSection = () => {
   // Context

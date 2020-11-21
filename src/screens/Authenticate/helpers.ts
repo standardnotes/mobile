@@ -3,7 +3,7 @@ import {
   ChallengeValidation,
   ChallengeValue,
   PrivilegeCredential,
-} from 'snjs';
+} from '@standardnotes/snjs';
 
 export const findMatchingPrivilegeValueIndex = (
   values: PrivilegeLockValue[],

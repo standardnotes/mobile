@@ -1,14 +1,14 @@
-import { Base64 } from 'js-base64';
-import { Alert, Share } from 'react-native';
-import FileViewer from 'react-native-file-viewer';
-import RNFS from 'react-native-fs';
-import Mailer from 'react-native-mail';
 import {
   ApplicationService,
   ButtonType,
   EncryptionIntent,
   Platform,
-} from 'snjs';
+} from '@standardnotes/snjs';
+import { Base64 } from 'js-base64';
+import { Alert, Share } from 'react-native';
+import FileViewer from 'react-native-file-viewer';
+import RNFS from 'react-native-fs';
+import Mailer from 'react-native-mail';
 import { MobileApplication } from './application';
 
 export class BackupsService extends ApplicationService {

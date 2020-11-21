@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import Bugsnag from '@bugsnag/react-native';
 import { enableScreens } from 'react-native-screens';
-import { SNLog } from 'snjs';
+import { SNLog } from '@standardnotes/snjs';
 
 import { AppRegistry, YellowBox } from 'react-native';
 import { App } from './src/App';

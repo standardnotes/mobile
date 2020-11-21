@@ -1,4 +1,4 @@
-import { ApplicationService, isNullOrUndefined } from 'snjs';
+import { ApplicationService, isNullOrUndefined } from '@standardnotes/snjs';
 import { MobileApplication } from './application';
 
 export enum PrefKey {

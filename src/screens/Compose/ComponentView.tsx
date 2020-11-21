@@ -1,5 +1,12 @@
 import { PrefKey } from '@Lib/preferences_manager';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import {
+  ButtonType,
+  ComponentAction,
+  ComponentArea,
+  LiveItem,
+  SNComponent,
+} from '@standardnotes/snjs';
 import React, {
   useCallback,
   useContext,
@@ -13,13 +20,6 @@ import {
   OnShouldStartLoadWithRequest,
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
-import {
-  ButtonType,
-  ComponentAction,
-  ComponentArea,
-  LiveItem,
-  SNComponent,
-} from 'snjs';
 import {
   FlexContainer,
   LockedContainer,

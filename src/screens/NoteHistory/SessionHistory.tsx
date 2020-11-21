@@ -1,9 +1,9 @@
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ItemSessionHistory, SNNote } from '@standardnotes/snjs';
+import { NoteHistoryEntry } from '@standardnotes/snjs/dist/@types/services/history/entries/note_history_entry';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ItemSessionHistory, SNNote } from 'snjs';
-import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { NoteHistoryCell } from './NoteHistoryCell';
 
 type Props = {

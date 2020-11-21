@@ -1,14 +1,14 @@
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
-import { Platform } from 'react-native';
-import VersionInfo from 'react-native-version-info';
 import {
   Challenge,
+  DeinitSource,
   Environment,
   platformFromString,
   SNApplication,
   SNComponentManager,
-} from 'snjs';
-import { DeinitSource } from 'snjs/dist/@types/types';
+} from '@standardnotes/snjs';
+import { Platform } from 'react-native';
+import VersionInfo from 'react-native-version-info';
 import { AlertService } from './alert_service';
 import { ApplicationState } from './application_state';
 import { BackupsService } from './backups_service';

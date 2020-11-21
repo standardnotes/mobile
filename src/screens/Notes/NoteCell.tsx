@@ -1,12 +1,17 @@
 import { useDeleteNoteWithPrivileges } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
+  CollectionSort,
+  isNullOrUndefined,
+  NoteMutator,
+  SNNote,
+} from '@standardnotes/snjs';
+import {
   CustomActionSheetOption,
   useCustomActionSheet,
 } from '@Style/custom_action_sheet';
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { CollectionSort, isNullOrUndefined, NoteMutator, SNNote } from 'snjs';
 import {
   Container,
   DateText,

@@ -2,6 +2,7 @@ import { AppStateEventType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { CollectionSort, SNNote } from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
@@ -19,7 +20,6 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IosSearchBar from 'react-native-search-bar';
 import AndroidSearchBar from 'react-native-search-box';
-import { CollectionSort, SNNote } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteCell } from './NoteCell';
 import {

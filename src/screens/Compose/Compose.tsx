@@ -4,6 +4,17 @@ import { isNullOrUndefined } from '@Lib/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
+import {
+  ApplicationEvent,
+  ComponentArea,
+  ContentType,
+  isPayloadSourceInternalChange,
+  isPayloadSourceRetrieved,
+  NoteMutator,
+  PayloadSource,
+  SNComponent,
+  SNNote,
+} from '@standardnotes/snjs';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import { lighten } from '@Style/utils';
@@ -17,17 +28,6 @@ import React, {
 import { Keyboard, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SNTextView from 'sn-textview';
-import {
-  ApplicationEvent,
-  ComponentArea,
-  ContentType,
-  isPayloadSourceInternalChange,
-  isPayloadSourceRetrieved,
-  NoteMutator,
-  PayloadSource,
-  SNComponent,
-  SNNote,
-} from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { ComponentView } from './ComponentView';
 import {

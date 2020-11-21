@@ -1,18 +1,5 @@
 import Bugsnag from '@bugsnag/react-native';
 import {
-  AppState,
-  AppStateStatus,
-  EmitterSubscription,
-  InteractionManager,
-  Keyboard,
-  KeyboardEventListener,
-  NativeModules,
-  Platform,
-} from 'react-native';
-import FlagSecure from 'react-native-flag-secure-android';
-import { enabled } from 'react-native-privacy-snapshot';
-import VersionInfo from 'react-native-version-info';
-import {
   ApplicationEvent,
   ApplicationService,
   Challenge,
@@ -28,7 +15,20 @@ import {
   SNUserPrefs,
   StorageKey,
   StorageValueModes,
-} from 'snjs';
+} from '@standardnotes/snjs';
+import {
+  AppState,
+  AppStateStatus,
+  EmitterSubscription,
+  InteractionManager,
+  Keyboard,
+  KeyboardEventListener,
+  NativeModules,
+  Platform,
+} from 'react-native';
+import FlagSecure from 'react-native-flag-secure-android';
+import { enabled } from 'react-native-privacy-snapshot';
+import VersionInfo from 'react-native-version-info';
 import { MobileApplication } from './application';
 import { Editor } from './editor';
 

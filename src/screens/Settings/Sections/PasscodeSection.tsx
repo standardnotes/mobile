@@ -16,8 +16,11 @@ import {
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_SETTINGS,
 } from '@Screens/screens';
+import {
+  ProtectedAction,
+  StorageEncryptionPolicies,
+} from '@standardnotes/snjs';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { ProtectedAction, StorageEncryptionPolicies } from 'snjs';
 import { Title } from './PasscodeSection.styled';
 
 type Props = {

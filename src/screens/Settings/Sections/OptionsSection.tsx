@@ -14,9 +14,9 @@ import {
   SCREEN_MANAGE_PRIVILEGES,
   SCREEN_SETTINGS,
 } from '@Screens/screens';
+import { ButtonType, ProtectedAction } from '@standardnotes/snjs';
 import moment from 'moment';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
-import { ButtonType, ProtectedAction } from 'snjs';
 
 type Props = {
   title: string;

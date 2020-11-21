@@ -6,13 +6,13 @@ import {
   SCREEN_NOTES,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens';
+import { ButtonType, PayloadSource, SNNote } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import { ELIPSIS } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, { useCallback, useContext, useLayoutEffect } from 'react';
 import { YellowBox } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ButtonType, PayloadSource, SNNote } from 'snjs';
 import {
   Container,
   StyledTextView,

@@ -4,8 +4,8 @@ import {
   isNullOrUndefined,
   removeFromArray,
   SNComponent,
-} from 'snjs';
-import { UuidString } from 'snjs/dist/@types/types';
+  UuidString,
+} from '@standardnotes/snjs';
 import { MobileApplication } from './application';
 
 /** Areas that only allow a single component to be active */

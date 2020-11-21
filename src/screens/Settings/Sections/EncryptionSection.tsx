@@ -2,8 +2,8 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { useIsLocked } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ContentType, StorageEncryptionPolicies } from '@standardnotes/snjs';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { ContentType, StorageEncryptionPolicies } from 'snjs';
 import {
   BaseView,
   StyledSectionedTableCell,

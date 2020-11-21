@@ -1,5 +1,5 @@
+import { ApplicationService, Platform } from '@standardnotes/snjs';
 import * as StoreReview from 'react-native-store-review';
-import { ApplicationService, Platform } from 'snjs';
 
 const RUN_COUNTS_BEFORE_REVIEW = [18, 45, 105];
 

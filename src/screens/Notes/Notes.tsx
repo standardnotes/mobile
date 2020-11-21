@@ -11,6 +11,13 @@ import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
 } from '@Screens/screens';
+import {
+  CollectionSort,
+  ContentType,
+  Platform,
+  ProtectedAction,
+  SNNote,
+} from '@standardnotes/snjs';
 import { ICON_ADD } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, {
@@ -21,13 +28,6 @@ import React, {
   useState,
 } from 'react';
 import FAB from 'react-native-fab';
-import {
-  CollectionSort,
-  ContentType,
-  Platform,
-  ProtectedAction,
-  SNNote,
-} from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';

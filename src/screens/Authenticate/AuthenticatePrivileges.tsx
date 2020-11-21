@@ -6,6 +6,11 @@ import { AppStateType, PasscodeKeyboardType } from '@Lib/application_state';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE_PRIVILEGES } from '@Screens/screens';
+import {
+  PrivilegeCredential,
+  PrivilegeSessionLength,
+  ProtectedAction,
+} from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
@@ -17,11 +22,6 @@ import React, {
   useState,
 } from 'react';
 import { Platform, TextInput } from 'react-native';
-import {
-  PrivilegeCredential,
-  PrivilegeSessionLength,
-  ProtectedAction,
-} from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   Container,
@@ -62,9 +62,10 @@ export const AuthenticatePrivileges = ({
   const [sessionLengthOptions] = useState(() =>
     application!.privilegesService!.getSessionLengthOptions()
   );
-  const [selectedSessionLength, setSelectedSessionLength] = useState<
-    PrivilegeSessionLength
-  >();
+  const [
+    selectedSessionLength,
+    setSelectedSessionLength,
+  ] = useState<PrivilegeSessionLength>();
   const [{ privilegeValues, privilegeValueStates }, dispatch] = useReducer(
     privilegesAuthenticationReducer,
     {

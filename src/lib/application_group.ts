@@ -2,7 +2,7 @@ import {
   ApplicationDescriptor,
   DeviceInterface,
   SNApplicationGroup,
-} from 'snjs';
+} from '@standardnotes/snjs';
 import { MobileApplication } from './application';
 import { ApplicationState } from './application_state';
 import { BackupsService } from './backups_service';

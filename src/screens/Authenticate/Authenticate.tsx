@@ -9,6 +9,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
+import {
+  ChallengeReason,
+  ChallengeValidation,
+  ChallengeValue,
+} from '@standardnotes/snjs';
 import { ICON_CLOSE } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import React, {
@@ -23,7 +28,6 @@ import React, {
 import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ChallengeReason, ChallengeValidation, ChallengeValue } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   BaseView,
