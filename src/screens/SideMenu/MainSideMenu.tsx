@@ -58,7 +58,6 @@ export const MainSideMenu = React.memo(
         .getAppState()
         .addStateChangeObserver(state => {
           if (state === AppStateType.TagChanged) {
-            console.log('update');
             setSelectedTag(application!.getAppState().getSelectedTag());
           }
         });
@@ -247,7 +246,7 @@ export const MainSideMenu = React.memo(
           mutator.conflictOf = undefined;
         });
       }
-      application!.getAppState().setSelectedTag(tag);
+      application!.getAppState().setSelectedTag(tag, true);
       drawerRef?.closeDrawer();
     };
 

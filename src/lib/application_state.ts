@@ -7,6 +7,7 @@ import {
   ChallengeReason,
   ChallengeValidation,
   ContentType,
+  isNullOrUndefined,
   PayloadSource,
   removeFromArray,
   SNNote,
@@ -31,6 +32,7 @@ import { enabled } from 'react-native-privacy-snapshot';
 import VersionInfo from 'react-native-version-info';
 import { MobileApplication } from './application';
 import { Editor } from './editor';
+import { PrefKey } from './preferences_manager';
 
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;
@@ -95,7 +97,7 @@ export class ApplicationState extends ApplicationService {
   keyboardDidHideListener?: EmitterSubscription;
   keyboardHeight?: number;
   appEventObersever: any;
-  selectedTag?: SNTag;
+  selectedTag: SNTag = this.application.getSmartTags()[0];
   userPreferences?: SNUserPrefs;
   tabletMode: boolean = false;
   ignoreStateChanges: boolean = false;
@@ -105,6 +107,7 @@ export class ApplicationState extends ApplicationService {
   passcodeTiming?: UnlockTiming;
   biometricsTiming?: UnlockTiming;
   removeItemChangesListener?: () => void;
+  removePreferencesLoadedListener?: () => void;
 
   constructor(application: MobileApplication) {
     super(application);
@@ -113,7 +116,6 @@ export class ApplicationState extends ApplicationService {
     this.handleApplicationEvents();
     this.handleItemsChanges();
 
-    this.setSelectedTag(this.application.getSmartTags()[0]);
     AppState.addEventListener('change', this.handleReactNativeAppStateChange);
 
     this.keyboardDidShowListener = Keyboard.addListener(
@@ -135,10 +137,34 @@ export class ApplicationState extends ApplicationService {
     if (this.removeItemChangesListener) {
       this.removeItemChangesListener();
     }
+    if (this.removePreferencesLoadedListener) {
+      this.removePreferencesLoadedListener();
+    }
     this.appEventObersever = undefined;
     this.observers.length = 0;
     this.keyboardDidShowListener = undefined;
     this.keyboardDidHideListener = undefined;
+  }
+
+  async onAppStart() {
+    this.removePreferencesLoadedListener = this.prefService.addPreferencesLoadedObserver(
+      () => {
+        const savedTagUuid: string | undefined = this.prefService.getValue(
+          PrefKey.SelectedTagUuid,
+          undefined
+        );
+
+        const savedTag = !isNullOrUndefined(savedTagUuid)
+          ? (this.application.findItem(savedTagUuid) as SNTag) ||
+            this.application
+              .getSmartTags()
+              .find(tag => tag.uuid === savedTagUuid)
+          : undefined;
+        if (savedTag) {
+          this.setSelectedTag(savedTag, false);
+        }
+      }
+    );
   }
 
   async onAppLaunch() {
@@ -396,15 +422,22 @@ export class ApplicationState extends ApplicationService {
   /**
    * Set selected @SNTag
    */
-  setSelectedTag(tag: SNTag) {
+  public setSelectedTag(tag: SNTag, saveSelection: boolean) {
     if (this.selectedTag === tag) {
       return;
     }
     const previousTag = this.selectedTag;
     this.selectedTag = tag;
+
+    if (saveSelection) {
+      this.application
+        .getPrefsService()
+        .setUserPrefValue(PrefKey.SelectedTagUuid, tag.uuid);
+    }
+
     this.notifyOfStateChange(AppStateType.TagChanged, {
-      tag: tag,
-      previousTag: previousTag,
+      tag,
+      previousTag,
     });
   }
 
@@ -645,6 +678,10 @@ export class ApplicationState extends ApplicationService {
 
   getMostRecentState() {
     return this.mostRecentState;
+  }
+
+  private get prefService() {
+    return this.application.getPrefsService();
   }
 
   public getEnvironment() {

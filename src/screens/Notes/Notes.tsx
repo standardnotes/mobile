@@ -74,6 +74,32 @@ export const Notes = React.memo(
     // Ref
     const haveDisplayOptions = useRef(false);
 
+    useEffect(() => {
+      const removePreferencesLoadedListener = application
+        ?.getPrefsService()
+        .addPreferencesLoadedObserver(() => {
+          setSortBy(
+            application
+              .getPrefsService()
+              .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
+          );
+          setSortReverse(
+            application
+              .getPrefsService()
+              .getValue(PrefKey.SortNotesReverse, false)
+          );
+          setHideDates(
+            application.getPrefsService().getValue(PrefKey.NotesHideDate, false)
+          );
+          setHidePreviews(
+            application
+              .getPrefsService()
+              .getValue(PrefKey.NotesHideNotePreview, false)
+          );
+        });
+      return removePreferencesLoadedListener;
+    }, [application]);
+
     const reloadTitle = useCallback(
       (newNotes?: SNNote[], newFilter?: string) => {
         let title = '';

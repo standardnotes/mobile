@@ -71,7 +71,7 @@ export const TagSelectionList = React.memo(
               if (matchingTag.deleted) {
                 application
                   .getAppState()
-                  .setSelectedTag(application!.getSmartTags()[0]);
+                  .setSelectedTag(application!.getSmartTags()[0], true);
               }
             }
           }
