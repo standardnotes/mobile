@@ -23,7 +23,7 @@ jobs:
           echo "${{ secrets.DEV_KEYSTORE }}" > keystore.keystore.asc
           gpg -d --passphrase "${{ secrets.DEV_KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
       - name: Install dependencies
-        run: yarn install --ignore-engines
+        run: yarn install
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
