@@ -314,7 +314,10 @@ export const Compose = React.memo(
             setTitle(newNote.title);
             setNoteText(newNote.text);
           }
-          if (newNote.locked !== note?.locked) {
+          if (
+            note?.prefersPlainEditor !== newNote.prefersPlainEditor ||
+            newNote.locked !== note?.locked
+          ) {
             if (note) {
               setNote(newNote);
             }
