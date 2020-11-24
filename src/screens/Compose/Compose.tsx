@@ -87,12 +87,12 @@ export const Compose = React.memo(
           statusTimeoutRef.current = setTimeout(() => {
             application
               ?.getStatusManager()
-              .setMessage(SCREEN_COMPOSE, status, color);
+              ?.setMessage(SCREEN_COMPOSE, status, color);
           }, MINIMUM_STATUS_DURATION);
         } else {
           application
             ?.getStatusManager()
-            .setMessage(SCREEN_COMPOSE, status, color);
+            ?.setMessage(SCREEN_COMPOSE, status, color);
         }
       },
       [application]
