@@ -81,8 +81,12 @@ export const Authenticate = ({
         } as ChallengeValue;
         return map;
       }, {} as Record<string, ChallengeValue>),
-      challengeValueStates: challenge.prompts.reduce((map, current) => {
-        map[current.id] = AuthenticationValueStateType.WaitingInput;
+      challengeValueStates: challenge.prompts.reduce((map, current, index) => {
+        if (index === 0) {
+          map[current.id] = AuthenticationValueStateType.WaitingInput;
+        } else {
+          map[current.id] = AuthenticationValueStateType.WaitingTurn;
+        }
         return map;
       }, {} as Record<string, AuthenticationValueStateType>),
     },

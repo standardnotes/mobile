@@ -158,6 +158,7 @@ export const getLabelForStateAndType = (
     case ChallengeValidation.Biometric: {
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
+          return 'Waiting for passcode.';
         case AuthenticationValueStateType.WaitingInput:
           return 'Press here to begin biometrics scan.';
         case AuthenticationValueStateType.Pending:
