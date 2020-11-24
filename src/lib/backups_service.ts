@@ -109,8 +109,8 @@ export class BackupsService extends ApplicationService {
 
   private async _showFileSavePromptAndroid(filepath: string) {
     const confirmed = await this.application!.alertService?.confirm(
-      'Backup Saved',
       `Your backup file has been saved to your local disk at this location:\n\n${filepath}`,
+      'Backup Saved',
       'Open File',
       ButtonType.Info,
       'Done'
