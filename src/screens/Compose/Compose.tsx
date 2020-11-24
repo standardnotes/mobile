@@ -164,10 +164,14 @@ export const Compose = React.memo(
 
     useEffect(() => {
       let mounted = true;
-      if (mounted && editor && editor.isTemplateNote) {
-        if (Platform.OS === 'ios') {
-          editorViewRef.current?.focus();
-        }
+      if (
+        mounted &&
+        editor &&
+        editor.isTemplateNote &&
+        editor.note?.prefersPlainEditor &&
+        Platform.OS === 'ios'
+      ) {
+        editorViewRef.current?.focus();
       }
       return () => {
         mounted = false;
@@ -180,6 +184,12 @@ export const Compose = React.memo(
         application?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
       };
     }, [application, note?.uuid]);
+
+    useEffect(() => {
+      return () => {
+        application?.getAppState().closeActiveEditor();
+      };
+    }, [application]);
 
     useFocusEffect(
       useCallback(() => {
@@ -532,7 +542,11 @@ export const Compose = React.memo(
               <StyledTextView
                 testID="noteContentField"
                 ref={editorViewRef}
-                autoFocus={Boolean(editor && editor.isTemplateNote)}
+                autoFocus={Boolean(
+                  editor &&
+                    editor.isTemplateNote &&
+                    editor.note?.prefersPlainEditor
+                )}
                 value={note?.text}
                 selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
                 handlesColor={theme.stylekitInfoColor}
