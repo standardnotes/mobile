@@ -450,7 +450,10 @@ export const Compose = React.memo(
     );
 
     const shouldDisplayEditor =
-      editorComponent && Boolean(note) && !webViewError;
+      editorComponent &&
+      Boolean(note) &&
+      !note?.prefersPlainEditor &&
+      !webViewError;
 
     return (
       <Container>
@@ -508,7 +511,7 @@ export const Compose = React.memo(
           <ComponentView
             key={editorComponent!.uuid}
             componentUuid={editorComponent!.uuid}
-            noteUuid={note!.uuid}
+            note={note!}
             onLoadStart={() => {
               setLoadingWebview(true);
               setWebviewError(false);

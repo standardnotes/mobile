@@ -122,7 +122,9 @@ export const Root = (): JSX.Element | null => {
   };
 
   const collapseIconBottomPosition =
-    (keyboardHeight ?? 0) > (height ?? 0) / 2 ? keyboardHeight : '50%';
+    (keyboardHeight ?? 0) > (height ?? 0) / 2
+      ? (keyboardHeight ?? 0) + 40
+      : '50%';
 
   if (isLocked) {
     return null;

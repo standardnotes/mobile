@@ -223,7 +223,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   );
 
   const onEditorPress = useCallback(
-    async (component?: SNComponent) => {
+    async (selectedComponent?: SNComponent) => {
       if (editor?.isTemplateNote) {
         await editor?.insertTemplatedNote();
       }
@@ -231,19 +231,22 @@ export const NoteSideMenu = React.memo((props: Props) => {
         note!
       );
       props.drawerRef?.closeDrawer();
-      if (!component) {
+      if (!selectedComponent) {
         if (!note?.prefersPlainEditor) {
           await application?.changeItem(note!.uuid, mutator => {
             const noteMutator = mutator as NoteMutator;
             noteMutator.prefersPlainEditor = true;
           });
         }
-        if (activeEditorComponent?.isExplicitlyEnabledForItem(note!.uuid)) {
+        if (
+          activeEditorComponent?.isExplicitlyEnabledForItem(note!.uuid) ||
+          activeEditorComponent?.isMobileDefault
+        ) {
           await disassociateComponentWithCurrentNote(activeEditorComponent);
         }
-      } else if (component.area === ComponentArea.Editor) {
+      } else if (selectedComponent.area === ComponentArea.Editor) {
         const currentEditor = activeEditorComponent;
-        if (currentEditor && component !== currentEditor) {
+        if (currentEditor && selectedComponent !== currentEditor) {
           await disassociateComponentWithCurrentNote(currentEditor);
         }
         const prefersPlain = note!.prefersPlainEditor;
@@ -253,7 +256,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             noteMutator.prefersPlainEditor = false;
           });
         }
-        await associateComponentWithCurrentNote(component);
+        await associateComponentWithCurrentNote(selectedComponent);
       }
       /** Dirtying can happen above */
       application?.sync();
