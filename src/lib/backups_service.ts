@@ -30,18 +30,17 @@ export class BackupsService extends ApplicationService {
       true
     );
 
-    const jsonString = JSON.stringify(data, null, 2 /* pretty print */);
     const modifier = encrypted ? 'Encrypted' : 'Decrypted';
     const filename = `Standard Notes ${modifier} Backup - ${this._formattedDate()}.txt`;
     if (data) {
       if (this.application?.platform === Platform.Ios) {
-        return this._exportIOS(filename, jsonString);
+        return this._exportIOS(filename, data);
       } else {
         const result = await this._showAndroidEmailOrSaveOption();
         if (result === 'email') {
           return this._exportViaEmailAndroid(Base64.encodeURI(data), filename);
         } else if (result === 'save') {
-          let filepath = await this._exportAndroid(filename, jsonString);
+          let filepath = await this._exportAndroid(filename, data);
           return this._showFileSavePromptAndroid(filepath);
         } else {
           return;
