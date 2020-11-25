@@ -1,4 +1,9 @@
-import { ContentType, PayloadSource, removeFromArray, SNNote } from 'snjs';
+import {
+  ContentType,
+  PayloadSource,
+  removeFromArray,
+  SNNote,
+} from '@standardnotes/snjs';
 import { MobileApplication } from './application';
 
 export type EditorNoteChangeObserver = (note: SNNote) => void;

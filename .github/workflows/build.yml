@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Export version from package.json
         run: |
-          echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
+          echo "PACKAGE_VERSION=$(grep '"version"' package.json | cut -d '"' -f 4)" >> $GITHUB_ENV
       - name: Setup react-native kernel and increase watchers
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Decode Dev Android keystore
@@ -27,6 +27,7 @@ jobs:
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
+          PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
           BUILD_NUMBER: ${{ github.run_number }}
           BUGSNAG_APIKEY: ${{ secrets.BUGSNAG_APIKEY }}
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.DEV_ANDROID_KEYSTORE_ALIAS }}
@@ -49,13 +50,13 @@ jobs:
         uses: actions/checkout@v2
       - name: Export version from package.json
         run: |
-          echo ::set-env name=PACKAGE_VERSION::$(node -pe "require('./package.json').version")
+          echo "PACKAGE_VERSION=$(grep '"version"' package.json | cut -d '"' -f 4)" >> $GITHUB_ENV
       - name: Set longer yarn timeout
         run: yarn config set network-timeout 300000
       - name: Install dependencies
         run: yarn run init
       - name: Set ssh connection to Github
-        uses: webfactory/ssh-agent@v0.4.0
+        uses: webfactory/ssh-agent@v0.4.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Export Apple AppStore Connect API key
@@ -71,6 +72,7 @@ jobs:
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
+          PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
           APPLE_APP_ID: ${{ secrets.DEV_APP_APPLE_ID }}
           APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
           APPSTORE_CONNECT_KEY_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ISSUER_ID }}

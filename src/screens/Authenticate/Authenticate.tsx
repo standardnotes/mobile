@@ -9,6 +9,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
+import {
+  ChallengeReason,
+  ChallengeValidation,
+  ChallengeValue,
+} from '@standardnotes/snjs';
 import { ICON_CLOSE } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import React, {
@@ -23,7 +28,6 @@ import React, {
 import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ChallengeReason, ChallengeValidation, ChallengeValue } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   BaseView,
@@ -77,8 +81,12 @@ export const Authenticate = ({
         } as ChallengeValue;
         return map;
       }, {} as Record<string, ChallengeValue>),
-      challengeValueStates: challenge.prompts.reduce((map, current) => {
-        map[current.id] = AuthenticationValueStateType.WaitingInput;
+      challengeValueStates: challenge.prompts.reduce((map, current, index) => {
+        if (index === 0) {
+          map[current.id] = AuthenticationValueStateType.WaitingInput;
+        } else {
+          map[current.id] = AuthenticationValueStateType.WaitingTurn;
+        }
         return map;
       }, {} as Record<string, AuthenticationValueStateType>),
     },

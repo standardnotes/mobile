@@ -3,7 +3,7 @@ import {
   ButtonType,
   isNullOrUndefined,
   StorageValueModes,
-} from 'snjs';
+} from '@standardnotes/snjs';
 import SNReactNative from 'standard-notes-rn';
 
 const FIRST_RUN_KEY = 'first_run';

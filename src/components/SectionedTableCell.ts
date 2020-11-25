@@ -33,9 +33,7 @@ export const SectionedTableCell = styled.View<Props>`
     `};
 `;
 
-export const SectionedTableCellTouchableHighlight = styled.TouchableHighlight<
-  Props
->`
+export const SectionedTableCellTouchableHighlight = styled.TouchableHighlight<Props>`
   border-bottom-color: ${props => props.theme.stylekitBorderColor};
   border-bottom-width: 1px;
   padding-left: ${props => props.theme.paddingLeft}px;

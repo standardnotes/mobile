@@ -2,6 +2,7 @@ import { AppStateType } from '@Lib/application_state';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
+import { ContentType, SNTag, SNTheme } from '@standardnotes/snjs';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
@@ -24,7 +25,6 @@ import { Platform } from 'react-native';
 import FAB from 'react-native-fab';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ContentType, SNTag, SNTheme } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   FirstSafeAreaView,
@@ -58,7 +58,6 @@ export const MainSideMenu = React.memo(
         .getAppState()
         .addStateChangeObserver(state => {
           if (state === AppStateType.TagChanged) {
-            console.log('update');
             setSelectedTag(application!.getAppState().getSelectedTag());
           }
         });
@@ -247,7 +246,7 @@ export const MainSideMenu = React.memo(
           mutator.conflictOf = undefined;
         });
       }
-      application!.getAppState().setSelectedTag(tag);
+      application!.getAppState().setSelectedTag(tag, true);
       drawerRef?.closeDrawer();
     };
 

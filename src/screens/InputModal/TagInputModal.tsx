@@ -5,6 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
+import { SNTag, TagMutator } from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
@@ -14,8 +15,6 @@ import React, {
   useState,
 } from 'react';
 import { TextInput } from 'react-native';
-import { SNTag } from 'snjs';
-import { TagMutator } from 'snjs/dist/@types/models/app/tag';
 import { Container, Input } from './InputModal.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_TAG>;

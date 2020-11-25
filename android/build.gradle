@@ -14,6 +14,13 @@ buildscript {
         mavenLocal()
         mavenCentral()
         jcenter()
+
+        configurations.all {
+            resolutionStrategy {
+                // use 0.9.0 to fix crash on Android 11
+                force "com.facebook.soloader:soloader:0.9.0"
+			}
+		}
     }
     dependencies {
         classpath('com.android.tools.build:gradle:3.5.2')

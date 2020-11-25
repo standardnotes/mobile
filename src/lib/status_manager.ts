@@ -1,5 +1,5 @@
 import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
-import { ApplicationService, removeFromArray } from 'snjs';
+import { ApplicationService, removeFromArray } from '@standardnotes/snjs';
 
 export type ScreenStatus = {
   status: string;

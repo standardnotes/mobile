@@ -5,6 +5,8 @@ import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens';
+import { SNNote } from '@standardnotes/snjs';
+import { NoteHistoryEntry } from '@standardnotes/snjs/dist/@types/services/history/entries/note_history_entry';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, { useContext, useState } from 'react';
 import { Dimensions, Platform } from 'react-native';
@@ -15,8 +17,6 @@ import {
   TabBar,
   TabView,
 } from 'react-native-tab-view';
-import { SNNote } from 'snjs';
-import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { ThemeContext } from 'styled-components/native';
 import { IosTabBarContainer } from './NoteHistory.styled';
 import { RemoteHistory } from './RemoteHistory';

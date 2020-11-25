@@ -1,11 +1,10 @@
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled';
+import { RevisionListEntry, SNNote } from '@standardnotes/snjs';
+import { NoteHistoryEntry } from '@standardnotes/snjs/dist/@types/services/history/entries/note_history_entry';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SNNote } from 'snjs';
-import { RevisionListEntry } from 'snjs/dist/@types/services/api/responses';
-import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { NoteHistoryCell } from './NoteHistoryCell';
 
 type Props = {

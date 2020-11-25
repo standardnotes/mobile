@@ -28,7 +28,7 @@ type Props = {
   options?: SideMenuOption[];
 };
 
-export const SideMenuSection: React.FC<Props> = props => {
+export const SideMenuSection: React.FC<Props> = React.memo(props => {
   const [collapsed, setCollapsed] = useState(Boolean(props.collapsed));
   const options = useMemo(() => {
     return props.options || [];
@@ -66,4 +66,4 @@ export const SideMenuSection: React.FC<Props> = props => {
       )}
     </Root>
   );
-};
+});

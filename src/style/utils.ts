@@ -1,5 +1,5 @@
+import { isNullOrUndefined } from '@standardnotes/snjs';
 import { Platform, ScaledSize } from 'react-native';
-import { isNullOrUndefined } from 'snjs';
 import { MobileTheme } from './theme_service';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';

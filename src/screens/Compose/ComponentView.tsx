@@ -1,5 +1,13 @@
 import { PrefKey } from '@Lib/preferences_manager';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import {
+  ButtonType,
+  ComponentAction,
+  ComponentArea,
+  LiveItem,
+  SNComponent,
+  SNNote,
+} from '@standardnotes/snjs';
 import React, {
   useCallback,
   useContext,
@@ -14,13 +22,6 @@ import {
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
 import {
-  ButtonType,
-  ComponentAction,
-  ComponentArea,
-  LiveItem,
-  SNComponent,
-} from 'snjs';
-import {
   FlexContainer,
   LockedContainer,
   LockedText,
@@ -30,7 +31,7 @@ import {
 
 type Props = {
   componentUuid: string;
-  noteUuid: string;
+  note: SNNote;
   onLoadEnd: () => void;
   onLoadStart: () => void;
   onLoadError: () => void;
@@ -40,7 +41,7 @@ export const ComponentView = ({
   onLoadEnd,
   onLoadError,
   onLoadStart,
-  noteUuid,
+  note,
   componentUuid,
 }: Props): JSX.Element => {
   // Context
@@ -118,7 +119,7 @@ export const ComponentView = ({
 
   useEffect(() => {
     let unregisterComponentHandler: (() => void) | undefined;
-    const note = application?.findItem(noteUuid);
+
     if (note && liveComponent) {
       unregisterComponentHandler = application?.componentManager!.registerHandler(
         {
@@ -132,7 +133,7 @@ export const ComponentView = ({
               );
             }
           },
-          contextRequestHandler: () => application?.findItem(noteUuid),
+          contextRequestHandler: () => note,
         }
       );
     }
@@ -140,7 +141,7 @@ export const ComponentView = ({
     return () => {
       unregisterComponentHandler && unregisterComponentHandler();
     };
-  }, [application, liveComponent, noteUuid]);
+  }, [application, liveComponent, note]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;

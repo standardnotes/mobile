@@ -1,14 +1,14 @@
-import { Base64 } from 'js-base64';
-import { Alert, Share } from 'react-native';
-import FileViewer from 'react-native-file-viewer';
-import RNFS from 'react-native-fs';
-import Mailer from 'react-native-mail';
 import {
   ApplicationService,
   ButtonType,
   EncryptionIntent,
   Platform,
-} from 'snjs';
+} from '@standardnotes/snjs';
+import { Base64 } from 'js-base64';
+import { Alert, Share } from 'react-native';
+import FileViewer from 'react-native-file-viewer';
+import RNFS from 'react-native-fs';
+import Mailer from 'react-native-mail';
 import { MobileApplication } from './application';
 
 export class BackupsService extends ApplicationService {
@@ -30,18 +30,17 @@ export class BackupsService extends ApplicationService {
       true
     );
 
-    const jsonString = JSON.stringify(data, null, 2 /* pretty print */);
     const modifier = encrypted ? 'Encrypted' : 'Decrypted';
     const filename = `Standard Notes ${modifier} Backup - ${this._formattedDate()}.txt`;
     if (data) {
       if (this.application?.platform === Platform.Ios) {
-        return this._exportIOS(filename, jsonString);
+        return this._exportIOS(filename, data);
       } else {
         const result = await this._showAndroidEmailOrSaveOption();
         if (result === 'email') {
           return this._exportViaEmailAndroid(Base64.encodeURI(data), filename);
         } else if (result === 'save') {
-          let filepath = await this._exportAndroid(filename, jsonString);
+          let filepath = await this._exportAndroid(filename, data);
           return this._showFileSavePromptAndroid(filepath);
         } else {
           return;
@@ -109,8 +108,8 @@ export class BackupsService extends ApplicationService {
 
   private async _showFileSavePromptAndroid(filepath: string) {
     const confirmed = await this.application!.alertService?.confirm(
-      'Backup Saved',
       `Your backup file has been saved to your local disk at this location:\n\n${filepath}`,
+      'Backup Saved',
       'Open File',
       ButtonType.Info,
       'Done'

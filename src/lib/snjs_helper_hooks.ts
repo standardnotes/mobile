@@ -7,14 +7,14 @@ import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
 } from '@Screens/screens';
-import React, { useCallback, useEffect } from 'react';
 import {
   ApplicationEvent,
   ButtonType,
   ProtectedAction,
   SNNote,
   StorageEncryptionPolicies,
-} from 'snjs';
+} from '@standardnotes/snjs';
+import React, { useCallback, useEffect } from 'react';
 import { LockStateType } from './application_state';
 import { Editor } from './editor';
 

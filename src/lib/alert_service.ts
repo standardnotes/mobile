@@ -1,6 +1,10 @@
 import { MODAL_BLOCKING_ALERT } from '@Screens/screens';
+import {
+  ButtonType,
+  DismissBlockingDialog,
+  SNAlertService,
+} from '@standardnotes/snjs';
 import { Alert, AlertButton } from 'react-native';
-import { ButtonType, DismissBlockingDialog, SNAlertService } from 'snjs';
 import { goBack, navigate } from './navigation_service';
 
 export class AlertService implements SNAlertService {

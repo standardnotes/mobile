@@ -3,9 +3,13 @@ import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTable
 import { SectionHeader } from '@Components/SectionHeader';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import {
+  PrivilegeCredential,
+  PrivilegeMutator,
+  ProtectedAction,
+  SNPrivileges,
+} from '@standardnotes/snjs';
 import React, { useCallback, useContext, useState } from 'react';
-import { PrivilegeCredential, ProtectedAction, SNPrivileges } from 'snjs';
-import { PrivilegeMutator } from 'snjs/dist/@types/models';
 import {
   AboutText,
   CellText,
@@ -63,10 +67,9 @@ export const ManagePrivileges = () => {
     const sessionEndDate = await application!.privilegesService!.getSessionExpirey();
     setSessionExpirey(sessionEndDate.toLocaleString());
     setSessionExpired(new Date() >= sessionEndDate);
-    let newCredentialDisplayInfo: Partial<Record<
-      PrivilegeCredential,
-      DisplayInfo
-    >> = {};
+    let newCredentialDisplayInfo: Partial<
+      Record<PrivilegeCredential, DisplayInfo>
+    > = {};
     for (const cred of updatedAvailableCredentials) {
       newCredentialDisplayInfo[cred] = displayInfoForCredential(cred);
     }

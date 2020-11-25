@@ -11,12 +11,12 @@ import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens';
+import { NoteHistoryEntry } from '@standardnotes/snjs/dist/@types/services/history/entries/note_history_entry';
 import { ICON_CHECKMARK } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, { useContext } from 'react';
 import { Platform } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { NoteHistoryEntry } from 'snjs/dist/@types/services/history/entries/note_history_entry';
 import { ThemeContext } from 'styled-components';
 import { HeaderTitleParams } from './App';
 

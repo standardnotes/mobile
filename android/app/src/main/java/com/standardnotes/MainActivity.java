@@ -1,6 +1,7 @@
 package com.standardnotes;
 
 import android.os.Bundle;
+import android.content.res.Configuration;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -36,6 +37,13 @@ public class MainActivity extends ReactActivity {
     @Override
     protected String getMainComponentName() {
       return "StandardNotes";
+    }
+
+    // Fix for Dark theme subscriptions https://github.com/facebook/react-native/issues/28823#issuecomment-642032481
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        getReactInstanceManager().onConfigurationChanged(this, newConfig);
     }
 
     @Override

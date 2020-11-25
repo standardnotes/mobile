@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-community/async-storage';
+import { ApplicationIdentifier, DeviceInterface } from '@standardnotes/snjs';
 import { Alert, Linking, Platform } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import { ApplicationIdentifier, DeviceInterface } from 'snjs';
 import Keychain from './keychain';
 
 export type BiometricsType =
@@ -46,6 +46,10 @@ export class MobileDeviceInterface extends DeviceInterface {
 
   deinit() {
     super.deinit();
+  }
+
+  legacy_setRawKeychainValue(value: any): Promise<void> {
+    return Keychain.setKeys(value);
   }
 
   private getDatabaseKeyPrefix(identifier: ApplicationIdentifier) {

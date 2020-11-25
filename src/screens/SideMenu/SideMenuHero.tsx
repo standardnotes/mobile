@@ -1,9 +1,9 @@
 import { Circle } from '@Components/Circle';
 import { useIsLocked, useOutOfSync, useSignedIn } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ContentType } from '@standardnotes/snjs';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ViewProps } from 'react-native';
-import { ContentType } from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import {
   Cell,

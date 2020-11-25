@@ -1,4 +1,4 @@
-import { removeFromArray } from 'snjs';
+import { removeFromArray } from '@standardnotes/snjs';
 import { MobileApplication } from './application';
 import { Editor } from './editor';
 

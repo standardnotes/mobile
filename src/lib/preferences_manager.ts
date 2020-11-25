@@ -1,4 +1,8 @@
-import { ApplicationService, isNullOrUndefined } from 'snjs';
+import {
+  ApplicationService,
+  isNullOrUndefined,
+  removeFromArray,
+} from '@standardnotes/snjs';
 import { MobileApplication } from './application';
 
 export enum PrefKey {
@@ -9,14 +13,17 @@ export enum PrefKey {
   NotesHideTags = 'hideTags',
   LastExportDate = 'lastExportDate',
   DoNotShowAgainUnsupportedEditors = 'doNotShowAgainUnsupportedEditors',
+  SelectedTagUuid = 'selectedTagUuid',
 }
 
+type Preferences = Record<PrefKey, any>;
+type PreferencesObserver = () => Promise<void> | void;
 export const LAST_EXPORT_DATE_KEY = 'LastExportDateKey';
 const PREFS_KEY = 'preferences';
 
 export class PreferencesManager extends ApplicationService {
-  private userPreferences!: Record<PrefKey, any>;
-  private loadingPrefs = false;
+  private userPreferences!: Preferences;
+  observers: PreferencesObserver[] = [];
 
   /** @override */
   async onAppLaunch() {
@@ -24,16 +31,35 @@ export class PreferencesManager extends ApplicationService {
     this.loadPreferences();
   }
 
+  deinit() {
+    this.observers = [];
+  }
+
+  /**
+   * Registers an observer for preferences loaded event
+   * @returns function that unregisters this observer
+   */
+  public addPreferencesLoadedObserver(callback: PreferencesObserver) {
+    this.observers.push(callback);
+    return () => {
+      removeFromArray(this.observers, callback);
+    };
+  }
+
+  notifyObserversOfPreferencesLoaded() {
+    for (const observer of this.observers) {
+      observer();
+    }
+  }
+
   get mobileApplication() {
     return this.application as MobileApplication;
   }
 
   private async loadPreferences() {
-    if (this.loadingPrefs) {
-      return;
-    }
     const preferences = await this.application.getValue(PREFS_KEY);
     this.userPreferences = preferences ?? {};
+    this.notifyObserversOfPreferencesLoaded();
   }
 
   private async saveSingleton() {

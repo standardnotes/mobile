@@ -1,13 +1,13 @@
 /* eslint-disable no-bitwise */
-import Aes from 'react-native-aes-crypto';
-import Sodium from 'react-native-sodium';
-import { timingSafeEqual } from 'sncrypto/lib/common';
 import {
   Base64String,
   HexString,
   SNPureCrypto,
+  timingSafeEqual,
   Utf8String,
-} from 'sncrypto/lib/common/pure_crypto';
+} from '@standardnotes/sncrypto-common';
+import Aes from 'react-native-aes-crypto';
+import Sodium from 'react-native-sodium';
 
 export class SNReactNativeCrypto implements SNPureCrypto {
   deinit(): void {}
@@ -136,14 +136,15 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
     const buf = new Uint32Array(tempBuf.buffer);
     let idx = -1;
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (
-      c
-    ) {
-      idx++;
-      const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+      /[xy]/g,
+      function (c) {
+        idx++;
+        const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      }
+    );
   }
 
   public async base64Encode(text: Utf8String): Promise<string> {

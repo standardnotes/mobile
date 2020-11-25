@@ -1,5 +1,17 @@
 import { MobileApplication } from '@Lib/application';
 import { ComponentManager } from '@Lib/component_manager';
+import {
+  ApplicationEvent,
+  ContentType,
+  CopyPayload,
+  CreateMaxPayloadFromAnyObject,
+  FillItemContent,
+  removeFromArray,
+  SNTheme,
+  StorageValueModes,
+  UuidString,
+} from '@standardnotes/snjs';
+import { RawPayload } from '@standardnotes/snjs/dist/@types/protocol/payloads/generator';
 import CSSParser from '@Style/css_parser';
 import {
   DARK_CONTENT,
@@ -17,18 +29,6 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native';
-import {
-  ApplicationEvent,
-  ContentType,
-  CopyPayload,
-  CreateMaxPayloadFromAnyObject,
-  FillItemContent,
-  removeFromArray,
-  SNTheme,
-  StorageValueModes,
-} from 'snjs';
-import { RawPayload } from 'snjs/dist/@types/protocol/payloads/generator';
-import { UuidString } from 'snjs/dist/@types/types';
 import THEME_DARK_JSON from './Themes/blue-dark.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 import THEME_RED_JSON from './Themes/red.json';

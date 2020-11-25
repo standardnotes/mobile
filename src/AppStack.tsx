@@ -82,7 +82,7 @@ export const AppStackComponent = (
       .addStateChangeObserver(event => {
         if (event === AppStateType.EditorClosed) {
           noteDrawerRef.current?.closeDrawer();
-          if (!isInTabletMode) {
+          if (!isInTabletMode && props.navigation.canGoBack()) {
             props.navigation.popToTop();
           }
         }
@@ -147,6 +147,9 @@ export const AppStackComponent = (
       drawerWidth={getDefaultDrawerWidth(dimensions)}
       drawerPosition={'left'}
       drawerType="slide"
+      drawerLockMode={
+        hasEditor && !isInTabletMode ? 'locked-closed' : 'unlocked'
+      }
       onDrawerStateChanged={handleDrawerStateChange}
       renderNavigationView={() =>
         !isLocked && <MainSideMenu drawerRef={drawerRef.current} />
@@ -160,7 +163,7 @@ export const AppStackComponent = (
         onDrawerClose={() => setNoteDrawerOpen(false)}
         drawerPosition={'right'}
         drawerType="slide"
-        drawerLockMode="locked-closed"
+        drawerLockMode={hasEditor ? 'unlocked' : 'locked-closed'}
         renderNavigationView={() =>
           hasEditor && (
             <NoteSideMenu

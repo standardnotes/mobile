@@ -1,5 +1,5 @@
+import { SNNote } from '@standardnotes/snjs';
 import React, { useContext } from 'react';
-import { SNNote } from 'snjs';
 import styled, { ThemeContext } from 'styled-components/native';
 
 const FlagsContainer = styled.View`

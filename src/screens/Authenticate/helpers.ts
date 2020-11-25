@@ -3,7 +3,7 @@ import {
   ChallengeValidation,
   ChallengeValue,
   PrivilegeCredential,
-} from 'snjs';
+} from '@standardnotes/snjs';
 
 export const findMatchingPrivilegeValueIndex = (
   values: PrivilegeLockValue[],
@@ -158,6 +158,7 @@ export const getLabelForStateAndType = (
     case ChallengeValidation.Biometric: {
       switch (state) {
         case AuthenticationValueStateType.WaitingTurn:
+          return 'Waiting for passcode.';
         case AuthenticationValueStateType.WaitingInput:
           return 'Press here to begin biometrics scan.';
         case AuthenticationValueStateType.Pending:

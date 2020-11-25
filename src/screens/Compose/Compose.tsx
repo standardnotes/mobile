@@ -4,6 +4,17 @@ import { isNullOrUndefined } from '@Lib/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
+import {
+  ApplicationEvent,
+  ComponentArea,
+  ContentType,
+  isPayloadSourceInternalChange,
+  isPayloadSourceRetrieved,
+  NoteMutator,
+  PayloadSource,
+  SNComponent,
+  SNNote,
+} from '@standardnotes/snjs';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import { lighten } from '@Style/utils';
@@ -17,17 +28,6 @@ import React, {
 import { Keyboard, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SNTextView from 'sn-textview';
-import {
-  ApplicationEvent,
-  ComponentArea,
-  ContentType,
-  isPayloadSourceInternalChange,
-  isPayloadSourceRetrieved,
-  NoteMutator,
-  PayloadSource,
-  SNComponent,
-  SNNote,
-} from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { ComponentView } from './ComponentView';
 import {
@@ -87,12 +87,12 @@ export const Compose = React.memo(
           statusTimeoutRef.current = setTimeout(() => {
             application
               ?.getStatusManager()
-              .setMessage(SCREEN_COMPOSE, status, color);
+              ?.setMessage(SCREEN_COMPOSE, status, color);
           }, MINIMUM_STATUS_DURATION);
         } else {
           application
             ?.getStatusManager()
-            .setMessage(SCREEN_COMPOSE, status, color);
+            ?.setMessage(SCREEN_COMPOSE, status, color);
         }
       },
       [application]
@@ -164,10 +164,14 @@ export const Compose = React.memo(
 
     useEffect(() => {
       let mounted = true;
-      if (mounted && editor && editor.isTemplateNote) {
-        if (Platform.OS === 'ios') {
-          editorViewRef.current?.focus();
-        }
+      if (
+        mounted &&
+        editor &&
+        editor.isTemplateNote &&
+        editor.note?.prefersPlainEditor &&
+        Platform.OS === 'ios'
+      ) {
+        editorViewRef.current?.focus();
       }
       return () => {
         mounted = false;
@@ -180,6 +184,12 @@ export const Compose = React.memo(
         application?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
       };
     }, [application, note?.uuid]);
+
+    useEffect(() => {
+      return () => {
+        application?.getAppState()?.closeActiveEditor();
+      };
+    }, [application]);
 
     useFocusEffect(
       useCallback(() => {
@@ -314,7 +324,10 @@ export const Compose = React.memo(
             setTitle(newNote.title);
             setNoteText(newNote.text);
           }
-          if (newNote.locked !== note?.locked) {
+          if (
+            note?.prefersPlainEditor !== newNote.prefersPlainEditor ||
+            newNote.locked !== note?.locked
+          ) {
             if (note) {
               setNote(newNote);
             }
@@ -447,7 +460,10 @@ export const Compose = React.memo(
     );
 
     const shouldDisplayEditor =
-      editorComponent && Boolean(note) && !webViewError;
+      editorComponent &&
+      Boolean(note) &&
+      !note?.prefersPlainEditor &&
+      !webViewError;
 
     return (
       <Container>
@@ -505,7 +521,7 @@ export const Compose = React.memo(
           <ComponentView
             key={editorComponent!.uuid}
             componentUuid={editorComponent!.uuid}
-            noteUuid={note!.uuid}
+            note={note!}
             onLoadStart={() => {
               setLoadingWebview(true);
               setWebviewError(false);
@@ -526,7 +542,11 @@ export const Compose = React.memo(
               <StyledTextView
                 testID="noteContentField"
                 ref={editorViewRef}
-                autoFocus={Boolean(editor && editor.isTemplateNote)}
+                autoFocus={Boolean(
+                  editor &&
+                    editor.isTemplateNote &&
+                    editor.note?.prefersPlainEditor
+                )}
                 value={note?.text}
                 selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
                 handlesColor={theme.stylekitInfoColor}

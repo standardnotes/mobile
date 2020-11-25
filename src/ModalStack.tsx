@@ -21,17 +21,17 @@ import {
 } from '@Screens/screens';
 import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
 import { Settings } from '@Screens/Settings/Settings';
-import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
-import { ThemeService } from '@Style/theme_service';
-import React, { useContext } from 'react';
-import { Platform } from 'react-native';
-import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import {
   Challenge,
   DeinitSource,
   PrivilegeCredential,
   ProtectedAction,
-} from 'snjs';
+} from '@standardnotes/snjs';
+import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
+import { ThemeService } from '@Style/theme_service';
+import React, { useContext } from 'react';
+import { Platform } from 'react-native';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ThemeContext } from 'styled-components';
 import { HeaderTitleParams } from './App';
 import { ApplicationContext } from './ApplicationContext';

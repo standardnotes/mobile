@@ -11,6 +11,13 @@ import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
 } from '@Screens/screens';
+import {
+  CollectionSort,
+  ContentType,
+  Platform,
+  ProtectedAction,
+  SNNote,
+} from '@standardnotes/snjs';
 import { ICON_ADD } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, {
@@ -21,13 +28,6 @@ import React, {
   useState,
 } from 'react';
 import FAB from 'react-native-fab';
-import {
-  CollectionSort,
-  ContentType,
-  Platform,
-  ProtectedAction,
-  SNNote,
-} from 'snjs';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';
@@ -264,11 +264,6 @@ export const Notes = React.memo(
       [application, getFirstSelectableNote, onNoteSelect]
     );
 
-    const currentTagCanHavePlaceholderNotes = useCallback(() => {
-      const selectedTag = application!.getAppState().getSelectedTag()!;
-      return selectedTag.isAllTag || !selectedTag.isSmartTag();
-    }, [application]);
-
     const reloadNotes = useCallback(
       (reselectNote?: boolean, tagChanged?: boolean, searchFilter?: string) => {
         const tag = application!.getAppState().selectedTag;
@@ -285,30 +280,6 @@ export const Notes = React.memo(
           ContentType.Note
         ) as SNNote[];
         let renderedNotes: SNNote[] = newNotes;
-
-        /**
-         * In case a template note is created we add it to
-         * the top of the list manually
-         */
-        if (
-          application?.getAppState().isTabletDevice &&
-          application?.getAppState().getActiveEditor()?.isTemplateNote &&
-          currentTagCanHavePlaceholderNotes()
-        ) {
-          /**
-           * We only add the template note in case the note is not already there
-           */
-          if (
-            newNotes.length === 0 ||
-            (newNotes.length > 0 &&
-              newNotes[0].uuid !==
-                application!.getAppState().getActiveEditor().note!.uuid)
-          ) {
-            renderedNotes = [
-              application!.getAppState().getActiveEditor().note!,
-            ].concat(newNotes);
-          }
-        }
 
         setNotes(renderedNotes);
         reloadTitle(renderedNotes, searchFilter);
@@ -339,7 +310,6 @@ export const Notes = React.memo(
       },
       [
         application,
-        currentTagCanHavePlaceholderNotes,
         reloadNotesDisplayOptions,
         reloadTitle,
         selectFirstNote,
