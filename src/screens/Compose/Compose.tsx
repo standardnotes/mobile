@@ -187,7 +187,7 @@ export const Compose = React.memo(
 
     useEffect(() => {
       return () => {
-        application?.getAppState().closeActiveEditor();
+        application?.getAppState()?.closeActiveEditor();
       };
     }, [application]);
 
