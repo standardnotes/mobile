@@ -55,7 +55,7 @@
     "react-navigation-header-buttons": "^6.0.0",
     "sn-textview": "standardnotes/sn-textview#440dbd60eedef4397b6272735e68d4579bb41ac8",
     "@standardnotes/sncrypto-common": "1.2.9",
-    "@standardnotes/snjs": "2.0.13",
+    "@standardnotes/snjs": "2.0.17",
     "standard-notes-rn": "standardnotes/standard-notes-rn#996b016",
     "styled-components": "^5.2.1"
   },
