@@ -118,14 +118,6 @@ export const Compose = React.memo(
     );
 
     useEffect(() => {
-      const unsubscribeStateEventObserver = application
-        ?.getAppState()
-        .addStateEventObserver(state => {
-          if (state === AppStateEventType.DrawerOpen) {
-            dissmissKeybard();
-          }
-        });
-
       const unsubscribeAppEventObserver = application?.addEventObserver(
         async eventName => {
           if (eventName === ApplicationEvent.CompletedFullSync) {
@@ -148,10 +140,7 @@ export const Compose = React.memo(
         }
       );
 
-      return () => {
-        unsubscribeAppEventObserver && unsubscribeAppEventObserver();
-        unsubscribeStateEventObserver && unsubscribeStateEventObserver();
-      };
+      return unsubscribeAppEventObserver;
     }, [
       application,
       note?.dirty,
@@ -161,6 +150,27 @@ export const Compose = React.memo(
       showErrorStatus,
       theme.stylekitWarningColor,
     ]);
+
+    useEffect(() => {
+      const unsubscribeStateEventObserver = application
+        ?.getAppState()
+        .addStateEventObserver(state => {
+          if (state === AppStateEventType.DrawerOpen) {
+            dissmissKeybard();
+            /**
+             * Saves latest note state before any change might happen in the drawer
+             */
+            if (note?.uuid) {
+              const updatedNote = application.findItem(note?.uuid) as SNNote;
+              if (updatedNote) {
+                setNote(updatedNote);
+              }
+            }
+          }
+        });
+
+      return unsubscribeStateEventObserver;
+    }, [application, note?.uuid]);
 
     useEffect(() => {
       let mounted = true;
@@ -318,7 +328,6 @@ export const Compose = React.memo(
             setTitle(newNote.title);
             setNoteText(newNote.text);
           }
-
           /**
            * If the note change was triggered by a local change
            * we only save it to local state if a meaningful value changed
@@ -326,9 +335,7 @@ export const Compose = React.memo(
            */
           if (
             note?.prefersPlainEditor !== newNote.prefersPlainEditor ||
-            newNote.locked !== note?.locked ||
-            newNote.text !== note.text ||
-            newNote.title !== note.title
+            newNote.locked !== note?.locked
           ) {
             if (note) {
               setNote(newNote);
