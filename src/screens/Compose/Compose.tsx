@@ -164,13 +164,7 @@ export const Compose = React.memo(
 
     useEffect(() => {
       let mounted = true;
-      if (
-        mounted &&
-        editor &&
-        editor.isTemplateNote &&
-        editor.note?.prefersPlainEditor &&
-        Platform.OS === 'ios'
-      ) {
+      if (mounted && editor && editor.isTemplateNote && Platform.OS === 'ios') {
         editorViewRef.current?.focus();
       }
       return () => {
@@ -324,9 +318,17 @@ export const Compose = React.memo(
             setTitle(newNote.title);
             setNoteText(newNote.text);
           }
+
+          /**
+           * If the note change was triggered by a local change
+           * we only save it to local state if a meaningful value changed
+           * to avoid unecessary UI renders.
+           */
           if (
             note?.prefersPlainEditor !== newNote.prefersPlainEditor ||
-            newNote.locked !== note?.locked
+            newNote.locked !== note?.locked ||
+            newNote.text !== note.text ||
+            newNote.title !== note.title
           ) {
             if (note) {
               setNote(newNote);
