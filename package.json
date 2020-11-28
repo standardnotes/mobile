@@ -1,7 +1,7 @@
 {
   "name": "StandardNotes",
-  "version": "3.5.9",
-  "user-version": "3.5.9",
+  "version": "3.5.10",
+  "user-version": "3.5.10",
   "private": true,
   "license": "AGPL-3.0-or-later",
   "scripts": {
