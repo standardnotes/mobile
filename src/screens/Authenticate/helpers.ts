@@ -139,12 +139,12 @@ export const getChallengePromptTitle = (
   prompt: ChallengePrompt,
   state: AuthenticationValueStateType
 ) => {
-  const title = prompt.title!;
+  const title = prompt.title;
   switch (state) {
     case AuthenticationValueStateType.WaitingTurn:
-      return title.concat(' ', '- Waiting.');
+      return title?.concat(' ', '- Waiting.') ?? 'Waiting';
     case AuthenticationValueStateType.Locked:
-      return title.concat(' ', '- Locked.');
+      return title?.concat(' ', '- Locked.') ?? 'Locked';
     default:
       return title;
   }
