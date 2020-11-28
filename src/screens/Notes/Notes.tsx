@@ -34,7 +34,13 @@ import { StyledIcon } from './Notes.styled';
 import { notePassesFilter, NoteSortKey } from './utils';
 
 export const Notes = React.memo(
-  ({ shouldSplitLayout }: { shouldSplitLayout: boolean | undefined }) => {
+  ({
+    shouldSplitLayout,
+    keyboardHeight,
+  }: {
+    shouldSplitLayout: boolean | undefined;
+    keyboardHeight: number | undefined;
+  }) => {
     // Context
     const application = useContext(ApplicationContext);
     const theme = useContext(ThemeContext);
@@ -477,7 +483,7 @@ export const Notes = React.memo(
           // @ts-ignore style prop does not exist in types
           style={
             application?.getAppState().isInTabletMode
-              ? { bottom: application?.getAppState().getKeyboardHeight() }
+              ? { bottom: keyboardHeight }
               : undefined
           }
           buttonColor={theme.stylekitInfoColor}
