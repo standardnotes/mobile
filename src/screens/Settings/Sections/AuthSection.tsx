@@ -98,7 +98,7 @@ export const AuthSection = (props: Props) => {
 
     if (result?.error) {
       if (result?.error.message) {
-        application?.alertService?.alert(result?.error.message, 'Oops', 'OK');
+        application?.alertService?.alert(result?.error.message);
       }
       setSigningIn(false);
       return;
@@ -133,11 +133,7 @@ export const AuthSection = (props: Props) => {
         true
       );
       if (result?.error) {
-        application?.alertService?.alert(
-          'Registration failed. Please try again.',
-          'Registration failed',
-          'OK'
-        );
+        application?.alertService?.alert(result.error.message);
       }
     }
     setRegistering(false);
