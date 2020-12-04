@@ -216,7 +216,7 @@ export const useSyncStatus = () => {
       setStatus(
         `Syncing ${stats.uploadCompletionCount}/${stats.uploadTotalCount} items...`
       );
-    } else {
+    } else if (!syncStatus.syncInProgress) {
       setStatus();
     }
   }, [application, setStatus]);
@@ -237,7 +237,9 @@ export const useSyncStatus = () => {
           updateLocalDataStatus();
         } else if (eventName === ApplicationEvent.WillSync) {
           if (!completedInitialSync) {
-            setStatus('Syncing...');
+            requestAnimationFrame(() => {
+              setStatus('Syncing...');
+            });
           }
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
           if (
