@@ -260,6 +260,8 @@ export const useSyncStatus = () => {
           application!.alertService!.alert(
             'Unable to write to local storage. Please restart the app and try again.'
           );
+        } else if (eventName === ApplicationEvent.SignedIn) {
+          setLoading(true);
         }
       }
     );
