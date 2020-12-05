@@ -6,7 +6,6 @@ const PADDING = 12;
 
 const Touchable = styled.TouchableWithoutFeedback``;
 const Container = styled.View`
-  flex: 1;
   flex-direction: row;
   margin: ${MARGIN}px;
   padding: ${PADDING}px;

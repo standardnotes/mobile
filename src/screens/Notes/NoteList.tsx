@@ -113,11 +113,6 @@ export const NoteList = (props: Props): JSX.Element => {
   }
   return (
     <Container>
-      {placeholderText.length > 0 && (
-        <LoadingContainer>
-          <LoadingText>{placeholderText}</LoadingText>
-        </LoadingContainer>
-      )}
       <HeaderContainer>
         {Platform.OS === 'ios' && (
           <IosSearchBar
@@ -167,10 +162,20 @@ export const NoteList = (props: Props): JSX.Element => {
       <FlatList
         style={styles.list}
         keyExtractor={item => item.uuid}
-        contentContainerStyle={{ paddingBottom: insets.bottom }}
+        contentContainerStyle={[
+          { paddingBottom: insets.bottom },
+          props.notes.length > 0 ? {} : { height: '100%' },
+        ]}
         initialNumToRender={6}
         windowSize={6}
         maxToRenderPerBatch={6}
+        ListEmptyComponent={() =>
+          placeholderText.length > 0 ? (
+            <LoadingContainer>
+              <LoadingText>{placeholderText}</LoadingText>
+            </LoadingContainer>
+          ) : null
+        }
         keyboardDismissMode={'interactive'}
         keyboardShouldPersistTaps={'never'}
         refreshControl={

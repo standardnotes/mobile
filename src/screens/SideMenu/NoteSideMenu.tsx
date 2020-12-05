@@ -88,6 +88,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
       changeNote(mutator => {
         mutator.trashed = true;
       });
+      props.drawerRef?.closeDrawer();
+      if (!application?.getAppState().isInTabletMode) {
+        navigation.popToTop();
+      }
     },
     editor
   );

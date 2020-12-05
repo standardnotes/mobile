@@ -236,7 +236,7 @@ export const useSyncStatus = () => {
           setLoading(false);
           updateLocalDataStatus();
         } else if (eventName === ApplicationEvent.WillSync) {
-          if (!completedInitialSync) {
+          if (application.hasAccount() && !completedInitialSync) {
             requestAnimationFrame(() => {
               setStatus('Syncing...');
             });
