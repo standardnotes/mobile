@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, TextStyle, ViewStyle } from 'react-native';
+import { Platform, TextStyle } from 'react-native';
 import styled from 'styled-components/native';
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
   buttonAction?: () => void;
   buttonStyles?: TextStyle;
   tinted?: boolean;
-  backgroundColor?: ViewStyle['backgroundColor'];
+  backgroundColor?: string;
 };
 
 const Container = styled.View<Pick<Props, 'backgroundColor'>>`

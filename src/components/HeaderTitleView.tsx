@@ -1,9 +1,9 @@
 import React from 'react';
-import { Platform, TextStyle } from 'react-native';
+import { Platform } from 'react-native';
 import styled from 'styled-components/native';
 
 type Props = {
-  subtitleColor?: TextStyle['color'];
+  subtitleColor?: string;
   title: string;
   subtitle?: string;
 };
