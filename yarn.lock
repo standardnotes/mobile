@@ -912,10 +912,10 @@
   resolved "https://registry.yarnpkg.com/@bugsnag/plugin-react/-/plugin-react-7.5.4.tgz#3fdd9a54d8170fbcdd99cfbd19d19628cf7ad582"
   integrity sha512-UFNCae2BbvvetIegAy+h45jlmtQ8k+ZnhpM0wnG4EPzDeZA1AFM+LzqRMWF7GrRRLb8H3W8PoswUN9M1Vr6eog==
 
-"@bugsnag/react-native@^7.5.4":
-  version "7.5.4"
-  resolved "https://registry.yarnpkg.com/@bugsnag/react-native/-/react-native-7.5.4.tgz#0cefb2cac062fcf36c957e6f4e07050ed7190097"
-  integrity sha512-WtAmNMiTekGhRj+BcCb47suNc+1+rJgUfDEhqlRGqXndMNH62YIG4mA/Ym8QzUlfLHbqhJj1S8z9NGJ4vYHuIg==
+"@bugsnag/react-native@^7.5.5":
+  version "7.5.5"
+  resolved "https://registry.yarnpkg.com/@bugsnag/react-native/-/react-native-7.5.5.tgz#5ba83b53c5c1e92acd15df290be57e15a332e6be"
+  integrity sha512-f2DapB8YjYcb2bjzYSdP3uJt0hzOudHxtGzjhMRVzcLv1AY2LvNSrD2karaX8MYKtM23Fs5K8G72DUBjk/cBUQ==
   dependencies:
     "@bugsnag/core" "^7.5.4"
     "@bugsnag/delivery-react-native" "^7.5.4"
@@ -1426,10 +1426,10 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.10.tgz#5dda643e19e587793bc2034dd9bf7398ad43d401"
   integrity sha512-rk4sWFsmtOw8oyx8SD3KSvawwaK7gRBSEIy2TAwURyGt+3TizssXP1r8nx3zY+R7v2vYYHXZ+k2/GULAT/bcaQ==
 
-"@react-native-community/segmented-control@^2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@react-native-community/segmented-control/-/segmented-control-2.2.1.tgz#5ca418d78c5f6051353c9586918458713b88a83c"
-  integrity sha512-BzxFbI9Iqv+31yVqEvCTzJYmwb8jOMTf/UPuC4Hj176tmEPqBpuDaGH+rkAFg1miOco3/43RQxiAZO+mkY40Fg==
+"@react-native-community/segmented-control@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/segmented-control/-/segmented-control-2.2.2.tgz#4014256819ab8f40f6bc3a3929ff14a9d149cf04"
+  integrity sha512-14+4HnGVrg3USqMzcHCPCqPmPmaEj0ogQH4pHRFXjoVvJokzidXBcYyXl5yrwFcKGW6zTXI6Fx9Qgt4ydtS6tw==
 
 "@react-navigation/core@^5.14.4":
   version "5.14.4"
@@ -1663,10 +1663,10 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.0.tgz#7036640b4e21cc2f259ae826ce843d277dad8cff"
   integrity sha512-RJJrrySY7A8havqpGObOB4W92QXKJo63/jFLLgpvOtsGUqbQZ9Sbgl35KMm1DjC6j7AvmmU2bIno+3IyEaemaw==
 
-"@types/styled-components@^5.1.4":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@types/styled-components/-/styled-components-5.1.4.tgz#11f167dbde268635c66adc89b5a5db2e69d75384"
-  integrity sha512-78f5Zuy0v/LTQNOYfpH+CINHpchzMMmAt9amY2YNtSgsk1TmlKm8L2Wijss/mtTrsUAVTm2CdGB8VOM65vA8xg==
+"@types/styled-components@^5.1.5":
+  version "5.1.5"
+  resolved "https://registry.yarnpkg.com/@types/styled-components/-/styled-components-5.1.5.tgz#a98e2ead1a1c7660b966f3aade4df9c0ec8ed75a"
+  integrity sha512-VWwoKm39W783a75oILtdCjnNn+FSV8Yh3O9naIudtZCAkk+rRfwLWzuPjf5k/OilENgZqAkxJ9sukSOZTAD86g==
   dependencies:
     "@types/hoist-non-react-statics" "*"
     "@types/react" "*"
