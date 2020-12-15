@@ -136,7 +136,10 @@ export const Root = (): JSX.Element | null => {
         notesListCollapsed={noteListCollapsed}
         shouldSplitLayout={shouldSplitLayout}
       >
-        <Notes shouldSplitLayout={shouldSplitLayout} />
+        <Notes
+          keyboardHeight={keyboardHeight}
+          shouldSplitLayout={shouldSplitLayout}
+        />
       </NotesContainer>
       {hasEditor && shouldSplitLayout && (
         <ComposeContainer>

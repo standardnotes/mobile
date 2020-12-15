@@ -1,10 +1,9 @@
-import { ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
 
 type Props = {
   size?: number;
-  backgroundColor: ViewStyle['backgroundColor'];
-  borderColor: ViewStyle['borderColor'];
+  backgroundColor?: string;
+  borderColor?: string;
 };
 
 export const Circle = styled.View<Props>`

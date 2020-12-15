@@ -8,8 +8,6 @@ import { App } from './src/App';
 import { name as appName } from './app.json';
 import { enableAndroidFontFix } from './src/style/android_text_fix';
 
-require('react-native').unstable_enableLogBox();
-
 enableScreens();
 
 if (__DEV__ === false) {

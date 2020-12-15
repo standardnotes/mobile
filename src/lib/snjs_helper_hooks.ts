@@ -216,7 +216,7 @@ export const useSyncStatus = () => {
       setStatus(
         `Syncing ${stats.uploadCompletionCount}/${stats.uploadTotalCount} items...`
       );
-    } else {
+    } else if (!syncStatus.syncInProgress) {
       setStatus();
     }
   }, [application, setStatus]);
@@ -236,8 +236,10 @@ export const useSyncStatus = () => {
           setLoading(false);
           updateLocalDataStatus();
         } else if (eventName === ApplicationEvent.WillSync) {
-          if (!completedInitialSync) {
-            setStatus('Syncing...');
+          if (application.hasAccount() && !completedInitialSync) {
+            requestAnimationFrame(() => {
+              setStatus('Syncing...');
+            });
           }
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
           if (
@@ -260,6 +262,8 @@ export const useSyncStatus = () => {
           application!.alertService!.alert(
             'Unable to write to local storage. Please restart the app and try again.'
           );
+        } else if (eventName === ApplicationEvent.SignedIn) {
+          setLoading(true);
         }
       }
     );
