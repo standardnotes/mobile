@@ -3,6 +3,7 @@ import { MobileApplication } from '@Lib/application';
 import { ApplicationGroup } from '@Lib/application_group';
 import { navigationRef } from '@Lib/navigation_service';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { DeinitSource } from '@standardnotes/snjs';
 import { MobileThemeVariables } from '@Style/Themes/styled-components';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -79,6 +80,7 @@ const AppComponent: React.FC<{
     return () => {
       themeServiceInstance?.deinit();
       setThemeServiceRef(undefined);
+      application.deinit(DeinitSource.Lock);
     };
   }, [application, application.Uuid, env, launchApp, setThemeServiceRef]);
 
