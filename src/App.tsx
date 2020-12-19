@@ -64,7 +64,6 @@ const AppComponent: React.FC<{
     let themeServiceInstance: ThemeService;
     const loadApplication = async () => {
       themeServiceInstance = new ThemeService(application);
-
       setThemeServiceRef(themeServiceInstance);
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
@@ -80,7 +79,9 @@ const AppComponent: React.FC<{
     return () => {
       themeServiceInstance?.deinit();
       setThemeServiceRef(undefined);
-      application.deinit(DeinitSource.Lock);
+      if (!application.hasStartedDeinit()) {
+        application.deinit(DeinitSource.Lock);
+      }
     };
   }, [application, application.Uuid, env, launchApp, setThemeServiceRef]);
 
