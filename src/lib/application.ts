@@ -36,6 +36,7 @@ export class MobileApplication extends SNApplication {
   private MobileServices!: MobileServices;
   public editorGroup: EditorGroup;
   public componentGroup: ComponentGroup;
+  private startedDeinit: boolean = false;
   public Uuid: string; // UI remounts when Uuid changes
 
   constructor(deviceInterface: MobileDeviceInterface, identifier: string) {
@@ -62,8 +63,13 @@ export class MobileApplication extends SNApplication {
     this.componentGroup = new ComponentGroup(this);
   }
 
+  public hasStartedDeinit() {
+    return this.startedDeinit;
+  }
+
   /** @override */
   deinit(source: DeinitSource) {
+    this.startedDeinit = true;
     for (const key of Object.keys(this.MobileServices)) {
       const service = (this.MobileServices as any)[key];
       if (service.deinit) {

@@ -20,6 +20,10 @@ jobs:
           gpg -d --passphrase "${{ secrets.KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
       - name: Install dependencies
         run: yarn install
+      - name: Ruby Setup for Fastlane
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:
