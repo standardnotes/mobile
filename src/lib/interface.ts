@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { ApplicationIdentifier, DeviceInterface } from '@standardnotes/snjs';
 import { Alert, Linking, Platform } from 'react-native';
+import DefaultPreference from 'react-native-default-preference';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Keychain from './keychain';
 
@@ -9,6 +10,11 @@ export type BiometricsType =
   | 'Face ID'
   | 'Biometrics'
   | 'Touch ID';
+
+/**
+ * This key is used for getting bugsnag preference from native side
+ */
+const BUGSNAG_OPT_OUT_KEY = 'bugsnagoptout';
 
 /**
  * This identifier was the database name used in Standard Notes web/desktop.
@@ -279,5 +285,17 @@ export class MobileDeviceInterface extends DeviceInterface {
         }
       })
       .catch(() => showAlert());
+  }
+
+  async getBugsnagOptedOut() {
+    try {
+      return (await DefaultPreference.get(BUGSNAG_OPT_OUT_KEY)) === 'true';
+    } catch {
+      return false;
+    }
+  }
+
+  setBusgnagOptedOut(optedOut: true | false) {
+    return DefaultPreference.set(BUGSNAG_OPT_OUT_KEY, optedOut.toString());
   }
 }

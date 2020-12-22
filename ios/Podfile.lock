@@ -320,6 +320,8 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.10):
     - React
+  - RNDefaultPreference (1.4.3):
+    - React
   - RNFileViewer (2.1.4):
     - React-Core
   - RNFS (2.16.6):
@@ -408,6 +410,7 @@ DEPENDENCIES:
   - ReactNativeAlternateIcons (from `../node_modules/react-native-alternate-icons`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
+  - RNDefaultPreference (from `../node_modules/react-native-default-preference`)
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -514,6 +517,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/async-storage"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
+  RNDefaultPreference:
+    :path: "../node_modules/react-native-default-preference"
   RNFileViewer:
     :path: "../node_modules/react-native-file-viewer"
   RNFS:
@@ -590,6 +595,7 @@ SPEC CHECKSUMS:
   ReactNativeAlternateIcons: b2a8a729d9d9756ed0652c352694f190407f297f
   RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
+  RNDefaultPreference: 2f8d6d54230edbd78708ada8d63bb275e5a8415b
   RNFileViewer: 83cc066ad795b1f986791d03b56fe0ee14b6a69f
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b

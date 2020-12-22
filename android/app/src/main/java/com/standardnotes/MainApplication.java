@@ -22,6 +22,7 @@ import com.bugsnag.android.Bugsnag;
 import com.facebook.react.modules.network.OkHttpClientProvider;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.database.CursorWindow;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -77,7 +78,12 @@ public class MainApplication extends Application implements ReactApplication {
       add(BreadcrumbType.ERROR);
     }});
 
-    Bugsnag.start(this, config);
+    SharedPreferences settings = getApplicationContext().getSharedPreferences("react-native", Context.MODE_PRIVATE);
+    String bugsnagOptOut = settings.getString("bugsnagoptout", "false");
+
+    if (bugsnagOptOut.equals("true")) {
+      Bugsnag.start(this, config);
+    }
 
     SoLoader.init(this, /* native exopackage */ false);
 
