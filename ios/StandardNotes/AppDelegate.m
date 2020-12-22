@@ -40,7 +40,7 @@ static void InitializeFlipper(UIApplication *application) {
   config.enabledBreadcrumbTypes = BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeLog
   | BSGEnabledBreadcrumbTypeUser | BSGEnabledBreadcrumbTypeState | BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeProcess;
   
-  if ([bugsnagOptOut isEqualToString:@"true"]) {
+  if (![bugsnagOptOut isEqualToString:@"true"]) {
     [Bugsnag startWithConfiguration:config];
   }
 

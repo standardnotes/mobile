@@ -54,7 +54,7 @@ export const CompanySection = (props: Props) => {
           'Changes will be refrected after an app restart.'
         );
       } catch {
-        application?.alertService.alert('Changing ');
+        application?.alertService.alert('An error occured. Please try again.');
       }
     },
     [application?.alertService, application?.deviceInterface]
