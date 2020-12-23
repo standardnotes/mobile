@@ -144,7 +144,7 @@ export const CompanySection = (props: Props) => {
       <ButtonCell
         leftAligned={true}
         title={
-          bugsnagOptOut ? 'Enable crash reporting' : 'Disable crash reporting'
+          bugsnagOptOut ? 'Enable error reporting' : 'Disable error reporting'
         }
         onPress={() => toggleBugnsagOptOut(!bugsnagOptOut)}
       >
