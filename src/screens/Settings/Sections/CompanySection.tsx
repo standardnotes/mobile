@@ -51,7 +51,7 @@ export const CompanySection = (props: Props) => {
         );
         setBugsnagOptOut(optOut);
         application?.alertService.alert(
-          'Changes will be refrected after an app restart.'
+          'Please restart the app to fully apply the requested changes.'
         );
       } catch {
         application?.alertService.alert('An error occured. Please try again.');
