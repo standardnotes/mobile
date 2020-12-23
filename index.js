@@ -14,8 +14,6 @@ if (__DEV__ === false) {
   console.log = () => {};
   console.warn = () => {};
   console.error = () => {};
-  // eslint-disable-next-line no-new
-  new Bugsnag.start();
   SNLog.onError = Bugsnag.notify;
   SNLog.onLog = Bugsnag.leaveBreadcrumb;
 } else {

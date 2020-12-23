@@ -32,12 +32,17 @@ static void InitializeFlipper(UIApplication *application) {
   #ifdef FB_SONARKIT_ENABLED
     InitializeFlipper(application);
   #endif
+  
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSString *bugsnagOptOut = [defaults objectForKey:@"bugsnagoptout"];
 
   BugsnagConfiguration *config = [BugsnagConfiguration loadConfig];
   config.enabledBreadcrumbTypes = BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeLog
   | BSGEnabledBreadcrumbTypeUser | BSGEnabledBreadcrumbTypeState | BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeProcess;
-
-  [Bugsnag startWithConfiguration:config];
+  
+  if (![bugsnagOptOut isEqualToString:@"true"]) {
+    [Bugsnag startWithConfiguration:config];
+  }
 
   [self configurePinning];
 
@@ -47,7 +52,7 @@ static void InitializeFlipper(UIApplication *application) {
 
   NSString *CFBundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
 
-  NSDictionary * initialProperties = @{@"env" : [CFBundleIdentifier isEqualToString:@"com.standardnotes.standardnotes.dev"] ? @"dev" : @"prod"};
+  NSDictionary * initialProperties = @{@"env" : [CFBundleIdentifier isEqualToString:@"com.standardnotes.standardnotes.dev"] ? @"dev" : @"prod", @"bugsnagOptOut": [bugsnagOptOut isEqualToString:@"true"] ? @YES : @NO};
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge

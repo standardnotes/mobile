@@ -1,3 +1,4 @@
+import Bugsnag from '@bugsnag/react-native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { MobileApplication } from '@Lib/application';
 import { ApplicationGroup } from '@Lib/application_group';
@@ -125,11 +126,22 @@ const AppComponent: React.FC<{
 const AppGroupInstance = new ApplicationGroup();
 AppGroupInstance.initialize();
 
-export const App = (props: { env: 'prod' | 'dev' }) => {
+export const App = (props: { env: 'prod' | 'dev'; bugsnagOptOut: boolean }) => {
   const applicationGroupRef = useRef(AppGroupInstance);
   const [application, setApplication] = useState<
     MobileApplication | undefined
   >();
+
+  useEffect(() => {
+    if (!__DEV__ && !props.bugsnagOptOut) {
+      try {
+        Bugsnag.start();
+      } catch {
+        console.error('Bugnsag failed to start');
+      }
+    }
+  }, [props.bugsnagOptOut]);
+
   useEffect(() => {
     const removeAppChangeObserver = applicationGroupRef.current.addApplicationChangeObserver(
       () => {
