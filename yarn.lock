@@ -1364,10 +1364,10 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.2.9.tgz#5212a959e4ec563584e42480bfd39ef129c3cbdf"
   integrity sha512-xJ5IUGOZztjSgNP/6XL+Ut5+q9UgSTv6xMtKkcQC5aJxCOkJy9u6RamPLdF00WQgwibxx2tu0e43bKUjTgzMig==
 
-"@standardnotes/snjs@2.0.27":
-  version "2.0.27"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.0.27.tgz#6356f17c3ff2288a35ddf4cb311872c0e73dc54c"
-  integrity sha512-VEhqsgnYHTBD49SMNAn276dbPP4KN1pQQhtJFh9dM9JK2LS0OsbYuatiNS0bzEXkxVCaSYLTsaRb3rk7tciQyg==
+"@standardnotes/snjs@2.0.30":
+  version "2.0.30"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.0.30.tgz#767be04c0a40850f759b58be7615fbfaa7af9a50"
+  integrity sha512-60vMyyKED7WUgQcQRzYfCA7LjiJbzpnheQkdfELKdNW3bb5LoihdDPnai8hmDSY5ul4IkcD7dtkdQPBIEvFXSw==
   dependencies:
     "@standardnotes/sncrypto-common" "^1.2.9"
 
@@ -1521,6 +1521,13 @@
   version "0.63.40"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.63.40.tgz#66b11824a6aadb0dde0db87bd8aff58165c7a8f8"
   integrity sha512-y98TQBjfncIrdDrwIhxcmcad1gHKNfUKFnCBk3heYy0Gvt6BNcBeSKRvACV4cf6R1K/cNJMoS3rjaMvYhQyAgw==
+  dependencies:
+    "@types/react" "*"
+
+"@types/react-native@0.63.42":
+  version "0.63.42"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.63.42.tgz#d0baf405edc646d15d5a7f8e67983b8701c1ea2a"
+  integrity sha512-zb7m2Uwfz6MQh/Nq1DDAmzTRO+EQWV7ZyRl9ZZ2QLd1480xjRjPDQqRkp4vuk3gyRlQtwi0v9I3tOh2IxHFujw==
   dependencies:
     "@types/react" "*"
 
@@ -7471,9 +7478,9 @@ slide@^1.1.5:
   resolved "https://registry.yarnpkg.com/slide/-/slide-1.1.6.tgz#56eb027d65b4d2dce6cb2e2d32c4d4afc9e1d707"
   integrity sha1-VusCfWW00tzmyy4tMsTUr8nh1wc=
 
-sn-textview@standardnotes/sn-textview#f140ea8de28ac3a75eb5a3a6a521b637ef78d207:
+sn-textview@standardnotes/sn-textview#3b56f5c2c87c24370f00ee5a0cee0da9a9fc66c3:
   version "1.0.0"
-  resolved "https://codeload.github.com/standardnotes/sn-textview/tar.gz/f140ea8de28ac3a75eb5a3a6a521b637ef78d207"
+  resolved "https://codeload.github.com/standardnotes/sn-textview/tar.gz/3b56f5c2c87c24370f00ee5a0cee0da9a9fc66c3"
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
