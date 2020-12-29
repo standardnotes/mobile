@@ -7478,9 +7478,9 @@ slide@^1.1.5:
   resolved "https://registry.yarnpkg.com/slide/-/slide-1.1.6.tgz#56eb027d65b4d2dce6cb2e2d32c4d4afc9e1d707"
   integrity sha1-VusCfWW00tzmyy4tMsTUr8nh1wc=
 
-sn-textview@standardnotes/sn-textview#f140ea8de28ac3a75eb5a3a6a521b637ef78d207:
+sn-textview@standardnotes/sn-textview#3b56f5c2c87c24370f00ee5a0cee0da9a9fc66c3:
   version "1.0.0"
-  resolved "https://codeload.github.com/standardnotes/sn-textview/tar.gz/f140ea8de28ac3a75eb5a3a6a521b637ef78d207"
+  resolved "https://codeload.github.com/standardnotes/sn-textview/tar.gz/3b56f5c2c87c24370f00ee5a0cee0da9a9fc66c3"
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
