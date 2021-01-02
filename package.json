@@ -1,7 +1,7 @@
 {
   "name": "StandardNotes",
-  "version": "3.5.15",
-  "user-version": "3.5.15",
+  "version": "3.5.16",
+  "user-version": "3.5.16",
   "private": true,
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -48,7 +48,7 @@
     "react-native-screens": "^2.16.1",
     "react-native-search-bar": "standardnotes/react-native-search-bar#7d2139d",
     "react-native-search-box": "standardnotes/react-native-search-box#c43b477943e99aa41e5b20711959c00c87286604",
-    "react-native-sodium": "standardnotes/react-native-sodium#e77eba9",
+    "react-native-sodium": "standardnotes/react-native-sodium#8b2a1dfad5cd7ecf5e34bbe77d4d7127b3670bea",
     "react-native-store-review": "^0.1.5",
     "react-native-tab-view": "^2.15.2",
     "react-native-vector-icons": "^7.1.0",
