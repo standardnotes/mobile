@@ -6736,9 +6736,9 @@ react-native-search-box@standardnotes/react-native-search-box#c43b477943e99aa41e
   dependencies:
     prop-types "^15.5.10"
 
-react-native-sodium@standardnotes/react-native-sodium#8b2a1dfad5cd7ecf5e34bbe77d4d7127b3670bea:
+react-native-sodium@standardnotes/react-native-sodium#367b61a90180fe75ddef5b599e01c47cb4761b1f:
   version "0.5.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-sodium/tar.gz/8b2a1dfad5cd7ecf5e34bbe77d4d7127b3670bea"
+  resolved "https://codeload.github.com/standardnotes/react-native-sodium/tar.gz/367b61a90180fe75ddef5b599e01c47cb4761b1f"
 
 react-native-store-review@^0.1.5:
   version "0.1.5"
