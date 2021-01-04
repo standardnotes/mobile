@@ -587,7 +587,7 @@ export const Authenticate = ({
                     secondInputRef,
                     thirdInputRef,
                     fourthInputRef
-                  )[index]
+                  )[index] as any
                 }
                 placeholder={challengeValue.prompt.placeholder}
                 onChangeText={text => {

@@ -36,7 +36,7 @@ export const TagSelectionList = React.memo(
     selectedTags,
     emptyPlaceholder,
     hasBottomPadding,
-  }: Props): JSX.Element => {
+  }: Props) => {
     // Context
     const application = useContext(ApplicationContext);
     const navigation = useNavigation<

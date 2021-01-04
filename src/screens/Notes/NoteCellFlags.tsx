@@ -28,7 +28,7 @@ export const NoteCellFlags = ({
 }: {
   note: SNNote;
   highlight: boolean;
-}): JSX.Element => {
+}) => {
   const theme = useContext(ThemeContext);
 
   let flags = [];

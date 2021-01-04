@@ -85,7 +85,7 @@ export const TagInputModal = (props: Props) => {
       <TableSection>
         <SectionedTableCell textInputCell first={true}>
           <Input
-            ref={textRef}
+            ref={textRef as any}
             placeholder={
               props.route.params.tagUuid ? 'Tag name' : 'New tag name'
             }

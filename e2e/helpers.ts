@@ -1,6 +1,7 @@
 const faker = require('faker');
 import { by, device, element, expect, waitFor } from 'detox';
 
+// eslint-disable-next-line no-undef
 export const expectToBeVisible = async (testedElement: Detox.DetoxAny) => {
   try {
     await expect(testedElement).toBeVisible();

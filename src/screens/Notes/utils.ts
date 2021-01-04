@@ -1,5 +1,6 @@
 import { SNNote } from '@standardnotes/snjs';
 
+// eslint-disable-next-line no-shadow
 export enum NoteSortKey {
   CreatedAt = 'created_at',
   UserUpdatedAt = 'userModifiedDate',

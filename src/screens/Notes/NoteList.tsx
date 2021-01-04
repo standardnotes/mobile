@@ -48,7 +48,7 @@ type Props = {
   onRefresh: () => void;
 };
 
-export const NoteList = (props: Props): JSX.Element => {
+export const NoteList = (props: Props) => {
   // Context
   const [signedIn] = useSignedIn();
   const application = useContext(ApplicationContext);

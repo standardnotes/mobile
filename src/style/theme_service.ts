@@ -68,6 +68,7 @@ export class MobileTheme extends SNTheme {
   }
 }
 
+// eslint-disable-next-line no-shadow
 enum SystemThemeTint {
   Blue = 'Blue',
   Dark = 'Dark',

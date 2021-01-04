@@ -354,9 +354,9 @@ export const AuthenticatePrivileges = ({
               <Input
                 key={Platform.OS === 'android' ? keyboardType : undefined}
                 ref={
-                  privilegeValue.type === PrivilegeCredential.LocalPasscode
+                  (privilegeValue.type === PrivilegeCredential.LocalPasscode
                     ? localPasscodeRef
-                    : accountPasswordRef
+                    : accountPasswordRef) as any
                 }
                 placeholder={
                   privilegeValue.type === PrivilegeCredential.LocalPasscode

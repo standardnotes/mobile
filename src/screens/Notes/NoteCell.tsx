@@ -38,7 +38,7 @@ export const NoteCell = ({
   sortType,
   hideDates,
   hidePreviews,
-}: Props): JSX.Element => {
+}: Props) => {
   // Context
   const application = useContext(ApplicationContext);
 
@@ -225,7 +225,7 @@ export const NoteCell = ({
       onPressOut={_onPressOut}
       onLongPress={onLongPress}
     >
-      <Container ref={elementRef} selected={highlight} padding={padding}>
+      <Container ref={elementRef as any} selected={highlight} padding={padding}>
         {note.deleted && <DeletedText>Deleting...</DeletedText>}
 
         <NoteCellFlags note={note} highlight={highlight} />

@@ -21,7 +21,7 @@ import {
   NotesContainer,
 } from './Root.styled';
 
-export const Root = (): JSX.Element | null => {
+export const Root = () => {
   // Context
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);

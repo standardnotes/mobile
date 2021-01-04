@@ -43,7 +43,7 @@ export const ComponentView = ({
   onLoadStart,
   note,
   componentUuid,
-}: Props): JSX.Element => {
+}: Props) => {
   // Context
   const application = useContext(ApplicationContext);
 
