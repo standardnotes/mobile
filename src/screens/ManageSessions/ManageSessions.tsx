@@ -1,0 +1,141 @@
+import { ApplicationContext } from '@Root/ApplicationContext';
+import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled';
+import {
+  ButtonType,
+  RemoteSession,
+  SessionStrings,
+  UuidString,
+} from '@standardnotes/snjs';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { FlatList, ListRenderItem, RefreshControl } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ThemeContext } from 'styled-components/native';
+import { SessionCell } from './SessionCell';
+
+const useSessions = (): [
+  RemoteSession[],
+  () => void,
+  boolean,
+  (uuid: UuidString) => Promise<void>,
+  string
+] => {
+  // Context
+  const application = useContext(ApplicationContext);
+
+  // State
+  const [sessions, setSessions] = useState<RemoteSession[]>([]);
+  const [refreshing, setRefreshing] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const getSessions = useCallback(async () => {
+    setRefreshing(true);
+    const response = await application?.getSessions();
+    if (response && 'error' in response) {
+      if (response.error?.message) {
+        setErrorMessage(response.error.message);
+      } else {
+        setErrorMessage('An unknown error occured while loading sessions.');
+      }
+    } else {
+      const newSessions = response as RemoteSession[];
+      setSessions(newSessions);
+      setErrorMessage('');
+    }
+    setRefreshing(false);
+  }, [application]);
+
+  useEffect(() => {
+    getSessions();
+  }, [application, getSessions]);
+
+  async function revokeSession(uuid: UuidString) {
+    let sessionsBeforeRevoke = sessions;
+    setSessions(sessions.filter(session => session.uuid !== uuid));
+    const response = await application?.revokeSession(uuid);
+    if (response && 'error' in response) {
+      if (response.error?.message) {
+        setErrorMessage(response.error?.message);
+      } else {
+        setErrorMessage('An unknown error occured while revoking the session.');
+      }
+      setSessions(sessionsBeforeRevoke);
+    }
+  }
+
+  return [sessions, getSessions, refreshing, revokeSession, errorMessage];
+};
+
+export const ManageSessions: React.FC = () => {
+  // Context
+  const application = useContext(ApplicationContext);
+  const theme = useContext(ThemeContext);
+  const insets = useSafeAreaInsets();
+
+  const [
+    sessions,
+    getSessions,
+    refreshing,
+    revokeSession,
+    errorMessage,
+  ] = useSessions();
+
+  const onItemPress = useCallback(
+    async (item: RemoteSession) => {
+      const confirmed = await application?.alertService.confirm(
+        SessionStrings.RevokeText,
+        SessionStrings.RevokeTitle,
+        SessionStrings.RevokeConfirmButton,
+        ButtonType.Danger,
+        SessionStrings.RevokeCancelButton
+      );
+      if (confirmed) {
+        try {
+          await revokeSession(item.uuid);
+          getSessions();
+        } catch (e) {
+          application?.alertService.alert('Action failed. Please try again.');
+        }
+      }
+    },
+    [application?.alertService, getSessions, revokeSession]
+  );
+
+  const RenderItem: ListRenderItem<RemoteSession> | null | undefined = ({
+    item,
+  }) => {
+    return (
+      <SessionCell
+        onPress={() => onItemPress(item)}
+        title={item.device_info}
+        subTitle={item.updated_at.toLocaleDateString()}
+        currentSession={item.current}
+      />
+    );
+  };
+
+  if (errorMessage) {
+    return (
+      <LoadingContainer>
+        <LoadingText>{errorMessage}</LoadingText>
+      </LoadingContainer>
+    );
+  }
+
+  return (
+    <FlatList<RemoteSession>
+      keyExtractor={item => item.uuid}
+      contentContainerStyle={{ paddingBottom: insets.bottom }}
+      initialNumToRender={7}
+      windowSize={7}
+      data={sessions}
+      refreshControl={
+        <RefreshControl
+          tintColor={theme.stylekitContrastForegroundColor}
+          refreshing={refreshing}
+          onRefresh={getSessions}
+        />
+      }
+      renderItem={RenderItem}
+    />
+  );
+};

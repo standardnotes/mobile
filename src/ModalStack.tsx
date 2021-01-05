@@ -10,6 +10,7 @@ import { Authenticate } from '@Screens/Authenticate/Authenticate';
 import { AuthenticatePrivileges } from '@Screens/Authenticate/AuthenticatePrivileges';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
+import { ManageSessions } from '@Screens/ManageSessions/ManageSessions';
 import {
   MODAL_BLOCKING_ALERT,
   SCREEN_AUTHENTICATE,
@@ -17,6 +18,7 @@ import {
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_MANAGE_PRIVILEGES,
+  SCREEN_MANAGE_SESSIONS,
   SCREEN_SETTINGS,
 } from '@Screens/screens';
 import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
@@ -43,6 +45,7 @@ type ModalStackNavigatorParamList = {
   HistoryStack: undefined;
   [SCREEN_SETTINGS]: undefined;
   [SCREEN_MANAGE_PRIVILEGES]: undefined;
+  [SCREEN_MANAGE_SESSIONS]: undefined;
   [SCREEN_INPUT_MODAL_TAG]: HeaderTitleParams & {
     tagUuid?: string;
     noteUuid?: string;
@@ -167,6 +170,31 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
           ),
         })}
         component={ManagePrivileges}
+      />
+      <MainStack.Screen
+        name={SCREEN_MANAGE_SESSIONS}
+        options={() => ({
+          title: 'Active Sessions',
+          headerTitle: ({ children }) => {
+            return <HeaderTitleView title={children || ''} />;
+          },
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Done' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : ThemeService.nameForIcon(ICON_CHECKMARK)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
+        })}
+        component={ManageSessions}
       />
       <MainStack.Screen
         name={SCREEN_INPUT_MODAL_PASSCODE}

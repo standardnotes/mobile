@@ -12,6 +12,7 @@ import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePri
 import {
   SCREEN_AUTHENTICATE_PRIVILEGES,
   SCREEN_MANAGE_PRIVILEGES,
+  SCREEN_MANAGE_SESSIONS,
   SCREEN_SETTINGS,
 } from '@Screens/screens';
 import { ButtonType, ProtectedAction } from '@standardnotes/snjs';
@@ -37,6 +38,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   const [encryptedBackup, setEncryptedBackp] = useState(false);
   const [lastExportDate, setLastExportDate] = useState<Date | undefined>(() =>
     application?.getPrefsService().getValue(PrefKey.LastExportDate, undefined)
+  );
+  const [isDevEnv] = useState<boolean>(
+    () => application?.getAppState().getEnvironment() === 'dev'
   );
 
   const lastExportData = useMemo(() => {
@@ -158,6 +162,10 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     navigation.push(SCREEN_MANAGE_PRIVILEGES);
   }, [navigation]);
 
+  const openManageSessions = useCallback(() => {
+    navigation.push(SCREEN_MANAGE_SESSIONS);
+  }, [navigation]);
+
   const onManagePrivilegesPress = useCallback(async () => {
     if (
       await application?.privilegesService!.actionRequiresPrivilege(
@@ -227,6 +235,15 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         title={'Manage Privileges'}
         onPress={onManagePrivilegesPress}
       />
+
+      {isDevEnv && (
+        <ButtonCell
+          testID="manageSessionsButton"
+          leftAligned={true}
+          title={'Active Sessions'}
+          onPress={openManageSessions}
+        />
+      )}
 
       {signedIn && (
         <ButtonCell
