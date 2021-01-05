@@ -83,9 +83,10 @@ export const ManageSessions: React.FC = () => {
     async (item: RemoteSession) => {
       const confirmed = await application?.alertService.confirm(
         SessionStrings.RevokeText,
-        SessionStrings.RevokeText,
-        undefined,
-        ButtonType.Info
+        SessionStrings.RevokeTitle,
+        SessionStrings.RevokeConfirmButton,
+        ButtonType.Danger,
+        SessionStrings.RevokeCancelButton
       );
       if (confirmed) {
         try {
