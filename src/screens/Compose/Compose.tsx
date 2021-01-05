@@ -491,7 +491,7 @@ export const Compose = React.memo(() => {
             size={16}
             color={theme.stylekitBackgroundColor}
           />
-          <LockedText>Unable to load</LockedText>
+          <LockedText>Unable to load {editorComponent?.name}</LockedText>
           <WebViewReloadButton
             onPress={() => {
               setLoadingWebview(false);
