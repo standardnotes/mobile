@@ -308,7 +308,6 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
           onClickAction={openSettings}
           visible={true}
           size={29}
-          paddingTop={Platform.OS ? 2 : 0}
           iconTextComponent={
             <Icon name={ThemeService.nameForIcon(ICON_SETTINGS)} />
           }
