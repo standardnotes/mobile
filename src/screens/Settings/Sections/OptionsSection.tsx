@@ -39,6 +39,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   const [lastExportDate, setLastExportDate] = useState<Date | undefined>(() =>
     application?.getPrefsService().getValue(PrefKey.LastExportDate, undefined)
   );
+  const [isDevEnv] = useState<boolean>(
+    () => application?.getAppState().getEnvironment() === 'dev'
+  );
 
   const lastExportData = useMemo(() => {
     if (lastExportDate) {
@@ -233,7 +236,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         onPress={onManagePrivilegesPress}
       />
 
-      {signedIn && (
+      {isDevEnv && (
         <ButtonCell
           testID="manageSessionsButton"
           leftAligned={true}

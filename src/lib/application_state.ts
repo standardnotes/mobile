@@ -668,7 +668,8 @@ export class ApplicationState extends ApplicationService {
   }
 
   public getEnvironment() {
-    const bundleId = VersionInfo.bundleIdentifier();
-    return bundleId === 'com.standardnotes.dev' ? 'dev' : 'prod';
+    const bundleId = VersionInfo.bundleIdentifier;
+    console.log(bundleId && bundleId.includes('dev'));
+    return bundleId && bundleId.includes('dev') ? 'dev' : 'prod';
   }
 }
