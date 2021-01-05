@@ -9,10 +9,9 @@ type Props = {
   testID?: string;
   disabled?: boolean;
   onPress: () => void;
-  first?: boolean;
-  last?: boolean;
   title: string;
-  subTitle?: string;
+  subTitle: string;
+  currentSession: boolean;
 };
 
 const Container = styled(SectionedTableCellTouchableHighlight).attrs(props => ({
@@ -40,25 +39,28 @@ const ButtonLabel = styled.Text<ButtonLabelProps>`
       opacity: 0.6;
     `}
 `;
-export const SubTitleText = styled.Text`
+export const SubTitleText = styled.Text<{ current: boolean }>`
   font-size: 14px;
   margin-top: 4px;
-  color: ${({ theme }) => theme.stylekitForegroundColor};
+  color: ${({ theme, current }) =>
+    current ? theme.stylekitInfoColor : theme.stylekitForegroundColor};
   opacity: 0.8;
   line-height: 21px;
 `;
 
-export const NoteHistoryCell: React.FC<Props> = props => (
+export const SessionCell: React.FC<Props> = props => (
   <Container
-    first={props.first}
-    last={props.last}
     testID={props.testID}
     disabled={props.disabled}
     onPress={props.onPress}
   >
     <ButtonContainer>
       <ButtonLabel disabled={props.disabled}>{props.title}</ButtonLabel>
-      {props.subTitle && <SubTitleText>{props.subTitle}</SubTitleText>}
+      <SubTitleText current={props.currentSession}>
+        {props.currentSession
+          ? 'Current session'
+          : 'Signed in on ' + props.subTitle}
+      </SubTitleText>
     </ButtonContainer>
   </Container>
 );
