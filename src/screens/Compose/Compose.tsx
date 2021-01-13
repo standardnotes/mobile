@@ -54,9 +54,9 @@ export class Compose extends React.Component<{}, State> {
   static contextType = ApplicationContext;
   context: React.ContextType<typeof ApplicationContext>;
   editorViewRef: React.RefObject<SNTextView> = createRef();
-  saveTimeoutRef: number | undefined;
+  saveTimeout: number | undefined;
   alreadySaved: boolean = false;
-  statusTimeoutRef: number | undefined;
+  statusTimeout: number | undefined;
   removeEditorObserver?: () => void;
   removeEditorNoteValueChangeObserver?: () => void;
   removeComponentsObserver?: () => void;
@@ -232,14 +232,20 @@ export class Compose extends React.Component<{}, State> {
     this.removeEditorNoteValueChangeObserver = undefined;
     this.dismissKeyboard();
     this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+    }
+    if (this.statusTimeout) {
+      clearTimeout(this.statusTimeout);
+    }
   }
 
   setStatus = (status: string, color?: string, wait: boolean = true) => {
-    if (this.statusTimeoutRef) {
-      clearTimeout(this.statusTimeoutRef);
+    if (this.statusTimeout) {
+      clearTimeout(this.statusTimeout);
     }
     if (wait) {
-      this.statusTimeoutRef = setTimeout(() => {
+      this.statusTimeout = setTimeout(() => {
         this.context
           ?.getStatusManager()
           ?.setMessage(SCREEN_COMPOSE, status, color);
@@ -298,7 +304,7 @@ export class Compose extends React.Component<{}, State> {
     } else if (associatedEditor.uuid !== this.state.editorComponent?.uuid) {
       await this.context?.componentGroup.activateComponent(associatedEditor);
     }
-    console.log('contextItemDidChangeInArea');
+
     this.context?.componentManager!.contextItemDidChangeInArea(
       ComponentArea.Editor
     );
@@ -351,14 +357,14 @@ export class Compose extends React.Component<{}, State> {
       isUserModified
     );
 
-    if (this.saveTimeoutRef) {
-      clearTimeout(this.saveTimeoutRef);
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
     }
     const noDebounce = bypassDebouncer || this.context?.noAccount();
     const syncDebouceMs = noDebounce
       ? SAVE_TIMEOUT_NO_DEBOUNCE
       : SAVE_TIMEOUT_DEBOUNCE;
-    this.saveTimeoutRef = setTimeout(() => {
+    this.saveTimeout = setTimeout(() => {
       this.context?.sync();
       if (closeAfterSync) {
         this.context?.getAppState().closeEditor(this.editor!);
