@@ -70,7 +70,6 @@ export class Compose extends React.Component<{}, State> {
   state: State = {
     title: '',
     noteText: '',
-    noteUuid: undefined,
     editorComponent: undefined,
     noteLocked: false,
     saveError: false,

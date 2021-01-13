@@ -40,7 +40,6 @@ export const ComponentView = ({
   onLoadEnd,
   onLoadError,
   onLoadStart,
-  note,
   componentUuid,
 }: Props) => {
   // Context
