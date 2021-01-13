@@ -1,34 +1,25 @@
 import { AppStateEventType } from '@Lib/application_state';
-import { Editor } from '@Lib/editor';
 import { isNullOrUndefined } from '@Lib/utils';
-import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import {
   ApplicationEvent,
+  ComponentAction,
   ComponentArea,
   ContentType,
   isPayloadSourceInternalChange,
   isPayloadSourceRetrieved,
   NoteMutator,
-  PayloadSource,
   SNComponent,
-  SNNote,
 } from '@standardnotes/snjs';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import { lighten } from '@Style/utils';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { createRef } from 'react';
 import { Keyboard, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SNTextView from 'sn-textview';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import { ComponentView } from './ComponentView';
 import {
   Container,
@@ -43,86 +34,138 @@ import {
   WebViewReloadButton,
   WebViewReloadButtonText,
 } from './Compose.styled';
+
 const NOTE_PREVIEW_CHAR_LIMIT = 80;
 const MINIMUM_STATUS_DURATION = 400;
 const SAVE_TIMEOUT_DEBOUNCE = 250;
 const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
 
-export const Compose = React.memo(() => {
-  // Context
-  const application = useContext(ApplicationContext);
-  const theme = useContext(ThemeContext);
-  const themeService = useContext(ThemeServiceContext);
+type State = {
+  title: string | undefined;
+  noteText: string | undefined;
+  noteLocked: boolean | undefined;
+  saveError: boolean;
+  editorComponent: SNComponent | undefined;
+  webViewError: boolean;
+  loadingWebview: boolean;
+};
 
-  //State
-  const [title, setTitle] = useState<string | undefined>();
-  const [noteText, setNoteText] = useState<string | undefined>(undefined);
-  const [editor, setEditor] = useState<Editor | undefined>();
-  const [note, setNote] = useState<SNNote | undefined>();
-  const [saveError, setSaveError] = useState(false);
-  const [editorComponent, setEditorComponent] = useState<
-    SNComponent | undefined
-  >();
-  const [webViewError, setWebviewError] = useState(false);
-  const [loadingWebview, setLoadingWebview] = useState(false);
+export class Compose extends React.Component<{}, State> {
+  static contextType = ApplicationContext;
+  context: React.ContextType<typeof ApplicationContext>;
+  editorViewRef: React.RefObject<SNTextView> = createRef();
+  saveTimeoutRef: number | undefined;
+  alreadySaved: boolean = false;
+  statusTimeoutRef: number | undefined;
+  removeEditorObserver?: () => void;
+  removeEditorNoteValueChangeObserver?: () => void;
+  removeComponentsObserver?: () => void;
+  removeEditorNoteChangeObserver?: () => void;
+  removeStreamComponents?: () => void;
+  removeComponentGroupObserver?: () => void;
+  removeStateEventObserver?: () => void;
+  removeAppEventObserver?: () => void;
+  removeComponentHandler?: () => void;
 
-  // Ref
-  const editorViewRef = useRef<SNTextView>(null);
-  const saveTimeoutRef = useRef<number | undefined>(undefined);
-  const statusTimeoutRef = useRef<number | undefined>(undefined);
-  const alreadySaved = useRef(false);
-
-  const dissmissKeybard = () => {
-    Keyboard.dismiss();
-    editorViewRef.current?.blur();
+  state: State = {
+    title: '',
+    noteText: '',
+    noteUuid: undefined,
+    editorComponent: undefined,
+    noteLocked: false,
+    saveError: false,
+    webViewError: false,
+    loadingWebview: false,
   };
 
-  const setStatus = useCallback(
-    (status: string, color?: string, wait: boolean = true) => {
-      if (statusTimeoutRef.current) {
-        clearTimeout(statusTimeoutRef.current);
+  componentDidMount() {
+    const initialEditor = this.context?.editorGroup.activeEditor;
+
+    // eslint-disable-next-line react/no-did-mount-set-state
+    this.setState({
+      title: initialEditor?.note?.safeTitle(),
+      noteText: initialEditor?.note?.safeText(),
+      noteLocked: initialEditor?.note?.locked,
+    });
+
+    this.removeEditorNoteChangeObserver = this.editor?.addNoteChangeObserver(
+      newNote => {
+        this.setState(
+          {
+            title: newNote.title,
+            noteText: newNote.text,
+            noteLocked: newNote.locked,
+          },
+          () => this.reloadComponentEditorState()
+        );
       }
-      if (wait) {
-        statusTimeoutRef.current = setTimeout(() => {
-          application
-            ?.getStatusManager()
-            ?.setMessage(SCREEN_COMPOSE, status, color);
-        }, MINIMUM_STATUS_DURATION);
-      } else {
-        application
-          ?.getStatusManager()
-          ?.setMessage(SCREEN_COMPOSE, status, color);
+    );
+
+    this.removeEditorNoteValueChangeObserver = this.editor?.addNoteValueChangeObserver(
+      (newNote, source) => {
+        if (isPayloadSourceRetrieved(source!)) {
+          this.setState({
+            title: newNote.title,
+            noteText: newNote.text,
+            noteLocked: newNote.locked,
+          });
+        }
+        if (!this.state.noteText) {
+          this.setState({ noteText: newNote.text });
+        }
+        if (!this.state.title) {
+          this.setState({ title: newNote.title });
+        }
+
+        if (newNote.lastSyncBegan) {
+          if (newNote.lastSyncEnd) {
+            if (
+              newNote.lastSyncBegan?.getTime() > newNote.lastSyncEnd.getTime()
+            ) {
+              this.showSavingStatus();
+            } else if (
+              newNote.lastSyncEnd.getTime() > newNote.lastSyncBegan.getTime()
+            ) {
+              this.showAllChangesSavedStatus();
+            }
+          } else {
+            this.showSavingStatus();
+          }
+        }
       }
-    },
-    [application]
-  );
+    );
 
-  const showSavingStatus = useCallback(() => {
-    alreadySaved.current = true;
-    setStatus('Saving...', undefined, false);
-  }, [setStatus]);
+    this.removeStreamComponents = this.context?.streamItems(
+      ContentType.Component,
+      async (_items, source) => {
+        if (isPayloadSourceInternalChange(source!)) {
+          return;
+        }
+        if (!this.note) {
+          return;
+        }
 
-  const showAllChangesSavedStatus = useCallback(() => {
-    setSaveError(false);
-    const offlineStatus = application?.hasAccount() ? '' : ' (offline)';
-    setStatus('All changes saved' + offlineStatus);
-  }, [application, setStatus]);
+        this.reloadComponentEditorState();
+      }
+    );
 
-  const showErrorStatus = useCallback(
-    (message: string) => {
-      setSaveError(true);
-      setStatus(message, theme.stylekitWarningColor);
-    },
-    [setStatus, theme.stylekitWarningColor]
-  );
+    this.removeComponentGroupObserver = this.context?.componentGroup.addChangeObserver(
+      async () => {
+        const newEditor = this.context?.componentGroup.activeComponentForArea(
+          ComponentArea.Editor
+        );
+        this.setState({
+          editorComponent: newEditor,
+        });
+      }
+    );
 
-  useEffect(() => {
-    const unsubscribeAppEventObserver = application?.addEventObserver(
+    this.removeAppEventObserver = this.context?.addEventObserver(
       async eventName => {
         if (eventName === ApplicationEvent.CompletedFullSync) {
           /** if we're still dirty, don't change status, a sync is likely upcoming. */
-          if (!note?.dirty && saveError) {
-            showAllChangesSavedStatus();
+          if (!this.note?.dirty && this.state.saveError) {
+            this.showAllChangesSavedStatus();
           }
         } else if (eventName === ApplicationEvent.FailedSync) {
           /**
@@ -130,454 +173,359 @@ export const Compose = React.memo(() => {
            * Otherwise, it means the originating sync came from somewhere else
            * and we don't want to display an error here.
            */
-          if (note?.dirty) {
-            showErrorStatus('Sync Unavailable (changes saved offline)');
+          if (this.note?.dirty) {
+            this.showErrorStatus('Sync Unavailable (changes saved offline)');
           }
         } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
-          showErrorStatus('Offline Saving Issue (changes not saved)');
+          this.showErrorStatus('Offline Saving Issue (changes not saved)');
         }
       }
     );
 
-    return unsubscribeAppEventObserver;
-  }, [
-    application,
-    note?.dirty,
-    saveError,
-    setStatus,
-    showAllChangesSavedStatus,
-    showErrorStatus,
-    theme.stylekitWarningColor,
-  ]);
+    this.removeComponentHandler = this.context?.componentManager!.registerHandler(
+      {
+        identifier: 'component-view-' + Math.random(),
+        areas: [ComponentArea.Editor],
+        actionHandler: (currentComponent, action, data) => {
+          if (action === ComponentAction.SetSize) {
+            this.context?.componentManager!.handleSetSizeEvent(
+              currentComponent,
+              data
+            );
+          }
+        },
+        contextRequestHandler: () => this.note,
+      }
+    );
 
-  useEffect(() => {
-    const unsubscribeStateEventObserver = application
+    this.removeStateEventObserver = this.context
       ?.getAppState()
       .addStateEventObserver(state => {
         if (state === AppStateEventType.DrawerOpen) {
-          dissmissKeybard();
+          this.dismissKeyboard();
           /**
            * Saves latest note state before any change might happen in the drawer
            */
-          if (note?.uuid) {
-            const updatedNote = application.findItem(note?.uuid) as SNNote;
-            if (updatedNote) {
-              setNote(updatedNote);
-            }
-          }
         }
       });
 
-    return unsubscribeStateEventObserver;
-  }, [application, note?.uuid]);
-
-  useEffect(() => {
-    let mounted = true;
-    if (mounted && editor && editor.isTemplateNote && Platform.OS === 'ios') {
-      editorViewRef.current?.focus();
+    if (this.editor && this.editor.isTemplateNote && Platform.OS === 'ios') {
+      this.editorViewRef?.current?.focus();
     }
-    return () => {
-      mounted = false;
-    };
-  }, [application?.platform, editor, editor?.note?.uuid]);
+  }
 
-  useEffect(() => {
-    return () => {
-      alreadySaved.current = false;
-      application?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
-    };
-  }, [application, note?.uuid]);
+  componentWillUnmount() {
+    this.removeEditorNoteValueChangeObserver &&
+      this.removeEditorNoteValueChangeObserver();
+    this.removeEditorNoteChangeObserver &&
+      this.removeEditorNoteChangeObserver();
+    this.removeAppEventObserver && this.removeAppEventObserver();
+    this.removeComponentGroupObserver && this.removeComponentGroupObserver();
+    this.removeStreamComponents && this.removeStreamComponents();
+    this.removeStateEventObserver && this.removeStateEventObserver();
+    this.removeComponentHandler && this.removeComponentHandler();
+    this.removeStateEventObserver = undefined;
+    this.removeComponentHandler = undefined;
+    this.removeStreamComponents = undefined;
+    this.removeAppEventObserver = undefined;
+    this.removeComponentGroupObserver = undefined;
+    this.removeEditorNoteChangeObserver = undefined;
+    this.removeEditorNoteValueChangeObserver = undefined;
+    this.dismissKeyboard();
+    this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
+  }
 
-  useEffect(() => {
-    return () => {
-      application?.getAppState()?.closeActiveEditor();
-    };
-  }, [application]);
-
-  useFocusEffect(
-    useCallback(() => {
-      return dissmissKeybard;
-    }, [])
-  );
-
-  useEffect(() => {
-    let mounted = true;
-    if (!editor && mounted) {
-      const initialEditor = application?.editorGroup.activeEditor;
-      const tempNote = initialEditor?.note;
-      setEditor(initialEditor);
-      setNote(tempNote);
-      setNoteText(initialEditor?.note?.safeText());
-      setTitle(initialEditor?.note?.safeTitle());
+  setStatus = (status: string, color?: string, wait: boolean = true) => {
+    if (this.statusTimeoutRef) {
+      clearTimeout(this.statusTimeoutRef);
     }
-
-    return () => {
-      mounted = false;
-    };
-  }, [application, editor]);
-
-  const reloadComponentEditorState = useCallback(
-    async (updatedNote?: SNNote) => {
-      if (!updatedNote) {
-        return;
-      }
-      const associatedEditor = application?.componentManager!.editorForNote(
-        updatedNote
-      );
-      if (!associatedEditor) {
-        /** No editor */
-        if (editorComponent) {
-          await application?.componentGroup.deactivateComponentForArea(
-            ComponentArea.Editor
-          );
-        }
-      } else if (associatedEditor.uuid !== editorComponent?.uuid) {
-        await application?.componentGroup.activateComponent(associatedEditor);
-      }
-      application?.componentManager!.contextItemDidChangeInArea(
-        ComponentArea.Editor
-      );
-    },
-    [
-      application?.componentGroup,
-      application?.componentManager,
-      editorComponent,
-    ]
-  );
-
-  useEffect(() => {
-    let mounted = true;
-    const removeEditorObserver = application?.editorGroup.addChangeObserver(
-      newEditor => {
-        if (mounted) {
-          setEditor(newEditor);
-          setNote(newEditor?.note);
-          if (newEditor && newEditor.note) {
-            setTitle(newEditor?.note?.safeTitle());
-            setNoteText(newEditor.note?.safeText());
-          }
-        }
-      }
-    );
-
-    const removeComponentGroupObserver = application?.componentGroup.addChangeObserver(
-      async () => {
-        const newEditor = application?.componentGroup.activeComponentForArea(
-          ComponentArea.Editor
-        );
-        if (mounted) {
-          setEditorComponent(newEditor);
-        }
-      }
-    );
-
-    return () => {
-      mounted = false;
-      removeEditorObserver && removeEditorObserver();
-      removeComponentGroupObserver && removeComponentGroupObserver();
-    };
-  }, [application, editorComponent]);
-
-  useEffect(() => {
-    const removeComponentsObserver = application?.streamItems(
-      ContentType.Component,
-      async (_items, source) => {
-        if (
-          isPayloadSourceInternalChange(source!) ||
-          note?.uuid === undefined
-        ) {
-          return;
-        }
-        /**
-         * Hook updated only when note uuid changes
-         * to avoid running reloadComponentEditorState too often.
-         */
-        const updatedNote = application.findItem(note.uuid) as SNNote;
-        await reloadComponentEditorState(updatedNote!);
-      }
-    );
-
-    return removeComponentsObserver;
-  }, [application, reloadComponentEditorState, note?.uuid]);
-
-  useEffect(() => {
-    const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
-      newNote => {
-        setNote(newNote);
-        setTitle(newNote.title);
-        setNoteText(newNote.text);
-        reloadComponentEditorState(newNote);
-      }
-    );
-    return removeEditorNoteChangeObserver;
-  }, [editor, reloadComponentEditorState]);
-
-  useEffect(() => {
-    let mounted = true;
-    const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
-      (newNote, source) => {
-        if (isPayloadSourceRetrieved(source!)) {
-          if (
-            !editorComponent ||
-            (editorComponent && source !== PayloadSource.ComponentRetrieved)
-          ) {
-            setNote(newNote);
-          }
-
-          setTitle(newNote.title);
-          setNoteText(newNote.text);
-        }
-        /**
-         * If the note change was triggered by a local change
-         * we only save it to local state if a meaningful value changed
-         * to avoid unecessary UI renders.
-         */
-        if (
-          note?.prefersPlainEditor !== newNote.prefersPlainEditor ||
-          newNote.locked !== note?.locked
-        ) {
-          if (note) {
-            setNote(newNote);
-          }
-        }
-        if (mounted && newNote.lastSyncBegan) {
-          if (newNote.lastSyncEnd) {
-            if (
-              newNote.lastSyncBegan.getTime() > newNote.lastSyncEnd.getTime()
-            ) {
-              showSavingStatus();
-            } else if (
-              newNote.lastSyncEnd.getTime() > newNote.lastSyncBegan.getTime() &&
-              alreadySaved.current
-            ) {
-              showAllChangesSavedStatus();
-            }
-          } else {
-            showSavingStatus();
-          }
-        }
-      }
-    );
-
-    return () => {
-      mounted = false;
-      removeEditorNoteValueChangeObserver &&
-        removeEditorNoteValueChangeObserver();
-    };
-  }, [
-    editor,
-    editorComponent,
-    note,
-    showAllChangesSavedStatus,
-    showSavingStatus,
-  ]);
-
-  const saveNote = useCallback(
-    async (
-      bypassDebouncer: boolean,
-      isUserModified: boolean,
-      dontUpdatePreviews: boolean,
-      closeAfterSync: boolean,
-      values: {
-        newTitle: string | undefined;
-        newNoteText: string | undefined;
-      }
-    ) => {
-      if (!note) {
-        return;
-      }
-      if (note?.deleted) {
-        application!.alertService!.alert('deteled replace this');
-        return;
-      }
-
-      if (editor?.isTemplateNote) {
-        await editor?.insertTemplatedNote();
-        if (application?.getAppState().selectedTag?.isSmartTag() === false) {
-          await application.changeItem(
-            application?.getAppState().selectedTag!.uuid,
-            mutator => {
-              mutator.addItemAsRelationship(note!);
-            }
-          );
-        }
-      }
-      if (!application?.findItem(note!.uuid)) {
-        application?.alertService!.alert('invalid note replace');
-        return;
-      }
-      await application!.changeItem(
-        note!.uuid,
-        mutator => {
-          const noteMutator = mutator as NoteMutator;
-          noteMutator.title = values.newTitle!;
-          noteMutator.text = values.newNoteText!;
-          if (!dontUpdatePreviews) {
-            const text = values.newNoteText ?? '';
-            const truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT;
-            const substring = text.substring(0, NOTE_PREVIEW_CHAR_LIMIT);
-            const previewPlain = substring + (truncate ? '...' : '');
-            noteMutator.preview_plain = previewPlain;
-            noteMutator.preview_html = undefined;
-          }
-        },
-        isUserModified
-      );
-
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-      const noDebounce = bypassDebouncer || application?.noAccount();
-      const syncDebouceMs = noDebounce
-        ? SAVE_TIMEOUT_NO_DEBOUNCE
-        : SAVE_TIMEOUT_DEBOUNCE;
-      saveTimeoutRef.current = setTimeout(() => {
-        application?.sync();
-        if (closeAfterSync) {
-          application?.getAppState().closeEditor(editor!);
-        }
-      }, syncDebouceMs);
-    },
-    [application, editor, note]
-  );
-
-  const onTitleChange = (newTitle: string) => {
-    setTitle(newTitle);
-    saveNote(false, true, false, false, {
-      newTitle,
-      newNoteText: noteText,
-    });
+    if (wait) {
+      this.statusTimeoutRef = setTimeout(() => {
+        this.context
+          ?.getStatusManager()
+          ?.setMessage(SCREEN_COMPOSE, status, color);
+      }, MINIMUM_STATUS_DURATION);
+    } else {
+      this.context
+        ?.getStatusManager()
+        ?.setMessage(SCREEN_COMPOSE, status, color);
+    }
   };
 
-  const onContentChange = useCallback(
-    (newNoteText: string) => {
-      if (Platform.OS === 'android' && note?.locked) {
-        application?.alertService?.alert(
-          'This note is locked. Please unlock this note to make changes.'
+  showSavingStatus = () => {
+    this.setStatus('Saving...', undefined, false);
+  };
+
+  showAllChangesSavedStatus = () => {
+    this.setState({
+      saveError: false,
+    });
+    const offlineStatus = this.context?.hasAccount() ? '' : ' (offline)';
+    this.setStatus('All changes saved' + offlineStatus);
+  };
+
+  showErrorStatus = (message: string) => {
+    this.setState({
+      saveError: true,
+    });
+    this.setStatus(message);
+  };
+
+  get note() {
+    return this.context?.editorGroup.activeEditor.note;
+  }
+
+  get editor() {
+    return this.context?.editorGroup.activeEditor;
+  }
+
+  dismissKeyboard = () => {
+    Keyboard.dismiss();
+    this.editorViewRef.current?.blur();
+  };
+
+  reloadComponentEditorState = async () => {
+    const associatedEditor = this.context?.componentManager!.editorForNote(
+      this.note!
+    );
+
+    if (!associatedEditor) {
+      /** No editor */
+      if (this.state.editorComponent) {
+        await this.context?.componentGroup.deactivateComponent(
+          this.state.editorComponent
         );
-        return;
       }
-      setNoteText(newNoteText);
-      saveNote(false, true, false, false, {
-        newTitle: title,
-        newNoteText,
-      });
-    },
-    [application?.alertService, note?.locked, saveNote, title]
-  );
+    } else if (associatedEditor.uuid !== this.state.editorComponent?.uuid) {
+      await this.context?.componentGroup.activateComponent(associatedEditor);
+    }
+    console.log('contextItemDidChangeInArea');
+    this.context?.componentManager!.contextItemDidChangeInArea(
+      ComponentArea.Editor
+    );
+  };
 
-  const shouldDisplayEditor =
-    editorComponent &&
-    Boolean(note) &&
-    !note?.prefersPlainEditor &&
-    !webViewError;
+  saveNote = async (
+    bypassDebouncer: boolean,
+    isUserModified: boolean,
+    dontUpdatePreviews: boolean,
+    closeAfterSync: boolean
+  ) => {
+    if (!this.note) {
+      return;
+    }
+    if (this.note?.deleted) {
+      this.context!.alertService!.alert('deteled replace this');
+      return;
+    }
 
-  return (
-    <Container>
-      {note?.locked && (
-        <LockedContainer>
-          <Icon
-            name={ThemeService.nameForIcon(ICON_LOCK)}
-            size={16}
-            color={theme.stylekitBackgroundColor}
-          />
-          <LockedText>Note Locked</LockedText>
-        </LockedContainer>
-      )}
-      {webViewError && (
-        <LockedContainer>
-          <Icon
-            name={ThemeService.nameForIcon(ICON_ALERT)}
-            size={16}
-            color={theme.stylekitBackgroundColor}
-          />
-          <LockedText>Unable to load {editorComponent?.name}</LockedText>
-          <WebViewReloadButton
-            onPress={() => {
-              setLoadingWebview(false);
-              setWebviewError(false);
-            }}
-          >
-            <WebViewReloadButtonText>Reload</WebViewReloadButtonText>
-          </WebViewReloadButton>
-        </LockedContainer>
-      )}
-      <NoteTitleInput
-        testID="noteTitleField"
-        onChangeText={onTitleChange}
-        value={title}
-        placeholder={'Add Title'}
-        selectionColor={theme.stylekitInfoColor}
-        underlineColorAndroid={'transparent'}
-        placeholderTextColor={theme.stylekitNeutralColor}
-        keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
-        autoCorrect={true}
-        autoCapitalize={'sentences'}
-        editable={!note?.locked}
-      />
-      {loadingWebview && (
-        <LoadingWebViewContainer locked={note?.locked}>
-          <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
-          <LoadingWebViewSubtitle>
-            {editorComponent?.name}
-          </LoadingWebViewSubtitle>
-        </LoadingWebViewContainer>
-      )}
-      {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
-      {shouldDisplayEditor && (
-        <ComponentView
-          key={editorComponent!.uuid}
-          componentUuid={editorComponent!.uuid}
-          note={note!}
-          onLoadStart={() => {
-            setLoadingWebview(true);
-            setWebviewError(false);
-          }}
-          onLoadEnd={() => {
-            setLoadingWebview(false);
-          }}
-          onLoadError={() => {
-            setLoadingWebview(false);
-            setWebviewError(true);
-          }}
-        />
-      )}
-      {!shouldDisplayEditor &&
-        !isNullOrUndefined(note) &&
-        Platform.OS === 'android' && (
-          <TextContainer>
-            <StyledTextView
-              testID="noteContentField"
-              ref={editorViewRef}
-              autoFocus={Boolean(
-                editor &&
-                  editor.isTemplateNote &&
-                  editor.note?.prefersPlainEditor
+    if (this.editor?.isTemplateNote) {
+      await this.editor?.insertTemplatedNote();
+      if (this.context?.getAppState().selectedTag?.isSmartTag() === false) {
+        await this.context.changeItem(
+          this.context?.getAppState().selectedTag!.uuid,
+          mutator => {
+            mutator.addItemAsRelationship(this.note!);
+          }
+        );
+      }
+    }
+    if (!this.context?.findItem(this.note!.uuid)) {
+      this.context?.alertService!.alert('invalid note replace');
+      return;
+    }
+    await this.context!.changeItem(
+      this.note!.uuid,
+      mutator => {
+        const noteMutator = mutator as NoteMutator;
+        noteMutator.title = this.state.title!;
+        noteMutator.text = this.state.noteText!;
+        if (!dontUpdatePreviews) {
+          const text = this.state.noteText ?? '';
+          const truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT;
+          const substring = text.substring(0, NOTE_PREVIEW_CHAR_LIMIT);
+          const previewPlain = substring + (truncate ? '...' : '');
+          noteMutator.preview_plain = previewPlain;
+          noteMutator.preview_html = undefined;
+        }
+      },
+      isUserModified
+    );
+
+    if (this.saveTimeoutRef) {
+      clearTimeout(this.saveTimeoutRef);
+    }
+    const noDebounce = bypassDebouncer || this.context?.noAccount();
+    const syncDebouceMs = noDebounce
+      ? SAVE_TIMEOUT_NO_DEBOUNCE
+      : SAVE_TIMEOUT_DEBOUNCE;
+    this.saveTimeoutRef = setTimeout(() => {
+      this.context?.sync();
+      if (closeAfterSync) {
+        this.context?.getAppState().closeEditor(this.editor!);
+      }
+    }, syncDebouceMs);
+  };
+
+  onTitleChange = (newTitle: string) => {
+    this.setState(
+      {
+        title: newTitle,
+      },
+      () => this.saveNote(false, true, false, false)
+    );
+  };
+
+  onContentChange = (newNoteText: string) => {
+    if (Platform.OS === 'android' && this.note?.locked) {
+      this.context?.alertService?.alert(
+        'This note is locked. Please unlock this note to make changes.'
+      );
+      return;
+    }
+    this.setState(
+      {
+        noteText: newNoteText,
+      },
+      () => this.saveNote(false, true, false, false)
+    );
+  };
+
+  render() {
+    const shouldDisplayEditor =
+      this.state.editorComponent &&
+      Boolean(this.note) &&
+      !this.note?.prefersPlainEditor &&
+      !this.state.webViewError;
+
+    return (
+      <Container>
+        <ThemeContext.Consumer>
+          {theme => (
+            <>
+              {this.state?.noteLocked && (
+                <LockedContainer>
+                  <Icon
+                    name={ThemeService.nameForIcon(ICON_LOCK)}
+                    size={16}
+                    color={theme.stylekitBackgroundColor}
+                  />
+                  <LockedText>Note Locked</LockedText>
+                </LockedContainer>
               )}
-              value={note?.text}
-              selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
-              handlesColor={theme.stylekitInfoColor}
-              onChangeText={onContentChange}
-            />
-          </TextContainer>
-        )}
-      {/* Empty wrapping view fixes native textview crashing */}
-      {!shouldDisplayEditor && Platform.OS === 'ios' && (
-        <View key={note?.uuid}>
-          <StyledTextView
-            testID="noteContentField"
-            ref={editorViewRef}
-            autoFocus={false}
-            multiline
-            value={note?.text}
-            keyboardDismissMode={'interactive'}
-            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
-            selectionColor={lighten(theme.stylekitInfoColor)}
-            onChangeText={onContentChange}
-            editable={!note?.locked}
-          />
-        </View>
-      )}
-    </Container>
-  );
-});
+              {this.state.webViewError && (
+                <LockedContainer>
+                  <Icon
+                    name={ThemeService.nameForIcon(ICON_ALERT)}
+                    size={16}
+                    color={theme.stylekitBackgroundColor}
+                  />
+                  <LockedText>
+                    Unable to load {this.state.editorComponent?.name}
+                  </LockedText>
+                  <WebViewReloadButton
+                    onPress={() => {
+                      this.setState({
+                        loadingWebview: false,
+                        webViewError: false,
+                      });
+                    }}
+                  >
+                    <WebViewReloadButtonText>Reload</WebViewReloadButtonText>
+                  </WebViewReloadButton>
+                </LockedContainer>
+              )}
+              <ThemeServiceContext.Consumer>
+                {themeService => (
+                  <>
+                    <NoteTitleInput
+                      testID="noteTitleField"
+                      onChangeText={this.onTitleChange}
+                      value={this.state.title}
+                      placeholder={'Add Title'}
+                      selectionColor={theme.stylekitInfoColor}
+                      underlineColorAndroid={'transparent'}
+                      placeholderTextColor={theme.stylekitNeutralColor}
+                      keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
+                      autoCorrect={true}
+                      autoCapitalize={'sentences'}
+                      editable={!this.state.noteLocked}
+                    />
+                    {this.state.loadingWebview && (
+                      <LoadingWebViewContainer locked={this.state.noteLocked}>
+                        <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
+                        <LoadingWebViewSubtitle>
+                          {this.state.editorComponent?.name}
+                        </LoadingWebViewSubtitle>
+                      </LoadingWebViewContainer>
+                    )}
+                    {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
+                    {shouldDisplayEditor && (
+                      <ComponentView
+                        key={this.state.editorComponent!.uuid}
+                        componentUuid={this.state.editorComponent!.uuid}
+                        note={this.note!}
+                        onLoadStart={() => {
+                          this.setState({
+                            loadingWebview: true,
+                            webViewError: false,
+                          });
+                        }}
+                        onLoadEnd={() => {
+                          this.setState({
+                            loadingWebview: false,
+                          });
+                        }}
+                        onLoadError={() => {
+                          this.setState({
+                            loadingWebview: false,
+                            webViewError: true,
+                          });
+                        }}
+                      />
+                    )}
+                    {!shouldDisplayEditor &&
+                      !isNullOrUndefined(this.note) &&
+                      Platform.OS === 'android' && (
+                        <TextContainer>
+                          <StyledTextView
+                            testID="noteContentField"
+                            ref={this.editorViewRef}
+                            autoFocus={Boolean(this.note?.prefersPlainEditor)}
+                            value={this.note?.text}
+                            selectionColor={lighten(
+                              theme.stylekitInfoColor,
+                              0.35
+                            )}
+                            handlesColor={theme.stylekitInfoColor}
+                            onChangeText={this.onContentChange}
+                          />
+                        </TextContainer>
+                      )}
+                    {/* Empty wrapping view fixes native textview crashing */}
+                    {!shouldDisplayEditor && Platform.OS === 'ios' && (
+                      <View key={this.note?.uuid}>
+                        <StyledTextView
+                          testID="noteContentField"
+                          ref={this.editorViewRef}
+                          autoFocus={false}
+                          multiline
+                          value={this.state.noteText}
+                          keyboardDismissMode={'interactive'}
+                          keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
+                          selectionColor={lighten(theme.stylekitInfoColor)}
+                          onChangeText={this.onContentChange}
+                          editable={!this.note?.locked}
+                        />
+                      </View>
+                    )}
+                  </>
+                )}
+              </ThemeServiceContext.Consumer>
+            </>
+          )}
+        </ThemeContext.Consumer>
+      </Container>
+    );
+  }
+}
