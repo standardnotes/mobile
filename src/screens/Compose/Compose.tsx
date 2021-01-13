@@ -43,7 +43,6 @@ const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
 type State = {
   title: string | undefined;
   noteText: string | undefined;
-  noteLocked: boolean | undefined;
   saveError: boolean;
   editorComponent: SNComponent | undefined;
   webViewError: boolean;
@@ -71,7 +70,6 @@ export class Compose extends React.Component<{}, State> {
     title: '',
     noteText: '',
     editorComponent: undefined,
-    noteLocked: false,
     saveError: false,
     webViewError: false,
     loadingWebview: false,
@@ -84,7 +82,6 @@ export class Compose extends React.Component<{}, State> {
     this.setState({
       title: initialEditor?.note?.safeTitle(),
       noteText: initialEditor?.note?.safeText(),
-      noteLocked: initialEditor?.note?.locked,
     });
 
     this.removeEditorNoteChangeObserver = this.editor?.addNoteChangeObserver(
@@ -93,7 +90,6 @@ export class Compose extends React.Component<{}, State> {
           {
             title: newNote.title,
             noteText: newNote.text,
-            noteLocked: newNote.locked,
           },
           () => this.reloadComponentEditorState()
         );
@@ -106,7 +102,6 @@ export class Compose extends React.Component<{}, State> {
           this.setState({
             title: newNote.title,
             noteText: newNote.text,
-            noteLocked: newNote.locked,
           });
         }
         if (!this.state.noteText) {
@@ -238,6 +233,21 @@ export class Compose extends React.Component<{}, State> {
     if (this.statusTimeout) {
       clearTimeout(this.statusTimeout);
     }
+  }
+
+  /**
+   * Because note.locked accesses note.content.appData,
+   * we do not want to expose the template to direct access to note.locked,
+   * otherwise an exception will occur when trying to access note.locked if the note
+   * is deleted. There is potential for race conditions to occur with setState, where a
+   * previous setState call may have queued a digest cycle, and the digest cycle triggers
+   * on a deleted note.
+   */
+  get noteLocked() {
+    if (!this.note || this.note.deleted) {
+      return false;
+    }
+    return this.note.locked;
   }
 
   setStatus = (status: string, color?: string, wait: boolean = true) => {
@@ -408,7 +418,7 @@ export class Compose extends React.Component<{}, State> {
         <ThemeContext.Consumer>
           {theme => (
             <>
-              {this.state?.noteLocked && (
+              {this.noteLocked && (
                 <LockedContainer>
                   <Icon
                     name={ThemeService.nameForIcon(ICON_LOCK)}
@@ -454,10 +464,10 @@ export class Compose extends React.Component<{}, State> {
                       keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
                       autoCorrect={true}
                       autoCapitalize={'sentences'}
-                      editable={!this.state.noteLocked}
+                      editable={!this.noteLocked}
                     />
                     {this.state.loadingWebview && (
-                      <LoadingWebViewContainer locked={this.state.noteLocked}>
+                      <LoadingWebViewContainer locked={this.noteLocked}>
                         <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
                         <LoadingWebViewSubtitle>
                           {this.state.editorComponent?.name}
@@ -520,7 +530,7 @@ export class Compose extends React.Component<{}, State> {
                           keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
                           selectionColor={lighten(theme.stylekitInfoColor)}
                           onChangeText={this.onContentChange}
-                          editable={!this.note?.locked}
+                          editable={!this.noteLocked}
                         />
                       </View>
                     )}
