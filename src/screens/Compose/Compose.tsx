@@ -42,7 +42,6 @@ const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
 
 type State = {
   title: string | undefined;
-  noteText: string | undefined;
   saveError: boolean;
   editorComponent: SNComponent | undefined;
   webViewError: boolean;
@@ -68,7 +67,6 @@ export class Compose extends React.Component<{}, State> {
 
   state: State = {
     title: '',
-    noteText: '',
     editorComponent: undefined,
     saveError: false,
     webViewError: false,
@@ -81,7 +79,6 @@ export class Compose extends React.Component<{}, State> {
     // eslint-disable-next-line react/no-did-mount-set-state
     this.setState({
       title: initialEditor?.note?.safeTitle(),
-      noteText: initialEditor?.note?.safeText(),
     });
 
     this.removeEditorNoteChangeObserver = this.editor?.addNoteChangeObserver(
@@ -89,7 +86,6 @@ export class Compose extends React.Component<{}, State> {
         this.setState(
           {
             title: newNote.title,
-            noteText: newNote.text,
           },
           () => this.reloadComponentEditorState()
         );
@@ -101,11 +97,7 @@ export class Compose extends React.Component<{}, State> {
         if (isPayloadSourceRetrieved(source!)) {
           this.setState({
             title: newNote.title,
-            noteText: newNote.text,
           });
-        }
-        if (!this.state.noteText) {
-          this.setState({ noteText: newNote.text });
         }
         if (!this.state.title) {
           this.setState({ title: newNote.title });
@@ -203,12 +195,15 @@ export class Compose extends React.Component<{}, State> {
         }
       });
 
-    if (this.editor && this.editor.isTemplateNote && Platform.OS === 'ios') {
-      this.editorViewRef?.current?.focus();
+    if (this.editor?.isTemplateNote && Platform.OS === 'ios') {
+      setTimeout(() => {
+        this.editorViewRef?.current?.focus();
+      }, 0);
     }
   }
 
   componentWillUnmount() {
+    this.dismissKeyboard();
     this.removeEditorNoteValueChangeObserver &&
       this.removeEditorNoteValueChangeObserver();
     this.removeEditorNoteChangeObserver &&
@@ -225,7 +220,7 @@ export class Compose extends React.Component<{}, State> {
     this.removeComponentGroupObserver = undefined;
     this.removeEditorNoteChangeObserver = undefined;
     this.removeEditorNoteValueChangeObserver = undefined;
-    this.dismissKeyboard();
+
     this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
@@ -324,7 +319,8 @@ export class Compose extends React.Component<{}, State> {
     bypassDebouncer: boolean,
     isUserModified: boolean,
     dontUpdatePreviews: boolean,
-    closeAfterSync: boolean
+    closeAfterSync: boolean,
+    newNoteText: string | undefined = this.note!.text
   ) => {
     if (!this.note) {
       return;
@@ -354,9 +350,9 @@ export class Compose extends React.Component<{}, State> {
       mutator => {
         const noteMutator = mutator as NoteMutator;
         noteMutator.title = this.state.title!;
-        noteMutator.text = this.state.noteText!;
+        noteMutator.text = newNoteText;
         if (!dontUpdatePreviews) {
-          const text = this.state.noteText ?? '';
+          const text = newNoteText ?? '';
           const truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT;
           const substring = text.substring(0, NOTE_PREVIEW_CHAR_LIMIT);
           const previewPlain = substring + (truncate ? '...' : '');
@@ -398,12 +394,7 @@ export class Compose extends React.Component<{}, State> {
       );
       return;
     }
-    this.setState(
-      {
-        noteText: newNoteText,
-      },
-      () => this.saveNote(false, true, false, false)
-    );
+    this.saveNote(false, true, false, false, newNoteText);
   };
 
   render() {
@@ -506,7 +497,7 @@ export class Compose extends React.Component<{}, State> {
                           <StyledTextView
                             testID="noteContentField"
                             ref={this.editorViewRef}
-                            autoFocus={Boolean(this.note?.prefersPlainEditor)}
+                            autoFocus={false}
                             value={this.note?.text}
                             selectionColor={lighten(
                               theme.stylekitInfoColor,
@@ -525,7 +516,7 @@ export class Compose extends React.Component<{}, State> {
                           ref={this.editorViewRef}
                           autoFocus={false}
                           multiline
-                          value={this.state.noteText}
+                          value={this.note?.text}
                           keyboardDismissMode={'interactive'}
                           keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
                           selectionColor={lighten(theme.stylekitInfoColor)}

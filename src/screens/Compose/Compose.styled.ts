@@ -1,3 +1,4 @@
+import React, { ComponentProps } from 'react';
 import { Platform } from 'react-native';
 import SNTextView from 'sn-textview';
 import styled, { css } from 'styled-components/native';
@@ -89,7 +90,7 @@ export const StyledKeyboardAvoidngView = styled.KeyboardAvoidingView`
   ${({ theme }) => theme.stylekitBackgroundColor};
 `;
 
-export const StyledTextView = styled(SNTextView)`
+const StyledTextViewComponent = styled(SNTextView)`
   padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   padding-left: ${({ theme }) =>
@@ -108,3 +109,25 @@ export const StyledTextView = styled(SNTextView)`
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   /* ${Platform.OS === 'ios' && 'padding-bottom: 10px'}; */
 `;
+
+export const StyledTextView = React.memo(
+  StyledTextViewComponent,
+  (
+    newProps: ComponentProps<typeof SNTextView>,
+    prevProps: ComponentProps<typeof SNTextView>
+  ) => {
+    if (
+      newProps.selectionColor !== prevProps.selectionColor ||
+      newProps.handlesColor !== prevProps.handlesColor ||
+      newProps.autoFocus !== prevProps.autoFocus ||
+      newProps.editable !== prevProps.editable ||
+      newProps.keyboardDismissMode !== prevProps.keyboardDismissMode ||
+      newProps.keyboardAppearance !== prevProps.keyboardAppearance ||
+      newProps.testID !== prevProps.testID ||
+      newProps.multiline !== prevProps.multiline
+    ) {
+      return false;
+    }
+    return true;
+  }
+);
