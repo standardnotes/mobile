@@ -13,6 +13,7 @@ import {
   ChallengeReason,
   ChallengeValidation,
   ChallengeValue,
+  ProtectionSessionDurations,
 } from '@standardnotes/snjs';
 import { ICON_CLOSE } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
@@ -34,6 +35,7 @@ import {
   Container,
   Input,
   SectionContainer,
+  SessionLengthContainer,
   SourceContainer,
   StyledSectionedTableCell,
   Subtitle,
@@ -49,6 +51,15 @@ import {
 } from './helpers';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_AUTHENTICATE>;
+
+function isValidChallengeValue(challengeValue: ChallengeValue): boolean {
+  switch (challengeValue.prompt.validation) {
+    case ChallengeValidation.ProtectionSessionDuration:
+      return typeof challengeValue.value === 'number';
+    default:
+      return !!challengeValue.value;
+  }
+}
 
 export const Authenticate = ({
   route: {
@@ -71,13 +82,14 @@ export const Authenticate = ({
   const [singleValidation] = useState(
     () => !(challenge.prompts.filter(prompt => prompt.validates).length > 0)
   );
+
   const [{ challengeValues, challengeValueStates }, dispatch] = useReducer(
     authenticationReducer,
     {
       challengeValues: challenge.prompts.reduce((map, current) => {
         map[current.id] = {
           prompt: current,
-          value: false,
+          value: current.initialValue ?? null,
         } as ChallengeValue;
         return map;
       }, {} as Record<string, ChallengeValue>),
@@ -127,6 +139,36 @@ export const Authenticate = ({
     }
   }, [navigation, challenge, application, pending]);
 
+  const [
+    submittedProtectionSessionDuration,
+    setSubmittedProtectionSessionDuration,
+  ] = useState(-1);
+  useEffect(() => {
+    /**
+     * Eagerly submit protectedSessionDuration prompts, because there should
+     * always be a default value for them.
+     */
+    const prompt = challenge.prompts.find(
+      p => p.validation === ChallengeValidation.ProtectionSessionDuration
+    );
+    if (!prompt) {
+      return;
+    }
+
+    const value = challengeValues[prompt.id].value as number;
+    if (submittedProtectionSessionDuration !== value) {
+      setSubmittedProtectionSessionDuration(value);
+      application?.submitValuesForChallenge(challenge, [
+        new ChallengeValue(prompt, value),
+      ]);
+    }
+  }, [
+    application,
+    challenge,
+    challengeValues,
+    submittedProtectionSessionDuration,
+  ]);
+
   const validateChallengeValue = useCallback(
     async (challengeValue: ChallengeValue) => {
       if (singleValidation) {
@@ -141,7 +183,7 @@ export const Authenticate = ({
         if (
           state === AuthenticationValueStateType.Locked ||
           state === AuthenticationValueStateType.Success ||
-          !challengeValue.value
+          !isValidChallengeValue(challengeValue)
         ) {
           return;
         }
@@ -458,8 +500,20 @@ export const Authenticate = ({
     };
   }, [challenge.reason, checkForBiometrics, checkPasscodeKeyboardType]);
 
+  /**
+   * Authenticate for challenge reasons like biometrics as soon as possible,
+   * unless a prompt has a prefilled control value, in which case give the
+   * option to adjust them first.
+   */
   useEffect(() => {
-    beginAuthenticatingForNextChallengeReason();
+    if (
+      !challenge.prompts.some(
+        prompt =>
+          prompt.validation === ChallengeValidation.ProtectionSessionDuration
+      )
+    ) {
+      beginAuthenticatingForNextChallengeReason();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -499,7 +553,7 @@ export const Authenticate = ({
 
   const onSubmitPress = () => {
     const challengeValue = challengeValues[firstNotSuccessful!];
-    if (!challengeValue.value) {
+    if (!isValidChallengeValue(challengeValue)) {
       return;
     }
     if (singleValidation) {
@@ -514,7 +568,6 @@ export const Authenticate = ({
         beginAuthenticatingForNextChallengeReason();
         return;
       }
-
       validateChallengeValue(challengeValue);
     }
   };
@@ -542,8 +595,12 @@ export const Authenticate = ({
     const last = index === Object.keys(challengeValues).length - 1;
     const state = challengeValueStates[challengeValue.prompt.id];
     const active = isInActiveState(state);
-    const isInput =
-      challengeValue.prompt.validation !== ChallengeValidation.Biometric;
+    const isBiometric =
+      challengeValue.prompt.validation === ChallengeValidation.Biometric;
+    const isProtectionSessionDuration =
+      challengeValue.prompt.validation ===
+      ChallengeValidation.ProtectionSessionDuration;
+    const isInput = !isBiometric && !isProtectionSessionDuration;
     const stateLabel = getLabelForStateAndType(
       challengeValue.prompt.validation,
       state
@@ -614,7 +671,7 @@ export const Authenticate = ({
             </SectionedTableCell>
           </SectionContainer>
         )}
-        {challengeValue.prompt.validation === ChallengeValidation.Biometric && (
+        {isBiometric && (
           <SectionContainer last={last}>
             <SectionedAccessoryTableCell
               first={true}
@@ -624,6 +681,27 @@ export const Authenticate = ({
               onPress={onBiometricDirectPress}
             />
           </SectionContainer>
+        )}
+        {isProtectionSessionDuration && (
+          <SessionLengthContainer>
+            {ProtectionSessionDurations.map((duration, i) => (
+              <SectionedAccessoryTableCell
+                text={duration.label}
+                key={duration.valueInSeconds}
+                first={i === 0}
+                last={i === ProtectionSessionDurations.length - 1}
+                selected={() => {
+                  return duration.valueInSeconds === challengeValue.value;
+                }}
+                onPress={() => {
+                  onValueChange({
+                    ...challengeValue,
+                    value: duration.valueInSeconds,
+                  });
+                }}
+              />
+            ))}
+          </SessionLengthContainer>
         )}
       </SourceContainer>
     );
@@ -636,6 +714,27 @@ export const Authenticate = ({
       ) >= 0,
     [challengeValueStates]
   );
+
+  let submitButtonTitle: 'Submit' | 'Next';
+  if (singleValidation) {
+    submitButtonTitle = 'Submit';
+  } else if (!firstNotSuccessful) {
+    submitButtonTitle = 'Next';
+  } else {
+    const stateKeys = Object.keys(challengeValueStates);
+    submitButtonTitle = 'Submit';
+    /** Check the next values; if one of them is not successful, show 'Next' */
+    for (
+      let i = stateKeys.indexOf(firstNotSuccessful) + 1;
+      i < stateKeys.length;
+      i++
+    ) {
+      const nextValueState = challengeValueStates[stateKeys[i]];
+      if (nextValueState !== AuthenticationValueStateType.Success) {
+        submitButtonTitle = 'Next';
+      }
+    }
+  }
 
   return (
     <Container>
@@ -655,14 +754,7 @@ export const Authenticate = ({
       <ButtonCell
         maxHeight={45}
         disabled={singleValidation ? !readyToSubmit || pending : isPending}
-        title={
-          singleValidation ||
-          (!!firstNotSuccessful &&
-            findIndexInObject(challengeValueStates, firstNotSuccessful) ===
-              Object.keys(challengeValueStates).length - 1)
-            ? 'Submit'
-            : 'Next'
-        }
+        title={submitButtonTitle}
         bold={true}
         onPress={onSubmitPress}
       />

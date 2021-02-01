@@ -5,17 +5,11 @@ import { useSignedIn, useSyncStatus } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
-import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
-import {
-  SCREEN_AUTHENTICATE_PRIVILEGES,
-  SCREEN_COMPOSE,
-  SCREEN_NOTES,
-} from '@Screens/screens';
+import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
 import {
   CollectionSort,
   ContentType,
   Platform,
-  ProtectedAction,
   SNNote,
 } from '@standardnotes/snjs';
 import { ICON_ADD } from '@Style/icons';
@@ -74,7 +68,6 @@ export const Notes = React.memo(
     const [notes, setNotes] = useState<SNNote[]>([]);
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
     const [searchText, setSearchText] = useState('');
-    const [expectsUnlock, setExpectsUnlock] = useState(false);
     const [editor, setEditor] = useState<Editor | undefined>(undefined);
 
     // Ref
@@ -132,28 +125,12 @@ export const Notes = React.memo(
               );
             }
           }
-          if (
-            note.protected &&
-            (await application?.privilegesService!.actionRequiresPrivilege(
-              ProtectedAction.ViewProtectedNotes
-            ))
-          ) {
-            const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
-              ProtectedAction.ViewProtectedNotes
-            );
-            setExpectsUnlock(true);
-            navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
-              action: ProtectedAction.ViewProtectedNotes,
-              privilegeCredentials,
-              unlockedItemId: noteUuid,
-              previousScreen: SCREEN_NOTES,
-            });
-          } else {
+          if (await application?.authorizeNoteAccess(note)) {
             openNote(noteUuid);
           }
         }
       },
-      [application, openNote, navigation]
+      [application, openNote]
     );
 
     useEffect(() => {
@@ -180,34 +157,6 @@ export const Notes = React.memo(
         removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
       };
     }, [application, editor]);
-
-    /*
-     * After screen is focused read if a requested privilage was unlocked
-     */
-    useFocusEffect(
-      useCallback(() => {
-        const readPrivilegesUnlockResponse = async () => {
-          if (application?.isLaunched() && expectsUnlock) {
-            const result = await application?.getValue(
-              PRIVILEGES_UNLOCK_PAYLOAD
-            );
-            if (
-              result &&
-              result.previousScreen === SCREEN_NOTES &&
-              result.unlockedItemId
-            ) {
-              setExpectsUnlock(false);
-              application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
-              openNote(result.unlockedItemId);
-            } else {
-              setExpectsUnlock(false);
-            }
-          }
-        };
-
-        readPrivilegesUnlockResponse();
-      }, [application, expectsUnlock, openNote])
-    );
 
     /**
      * Note that reloading display options destroys the current index and rebuilds it,
