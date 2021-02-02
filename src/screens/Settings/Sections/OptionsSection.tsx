@@ -140,7 +140,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         <ButtonCell
           testID="manageSessionsButton"
           leftAligned={true}
-          title={'Active Sessions'}
+          title={'Manage Sessions'}
           onPress={openManageSessions}
         />
       )}
