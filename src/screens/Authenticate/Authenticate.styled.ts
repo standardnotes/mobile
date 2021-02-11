@@ -16,7 +16,6 @@ export const Title = styled.Text`
   color: ${({ theme }) => theme.stylekitForegroundColor};
   font-size: 14px;
   font-weight: bold;
-  margin-top: 4px;
 `;
 
 export const Subtitle = styled.Text`
@@ -34,16 +33,8 @@ export const Input = styled.TextInput.attrs(({ theme }) => ({
   height: 100%;
 `;
 
-export const SectionContainer = styled.View<{ last: boolean }>`
-  ${({ last }) =>
-    !last &&
-    css`
-      margin-top: 10px;
-    `}
-`;
+export const SectionContainer = styled.View<{ last: boolean }>``;
 
 export const SourceContainer = styled.View``;
 
-export const SessionLengthContainer = styled.View`
-  margin-top: 10px;
-`;
+export const SessionLengthContainer = styled.View``;
