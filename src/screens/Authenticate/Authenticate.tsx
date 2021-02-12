@@ -28,8 +28,8 @@ import React, {
 } from 'react';
 import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { ThemeContext } from 'styled-components/native';
 import {
   BaseView,
