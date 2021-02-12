@@ -29,6 +29,7 @@ import React, {
 import { Alert, BackHandler, Platform, TextInput } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { ThemeContext } from 'styled-components/native';
 import {
   BaseView,
@@ -737,27 +738,29 @@ export const Authenticate = ({
   }
 
   return (
-    <Container>
-      {(challenge.heading || challenge.subheading) && (
-        <StyledSectionedTableCell first>
-          <BaseView>
-            {challenge.heading && <Title>{challenge.heading}</Title>}
-            {challenge.subheading && (
-              <Subtitle>{challenge.subheading}</Subtitle>
-            )}
-          </BaseView>
-        </StyledSectionedTableCell>
-      )}
-      {Object.values(challengeValues).map((challengeValue, index) =>
-        renderAuthenticationSource(challengeValue, index)
-      )}
-      <ButtonCell
-        maxHeight={45}
-        disabled={singleValidation ? !readyToSubmit || pending : isPending}
-        title={submitButtonTitle}
-        bold={true}
-        onPress={onSubmitPress}
-      />
-    </Container>
+    <KeyboardAwareScrollView>
+      <Container>
+        {(challenge.heading || challenge.subheading) && (
+          <StyledSectionedTableCell first>
+            <BaseView>
+              {challenge.heading && <Title>{challenge.heading}</Title>}
+              {challenge.subheading && (
+                <Subtitle>{challenge.subheading}</Subtitle>
+              )}
+            </BaseView>
+          </StyledSectionedTableCell>
+        )}
+        {Object.values(challengeValues).map((challengeValue, index) =>
+          renderAuthenticationSource(challengeValue, index)
+        )}
+        <ButtonCell
+          maxHeight={45}
+          disabled={singleValidation ? !readyToSubmit || pending : isPending}
+          title={submitButtonTitle}
+          bold={true}
+          onPress={onSubmitPress}
+        />
+      </Container>
+    </KeyboardAwareScrollView>
   );
 };
