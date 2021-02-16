@@ -10,6 +10,7 @@ import { EncryptionSection } from './Sections/EncryptionSection';
 import { OptionsSection } from './Sections/OptionsSection';
 import { PasscodeSection } from './Sections/PasscodeSection';
 import { PreferencesSection } from './Sections/PreferencesSection';
+import { ProtectionsSection } from './Sections/ProtectionsSection';
 import { Container } from './Settings.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_SETTINGS>;
@@ -60,6 +61,9 @@ export const Settings = (props: Props) => {
         encryptionAvailable={!!encryptionAvailable}
         hasPasscode={hasPasscode}
         title="Security"
+      />
+      <ProtectionsSection
+        title="Protections"
       />
       <EncryptionSection
         encryptionAvailable={!!encryptionAvailable}
