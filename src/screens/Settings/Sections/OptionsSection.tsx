@@ -140,6 +140,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         <ButtonCell
           testID="manageSessionsButton"
           leftAligned={true}
+          first={true}
           title={'Manage Sessions'}
           onPress={openManageSessions}
         />
@@ -149,6 +150,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         <ButtonCell
           testID="signOutButton"
           leftAligned={true}
+          first={!isDevEnv}
           title={`Sign out (${email})`}
           onPress={destroyLocalData}
         />

@@ -6,6 +6,7 @@ import {
   SessionStrings,
   UuidString,
 } from '@standardnotes/snjs';
+import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -68,6 +69,7 @@ const useSessions = (): [
 export const ManageSessions: React.FC = () => {
   // Context
   const application = useContext(ApplicationContext);
+  const { showActionSheet } = useCustomActionSheet();
   const theme = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
 
@@ -79,7 +81,17 @@ export const ManageSessions: React.FC = () => {
     errorMessage,
   ] = useSessions();
 
-  const onItemPress = useCallback(
+  const onItemPress = (item: RemoteSession) => {
+    showActionSheet(item.device_info, [
+      {
+        text: 'Revoke',
+        destructive: true,
+        callback: () => showRevokeSessionAlert(item),
+      },
+    ]);
+  };
+
+  const showRevokeSessionAlert = useCallback(
     async (item: RemoteSession) => {
       const confirmed = await application?.alertService.confirm(
         SessionStrings.RevokeText,
