@@ -1,3 +1,4 @@
+import { isSameDay } from '@Lib/utils';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_NOTES } from '@Screens/screens';
 import {
@@ -349,4 +350,57 @@ export const useDeleteNoteWithPrivileges = (
   );
 
   return [deleteNote];
+};
+
+export const useProtectionSessionExpiry = () => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const getProtectionsDisabledUntil = React.useCallback(() => {
+    const protectionExpiry = application?.getProtectionSessionExpiryDate();
+    const now = new Date();
+
+    if (protectionExpiry && protectionExpiry > now) {
+      let f: Intl.DateTimeFormat;
+
+      if (isSameDay(protectionExpiry, now)) {
+        f = new Intl.DateTimeFormat(undefined, {
+          hour: 'numeric',
+          minute: 'numeric',
+        });
+      } else {
+        f = new Intl.DateTimeFormat(undefined, {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'short',
+          hour: 'numeric',
+          minute: 'numeric',
+        });
+      }
+
+      return f.format(protectionExpiry);
+    }
+    return null;
+  }, [application]);
+
+  // State
+  const [
+    protectionsDisabledUntil,
+    setProtectionsDisabledUntil,
+  ] = React.useState(getProtectionsDisabledUntil());
+
+  useEffect(() => {
+    const removeProtectionLengthSubscriber = application?.addEventObserver(
+      async event => {
+        if (event === ApplicationEvent.ProtectionSessionExpiryDateChanged) {
+          setProtectionsDisabledUntil(getProtectionsDisabledUntil());
+        }
+      }
+    );
+    return () => {
+      removeProtectionLengthSubscriber && removeProtectionLengthSubscriber();
+    };
+  }, [application, getProtectionsDisabledUntil]);
+
+  return [protectionsDisabledUntil];
 };

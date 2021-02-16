@@ -7,13 +7,19 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { UnlockTiming } from '@Lib/application_state';
 import { MobileDeviceInterface } from '@Lib/interface';
+import { useProtectionSessionExpiry } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_PASSCODE, SCREEN_SETTINGS } from '@Screens/screens';
 import { StorageEncryptionPolicies } from '@standardnotes/snjs';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Title } from './PasscodeSection.styled';
+import {
+  BaseView,
+  StyledSectionedTableCell,
+  Subtitle,
+  Title,
+} from './PasscodeSection.styled';
 
 type Props = {
   title: string;
@@ -44,6 +50,7 @@ export const PasscodeSection = (props: Props) => {
     encryptionPolictChangeInProgress,
     setEncryptionPolictChangeInProgress,
   ] = useState(false);
+  const [protectionsDisabledUntil] = useProtectionSessionExpiry();
 
   useEffect(() => {
     let mounted = true;
@@ -121,6 +128,13 @@ export const PasscodeSection = (props: Props) => {
   if (encryptionPolictChangeInProgress) {
     storageSubText = 'Applying changes...';
   }
+
+  const protectionsEnabledTitle = protectionsDisabledUntil
+    ? `Protections are disabled until ${protectionsDisabledUntil}`
+    : 'Protections are enabled';
+
+  const protectionsEnabledSubtitle =
+    'Actions like viewing protected notes, exporting decrypted backups, or revoking an active session, require additional authentication like entering your account password or application passcode.';
 
   const passcodeTitle = props.hasPasscode
     ? 'Disable Passcode Lock'
@@ -203,6 +217,10 @@ export const PasscodeSection = (props: Props) => {
     [disableBiometrics, disablePasscode]
   );
 
+  const enableProtections = () => {
+    application?.clearProtectionSession();
+  };
+
   let biometricTitle = hasBiometrics
     ? 'Disable Biometrics Lock'
     : 'Enable Biometrics Lock';
@@ -216,8 +234,26 @@ export const PasscodeSection = (props: Props) => {
         title={storageEncryptionTitle}
         onPress={toggleEncryptionPolicy}
       >
-        <Title>{storageSubText}</Title>
+        <Subtitle>{storageSubText}</Subtitle>
       </ButtonCell>
+
+      {protectionsDisabledUntil ? (
+        <ButtonCell
+          leftAligned
+          title={'Enable Protections'}
+          onPress={enableProtections}
+        >
+          <Title>{protectionsEnabledTitle}</Title>
+          <Subtitle>{protectionsEnabledSubtitle}</Subtitle>
+        </ButtonCell>
+      ) : (
+        <StyledSectionedTableCell>
+          <BaseView>
+            <Title>{protectionsEnabledTitle}</Title>
+            <Subtitle>{protectionsEnabledSubtitle}</Subtitle>
+          </BaseView>
+        </StyledSectionedTableCell>
+      )}
 
       <ButtonCell leftAligned title={passcodeTitle} onPress={passcodeOnPress} />
 
