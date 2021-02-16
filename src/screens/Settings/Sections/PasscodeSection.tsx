@@ -174,8 +174,9 @@ export const PasscodeSection = (props: Props) => {
   };
 
   const disableBiometrics = useCallback(async () => {
-    setHasBiometrics(false);
-    await application?.disableBiometrics();
+    if (await application?.disableBiometrics()) {
+      setHasBiometrics(false);
+    }
   }, [application]);
 
   const disablePasscode = useCallback(async () => {
