@@ -38,6 +38,7 @@ import {
   SessionLengthContainer,
   SourceContainer,
   StyledSectionedTableCell,
+  StyledTableSection,
   Subtitle,
   Title,
 } from './Authenticate.styled';
@@ -610,99 +611,101 @@ export const Authenticate = ({
 
     return (
       <SourceContainer key={challengeValue.prompt.id}>
-        <SectionHeader
-          title={stateTitle}
-          subtitle={isInput ? stateLabel : undefined}
-          tinted={active}
-          buttonText={
-            challengeValue.prompt.validation ===
-              ChallengeValidation.LocalPasscode &&
-            (state === AuthenticationValueStateType.WaitingInput ||
-              state === AuthenticationValueStateType.Fail)
-              ? 'Change Keyboard'
-              : undefined
-          }
-          buttonAction={switchKeyboard}
-          buttonStyles={
-            challengeValue.prompt.validation ===
-            ChallengeValidation.LocalPasscode
-              ? {
-                  color: theme.stylekitNeutralColor,
-                  fontSize: theme.mainTextFontSize - 5,
-                }
-              : undefined
-          }
-        />
-        {isInput && (
-          <SectionContainer last={last}>
-            <SectionedTableCell textInputCell={true} first={true}>
-              <Input
-                key={Platform.OS === 'android' ? keyboardType : undefined}
-                ref={
-                  Array.of(
-                    firstInputRef,
-                    secondInputRef,
-                    thirdInputRef,
-                    fourthInputRef
-                  )[index] as any
-                }
-                placeholder={challengeValue.prompt.placeholder}
-                onChangeText={text => {
-                  onValueChange({ ...challengeValue, value: text });
-                }}
-                value={(challengeValue.value || '') as string}
-                autoCorrect={false}
-                autoFocus={false}
-                autoCapitalize={'none'}
-                secureTextEntry={challengeValue.prompt.secureTextEntry}
-                keyboardType={
-                  challengeValue.prompt.keyboardType ?? keyboardType
-                }
-                keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
-                underlineColorAndroid={'transparent'}
-                onSubmitEditing={
-                  !singleValidation
-                    ? () => {
-                        validateChallengeValue(challengeValue);
-                      }
-                    : undefined
-                }
-              />
-            </SectionedTableCell>
-          </SectionContainer>
-        )}
-        {isBiometric && (
-          <SectionContainer last={last}>
-            <SectionedAccessoryTableCell
-              first={true}
-              dimmed={active}
-              tinted={active}
-              text={stateLabel}
-              onPress={onBiometricDirectPress}
-            />
-          </SectionContainer>
-        )}
-        {isProtectionSessionDuration && (
-          <SessionLengthContainer>
-            {ProtectionSessionDurations.map((duration, i) => (
+        <StyledTableSection last={last}>
+          <SectionHeader
+            title={stateTitle}
+            subtitle={isInput ? stateLabel : undefined}
+            tinted={active}
+            buttonText={
+              challengeValue.prompt.validation ===
+                ChallengeValidation.LocalPasscode &&
+              (state === AuthenticationValueStateType.WaitingInput ||
+                state === AuthenticationValueStateType.Fail)
+                ? 'Change Keyboard'
+                : undefined
+            }
+            buttonAction={switchKeyboard}
+            buttonStyles={
+              challengeValue.prompt.validation ===
+              ChallengeValidation.LocalPasscode
+                ? {
+                    color: theme.stylekitNeutralColor,
+                    fontSize: theme.mainTextFontSize - 5,
+                  }
+                : undefined
+            }
+          />
+          {isInput && (
+            <SectionContainer>
+              <SectionedTableCell textInputCell={true} first={true}>
+                <Input
+                  key={Platform.OS === 'android' ? keyboardType : undefined}
+                  ref={
+                    Array.of(
+                      firstInputRef,
+                      secondInputRef,
+                      thirdInputRef,
+                      fourthInputRef
+                    )[index] as any
+                  }
+                  placeholder={challengeValue.prompt.placeholder}
+                  onChangeText={text => {
+                    onValueChange({ ...challengeValue, value: text });
+                  }}
+                  value={(challengeValue.value || '') as string}
+                  autoCorrect={false}
+                  autoFocus={false}
+                  autoCapitalize={'none'}
+                  secureTextEntry={challengeValue.prompt.secureTextEntry}
+                  keyboardType={
+                    challengeValue.prompt.keyboardType ?? keyboardType
+                  }
+                  keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
+                  underlineColorAndroid={'transparent'}
+                  onSubmitEditing={
+                    !singleValidation
+                      ? () => {
+                          validateChallengeValue(challengeValue);
+                        }
+                      : undefined
+                  }
+                />
+              </SectionedTableCell>
+            </SectionContainer>
+          )}
+          {isBiometric && (
+            <SectionContainer>
               <SectionedAccessoryTableCell
-                text={duration.label}
-                key={duration.valueInSeconds}
-                first={i === 0}
-                last={i === ProtectionSessionDurations.length - 1}
-                selected={() => {
-                  return duration.valueInSeconds === challengeValue.value;
-                }}
-                onPress={() => {
-                  onValueChange({
-                    ...challengeValue,
-                    value: duration.valueInSeconds,
-                  });
-                }}
+                first={true}
+                dimmed={active}
+                tinted={active}
+                text={stateLabel}
+                onPress={onBiometricDirectPress}
               />
-            ))}
-          </SessionLengthContainer>
-        )}
+            </SectionContainer>
+          )}
+          {isProtectionSessionDuration && (
+            <SessionLengthContainer>
+              {ProtectionSessionDurations.map((duration, i) => (
+                <SectionedAccessoryTableCell
+                  text={duration.label}
+                  key={duration.valueInSeconds}
+                  first={i === 0}
+                  last={i === ProtectionSessionDurations.length - 1}
+                  selected={() => {
+                    return duration.valueInSeconds === challengeValue.value;
+                  }}
+                  onPress={() => {
+                    onValueChange({
+                      ...challengeValue,
+                      value: duration.valueInSeconds,
+                    });
+                  }}
+                />
+              ))}
+            </SessionLengthContainer>
+          )}
+        </StyledTableSection>
       </SourceContainer>
     );
   };
@@ -739,14 +742,16 @@ export const Authenticate = ({
   return (
     <Container>
       {(challenge.heading || challenge.subheading) && (
-        <StyledSectionedTableCell first>
-          <BaseView>
-            {challenge.heading && <Title>{challenge.heading}</Title>}
-            {challenge.subheading && (
-              <Subtitle>{challenge.subheading}</Subtitle>
-            )}
-          </BaseView>
-        </StyledSectionedTableCell>
+        <StyledTableSection>
+          <StyledSectionedTableCell>
+            <BaseView>
+              {challenge.heading && <Title>{challenge.heading}</Title>}
+              {challenge.subheading && (
+                <Subtitle>{challenge.subheading}</Subtitle>
+              )}
+            </BaseView>
+          </StyledSectionedTableCell>
+        </StyledTableSection>
       )}
       {Object.values(challengeValues).map((challengeValue, index) =>
         renderAuthenticationSource(challengeValue, index)
