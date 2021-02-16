@@ -14,7 +14,7 @@ export function isMatchCaseInsensitive(a: string, b: string) {
 }
 
 /**
- * Returns a Date object from a JSON stringifed date
+ * Returns a Date object from a JSON stringified date
  */
 export function dateFromJsonString(str: string) {
   if (str) {
@@ -22,4 +22,15 @@ export function dateFromJsonString(str: string) {
   }
 
   return str;
+}
+
+/**
+ * Returns a boolean representing whether two dates are on the same day
+ */
+export function isSameDay(dateA: Date, dateB: Date) {
+  return (
+    dateA.getFullYear() === dateB.getFullYear() &&
+    dateA.getMonth() === dateB.getMonth() &&
+    dateA.getDate() === dateB.getDate()
+  );
 }
