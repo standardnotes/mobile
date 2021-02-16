@@ -13,9 +13,9 @@ export const Subtitle = styled.Text`
   margin-top: 4px;
 `;
 
-export const Title = styled.Text`
+export const Title = styled.Text<{ first?: boolean }>`
+  margin-top: ${({ first }) => (first ? '0px' : '8px')};
   color: ${({ theme }) => theme.stylekitForegroundColor};
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
-  margin-top: 4px;
 `;

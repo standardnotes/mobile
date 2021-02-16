@@ -250,7 +250,7 @@ export const PasscodeSection = (props: Props) => {
       ) : (
         <StyledSectionedTableCell>
           <BaseView>
-            <Title>{protectionsEnabledTitle}</Title>
+            <Title first>{protectionsEnabledTitle}</Title>
             <Subtitle>{protectionsEnabledSubtitle}</Subtitle>
           </BaseView>
         </StyledSectionedTableCell>
