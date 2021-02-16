@@ -136,28 +136,28 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     <TableSection>
       <SectionHeader title={title} />
 
-      {isDevEnv && (
-        <ButtonCell
-          testID="manageSessionsButton"
-          leftAligned={true}
-          first={true}
-          title={'Manage Sessions'}
-          onPress={openManageSessions}
-        />
+      {signedIn && (
+        <>
+          <ButtonCell
+            testID="manageSessionsButton"
+            leftAligned={true}
+            first={true}
+            title={'Manage Sessions'}
+            onPress={openManageSessions}
+          />
+          <ButtonCell
+            testID="signOutButton"
+            leftAligned={true}
+            first={false}
+            title={`Sign out (${email})`}
+            onPress={destroyLocalData}
+          />
+        </>
       )}
 
-      {signedIn && (
-        <ButtonCell
-          testID="signOutButton"
-          leftAligned={true}
-          first={!isDevEnv}
-          title={`Sign out (${email})`}
-          onPress={destroyLocalData}
-        />
-      )}
       <SectionedOptionsTableCell
         testID="exportData"
-        first={false}
+        first={!signedIn}
         leftAligned
         options={exportOptions}
         title={exporting ? 'Processing...' : 'Export Data'}
