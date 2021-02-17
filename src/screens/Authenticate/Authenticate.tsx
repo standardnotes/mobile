@@ -30,6 +30,7 @@ import React, {
 import {
   Alert,
   BackHandler,
+  Keyboard,
   Platform,
   ScrollView,
   TextInput,
@@ -86,10 +87,11 @@ export const Authenticate = ({
   >(undefined);
   const [keyboardType, setKeyboardType] = useState<
     PasscodeKeyboardType | undefined
-  >(undefined);
+  >(PasscodeKeyboardType.Default);
   const [singleValidation] = useState(
     () => !(challenge.prompts.filter(prompt => prompt.validates).length > 0)
   );
+  const [showSwitchKeyboard, setShowSwitchKeyboard] = useState<boolean>(false);
 
   const [{ challengeValues, challengeValueStates }, dispatch] = useReducer(
     authenticationReducer,
@@ -526,11 +528,16 @@ export const Authenticate = ({
   }, []);
 
   const onBiometricDirectPress = () => {
+    Keyboard.dismiss();
+
     const biometricChallengeValue = Object.values(challengeValues).find(
       value => value.prompt.validation === ChallengeValidation.Biometric
     );
     const state = challengeValueStates[biometricChallengeValue?.prompt.id!];
-    if (state === AuthenticationValueStateType.Locked) {
+    if (
+      state === AuthenticationValueStateType.Locked ||
+      state === AuthenticationValueStateType.Success
+    ) {
       return;
     }
 
@@ -538,6 +545,8 @@ export const Authenticate = ({
   };
 
   const onValueChange = (newValue: ChallengeValue) => {
+    Keyboard.dismiss();
+
     dispatch({
       type: 'setValue',
       id: newValue.prompt.id.toString(),
@@ -581,10 +590,10 @@ export const Authenticate = ({
   };
 
   const switchKeyboard = () => {
-    if (keyboardType === PasscodeKeyboardType.Default) {
-      setKeyboardType(PasscodeKeyboardType.Numeric);
-    } else if (keyboardType === PasscodeKeyboardType.Numeric) {
+    if (keyboardType === PasscodeKeyboardType.Numeric) {
       setKeyboardType(PasscodeKeyboardType.Default);
+    } else {
+      setKeyboardType(PasscodeKeyboardType.Numeric);
     }
   };
 
@@ -625,9 +634,7 @@ export const Authenticate = ({
             tinted={active}
             buttonText={
               challengeValue.prompt.validation ===
-                ChallengeValidation.LocalPasscode &&
-              (state === AuthenticationValueStateType.WaitingInput ||
-                state === AuthenticationValueStateType.Fail)
+                ChallengeValidation.LocalPasscode && showSwitchKeyboard
                 ? 'Change Keyboard'
                 : undefined
             }
@@ -676,6 +683,8 @@ export const Authenticate = ({
                         }
                       : undefined
                   }
+                  onFocus={() => setShowSwitchKeyboard(true)}
+                  onBlur={() => setShowSwitchKeyboard(false)}
                 />
               </SectionedTableCell>
             </SectionContainer>
@@ -753,7 +762,7 @@ export const Authenticate = ({
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={headerHeight}
         >
-          <ScrollView>
+          <ScrollView keyboardShouldPersistTaps="handled">
             {(challenge.heading || challenge.subheading) && (
               <StyledTableSection>
                 <StyledSectionedTableCell>
