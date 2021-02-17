@@ -665,7 +665,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
         }
         visible={true}
         size={30}
-        paddingTop={Platform.OS === 'ios' ? 1 : 0}
         iconTextComponent={
           <Icon name={ThemeService.nameForIcon(ICON_PRICE_TAG)} />
         }

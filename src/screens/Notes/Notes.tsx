@@ -440,7 +440,6 @@ export const Notes = React.memo(
           onClickAction={onNoteCreate}
           visible={true}
           size={30}
-          paddingTop={application!.platform === Platform.Ios ? 1 : 0}
           iconTextComponent={
             <StyledIcon
               testID="newNoteButton"
