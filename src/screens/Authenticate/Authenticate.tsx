@@ -497,11 +497,9 @@ export const Authenticate = ({
     };
     setBiometricsAsync();
     const setInitialKeyboardType = async () => {
-      if (challenge.reason === ChallengeReason.ApplicationUnlock) {
-        const initialKeyboardType = await checkPasscodeKeyboardType();
-        if (mounted) {
-          setKeyboardType(initialKeyboardType);
-        }
+      const initialKeyboardType = await checkPasscodeKeyboardType();
+      if (mounted) {
+        setKeyboardType(initialKeyboardType);
       }
     };
     setInitialKeyboardType();

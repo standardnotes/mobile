@@ -52,6 +52,9 @@ export const PasscodeInputModal = (props: Props) => {
       setSettingPassocode(false);
     } else {
       await application?.setPasscode(text);
+      await application
+        ?.getAppState()
+        .setPasscodeKeyboardType(keyboardType as PasscodeKeyboardType);
       await application?.getAppState().setPasscodeTiming(UnlockTiming.OnQuit);
       await application?.getAppState().setScreenshotPrivacy();
       setSettingPassocode(false);
@@ -77,9 +80,6 @@ export const PasscodeInputModal = (props: Props) => {
 
   const onKeyboardTypeSelect = (option: Option) => {
     setKeyboardType(option.key as KeyboardType);
-    application
-      ?.getAppState()
-      .setPasscodeKeyboardType(option.key as PasscodeKeyboardType);
   };
 
   return (
