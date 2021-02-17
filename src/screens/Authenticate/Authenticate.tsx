@@ -6,6 +6,7 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { AppStateType, PasscodeKeyboardType } from '@Lib/application_state';
 import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect } from '@react-navigation/native';
+import { HeaderHeightContext } from '@react-navigation/stack';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
@@ -26,17 +27,23 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Alert, BackHandler, Platform, TextInput } from 'react-native';
+import {
+  Alert,
+  BackHandler,
+  Platform,
+  ScrollView,
+  TextInput,
+} from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ThemeContext } from 'styled-components/native';
 import {
   BaseView,
-  Container,
   Input,
   SectionContainer,
   SessionLengthContainer,
   SourceContainer,
+  StyledKeyboardAvoidingView,
   StyledSectionedTableCell,
   StyledTableSection,
   Subtitle,
@@ -740,29 +747,40 @@ export const Authenticate = ({
   }
 
   return (
-    <Container>
-      {(challenge.heading || challenge.subheading) && (
-        <StyledTableSection>
-          <StyledSectionedTableCell>
-            <BaseView>
-              {challenge.heading && <Title>{challenge.heading}</Title>}
-              {challenge.subheading && (
-                <Subtitle>{challenge.subheading}</Subtitle>
-              )}
-            </BaseView>
-          </StyledSectionedTableCell>
-        </StyledTableSection>
+    <HeaderHeightContext.Consumer>
+      {headerHeight => (
+        <StyledKeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={headerHeight}
+        >
+          <ScrollView>
+            {(challenge.heading || challenge.subheading) && (
+              <StyledTableSection>
+                <StyledSectionedTableCell>
+                  <BaseView>
+                    {challenge.heading && <Title>{challenge.heading}</Title>}
+                    {challenge.subheading && (
+                      <Subtitle>{challenge.subheading}</Subtitle>
+                    )}
+                  </BaseView>
+                </StyledSectionedTableCell>
+              </StyledTableSection>
+            )}
+            {Object.values(challengeValues).map((challengeValue, index) =>
+              renderAuthenticationSource(challengeValue, index)
+            )}
+            <ButtonCell
+              maxHeight={45}
+              disabled={
+                singleValidation ? !readyToSubmit || pending : isPending
+              }
+              title={submitButtonTitle}
+              bold={true}
+              onPress={onSubmitPress}
+            />
+          </ScrollView>
+        </StyledKeyboardAvoidingView>
       )}
-      {Object.values(challengeValues).map((challengeValue, index) =>
-        renderAuthenticationSource(challengeValue, index)
-      )}
-      <ButtonCell
-        maxHeight={45}
-        disabled={singleValidation ? !readyToSubmit || pending : isPending}
-        title={submitButtonTitle}
-        bold={true}
-        onPress={onSubmitPress}
-      />
-    </Container>
+    </HeaderHeightContext.Consumer>
   );
 };

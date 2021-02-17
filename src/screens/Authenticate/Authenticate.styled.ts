@@ -2,7 +2,7 @@ import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
 import styled, { css } from 'styled-components/native';
 
-export const Container = styled.View`
+export const StyledKeyboardAvoidingView = styled.KeyboardAvoidingView`
   flex: 1;
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
 `;
