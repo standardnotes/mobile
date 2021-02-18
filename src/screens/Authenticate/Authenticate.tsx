@@ -149,36 +149,6 @@ export const Authenticate = ({
     }
   }, [navigation, challenge, application, pending]);
 
-  const [
-    submittedProtectionSessionDuration,
-    setSubmittedProtectionSessionDuration,
-  ] = useState(-1);
-  useEffect(() => {
-    /**
-     * Eagerly submit protectedSessionDuration prompts, because there should
-     * always be a default value for them.
-     */
-    const prompt = challenge.prompts.find(
-      p => p.validation === ChallengeValidation.ProtectionSessionDuration
-    );
-    if (!prompt) {
-      return;
-    }
-
-    const value = challengeValues[prompt.id].value as number;
-    if (submittedProtectionSessionDuration !== value) {
-      setSubmittedProtectionSessionDuration(value);
-      application?.submitValuesForChallenge(challenge, [
-        new ChallengeValue(prompt, value),
-      ]);
-    }
-  }, [
-    application,
-    challenge,
-    challengeValues,
-    submittedProtectionSessionDuration,
-  ]);
-
   const validateChallengeValue = useCallback(
     async (challengeValue: ChallengeValue) => {
       if (singleValidation) {
