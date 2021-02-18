@@ -515,10 +515,10 @@ export const Authenticate = ({
    */
   useEffect(() => {
     if (
-      !challenge.prompts.some(
-        prompt =>
-          prompt.validation === ChallengeValidation.ProtectionSessionDuration
-      )
+      challenge.prompts &&
+      challenge.prompts.length > 0 &&
+      challenge.prompts[0].validation !==
+        ChallengeValidation.ProtectionSessionDuration
     ) {
       beginAuthenticatingForNextChallengeReason();
     }
