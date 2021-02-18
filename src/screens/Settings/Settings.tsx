@@ -22,15 +22,23 @@ export const Settings = (props: Props) => {
   const [hasPasscode, setHasPasscode] = useState(() =>
     Boolean(application?.hasPasscode())
   );
+  const [protectionsAvailable, setProtectionsAvailable] = useState(
+    application?.hasProtectionSources()
+  );
   const [encryptionAvailable, setEncryptionAvailable] = useState(() =>
     application?.isEncryptionAvailable()
   );
+
+  const updateProtectionsAvailable = () => {
+    setProtectionsAvailable(application?.hasProtectionSources());
+  };
 
   useEffect(() => {
     const removeApplicationEventSubscriber = application?.addEventObserver(
       async event => {
         if (event === ApplicationEvent.KeyStatusChanged) {
           setHasPasscode(Boolean(application?.hasPasscode()));
+          updateProtectionsAvailable();
           setEncryptionAvailable(() => application?.isEncryptionAvailable());
         }
       }
@@ -60,11 +68,10 @@ export const Settings = (props: Props) => {
       <PasscodeSection
         encryptionAvailable={!!encryptionAvailable}
         hasPasscode={hasPasscode}
+        updateProtectionsAvailable={updateProtectionsAvailable}
         title="Security"
       />
-      <ProtectionsSection
-        title="Protections"
-      />
+      {protectionsAvailable && <ProtectionsSection title="Protections" />}
       <EncryptionSection
         encryptionAvailable={!!encryptionAvailable}
         title={'Encryption Status'}

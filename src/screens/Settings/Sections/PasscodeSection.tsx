@@ -19,6 +19,7 @@ type Props = {
   title: string;
   hasPasscode: boolean;
   encryptionAvailable: boolean;
+  updateProtectionsAvailable: Function;
 };
 
 export const PasscodeSection = (props: Props) => {
@@ -156,6 +157,7 @@ export const PasscodeSection = (props: Props) => {
       await application?.enableBiometrics();
       await setBiometricsTiming(UnlockTiming.OnQuit);
     }
+    props.updateProtectionsAvailable();
     await application?.getAppState().setScreenshotPrivacy();
   };
 
