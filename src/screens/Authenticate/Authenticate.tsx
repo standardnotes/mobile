@@ -542,8 +542,13 @@ export const Authenticate = ({
     beginAuthenticatingForNextChallengeReason();
   };
 
-  const onValueChange = (newValue: ChallengeValue) => {
-    Keyboard.dismiss();
+  const onValueChange = (
+    newValue: ChallengeValue,
+    dismissKeyboard: boolean = false
+  ) => {
+    if (dismissKeyboard) {
+      Keyboard.dismiss();
+    }
 
     dispatch({
       type: 'setValue',
@@ -710,10 +715,13 @@ export const Authenticate = ({
                     return duration.valueInSeconds === challengeValue.value;
                   }}
                   onPress={() => {
-                    onValueChange({
-                      ...challengeValue,
-                      value: duration.valueInSeconds,
-                    });
+                    onValueChange(
+                      {
+                        ...challengeValue,
+                        value: duration.valueInSeconds,
+                      },
+                      true
+                    );
                   }}
                 />
               ))}
