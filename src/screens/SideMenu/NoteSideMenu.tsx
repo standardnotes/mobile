@@ -609,6 +609,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     navigation,
     application,
     deleteNote,
+    showProtectNoteAlert,
   ]);
 
   const onTagSelect = useCallback(
