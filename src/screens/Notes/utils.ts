@@ -20,7 +20,11 @@ export function notePassesFilter(
 ) {
   let canShowArchived = showArchived;
   const canShowPinned = !hidePinned;
-  if ((note.archived && !canShowArchived) || (note.pinned && !canShowPinned)) {
+  if (
+    (note.archived && !canShowArchived) ||
+    (note.pinned && !canShowPinned) ||
+    (note.protected && filterText)
+  ) {
     return false;
   }
   return noteMatchesQuery(note, filterText);
