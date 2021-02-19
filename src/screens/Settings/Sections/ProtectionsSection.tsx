@@ -14,7 +14,7 @@ import {
 
 type Props = {
   title: string;
-  protectionsAvailable: Boolean;
+  protectionsAvailable?: Boolean;
 };
 
 export const ProtectionsSection = (props: Props) => {
