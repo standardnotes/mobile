@@ -1,5 +1,8 @@
 import { Editor } from '@Lib/editor';
-import { useDeleteNoteWithPrivileges } from '@Lib/snjs_helper_hooks';
+import {
+  useDeleteNoteWithPrivileges,
+  useProtectNoteAlert,
+} from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
@@ -74,6 +77,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
   const [components, setComponents] = useState<SNComponent[]>([]);
+  const [showProtectNoteAlert] = useProtectNoteAlert();
 
   const [deleteNote] = useDeleteNoteWithPrivileges(
     note!,
@@ -489,10 +493,15 @@ export const NoteSideMenu = React.memo((props: Props) => {
       });
 
     const protectOption = note.protected ? 'Unprotect' : 'Protect';
-    const protectEvent = () =>
+    const protectEvent = () => {
+      const protectedNote = note.protected;
+
       changeNote(mutator => {
         mutator.protected = !note.protected;
       });
+
+      showProtectNoteAlert(protectedNote);
+    };
 
     const openSessionHistory = () => {
       if (!editor?.isTemplateNote) {

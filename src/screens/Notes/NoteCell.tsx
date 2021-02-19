@@ -1,4 +1,7 @@
-import { useDeleteNoteWithPrivileges } from '@Lib/snjs_helper_hooks';
+import {
+  useDeleteNoteWithPrivileges,
+  useProtectNoteAlert,
+} from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
   CollectionSort,
@@ -41,6 +44,7 @@ export const NoteCell = ({
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+  const [showProtectNoteAlert] = useProtectNoteAlert();
 
   // State
   const [selected, setSelected] = useState(false);
@@ -172,10 +176,15 @@ export const NoteCell = ({
       options.push({
         text: note.protected ? 'Unprotect' : 'Protect',
         key: 'protect',
-        callback: () =>
+        callback: () => {
+          const protectedNote = note.protected;
+
           changeNote(mutator => {
             mutator.protected = !note.protected;
-          }),
+          });
+
+          showProtectNoteAlert(protectedNote);
+        },
       });
 
       if (!note.trashed) {

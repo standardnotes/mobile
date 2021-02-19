@@ -1,9 +1,10 @@
-import { isSameDay } from '@Lib/utils';
+import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_NOTES } from '@Screens/screens';
+import { SCREEN_NOTES, SCREEN_SETTINGS } from '@Screens/screens';
 import {
   ApplicationEvent,
   ButtonType,
+  isSameDay,
   SNNote,
   StorageEncryptionPolicies,
 } from '@standardnotes/snjs';
@@ -403,4 +404,33 @@ export const useProtectionSessionExpiry = () => {
   }, [application, getProtectionsDisabledUntil]);
 
   return [protectionsDisabledUntil];
+};
+
+export const useProtectNoteAlert = () => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const navigation = useNavigation();
+
+  const showProtectNoteAlert = useCallback(
+    async protectedNote => {
+      if (
+        !protectedNote &&
+        !application?.protectionService?.hasProtectionSources()
+      ) {
+        const confirmed = await application?.alertService.confirm(
+          'In order to Protect a note, you must add an application passcode or enable biometrics.',
+          undefined,
+          'Go to Settings'
+        );
+
+        if (confirmed) {
+          navigation.navigate(SCREEN_SETTINGS);
+        }
+      }
+    },
+    [application, navigation]
+  );
+
+  return [showProtectNoteAlert];
 };
