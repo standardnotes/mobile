@@ -156,16 +156,17 @@ export const PasscodeSection = (props: Props) => {
       setHasBiometrics(true);
       await application?.enableBiometrics();
       await setBiometricsTiming(UnlockTiming.OnQuit);
+      props.updateProtectionsAvailable();
     }
-    props.updateProtectionsAvailable();
     await application?.getAppState().setScreenshotPrivacy();
   };
 
   const disableBiometrics = useCallback(async () => {
     if (await application?.disableBiometrics()) {
       setHasBiometrics(false);
+      props.updateProtectionsAvailable();
     }
-  }, [application]);
+  }, [application, props]);
 
   const disablePasscode = useCallback(async () => {
     const hasAccount = Boolean(application?.hasAccount());

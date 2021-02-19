@@ -29,9 +29,9 @@ export const Settings = (props: Props) => {
     application?.isEncryptionAvailable()
   );
 
-  const updateProtectionsAvailable = () => {
+  const updateProtectionsAvailable = useCallback(() => {
     setProtectionsAvailable(application?.hasProtectionSources());
-  };
+  }, [application]);
 
   useEffect(() => {
     const removeApplicationEventSubscriber = application?.addEventObserver(
@@ -46,7 +46,7 @@ export const Settings = (props: Props) => {
     return () => {
       removeApplicationEventSubscriber && removeApplicationEventSubscriber();
     };
-  }, [application]);
+  }, [application, updateProtectionsAvailable]);
 
   const goBack = useCallback(() => {
     props.navigation.goBack();
@@ -71,7 +71,10 @@ export const Settings = (props: Props) => {
         updateProtectionsAvailable={updateProtectionsAvailable}
         title="Security"
       />
-      {protectionsAvailable && <ProtectionsSection title="Protections" />}
+      <ProtectionsSection
+        title="Protections"
+        protectionsAvailable={protectionsAvailable}
+      />
       <EncryptionSection
         encryptionAvailable={!!encryptionAvailable}
         title={'Encryption Status'}

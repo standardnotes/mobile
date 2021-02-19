@@ -14,6 +14,7 @@ import {
 
 type Props = {
   title: string;
+  protectionsAvailable: Boolean;
 };
 
 export const ProtectionsSection = (props: Props) => {
@@ -40,7 +41,11 @@ export const ProtectionsSection = (props: Props) => {
       <StyledSectionedTableCell first>
         <BaseView>
           <Title>Status</Title>
-          <Subtitle>{protectionsEnabledSubtitle}</Subtitle>
+          <Subtitle>
+            {props.protectionsAvailable
+              ? protectionsEnabledSubtitle
+              : 'Disabled'}
+          </Subtitle>
         </BaseView>
       </StyledSectionedTableCell>
       {protectionsDisabledUntil && (
