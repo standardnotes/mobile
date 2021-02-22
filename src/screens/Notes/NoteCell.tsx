@@ -14,11 +14,11 @@ import {
   useCustomActionSheet,
 } from '@Style/custom_action_sheet';
 import React, { useCallback, useContext, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import {
   Container,
-  DateText,
   DeletedText,
+  DetailsText,
   NoteText,
   TitleText,
   TouchableContainer,
@@ -226,6 +226,7 @@ export const NoteCell = ({
   const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
   const hasPlainPreview =
     !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
+  const showDetails = !note.errorDecrypting && (!hideDates || note.protected);
 
   return (
     <TouchableContainer
@@ -261,12 +262,22 @@ export const NoteCell = ({
           </NoteText>
         )}
 
-        {!note.errorDecrypting && !hideDates && (
-          <DateText numberOfLines={1} selected={highlight}>
-            {sortType === CollectionSort.UpdatedAt
-              ? 'Modified ' + note.updatedAtString
-              : note.createdAtString}
-          </DateText>
+        {showDetails && (
+          <DetailsText numberOfLines={1} selected={highlight}>
+            {note.protected && (
+              <Text>
+                Protected
+                {!hideDates && ' • '}
+              </Text>
+            )}
+            {!hideDates && (
+              <Text>
+                {sortType === CollectionSort.UpdatedAt
+                  ? 'Modified ' + note.updatedAtString
+                  : note.createdAtString}
+              </Text>
+            )}
+          </DetailsText>
         )}
       </Container>
     </TouchableContainer>

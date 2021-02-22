@@ -41,7 +41,7 @@ export const TagText = styled.Text<{ selected: boolean }>`
     selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
   opacity: ${props => (props.selected ? 0.8 : 0.5)};
 `;
-export const DateText = styled(TagText)`
+export const DetailsText = styled(TagText)`
   margin-right: 0px;
   margin-top: 5px;
 `;

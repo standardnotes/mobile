@@ -47,13 +47,6 @@ export const NoteCellFlags = ({
     });
   }
 
-  if (note.protected) {
-    flags.push({
-      text: 'Protected',
-      color: theme.stylekitSuccessColor,
-    });
-  }
-
   if (note.locked) {
     flags.push({
       text: 'Locked',
