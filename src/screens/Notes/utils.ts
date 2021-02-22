@@ -20,11 +20,7 @@ export function notePassesFilter(
 ) {
   let canShowArchived = showArchived;
   const canShowPinned = !hidePinned;
-  if (
-    (note.archived && !canShowArchived) ||
-    (note.pinned && !canShowPinned) ||
-    (note.protected && filterText)
-  ) {
+  if ((note.archived && !canShowArchived) || (note.pinned && !canShowPinned)) {
     return false;
   }
   return noteMatchesQuery(note, filterText);
@@ -39,7 +35,10 @@ function noteMatchesQuery(note: SNNote, query: string) {
   const lowercaseText = query.toLowerCase();
   const quotedText = stringBetweenQuotes(lowercaseText);
   if (quotedText) {
-    return title.includes(quotedText) || text.includes(quotedText);
+    return (
+      title.includes(quotedText) ||
+      (!note.protected && text.includes(quotedText))
+    );
   }
   if (stringIsUuid(lowercaseText)) {
     return note.uuid === lowercaseText;
@@ -51,7 +50,7 @@ function noteMatchesQuery(note: SNNote, query: string) {
   const matchesBody = words.every(word => {
     return text.indexOf(word) >= 0;
   });
-  return matchesTitle || matchesBody;
+  return matchesTitle || (!note.protected && matchesBody);
 }
 
 function stringBetweenQuotes(text: string) {
