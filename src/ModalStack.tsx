@@ -1,6 +1,7 @@
 import { BlockingModal } from '@Components/BlockingModal';
 import { HeaderTitleView } from '@Components/HeaderTitleView';
 import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
+import { LockLevelType } from '@Lib/application_state';
 import { RouteProp } from '@react-navigation/native';
 import {
   createStackNavigator,
@@ -44,6 +45,7 @@ type ModalStackNavigatorParamList = {
   [SCREEN_AUTHENTICATE]: {
     challenge: Challenge;
     title?: string;
+    lockLevel: LockLevelType;
   };
   [MODAL_BLOCKING_ALERT]: {
     title?: string;

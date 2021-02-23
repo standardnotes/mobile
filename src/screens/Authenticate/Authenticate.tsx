@@ -3,7 +3,11 @@ import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
 import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
-import { AppStateType, PasscodeKeyboardType } from '@Lib/application_state';
+import {
+  AppStateType,
+  LockLevelType,
+  PasscodeKeyboardType,
+} from '@Lib/application_state';
 import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect } from '@react-navigation/native';
 import { HeaderHeightContext } from '@react-navigation/stack';
@@ -72,7 +76,7 @@ function isValidChallengeValue(challengeValue: ChallengeValue): boolean {
 
 export const Authenticate = ({
   route: {
-    params: { challenge },
+    params: { challenge, lockLevel },
   },
   navigation,
 }: Props) => {
@@ -210,6 +214,14 @@ export const Authenticate = ({
 
   const authenticateBiometrics = useCallback(
     async (challengeValue: ChallengeValue) => {
+      // Bypass biometrics and mark it as valid if lock level is passcode only
+      if (lockLevel === LockLevelType.PasscodeOnly) {
+        const newChallengeValue = { ...challengeValue, value: true };
+
+        onValueChange(newChallengeValue);
+        return validateChallengeValue(newChallengeValue);
+      }
+
       let hasBiometrics = supportsBiometrics;
       if (supportsBiometrics === undefined) {
         hasBiometrics = await checkForBiometrics();
@@ -314,6 +326,7 @@ export const Authenticate = ({
     [
       application,
       checkForBiometrics,
+      lockLevel,
       onValueLocked,
       supportsBiometrics,
       validateChallengeValue,
@@ -600,104 +613,107 @@ export const Authenticate = ({
 
     return (
       <SourceContainer key={challengeValue.prompt.id}>
-        <StyledTableSection last={last}>
-          <SectionHeader
-            title={stateTitle}
-            subtitle={isInput ? stateLabel : undefined}
-            tinted={active}
-            buttonText={
-              challengeValue.prompt.validation ===
-                ChallengeValidation.LocalPasscode && showSwitchKeyboard
-                ? 'Change Keyboard'
-                : undefined
-            }
-            buttonAction={switchKeyboard}
-            buttonStyles={
-              challengeValue.prompt.validation ===
-              ChallengeValidation.LocalPasscode
-                ? {
-                    color: theme.stylekitNeutralColor,
-                    fontSize: theme.mainTextFontSize - 5,
-                  }
-                : undefined
-            }
-          />
-          {isInput && (
-            <SectionContainer>
-              <SectionedTableCell textInputCell={true} first={true}>
-                <Input
-                  key={Platform.OS === 'android' ? keyboardType : undefined}
-                  ref={
-                    Array.of(
-                      firstInputRef,
-                      secondInputRef,
-                      thirdInputRef,
-                      fourthInputRef
-                    )[index] as any
-                  }
-                  placeholder={challengeValue.prompt.placeholder}
-                  onChangeText={text => {
-                    onValueChange({ ...challengeValue, value: text });
-                  }}
-                  value={(challengeValue.value || '') as string}
-                  autoCorrect={false}
-                  autoFocus={false}
-                  autoCapitalize={'none'}
-                  secureTextEntry={challengeValue.prompt.secureTextEntry}
-                  keyboardType={
-                    challengeValue.prompt.keyboardType ?? keyboardType
-                  }
-                  keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
-                  underlineColorAndroid={'transparent'}
-                  onSubmitEditing={
-                    !singleValidation
-                      ? () => {
-                          validateChallengeValue(challengeValue);
-                        }
-                      : undefined
-                  }
-                  onFocus={() => setShowSwitchKeyboard(true)}
-                  onBlur={() => setShowSwitchKeyboard(false)}
-                />
-              </SectionedTableCell>
-            </SectionContainer>
-          )}
-          {isBiometric && (
-            <SectionContainer>
-              <SectionedAccessoryTableCell
-                first={true}
-                dimmed={active}
-                tinted={active}
-                text={stateLabel}
-                onPress={onBiometricDirectPress}
-              />
-            </SectionContainer>
-          )}
-          {isProtectionSessionDuration && (
-            <SessionLengthContainer>
-              {ProtectionSessionDurations.map((duration, i) => (
+        {/* If lock level is passcode only, don't show biometrics */}
+        {(!isBiometric || lockLevel !== LockLevelType.PasscodeOnly) && (
+          <StyledTableSection last={last}>
+            <SectionHeader
+              title={stateTitle}
+              subtitle={isInput ? stateLabel : undefined}
+              tinted={active}
+              buttonText={
+                challengeValue.prompt.validation ===
+                  ChallengeValidation.LocalPasscode && showSwitchKeyboard
+                  ? 'Change Keyboard'
+                  : undefined
+              }
+              buttonAction={switchKeyboard}
+              buttonStyles={
+                challengeValue.prompt.validation ===
+                ChallengeValidation.LocalPasscode
+                  ? {
+                      color: theme.stylekitNeutralColor,
+                      fontSize: theme.mainTextFontSize - 5,
+                    }
+                  : undefined
+              }
+            />
+            {isInput && (
+              <SectionContainer>
+                <SectionedTableCell textInputCell={true} first={true}>
+                  <Input
+                    key={Platform.OS === 'android' ? keyboardType : undefined}
+                    ref={
+                      Array.of(
+                        firstInputRef,
+                        secondInputRef,
+                        thirdInputRef,
+                        fourthInputRef
+                      )[index] as any
+                    }
+                    placeholder={challengeValue.prompt.placeholder}
+                    onChangeText={text => {
+                      onValueChange({ ...challengeValue, value: text });
+                    }}
+                    value={(challengeValue.value || '') as string}
+                    autoCorrect={false}
+                    autoFocus={false}
+                    autoCapitalize={'none'}
+                    secureTextEntry={challengeValue.prompt.secureTextEntry}
+                    keyboardType={
+                      challengeValue.prompt.keyboardType ?? keyboardType
+                    }
+                    keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
+                    underlineColorAndroid={'transparent'}
+                    onSubmitEditing={
+                      !singleValidation
+                        ? () => {
+                            validateChallengeValue(challengeValue);
+                          }
+                        : undefined
+                    }
+                    onFocus={() => setShowSwitchKeyboard(true)}
+                    onBlur={() => setShowSwitchKeyboard(false)}
+                  />
+                </SectionedTableCell>
+              </SectionContainer>
+            )}
+            {isBiometric && (
+              <SectionContainer>
                 <SectionedAccessoryTableCell
-                  text={duration.label}
-                  key={duration.valueInSeconds}
-                  first={i === 0}
-                  last={i === ProtectionSessionDurations.length - 1}
-                  selected={() => {
-                    return duration.valueInSeconds === challengeValue.value;
-                  }}
-                  onPress={() => {
-                    onValueChange(
-                      {
-                        ...challengeValue,
-                        value: duration.valueInSeconds,
-                      },
-                      true
-                    );
-                  }}
+                  first={true}
+                  dimmed={active}
+                  tinted={active}
+                  text={stateLabel}
+                  onPress={onBiometricDirectPress}
                 />
-              ))}
-            </SessionLengthContainer>
-          )}
-        </StyledTableSection>
+              </SectionContainer>
+            )}
+            {isProtectionSessionDuration && (
+              <SessionLengthContainer>
+                {ProtectionSessionDurations.map((duration, i) => (
+                  <SectionedAccessoryTableCell
+                    text={duration.label}
+                    key={duration.valueInSeconds}
+                    first={i === 0}
+                    last={i === ProtectionSessionDurations.length - 1}
+                    selected={() => {
+                      return duration.valueInSeconds === challengeValue.value;
+                    }}
+                    onPress={() => {
+                      onValueChange(
+                        {
+                          ...challengeValue,
+                          value: duration.valueInSeconds,
+                        },
+                        true
+                      );
+                    }}
+                  />
+                ))}
+              </SessionLengthContainer>
+            )}
+          </StyledTableSection>
+        )}
       </SourceContainer>
     );
   };

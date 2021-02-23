@@ -2,6 +2,7 @@ import Bugsnag from '@bugsnag/react-native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { MobileApplication } from '@Lib/application';
 import { ApplicationGroup } from '@Lib/application_group';
+import { LockLevelType } from '@Lib/application_state';
 import { navigationRef } from '@Lib/navigation_service';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { DeinitSource } from '@standardnotes/snjs';
@@ -68,7 +69,12 @@ const AppComponent: React.FC<{
       setThemeServiceRef(themeServiceInstance);
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
-          application!.promptForChallenge(challenge);
+          const lockLevel = await application.getAppState().getLockLevel();
+          application.getAppState().setLockLevel(LockLevelType.Default);
+          application!.promptForChallenge(
+            challenge,
+            lockLevel || LockLevelType.Default
+          );
         },
       });
       await themeServiceInstance.init();

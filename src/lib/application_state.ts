@@ -36,6 +36,8 @@ import { PrefKey } from './preferences_manager';
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;
 
+const LOCK_LEVEL = 'standardnotes-lock_level';
+
 // eslint-disable-next-line no-shadow
 export enum AppStateType {
   LosingFocus = 1,
@@ -80,6 +82,11 @@ export enum PasscodeKeyboardType {
 // eslint-disable-next-line no-shadow
 export enum MobileStorageKey {
   PasscodeKeyboardTypeKey = 'passcodeKeyboardType',
+}
+
+export enum LockLevelType {
+  Default = 'default',
+  PasscodeOnly = 'passcode-only',
 }
 
 type EventObserverCallback = (
@@ -509,6 +516,14 @@ export class ApplicationState extends ApplicationService {
       const hasBiometrics = await this.application.hasBiometrics();
       const hasPasscode = this.application.hasPasscode();
       if (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately) {
+        if (
+          hasBiometrics &&
+          this.biometricsTiming !== UnlockTiming.Immediately
+        ) {
+          // If biometrics is not set to immediately, set lock level to passcode only before locking app
+          await this.setLockLevel(LockLevelType.PasscodeOnly);
+        }
+
         await this.application.lock();
       } else if (
         hasBiometrics &&
@@ -601,6 +616,12 @@ export class ApplicationState extends ApplicationService {
     );
   }
 
+  public async getLockLevel(): Promise<LockLevelType | undefined> {
+    return (await this.application.deviceInterface.getRawStorageValue(
+      LOCK_LEVEL
+    )) as LockLevelType;
+  }
+
   public async setPasscodeTiming(timing: UnlockTiming) {
     await this.application.setValue(
       StorageKey.MobilePasscodeTiming,
@@ -619,6 +640,14 @@ export class ApplicationState extends ApplicationService {
     );
     this.biometricsTiming = timing;
     this.setScreenshotPrivacy();
+  }
+
+  public async setLockLevel(lockLevel: LockLevelType) {
+    // Save this as standalone storage value, can't use setValue as application hasn't been launched yet
+    await this.application.deviceInterface.setRawStorageValue(
+      LOCK_LEVEL,
+      lockLevel
+    );
   }
 
   public async getPasscodeKeyboardType(): Promise<PasscodeKeyboardType> {
