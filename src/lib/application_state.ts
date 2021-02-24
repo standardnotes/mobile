@@ -172,10 +172,11 @@ export class ApplicationState extends ApplicationService {
       }
     );
 
-    await this.getUnlockTiming();
+    await this.loadUnlockTiming();
   }
 
   async onAppLaunch() {
+    MobileApplication.setPreviouslyLaunched(true);
     this.setScreenshotPrivacy();
   }
 
@@ -249,7 +250,7 @@ export class ApplicationState extends ApplicationService {
     }
   }
 
-  private async getUnlockTiming() {
+  private async loadUnlockTiming() {
     this.passcodeTiming = await this.getPasscodeTiming();
     this.biometricsTiming = await this.getBiometricsTiming();
   }

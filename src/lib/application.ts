@@ -99,35 +99,30 @@ export class MobileApplication extends SNApplication {
   /** @override */
   getLaunchChallenge() {
     const challenge = super.getLaunchChallenge();
+
+    if (!challenge) {
+      return null;
+    }
+
     const previouslyLaunched = MobileApplication.getPreviouslyLaunched();
     const biometricsTiming = this.getAppState().biometricsTiming;
 
-    if (previouslyLaunched && biometricsTiming === UnlockTiming.OnQuit) {
-      MobileApplication.setPreviouslyLaunched(false);
+    MobileApplication.setPreviouslyLaunched(false);
 
-      const filteredPrompts = challenge?.prompts.filter(
+    if (previouslyLaunched && biometricsTiming === UnlockTiming.OnQuit) {
+      const filteredPrompts = challenge.prompts.filter(
         (prompt: ChallengePrompt) =>
           prompt.validation !== ChallengeValidation.Biometric
       );
 
-      if (filteredPrompts) {
-        const filteredChallenge = new Challenge(
-          filteredPrompts,
-          ChallengeReason.ApplicationUnlock,
-          false
-        );
-
-        return filteredChallenge;
-      }
+      return new Challenge(
+        filteredPrompts,
+        ChallengeReason.ApplicationUnlock,
+        false
+      );
     }
 
     return challenge;
-  }
-
-  /** @override */
-  async lock() {
-    MobileApplication.setPreviouslyLaunched(true);
-    super.lock();
   }
 
   promptForChallenge(challenge: Challenge) {
