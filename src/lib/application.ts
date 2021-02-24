@@ -1,6 +1,8 @@
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import {
   Challenge,
+  ChallengeReason,
+  ChallengeValidation,
   DeinitSource,
   Environment,
   platformFromString,
@@ -10,7 +12,7 @@ import {
 import { Platform } from 'react-native';
 import VersionInfo from 'react-native-version-info';
 import { AlertService } from './alert_service';
-import { ApplicationState } from './application_state';
+import { ApplicationState, UnlockTiming } from './application_state';
 import { BackupsService } from './backups_service';
 import { ComponentGroup } from './component_group';
 import { ComponentManager } from './component_manager';
@@ -39,6 +41,8 @@ export class MobileApplication extends SNApplication {
   private startedDeinit: boolean = false;
   public Uuid: string; // UI remounts when Uuid changes
 
+  static previouslyLaunched: boolean = false;
+
   constructor(deviceInterface: MobileDeviceInterface, identifier: string) {
     super(
       Environment.Mobile,
@@ -63,6 +67,14 @@ export class MobileApplication extends SNApplication {
     this.componentGroup = new ComponentGroup(this);
   }
 
+  static getPreviouslyLaunched() {
+    return this.previouslyLaunched;
+  }
+
+  static setPreviouslyLaunched(previouslyLaunched: boolean) {
+    this.previouslyLaunched = previouslyLaunched;
+  }
+
   public hasStartedDeinit() {
     return this.startedDeinit;
   }
@@ -81,6 +93,40 @@ export class MobileApplication extends SNApplication {
     this.editorGroup.deinit();
     this.componentGroup.deinit();
     super.deinit(source);
+  }
+
+  /** @override */
+  getLaunchChallenge() {
+    const challenge = super.getLaunchChallenge();
+    const previouslyLaunched = MobileApplication.getPreviouslyLaunched();
+    const biometricsTiming = this.getAppState().biometricsTiming;
+
+    if (previouslyLaunched && biometricsTiming === UnlockTiming.OnQuit) {
+      MobileApplication.setPreviouslyLaunched(false);
+      console.log(MobileApplication.getPreviouslyLaunched());
+
+      const filteredPrompts = challenge?.prompts.filter(
+        prompt => prompt.validation !== ChallengeValidation.Biometric
+      );
+
+      if (filteredPrompts) {
+        const filteredChallenge = new Challenge(
+          filteredPrompts,
+          ChallengeReason.ApplicationUnlock,
+          false
+        );
+
+        return filteredChallenge;
+      }
+    }
+
+    return challenge;
+  }
+
+  /** @override */
+  async lock() {
+    MobileApplication.setPreviouslyLaunched(true);
+    super.lock();
   }
 
   promptForChallenge(challenge: Challenge) {

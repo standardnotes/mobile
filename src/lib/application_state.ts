@@ -171,10 +171,11 @@ export class ApplicationState extends ApplicationService {
         }
       }
     );
+
+    await this.getUnlockTiming();
   }
 
   async onAppLaunch() {
-    await this.getUnlockTiming();
     this.setScreenshotPrivacy();
   }
 
