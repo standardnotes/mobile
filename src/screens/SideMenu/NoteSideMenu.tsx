@@ -418,43 +418,61 @@ export const NoteSideMenu = React.memo((props: Props) => {
     }, [reloadTags])
   );
 
+  const canChangeNote = useCallback(async () => {
+    if (!editor || !note) {
+      return false;
+    }
+
+    if (note.deleted) {
+      application?.alertService?.alert(
+        'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
+      );
+      return false;
+    }
+    if (editor.isTemplateNote) {
+      await editor.insertTemplatedNote();
+      if (application?.getAppState().selectedTag?.isSmartTag() === false) {
+        await application?.changeItem(
+          application?.getAppState().selectedTag!.uuid,
+          mutator => {
+            mutator.addItemAsRelationship(note);
+          }
+        );
+      }
+    }
+    if (!application?.findItem(note.uuid)) {
+      application?.alertService!.alert(
+        "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
+      );
+      return false;
+    }
+
+    return true;
+  }, [application, editor, note]);
+
   const changeNote = useCallback(
     async (mutate: (mutator: NoteMutator) => void) => {
-      if (!editor || !note) {
-        return;
+      if (await canChangeNote()) {
+        await application?.changeAndSaveItem(note!.uuid, mutator => {
+          const noteMutator = mutator as NoteMutator;
+          mutate(noteMutator);
+        });
       }
-
-      if (note.deleted) {
-        application?.alertService?.alert(
-          'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
-        );
-        return;
-      }
-      if (editor.isTemplateNote) {
-        await editor.insertTemplatedNote();
-        if (application?.getAppState().selectedTag?.isSmartTag() === false) {
-          await application?.changeItem(
-            application?.getAppState().selectedTag!.uuid,
-            mutator => {
-              mutator.addItemAsRelationship(note);
-            }
-          );
-        }
-      }
-      if (!application?.findItem(note.uuid)) {
-        application?.alertService!.alert(
-          "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
-        );
-        return;
-      }
-
-      await application?.changeAndSaveItem(note.uuid, mutator => {
-        const noteMutator = mutator as NoteMutator;
-        mutate(noteMutator);
-      });
     },
-    [application, editor, note]
+    [application, note, canChangeNote]
   );
+
+  const protectNote = useCallback(async () => {
+    if (await canChangeNote()) {
+      application?.protectNote(note!);
+    }
+  }, [application, note, canChangeNote]);
+
+  const unprotectNote = useCallback(async () => {
+    if (await canChangeNote()) {
+      await application?.unprotectNote(note!);
+    }
+  }, [application, note, canChangeNote]);
 
   const leaveEditor = useCallback(() => {
     props.drawerRef?.closeDrawer();
@@ -493,12 +511,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
       });
 
     const protectOption = note.protected ? 'Unprotect' : 'Protect';
-    const protectEvent = () => {
+    const protectEvent = async () => {
       const protectedNote = note.protected;
 
-      changeNote(mutator => {
-        mutator.protected = !note.protected;
-      });
+      if (protectedNote) {
+        await unprotectNote();
+      } else {
+        protectNote();
+      }
 
       showProtectNoteAlert(protectedNote);
     };
@@ -609,6 +629,8 @@ export const NoteSideMenu = React.memo((props: Props) => {
     navigation,
     application,
     deleteNote,
+    protectNote,
+    unprotectNote,
     showProtectNoteAlert,
   ]);
 

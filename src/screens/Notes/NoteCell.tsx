@@ -91,33 +91,51 @@ export const NoteCell = ({
     setSelected(false);
   };
 
+  const canChangeNote = useCallback(() => {
+    if (!note) {
+      return false;
+    }
+
+    if (note.deleted) {
+      application?.alertService?.alert(
+        'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
+      );
+      return false;
+    }
+
+    if (!application?.findItem(note.uuid)) {
+      application?.alertService!.alert(
+        "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
+      );
+      return false;
+    }
+
+    return true;
+  }, [application, note]);
+
   const changeNote = useCallback(
     async (mutate: (mutator: NoteMutator) => void) => {
-      if (!note) {
-        return;
+      if (canChangeNote()) {
+        await application?.changeAndSaveItem(note.uuid, mutator => {
+          const noteMutator = mutator as NoteMutator;
+          mutate(noteMutator);
+        });
       }
-
-      if (note.deleted) {
-        application?.alertService?.alert(
-          'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
-        );
-        return;
-      }
-
-      if (!application?.findItem(note.uuid)) {
-        application?.alertService!.alert(
-          "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
-        );
-        return;
-      }
-
-      await application?.changeAndSaveItem(note.uuid, mutator => {
-        const noteMutator = mutator as NoteMutator;
-        mutate(noteMutator);
-      });
     },
-    [application, note]
+    [application, note, canChangeNote]
   );
+
+  const protectNote = useCallback(async () => {
+    if (canChangeNote()) {
+      application?.protectNote(note!);
+    }
+  }, [application, note, canChangeNote]);
+
+  const unprotectNote = useCallback(async () => {
+    if (canChangeNote()) {
+      await application?.unprotectNote(note!);
+    }
+  }, [application, note, canChangeNote]);
 
   const onLongPress = () => {
     if (note.errorDecrypting) {
@@ -176,12 +194,14 @@ export const NoteCell = ({
       options.push({
         text: note.protected ? 'Unprotect' : 'Protect',
         key: 'protect',
-        callback: () => {
+        callback: async () => {
           const protectedNote = note.protected;
 
-          changeNote(mutator => {
-            mutator.protected = !note.protected;
-          });
+          if (protectedNote) {
+            await unprotectNote();
+          } else {
+            protectNote();
+          }
 
           showProtectNoteAlert(protectedNote);
         },
