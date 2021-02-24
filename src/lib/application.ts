@@ -1,6 +1,7 @@
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import {
   Challenge,
+  ChallengePrompt,
   ChallengeReason,
   ChallengeValidation,
   DeinitSource,
@@ -103,10 +104,10 @@ export class MobileApplication extends SNApplication {
 
     if (previouslyLaunched && biometricsTiming === UnlockTiming.OnQuit) {
       MobileApplication.setPreviouslyLaunched(false);
-      console.log(MobileApplication.getPreviouslyLaunched());
 
       const filteredPrompts = challenge?.prompts.filter(
-        prompt => prompt.validation !== ChallengeValidation.Biometric
+        (prompt: ChallengePrompt) =>
+          prompt.validation !== ChallengeValidation.Biometric
       );
 
       if (filteredPrompts) {
