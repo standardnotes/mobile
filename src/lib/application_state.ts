@@ -176,7 +176,7 @@ export class ApplicationState extends ApplicationService {
   }
 
   async onAppLaunch() {
-    MobileApplication.setPreviouslyLaunched(true);
+    MobileApplication.setPreviouslyLaunched();
     this.setScreenshotPrivacy();
   }
 

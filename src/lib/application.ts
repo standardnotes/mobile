@@ -72,8 +72,8 @@ export class MobileApplication extends SNApplication {
     return this.previouslyLaunched;
   }
 
-  static setPreviouslyLaunched(previouslyLaunched: boolean) {
-    this.previouslyLaunched = previouslyLaunched;
+  static setPreviouslyLaunched() {
+    this.previouslyLaunched = true;
   }
 
   public hasStartedDeinit() {
