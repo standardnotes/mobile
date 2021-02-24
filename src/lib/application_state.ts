@@ -256,19 +256,10 @@ export class ApplicationState extends ApplicationService {
   }
 
   public async setScreenshotPrivacy() {
-    const hasBiometrics = await this.application.hasBiometrics();
-    const hasPasscode = this.application.hasPasscode();
-    const hasImmediateLock =
-      (hasBiometrics && this.biometricsTiming === UnlockTiming.Immediately) ||
-      (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately);
     if (Platform.OS === 'ios') {
-      enabled(hasImmediateLock);
+      enabled(true);
     } else {
-      if (hasImmediateLock) {
-        FlagSecure.activate();
-      } else {
-        FlagSecure.deactivate();
-      }
+      FlagSecure.activate();
     }
   }
 
