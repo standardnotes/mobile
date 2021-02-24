@@ -10,7 +10,7 @@ import {
 import { Platform } from 'react-native';
 import VersionInfo from 'react-native-version-info';
 import { AlertService } from './alert_service';
-import { ApplicationState, LockLevelType } from './application_state';
+import { ApplicationState } from './application_state';
 import { BackupsService } from './backups_service';
 import { ComponentGroup } from './component_group';
 import { ComponentManager } from './component_manager';
@@ -83,12 +83,8 @@ export class MobileApplication extends SNApplication {
     super.deinit(source);
   }
 
-  async promptForChallenge(challenge: Challenge, lockLevel: LockLevelType) {
-    push(SCREEN_AUTHENTICATE, {
-      challenge,
-      title: challenge.modalTitle,
-      lockLevel,
-    });
+  promptForChallenge(challenge: Challenge) {
+    push(SCREEN_AUTHENTICATE, { challenge, title: challenge.modalTitle });
   }
 
   setMobileServices(services: MobileServices) {
