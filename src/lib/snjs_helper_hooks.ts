@@ -5,6 +5,7 @@ import {
   ApplicationEvent,
   ButtonType,
   isSameDay,
+  NoteMutator,
   SNNote,
   StorageEncryptionPolicies,
 } from '@standardnotes/snjs';
@@ -433,4 +434,94 @@ export const useProtectNoteAlert = () => {
   );
 
   return [showProtectNoteAlert];
+};
+
+export const useChangeNoteChecks = (
+  note: SNNote | undefined,
+  editor: Editor | undefined = undefined
+) => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const canChangeNote = useCallback(async () => {
+    if (!note) {
+      return false;
+    }
+
+    if (note.deleted) {
+      application?.alertService?.alert(
+        'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
+      );
+      return false;
+    }
+
+    if (editor && editor.isTemplateNote) {
+      await editor.insertTemplatedNote();
+      if (application?.getAppState().selectedTag?.isSmartTag() === false) {
+        await application?.changeItem(
+          application?.getAppState().selectedTag!.uuid,
+          mutator => {
+            mutator.addItemAsRelationship(note);
+          }
+        );
+      }
+    }
+
+    if (!application?.findItem(note.uuid)) {
+      application?.alertService!.alert(
+        "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
+      );
+      return false;
+    }
+
+    return true;
+  }, [application, editor, note]);
+
+  return [canChangeNote];
+};
+
+export const useChangeNote = (
+  note: SNNote | undefined,
+  editor: Editor | undefined = undefined
+) => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const [canChangeNote] = useChangeNoteChecks(note, editor);
+
+  const changeNote = useCallback(
+    async (mutate: (mutator: NoteMutator) => void) => {
+      if (await canChangeNote()) {
+        await application?.changeAndSaveItem(note!.uuid, mutator => {
+          const noteMutator = mutator as NoteMutator;
+          mutate(noteMutator);
+        });
+      }
+    },
+    [application, note, canChangeNote]
+  );
+
+  return [changeNote];
+};
+
+export const useProtectOrUnprotectNote = (
+  note: SNNote | undefined,
+  editor: Editor | undefined = undefined
+) => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const [canChangeNote] = useChangeNoteChecks(note, editor);
+
+  const protectOrUnprotectNote = useCallback(async () => {
+    if (await canChangeNote()) {
+      if (note!.protected) {
+        await application?.unprotectNote(note!);
+      } else {
+        application?.protectNote(note!);
+      }
+    }
+  }, [application, note, canChangeNote]);
+
+  return [protectOrUnprotectNote];
 };
