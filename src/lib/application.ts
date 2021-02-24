@@ -101,7 +101,7 @@ export class MobileApplication extends SNApplication {
     const challenge = super.getLaunchChallenge();
 
     if (!challenge) {
-      return null;
+      return undefined;
     }
 
     const previouslyLaunched = MobileApplication.getPreviouslyLaunched();
