@@ -1,7 +1,9 @@
 import { Editor } from '@Lib/editor';
 import {
+  useChangeNote,
   useDeleteNoteWithPrivileges,
   useProtectNoteAlert,
+  useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -77,7 +79,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
   const [components, setComponents] = useState<SNComponent[]>([]);
+
   const [showProtectNoteAlert] = useProtectNoteAlert();
+  const [changeNote] = useChangeNote(note, editor);
+  const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note, editor);
 
   const [deleteNote] = useDeleteNoteWithPrivileges(
     note!,
@@ -418,62 +423,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
     }, [reloadTags])
   );
 
-  const canChangeNote = useCallback(async () => {
-    if (!editor || !note) {
-      return false;
-    }
-
-    if (note.deleted) {
-      application?.alertService?.alert(
-        'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
-      );
-      return false;
-    }
-    if (editor.isTemplateNote) {
-      await editor.insertTemplatedNote();
-      if (application?.getAppState().selectedTag?.isSmartTag() === false) {
-        await application?.changeItem(
-          application?.getAppState().selectedTag!.uuid,
-          mutator => {
-            mutator.addItemAsRelationship(note);
-          }
-        );
-      }
-    }
-    if (!application?.findItem(note.uuid)) {
-      application?.alertService!.alert(
-        "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
-      );
-      return false;
-    }
-
-    return true;
-  }, [application, editor, note]);
-
-  const changeNote = useCallback(
-    async (mutate: (mutator: NoteMutator) => void) => {
-      if (await canChangeNote()) {
-        await application?.changeAndSaveItem(note!.uuid, mutator => {
-          const noteMutator = mutator as NoteMutator;
-          mutate(noteMutator);
-        });
-      }
-    },
-    [application, note, canChangeNote]
-  );
-
-  const protectNote = useCallback(async () => {
-    if (await canChangeNote()) {
-      application?.protectNote(note!);
-    }
-  }, [application, note, canChangeNote]);
-
-  const unprotectNote = useCallback(async () => {
-    if (await canChangeNote()) {
-      await application?.unprotectNote(note!);
-    }
-  }, [application, note, canChangeNote]);
-
   const leaveEditor = useCallback(() => {
     props.drawerRef?.closeDrawer();
     navigation.goBack();
@@ -513,13 +462,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const protectOption = note.protected ? 'Unprotect' : 'Protect';
     const protectEvent = async () => {
       const protectedNote = note.protected;
-
-      if (protectedNote) {
-        await unprotectNote();
-      } else {
-        protectNote();
-      }
-
+      await protectOrUnprotectNote();
       showProtectNoteAlert(protectedNote);
     };
 
@@ -628,9 +571,8 @@ export const NoteSideMenu = React.memo((props: Props) => {
     props.drawerRef,
     navigation,
     application,
+    protectOrUnprotectNote,
     deleteNote,
-    protectNote,
-    unprotectNote,
     showProtectNoteAlert,
   ]);
 

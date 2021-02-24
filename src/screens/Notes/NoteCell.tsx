@@ -1,19 +1,16 @@
 import {
+  useChangeNote,
   useDeleteNoteWithPrivileges,
   useProtectNoteAlert,
+  useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import {
-  CollectionSort,
-  isNullOrUndefined,
-  NoteMutator,
-  SNNote,
-} from '@standardnotes/snjs';
+import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
 } from '@Style/custom_action_sheet';
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import {
   Container,
@@ -44,7 +41,10 @@ export const NoteCell = ({
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+
   const [showProtectNoteAlert] = useProtectNoteAlert();
+  const [changeNote] = useChangeNote(note);
+  const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note);
 
   // State
   const [selected, setSelected] = useState(false);
@@ -90,52 +90,6 @@ export const NoteCell = ({
     }
     setSelected(false);
   };
-
-  const canChangeNote = useCallback(() => {
-    if (!note) {
-      return false;
-    }
-
-    if (note.deleted) {
-      application?.alertService?.alert(
-        'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
-      );
-      return false;
-    }
-
-    if (!application?.findItem(note.uuid)) {
-      application?.alertService!.alert(
-        "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
-      );
-      return false;
-    }
-
-    return true;
-  }, [application, note]);
-
-  const changeNote = useCallback(
-    async (mutate: (mutator: NoteMutator) => void) => {
-      if (canChangeNote()) {
-        await application?.changeAndSaveItem(note.uuid, mutator => {
-          const noteMutator = mutator as NoteMutator;
-          mutate(noteMutator);
-        });
-      }
-    },
-    [application, note, canChangeNote]
-  );
-
-  const protectNote = useCallback(async () => {
-    if (canChangeNote()) {
-      application?.protectNote(note!);
-    }
-  }, [application, note, canChangeNote]);
-
-  const unprotectNote = useCallback(async () => {
-    if (canChangeNote()) {
-      await application?.unprotectNote(note!);
-    }
-  }, [application, note, canChangeNote]);
 
   const onLongPress = () => {
     if (note.errorDecrypting) {
@@ -196,13 +150,7 @@ export const NoteCell = ({
         key: 'protect',
         callback: async () => {
           const protectedNote = note.protected;
-
-          if (protectedNote) {
-            await unprotectNote();
-          } else {
-            protectNote();
-          }
-
+          await protectOrUnprotectNote();
           showProtectNoteAlert(protectedNote);
         },
       });
