@@ -76,7 +76,7 @@ function isValidChallengeValue(challengeValue: ChallengeValue): boolean {
 
 export const Authenticate = ({
   route: {
-    params: { challenge, lockLevel = LockLevelType.Default },
+    params: { challenge, lockLevel },
   },
   navigation,
 }: Props) => {
