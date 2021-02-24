@@ -1,6 +1,9 @@
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import {
   Challenge,
+  ChallengePrompt,
+  ChallengeReason,
+  ChallengeValidation,
   DeinitSource,
   Environment,
   platformFromString,
@@ -10,7 +13,7 @@ import {
 import { Platform } from 'react-native';
 import VersionInfo from 'react-native-version-info';
 import { AlertService } from './alert_service';
-import { ApplicationState } from './application_state';
+import { ApplicationState, UnlockTiming } from './application_state';
 import { BackupsService } from './backups_service';
 import { ComponentGroup } from './component_group';
 import { ComponentManager } from './component_manager';
@@ -39,6 +42,8 @@ export class MobileApplication extends SNApplication {
   private startedDeinit: boolean = false;
   public Uuid: string; // UI remounts when Uuid changes
 
+  static previouslyLaunched: boolean = false;
+
   constructor(deviceInterface: MobileDeviceInterface, identifier: string) {
     super(
       Environment.Mobile,
@@ -63,6 +68,14 @@ export class MobileApplication extends SNApplication {
     this.componentGroup = new ComponentGroup(this);
   }
 
+  static getPreviouslyLaunched() {
+    return this.previouslyLaunched;
+  }
+
+  static setPreviouslyLaunched() {
+    this.previouslyLaunched = true;
+  }
+
   public hasStartedDeinit() {
     return this.startedDeinit;
   }
@@ -81,6 +94,33 @@ export class MobileApplication extends SNApplication {
     this.editorGroup.deinit();
     this.componentGroup.deinit();
     super.deinit(source);
+  }
+
+  /** @override */
+  getLaunchChallenge() {
+    const challenge = super.getLaunchChallenge();
+
+    if (!challenge) {
+      return undefined;
+    }
+
+    const previouslyLaunched = MobileApplication.getPreviouslyLaunched();
+    const biometricsTiming = this.getAppState().biometricsTiming;
+
+    if (previouslyLaunched && biometricsTiming === UnlockTiming.OnQuit) {
+      const filteredPrompts = challenge.prompts.filter(
+        (prompt: ChallengePrompt) =>
+          prompt.validation !== ChallengeValidation.Biometric
+      );
+
+      return new Challenge(
+        filteredPrompts,
+        ChallengeReason.ApplicationUnlock,
+        false
+      );
+    }
+
+    return challenge;
   }
 
   promptForChallenge(challenge: Challenge) {
