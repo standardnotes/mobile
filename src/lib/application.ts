@@ -107,8 +107,6 @@ export class MobileApplication extends SNApplication {
     const previouslyLaunched = MobileApplication.getPreviouslyLaunched();
     const biometricsTiming = this.getAppState().biometricsTiming;
 
-    MobileApplication.setPreviouslyLaunched(false);
-
     if (previouslyLaunched && biometricsTiming === UnlockTiming.OnQuit) {
       const filteredPrompts = challenge.prompts.filter(
         (prompt: ChallengePrompt) =>
