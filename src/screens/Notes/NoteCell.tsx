@@ -263,7 +263,11 @@ export const NoteCell = ({
         )}
 
         {showDetails && (
-          <DetailsText numberOfLines={1} selected={highlight}>
+          <DetailsText
+            numberOfLines={1}
+            selected={highlight}
+            first={!note.title}
+          >
             {note.protected && (
               <Text>
                 Protected
