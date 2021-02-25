@@ -85,7 +85,7 @@ export const Authenticate = ({
   const [supportsBiometrics, setSupportsBiometrics] = useState<
     boolean | undefined
   >(undefined);
-  const [keyboardType, setKeyboardType] = useState<
+  const [passcodeKeyboardType, setPasscodeKeyboardType] = useState<
     PasscodeKeyboardType | undefined
   >(PasscodeKeyboardType.Default);
   const [singleValidation] = useState(
@@ -466,13 +466,13 @@ export const Authenticate = ({
       }
     };
     setBiometricsAsync();
-    const setInitialKeyboardType = async () => {
-      const initialKeyboardType = await checkPasscodeKeyboardType();
+    const setInitialPasscodeKeyboardType = async () => {
+      const initialPasscodeKeyboardType = await checkPasscodeKeyboardType();
       if (mounted) {
-        setKeyboardType(initialKeyboardType);
+        setPasscodeKeyboardType(initialPasscodeKeyboardType);
       }
     };
-    setInitialKeyboardType();
+    setInitialPasscodeKeyboardType();
     return () => {
       mounted = false;
     };
@@ -563,10 +563,10 @@ export const Authenticate = ({
   };
 
   const switchKeyboard = () => {
-    if (keyboardType === PasscodeKeyboardType.Numeric) {
-      setKeyboardType(PasscodeKeyboardType.Default);
+    if (passcodeKeyboardType === PasscodeKeyboardType.Numeric) {
+      setPasscodeKeyboardType(PasscodeKeyboardType.Default);
     } else {
-      setKeyboardType(PasscodeKeyboardType.Numeric);
+      setPasscodeKeyboardType(PasscodeKeyboardType.Numeric);
     }
   };
 
@@ -597,6 +597,12 @@ export const Authenticate = ({
     );
 
     const stateTitle = getChallengePromptTitle(challengeValue.prompt, state);
+
+    const keyboardType =
+      challengeValue.prompt.keyboardType ??
+      (challengeValue.prompt.validation === ChallengeValidation.LocalPasscode
+        ? passcodeKeyboardType
+        : 'default');
 
     return (
       <SourceContainer key={challengeValue.prompt.id}>
@@ -644,9 +650,7 @@ export const Authenticate = ({
                   autoFocus={false}
                   autoCapitalize={'none'}
                   secureTextEntry={challengeValue.prompt.secureTextEntry}
-                  keyboardType={
-                    challengeValue.prompt.keyboardType ?? keyboardType
-                  }
+                  keyboardType={keyboardType}
                   keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
                   underlineColorAndroid={'transparent'}
                   onSubmitEditing={
