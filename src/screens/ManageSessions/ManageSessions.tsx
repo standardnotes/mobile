@@ -16,6 +16,7 @@ import { SessionCell } from './SessionCell';
 const useSessions = (): [
   RemoteSession[],
   () => void,
+  () => void,
   boolean,
   (uuid: UuidString) => Promise<void>,
   string
@@ -25,11 +26,10 @@ const useSessions = (): [
 
   // State
   const [sessions, setSessions] = useState<RemoteSession[]>([]);
-  const [refreshing, setRefreshing] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const getSessions = useCallback(async () => {
-    setRefreshing(true);
     const response = await application?.getSessions();
     if (response && 'error' in response) {
       if (response.error?.message) {
@@ -42,12 +42,17 @@ const useSessions = (): [
       setSessions(newSessions);
       setErrorMessage('');
     }
-    setRefreshing(false);
   }, [application]);
 
+  const refreshSessions = useCallback(async () => {
+    setRefreshing(true);
+    await getSessions();
+    setRefreshing(false);
+  }, [getSessions]);
+
   useEffect(() => {
-    getSessions();
-  }, [application, getSessions]);
+    refreshSessions();
+  }, [application, refreshSessions]);
 
   async function revokeSession(uuid: UuidString) {
     let sessionsBeforeRevoke = sessions;
@@ -63,7 +68,14 @@ const useSessions = (): [
     }
   }
 
-  return [sessions, getSessions, refreshing, revokeSession, errorMessage];
+  return [
+    sessions,
+    getSessions,
+    refreshSessions,
+    refreshing,
+    revokeSession,
+    errorMessage,
+  ];
 };
 
 export const ManageSessions: React.FC = () => {
@@ -76,6 +88,7 @@ export const ManageSessions: React.FC = () => {
   const [
     sessions,
     getSessions,
+    refreshSessions,
     refreshing,
     revokeSession,
     errorMessage,
@@ -145,7 +158,7 @@ export const ManageSessions: React.FC = () => {
         <RefreshControl
           tintColor={theme.stylekitContrastForegroundColor}
           refreshing={refreshing}
-          onRefresh={getSessions}
+          onRefresh={refreshSessions}
         />
       }
       renderItem={RenderItem}
