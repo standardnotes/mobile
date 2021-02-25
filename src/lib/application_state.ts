@@ -27,7 +27,7 @@ import {
   Platform,
 } from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
-import { enabled } from 'react-native-privacy-snapshot';
+import { hide, show } from 'react-native-privacy-snapshot';
 import VersionInfo from 'react-native-version-info';
 import { MobileApplication } from './application';
 import { Editor } from './editor';
@@ -173,11 +173,11 @@ export class ApplicationState extends ApplicationService {
     );
 
     await this.loadUnlockTiming();
+    this.setAndroidScreenshotPrivacy();
   }
 
   async onAppLaunch() {
     MobileApplication.setPreviouslyLaunched();
-    this.setScreenshotPrivacy();
   }
 
   /**
@@ -255,10 +255,8 @@ export class ApplicationState extends ApplicationService {
     this.biometricsTiming = await this.getBiometricsTiming();
   }
 
-  public async setScreenshotPrivacy() {
-    if (Platform.OS === 'ios') {
-      enabled(true);
-    } else {
+  public async setAndroidScreenshotPrivacy() {
+    if (Platform.OS === 'android') {
       FlagSecure.activate();
     }
   }
@@ -552,6 +550,7 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isResumingFromBackground || isResuming) {
+      hide();
       if (isResumingFromBackground) {
         this.notifyOfStateChange(AppStateType.ResumingFromBackground);
       }
@@ -562,6 +561,7 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isLosingFocus) {
+      show();
       this.notifyOfStateChange(AppStateType.LosingFocus);
       return this.checkAndLockApplication();
     }
@@ -601,7 +601,6 @@ export class ApplicationState extends ApplicationService {
       StorageValueModes.Nonwrapped
     );
     this.passcodeTiming = timing;
-    this.setScreenshotPrivacy();
   }
 
   public async setBiometricsTiming(timing: UnlockTiming) {
@@ -611,7 +610,6 @@ export class ApplicationState extends ApplicationService {
       StorageValueModes.Nonwrapped
     );
     this.biometricsTiming = timing;
-    this.setScreenshotPrivacy();
   }
 
   public async getPasscodeKeyboardType(): Promise<PasscodeKeyboardType> {

@@ -158,7 +158,6 @@ export const PasscodeSection = (props: Props) => {
       await setBiometricsTiming(UnlockTiming.OnQuit);
       props.updateProtectionsAvailable();
     }
-    await application?.getAppState().setScreenshotPrivacy();
   };
 
   const disableBiometrics = useCallback(async () => {
@@ -187,7 +186,6 @@ export const PasscodeSection = (props: Props) => {
     );
     if (confirmed) {
       await application?.removePasscode();
-      await application?.getAppState().setScreenshotPrivacy();
     }
   }, [application]);
 

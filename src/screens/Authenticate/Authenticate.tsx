@@ -36,6 +36,7 @@ import {
   TextInput,
 } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
+import { hide } from 'react-native-privacy-snapshot';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ThemeContext } from 'styled-components/native';
 import {
@@ -117,7 +118,7 @@ export const Authenticate = ({
   const [pending, setPending] = useState(false);
 
   // Refs
-  const isAuthenticatingAndroid = useRef(false);
+  const isAuthenticating = useRef(false);
   const firstInputRef = useRef<TextInput>(null);
   const secondInputRef = useRef<TextInput>(null);
   const thirdInputRef = useRef<TextInput>(null);
@@ -235,11 +236,13 @@ export const Authenticate = ({
         state: AuthenticationValueStateType.Pending,
       });
 
+      hide();
+
       if (Platform.OS === 'android') {
         await application
           ?.getAppState()
           .performActionWithoutStateChangeImpact(async () => {
-            isAuthenticatingAndroid.current = true;
+            isAuthenticating.current = true;
             FingerprintScanner.authenticate({
               // @ts-ignore ts type does not exist for deviceCredentialAllowed
               deviceCredentialAllowed: true,
@@ -255,7 +258,6 @@ export const Authenticate = ({
               .catch(error => {
                 FingerprintScanner.release();
                 if (error.name === 'DeviceLocked') {
-                  isAuthenticatingAndroid.current = false;
                   onValueLocked(challengeValue);
                   Alert.alert(
                     'Unsuccessful',
@@ -272,6 +274,9 @@ export const Authenticate = ({
                     'Authentication failed. Tap to try again.'
                   );
                 }
+              })
+              .finally(() => {
+                isAuthenticating.current = false;
               });
           }, true);
       } else {
@@ -279,12 +284,14 @@ export const Authenticate = ({
         await application
           ?.getAppState()
           .performActionWithoutStateChangeImpact(async () => {
+            isAuthenticating.current = true;
             FingerprintScanner.authenticate({
               fallbackEnabled: true,
               description: 'This is required to access your notes.',
             })
               .then(() => {
                 FingerprintScanner.release();
+
                 const newChallengeValue = { ...challengeValue, value: true };
                 onValueChange(newChallengeValue);
                 return validateChallengeValue(newChallengeValue);
@@ -307,6 +314,9 @@ export const Authenticate = ({
                   id: challengeValue.prompt.id.toString(),
                   state: AuthenticationValueStateType.Fail,
                 });
+              })
+              .finally(() => {
+                isAuthenticating.current = false;
               });
           }, true);
       }
@@ -396,16 +406,16 @@ export const Authenticate = ({
   useEffect(() => {
     const remove = application?.getAppState().addStateChangeObserver(state => {
       if (state === AppStateType.ResumingFromBackground) {
-        if (!isAuthenticatingAndroid.current) {
+        if (!isAuthenticating.current) {
           beginAuthenticatingForNextChallengeReason();
         }
       } else if (state === AppStateType.EnteringBackground) {
+        FingerprintScanner.release();
         dispatch({
           type: 'setState',
           id: firstNotSuccessful!,
           state: AuthenticationValueStateType.WaitingInput,
         });
-        FingerprintScanner.release();
       }
     });
     return remove;
