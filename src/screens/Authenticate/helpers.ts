@@ -104,7 +104,7 @@ export const getLabelForStateAndType = (
         case AuthenticationValueStateType.Pending:
           return 'Waiting for unlock.';
         case AuthenticationValueStateType.Success:
-          return 'Success | Biometrics.';
+          return 'Success | Biometrics';
         case AuthenticationValueStateType.Fail:
           return 'Biometrics failed. Tap to try again.';
         case AuthenticationValueStateType.Locked:

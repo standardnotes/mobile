@@ -129,7 +129,7 @@ export const NoteCell = ({
         note.safeTitle(),
         [
           {
-            text: 'Note protected',
+            text: 'Note Protected',
           },
         ],
         undefined,
