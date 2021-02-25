@@ -82,10 +82,6 @@ export const ManageSessions: React.FC = () => {
   ] = useSessions();
 
   const onItemPress = (item: RemoteSession) => {
-    if (item.current) {
-      return;
-    }
-
     showActionSheet(item.device_info, [
       {
         text: 'Revoke',
@@ -125,6 +121,7 @@ export const ManageSessions: React.FC = () => {
         title={item.device_info}
         subTitle={item.updated_at.toLocaleDateString()}
         currentSession={item.current}
+        disabled={item.current}
       />
     );
   };
