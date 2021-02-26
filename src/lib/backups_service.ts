@@ -25,7 +25,8 @@ export class BackupsService extends ApplicationService {
     const data = await this.application!.createBackupFile(
       encrypted
         ? EncryptionIntent.FileEncrypted
-        : EncryptionIntent.FileDecrypted
+        : EncryptionIntent.FileDecrypted,
+      true
     );
     const prettyPrint = 2;
     const stringifiedData = JSON.stringify(data, null, prettyPrint);
