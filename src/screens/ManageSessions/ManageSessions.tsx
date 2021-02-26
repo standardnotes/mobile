@@ -55,8 +55,6 @@ const useSessions = (): [
   }, [application, refreshSessions]);
 
   async function revokeSession(uuid: UuidString) {
-    let sessionsBeforeRevoke = sessions;
-    setSessions(sessions.filter(session => session.uuid !== uuid));
     const response = await application?.revokeSession(uuid);
     if (response && 'error' in response) {
       if (response.error?.message) {
@@ -64,7 +62,8 @@ const useSessions = (): [
       } else {
         setErrorMessage('An unknown error occured while revoking the session.');
       }
-      setSessions(sessionsBeforeRevoke);
+    } else {
+      setSessions(sessions.filter(session => session.uuid !== uuid));
     }
   }
 
