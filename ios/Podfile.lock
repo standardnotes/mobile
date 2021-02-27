@@ -292,9 +292,9 @@ PODS:
   - RNVectorIcons (7.1.0):
     - React
   - sn-textview (1.0.0):
-    - React
+    - React-Core
   - SNReactNative (1.0.0):
-    - React
+    - React-Core
   - TrustKit (1.6.5)
   - Yoga (1.14.0)
 
@@ -513,11 +513,11 @@ SPEC CHECKSUMS:
   RNSearchBar: 5ed8e13ba8a6c701fbd2afdfe4164493d24b2aee
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
-  sn-textview: f478ee79531da2c7b129c4ea3b20c665e75e1f4b
-  SNReactNative: c47c4fd6d310eea152cc52e23f4fd306491efee3
+  sn-textview: 43135d1feb6e97994b8475b6a1e6e3c902d6b189
+  SNReactNative: 3fa6096f78bea7dbd329c897ee854f73666d20db
   TrustKit: 073855e3adecd317417bda4ac9e9ac54a2e3b9f2
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: 6e0e33c5c699f9a8f26ac1a7e11d94abe3c2262d
+PODFILE CHECKSUM: 5f6066efbcc06032bd833f9e21b5c400c0a572eb
 
 COCOAPODS: 1.10.1
