@@ -1,7 +1,7 @@
 {
   "name": "StandardNotes",
-  "version": "3.5.15",
-  "user-version": "3.5.15",
+  "version": "3.6.0",
+  "user-version": "3.6.0",
   "private": true,
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -18,7 +18,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@bugsnag/react-native": "^7.5.5",
+    "@bugsnag/react-native": "^7.5.6",
     "@expo/react-native-action-sheet": "^3.8.0",
     "@react-native-community/async-storage": "1.12.1",
     "@react-native-community/masked-view": "^0.1.10",
@@ -26,7 +26,7 @@
     "@react-navigation/native": "^5.8.10",
     "@react-navigation/stack": "^5.12.8",
     "@standardnotes/sncrypto-common": "1.2.9",
-    "@standardnotes/snjs": "2.0.30",
+    "@standardnotes/snjs": "^2.0.61",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
     "react": "16.13.1",
@@ -48,13 +48,13 @@
     "react-native-screens": "^2.16.1",
     "react-native-search-bar": "standardnotes/react-native-search-bar#7d2139d",
     "react-native-search-box": "standardnotes/react-native-search-box#c43b477943e99aa41e5b20711959c00c87286604",
-    "react-native-sodium": "standardnotes/react-native-sodium#e77eba9",
+    "react-native-sodium": "standardnotes/react-native-sodium#17b240ea0c2656c89b83cd0168acfbb64f67f0e1",
     "react-native-store-review": "^0.1.5",
     "react-native-tab-view": "^2.15.2",
     "react-native-vector-icons": "^7.1.0",
     "react-native-version-info": "^1.1.0",
-    "react-native-webview": "^10.10.2",
-    "react-navigation-header-buttons": "^6.0.0",
+    "react-native-webview": "^11.0.3",
+    "react-navigation-header-buttons": "^6.0.2",
     "sn-textview": "standardnotes/sn-textview#3b56f5c2c87c24370f00ee5a0cee0da9a9fc66c3",
     "standard-notes-rn": "standardnotes/standard-notes-rn#996b016",
     "styled-components": "^5.2.1"
@@ -67,11 +67,11 @@
     "@types/faker": "^5.1.3",
     "@types/jest": "^26.0.14",
     "@types/js-base64": "^3.0.0",
-    "@types/react-native": "0.63.42",
+    "@types/react-native": "0.63.43",
     "@types/react-native-vector-icons": "^6.4.6",
-    "@types/styled-components": "^5.1.5",
-    "@typescript-eslint/eslint-plugin": "^3.10.1",
-    "@typescript-eslint/parser": "^3.10.1",
+    "@types/styled-components": "5.1.5",
+    "@typescript-eslint/eslint-plugin": "^4.11.1",
+    "@typescript-eslint/parser": "^4.11.1",
     "babel-jest": "^26.6.3",
     "bugsnag-sourcemaps": "^1.3.0",
     "concurrently": "^5.3.0",
@@ -84,14 +84,11 @@
     "metro-react-native-babel-preset": "^0.60.0",
     "npm-run-all": "^4.1.5",
     "postinstall-postinstall": "^2.1.0",
-    "prettier": "^2.2.0",
+    "prettier": "^2.2.1",
     "prettier-plugin-organize-imports": "^1.1.1",
     "react-test-renderer": "16.13.1",
     "replace-in-file": "^6.1.0",
-    "typescript": "^3.9.2"
-  },
-  "resolutions": {
-    "@types/react-native": "0.63.40"
+    "typescript": "^3.9.4"
   },
   "jest": {
     "preset": "react-native"

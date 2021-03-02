@@ -6,6 +6,7 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { AppStateType, PasscodeKeyboardType } from '@Lib/application_state';
 import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect } from '@react-navigation/native';
+import { HeaderHeightContext } from '@react-navigation/stack';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
@@ -13,6 +14,7 @@ import {
   ChallengeReason,
   ChallengeValidation,
   ChallengeValue,
+  ProtectionSessionDurations,
 } from '@standardnotes/snjs';
 import { ICON_CLOSE } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
@@ -25,17 +27,27 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Alert, BackHandler, Platform, TextInput } from 'react-native';
+import {
+  Alert,
+  BackHandler,
+  Keyboard,
+  Platform,
+  ScrollView,
+  TextInput,
+} from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
+import { hide } from 'react-native-privacy-snapshot';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ThemeContext } from 'styled-components/native';
 import {
   BaseView,
-  Container,
   Input,
   SectionContainer,
+  SessionLengthContainer,
   SourceContainer,
+  StyledKeyboardAvoidingView,
   StyledSectionedTableCell,
+  StyledTableSection,
   Subtitle,
   Title,
 } from './Authenticate.styled';
@@ -49,6 +61,15 @@ import {
 } from './helpers';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_AUTHENTICATE>;
+
+function isValidChallengeValue(challengeValue: ChallengeValue): boolean {
+  switch (challengeValue.prompt.validation) {
+    case ChallengeValidation.ProtectionSessionDuration:
+      return typeof challengeValue.value === 'number';
+    default:
+      return !!challengeValue.value;
+  }
+}
 
 export const Authenticate = ({
   route: {
@@ -65,19 +86,21 @@ export const Authenticate = ({
   const [supportsBiometrics, setSupportsBiometrics] = useState<
     boolean | undefined
   >(undefined);
-  const [keyboardType, setKeyboardType] = useState<
+  const [passcodeKeyboardType, setPasscodeKeyboardType] = useState<
     PasscodeKeyboardType | undefined
-  >(undefined);
+  >(PasscodeKeyboardType.Default);
   const [singleValidation] = useState(
     () => !(challenge.prompts.filter(prompt => prompt.validates).length > 0)
   );
+  const [showSwitchKeyboard, setShowSwitchKeyboard] = useState<boolean>(false);
+
   const [{ challengeValues, challengeValueStates }, dispatch] = useReducer(
     authenticationReducer,
     {
       challengeValues: challenge.prompts.reduce((map, current) => {
         map[current.id] = {
           prompt: current,
-          value: false,
+          value: current.initialValue ?? null,
         } as ChallengeValue;
         return map;
       }, {} as Record<string, ChallengeValue>),
@@ -95,7 +118,7 @@ export const Authenticate = ({
   const [pending, setPending] = useState(false);
 
   // Refs
-  const isAuthenticatingAndroid = useRef(false);
+  const isAuthenticating = useRef(false);
   const firstInputRef = useRef<TextInput>(null);
   const secondInputRef = useRef<TextInput>(null);
   const thirdInputRef = useRef<TextInput>(null);
@@ -141,7 +164,7 @@ export const Authenticate = ({
         if (
           state === AuthenticationValueStateType.Locked ||
           state === AuthenticationValueStateType.Success ||
-          !challengeValue.value
+          !isValidChallengeValue(challengeValue)
         ) {
           return;
         }
@@ -213,11 +236,13 @@ export const Authenticate = ({
         state: AuthenticationValueStateType.Pending,
       });
 
+      hide();
+
       if (Platform.OS === 'android') {
         await application
           ?.getAppState()
           .performActionWithoutStateChangeImpact(async () => {
-            isAuthenticatingAndroid.current = true;
+            isAuthenticating.current = true;
             FingerprintScanner.authenticate({
               // @ts-ignore ts type does not exist for deviceCredentialAllowed
               deviceCredentialAllowed: true,
@@ -233,7 +258,6 @@ export const Authenticate = ({
               .catch(error => {
                 FingerprintScanner.release();
                 if (error.name === 'DeviceLocked') {
-                  isAuthenticatingAndroid.current = false;
                   onValueLocked(challengeValue);
                   Alert.alert(
                     'Unsuccessful',
@@ -250,6 +274,9 @@ export const Authenticate = ({
                     'Authentication failed. Tap to try again.'
                   );
                 }
+              })
+              .finally(() => {
+                isAuthenticating.current = false;
               });
           }, true);
       } else {
@@ -257,12 +284,14 @@ export const Authenticate = ({
         await application
           ?.getAppState()
           .performActionWithoutStateChangeImpact(async () => {
+            isAuthenticating.current = true;
             FingerprintScanner.authenticate({
               fallbackEnabled: true,
               description: 'This is required to access your notes.',
             })
               .then(() => {
                 FingerprintScanner.release();
+
                 const newChallengeValue = { ...challengeValue, value: true };
                 onValueChange(newChallengeValue);
                 return validateChallengeValue(newChallengeValue);
@@ -285,6 +314,9 @@ export const Authenticate = ({
                   id: challengeValue.prompt.id.toString(),
                   state: AuthenticationValueStateType.Fail,
                 });
+              })
+              .finally(() => {
+                isAuthenticating.current = false;
               });
           }, true);
       }
@@ -374,16 +406,16 @@ export const Authenticate = ({
   useEffect(() => {
     const remove = application?.getAppState().addStateChangeObserver(state => {
       if (state === AppStateType.ResumingFromBackground) {
-        if (!isAuthenticatingAndroid.current) {
+        if (!isAuthenticating.current) {
           beginAuthenticatingForNextChallengeReason();
         }
       } else if (state === AppStateType.EnteringBackground) {
+        FingerprintScanner.release();
         dispatch({
           type: 'setState',
           id: firstNotSuccessful!,
           state: AuthenticationValueStateType.WaitingInput,
         });
-        FingerprintScanner.release();
       }
     });
     return remove;
@@ -444,38 +476,60 @@ export const Authenticate = ({
       }
     };
     setBiometricsAsync();
-    const setInitialKeyboardType = async () => {
-      if (challenge.reason === ChallengeReason.ApplicationUnlock) {
-        const initialKeyboardType = await checkPasscodeKeyboardType();
-        if (mounted) {
-          setKeyboardType(initialKeyboardType);
-        }
+    const setInitialPasscodeKeyboardType = async () => {
+      const initialPasscodeKeyboardType = await checkPasscodeKeyboardType();
+      if (mounted) {
+        setPasscodeKeyboardType(initialPasscodeKeyboardType);
       }
     };
-    setInitialKeyboardType();
+    setInitialPasscodeKeyboardType();
     return () => {
       mounted = false;
     };
   }, [challenge.reason, checkForBiometrics, checkPasscodeKeyboardType]);
 
+  /**
+   * Authenticate for challenge reasons like biometrics as soon as possible,
+   * unless a prompt has a prefilled control value, in which case give the
+   * option to adjust them first.
+   */
   useEffect(() => {
-    beginAuthenticatingForNextChallengeReason();
+    if (
+      challenge.prompts &&
+      challenge.prompts.length > 0 &&
+      challenge.prompts[0].validation !==
+        ChallengeValidation.ProtectionSessionDuration
+    ) {
+      beginAuthenticatingForNextChallengeReason();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onBiometricDirectPress = () => {
+    Keyboard.dismiss();
+
     const biometricChallengeValue = Object.values(challengeValues).find(
       value => value.prompt.validation === ChallengeValidation.Biometric
     );
     const state = challengeValueStates[biometricChallengeValue?.prompt.id!];
-    if (state === AuthenticationValueStateType.Locked) {
+    if (
+      state === AuthenticationValueStateType.Locked ||
+      state === AuthenticationValueStateType.Success
+    ) {
       return;
     }
 
     beginAuthenticatingForNextChallengeReason();
   };
 
-  const onValueChange = (newValue: ChallengeValue) => {
+  const onValueChange = (
+    newValue: ChallengeValue,
+    dismissKeyboard: boolean = false
+  ) => {
+    if (dismissKeyboard) {
+      Keyboard.dismiss();
+    }
+
     dispatch({
       type: 'setValue',
       id: newValue.prompt.id.toString(),
@@ -499,7 +553,7 @@ export const Authenticate = ({
 
   const onSubmitPress = () => {
     const challengeValue = challengeValues[firstNotSuccessful!];
-    if (!challengeValue.value) {
+    if (!isValidChallengeValue(challengeValue)) {
       return;
     }
     if (singleValidation) {
@@ -514,16 +568,15 @@ export const Authenticate = ({
         beginAuthenticatingForNextChallengeReason();
         return;
       }
-
       validateChallengeValue(challengeValue);
     }
   };
 
   const switchKeyboard = () => {
-    if (keyboardType === PasscodeKeyboardType.Default) {
-      setKeyboardType(PasscodeKeyboardType.Numeric);
-    } else if (keyboardType === PasscodeKeyboardType.Numeric) {
-      setKeyboardType(PasscodeKeyboardType.Default);
+    if (passcodeKeyboardType === PasscodeKeyboardType.Numeric) {
+      setPasscodeKeyboardType(PasscodeKeyboardType.Default);
+    } else {
+      setPasscodeKeyboardType(PasscodeKeyboardType.Numeric);
     }
   };
 
@@ -542,8 +595,12 @@ export const Authenticate = ({
     const last = index === Object.keys(challengeValues).length - 1;
     const state = challengeValueStates[challengeValue.prompt.id];
     const active = isInActiveState(state);
-    const isInput =
-      challengeValue.prompt.validation !== ChallengeValidation.Biometric;
+    const isBiometric =
+      challengeValue.prompt.validation === ChallengeValidation.Biometric;
+    const isProtectionSessionDuration =
+      challengeValue.prompt.validation ===
+      ChallengeValidation.ProtectionSessionDuration;
+    const isInput = !isBiometric && !isProtectionSessionDuration;
     const stateLabel = getLabelForStateAndType(
       challengeValue.prompt.validation,
       state
@@ -551,80 +608,110 @@ export const Authenticate = ({
 
     const stateTitle = getChallengePromptTitle(challengeValue.prompt, state);
 
+    const keyboardType =
+      challengeValue.prompt.keyboardType ??
+      (challengeValue.prompt.validation === ChallengeValidation.LocalPasscode
+        ? passcodeKeyboardType
+        : 'default');
+
     return (
       <SourceContainer key={challengeValue.prompt.id}>
-        <SectionHeader
-          title={stateTitle}
-          subtitle={isInput ? stateLabel : undefined}
-          tinted={active}
-          buttonText={
-            challengeValue.prompt.validation ===
-              ChallengeValidation.LocalPasscode &&
-            (state === AuthenticationValueStateType.WaitingInput ||
-              state === AuthenticationValueStateType.Fail)
-              ? 'Change Keyboard'
-              : undefined
-          }
-          buttonAction={switchKeyboard}
-          buttonStyles={
-            challengeValue.prompt.validation ===
-            ChallengeValidation.LocalPasscode
-              ? {
-                  color: theme.stylekitNeutralColor,
-                  fontSize: theme.mainTextFontSize - 5,
-                }
-              : undefined
-          }
-        />
-        {isInput && (
-          <SectionContainer last={last}>
-            <SectionedTableCell textInputCell={true} first={true}>
-              <Input
-                key={Platform.OS === 'android' ? keyboardType : undefined}
-                ref={
-                  Array.of(
-                    firstInputRef,
-                    secondInputRef,
-                    thirdInputRef,
-                    fourthInputRef
-                  )[index]
-                }
-                placeholder={challengeValue.prompt.placeholder}
-                onChangeText={text => {
-                  onValueChange({ ...challengeValue, value: text });
-                }}
-                value={(challengeValue.value || '') as string}
-                autoCorrect={false}
-                autoFocus={false}
-                autoCapitalize={'none'}
-                secureTextEntry={challengeValue.prompt.secureTextEntry}
-                keyboardType={
-                  challengeValue.prompt.keyboardType ?? keyboardType
-                }
-                keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
-                underlineColorAndroid={'transparent'}
-                onSubmitEditing={
-                  !singleValidation
-                    ? () => {
-                        validateChallengeValue(challengeValue);
-                      }
-                    : undefined
-                }
+        <StyledTableSection last={last}>
+          <SectionHeader
+            title={stateTitle}
+            subtitle={isInput ? stateLabel : undefined}
+            tinted={active}
+            buttonText={
+              challengeValue.prompt.validation ===
+                ChallengeValidation.LocalPasscode && showSwitchKeyboard
+                ? 'Change Keyboard'
+                : undefined
+            }
+            buttonAction={switchKeyboard}
+            buttonStyles={
+              challengeValue.prompt.validation ===
+              ChallengeValidation.LocalPasscode
+                ? {
+                    color: theme.stylekitNeutralColor,
+                    fontSize: theme.mainTextFontSize - 5,
+                  }
+                : undefined
+            }
+          />
+          {isInput && (
+            <SectionContainer>
+              <SectionedTableCell textInputCell={true} first={true}>
+                <Input
+                  key={Platform.OS === 'android' ? keyboardType : undefined}
+                  ref={
+                    Array.of(
+                      firstInputRef,
+                      secondInputRef,
+                      thirdInputRef,
+                      fourthInputRef
+                    )[index] as any
+                  }
+                  placeholder={challengeValue.prompt.placeholder}
+                  onChangeText={text => {
+                    onValueChange({ ...challengeValue, value: text });
+                  }}
+                  value={(challengeValue.value || '') as string}
+                  autoCorrect={false}
+                  autoFocus={false}
+                  autoCapitalize={'none'}
+                  secureTextEntry={challengeValue.prompt.secureTextEntry}
+                  keyboardType={keyboardType}
+                  keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
+                  underlineColorAndroid={'transparent'}
+                  onSubmitEditing={
+                    !singleValidation
+                      ? () => {
+                          validateChallengeValue(challengeValue);
+                        }
+                      : undefined
+                  }
+                  onFocus={() => setShowSwitchKeyboard(true)}
+                  onBlur={() => setShowSwitchKeyboard(false)}
+                />
+              </SectionedTableCell>
+            </SectionContainer>
+          )}
+          {isBiometric && (
+            <SectionContainer>
+              <SectionedAccessoryTableCell
+                first={true}
+                dimmed={active}
+                tinted={active}
+                text={stateLabel}
+                onPress={onBiometricDirectPress}
               />
-            </SectionedTableCell>
-          </SectionContainer>
-        )}
-        {challengeValue.prompt.validation === ChallengeValidation.Biometric && (
-          <SectionContainer last={last}>
-            <SectionedAccessoryTableCell
-              first={true}
-              dimmed={active}
-              tinted={active}
-              text={stateLabel}
-              onPress={onBiometricDirectPress}
-            />
-          </SectionContainer>
-        )}
+            </SectionContainer>
+          )}
+          {isProtectionSessionDuration && (
+            <SessionLengthContainer>
+              {ProtectionSessionDurations.map((duration, i) => (
+                <SectionedAccessoryTableCell
+                  text={duration.label}
+                  key={duration.valueInSeconds}
+                  first={i === 0}
+                  last={i === ProtectionSessionDurations.length - 1}
+                  selected={() => {
+                    return duration.valueInSeconds === challengeValue.value;
+                  }}
+                  onPress={() => {
+                    onValueChange(
+                      {
+                        ...challengeValue,
+                        value: duration.valueInSeconds,
+                      },
+                      true
+                    );
+                  }}
+                />
+              ))}
+            </SessionLengthContainer>
+          )}
+        </StyledTableSection>
       </SourceContainer>
     );
   };
@@ -637,35 +724,62 @@ export const Authenticate = ({
     [challengeValueStates]
   );
 
+  let submitButtonTitle: 'Submit' | 'Next';
+  if (singleValidation) {
+    submitButtonTitle = 'Submit';
+  } else if (!firstNotSuccessful) {
+    submitButtonTitle = 'Next';
+  } else {
+    const stateKeys = Object.keys(challengeValueStates);
+    submitButtonTitle = 'Submit';
+    /** Check the next values; if one of them is not successful, show 'Next' */
+    for (
+      let i = stateKeys.indexOf(firstNotSuccessful) + 1;
+      i < stateKeys.length;
+      i++
+    ) {
+      const nextValueState = challengeValueStates[stateKeys[i]];
+      if (nextValueState !== AuthenticationValueStateType.Success) {
+        submitButtonTitle = 'Next';
+      }
+    }
+  }
+
   return (
-    <Container>
-      {(challenge.heading || challenge.subheading) && (
-        <StyledSectionedTableCell first>
-          <BaseView>
-            {challenge.heading && <Title>{challenge.heading}</Title>}
-            {challenge.subheading && (
-              <Subtitle>{challenge.subheading}</Subtitle>
+    <HeaderHeightContext.Consumer>
+      {headerHeight => (
+        <StyledKeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={headerHeight}
+        >
+          <ScrollView keyboardShouldPersistTaps="handled">
+            {(challenge.heading || challenge.subheading) && (
+              <StyledTableSection>
+                <StyledSectionedTableCell>
+                  <BaseView>
+                    {challenge.heading && <Title>{challenge.heading}</Title>}
+                    {challenge.subheading && (
+                      <Subtitle>{challenge.subheading}</Subtitle>
+                    )}
+                  </BaseView>
+                </StyledSectionedTableCell>
+              </StyledTableSection>
             )}
-          </BaseView>
-        </StyledSectionedTableCell>
+            {Object.values(challengeValues).map((challengeValue, index) =>
+              renderAuthenticationSource(challengeValue, index)
+            )}
+            <ButtonCell
+              maxHeight={45}
+              disabled={
+                singleValidation ? !readyToSubmit || pending : isPending
+              }
+              title={submitButtonTitle}
+              bold={true}
+              onPress={onSubmitPress}
+            />
+          </ScrollView>
+        </StyledKeyboardAvoidingView>
       )}
-      {Object.values(challengeValues).map((challengeValue, index) =>
-        renderAuthenticationSource(challengeValue, index)
-      )}
-      <ButtonCell
-        maxHeight={45}
-        disabled={singleValidation ? !readyToSubmit || pending : isPending}
-        title={
-          singleValidation ||
-          (!!firstNotSuccessful &&
-            findIndexInObject(challengeValueStates, firstNotSuccessful) ===
-              Object.keys(challengeValueStates).length - 1)
-            ? 'Submit'
-            : 'Next'
-        }
-        bold={true}
-        onPress={onSubmitPress}
-      />
-    </Container>
+    </HeaderHeightContext.Consumer>
   );
 };

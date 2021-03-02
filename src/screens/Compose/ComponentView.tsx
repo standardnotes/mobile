@@ -2,7 +2,6 @@ import { PrefKey } from '@Lib/preferences_manager';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
   ButtonType,
-  ComponentAction,
   ComponentArea,
   LiveItem,
   SNComponent,
@@ -41,9 +40,8 @@ export const ComponentView = ({
   onLoadEnd,
   onLoadError,
   onLoadStart,
-  note,
   componentUuid,
-}: Props): JSX.Element => {
+}: Props) => {
   // Context
   const application = useContext(ApplicationContext);
 
@@ -116,32 +114,6 @@ export const ComponentView = ({
       liveComponent?.deinit();
     };
   }, [application, liveComponent]);
-
-  useEffect(() => {
-    let unregisterComponentHandler: (() => void) | undefined;
-
-    if (note && liveComponent) {
-      unregisterComponentHandler = application?.componentManager!.registerHandler(
-        {
-          identifier: 'component-view-' + Math.random(),
-          areas: [liveComponent.item.area],
-          actionHandler: (currentComponent, action, data) => {
-            if (action === ComponentAction.SetSize) {
-              application.componentManager!.handleSetSizeEvent(
-                currentComponent,
-                data
-              );
-            }
-          },
-          contextRequestHandler: () => note,
-        }
-      );
-    }
-
-    return () => {
-      unregisterComponentHandler && unregisterComponentHandler();
-    };
-  }, [application, liveComponent, note]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;

@@ -52,8 +52,10 @@ export const PasscodeInputModal = (props: Props) => {
       setSettingPassocode(false);
     } else {
       await application?.setPasscode(text);
+      await application
+        ?.getAppState()
+        .setPasscodeKeyboardType(keyboardType as PasscodeKeyboardType);
       await application?.getAppState().setPasscodeTiming(UnlockTiming.OnQuit);
-      await application?.getAppState().setScreenshotPrivacy();
       setSettingPassocode(false);
       props.navigation.goBack();
     }
@@ -77,9 +79,6 @@ export const PasscodeInputModal = (props: Props) => {
 
   const onKeyboardTypeSelect = (option: Option) => {
     setKeyboardType(option.key as KeyboardType);
-    application
-      ?.getAppState()
-      .setPasscodeKeyboardType(option.key as PasscodeKeyboardType);
   };
 
   return (
@@ -87,7 +86,7 @@ export const PasscodeInputModal = (props: Props) => {
       <TableSection>
         <SectionedTableCell textInputCell first={true}>
           <Input
-            ref={textRef}
+            ref={textRef as any}
             key={Platform.OS === 'android' ? keyboardType + '1' : undefined}
             placeholder="Enter a passcode"
             onChangeText={setText}
@@ -105,7 +104,7 @@ export const PasscodeInputModal = (props: Props) => {
 
         <SectionedTableCell textInputCell first={false}>
           <Input
-            ref={confirmTextRef}
+            ref={confirmTextRef as any}
             key={Platform.OS === 'android' ? keyboardType + '2' : undefined}
             placeholder="Confirm passcode"
             onChangeText={setConfirmText}

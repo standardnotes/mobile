@@ -7,26 +7,19 @@ import {
   StackNavigationProp,
 } from '@react-navigation/stack';
 import { Authenticate } from '@Screens/Authenticate/Authenticate';
-import { AuthenticatePrivileges } from '@Screens/Authenticate/AuthenticatePrivileges';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
+import { ManageSessions } from '@Screens/ManageSessions/ManageSessions';
 import {
   MODAL_BLOCKING_ALERT,
   SCREEN_AUTHENTICATE,
-  SCREEN_AUTHENTICATE_PRIVILEGES,
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_INPUT_MODAL_TAG,
-  SCREEN_MANAGE_PRIVILEGES,
+  SCREEN_MANAGE_SESSIONS,
   SCREEN_SETTINGS,
 } from '@Screens/screens';
-import { ManagePrivileges } from '@Screens/Settings/ManagePrivileges';
 import { Settings } from '@Screens/Settings/Settings';
-import {
-  Challenge,
-  DeinitSource,
-  PrivilegeCredential,
-  ProtectedAction,
-} from '@standardnotes/snjs';
+import { Challenge, DeinitSource } from '@standardnotes/snjs';
 import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, { useContext } from 'react';
@@ -42,7 +35,7 @@ type ModalStackNavigatorParamList = {
   AppStack: undefined;
   HistoryStack: undefined;
   [SCREEN_SETTINGS]: undefined;
-  [SCREEN_MANAGE_PRIVILEGES]: undefined;
+  [SCREEN_MANAGE_SESSIONS]: undefined;
   [SCREEN_INPUT_MODAL_TAG]: HeaderTitleParams & {
     tagUuid?: string;
     noteUuid?: string;
@@ -51,12 +44,6 @@ type ModalStackNavigatorParamList = {
   [SCREEN_AUTHENTICATE]: {
     challenge: Challenge;
     title?: string;
-  };
-  [SCREEN_AUTHENTICATE_PRIVILEGES]: {
-    action: ProtectedAction;
-    privilegeCredentials: PrivilegeCredential[];
-    previousScreen: string;
-    unlockedItemId?: string;
   };
   [MODAL_BLOCKING_ALERT]: {
     title?: string;
@@ -144,9 +131,9 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
         component={Settings}
       />
       <MainStack.Screen
-        name={SCREEN_MANAGE_PRIVILEGES}
+        name={SCREEN_MANAGE_SESSIONS}
         options={() => ({
-          title: 'Privileges',
+          title: 'Active Sessions',
           headerTitle: ({ children }) => {
             return <HeaderTitleView title={children || ''} />;
           },
@@ -166,7 +153,7 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
             </HeaderButtons>
           ),
         })}
-        component={ManagePrivileges}
+        component={ManageSessions}
       />
       <MainStack.Screen
         name={SCREEN_INPUT_MODAL_PASSCODE}
@@ -233,31 +220,6 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
           ),
         })}
         component={Authenticate}
-      />
-      <MainStack.Screen
-        name={SCREEN_AUTHENTICATE_PRIVILEGES}
-        options={() => ({
-          title: 'Authenticate',
-          headerLeft: ({ disabled, onPress }) => (
-            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-              <Item
-                testID="headerButton"
-                disabled={disabled}
-                title={Platform.OS === 'ios' ? 'Cancel' : ''}
-                iconName={
-                  Platform.OS === 'ios'
-                    ? undefined
-                    : ThemeService.nameForIcon(ICON_CLOSE)
-                }
-                onPress={onPress}
-              />
-            </HeaderButtons>
-          ),
-          headerTitle: ({ children }) => {
-            return <HeaderTitleView title={children || ''} />;
-          },
-        })}
-        component={AuthenticatePrivileges}
       />
       <MainStack.Screen
         name={MODAL_BLOCKING_ALERT}

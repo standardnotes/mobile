@@ -1,5 +1,6 @@
 import { SNNote } from '@standardnotes/snjs';
 
+// eslint-disable-next-line no-shadow
 export enum NoteSortKey {
   CreatedAt = 'created_at',
   UserUpdatedAt = 'userModifiedDate',
@@ -34,7 +35,10 @@ function noteMatchesQuery(note: SNNote, query: string) {
   const lowercaseText = query.toLowerCase();
   const quotedText = stringBetweenQuotes(lowercaseText);
   if (quotedText) {
-    return title.includes(quotedText) || text.includes(quotedText);
+    return (
+      title.includes(quotedText) ||
+      (!note.protected && text.includes(quotedText))
+    );
   }
   if (stringIsUuid(lowercaseText)) {
     return note.uuid === lowercaseText;
@@ -46,7 +50,7 @@ function noteMatchesQuery(note: SNNote, query: string) {
   const matchesBody = words.every(word => {
     return text.indexOf(word) >= 0;
   });
-  return matchesTitle || matchesBody;
+  return matchesTitle || (!note.protected && matchesBody);
 }
 
 function stringBetweenQuotes(text: string) {

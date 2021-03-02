@@ -10,6 +10,7 @@ import { EncryptionSection } from './Sections/EncryptionSection';
 import { OptionsSection } from './Sections/OptionsSection';
 import { PasscodeSection } from './Sections/PasscodeSection';
 import { PreferencesSection } from './Sections/PreferencesSection';
+import { ProtectionsSection } from './Sections/ProtectionsSection';
 import { Container } from './Settings.styled';
 
 type Props = ModalStackNavigationProp<typeof SCREEN_SETTINGS>;
@@ -21,15 +22,23 @@ export const Settings = (props: Props) => {
   const [hasPasscode, setHasPasscode] = useState(() =>
     Boolean(application?.hasPasscode())
   );
+  const [protectionsAvailable, setProtectionsAvailable] = useState(
+    application?.hasProtectionSources()
+  );
   const [encryptionAvailable, setEncryptionAvailable] = useState(() =>
     application?.isEncryptionAvailable()
   );
+
+  const updateProtectionsAvailable = useCallback(() => {
+    setProtectionsAvailable(application?.hasProtectionSources());
+  }, [application]);
 
   useEffect(() => {
     const removeApplicationEventSubscriber = application?.addEventObserver(
       async event => {
         if (event === ApplicationEvent.KeyStatusChanged) {
           setHasPasscode(Boolean(application?.hasPasscode()));
+          updateProtectionsAvailable();
           setEncryptionAvailable(() => application?.isEncryptionAvailable());
         }
       }
@@ -37,7 +46,7 @@ export const Settings = (props: Props) => {
     return () => {
       removeApplicationEventSubscriber && removeApplicationEventSubscriber();
     };
-  }, [application]);
+  }, [application, updateProtectionsAvailable]);
 
   const goBack = useCallback(() => {
     props.navigation.goBack();
@@ -59,7 +68,12 @@ export const Settings = (props: Props) => {
       <PasscodeSection
         encryptionAvailable={!!encryptionAvailable}
         hasPasscode={hasPasscode}
+        updateProtectionsAvailable={updateProtectionsAvailable}
         title="Security"
+      />
+      <ProtectionsSection
+        title="Protections"
+        protectionsAvailable={protectionsAvailable}
       />
       <EncryptionSection
         encryptionAvailable={!!encryptionAvailable}

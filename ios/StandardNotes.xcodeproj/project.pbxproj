@@ -11,7 +11,6 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		663D048DED7F1CFEB7C8F81D /* libPods-StandardNotes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96BD227C16076BDE6AED487A /* libPods-StandardNotes.a */; };
 		8343BD6A244F211C0020E9F0 /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD67244F211C0020E9F0 /* Red.png */; };
 		8343BD6B244F211C0020E9F0 /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD67244F211C0020E9F0 /* Red.png */; };
 		8343BD6C244F211C0020E9F0 /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD68244F211C0020E9F0 /* Red@3x.png */; };
@@ -26,6 +25,7 @@
 		83DCC09F24C0A21200D58E1B /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD69244F211C0020E9F0 /* Red@2x.png */; };
 		83DCC0A024C0A21200D58E1B /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD68244F211C0020E9F0 /* Red@3x.png */; };
 		83F9431824C1EBC5007014C8 /* Dev.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83F9431724C1EBC5007014C8 /* Dev.xcassets */; };
+		9472713467B26799E9270592 /* Pods_StandardNotes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 892691A10E7D83241BCA16C1 /* Pods_StandardNotes.framework */; };
 		F1AF40B6D465714940D457A3 /* libPods-StandardNotesDev.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 340672DE690D292C12CF8DF2 /* libPods-StandardNotesDev.a */; };
 /* End PBXBuildFile section */
 
@@ -61,8 +61,8 @@
 		83E99B1D24EC4EC5007B8F21 /* SN Dev.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "SN Dev.entitlements"; sourceTree = "<group>"; };
 		83E99B1E24EC9953007B8F21 /* StandardNotes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = StandardNotes.entitlements; path = StandardNotes/StandardNotes.entitlements; sourceTree = "<group>"; };
 		83F9431724C1EBC5007014C8 /* Dev.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Dev.xcassets; sourceTree = "<group>"; };
+		892691A10E7D83241BCA16C1 /* Pods_StandardNotes.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StandardNotes.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		91D5BC0CD8D03CC85FE2AAD4 /* Pods-StandardNotesDev.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotesDev.debug.xcconfig"; path = "Target Support Files/Pods-StandardNotesDev/Pods-StandardNotesDev.debug.xcconfig"; sourceTree = "<group>"; };
-		96BD227C16076BDE6AED487A /* libPods-StandardNotes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StandardNotes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A905072699998C893CF2B50C /* Pods-StandardNotes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes.debug.xcconfig"; path = "Target Support Files/Pods-StandardNotes/Pods-StandardNotes.debug.xcconfig"; sourceTree = "<group>"; };
 		CB9B9DBF83F519AB6584F5FE /* Pods-StandardNotesDev.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotesDev.release.xcconfig"; path = "Target Support Files/Pods-StandardNotesDev/Pods-StandardNotesDev.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -81,7 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				663D048DED7F1CFEB7C8F81D /* libPods-StandardNotes.a in Frameworks */,
+				9472713467B26799E9270592 /* Pods_StandardNotes.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,8 +137,8 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				96BD227C16076BDE6AED487A /* libPods-StandardNotes.a */,
 				340672DE690D292C12CF8DF2 /* libPods-StandardNotesDev.a */,
+				892691A10E7D83241BCA16C1 /* Pods_StandardNotes.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -220,7 +220,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				2C355151CE32AB5150469A30 /* [CP] Copy Pods Resources */,
+				94C763DAAEF98E4BE76E8F53 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -371,56 +371,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		2C355151CE32AB5150469A30 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-StandardNotes/Pods-StandardNotes-resources.sh",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StandardNotes/Pods-StandardNotes-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		3D5DE5334A130ACABFE38AF3 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -444,7 +394,7 @@
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core-library/AccessibilityResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -502,7 +452,117 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+		};
+		94C763DAAEF98E4BE76E8F53 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-StandardNotes/Pods-StandardNotes-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/TrustKit-framework/TrustKit.framework",
+				"${BUILT_PRODUCTS_DIR}/BugsnagReactNative-framework/Bugsnag.framework",
+				"${BUILT_PRODUCTS_DIR}/DoubleConversion-framework/DoubleConversion.framework",
+				"${BUILT_PRODUCTS_DIR}/FBReactNativeSpec-framework/FBReactNativeSpec.framework",
+				"${BUILT_PRODUCTS_DIR}/Folly-framework/folly.framework",
+				"${BUILT_PRODUCTS_DIR}/RCTTypeSafety-framework/RCTTypeSafety.framework",
+				"${BUILT_PRODUCTS_DIR}/RNCAsyncStorage-framework/RNCAsyncStorage.framework",
+				"${BUILT_PRODUCTS_DIR}/RNCMaskedView-framework/RNCMaskedView.framework",
+				"${BUILT_PRODUCTS_DIR}/RNDefaultPreference-framework/RNDefaultPreference.framework",
+				"${BUILT_PRODUCTS_DIR}/RNFS-framework/RNFS.framework",
+				"${BUILT_PRODUCTS_DIR}/RNFileViewer-framework/RNFileViewer.framework",
+				"${BUILT_PRODUCTS_DIR}/RNGestureHandler-framework/RNGestureHandler.framework",
+				"${BUILT_PRODUCTS_DIR}/RNKeychain-framework/RNKeychain.framework",
+				"${BUILT_PRODUCTS_DIR}/RNPrivacySnapshot-framework/RNPrivacySnapshot.framework",
+				"${BUILT_PRODUCTS_DIR}/RNReanimated-framework/RNReanimated.framework",
+				"${BUILT_PRODUCTS_DIR}/RNScreens-framework/RNScreens.framework",
+				"${BUILT_PRODUCTS_DIR}/RNSearchBar-framework/RNSearchBar.framework",
+				"${BUILT_PRODUCTS_DIR}/RNStoreReview-framework/RNStoreReview.framework",
+				"${BUILT_PRODUCTS_DIR}/RNVectorIcons-framework/RNVectorIcons.framework",
+				"${BUILT_PRODUCTS_DIR}/React-Core-framework/React.framework",
+				"${BUILT_PRODUCTS_DIR}/React-CoreModules-framework/CoreModules.framework",
+				"${BUILT_PRODUCTS_DIR}/React-RCTAnimation-framework/RCTAnimation.framework",
+				"${BUILT_PRODUCTS_DIR}/React-RCTBlob-framework/RCTBlob.framework",
+				"${BUILT_PRODUCTS_DIR}/React-RCTImage-framework/RCTImage.framework",
+				"${BUILT_PRODUCTS_DIR}/React-RCTLinking-framework/RCTLinking.framework",
+				"${BUILT_PRODUCTS_DIR}/React-RCTNetwork-framework/RCTNetwork.framework",
+				"${BUILT_PRODUCTS_DIR}/React-RCTSettings-framework/RCTSettings.framework",
+				"${BUILT_PRODUCTS_DIR}/React-RCTText-framework/RCTText.framework",
+				"${BUILT_PRODUCTS_DIR}/React-RCTVibration-framework/RCTVibration.framework",
+				"${BUILT_PRODUCTS_DIR}/React-cxxreact-framework/cxxreact.framework",
+				"${BUILT_PRODUCTS_DIR}/React-jsi-framework/jsi.framework",
+				"${BUILT_PRODUCTS_DIR}/React-jsiexecutor-framework/jsireact.framework",
+				"${BUILT_PRODUCTS_DIR}/React-jsinspector-framework/jsinspector.framework",
+				"${BUILT_PRODUCTS_DIR}/ReactCommon-framework/ReactCommon.framework",
+				"${BUILT_PRODUCTS_DIR}/ReactNativeAlternateIcons-framework/ReactNativeAlternateIcons.framework",
+				"${BUILT_PRODUCTS_DIR}/SNReactNative-framework/SNReactNative.framework",
+				"${BUILT_PRODUCTS_DIR}/Yoga-framework/yoga.framework",
+				"${BUILT_PRODUCTS_DIR}/glog-framework/glog.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-aes-framework/react_native_aes.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-fingerprint-scanner-framework/react_native_fingerprint_scanner.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-mail-framework/react_native_mail.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-safe-area-context-framework/react_native_safe_area_context.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-segmented-control-framework/react_native_segmented_control.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-sodium-framework/react_native_sodium.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-version-info-framework/react_native_version_info.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-webview-framework/react_native_webview.framework",
+				"${BUILT_PRODUCTS_DIR}/sn-textview-framework/sn_textview.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TrustKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bugsnag.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DoubleConversion.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBReactNativeSpec.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/folly.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTTypeSafety.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCAsyncStorage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCMaskedView.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNDefaultPreference.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNFS.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNFileViewer.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNGestureHandler.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNKeychain.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNPrivacySnapshot.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNReanimated.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNScreens.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNSearchBar.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNStoreReview.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNVectorIcons.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CoreModules.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTAnimation.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTBlob.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTImage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTLinking.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTNetwork.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTSettings.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTText.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTVibration.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/cxxreact.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/jsi.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/jsireact.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/jsinspector.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactCommon.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeAlternateIcons.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SNReactNative.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/yoga.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/glog.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_aes.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_fingerprint_scanner.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_mail.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_safe_area_context.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_segmented_control.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_sodium.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_version_info.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_webview.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/sn_textview.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StandardNotes/Pods-StandardNotes-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 		E5E35654B81EF4E64AB5D97C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

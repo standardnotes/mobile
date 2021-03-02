@@ -1,5 +1,5 @@
 import { hexToRGBA } from '@Style/utils';
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
 
 export const TouchableContainer = styled.TouchableWithoutFeedback``;
 export const Container = styled.View<{ selected: boolean; padding: number }>`
@@ -41,7 +41,11 @@ export const TagText = styled.Text<{ selected: boolean }>`
     selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
   opacity: ${props => (props.selected ? 0.8 : 0.5)};
 `;
-export const DateText = styled(TagText)`
+export const DetailsText = styled(TagText)<{ first: boolean }>`
   margin-right: 0px;
-  margin-top: 5px;
+  ${({ first }) =>
+    !first &&
+    css`
+      margin-top: 5px;
+    `}
 `;

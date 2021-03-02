@@ -23,24 +23,28 @@ export class BackupsService extends ApplicationService {
 
   async export(encrypted: boolean) {
     const data = await this.application!.createBackupFile(
-      undefined,
       encrypted
         ? EncryptionIntent.FileEncrypted
         : EncryptionIntent.FileDecrypted,
       true
     );
+    const prettyPrint = 2;
+    const stringifiedData = JSON.stringify(data, null, prettyPrint);
 
     const modifier = encrypted ? 'Encrypted' : 'Decrypted';
     const filename = `Standard Notes ${modifier} Backup - ${this._formattedDate()}.txt`;
     if (data) {
       if (this.application?.platform === Platform.Ios) {
-        return this._exportIOS(filename, data);
+        return this._exportIOS(filename, stringifiedData);
       } else {
         const result = await this._showAndroidEmailOrSaveOption();
         if (result === 'email') {
-          return this._exportViaEmailAndroid(Base64.encodeURI(data), filename);
+          return this._exportViaEmailAndroid(
+            Base64.encodeURI(stringifiedData),
+            filename
+          );
         } else if (result === 'save') {
-          let filepath = await this._exportAndroid(filename, data);
+          let filepath = await this._exportAndroid(filename, stringifiedData);
           return this._showFileSavePromptAndroid(filepath);
         } else {
           return;
@@ -145,7 +149,7 @@ export class BackupsService extends ApplicationService {
       // On Android the Mailer callback event isn't always triggered.
       setTimeout(function () {
         if (!resolved) {
-          resolve();
+          resolve(true);
         }
       }, 2500);
     });

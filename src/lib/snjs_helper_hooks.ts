@@ -1,16 +1,11 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { AppStackNavigationProp } from '@Root/AppStack';
-import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
-import {
-  SCREEN_AUTHENTICATE_PRIVILEGES,
-  SCREEN_COMPOSE,
-  SCREEN_NOTES,
-} from '@Screens/screens';
+import { SCREEN_NOTES, SCREEN_SETTINGS } from '@Screens/screens';
 import {
   ApplicationEvent,
   ButtonType,
-  ProtectedAction,
+  isSameDay,
+  NoteMutator,
   SNNote,
   StorageEncryptionPolicies,
 } from '@standardnotes/snjs';
@@ -297,12 +292,6 @@ export const useDeleteNoteWithPrivileges = (
 ) => {
   // Context
   const application = React.useContext(ApplicationContext);
-  const navigation = useNavigation<
-    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
-  >();
-
-  // State
-  const [deleteAction, setDeleteAction] = React.useState<'trash' | 'delete'>();
 
   const trashNote = useCallback(async () => {
     const title = 'Move to Trash';
@@ -353,81 +342,186 @@ export const useDeleteNoteWithPrivileges = (
         );
         return;
       }
-      if (
-        await application?.privilegesService!.actionRequiresPrivilege(
-          ProtectedAction.DeleteNote
-        )
-      ) {
-        const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
-          ProtectedAction.DeleteNote
-        );
-        const activeScreen = application!.getAppState().isInTabletMode
-          ? SCREEN_NOTES
-          : SCREEN_COMPOSE;
-        setDeleteAction(permanently ? 'delete' : 'trash');
-        navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
-          action: ProtectedAction.DeleteNote,
-          privilegeCredentials,
-          unlockedItemId: note.uuid,
-          previousScreen: activeScreen,
-        });
+      if (permanently) {
+        deleteNotePermanently();
       } else {
-        if (permanently) {
-          deleteNotePermanently();
-        } else {
-          trashNote();
-        }
+        trashNote();
       }
     },
-    [
-      application,
-      deleteNotePermanently,
-      navigation,
-      note?.locked,
-      note?.uuid,
-      trashNote,
-    ]
-  );
-
-  /*
-   * After screen is focused read if a requested privilage was unlocked
-   */
-  useFocusEffect(
-    useCallback(() => {
-      const readPrivilegesUnlockResponse = async () => {
-        if (deleteAction && application?.isLaunched()) {
-          const activeScreen = application.getAppState().isInTabletMode
-            ? SCREEN_NOTES
-            : SCREEN_COMPOSE;
-          const result = await application?.getValue(PRIVILEGES_UNLOCK_PAYLOAD);
-          if (
-            result &&
-            result.previousScreen === activeScreen &&
-            result.unlockedAction === ProtectedAction.DeleteNote &&
-            result.unlockedItemId === note.uuid
-          ) {
-            setDeleteAction(undefined);
-            application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
-            if (deleteAction === 'trash') {
-              trashNote();
-            } else if (deleteAction === 'delete') {
-              deleteNotePermanently();
-            }
-          } else {
-            setDeleteAction(undefined);
-          }
-        }
-      };
-
-      readPrivilegesUnlockResponse();
-    }, [
-      application,
-      deleteAction,
-      deleteNotePermanently,
-      note?.uuid,
-      trashNote,
-    ])
+    [application, deleteNotePermanently, note?.locked, trashNote]
   );
 
   return [deleteNote];
+};
+
+export const useProtectionSessionExpiry = () => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const getProtectionsDisabledUntil = React.useCallback(() => {
+    const protectionExpiry = application?.getProtectionSessionExpiryDate();
+    const now = new Date();
+
+    if (protectionExpiry && protectionExpiry > now) {
+      let f: Intl.DateTimeFormat;
+
+      if (isSameDay(protectionExpiry, now)) {
+        f = new Intl.DateTimeFormat(undefined, {
+          hour: 'numeric',
+          minute: 'numeric',
+        });
+      } else {
+        f = new Intl.DateTimeFormat(undefined, {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'short',
+          hour: 'numeric',
+          minute: 'numeric',
+        });
+      }
+
+      return f.format(protectionExpiry);
+    }
+    return null;
+  }, [application]);
+
+  // State
+  const [
+    protectionsDisabledUntil,
+    setProtectionsDisabledUntil,
+  ] = React.useState(getProtectionsDisabledUntil());
+
+  useEffect(() => {
+    const removeProtectionLengthSubscriber = application?.addEventObserver(
+      async event => {
+        if (event === ApplicationEvent.ProtectionSessionExpiryDateChanged) {
+          setProtectionsDisabledUntil(getProtectionsDisabledUntil());
+        }
+      }
+    );
+    return () => {
+      removeProtectionLengthSubscriber && removeProtectionLengthSubscriber();
+    };
+  }, [application, getProtectionsDisabledUntil]);
+
+  return [protectionsDisabledUntil];
+};
+
+export const useProtectNoteAlert = () => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const navigation = useNavigation();
+
+  const showProtectNoteAlert = useCallback(
+    async protectedNote => {
+      if (
+        !protectedNote &&
+        !application?.protectionService?.hasProtectionSources()
+      ) {
+        const confirmed = await application?.alertService.confirm(
+          'In order to Protect a note, you must add an application passcode or enable biometrics.',
+          undefined,
+          'Go to Settings'
+        );
+
+        if (confirmed) {
+          navigation.navigate(SCREEN_SETTINGS);
+        }
+      }
+    },
+    [application, navigation]
+  );
+
+  return [showProtectNoteAlert];
+};
+
+export const useChangeNoteChecks = (
+  note: SNNote | undefined,
+  editor: Editor | undefined = undefined
+) => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const canChangeNote = useCallback(async () => {
+    if (!note) {
+      return false;
+    }
+
+    if (note.deleted) {
+      application?.alertService?.alert(
+        'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
+      );
+      return false;
+    }
+
+    if (editor && editor.isTemplateNote) {
+      await editor.insertTemplatedNote();
+      if (application?.getAppState().selectedTag?.isSmartTag() === false) {
+        await application?.changeItem(
+          application?.getAppState().selectedTag!.uuid,
+          mutator => {
+            mutator.addItemAsRelationship(note);
+          }
+        );
+      }
+    }
+
+    if (!application?.findItem(note.uuid)) {
+      application?.alertService!.alert(
+        "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
+      );
+      return false;
+    }
+
+    return true;
+  }, [application, editor, note]);
+
+  return [canChangeNote];
+};
+
+export const useChangeNote = (
+  note: SNNote | undefined,
+  editor: Editor | undefined = undefined
+) => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const [canChangeNote] = useChangeNoteChecks(note, editor);
+
+  const changeNote = useCallback(
+    async (mutate: (mutator: NoteMutator) => void) => {
+      if (await canChangeNote()) {
+        await application?.changeAndSaveItem(note!.uuid, mutator => {
+          const noteMutator = mutator as NoteMutator;
+          mutate(noteMutator);
+        });
+      }
+    },
+    [application, note, canChangeNote]
+  );
+
+  return [changeNote];
+};
+
+export const useProtectOrUnprotectNote = (
+  note: SNNote | undefined,
+  editor: Editor | undefined = undefined
+) => {
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const [canChangeNote] = useChangeNoteChecks(note, editor);
+
+  const protectOrUnprotectNote = useCallback(async () => {
+    if (await canChangeNote()) {
+      if (note!.protected) {
+        await application?.unprotectNote(note!);
+      } else {
+        application?.protectNote(note!);
+      }
+    }
+  }, [application, note, canChangeNote]);
+
+  return [protectOrUnprotectNote];
 };

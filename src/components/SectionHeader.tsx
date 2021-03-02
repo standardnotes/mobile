@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, TextStyle } from 'react-native';
+import { Platform } from 'react-native';
 import styled from 'styled-components/native';
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
   subtitle?: string;
   buttonText?: string;
   buttonAction?: () => void;
-  buttonStyles?: TextStyle;
+  buttonStyles?: any;
   tinted?: boolean;
   backgroundColor?: string;
 };

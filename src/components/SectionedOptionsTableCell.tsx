@@ -13,6 +13,7 @@ type Props = {
   leftAligned?: boolean;
 };
 type ContainerProps = Omit<Props, 'title' | 'onPress' | 'options'>;
+
 export const Container = styled.View<ContainerProps>`
   border-bottom-color: ${props => props.theme.stylekitBorderColor};
   border-bottom-width: 1px;
@@ -73,7 +74,7 @@ const ButtonTitle = styled.Text<{ selected: boolean }>`
 `;
 
 export const SectionedOptionsTableCell: React.FC<Props> = props => (
-  <Container>
+  <Container first={props.first}>
     <Title leftAligned={props.leftAligned}>{props.title}</Title>
     <OptionsContainer>
       {props.options.map(option => {

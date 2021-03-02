@@ -28,7 +28,7 @@ export const NoteCellFlags = ({
 }: {
   note: SNNote;
   highlight: boolean;
-}): JSX.Element => {
+}) => {
   const theme = useContext(ThemeContext);
 
   let flags = [];
@@ -44,13 +44,6 @@ export const NoteCellFlags = ({
     flags.push({
       text: 'Archived',
       color: theme.stylekitWarningColor,
-    });
-  }
-
-  if (note.protected) {
-    flags.push({
-      text: 'Protected',
-      color: theme.stylekitSuccessColor,
     });
   }
 

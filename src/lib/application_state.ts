@@ -27,7 +27,7 @@ import {
   Platform,
 } from 'react-native';
 import FlagSecure from 'react-native-flag-secure-android';
-import { enabled } from 'react-native-privacy-snapshot';
+import { hide, show } from 'react-native-privacy-snapshot';
 import VersionInfo from 'react-native-version-info';
 import { MobileApplication } from './application';
 import { Editor } from './editor';
@@ -36,6 +36,7 @@ import { PrefKey } from './preferences_manager';
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;
 
+// eslint-disable-next-line no-shadow
 export enum AppStateType {
   LosingFocus = 1,
   EnteringBackground = 2,
@@ -46,11 +47,13 @@ export enum AppStateType {
   PreferencesChanged = 7,
 }
 
+// eslint-disable-next-line no-shadow
 export enum LockStateType {
   Locked = 1,
   Unlocked = 2,
 }
 
+// eslint-disable-next-line no-shadow
 export enum AppStateEventType {
   KeyboardChangeEvent = 1,
   TabletModeChange = 2,
@@ -62,16 +65,19 @@ export type TabletModeChangeData = {
   old_isInTabletMode: boolean;
 };
 
+// eslint-disable-next-line no-shadow
 export enum UnlockTiming {
   Immediately = 'immediately',
   OnQuit = 'on-quit',
 }
 
+// eslint-disable-next-line no-shadow
 export enum PasscodeKeyboardType {
   Default = 'default',
   Numeric = 'numeric',
 }
 
+// eslint-disable-next-line no-shadow
 export enum MobileStorageKey {
   PasscodeKeyboardTypeKey = 'passcodeKeyboardType',
 }
@@ -165,11 +171,13 @@ export class ApplicationState extends ApplicationService {
         }
       }
     );
+
+    await this.loadUnlockTiming();
+    this.setAndroidScreenshotPrivacy();
   }
 
   async onAppLaunch() {
-    await this.getUnlockTiming();
-    this.setScreenshotPrivacy();
+    MobileApplication.setPreviouslyLaunched();
   }
 
   /**
@@ -242,25 +250,14 @@ export class ApplicationState extends ApplicationService {
     }
   }
 
-  private async getUnlockTiming() {
+  private async loadUnlockTiming() {
     this.passcodeTiming = await this.getPasscodeTiming();
     this.biometricsTiming = await this.getBiometricsTiming();
   }
 
-  public async setScreenshotPrivacy() {
-    const hasBiometrics = await this.application.hasBiometrics();
-    const hasPasscode = this.application.hasPasscode();
-    const hasImmediateLock =
-      (hasBiometrics && this.biometricsTiming === UnlockTiming.Immediately) ||
-      (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately);
-    if (Platform.OS === 'ios') {
-      enabled(hasImmediateLock);
-    } else {
-      if (hasImmediateLock) {
-        FlagSecure.activate();
-      } else {
-        FlagSecure.deactivate();
-      }
+  public async setAndroidScreenshotPrivacy() {
+    if (Platform.OS === 'android') {
+      FlagSecure.activate();
     }
   }
 
@@ -553,6 +550,7 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isResumingFromBackground || isResuming) {
+      hide();
       if (isResumingFromBackground) {
         this.notifyOfStateChange(AppStateType.ResumingFromBackground);
       }
@@ -563,6 +561,7 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isLosingFocus) {
+      show();
       this.notifyOfStateChange(AppStateType.LosingFocus);
       return this.checkAndLockApplication();
     }
@@ -602,7 +601,6 @@ export class ApplicationState extends ApplicationService {
       StorageValueModes.Nonwrapped
     );
     this.passcodeTiming = timing;
-    this.setScreenshotPrivacy();
   }
 
   public async setBiometricsTiming(timing: UnlockTiming) {
@@ -612,7 +610,6 @@ export class ApplicationState extends ApplicationService {
       StorageValueModes.Nonwrapped
     );
     this.biometricsTiming = timing;
-    this.setScreenshotPrivacy();
   }
 
   public async getPasscodeKeyboardType(): Promise<PasscodeKeyboardType> {
@@ -662,7 +659,8 @@ export class ApplicationState extends ApplicationService {
   }
 
   public getEnvironment() {
-    const bundleId = VersionInfo.bundleIdentifier();
-    return bundleId === 'com.standardnotes.dev' ? 'dev' : 'prod';
+    const bundleId = VersionInfo.bundleIdentifier;
+    console.log(bundleId && bundleId.includes('dev'));
+    return bundleId && bundleId.includes('dev') ? 'dev' : 'prod';
   }
 }

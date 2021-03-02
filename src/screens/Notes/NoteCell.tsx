@@ -1,21 +1,21 @@
-import { useDeleteNoteWithPrivileges } from '@Lib/snjs_helper_hooks';
-import { ApplicationContext } from '@Root/ApplicationContext';
 import {
-  CollectionSort,
-  isNullOrUndefined,
-  NoteMutator,
-  SNNote,
-} from '@standardnotes/snjs';
+  useChangeNote,
+  useDeleteNoteWithPrivileges,
+  useProtectNoteAlert,
+  useProtectOrUnprotectNote,
+} from '@Lib/snjs_helper_hooks';
+import { ApplicationContext } from '@Root/ApplicationContext';
+import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
 } from '@Style/custom_action_sheet';
-import React, { useCallback, useContext, useRef, useState } from 'react';
-import { View } from 'react-native';
+import React, { useContext, useRef, useState } from 'react';
+import { Text, View } from 'react-native';
 import {
   Container,
-  DateText,
   DeletedText,
+  DetailsText,
   NoteText,
   TitleText,
   TouchableContainer,
@@ -38,9 +38,13 @@ export const NoteCell = ({
   sortType,
   hideDates,
   hidePreviews,
-}: Props): JSX.Element => {
+}: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+
+  const [showProtectNoteAlert] = useProtectNoteAlert();
+  const [changeNote] = useChangeNote(note);
+  const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note);
 
   // State
   const [selected, setSelected] = useState(false);
@@ -87,34 +91,6 @@ export const NoteCell = ({
     setSelected(false);
   };
 
-  const changeNote = useCallback(
-    async (mutate: (mutator: NoteMutator) => void) => {
-      if (!note) {
-        return;
-      }
-
-      if (note.deleted) {
-        application?.alertService?.alert(
-          'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
-        );
-        return;
-      }
-
-      if (!application?.findItem(note.uuid)) {
-        application?.alertService!.alert(
-          "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
-        );
-        return;
-      }
-
-      await application?.changeAndSaveItem(note.uuid, mutator => {
-        const noteMutator = mutator as NoteMutator;
-        mutate(noteMutator);
-      });
-    },
-    [application, note]
-  );
-
   const onLongPress = () => {
     if (note.errorDecrypting) {
       return;
@@ -125,7 +101,7 @@ export const NoteCell = ({
         note.safeTitle(),
         [
           {
-            text: 'Note protected',
+            text: 'Note Protected',
           },
         ],
         undefined,
@@ -172,10 +148,11 @@ export const NoteCell = ({
       options.push({
         text: note.protected ? 'Unprotect' : 'Protect',
         key: 'protect',
-        callback: () =>
-          changeNote(mutator => {
-            mutator.protected = !note.protected;
-          }),
+        callback: async () => {
+          const protectedNote = note.protected;
+          await protectOrUnprotectNote();
+          showProtectNoteAlert(protectedNote);
+        },
       });
 
       if (!note.trashed) {
@@ -217,6 +194,7 @@ export const NoteCell = ({
   const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
   const hasPlainPreview =
     !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
+  const showDetails = !note.errorDecrypting && (!hideDates || note.protected);
 
   return (
     <TouchableContainer
@@ -225,7 +203,7 @@ export const NoteCell = ({
       onPressOut={_onPressOut}
       onLongPress={onLongPress}
     >
-      <Container ref={elementRef} selected={highlight} padding={padding}>
+      <Container ref={elementRef as any} selected={highlight} padding={padding}>
         {note.deleted && <DeletedText>Deleting...</DeletedText>}
 
         <NoteCellFlags note={note} highlight={highlight} />
@@ -252,12 +230,26 @@ export const NoteCell = ({
           </NoteText>
         )}
 
-        {!note.errorDecrypting && !hideDates && (
-          <DateText numberOfLines={1} selected={highlight}>
-            {sortType === CollectionSort.UpdatedAt
-              ? 'Modified ' + note.updatedAtString
-              : note.createdAtString}
-          </DateText>
+        {showDetails && (
+          <DetailsText
+            numberOfLines={1}
+            selected={highlight}
+            first={!note.title}
+          >
+            {note.protected && (
+              <Text>
+                Protected
+                {!hideDates && ' • '}
+              </Text>
+            )}
+            {!hideDates && (
+              <Text>
+                {sortType === CollectionSort.UpdatedAt
+                  ? 'Modified ' + note.updatedAtString
+                  : note.createdAtString}
+              </Text>
+            )}
+          </DetailsText>
         )}
       </Container>
     </TouchableContainer>

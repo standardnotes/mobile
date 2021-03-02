@@ -10,16 +10,8 @@ import { MobileDeviceInterface } from '@Lib/interface';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
-import { PRIVILEGES_UNLOCK_PAYLOAD } from '@Screens/Authenticate/AuthenticatePrivileges';
-import {
-  SCREEN_AUTHENTICATE_PRIVILEGES,
-  SCREEN_INPUT_MODAL_PASSCODE,
-  SCREEN_SETTINGS,
-} from '@Screens/screens';
-import {
-  ProtectedAction,
-  StorageEncryptionPolicies,
-} from '@standardnotes/snjs';
+import { SCREEN_INPUT_MODAL_PASSCODE, SCREEN_SETTINGS } from '@Screens/screens';
+import { StorageEncryptionPolicies } from '@standardnotes/snjs';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Title } from './PasscodeSection.styled';
 
@@ -27,6 +19,7 @@ type Props = {
   title: string;
   hasPasscode: boolean;
   encryptionAvailable: boolean;
+  updateProtectionsAvailable: Function;
 };
 
 export const PasscodeSection = (props: Props) => {
@@ -52,7 +45,6 @@ export const PasscodeSection = (props: Props) => {
     encryptionPolictChangeInProgress,
     setEncryptionPolictChangeInProgress,
   ] = useState(false);
-  const [lockedMethod, setLockedMethod] = useState<'passcode' | 'biometrics'>();
 
   useEffect(() => {
     let mounted = true;
@@ -164,14 +156,16 @@ export const PasscodeSection = (props: Props) => {
       setHasBiometrics(true);
       await application?.enableBiometrics();
       await setBiometricsTiming(UnlockTiming.OnQuit);
+      props.updateProtectionsAvailable();
     }
-    await application?.getAppState().setScreenshotPrivacy();
   };
 
   const disableBiometrics = useCallback(async () => {
-    setHasBiometrics(false);
-    await application?.disableBiometrics();
-  }, [application]);
+    if (await application?.disableBiometrics()) {
+      setHasBiometrics(false);
+      props.updateProtectionsAvailable();
+    }
+  }, [application, props]);
 
   const disablePasscode = useCallback(async () => {
     const hasAccount = Boolean(application?.hasAccount());
@@ -192,66 +186,23 @@ export const PasscodeSection = (props: Props) => {
     );
     if (confirmed) {
       await application?.removePasscode();
-      await application?.getAppState().setScreenshotPrivacy();
     }
   }, [application]);
 
   const disableAuthentication = useCallback(
     async (authenticationMethod: 'passcode' | 'biometrics') => {
-      if (
-        await application?.privilegesService!.actionRequiresPrivilege(
-          ProtectedAction.ManagePasscode
-        )
-      ) {
-        const privilegeCredentials = await application!.privilegesService!.netCredentialsForAction(
-          ProtectedAction.ManagePasscode
-        );
-        setLockedMethod(authenticationMethod);
-        navigation.navigate(SCREEN_AUTHENTICATE_PRIVILEGES, {
-          action: ProtectedAction.ManagePasscode,
-          privilegeCredentials,
-          previousScreen: SCREEN_SETTINGS,
-        });
-      } else {
-        if (authenticationMethod === 'biometrics') {
+      switch (authenticationMethod) {
+        case 'biometrics': {
           disableBiometrics();
-        } else if (authenticationMethod === 'passcode') {
+          break;
+        }
+        case 'passcode': {
           disablePasscode();
+          break;
         }
       }
     },
-    [application, disableBiometrics, disablePasscode, navigation]
-  );
-
-  /*
-   * After screen is focused read if a requested privilage was unlocked
-   */
-  useFocusEffect(
-    useCallback(() => {
-      const readPrivilegesUnlockResponse = async () => {
-        if (application?.isLaunched() && lockedMethod) {
-          const result = await application?.getValue(PRIVILEGES_UNLOCK_PAYLOAD);
-          if (
-            result &&
-            result.previousScreen === SCREEN_SETTINGS &&
-            result.unlockedAction === ProtectedAction.ManagePasscode
-          ) {
-            if (lockedMethod === 'biometrics') {
-              disableBiometrics();
-            } else if (lockedMethod === 'passcode') {
-              disablePasscode();
-            }
-            setLockedMethod(undefined);
-            application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
-            application?.removeValue(PRIVILEGES_UNLOCK_PAYLOAD);
-          } else {
-            setLockedMethod(undefined);
-          }
-        }
-      };
-
-      readPrivilegesUnlockResponse();
-    }, [application, disableBiometrics, disablePasscode, lockedMethod])
+    [disableBiometrics, disablePasscode]
   );
 
   let biometricTitle = hasBiometrics
