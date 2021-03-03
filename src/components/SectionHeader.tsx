@@ -61,7 +61,7 @@ const Button = styled.Text`
 export const SectionHeader: React.FC<Props> = props => (
   <Container>
     <TitleContainer>
-      {props.title && (
+      {!!props.title && (
         <Title>
           {Platform.select({
             ios: props.title.toUpperCase(),
@@ -69,9 +69,9 @@ export const SectionHeader: React.FC<Props> = props => (
           })}
         </Title>
       )}
-      {props.subtitle && <SubTitle>{props.subtitle}</SubTitle>}
+      {!!props.subtitle && <SubTitle>{props.subtitle}</SubTitle>}
     </TitleContainer>
-    {props.buttonText && (
+    {!!props.buttonText && (
       <ButtonContainer onPress={props.buttonAction}>
         <Button style={props.buttonStyles}>{props.buttonText}</Button>
       </ButtonContainer>
