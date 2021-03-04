@@ -2,7 +2,6 @@ import 'react-native-gesture-handler';
 import Bugsnag from '@bugsnag/react-native';
 import { enableScreens } from 'react-native-screens';
 import { SNLog } from '@standardnotes/snjs';
-import { Platform } from 'react-native';
 
 import { AppRegistry } from 'react-native';
 import { App } from './src/App';
@@ -23,10 +22,5 @@ if (__DEV__ === false) {
 }
 
 enableAndroidFontFix();
-
-if (Platform.OS === 'android') {
-  require('intl');
-  require('intl/locale-data/jsonp/en-IN');
-}
 
 AppRegistry.registerComponent(appName, () => App);

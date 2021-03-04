@@ -363,24 +363,32 @@ export const useProtectionSessionExpiry = () => {
     const now = new Date();
 
     if (protectionExpiry && protectionExpiry > now) {
-      let f: Intl.DateTimeFormat;
+      if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
+        let f: Intl.DateTimeFormat;
 
-      if (isSameDay(protectionExpiry, now)) {
-        f = new Intl.DateTimeFormat(undefined, {
-          hour: 'numeric',
-          minute: 'numeric',
-        });
+        if (isSameDay(protectionExpiry, now)) {
+          f = new Intl.DateTimeFormat(undefined, {
+            hour: 'numeric',
+            minute: 'numeric',
+          });
+        } else {
+          f = new Intl.DateTimeFormat(undefined, {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'short',
+            hour: 'numeric',
+            minute: 'numeric',
+          });
+        }
+
+        return f.format(protectionExpiry);
       } else {
-        f = new Intl.DateTimeFormat(undefined, {
-          weekday: 'long',
-          day: 'numeric',
-          month: 'short',
-          hour: 'numeric',
-          minute: 'numeric',
-        });
+        if (isSameDay(protectionExpiry, now)) {
+          return protectionExpiry.toLocaleTimeString();
+        } else {
+          return `${protectionExpiry.toDateString()} ${protectionExpiry.toLocaleTimeString()}`;
+        }
       }
-
-      return f.format(protectionExpiry);
     }
     return null;
   }, [application]);

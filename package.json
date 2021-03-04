@@ -27,7 +27,6 @@
     "@react-navigation/stack": "^5.12.8",
     "@standardnotes/sncrypto-common": "1.2.9",
     "@standardnotes/snjs": "^2.0.62",
-    "intl": "^1.2.5",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
     "react": "16.13.1",
