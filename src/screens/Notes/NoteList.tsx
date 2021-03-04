@@ -2,7 +2,7 @@ import { AppStateEventType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { CollectionSort, SNNote } from '@standardnotes/snjs';
+import { CollectionSort, SNNote, SNTag } from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
@@ -61,6 +61,8 @@ export const NoteList = (props: Props) => {
 
   // Ref
   const searchBoxInputRef = useRef<IosSearchBar>(null);
+  const noteListRef = useRef<FlatList>(null);
+  const selectedTag = useRef<SNTag | undefined>(undefined);
 
   const dissmissKeybard = () => {
     searchBoxInputRef.current?.blur();
@@ -77,6 +79,18 @@ export const NoteList = (props: Props) => {
 
     return unsubscribeStateEventObserver;
   }, [application]);
+
+  useEffect(() => {
+    const newSelectedTag = application?.getAppState().selectedTag;
+
+    if (newSelectedTag !== selectedTag.current) {
+      selectedTag.current = application?.getAppState().selectedTag;
+
+      if (props.notes && props.notes.length > 0) {
+        noteListRef.current?.scrollToIndex({ animated: false, index: 0 });
+      }
+    }
+  }, [application, props.notes]);
 
   useEffect(() => {
     /**
@@ -160,6 +174,7 @@ export const NoteList = (props: Props) => {
         )}
       </HeaderContainer>
       <FlatList
+        ref={noteListRef}
         style={styles.list}
         keyExtractor={item => item.uuid}
         contentContainerStyle={[
