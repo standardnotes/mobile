@@ -2,7 +2,7 @@ import { AppStateEventType, AppStateType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { CollectionSort, SNNote, SNTag } from '@standardnotes/snjs';
+import { CollectionSort, SNNote } from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
@@ -110,6 +110,11 @@ export const NoteList = (props: Props) => {
     }, [])
   );
 
+  const onChangeSearchText = (text: string) => {
+    props.onSearchChange(text);
+    scrollListToTop();
+  };
+
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
     return (
       <NoteCell
@@ -146,7 +151,7 @@ export const NoteList = (props: Props) => {
             appearance={themeService?.keyboardColorForActiveTheme()}
             barTintColor={theme.stylekitInfoColor}
             textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
-            onChangeText={props.onSearchChange}
+            onChangeText={onChangeSearchText}
             onSearchButtonPress={() => {
               searchBoxInputRef.current?.blur();
             }}
@@ -158,7 +163,7 @@ export const NoteList = (props: Props) => {
         )}
         {Platform.OS === 'android' && (
           <AndroidSearchBar
-            onChangeText={props.onSearchChange}
+            onChangeText={onChangeSearchText}
             onCancel={props.onSearchCancel}
             onDelete={props.onSearchCancel}
             blurOnSubmit={true}
