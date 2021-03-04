@@ -1,4 +1,4 @@
-import { AppStateEventType } from '@Lib/application_state';
+import { AppStateEventType, AppStateType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -62,7 +62,6 @@ export const NoteList = (props: Props) => {
   // Ref
   const searchBoxInputRef = useRef<IosSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
-  const selectedTag = useRef<SNTag | undefined>(undefined);
 
   const dissmissKeybard = () => {
     searchBoxInputRef.current?.blur();
@@ -80,17 +79,23 @@ export const NoteList = (props: Props) => {
     return unsubscribeStateEventObserver;
   }, [application]);
 
-  useEffect(() => {
-    const newSelectedTag = application?.getAppState().selectedTag;
-
-    if (newSelectedTag !== selectedTag.current) {
-      selectedTag.current = application?.getAppState().selectedTag;
-
-      if (props.notes && props.notes.length > 0) {
-        noteListRef.current?.scrollToIndex({ animated: false, index: 0 });
-      }
+  const scrollListToTop = useCallback(() => {
+    if (props.notes && props.notes.length > 0) {
+      noteListRef.current?.scrollToIndex({ animated: false, index: 0 });
     }
-  }, [application, props.notes]);
+  }, [props.notes]);
+
+  useEffect(() => {
+    const unsubscribeTagChangedEventObserver = application
+      ?.getAppState()
+      .addStateChangeObserver(event => {
+        if (event === AppStateType.TagChanged) {
+          scrollListToTop();
+        }
+      });
+
+    return unsubscribeTagChangedEventObserver;
+  }, [application, scrollListToTop]);
 
   useEffect(() => {
     /**
