@@ -25,7 +25,6 @@ import FAB from 'react-native-fab';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';
-import { NoteSortKey } from './utils';
 
 export const Notes = React.memo(
   ({
@@ -310,16 +309,9 @@ export const Notes = React.memo(
     }, [application, reloadNotes, reloadNotesDisplayOptions]);
 
     const reloadPreferences = useCallback(async () => {
-      let newSortBy = application
+      const newSortBy = application
         ?.getPrefsService()
-        .getValue(PrefKey.SortNotesBy, NoteSortKey.CreatedAt);
-      if (
-        newSortBy === NoteSortKey.UpdatedAt ||
-        newSortBy === NoteSortKey.ClientUpdatedAt
-      ) {
-        /** Use UserUpdatedAt instead */
-        newSortBy = NoteSortKey.UserUpdatedAt;
-      }
+        .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt);
       let displayOptionsChanged = false;
 
       const newSortReverse = application
