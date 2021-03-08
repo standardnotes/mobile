@@ -326,7 +326,9 @@ export class Compose extends React.Component<{}, State> {
       return;
     }
     if (this.note?.deleted) {
-      this.context!.alertService!.alert('deteled replace this');
+      this.context!.alertService!.alert(
+        'Attempting to save this note has failed. The note has previously been deleted.'
+      );
       return;
     }
 
@@ -342,7 +344,9 @@ export class Compose extends React.Component<{}, State> {
       }
     }
     if (!this.context?.findItem(this.note!.uuid)) {
-      this.context?.alertService!.alert('invalid note replace');
+      this.context?.alertService!.alert(
+        'Attempting to save this note has failed. The note cannot be found.'
+      );
       return;
     }
     await this.context!.changeItem(
