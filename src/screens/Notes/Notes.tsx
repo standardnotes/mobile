@@ -184,8 +184,6 @@ export const Notes = React.memo(
           sortDirection:
             sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
           tags: tag ? [tag] : [],
-          includeArchived: tag?.isArchiveTag || tag?.isTrashTag,
-          includePinned: true,
           searchQuery: searchQuery,
         });
         application!.setNotesDisplayCriteria(criteria);
