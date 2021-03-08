@@ -9,7 +9,7 @@ import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
 import {
   CollectionSort,
   ContentType,
-  Platform,
+  NotesDisplayCriteria,
   SNNote,
 } from '@standardnotes/snjs';
 import { ICON_ADD } from '@Style/icons';
@@ -25,7 +25,7 @@ import FAB from 'react-native-fab';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';
-import { notePassesFilter, NoteSortKey } from './utils';
+import { NoteSortKey } from './utils';
 
 export const Notes = React.memo(
   ({
@@ -173,20 +173,23 @@ export const Notes = React.memo(
           sortReverse: boolean;
         }
       ) => {
-        const tag = application!.getAppState().selectedTag!;
-        application!.setNotesDisplayOptions(
-          tag,
-          sortOptions?.sortBy ?? (sortBy! as CollectionSort),
-          sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
-          (note: SNNote) => {
-            return notePassesFilter(
-              note,
-              tag?.isArchiveTag || tag?.isTrashTag,
-              false,
-              searchFilter?.toLowerCase() ?? searchText.toLowerCase()
-            );
-          }
-        );
+        const tag = application!.getAppState().selectedTag;
+        const searchQuery = searchText
+          ? {
+              query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
+              includeProtectedNoteText: false,
+            }
+          : undefined;
+        const criteria = NotesDisplayCriteria.Create({
+          sortProperty: sortOptions?.sortBy ?? (sortBy! as CollectionSort),
+          sortDirection:
+            sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
+          tags: tag ? [tag] : [],
+          includeArchived: tag?.isArchiveTag || tag?.isTrashTag,
+          includePinned: true,
+          searchQuery: searchQuery,
+        });
+        application!.setNotesDisplayCriteria(criteria);
       },
       [application, sortBy, sortReverse, searchText]
     );

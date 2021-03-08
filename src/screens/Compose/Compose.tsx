@@ -332,7 +332,7 @@ export class Compose extends React.Component<{}, State> {
 
     if (this.editor?.isTemplateNote) {
       await this.editor?.insertTemplatedNote();
-      if (this.context?.getAppState().selectedTag?.isSmartTag() === false) {
+      if (this.context?.getAppState().selectedTag?.isSmartTag === false) {
         await this.context.changeItem(
           this.context?.getAppState().selectedTag!.uuid,
           mutator => {
