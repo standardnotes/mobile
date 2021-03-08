@@ -428,7 +428,7 @@ export class ApplicationState extends ApplicationService {
    * @returns notes this tag references
    */
   public getTagNotes(tag: SNTag) {
-    if (tag.isSmartTag()) {
+    if (tag.isSmartTag) {
       return this.application.notesMatchingSmartTag(tag as SNSmartTag);
     } else {
       return this.application.referencesForItem(tag).filter(ref => {
