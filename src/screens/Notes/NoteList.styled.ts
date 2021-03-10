@@ -36,3 +36,10 @@ export const HeaderContainer = styled.View`
   padding-left: 5px;
   padding-right: 5px;
 `;
+
+export const SearchOptionsContainer = styled.View`
+  display: flex;
+  flex-direction: row;
+  margin-left: 8px;
+  margin-bottom: 12px;
+`;

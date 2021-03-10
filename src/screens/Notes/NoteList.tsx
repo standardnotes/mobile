@@ -1,3 +1,4 @@
+import { Chip } from '@Components/Chip';
 import { AppStateEventType, AppStateType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect } from '@react-navigation/native';
@@ -27,6 +28,7 @@ import {
   HeaderContainer,
   LoadingContainer,
   LoadingText,
+  SearchOptionsContainer,
   styles,
 } from './NoteList.styled';
 import { OfflineBanner } from './OfflineBanner';
@@ -35,6 +37,11 @@ type Props = {
   onSearchChange: (text: string) => void;
   onSearchCancel: () => void;
   searchText: string;
+  searchOptions: {
+    selected: boolean;
+    onPress: () => void;
+    label: string;
+  }[];
   onPressItem: (noteUuid: SNNote['uuid']) => void;
   selectedNoteId: string | undefined;
   sortType: CollectionSort;
@@ -58,6 +65,7 @@ export const NoteList = (props: Props) => {
 
   // State
   const [searchText, setSearchText] = useState(' ');
+  const [showSearchOptions, setShowSearchOptions] = useState(false);
 
   // Ref
   const searchBoxInputRef = useRef<IosSearchBar>(null);
@@ -115,6 +123,14 @@ export const NoteList = (props: Props) => {
     scrollListToTop();
   };
 
+  const onSearchFocus = () => {
+    setShowSearchOptions(true);
+  };
+
+  const onSearchBlur = () => {
+    setShowSearchOptions(false);
+  };
+
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
     return (
       <NoteCell
@@ -159,6 +175,8 @@ export const NoteList = (props: Props) => {
               searchBoxInputRef.current?.blur();
               props.onSearchCancel();
             }}
+            onFocus={onSearchFocus}
+            onBlur={onSearchBlur}
           />
         )}
         {Platform.OS === 'android' && (
@@ -166,6 +184,8 @@ export const NoteList = (props: Props) => {
             onChangeText={onChangeSearchText}
             onCancel={props.onSearchCancel}
             onDelete={props.onSearchCancel}
+            onFocus={onSearchFocus}
+            onBlur={onSearchBlur}
             blurOnSubmit={true}
             backgroundColor={theme.stylekitBackgroundColor}
             titleCancelColor={theme.stylekitInfoColor}
@@ -181,6 +201,18 @@ export const NoteList = (props: Props) => {
               },
             ]}
           />
+        )}
+        {showSearchOptions && (
+          <SearchOptionsContainer>
+            {props.searchOptions.map(({ selected, onPress, label }, index) => (
+              <Chip
+                selected={selected}
+                onPress={onPress}
+                label={label}
+                last={index === props.searchOptions.length - 1}
+              />
+            ))}
+          </SearchOptionsContainer>
         )}
       </HeaderContainer>
       <FlatList
