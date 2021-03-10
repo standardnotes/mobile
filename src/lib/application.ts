@@ -58,7 +58,6 @@ export class MobileApplication extends SNApplication {
           with: ComponentManager,
         },
       ],
-      undefined,
       VersionInfo.bundleIdentifier?.includes('dev')
         ? 'https://syncing-server-dev.standardnotes.org/'
         : 'https://sync.standardnotes.org'

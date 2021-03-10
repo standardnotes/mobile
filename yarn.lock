@@ -1380,16 +1380,22 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@standardnotes/auth@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-2.0.0.tgz#93f633fd40855f87843f911109e92b29dcbc5a04"
+  integrity sha512-B2NznCm3pzwBvBU/YQfuDrtlEbLO3hNH3QrqSwK2dFwUGAnl5UQPC9FKFWYgly05rWevwMY3IUmiZRzUEVlKsQ==
+
 "@standardnotes/sncrypto-common@1.2.9", "@standardnotes/sncrypto-common@^1.2.9":
   version "1.2.9"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.2.9.tgz#5212a959e4ec563584e42480bfd39ef129c3cbdf"
   integrity sha512-xJ5IUGOZztjSgNP/6XL+Ut5+q9UgSTv6xMtKkcQC5aJxCOkJy9u6RamPLdF00WQgwibxx2tu0e43bKUjTgzMig==
 
-"@standardnotes/snjs@^2.0.63":
-  version "2.0.64"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.0.64.tgz#6849fe9bc7d128f06d3c4a58311bea070aede9ab"
-  integrity sha512-06FjIBveSmIliJwpJlZ5FUPpvf6wv8YZqOdy4Bpjl0L9Cx92iBAe3ggDpJ8wNvtj3xwkrKgg/o/qmtOj50MiQQ==
+"@standardnotes/snjs@^2.0.65":
+  version "2.0.67"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.0.67.tgz#87e29f40bb5efaa36f30ddc5905164f7dce194d9"
+  integrity sha512-XCDxlFQCh0zmV3Hc9mjU7ritZ/2Ma5JPoCbDy4CIAlkKdmVL4tu/4jCfRFILM0zpKF/kLsCTbLGdG7TgU/ReKg==
   dependencies:
+    "@standardnotes/auth" "^2.0.0"
     "@standardnotes/sncrypto-common" "^1.2.9"
 
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.7":

@@ -31,14 +31,20 @@ const useSessions = (): [
 
   const getSessions = useCallback(async () => {
     const response = await application?.getSessions();
-    if (response && 'error' in response) {
+
+    if (!response) {
+      setErrorMessage('An unknown error occured while loading sessions.');
+      return;
+    }
+
+    if ('error' in response || !response.data) {
       if (response.error?.message) {
         setErrorMessage(response.error.message);
       } else {
         setErrorMessage('An unknown error occured while loading sessions.');
       }
     } else {
-      const newSessions = response as RemoteSession[];
+      const newSessions = response.data;
       setSessions(newSessions);
       setErrorMessage('');
     }
