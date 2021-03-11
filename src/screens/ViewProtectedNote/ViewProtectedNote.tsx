@@ -16,7 +16,7 @@ export const ViewProtectedNote = ({
       <Title>This note is Protected.</Title>
       <Button label="View" onPress={onPressView} />
       <Text>
-        Add a passcode, account or biometrics to require authentication to view
+        Add a passcode, account, or biometrics to require authentication to view
         this note.
       </Text>
     </Container>
