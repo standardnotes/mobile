@@ -232,11 +232,17 @@ export const Notes = React.memo(
       ]
     );
 
-    const toggleIncludeProtected = useCallback(() => {
+    const toggleIncludeProtected = useCallback(async () => {
       const includeProtected = !includeProtectedNoteText;
-      reloadNotesDisplayOptions(undefined, undefined, includeProtected);
-      setIncludeProtectedNoteText(includeProtected);
-    }, [includeProtectedNoteText, reloadNotesDisplayOptions]);
+      const allowToggling = includeProtected
+        ? await application?.authorizeSearchingProtectedNotesText()
+        : true;
+
+      if (allowToggling) {
+        reloadNotesDisplayOptions(undefined, undefined, includeProtected);
+        setIncludeProtectedNoteText(includeProtected);
+      }
+    }, [application, includeProtectedNoteText, reloadNotesDisplayOptions]);
 
     const toggleIncludeArchived = useCallback(() => {
       const includeArchived = !includeArchivedNotes;
