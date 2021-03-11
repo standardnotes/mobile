@@ -205,7 +205,10 @@ export const NoteList = (props: Props) => {
           />
         )}
         {showSearchOptions && (
-          <SearchOptionsContainer horizontal>
+          <SearchOptionsContainer
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
             {props.searchOptions.map(({ selected, onPress, label }, index) => (
               <Chip
                 key={label}
