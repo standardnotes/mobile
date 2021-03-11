@@ -78,7 +78,13 @@ export const Notes = React.memo(
     const [
       includeProtectedNoteText,
       setIncludeProtectedNoteText,
-    ] = useState<boolean>(true);
+    ] = useState<boolean>(
+      () =>
+        !(
+          application!.hasProtectionSources() &&
+          application!.areProtectionsEnabled()
+        )
+    );
     const [includeArchivedNotes, setIncludeArchivedNotes] = useState<boolean>(
       true
     );
@@ -88,6 +94,10 @@ export const Notes = React.memo(
 
     // Ref
     const haveDisplayOptions = useRef(false);
+    const protectionsEnabled = useRef(
+      application!.hasProtectionSources() &&
+        application!.areProtectionsEnabled()
+    );
 
     const reloadTitle = useCallback(
       (newNotes?: SNNote[], newFilter?: string) => {
@@ -252,6 +262,15 @@ export const Notes = React.memo(
     }, [includeTrashedNotes, reloadNotesDisplayOptions]);
 
     const reloadSearchOptions = useCallback(() => {
+      const protections =
+        application?.hasProtectionSources() &&
+        application?.areProtectionsEnabled();
+
+      if (protections !== protectionsEnabled.current) {
+        protectionsEnabled.current = !!protections;
+        setIncludeProtectedNoteText(!protections);
+      }
+
       const selectedTag = application?.getAppState().selectedTag;
       const options = [
         {
