@@ -37,7 +37,7 @@ export const HeaderContainer = styled.View`
   padding-right: 5px;
 `;
 
-export const SearchOptionsContainer = styled.View`
+export const SearchOptionsContainer = styled.ScrollView`
   display: flex;
   flex-direction: row;
   margin-left: 8px;

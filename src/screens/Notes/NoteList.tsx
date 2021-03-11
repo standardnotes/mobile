@@ -203,7 +203,7 @@ export const NoteList = (props: Props) => {
           />
         )}
         {showSearchOptions && (
-          <SearchOptionsContainer>
+          <SearchOptionsContainer horizontal>
             {props.searchOptions.map(({ selected, onPress, label }, index) => (
               <Chip
                 key={label}
