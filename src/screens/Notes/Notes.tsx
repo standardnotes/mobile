@@ -563,6 +563,7 @@ export const Notes = React.memo(
               : undefined
           }
           searchOptions={searchOptions}
+          showProtectedContents={includeProtectedNoteText}
         />
         <FAB
           // @ts-ignore style prop does not exist in types
