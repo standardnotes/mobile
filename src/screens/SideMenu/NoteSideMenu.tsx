@@ -2,7 +2,6 @@ import { Editor } from '@Lib/editor';
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
-  useProtectNoteAlert,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -80,7 +79,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
   const [components, setComponents] = useState<SNComponent[]>([]);
 
-  const [showProtectNoteAlert] = useProtectNoteAlert();
   const [changeNote] = useChangeNote(note, editor);
   const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note, editor);
 
@@ -460,11 +458,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       });
 
     const protectOption = note.protected ? 'Unprotect' : 'Protect';
-    const protectEvent = async () => {
-      const protectedNote = note.protected;
-      await protectOrUnprotectNote();
-      showProtectNoteAlert(protectedNote);
-    };
+    const protectEvent = async () => await protectOrUnprotectNote();
 
     const openSessionHistory = () => {
       if (!editor?.isTemplateNote) {
@@ -573,7 +567,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
     application,
     protectOrUnprotectNote,
     deleteNote,
-    showProtectNoteAlert,
   ]);
 
   const onTagSelect = useCallback(
