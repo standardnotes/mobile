@@ -5,7 +5,11 @@ import { useSignedIn, useSyncStatus } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
-import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
+import {
+  SCREEN_COMPOSE,
+  SCREEN_NOTES,
+  SCREEN_VIEW_PROTECTED_NOTE,
+} from '@Screens/screens';
 import {
   CollectionSort,
   ContentType,
@@ -119,20 +123,26 @@ export const Notes = React.memo(
     );
 
     const openCompose = useCallback(
-      (newNote: boolean) => {
+      (newNote: boolean, replaceScreen: boolean = false) => {
         if (!shouldSplitLayout) {
-          navigation.navigate(SCREEN_COMPOSE, {
-            title: newNote ? 'Compose' : 'Note',
-          });
+          if (replaceScreen) {
+            navigation.replace(SCREEN_COMPOSE, {
+              title: newNote ? 'Compose' : 'Note',
+            });
+          } else {
+            navigation.navigate(SCREEN_COMPOSE, {
+              title: newNote ? 'Compose' : 'Note',
+            });
+          }
         }
       },
       [navigation, shouldSplitLayout]
     );
 
     const openNote = useCallback(
-      async (noteUuid: SNNote['uuid']) => {
+      async (noteUuid: SNNote['uuid'], replaceScreen: boolean = false) => {
         await application!.getAppState().openEditor(noteUuid);
-        openCompose(false);
+        openCompose(false, replaceScreen);
       },
       [application, openCompose]
     );
@@ -151,12 +161,18 @@ export const Notes = React.memo(
               );
             }
           }
+
+          if (note.protected && !application?.hasProtectionSources()) {
+            return navigation.navigate(SCREEN_VIEW_PROTECTED_NOTE, {
+              onPressView: () => openNote(noteUuid, true),
+            });
+          }
           if (await application?.authorizeNoteAccess(note)) {
             openNote(noteUuid);
           }
         }
       },
-      [application, openNote]
+      [application, navigation, openNote]
     );
 
     useEffect(() => {

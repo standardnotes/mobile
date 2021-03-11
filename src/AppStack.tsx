@@ -14,9 +14,14 @@ import {
 } from '@react-navigation/stack';
 import { Compose } from '@Screens/Compose/Compose';
 import { Root } from '@Screens/Root';
-import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
+import {
+  SCREEN_COMPOSE,
+  SCREEN_NOTES,
+  SCREEN_VIEW_PROTECTED_NOTE,
+} from '@Screens/screens';
 import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu';
 import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu';
+import { ViewProtectedNote } from '@Screens/ViewProtectedNote/ViewProtectedNote';
 import { ICON_MENU } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import { getDefaultDrawerWidth } from '@Style/utils';
@@ -40,6 +45,9 @@ import { ModalStackNavigationProp } from './ModalStack';
 type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
   [SCREEN_COMPOSE]: HeaderTitleParams | undefined;
+  [SCREEN_VIEW_PROTECTED_NOTE]: {
+    onPressView: () => void;
+  };
 };
 
 export type AppStackNavigationProp<
@@ -263,6 +271,13 @@ export const AppStackComponent = (
                 ),
             })}
             component={Compose}
+          />
+          <AppStack.Screen
+            name={SCREEN_VIEW_PROTECTED_NOTE}
+            options={() => ({
+              title: 'View Protected Note',
+            })}
+            component={ViewProtectedNote}
           />
         </AppStack.Navigator>
       </DrawerLayout>
