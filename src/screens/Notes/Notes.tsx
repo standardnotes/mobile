@@ -280,7 +280,7 @@ export const Notes = React.memo(
       const selectedTag = application?.getAppState().selectedTag;
       const options = [
         {
-          label: 'Protected Contents',
+          label: 'Include Protected Contents',
           selected: includeProtectedNoteText,
           onPress: toggleIncludeProtected,
         },
