@@ -206,6 +206,7 @@ export const NoteList = (props: Props) => {
           <SearchOptionsContainer>
             {props.searchOptions.map(({ selected, onPress, label }, index) => (
               <Chip
+                key={label}
                 selected={selected}
                 onPress={onPress}
                 label={label}
