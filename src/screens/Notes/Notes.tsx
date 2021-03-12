@@ -227,14 +227,24 @@ export const Notes = React.memo(
                   includeProtected ?? includeProtectedNoteText,
               }
             : undefined;
+
+        let applyFilters = false;
+        if (typeof searchFilter !== 'undefined') {
+          applyFilters = searchFilter !== '';
+        } else if (typeof searchText !== 'undefined') {
+          applyFilters = searchText !== '';
+        }
+
         const criteria = NotesDisplayCriteria.Create({
           sortProperty: sortOptions?.sortBy ?? (sortBy! as CollectionSort),
           sortDirection:
             sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
           tags: tag ? [tag] : [],
           searchQuery: searchQuery,
-          includeArchived: includeArchived ?? includeArchivedNotes,
-          includeTrashed: includeTrashed ?? includeTrashedNotes,
+          includeArchived:
+            applyFilters && (includeArchived ?? includeArchivedNotes),
+          includeTrashed:
+            applyFilters && (includeTrashed ?? includeTrashedNotes),
         });
         application!.setNotesDisplayCriteria(criteria);
       },
