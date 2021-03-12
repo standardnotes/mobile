@@ -1,11 +1,15 @@
 import { Chip } from '@Components/Chip';
 import { AppStateEventType, AppStateType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
+import { SCREEN_NOTES } from '@Screens/screens';
 import { CollectionSort, SNNote } from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
+  Dispatch,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -53,6 +57,8 @@ type Props = {
   notes: SNNote[];
   refreshing: boolean;
   onRefresh: () => void;
+  shouldFocusSearch: boolean;
+  setShouldFocusSearch: Dispatch<SetStateAction<boolean>>;
 };
 
 export const NoteList = (props: Props) => {
@@ -66,12 +72,18 @@ export const NoteList = (props: Props) => {
   // State
   const [searchText, setSearchText] = useState(' ');
   const [showSearchOptions, setShowSearchOptions] = useState(false);
+  const [isFocusingSearch, setIsFocusingSearch] = useState(false);
 
   // Ref
   const searchBoxInputRef = useRef<IosSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
 
-  const dissmissKeybard = () => {
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
+  >();
+
+  const dismissKeyboard = () => {
+    setIsFocusingSearch(false);
     searchBoxInputRef.current?.blur();
   };
 
@@ -80,7 +92,7 @@ export const NoteList = (props: Props) => {
       ?.getAppState()
       .addStateEventObserver(state => {
         if (state === AppStateEventType.DrawerOpen) {
-          dissmissKeybard();
+          dismissKeyboard();
         }
       });
 
@@ -112,9 +124,22 @@ export const NoteList = (props: Props) => {
     setSearchText('');
   }, []);
 
+  const { shouldFocusSearch, setShouldFocusSearch } = props;
+
+  useEffect(() => {
+    const removeFocusScreenListener = navigation.addListener('focus', () => {
+      if (shouldFocusSearch) {
+        setIsFocusingSearch(true);
+        searchBoxInputRef.current?.focus();
+      }
+    });
+
+    return removeFocusScreenListener;
+  }, [navigation, shouldFocusSearch, setShouldFocusSearch]);
+
   useFocusEffect(
     useCallback(() => {
-      return dissmissKeybard;
+      return dismissKeyboard;
     }, [])
   );
 
@@ -124,6 +149,7 @@ export const NoteList = (props: Props) => {
   };
 
   const onSearchFocus = () => {
+    setShouldFocusSearch(false);
     setShowSearchOptions(true);
   };
 
@@ -169,14 +195,17 @@ export const NoteList = (props: Props) => {
             textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
             onChangeText={onChangeSearchText}
             onSearchButtonPress={() => {
+              setIsFocusingSearch(false);
               searchBoxInputRef.current?.blur();
             }}
             onCancelButtonPress={() => {
+              setIsFocusingSearch(false);
               searchBoxInputRef.current?.blur();
               props.onSearchCancel();
             }}
             onFocus={onSearchFocus}
             onBlur={onSearchBlur}
+            showsCancelButton={isFocusingSearch}
           />
         )}
         {Platform.OS === 'android' && (
@@ -202,7 +231,7 @@ export const NoteList = (props: Props) => {
             ]}
           />
         )}
-        {showSearchOptions && (
+        {(showSearchOptions || isFocusingSearch) && (
           <SearchOptionsContainer
             horizontal
             showsHorizontalScrollIndicator={false}

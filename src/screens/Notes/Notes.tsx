@@ -95,6 +95,7 @@ export const Notes = React.memo(
     const [includeTrashedNotes, setIncludeTrashedNotes] = useState<boolean>(
       true
     );
+    const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false);
 
     // Ref
     const haveDisplayOptions = useRef(false);
@@ -263,6 +264,8 @@ export const Notes = React.memo(
     );
 
     const toggleIncludeProtected = useCallback(async () => {
+      setShouldFocusSearch(true);
+
       const includeProtected = !includeProtectedNoteText;
       const allowToggling = includeProtected
         ? await application?.authorizeSearchingProtectedNotesText()
@@ -577,6 +580,8 @@ export const Notes = React.memo(
               : undefined
           }
           searchOptions={searchOptions}
+          shouldFocusSearch={shouldFocusSearch}
+          setShouldFocusSearch={setShouldFocusSearch}
         />
         <FAB
           // @ts-ignore style prop does not exist in types
