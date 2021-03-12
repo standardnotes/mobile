@@ -219,13 +219,14 @@ export const Notes = React.memo(
         includeTrashed?: boolean
       ) => {
         const tag = application!.getAppState().selectedTag;
-        const searchQuery = searchText
-          ? {
-              query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
-              includeProtectedNoteText:
-                includeProtected ?? includeProtectedNoteText,
-            }
-          : undefined;
+        const searchQuery =
+          searchText || searchFilter
+            ? {
+                query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
+                includeProtectedNoteText:
+                  includeProtected ?? includeProtectedNoteText,
+              }
+            : undefined;
         const criteria = NotesDisplayCriteria.Create({
           sortProperty: sortOptions?.sortBy ?? (sortBy! as CollectionSort),
           sortDirection:
