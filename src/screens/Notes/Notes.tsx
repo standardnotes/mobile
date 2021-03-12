@@ -108,7 +108,10 @@ export const Notes = React.memo(
         let title = '';
         if (newNotes && (newFilter ?? searchText).length > 0) {
           const resultCount = newNotes.length;
-          title = `${resultCount} search results`;
+          title =
+            resultCount > 1
+              ? `${resultCount} search results`
+              : `${resultCount} search result`;
         } else if (application?.getAppState().selectedTag) {
           title = application.getAppState().selectedTag!.title;
         }
