@@ -28,7 +28,6 @@ type Props = {
   hideDates: boolean;
   hidePreviews: boolean;
   sortType: CollectionSort;
-  showProtectedContent: boolean;
 };
 
 export const NoteCell = ({
@@ -38,7 +37,6 @@ export const NoteCell = ({
   sortType,
   hideDates,
   hidePreviews,
-  showProtectedContent,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -187,10 +185,7 @@ export const NoteCell = ({
   };
 
   const padding = 14;
-  const showPreview =
-    !hidePreviews &&
-    (!note.protected || showProtectedContent) &&
-    !note.hidePreview;
+  const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
   const hasPlainPreview =
     !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
   const showDetails = !note.errorDecrypting && (!hideDates || note.protected);

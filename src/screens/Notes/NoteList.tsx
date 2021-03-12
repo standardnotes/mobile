@@ -42,7 +42,6 @@ type Props = {
     onPress: () => void;
     label: string;
   }[];
-  showProtectedContents: boolean;
   onPressItem: (noteUuid: SNNote['uuid']) => void;
   selectedNoteId: string | undefined;
   sortType: CollectionSort;
@@ -141,7 +140,6 @@ export const NoteList = (props: Props) => {
         hideDates={props.hideDates}
         hidePreviews={props.hidePreviews}
         highlighted={item.uuid === props.selectedNoteId}
-        showProtectedContent={props.showProtectedContents}
       />
     );
   };
