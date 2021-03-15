@@ -83,7 +83,6 @@ export const NoteList = (props: Props) => {
   >();
 
   const dismissKeyboard = () => {
-    setIsFocusingSearch(false);
     searchBoxInputRef.current?.blur();
   };
 
@@ -149,11 +148,18 @@ export const NoteList = (props: Props) => {
   };
 
   const onSearchFocus = () => {
-    setShouldFocusSearch(false);
+    if (shouldFocusSearch) {
+      setShouldFocusSearch(false);
+    }
+
     setShowSearchOptions(true);
   };
 
   const onSearchBlur = () => {
+    if (isFocusingSearch) {
+      setIsFocusingSearch(false);
+    }
+
     setShowSearchOptions(false);
   };
 
@@ -195,11 +201,9 @@ export const NoteList = (props: Props) => {
             textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
             onChangeText={onChangeSearchText}
             onSearchButtonPress={() => {
-              setIsFocusingSearch(false);
               searchBoxInputRef.current?.blur();
             }}
             onCancelButtonPress={() => {
-              setIsFocusingSearch(false);
               searchBoxInputRef.current?.blur();
               props.onSearchCancel();
             }}
@@ -231,7 +235,7 @@ export const NoteList = (props: Props) => {
             ]}
           />
         )}
-        {(showSearchOptions || isFocusingSearch) && (
+        {showSearchOptions && (
           <SearchOptionsContainer
             horizontal
             showsHorizontalScrollIndicator={false}
