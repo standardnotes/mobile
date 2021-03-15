@@ -12,4 +12,4 @@ export const SCREEN_MANAGE_SESSIONS = 'ManageSessions' as 'ManageSessions';
 
 export const MODAL_BLOCKING_ALERT = 'ModalBlockingAlert' as 'ModalBlockingAlert';
 
-export const SCREEN_VIEW_PROTECTED_NOTE = 'ViewProtectedNote';
+export const SCREEN_VIEW_PROTECTED_NOTE = 'ViewProtectedNote' as 'ViewProtectedNote';

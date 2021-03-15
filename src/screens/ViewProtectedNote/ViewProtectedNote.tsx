@@ -1,7 +1,9 @@
 import { Button } from '@Components/Button';
+import { useFocusEffect } from '@react-navigation/native';
+import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
-import { SCREEN_VIEW_PROTECTED_NOTE } from '@Screens/screens';
-import React from 'react';
+import { SCREEN_SETTINGS, SCREEN_VIEW_PROTECTED_NOTE } from '@Screens/screens';
+import React, { useCallback, useContext } from 'react';
 import { Container, Text, Title } from './ViewProtectedNote.styled';
 
 type Props = AppStackNavigationProp<typeof SCREEN_VIEW_PROTECTED_NOTE>;
@@ -10,15 +12,37 @@ export const ViewProtectedNote = ({
   route: {
     params: { onPressView },
   },
+  navigation,
 }: Props) => {
+  const application = useContext(ApplicationContext);
+
+  const onPressGoToSettings = () => {
+    navigation.navigate(SCREEN_SETTINGS);
+  };
+
+  const checkProtectionSources = useCallback(() => {
+    const hasProtectionSources = application?.hasProtectionSources();
+    if (hasProtectionSources) {
+      onPressView();
+    }
+  }, [application, onPressView]);
+
+  useFocusEffect(checkProtectionSources);
+
   return (
     <Container>
-      <Title>This note is Protected.</Title>
-      <Button label="View" onPress={onPressView} />
+      <Title>This note is protected</Title>
       <Text>
         Add a passcode, account, or biometrics to require authentication to view
         this note.
       </Text>
+      <Button
+        label="Go to Settings"
+        primary={true}
+        fullWidth={true}
+        onPress={onPressGoToSettings}
+      />
+      <Button label="View" fullWidth={true} last={true} onPress={onPressView} />
     </Container>
   );
 };
