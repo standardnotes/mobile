@@ -215,10 +215,12 @@ export const NoteList = (props: Props) => {
         {Platform.OS === 'android' && (
           <AndroidSearchBar
             onChangeText={onChangeSearchText}
-            onCancel={props.onSearchCancel}
+            onCancel={() => {
+              props.onSearchCancel();
+              onSearchBlur();
+            }}
             onDelete={props.onSearchCancel}
             onFocus={onSearchFocus}
-            onBlur={onSearchBlur}
             blurOnSubmit={true}
             backgroundColor={theme.stylekitBackgroundColor}
             titleCancelColor={theme.stylekitInfoColor}
