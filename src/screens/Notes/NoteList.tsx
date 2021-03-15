@@ -78,10 +78,6 @@ export const NoteList = (props: Props) => {
   const searchBoxInputRef = useRef<IosSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
 
-  const navigation = useNavigation<
-    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
-  >();
-
   const dismissKeyboard = () => {
     searchBoxInputRef.current?.blur();
   };
@@ -125,16 +121,14 @@ export const NoteList = (props: Props) => {
 
   const { shouldFocusSearch, setShouldFocusSearch } = props;
 
-  useEffect(() => {
-    const removeFocusScreenListener = navigation.addListener('focus', () => {
-      if (shouldFocusSearch) {
-        setIsFocusingSearch(true);
-        searchBoxInputRef.current?.focus();
-      }
-    });
+  const focusSearch = useCallback(() => {
+    if (shouldFocusSearch) {
+      setIsFocusingSearch(true);
+      searchBoxInputRef.current?.focus();
+    }
+  }, [shouldFocusSearch]);
 
-    return removeFocusScreenListener;
-  }, [navigation, shouldFocusSearch, setShouldFocusSearch]);
+  useFocusEffect(focusSearch);
 
   useFocusEffect(
     useCallback(() => {
