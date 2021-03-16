@@ -229,6 +229,8 @@ export const NoteList = (props: Props) => {
                 backgroundColor: theme.stylekitContrastBackgroundColor,
               },
             ]}
+            placeholderExpandedMargin={25}
+            searchIconCollapsedMargin={30}
           />
         )}
         {showSearchOptions && (
