@@ -1,10 +1,8 @@
 import { Chip } from '@Components/Chip';
 import { AppStateEventType, AppStateType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { AppStackNavigationProp } from '@Root/AppStack';
-import { SCREEN_NOTES } from '@Screens/screens';
 import { CollectionSort, SNNote } from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
@@ -69,17 +67,16 @@ export const NoteList = (props: Props) => {
   const theme = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
 
-  // State
-  const [searchText, setSearchText] = useState(' ');
   const [showSearchOptions, setShowSearchOptions] = useState(false);
   const [isFocusingSearch, setIsFocusingSearch] = useState(false);
 
   // Ref
-  const searchBoxInputRef = useRef<IosSearchBar>(null);
+  const iosSearchBarInputRef = useRef<IosSearchBar>(null);
+  const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
 
   const dismissKeyboard = () => {
-    searchBoxInputRef.current?.blur();
+    iosSearchBarInputRef.current?.blur();
   };
 
   useEffect(() => {
@@ -112,21 +109,15 @@ export const NoteList = (props: Props) => {
     return unsubscribeTagChangedEventObserver;
   }, [application, scrollListToTop]);
 
-  useEffect(() => {
-    /**
-     * Android workaound to fix clear search not working
-     */
-    setSearchText('');
-  }, []);
-
-  const { shouldFocusSearch, setShouldFocusSearch } = props;
+  const { shouldFocusSearch, searchText } = props;
 
   const focusSearch = useCallback(() => {
     if (shouldFocusSearch) {
       setIsFocusingSearch(true);
-      searchBoxInputRef.current?.focus();
+      iosSearchBarInputRef.current?.focus();
+      androidSearchBarInputRef.current?.focus(searchText);
     }
-  }, [shouldFocusSearch]);
+  }, [shouldFocusSearch, searchText]);
 
   useFocusEffect(focusSearch);
 
@@ -143,7 +134,7 @@ export const NoteList = (props: Props) => {
 
   const onSearchFocus = () => {
     if (shouldFocusSearch) {
-      setShouldFocusSearch(false);
+      props.setShouldFocusSearch(false);
     }
 
     setShowSearchOptions(true);
@@ -182,7 +173,7 @@ export const NoteList = (props: Props) => {
       <HeaderContainer>
         {Platform.OS === 'ios' && (
           <IosSearchBar
-            ref={searchBoxInputRef}
+            ref={iosSearchBarInputRef}
             keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
             placeholder="Search"
             text={searchText}
@@ -195,10 +186,10 @@ export const NoteList = (props: Props) => {
             textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
             onChangeText={onChangeSearchText}
             onSearchButtonPress={() => {
-              searchBoxInputRef.current?.blur();
+              iosSearchBarInputRef.current?.blur();
             }}
             onCancelButtonPress={() => {
-              searchBoxInputRef.current?.blur();
+              iosSearchBarInputRef.current?.blur();
               props.onSearchCancel();
             }}
             onFocus={onSearchFocus}
@@ -208,13 +199,12 @@ export const NoteList = (props: Props) => {
         )}
         {Platform.OS === 'android' && (
           <AndroidSearchBar
+            ref={androidSearchBarInputRef}
             onChangeText={onChangeSearchText}
-            onCancel={() => {
-              props.onSearchCancel();
-              onSearchBlur();
-            }}
+            onCancel={props.onSearchCancel}
             onDelete={props.onSearchCancel}
             onFocus={onSearchFocus}
+            onBlur={onSearchBlur}
             blurOnSubmit={true}
             backgroundColor={theme.stylekitBackgroundColor}
             titleCancelColor={theme.stylekitInfoColor}
@@ -237,6 +227,7 @@ export const NoteList = (props: Props) => {
           <SearchOptionsContainer
             horizontal
             showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps={'handled'}
           >
             {props.searchOptions.map(({ selected, onPress, label }, index) => (
               <Chip
