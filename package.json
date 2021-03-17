@@ -47,7 +47,7 @@
     "react-native-safe-area-context": "^3.1.9",
     "react-native-screens": "^2.16.1",
     "react-native-search-bar": "standardnotes/react-native-search-bar#7d2139d",
-    "react-native-search-box": "standardnotes/react-native-search-box#fa2cfcab048eaac19e2de0795b54bf7fde80e6d1",
+    "react-native-search-box": "standardnotes/react-native-search-box#36e34e7ddebc9b65ab1fc67c2905d145199db91c",
     "react-native-sodium": "standardnotes/react-native-sodium#17b240ea0c2656c89b83cd0168acfbb64f67f0e1",
     "react-native-store-review": "^0.1.5",
     "react-native-tab-view": "^2.15.2",
