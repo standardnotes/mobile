@@ -1,5 +1,7 @@
-import React from 'react';
-import styled, { css } from 'styled-components/native';
+import React, { useRef } from 'react';
+import { Animated } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import styled, { css, ThemeContext } from 'styled-components/native';
 
 type Props = {
   selected: boolean;
@@ -8,36 +10,82 @@ type Props = {
   last?: boolean;
 };
 
-const Container = styled.TouchableOpacity<{
-  selected: boolean;
+const Container = styled.View<{
   last?: boolean;
 }>`
   border-radius: 100px;
   padding: 5px 10px;
   border-width: 1px;
-  background-color: ${({ selected, theme }) =>
-    selected ? theme.stylekitInfoColor : theme.stylekitInfoContrastColor}
-  border-color: ${({ selected, theme }) =>
-    selected ? theme.stylekitInfoColor : theme.stylekitBorderColor}
-    ${({ last }) =>
-      !last &&
-      css`
-        margin-right: 8px;
-      `};
+  ${({ last }) =>
+    !last &&
+    css`
+      margin-right: 8px;
+    `};
 `;
 
 const Label = styled.Text<{ selected: boolean }>`
   font-size: 14px;
-  color: ${({ selected, theme }) =>
-    selected ? theme.stylekitNeutralContrastColor : theme.stylekitNeutralColor};
 `;
 
-export const Chip: React.FC<Props> = props => (
-  <Container
-    selected={props.selected}
-    onPress={props.onPress}
-    last={props.last}
-  >
-    <Label selected={props.selected}>{props.label}</Label>
-  </Container>
-);
+export const Chip: React.FC<Props> = props => {
+  const animationValue = useRef(new Animated.Value(props.selected ? 100 : 0))
+    .current;
+
+  const toggleChip = () => {
+    Animated.timing(animationValue, {
+      toValue: props.selected ? 0 : 100,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const onPress = () => {
+    toggleChip();
+    props.onPress();
+  };
+
+  return (
+    <ThemeContext.Consumer>
+      {theme => (
+        <TouchableWithoutFeedback onPress={onPress}>
+          <Container
+            as={Animated.View}
+            last={props.last}
+            style={{
+              backgroundColor: animationValue.interpolate({
+                inputRange: [0, 100],
+                outputRange: [
+                  theme.stylekitInfoContrastColor,
+                  theme.stylekitInfoColor,
+                ],
+              }),
+              borderColor: animationValue.interpolate({
+                inputRange: [0, 100],
+                outputRange: [
+                  theme.stylekitBorderColor,
+                  theme.stylekitInfoColor,
+                ],
+              }),
+            }}
+          >
+            <Label
+              as={Animated.Text}
+              selected={props.selected}
+              style={{
+                color: animationValue.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: [
+                    theme.stylekitNeutralColor,
+                    theme.stylekitNeutralContrastColor,
+                  ],
+                }),
+              }}
+            >
+              {props.label}
+            </Label>
+          </Container>
+        </TouchableWithoutFeedback>
+      )}
+    </ThemeContext.Consumer>
+  );
+};
