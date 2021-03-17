@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import styled, { css, ThemeContext } from 'styled-components/native';
@@ -27,22 +27,24 @@ const Label = styled.Text<{ selected: boolean }>`
   font-size: 14px;
 `;
 
-export const Chip: React.FC<Props> = props => {
-  const animationValue = useRef(new Animated.Value(props.selected ? 100 : 0))
-    .current;
+export const Chip: React.FC<Props> = ({ selected, onPress, label, last }) => {
+  const animationValue = useRef(new Animated.Value(selected ? 100 : 0)).current;
+  const selectedRef = useRef<boolean>(selected);
 
-  const toggleChip = () => {
+  const toggleChip = useCallback(() => {
     Animated.timing(animationValue, {
-      toValue: props.selected ? 0 : 100,
+      toValue: selected ? 100 : 0,
       duration: 250,
       useNativeDriver: false,
     }).start();
-  };
+  }, [animationValue, selected]);
 
-  const onPress = () => {
-    toggleChip();
-    props.onPress();
-  };
+  useEffect(() => {
+    if (selected !== selectedRef.current) {
+      toggleChip();
+      selectedRef.current = selected;
+    }
+  }, [selected, toggleChip]);
 
   return (
     <ThemeContext.Consumer>
@@ -50,7 +52,7 @@ export const Chip: React.FC<Props> = props => {
         <TouchableWithoutFeedback onPress={onPress}>
           <Container
             as={Animated.View}
-            last={props.last}
+            last={last}
             style={{
               backgroundColor: animationValue.interpolate({
                 inputRange: [0, 100],
@@ -70,7 +72,7 @@ export const Chip: React.FC<Props> = props => {
           >
             <Label
               as={Animated.Text}
-              selected={props.selected}
+              selected={selected}
               style={{
                 color: animationValue.interpolate({
                   inputRange: [0, 100],
@@ -81,7 +83,7 @@ export const Chip: React.FC<Props> = props => {
                 }),
               }}
             >
-              {props.label}
+              {label}
             </Label>
           </Container>
         </TouchableWithoutFeedback>
