@@ -137,7 +137,7 @@ export const NoteList = (props: Props) => {
   const toggleSearchOptions = (showOptions: boolean) => {
     Animated.timing(searchOptionsTopMargin, {
       toValue: showOptions ? 0 : -40,
-      duration: 150,
+      duration: 100,
       useNativeDriver: false,
     }).start();
   };
