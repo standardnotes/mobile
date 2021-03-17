@@ -34,7 +34,7 @@ export const Chip: React.FC<Props> = props => {
   const toggleChip = () => {
     Animated.timing(animationValue, {
       toValue: props.selected ? 0 : 100,
-      duration: 500,
+      duration: 250,
       useNativeDriver: false,
     }).start();
   };
