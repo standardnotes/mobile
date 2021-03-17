@@ -38,6 +38,7 @@ export const HeaderContainer = styled.View`
 `;
 
 export const SearchBarContainer = styled.View`
+  background-color: ${props => props.theme.stylekitBackgroundColor};
   z-index: 2;
   elevation: 2;
 `;
