@@ -15,6 +15,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  Animated,
   FlatList,
   ListRenderItem,
   Platform,
@@ -30,6 +31,7 @@ import {
   HeaderContainer,
   LoadingContainer,
   LoadingText,
+  SearchBarContainer,
   SearchOptionsContainer,
   styles,
 } from './NoteList.styled';
@@ -67,10 +69,10 @@ export const NoteList = (props: Props) => {
   const theme = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
 
-  const [showSearchOptions, setShowSearchOptions] = useState(false);
   const [isFocusingSearch, setIsFocusingSearch] = useState(false);
 
   // Ref
+  const searchOptionsTopMargin = useRef(new Animated.Value(-40)).current;
   const iosSearchBarInputRef = useRef<IosSearchBar>(null);
   const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
@@ -132,12 +134,20 @@ export const NoteList = (props: Props) => {
     scrollListToTop();
   };
 
+  const toggleSearchOptions = (showOptions: boolean) => {
+    Animated.timing(searchOptionsTopMargin, {
+      toValue: showOptions ? 0 : -40,
+      duration: 150,
+      useNativeDriver: false,
+    }).start();
+  };
+
   const onSearchFocus = () => {
     if (shouldFocusSearch) {
       props.setShouldFocusSearch(false);
+    } else {
+      toggleSearchOptions(true);
     }
-
-    setShowSearchOptions(true);
   };
 
   const onSearchBlur = () => {
@@ -145,7 +155,9 @@ export const NoteList = (props: Props) => {
       setIsFocusingSearch(false);
     }
 
-    setShowSearchOptions(false);
+    if (!shouldFocusSearch && !isFocusingSearch) {
+      toggleSearchOptions(false);
+    }
   };
 
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
@@ -171,75 +183,77 @@ export const NoteList = (props: Props) => {
   return (
     <Container>
       <HeaderContainer>
-        {Platform.OS === 'ios' && (
-          <IosSearchBar
-            ref={iosSearchBarInputRef}
-            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
-            placeholder="Search"
-            text={searchText}
-            hideBackground
-            /**
-             * keyboardColorForActiveTheme returns the same value as apperance
-             */
-            appearance={themeService?.keyboardColorForActiveTheme()}
-            barTintColor={theme.stylekitInfoColor}
-            textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
-            onChangeText={onChangeSearchText}
-            onSearchButtonPress={() => {
-              iosSearchBarInputRef.current?.blur();
-            }}
-            onCancelButtonPress={() => {
-              iosSearchBarInputRef.current?.blur();
-              props.onSearchCancel();
-            }}
-            onFocus={onSearchFocus}
-            onBlur={onSearchBlur}
-            showsCancelButton={isFocusingSearch}
-          />
-        )}
-        {Platform.OS === 'android' && (
-          <AndroidSearchBar
-            ref={androidSearchBarInputRef}
-            onChangeText={onChangeSearchText}
-            onCancel={props.onSearchCancel}
-            onDelete={props.onSearchCancel}
-            onFocus={onSearchFocus}
-            onBlur={onSearchBlur}
-            blurOnSubmit={true}
-            backgroundColor={theme.stylekitBackgroundColor}
-            titleCancelColor={theme.stylekitInfoColor}
-            keyboardDismissMode={'interactive'}
-            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
-            inputBorderRadius={4}
-            tintColorSearch={theme.stylekitForegroundColor}
-            inputStyle={[
-              styles.androidSearch,
-              {
-                color: theme.stylekitForegroundColor,
-                backgroundColor: theme.stylekitContrastBackgroundColor,
-              },
-            ]}
-            placeholderExpandedMargin={25}
-            searchIconCollapsedMargin={30}
-          />
-        )}
-        {showSearchOptions && (
-          <SearchOptionsContainer
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyboardShouldPersistTaps={'handled'}
-          >
-            {props.searchOptions.map(({ selected, onPress, label }, index) => (
-              <Chip
-                key={label}
-                selected={selected}
-                onPress={onPress}
-                label={label}
-                last={index === props.searchOptions.length - 1}
-              />
-            ))}
-          </SearchOptionsContainer>
-        )}
+        <SearchBarContainer>
+          {Platform.OS === 'ios' && (
+            <IosSearchBar
+              ref={iosSearchBarInputRef}
+              keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
+              placeholder="Search"
+              text={searchText}
+              hideBackground
+              /**
+               * keyboardColorForActiveTheme returns the same value as apperance
+               */
+              appearance={themeService?.keyboardColorForActiveTheme()}
+              barTintColor={theme.stylekitInfoColor}
+              textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
+              onChangeText={onChangeSearchText}
+              onSearchButtonPress={() => {
+                iosSearchBarInputRef.current?.blur();
+              }}
+              onCancelButtonPress={() => {
+                iosSearchBarInputRef.current?.blur();
+                props.onSearchCancel();
+              }}
+              onFocus={onSearchFocus}
+              onBlur={onSearchBlur}
+              showsCancelButton={isFocusingSearch}
+            />
+          )}
+          {Platform.OS === 'android' && (
+            <AndroidSearchBar
+              ref={androidSearchBarInputRef}
+              onChangeText={onChangeSearchText}
+              onCancel={props.onSearchCancel}
+              onDelete={props.onSearchCancel}
+              onFocus={onSearchFocus}
+              onBlur={onSearchBlur}
+              blurOnSubmit={true}
+              backgroundColor={theme.stylekitBackgroundColor}
+              titleCancelColor={theme.stylekitInfoColor}
+              keyboardDismissMode={'interactive'}
+              keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
+              inputBorderRadius={4}
+              tintColorSearch={theme.stylekitForegroundColor}
+              inputStyle={[
+                styles.androidSearch,
+                {
+                  color: theme.stylekitForegroundColor,
+                  backgroundColor: theme.stylekitContrastBackgroundColor,
+                },
+              ]}
+              placeholderExpandedMargin={25}
+              searchIconCollapsedMargin={30}
+            />
+          )}
+        </SearchBarContainer>
+        <SearchOptionsContainer
+          as={Animated.ScrollView}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyboardShouldPersistTaps={'always'}
+          style={{ marginTop: searchOptionsTopMargin }}
+        >
+          {props.searchOptions.map(({ selected, onPress, label }, index) => (
+            <Chip
+              key={label}
+              selected={selected}
+              onPress={onPress}
+              label={label}
+              last={index === props.searchOptions.length - 1}
+            />
+          ))}
+        </SearchOptionsContainer>
       </HeaderContainer>
       <FlatList
         ref={noteListRef}

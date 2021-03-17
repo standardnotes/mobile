@@ -37,6 +37,11 @@ export const HeaderContainer = styled.View`
   padding-right: 5px;
 `;
 
+export const SearchBarContainer = styled.View`
+  z-index: 2;
+  elevation: 2;
+`;
+
 export const SearchOptionsContainer = styled.ScrollView`
   display: flex;
   flex-direction: row;
@@ -45,6 +50,6 @@ export const SearchOptionsContainer = styled.ScrollView`
   ${() =>
     Platform.OS === 'android' &&
     css`
-      margin-top: 4px;
+      padding-top: 4px;
     `}
 `;
