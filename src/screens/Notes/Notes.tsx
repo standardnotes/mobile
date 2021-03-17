@@ -319,7 +319,7 @@ export const Notes = React.memo(
         },
       ];
 
-      if (selectedTag?.isAllTag) {
+      if (!selectedTag?.isArchiveTag && !selectedTag?.isTrashTag) {
         setSearchOptions([
           ...options,
           {
