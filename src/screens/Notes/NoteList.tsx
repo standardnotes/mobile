@@ -72,7 +72,8 @@ export const NoteList = (props: Props) => {
   const [isFocusingSearch, setIsFocusingSearch] = useState(false);
 
   // Ref
-  const searchOptionsTopMargin = useRef(new Animated.Value(-40)).current;
+  const opacityAnimationValue = useRef(new Animated.Value(0)).current;
+  const marginTopAnimationValue = useRef(new Animated.Value(-40)).current;
   const iosSearchBarInputRef = useRef<IosSearchBar>(null);
   const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
@@ -135,11 +136,18 @@ export const NoteList = (props: Props) => {
   };
 
   const toggleSearchOptions = (showOptions: boolean) => {
-    Animated.timing(searchOptionsTopMargin, {
-      toValue: showOptions ? 0 : -40,
-      duration: 100,
-      useNativeDriver: false,
-    }).start();
+    Animated.parallel([
+      Animated.timing(opacityAnimationValue, {
+        toValue: showOptions ? 1 : 0,
+        duration: 400,
+        useNativeDriver: false,
+      }),
+      Animated.timing(marginTopAnimationValue, {
+        toValue: showOptions ? 0 : -40,
+        duration: 100,
+        useNativeDriver: false,
+      }),
+    ]).start();
   };
 
   const onSearchFocus = () => {
@@ -242,7 +250,10 @@ export const NoteList = (props: Props) => {
           horizontal
           showsHorizontalScrollIndicator={false}
           keyboardShouldPersistTaps={'always'}
-          style={{ marginTop: searchOptionsTopMargin }}
+          style={{
+            opacity: opacityAnimationValue,
+            marginTop: marginTopAnimationValue,
+          }}
         >
           {props.searchOptions.map(({ selected, onPress, label }, index) => (
             <Chip
