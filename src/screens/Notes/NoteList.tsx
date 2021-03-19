@@ -139,12 +139,12 @@ export const NoteList = (props: Props) => {
     Animated.parallel([
       Animated.timing(opacityAnimationValue, {
         toValue: showOptions ? 1 : 0,
-        duration: 400,
+        duration: 200,
         useNativeDriver: false,
       }),
       Animated.timing(marginTopAnimationValue, {
         toValue: showOptions ? 0 : -40,
-        duration: 100,
+        duration: 200,
         useNativeDriver: false,
       }),
     ]).start();
