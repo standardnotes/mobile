@@ -71,3 +71,8 @@
 
 -keep class com.samsung.android.sdk.** { *; }
 -dontwarn com.samsung.android.sdk.**
+
+# Hermes
+
+-keep class com.facebook.hermes.unicode.** { *; }
+-keep class com.facebook.jni.** { *; }
