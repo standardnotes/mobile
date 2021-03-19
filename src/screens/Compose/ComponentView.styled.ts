@@ -32,6 +32,7 @@ export const StyledWebview = styled(WebView)`
   flex: 1;
   background-color: transparent;
   opacity: 0.99;
+  min-height: 1px;
 `;
 
 export const StyledIcon = styled(Icon).attrs(({ theme }) => ({
