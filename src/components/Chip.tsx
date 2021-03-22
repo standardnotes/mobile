@@ -53,7 +53,7 @@ export const Chip: React.FC<Props> = ({ selected, onPress, label, last }) => {
   const toggleChip = useCallback(() => {
     Animated.timing(animationValue, {
       toValue: selected ? 1 : 0,
-      duration: 250,
+      duration: 100,
       useNativeDriver: true,
     }).start();
   }, [animationValue, selected]);
