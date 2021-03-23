@@ -5,7 +5,11 @@ import { useSignedIn, useSyncStatus } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
-import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
+import {
+  SCREEN_COMPOSE,
+  SCREEN_NOTES,
+  SCREEN_VIEW_PROTECTED_NOTE,
+} from '@Screens/screens';
 import {
   CollectionSort,
   ContentType,
@@ -25,6 +29,12 @@ import FAB from 'react-native-fab';
 import { ThemeContext } from 'styled-components/native';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';
+
+type SearchOptions = {
+  selected: boolean;
+  onPress: () => void;
+  label: string;
+}[];
 
 export const Notes = React.memo(
   ({
@@ -68,16 +78,41 @@ export const Notes = React.memo(
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
     const [searchText, setSearchText] = useState('');
     const [editor, setEditor] = useState<Editor | undefined>(undefined);
+    const [searchOptions, setSearchOptions] = useState<SearchOptions>([]);
+    const [
+      includeProtectedNoteText,
+      setIncludeProtectedNoteText,
+    ] = useState<boolean>(
+      () =>
+        !(
+          application!.hasProtectionSources() &&
+          application!.areProtectionsEnabled()
+        )
+    );
+    const [includeArchivedNotes, setIncludeArchivedNotes] = useState<boolean>(
+      true
+    );
+    const [includeTrashedNotes, setIncludeTrashedNotes] = useState<boolean>(
+      true
+    );
+    const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false);
 
     // Ref
     const haveDisplayOptions = useRef(false);
+    const protectionsEnabled = useRef(
+      application!.hasProtectionSources() &&
+        application!.areProtectionsEnabled()
+    );
 
     const reloadTitle = useCallback(
       (newNotes?: SNNote[], newFilter?: string) => {
         let title = '';
         if (newNotes && (newFilter ?? searchText).length > 0) {
           const resultCount = newNotes.length;
-          title = `${resultCount} search results`;
+          title =
+            resultCount === 1
+              ? `${resultCount} search result`
+              : `${resultCount} search results`;
         } else if (application?.getAppState().selectedTag) {
           title = application.getAppState().selectedTag!.title;
         }
@@ -92,20 +127,26 @@ export const Notes = React.memo(
     );
 
     const openCompose = useCallback(
-      (newNote: boolean) => {
+      (newNote: boolean, replaceScreen: boolean = false) => {
         if (!shouldSplitLayout) {
-          navigation.navigate(SCREEN_COMPOSE, {
-            title: newNote ? 'Compose' : 'Note',
-          });
+          if (replaceScreen) {
+            navigation.replace(SCREEN_COMPOSE, {
+              title: newNote ? 'Compose' : 'Note',
+            });
+          } else {
+            navigation.navigate(SCREEN_COMPOSE, {
+              title: newNote ? 'Compose' : 'Note',
+            });
+          }
         }
       },
       [navigation, shouldSplitLayout]
     );
 
     const openNote = useCallback(
-      async (noteUuid: SNNote['uuid']) => {
+      async (noteUuid: SNNote['uuid'], replaceScreen: boolean = false) => {
         await application!.getAppState().openEditor(noteUuid);
-        openCompose(false);
+        openCompose(false, replaceScreen);
       },
       [application, openCompose]
     );
@@ -124,12 +165,18 @@ export const Notes = React.memo(
               );
             }
           }
+
+          if (note.protected && !application?.hasProtectionSources()) {
+            return navigation.navigate(SCREEN_VIEW_PROTECTED_NOTE, {
+              onPressView: () => openNote(noteUuid, true),
+            });
+          }
           if (await application?.authorizeNoteAccess(note)) {
             openNote(noteUuid);
           }
         }
       },
-      [application, openNote]
+      [application, navigation, openNote]
     );
 
     useEffect(() => {
@@ -170,26 +217,134 @@ export const Notes = React.memo(
         sortOptions?: {
           sortBy?: CollectionSort;
           sortReverse: boolean;
-        }
+        },
+        includeProtected?: boolean,
+        includeArchived?: boolean,
+        includeTrashed?: boolean
       ) => {
         const tag = application!.getAppState().selectedTag;
-        const searchQuery = searchText
-          ? {
-              query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
-              includeProtectedNoteText: false,
-            }
-          : undefined;
+        const searchQuery =
+          searchText || searchFilter
+            ? {
+                query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
+                includeProtectedNoteText:
+                  includeProtected ?? includeProtectedNoteText,
+              }
+            : undefined;
+
+        let applyFilters = false;
+        if (typeof searchFilter !== 'undefined') {
+          applyFilters = searchFilter !== '';
+        } else if (typeof searchText !== 'undefined') {
+          applyFilters = searchText !== '';
+        }
+
         const criteria = NotesDisplayCriteria.Create({
           sortProperty: sortOptions?.sortBy ?? (sortBy! as CollectionSort),
           sortDirection:
             sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
           tags: tag ? [tag] : [],
           searchQuery: searchQuery,
+          includeArchived:
+            applyFilters && (includeArchived ?? includeArchivedNotes),
+          includeTrashed:
+            applyFilters && (includeTrashed ?? includeTrashedNotes),
         });
         application!.setNotesDisplayCriteria(criteria);
       },
-      [application, sortBy, sortReverse, searchText]
+      [
+        application,
+        includeArchivedNotes,
+        includeProtectedNoteText,
+        includeTrashedNotes,
+        sortBy,
+        sortReverse,
+        searchText,
+      ]
     );
+
+    const toggleIncludeProtected = useCallback(async () => {
+      setShouldFocusSearch(true);
+
+      const includeProtected = !includeProtectedNoteText;
+      const allowToggling = includeProtected
+        ? await application?.authorizeSearchingProtectedNotesText()
+        : true;
+
+      if (allowToggling) {
+        reloadNotesDisplayOptions(undefined, undefined, includeProtected);
+        setIncludeProtectedNoteText(includeProtected);
+      }
+    }, [application, includeProtectedNoteText, reloadNotesDisplayOptions]);
+
+    const toggleIncludeArchived = useCallback(() => {
+      const includeArchived = !includeArchivedNotes;
+      reloadNotesDisplayOptions(
+        undefined,
+        undefined,
+        undefined,
+        includeArchived
+      );
+      setIncludeArchivedNotes(includeArchived);
+    }, [includeArchivedNotes, reloadNotesDisplayOptions]);
+
+    const toggleIncludeTrashed = useCallback(() => {
+      const includeTrashed = !includeTrashedNotes;
+      reloadNotesDisplayOptions(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        includeTrashed
+      );
+      setIncludeTrashedNotes(includeTrashed);
+    }, [includeTrashedNotes, reloadNotesDisplayOptions]);
+
+    const reloadSearchOptions = useCallback(() => {
+      const protections =
+        application?.hasProtectionSources() &&
+        application?.areProtectionsEnabled();
+
+      if (protections !== protectionsEnabled.current) {
+        protectionsEnabled.current = !!protections;
+        setIncludeProtectedNoteText(!protections);
+      }
+
+      const selectedTag = application?.getAppState().selectedTag;
+      const options = [
+        {
+          label: 'Include Protected Contents',
+          selected: includeProtectedNoteText,
+          onPress: toggleIncludeProtected,
+        },
+      ];
+
+      if (!selectedTag?.isArchiveTag && !selectedTag?.isTrashTag) {
+        setSearchOptions([
+          ...options,
+          {
+            label: 'Archived',
+            selected: includeArchivedNotes,
+            onPress: toggleIncludeArchived,
+          },
+          {
+            label: 'Trashed',
+            selected: includeTrashedNotes,
+            onPress: toggleIncludeTrashed,
+          },
+        ]);
+      } else {
+        setSearchOptions(options);
+      }
+    }, [
+      application,
+      includeProtectedNoteText,
+      includeArchivedNotes,
+      includeTrashedNotes,
+      toggleIncludeProtected,
+      toggleIncludeArchived,
+      toggleIncludeTrashed,
+    ]);
 
     const getFirstSelectableNote = useCallback(
       (newNotes: SNNote[]) =>
@@ -226,11 +381,14 @@ export const Notes = React.memo(
           return;
         }
 
+        reloadSearchOptions();
+
         /** If no display options we set them initially */
         if (!haveDisplayOptions.current) {
           haveDisplayOptions.current = true;
           reloadNotesDisplayOptions();
         }
+
         const newNotes = application!.getDisplayableItems(
           ContentType.Note
         ) as SNNote[];
@@ -266,6 +424,7 @@ export const Notes = React.memo(
       [
         application,
         reloadNotesDisplayOptions,
+        reloadSearchOptions,
         reloadTitle,
         selectFirstNote,
         selectNextOrCreateNew,
@@ -420,6 +579,9 @@ export const Notes = React.memo(
               ? selectedNoteId
               : undefined
           }
+          searchOptions={searchOptions}
+          shouldFocusSearch={shouldFocusSearch}
+          setShouldFocusSearch={setShouldFocusSearch}
         />
         <FAB
           // @ts-ignore style prop does not exist in types

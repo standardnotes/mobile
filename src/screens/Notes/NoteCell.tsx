@@ -1,7 +1,6 @@
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
-  useProtectNoteAlert,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -42,7 +41,6 @@ export const NoteCell = ({
   // Context
   const application = useContext(ApplicationContext);
 
-  const [showProtectNoteAlert] = useProtectNoteAlert();
   const [changeNote] = useChangeNote(note);
   const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note);
 
@@ -148,11 +146,7 @@ export const NoteCell = ({
       options.push({
         text: note.protected ? 'Unprotect' : 'Protect',
         key: 'protect',
-        callback: async () => {
-          const protectedNote = note.protected;
-          await protectOrUnprotectNote();
-          showProtectNoteAlert(protectedNote);
-        },
+        callback: async () => await protectOrUnprotectNote(),
       });
 
       if (!note.trashed) {

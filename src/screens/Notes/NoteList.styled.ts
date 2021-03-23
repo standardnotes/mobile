@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import styled from 'styled-components/native';
+import { Platform, StyleSheet } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 // no support for generic types in Flatlist
 export const styles = StyleSheet.create({
@@ -32,7 +32,24 @@ export const LoadingText = styled.Text`
 `;
 
 export const HeaderContainer = styled.View`
-  padding-top: 3px;
+  padding-top: 3px
   padding-left: 5px;
   padding-right: 5px;
+`;
+
+export const SearchBarContainer = styled.View`
+  background-color: ${props => props.theme.stylekitBackgroundColor};
+  z-index: 2;
+`;
+
+export const SearchOptionsContainer = styled.ScrollView`
+  display: flex;
+  flex-direction: row;
+  margin-left: 8px;
+  margin-bottom: 12px;
+  ${() =>
+    Platform.OS === 'android' &&
+    css`
+      padding-top: 4px;
+    `}
 `;

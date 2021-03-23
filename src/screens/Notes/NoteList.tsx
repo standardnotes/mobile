@@ -1,3 +1,4 @@
+import { Chip } from '@Components/Chip';
 import { AppStateEventType, AppStateType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect } from '@react-navigation/native';
@@ -5,6 +6,8 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { CollectionSort, SNNote } from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
+  Dispatch,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -12,6 +15,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  Animated,
   FlatList,
   ListRenderItem,
   Platform,
@@ -27,6 +31,8 @@ import {
   HeaderContainer,
   LoadingContainer,
   LoadingText,
+  SearchBarContainer,
+  SearchOptionsContainer,
   styles,
 } from './NoteList.styled';
 import { OfflineBanner } from './OfflineBanner';
@@ -35,6 +41,11 @@ type Props = {
   onSearchChange: (text: string) => void;
   onSearchCancel: () => void;
   searchText: string;
+  searchOptions: {
+    selected: boolean;
+    onPress: () => void;
+    label: string;
+  }[];
   onPressItem: (noteUuid: SNNote['uuid']) => void;
   selectedNoteId: string | undefined;
   sortType: CollectionSort;
@@ -46,6 +57,8 @@ type Props = {
   notes: SNNote[];
   refreshing: boolean;
   onRefresh: () => void;
+  shouldFocusSearch: boolean;
+  setShouldFocusSearch: Dispatch<SetStateAction<boolean>>;
 };
 
 export const NoteList = (props: Props) => {
@@ -56,15 +69,17 @@ export const NoteList = (props: Props) => {
   const theme = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
 
-  // State
-  const [searchText, setSearchText] = useState(' ');
+  const [isFocusingSearch, setIsFocusingSearch] = useState(false);
 
   // Ref
-  const searchBoxInputRef = useRef<IosSearchBar>(null);
+  const opacityAnimationValue = useRef(new Animated.Value(0)).current;
+  const marginTopAnimationValue = useRef(new Animated.Value(-40)).current;
+  const iosSearchBarInputRef = useRef<IosSearchBar>(null);
+  const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
 
-  const dissmissKeybard = () => {
-    searchBoxInputRef.current?.blur();
+  const dismissKeyboard = () => {
+    iosSearchBarInputRef.current?.blur();
   };
 
   useEffect(() => {
@@ -72,7 +87,7 @@ export const NoteList = (props: Props) => {
       ?.getAppState()
       .addStateEventObserver(state => {
         if (state === AppStateEventType.DrawerOpen) {
-          dissmissKeybard();
+          dismissKeyboard();
         }
       });
 
@@ -97,22 +112,60 @@ export const NoteList = (props: Props) => {
     return unsubscribeTagChangedEventObserver;
   }, [application, scrollListToTop]);
 
-  useEffect(() => {
-    /**
-     * Android workaound to fix clear search not working
-     */
-    setSearchText('');
-  }, []);
+  const { shouldFocusSearch, searchText } = props;
+
+  const focusSearch = useCallback(() => {
+    if (shouldFocusSearch) {
+      setIsFocusingSearch(true);
+      iosSearchBarInputRef.current?.focus();
+      androidSearchBarInputRef.current?.focus(searchText);
+    }
+  }, [shouldFocusSearch, searchText]);
+
+  useFocusEffect(focusSearch);
 
   useFocusEffect(
     useCallback(() => {
-      return dissmissKeybard;
+      return dismissKeyboard;
     }, [])
   );
 
   const onChangeSearchText = (text: string) => {
     props.onSearchChange(text);
     scrollListToTop();
+  };
+
+  const toggleSearchOptions = (showOptions: boolean) => {
+    Animated.parallel([
+      Animated.timing(opacityAnimationValue, {
+        toValue: showOptions ? 1 : 0,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+      Animated.timing(marginTopAnimationValue, {
+        toValue: showOptions ? 0 : -40,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  const onSearchFocus = () => {
+    if (shouldFocusSearch) {
+      props.setShouldFocusSearch(false);
+    } else {
+      toggleSearchOptions(true);
+    }
+  };
+
+  const onSearchBlur = () => {
+    if (isFocusingSearch) {
+      setIsFocusingSearch(false);
+    }
+
+    if (!shouldFocusSearch && !isFocusingSearch) {
+      toggleSearchOptions(false);
+    }
   };
 
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
@@ -138,50 +191,80 @@ export const NoteList = (props: Props) => {
   return (
     <Container>
       <HeaderContainer>
-        {Platform.OS === 'ios' && (
-          <IosSearchBar
-            ref={searchBoxInputRef}
-            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
-            placeholder="Search"
-            text={searchText}
-            hideBackground
-            /**
-             * keyboardColorForActiveTheme returns the same value as apperance
-             */
-            appearance={themeService?.keyboardColorForActiveTheme()}
-            barTintColor={theme.stylekitInfoColor}
-            textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
-            onChangeText={onChangeSearchText}
-            onSearchButtonPress={() => {
-              searchBoxInputRef.current?.blur();
-            }}
-            onCancelButtonPress={() => {
-              searchBoxInputRef.current?.blur();
-              props.onSearchCancel();
-            }}
-          />
-        )}
-        {Platform.OS === 'android' && (
-          <AndroidSearchBar
-            onChangeText={onChangeSearchText}
-            onCancel={props.onSearchCancel}
-            onDelete={props.onSearchCancel}
-            blurOnSubmit={true}
-            backgroundColor={theme.stylekitBackgroundColor}
-            titleCancelColor={theme.stylekitInfoColor}
-            keyboardDismissMode={'interactive'}
-            keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
-            inputBorderRadius={4}
-            tintColorSearch={theme.stylekitForegroundColor}
-            inputStyle={[
-              styles.androidSearch,
-              {
-                color: theme.stylekitForegroundColor,
-                backgroundColor: theme.stylekitContrastBackgroundColor,
-              },
-            ]}
-          />
-        )}
+        <SearchBarContainer>
+          {Platform.OS === 'ios' && (
+            <IosSearchBar
+              ref={iosSearchBarInputRef}
+              keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
+              placeholder="Search"
+              text={searchText}
+              hideBackground
+              /**
+               * keyboardColorForActiveTheme returns the same value as apperance
+               */
+              appearance={themeService?.keyboardColorForActiveTheme()}
+              barTintColor={theme.stylekitInfoColor}
+              textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
+              onChangeText={onChangeSearchText}
+              onSearchButtonPress={() => {
+                iosSearchBarInputRef.current?.blur();
+              }}
+              onCancelButtonPress={() => {
+                iosSearchBarInputRef.current?.blur();
+                props.onSearchCancel();
+              }}
+              onFocus={onSearchFocus}
+              onBlur={onSearchBlur}
+              showsCancelButton={isFocusingSearch}
+            />
+          )}
+          {Platform.OS === 'android' && (
+            <AndroidSearchBar
+              ref={androidSearchBarInputRef}
+              onChangeText={onChangeSearchText}
+              onCancel={props.onSearchCancel}
+              onDelete={props.onSearchCancel}
+              onFocus={onSearchFocus}
+              onBlur={onSearchBlur}
+              blurOnSubmit={true}
+              backgroundColor={theme.stylekitBackgroundColor}
+              titleCancelColor={theme.stylekitInfoColor}
+              keyboardDismissMode={'interactive'}
+              keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
+              inputBorderRadius={4}
+              tintColorSearch={theme.stylekitForegroundColor}
+              inputStyle={[
+                styles.androidSearch,
+                {
+                  color: theme.stylekitForegroundColor,
+                  backgroundColor: theme.stylekitContrastBackgroundColor,
+                },
+              ]}
+              placeholderExpandedMargin={25}
+              searchIconCollapsedMargin={30}
+            />
+          )}
+        </SearchBarContainer>
+        <SearchOptionsContainer
+          as={Animated.ScrollView}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyboardShouldPersistTaps={'always'}
+          style={{
+            opacity: opacityAnimationValue,
+            marginTop: marginTopAnimationValue,
+          }}
+        >
+          {props.searchOptions.map(({ selected, onPress, label }, index) => (
+            <Chip
+              key={label}
+              selected={selected}
+              onPress={onPress}
+              label={label}
+              last={index === props.searchOptions.length - 1}
+            />
+          ))}
+        </SearchOptionsContainer>
       </HeaderContainer>
       <FlatList
         ref={noteListRef}
