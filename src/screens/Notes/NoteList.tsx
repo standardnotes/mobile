@@ -1,8 +1,10 @@
 import { Chip } from '@Components/Chip';
 import { AppStateEventType, AppStateType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
+import { SCREEN_NOTES } from '@Screens/screens';
 import { CollectionSort, SNNote } from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
@@ -70,6 +72,7 @@ export const NoteList = (props: Props) => {
   const insets = useSafeAreaInsets();
 
   const [isFocusingSearch, setIsFocusingSearch] = useState(false);
+  const [collapseSearchBarOnBlur, setCollapseSearchBarOnBlur] = useState(true);
 
   // Ref
   const opacityAnimationValue = useRef(new Animated.Value(0)).current;
@@ -78,9 +81,21 @@ export const NoteList = (props: Props) => {
   const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
 
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
+  >();
+
   const dismissKeyboard = () => {
     iosSearchBarInputRef.current?.blur();
   };
+
+  useEffect(() => {
+    const removeBlurScreenListener = navigation.addListener('blur', () => {
+      setCollapseSearchBarOnBlur(false);
+    });
+
+    return removeBlurScreenListener;
+  });
 
   useEffect(() => {
     const unsubscribeStateEventObserver = application
@@ -115,6 +130,8 @@ export const NoteList = (props: Props) => {
   const { shouldFocusSearch, searchText } = props;
 
   const focusSearch = useCallback(() => {
+    setCollapseSearchBarOnBlur(true);
+
     if (shouldFocusSearch) {
       setIsFocusingSearch(true);
       iosSearchBarInputRef.current?.focus();
@@ -159,12 +176,12 @@ export const NoteList = (props: Props) => {
   };
 
   const onSearchBlur = () => {
-    if (isFocusingSearch) {
-      setIsFocusingSearch(false);
-    }
-
     if (!shouldFocusSearch && !isFocusingSearch) {
       toggleSearchOptions(false);
+    }
+
+    if (isFocusingSearch) {
+      setIsFocusingSearch(false);
     }
   };
 
@@ -229,6 +246,7 @@ export const NoteList = (props: Props) => {
               onDelete={props.onSearchCancel}
               onFocus={onSearchFocus}
               onBlur={onSearchBlur}
+              collapseOnBlur={collapseSearchBarOnBlur}
               blurOnSubmit={true}
               backgroundColor={theme.stylekitBackgroundColor}
               titleCancelColor={theme.stylekitInfoColor}

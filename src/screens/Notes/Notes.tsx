@@ -96,8 +96,8 @@ export const Notes = React.memo(
       true
     );
     const [
-      protectedTogglingStarted,
-      setProtectedTogglingStarted,
+      includeProtectedStarted,
+      setIncludeProtectedStarted,
     ] = useState<boolean>(false);
     const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false);
 
@@ -185,14 +185,14 @@ export const Notes = React.memo(
 
     useEffect(() => {
       const removeBlurScreenListener = navigation.addListener('blur', () => {
-        if (protectedTogglingStarted) {
-          setProtectedTogglingStarted(false);
+        if (includeProtectedStarted) {
+          setIncludeProtectedStarted(false);
           setShouldFocusSearch(true);
         }
       });
 
       return removeBlurScreenListener;
-    }, [navigation, protectedTogglingStarted]);
+    }, [navigation, includeProtectedStarted]);
 
     useEffect(() => {
       let mounted = true;
@@ -279,12 +279,15 @@ export const Notes = React.memo(
     );
 
     const toggleIncludeProtected = useCallback(async () => {
-      setProtectedTogglingStarted(true);
-
       const includeProtected = !includeProtectedNoteText;
-      const allowToggling = includeProtected
-        ? await application?.authorizeSearchingProtectedNotesText()
-        : true;
+      let allowToggling: boolean | undefined = true;
+
+      if (includeProtected) {
+        setIncludeProtectedStarted(true);
+        allowToggling = await application?.authorizeSearchingProtectedNotesText();
+      }
+
+      setIncludeProtectedStarted(false);
 
       if (allowToggling) {
         reloadNotesDisplayOptions(undefined, undefined, includeProtected);

@@ -218,6 +218,7 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
           headerTitle: ({ children }) => (
             <HeaderTitleView title={route.params?.title ?? (children || '')} />
           ),
+          animationEnabled: false,
         })}
         component={Authenticate}
       />
