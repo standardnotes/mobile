@@ -48,7 +48,7 @@
     "react-native-screens": "^2.16.1",
     "react-native-search-bar": "standardnotes/react-native-search-bar#7d2139d",
     "react-native-search-box": "standardnotes/react-native-search-box#c43b477943e99aa41e5b20711959c00c87286604",
-    "react-native-sodium": "standardnotes/react-native-sodium#17b240ea0c2656c89b83cd0168acfbb64f67f0e1",
+    "react-native-sodium": "standardnotes/react-native-sodium#7e169138801011df42e5eb0ba229b8910c3bec2f",
     "react-native-store-review": "^0.1.5",
     "react-native-tab-view": "^2.15.2",
     "react-native-vector-icons": "^7.1.0",
