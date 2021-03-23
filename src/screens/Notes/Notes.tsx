@@ -95,6 +95,10 @@ export const Notes = React.memo(
     const [includeTrashedNotes, setIncludeTrashedNotes] = useState<boolean>(
       true
     );
+    const [
+      protectedTogglingStarted,
+      setProtectedTogglingStarted,
+    ] = useState<boolean>(false);
     const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false);
 
     // Ref
@@ -178,6 +182,17 @@ export const Notes = React.memo(
       },
       [application, navigation, openNote]
     );
+
+    useEffect(() => {
+      const removeBlurScreenListener = navigation.addListener('blur', () => {
+        if (protectedTogglingStarted) {
+          setProtectedTogglingStarted(false);
+          setShouldFocusSearch(true);
+        }
+      });
+
+      return removeBlurScreenListener;
+    }, [navigation, protectedTogglingStarted]);
 
     useEffect(() => {
       let mounted = true;
@@ -264,7 +279,7 @@ export const Notes = React.memo(
     );
 
     const toggleIncludeProtected = useCallback(async () => {
-      setShouldFocusSearch(true);
+      setProtectedTogglingStarted(true);
 
       const includeProtected = !includeProtectedNoteText;
       const allowToggling = includeProtected
