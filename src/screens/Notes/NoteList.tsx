@@ -168,21 +168,13 @@ export const NoteList = (props: Props) => {
   };
 
   const onSearchFocus = () => {
-    if (shouldFocusSearch) {
-      props.setShouldFocusSearch(false);
-    } else {
-      toggleSearchOptions(true);
-    }
+    toggleSearchOptions(true);
+    props.setShouldFocusSearch(false);
   };
 
   const onSearchBlur = () => {
-    if (!shouldFocusSearch && !isFocusingSearch) {
-      toggleSearchOptions(false);
-    }
-
-    if (isFocusingSearch) {
-      setIsFocusingSearch(false);
-    }
+    toggleSearchOptions(false);
+    setIsFocusingSearch(false);
   };
 
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
@@ -239,10 +231,7 @@ export const NoteList = (props: Props) => {
             <AndroidSearchBar
               ref={androidSearchBarInputRef}
               onChangeText={onChangeSearchText}
-              onCancel={() => {
-                props.onSearchCancel();
-                onSearchBlur();
-              }}
+              onCancel={onSearchBlur}
               onDelete={props.onSearchCancel}
               onFocus={onSearchFocus}
               onBlur={onSearchBlur}

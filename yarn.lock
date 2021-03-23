@@ -6897,9 +6897,9 @@ react-native-search-bar@standardnotes/react-native-search-bar#7d2139d:
   dependencies:
     prop-types "^15.5.10"
 
-react-native-search-box@standardnotes/react-native-search-box#cc295af7fd8e5e75cbe729ca490babeb9377f60e:
+react-native-search-box@standardnotes/react-native-search-box#c0de5bab18cb418fef75ef2c2cd921304142e492:
   version "0.0.19"
-  resolved "https://codeload.github.com/standardnotes/react-native-search-box/tar.gz/cc295af7fd8e5e75cbe729ca490babeb9377f60e"
+  resolved "https://codeload.github.com/standardnotes/react-native-search-box/tar.gz/c0de5bab18cb418fef75ef2c2cd921304142e492"
   dependencies:
     prop-types "^15.5.10"
 
