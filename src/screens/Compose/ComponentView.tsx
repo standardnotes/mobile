@@ -1,5 +1,8 @@
 import { PrefKey } from '@Lib/preferences_manager';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
+import { SCREEN_NOTES } from '@Screens/screens';
 import {
   ButtonType,
   ComponentArea,
@@ -50,10 +53,27 @@ export const ComponentView = ({
     LiveItem<SNComponent> | undefined
   >(() => new LiveItem(componentUuid, application!));
   const [url, setUrl] = useState('');
+  const [showWebView, setShowWebView] = useState<boolean>(true);
 
   // Ref
   const webViewRef = useRef<WebView>(null);
   const timeoutRef = useRef<number | undefined>(undefined);
+
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
+  >();
+
+  useEffect(() => {
+    const removeBlurScreenListener = navigation.addListener('blur', () => {
+      setShowWebView(false);
+    });
+
+    return removeBlurScreenListener;
+  });
+
+  useFocusEffect(() => {
+    setShowWebView(true);
+  });
 
   useEffect(() => {
     if (liveComponent?.item.uuid !== componentUuid) {
@@ -215,6 +235,7 @@ export const ComponentView = ({
         )}
       {Boolean(url) && (
         <StyledWebview
+          showWebView={showWebView}
           source={{ uri: url }}
           key={liveComponent?.item.uuid}
           ref={webViewRef}

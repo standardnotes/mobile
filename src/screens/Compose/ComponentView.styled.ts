@@ -3,7 +3,7 @@ import { ThemeService } from '@Style/theme_service';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import WebView from 'react-native-webview';
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
 
 export const FlexContainer = styled(SafeAreaView).attrs(() => ({
   edges: ['bottom'],
@@ -28,11 +28,16 @@ export const LockedText = styled.Text`
   padding-left: 10px;
 `;
 
-export const StyledWebview = styled(WebView)`
+export const StyledWebview = styled(WebView)<{ showWebView: boolean }>`
   flex: 1;
   background-color: transparent;
   opacity: 0.99;
   min-height: 1px;
+  ${({ showWebView }) =>
+    !showWebView &&
+    css`
+      display: none;
+    `};
 `;
 
 export const StyledIcon = styled(Icon).attrs(({ theme }) => ({
