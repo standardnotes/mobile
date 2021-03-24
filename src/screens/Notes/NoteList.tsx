@@ -71,7 +71,6 @@ export const NoteList = (props: Props) => {
   const theme = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
 
-  const [isFocusingSearch, setIsFocusingSearch] = useState(false);
   const [collapseSearchBarOnBlur, setCollapseSearchBarOnBlur] = useState(true);
 
   // Ref
@@ -133,7 +132,6 @@ export const NoteList = (props: Props) => {
     setCollapseSearchBarOnBlur(true);
 
     if (shouldFocusSearch) {
-      setIsFocusingSearch(true);
       iosSearchBarInputRef.current?.focus();
       androidSearchBarInputRef.current?.focus(searchText);
     }
@@ -174,7 +172,6 @@ export const NoteList = (props: Props) => {
 
   const onSearchBlur = () => {
     toggleSearchOptions(false);
-    setIsFocusingSearch(false);
   };
 
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
@@ -224,7 +221,6 @@ export const NoteList = (props: Props) => {
               }}
               onFocus={onSearchFocus}
               onBlur={onSearchBlur}
-              showsCancelButton={isFocusingSearch}
             />
           )}
           {Platform.OS === 'android' && (
