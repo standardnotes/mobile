@@ -51,7 +51,7 @@ export const PasscodeInputModal = (props: Props) => {
       );
       setSettingPassocode(false);
     } else {
-      await application?.setPasscode(text);
+      await application?.addPasscode(text);
       await application
         ?.getAppState()
         .setPasscodeKeyboardType(keyboardType as PasscodeKeyboardType);
