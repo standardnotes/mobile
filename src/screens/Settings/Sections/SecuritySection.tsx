@@ -13,7 +13,7 @@ import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_PASSCODE, SCREEN_SETTINGS } from '@Screens/screens';
 import { StorageEncryptionPolicies } from '@standardnotes/snjs';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Title } from './PasscodeSection.styled';
+import { Title } from './SecuritySection.styled';
 
 type Props = {
   title: string;
@@ -22,7 +22,7 @@ type Props = {
   updateProtectionsAvailable: Function;
 };
 
-export const PasscodeSection = (props: Props) => {
+export const SecuritySection = (props: Props) => {
   const navigation = useNavigation<
     ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
   >();
@@ -33,18 +33,18 @@ export const PasscodeSection = (props: Props) => {
   const [encryptionPolicy, setEncryptionPolicy] = useState(() =>
     application?.getStorageEncryptionPolicy()
   );
+  const [
+    encryptionPolictChangeInProgress,
+    setEncryptionPolictChangeInProgress,
+  ] = useState(false);
   const [hasBiometrics, setHasBiometrics] = useState(false);
+  const [supportsBiometrics, setSupportsBiometrics] = useState(false);
   const [biometricsTimingOptions, setBiometricsTimingOptions] = useState(() =>
     application!.getAppState().getBiometricsTimingOptions()
   );
   const [passcodeTimingOptions, setPasscodeTimingOptions] = useState(() =>
     application!.getAppState().getPasscodeTimingOptions()
   );
-  const [supportsBiometrics, setSupportsBiometrics] = useState(false);
-  const [
-    encryptionPolictChangeInProgress,
-    setEncryptionPolictChangeInProgress,
-  ] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -127,13 +127,9 @@ export const PasscodeSection = (props: Props) => {
     ? 'Disable Passcode Lock'
     : 'Enable Passcode Lock';
 
-  const passcodeOnPress = async () => {
-    if (props.hasPasscode) {
-      disableAuthentication('passcode');
-    } else {
-      navigation.push(SCREEN_INPUT_MODAL_PASSCODE);
-    }
-  };
+  const biometricTitle = hasBiometrics
+    ? 'Disable Biometrics Lock'
+    : 'Enable Biometrics Lock';
 
   const setBiometricsTiming = async (timing: UnlockTiming) => {
     await application?.getAppState().setBiometricsTiming(timing);
@@ -147,6 +143,14 @@ export const PasscodeSection = (props: Props) => {
     setPasscodeTimingOptions(() =>
       application!.getAppState().getPasscodeTimingOptions()
     );
+  };
+
+  const onPasscodePress = async () => {
+    if (props.hasPasscode) {
+      disableAuthentication('passcode');
+    } else {
+      navigation.push(SCREEN_INPUT_MODAL_PASSCODE);
+    }
   };
 
   const onBiometricsPress = async () => {
@@ -205,9 +209,6 @@ export const PasscodeSection = (props: Props) => {
     [disableBiometrics, disablePasscode]
   );
 
-  let biometricTitle = hasBiometrics
-    ? 'Disable Biometrics Lock'
-    : 'Enable Biometrics Lock';
   return (
     <TableSection>
       <SectionHeader title={props.title} />
@@ -221,7 +222,7 @@ export const PasscodeSection = (props: Props) => {
         <Title>{storageSubText}</Title>
       </ButtonCell>
 
-      <ButtonCell leftAligned title={passcodeTitle} onPress={passcodeOnPress} />
+      <ButtonCell leftAligned title={passcodeTitle} onPress={onPasscodePress} />
 
       <ButtonCell
         last={!hasBiometrics && !props.hasPasscode}
