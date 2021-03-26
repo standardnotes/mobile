@@ -42,8 +42,8 @@ export const WebViewReloadButtonText = styled.Text`
   font-weight: bold;
 `;
 export const NoteTitleInput = styled.TextInput`
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: bold;
+  font-size: 18px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   height: ${NOTE_TITLE_HEIGHT}px;
