@@ -165,21 +165,6 @@ export const useSyncStatus = () => {
     [application]
   );
 
-  useEffect(() => {
-    let mounted = true;
-    const isEncryptionAvailable =
-      application!.isEncryptionAvailable() &&
-      application!.getStorageEncryptionPolicy() ===
-        StorageEncryptionPolicies.Default;
-    if (mounted) {
-      setDecrypting(!completedInitialSync && isEncryptionAvailable);
-      setLoading(!completedInitialSync && !isEncryptionAvailable);
-    }
-    return () => {
-      mounted = false;
-    };
-  }, [application, completedInitialSync]);
-
   const updateLocalDataStatus = useCallback(() => {
     const syncStatus = application!.getSyncStatus();
     const stats = syncStatus.getStats();
@@ -189,6 +174,7 @@ export const useSyncStatus = () => {
         StorageEncryptionPolicies.Default;
     if (stats.localDataDone) {
       setStatus();
+      return;
     }
     const notesString = `${stats.localDataCurrent}/${stats.localDataTotal} items...`;
     const loadingStatus = encryption
@@ -196,6 +182,22 @@ export const useSyncStatus = () => {
       : `Loading ${notesString}`;
     setStatus(loadingStatus);
   }, [application, setStatus]);
+
+  useEffect(() => {
+    let mounted = true;
+    const isEncryptionAvailable =
+      application!.isEncryptionAvailable() &&
+      application!.getStorageEncryptionPolicy() ===
+        StorageEncryptionPolicies.Default;
+    if (mounted) {
+      setDecrypting(!completedInitialSync && isEncryptionAvailable);
+      updateLocalDataStatus();
+      setLoading(!completedInitialSync && !isEncryptionAvailable);
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [application, completedInitialSync, updateLocalDataStatus]);
 
   const updateSyncStatus = useCallback(() => {
     const syncStatus = application!.getSyncStatus();
@@ -231,9 +233,7 @@ export const useSyncStatus = () => {
           updateLocalDataStatus();
         } else if (eventName === ApplicationEvent.WillSync) {
           if (application.hasAccount() && !completedInitialSync) {
-            requestAnimationFrame(() => {
-              setStatus('Syncing...');
-            });
+            setStatus('Syncing...');
           }
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
           if (
