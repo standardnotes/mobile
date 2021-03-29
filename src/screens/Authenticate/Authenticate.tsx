@@ -236,7 +236,9 @@ export const Authenticate = ({
         state: AuthenticationValueStateType.Pending,
       });
 
-      hide();
+      if (application?.getAppState().screenshotPrivacyEnabled) {
+        hide();
+      }
 
       if (Platform.OS === 'android') {
         await application

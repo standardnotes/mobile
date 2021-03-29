@@ -37,6 +37,9 @@ export const SecuritySection = (props: Props) => {
     encryptionPolictChangeInProgress,
     setEncryptionPolictChangeInProgress,
   ] = useState(false);
+  const [hasScreenshotPrivacy, setHasScreenshotPrivacy] = useState<
+    boolean | undefined
+  >(false);
   const [hasBiometrics, setHasBiometrics] = useState(false);
   const [supportsBiometrics, setSupportsBiometrics] = useState(false);
   const [biometricsTimingOptions, setBiometricsTimingOptions] = useState(() =>
@@ -48,6 +51,14 @@ export const SecuritySection = (props: Props) => {
 
   useEffect(() => {
     let mounted = true;
+    const getHasScreenshotPrivacy = async () => {
+      const hasScreenshotPrivacyEnabled = await application?.getAppState()
+        .screenshotPrivacyEnabled;
+      if (mounted) {
+        setHasScreenshotPrivacy(hasScreenshotPrivacyEnabled);
+      }
+    };
+    getHasScreenshotPrivacy();
     const getHasBiometrics = async () => {
       const appHasBiometrics = await application!.hasBiometrics();
       if (mounted) {
@@ -123,6 +134,10 @@ export const SecuritySection = (props: Props) => {
     storageSubText = 'Applying changes...';
   }
 
+  const screenshotPrivacyTitle = hasScreenshotPrivacy
+    ? 'Disable Multitasking/Screenshot Privacy'
+    : 'Enable Multitasking/Screenshot Privacy';
+
   const passcodeTitle = props.hasPasscode
     ? 'Disable Passcode Lock'
     : 'Enable Passcode Lock';
@@ -143,6 +158,12 @@ export const SecuritySection = (props: Props) => {
     setPasscodeTimingOptions(() =>
       application!.getAppState().getPasscodeTimingOptions()
     );
+  };
+
+  const onScreenshotPrivacyPress = async () => {
+    const enable = !hasScreenshotPrivacy;
+    setHasScreenshotPrivacy(enable);
+    await application?.getAppState().setScreenshotPrivacyEnabled(enable);
   };
 
   const onPasscodePress = async () => {
@@ -221,6 +242,12 @@ export const SecuritySection = (props: Props) => {
       >
         <Title>{storageSubText}</Title>
       </ButtonCell>
+
+      <ButtonCell
+        leftAligned
+        title={screenshotPrivacyTitle}
+        onPress={onScreenshotPrivacyPress}
+      />
 
       <ButtonCell leftAligned title={passcodeTitle} onPress={onPasscodePress} />
 
