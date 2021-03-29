@@ -13,6 +13,7 @@ import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_PASSCODE, SCREEN_SETTINGS } from '@Screens/screens';
 import { StorageEncryptionPolicies } from '@standardnotes/snjs';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { Title } from './SecuritySection.styled';
 
 type Props = {
@@ -134,9 +135,14 @@ export const SecuritySection = (props: Props) => {
     storageSubText = 'Applying changes...';
   }
 
+  const screenshotPrivacyFeatureText =
+    Platform.OS === 'ios'
+      ? 'Multitasking Privacy'
+      : 'Multitasking/Screenshot privacy';
+
   const screenshotPrivacyTitle = hasScreenshotPrivacy
-    ? 'Disable Multitasking/Screenshot Privacy'
-    : 'Enable Multitasking/Screenshot Privacy';
+    ? `Disable ${screenshotPrivacyFeatureText}`
+    : `Enable ${screenshotPrivacyFeatureText}`;
 
   const passcodeTitle = props.hasPasscode
     ? 'Disable Passcode Lock'
