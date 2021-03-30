@@ -227,7 +227,10 @@ export const NoteList = (props: Props) => {
             <AndroidSearchBar
               ref={androidSearchBarInputRef}
               onChangeText={onChangeSearchText}
-              onCancel={onSearchBlur}
+              onCancel={() => {
+                onSearchBlur();
+                props.onSearchCancel();
+              }}
               onDelete={props.onSearchCancel}
               onFocus={onSearchFocus}
               onBlur={onSearchBlur}
