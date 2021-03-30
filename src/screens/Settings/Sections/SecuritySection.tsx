@@ -13,7 +13,8 @@ import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_PASSCODE, SCREEN_SETTINGS } from '@Screens/screens';
 import { StorageEncryptionPolicies } from '@standardnotes/snjs';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Title } from './PasscodeSection.styled';
+import { Platform } from 'react-native';
+import { Title } from './SecuritySection.styled';
 
 type Props = {
   title: string;
@@ -22,7 +23,7 @@ type Props = {
   updateProtectionsAvailable: Function;
 };
 
-export const PasscodeSection = (props: Props) => {
+export const SecuritySection = (props: Props) => {
   const navigation = useNavigation<
     ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
   >();
@@ -33,21 +34,32 @@ export const PasscodeSection = (props: Props) => {
   const [encryptionPolicy, setEncryptionPolicy] = useState(() =>
     application?.getStorageEncryptionPolicy()
   );
+  const [
+    encryptionPolictChangeInProgress,
+    setEncryptionPolictChangeInProgress,
+  ] = useState(false);
+  const [hasScreenshotPrivacy, setHasScreenshotPrivacy] = useState<
+    boolean | undefined
+  >(false);
   const [hasBiometrics, setHasBiometrics] = useState(false);
+  const [supportsBiometrics, setSupportsBiometrics] = useState(false);
   const [biometricsTimingOptions, setBiometricsTimingOptions] = useState(() =>
     application!.getAppState().getBiometricsTimingOptions()
   );
   const [passcodeTimingOptions, setPasscodeTimingOptions] = useState(() =>
     application!.getAppState().getPasscodeTimingOptions()
   );
-  const [supportsBiometrics, setSupportsBiometrics] = useState(false);
-  const [
-    encryptionPolictChangeInProgress,
-    setEncryptionPolictChangeInProgress,
-  ] = useState(false);
 
   useEffect(() => {
     let mounted = true;
+    const getHasScreenshotPrivacy = async () => {
+      const hasScreenshotPrivacyEnabled = await application?.getAppState()
+        .screenshotPrivacyEnabled;
+      if (mounted) {
+        setHasScreenshotPrivacy(hasScreenshotPrivacyEnabled);
+      }
+    };
+    getHasScreenshotPrivacy();
     const getHasBiometrics = async () => {
       const appHasBiometrics = await application!.hasBiometrics();
       if (mounted) {
@@ -123,17 +135,22 @@ export const PasscodeSection = (props: Props) => {
     storageSubText = 'Applying changes...';
   }
 
+  const screenshotPrivacyFeatureText =
+    Platform.OS === 'ios'
+      ? 'Multitasking Privacy'
+      : 'Multitasking/Screenshot Privacy';
+
+  const screenshotPrivacyTitle = hasScreenshotPrivacy
+    ? `Disable ${screenshotPrivacyFeatureText}`
+    : `Enable ${screenshotPrivacyFeatureText}`;
+
   const passcodeTitle = props.hasPasscode
     ? 'Disable Passcode Lock'
     : 'Enable Passcode Lock';
 
-  const passcodeOnPress = async () => {
-    if (props.hasPasscode) {
-      disableAuthentication('passcode');
-    } else {
-      navigation.push(SCREEN_INPUT_MODAL_PASSCODE);
-    }
-  };
+  const biometricTitle = hasBiometrics
+    ? 'Disable Biometrics Lock'
+    : 'Enable Biometrics Lock';
 
   const setBiometricsTiming = async (timing: UnlockTiming) => {
     await application?.getAppState().setBiometricsTiming(timing);
@@ -147,6 +164,20 @@ export const PasscodeSection = (props: Props) => {
     setPasscodeTimingOptions(() =>
       application!.getAppState().getPasscodeTimingOptions()
     );
+  };
+
+  const onScreenshotPrivacyPress = async () => {
+    const enable = !hasScreenshotPrivacy;
+    setHasScreenshotPrivacy(enable);
+    await application?.getAppState().setScreenshotPrivacyEnabled(enable);
+  };
+
+  const onPasscodePress = async () => {
+    if (props.hasPasscode) {
+      disableAuthentication('passcode');
+    } else {
+      navigation.push(SCREEN_INPUT_MODAL_PASSCODE);
+    }
   };
 
   const onBiometricsPress = async () => {
@@ -205,9 +236,6 @@ export const PasscodeSection = (props: Props) => {
     [disableBiometrics, disablePasscode]
   );
 
-  let biometricTitle = hasBiometrics
-    ? 'Disable Biometrics Lock'
-    : 'Enable Biometrics Lock';
   return (
     <TableSection>
       <SectionHeader title={props.title} />
@@ -221,7 +249,13 @@ export const PasscodeSection = (props: Props) => {
         <Title>{storageSubText}</Title>
       </ButtonCell>
 
-      <ButtonCell leftAligned title={passcodeTitle} onPress={passcodeOnPress} />
+      <ButtonCell
+        leftAligned
+        title={screenshotPrivacyTitle}
+        onPress={onScreenshotPrivacyPress}
+      />
+
+      <ButtonCell leftAligned title={passcodeTitle} onPress={onPasscodePress} />
 
       <ButtonCell
         last={!hasBiometrics && !props.hasPasscode}

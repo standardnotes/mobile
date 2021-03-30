@@ -109,6 +109,7 @@ export class ApplicationState extends ApplicationService {
   mostRecentState?: AppStateType;
   authenticationInProgress: boolean = false;
   multiEditorEnabled = false;
+  screenshotPrivacyEnabled?: boolean;
   passcodeTiming?: UnlockTiming;
   biometricsTiming?: UnlockTiming;
   removeItemChangesListener?: () => void;
@@ -173,7 +174,9 @@ export class ApplicationState extends ApplicationService {
     );
 
     await this.loadUnlockTiming();
-    this.setAndroidScreenshotPrivacy();
+    this.screenshotPrivacyEnabled =
+      (await this.getScreenshotPrivacyEnabled()) ?? true;
+    this.setAndroidScreenshotPrivacy(this.screenshotPrivacyEnabled);
   }
 
   async onAppLaunch() {
@@ -255,9 +258,9 @@ export class ApplicationState extends ApplicationService {
     this.biometricsTiming = await this.getBiometricsTiming();
   }
 
-  public async setAndroidScreenshotPrivacy() {
+  public async setAndroidScreenshotPrivacy(enable: boolean) {
     if (Platform.OS === 'android') {
-      FlagSecure.activate();
+      enable ? FlagSecure.activate() : FlagSecure.deactivate();
     }
   }
 
@@ -550,7 +553,10 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isResumingFromBackground || isResuming) {
-      hide();
+      if (this.screenshotPrivacyEnabled) {
+        hide();
+      }
+
       if (isResumingFromBackground) {
         this.notifyOfStateChange(AppStateType.ResumingFromBackground);
       }
@@ -561,7 +567,10 @@ export class ApplicationState extends ApplicationService {
     }
 
     if (isLosingFocus) {
-      show();
+      if (this.screenshotPrivacyEnabled) {
+        show();
+      }
+
       this.notifyOfStateChange(AppStateType.LosingFocus);
       return this.checkAndLockApplication();
     }
@@ -580,6 +589,13 @@ export class ApplicationState extends ApplicationService {
     ] as Array<AppStateType>).includes(state);
   }
 
+  private async getScreenshotPrivacyEnabled(): Promise<boolean | undefined> {
+    return this.application.getValue(
+      StorageKey.MobileScreenshotPrivacyEnabled,
+      StorageValueModes.Default
+    );
+  }
+
   private async getPasscodeTiming(): Promise<UnlockTiming | undefined> {
     return this.application.getValue(
       StorageKey.MobilePasscodeTiming,
@@ -592,6 +608,16 @@ export class ApplicationState extends ApplicationService {
       StorageKey.MobileBiometricsTiming,
       StorageValueModes.Nonwrapped
     );
+  }
+
+  public async setScreenshotPrivacyEnabled(enabled: boolean) {
+    await this.application.setValue(
+      StorageKey.MobileScreenshotPrivacyEnabled,
+      enabled,
+      StorageValueModes.Default
+    );
+    this.screenshotPrivacyEnabled = enabled;
+    this.setAndroidScreenshotPrivacy(enabled);
   }
 
   public async setPasscodeTiming(timing: UnlockTiming) {
