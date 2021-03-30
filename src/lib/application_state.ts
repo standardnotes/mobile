@@ -592,7 +592,7 @@ export class ApplicationState extends ApplicationService {
   private async getScreenshotPrivacyEnabled(): Promise<boolean | undefined> {
     return this.application.getValue(
       StorageKey.MobileScreenshotPrivacyEnabled,
-      StorageValueModes.Nonwrapped
+      StorageValueModes.Default
     );
   }
 
@@ -614,7 +614,7 @@ export class ApplicationState extends ApplicationService {
     await this.application.setValue(
       StorageKey.MobileScreenshotPrivacyEnabled,
       enabled,
-      StorageValueModes.Nonwrapped
+      StorageValueModes.Default
     );
     this.screenshotPrivacyEnabled = enabled;
     this.setAndroidScreenshotPrivacy(enabled);
