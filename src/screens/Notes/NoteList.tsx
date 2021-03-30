@@ -72,6 +72,7 @@ export const NoteList = (props: Props) => {
   const insets = useSafeAreaInsets();
 
   const [collapseSearchBarOnBlur, setCollapseSearchBarOnBlur] = useState(true);
+  const [noteListScrolled, setNoteListScrolled] = useState(false);
 
   // Ref
   const opacityAnimationValue = useRef(new Animated.Value(0)).current;
@@ -109,10 +110,11 @@ export const NoteList = (props: Props) => {
   }, [application]);
 
   const scrollListToTop = useCallback(() => {
-    if (props.notes && props.notes.length > 0) {
+    if (noteListScrolled && props.notes && props.notes.length > 0) {
       noteListRef.current?.scrollToIndex({ animated: false, index: 0 });
+      setNoteListScrolled(false);
     }
-  }, [props.notes]);
+  }, [noteListScrolled, props.notes]);
 
   useEffect(() => {
     const unsubscribeTagChangedEventObserver = application
@@ -172,6 +174,10 @@ export const NoteList = (props: Props) => {
 
   const onSearchBlur = () => {
     toggleSearchOptions(false);
+  };
+
+  const onScroll = () => {
+    setNoteListScrolled(true);
   };
 
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
@@ -310,6 +316,7 @@ export const NoteList = (props: Props) => {
         ListHeaderComponent={() => (
           <HeaderContainer>{!signedIn && <OfflineBanner />}</HeaderContainer>
         )}
+        onScroll={onScroll}
       />
     </Container>
   );
