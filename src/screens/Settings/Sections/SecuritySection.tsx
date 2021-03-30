@@ -138,7 +138,7 @@ export const SecuritySection = (props: Props) => {
   const screenshotPrivacyFeatureText =
     Platform.OS === 'ios'
       ? 'Multitasking Privacy'
-      : 'Multitasking/Screenshot privacy';
+      : 'Multitasking/Screenshot Privacy';
 
   const screenshotPrivacyTitle = hasScreenshotPrivacy
     ? `Disable ${screenshotPrivacyFeatureText}`
