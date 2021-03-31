@@ -18,11 +18,19 @@ import React, {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
+import {
+  DocumentDirectoryPath,
+  downloadFile,
+  exists,
+  readDir,
+  unlink,
+} from 'react-native-fs';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
+import { unzip } from 'react-native-zip-archive';
 import {
   FlexContainer,
   LockedContainer,
@@ -109,6 +117,37 @@ export const ComponentView = ({
       warnUnsupportedEditors();
     }
   }, [application]);
+
+  const getEditor = useCallback(async () => {
+    const {
+      identifier: editorIdentifier,
+      version: editorVersion,
+      download_url: downloadUrl,
+    } = liveComponent!.item.package_info;
+    const downloadPath = `${DocumentDirectoryPath}/${editorIdentifier}.zip`;
+    const editorDir = `${DocumentDirectoryPath}/editors/${editorIdentifier}`;
+    const versionDir = `${editorDir}/${editorVersion}`;
+
+    const shouldDownload =
+      !(await exists(versionDir)) || (await readDir(versionDir)).length === 0;
+
+    if (shouldDownload) {
+      // Delete any previous versions downloads
+      if (await exists(editorDir)) {
+        await unlink(editorDir);
+      }
+      await downloadFile({
+        fromUrl: downloadUrl,
+        toFile: downloadPath,
+      }).promise;
+      await unzip(downloadPath, versionDir);
+      // Delete zip after extraction
+      await unlink(downloadPath);
+    }
+
+    const packageDir = await readDir(versionDir);
+    setUrl(`file://${packageDir[0].path}/dist/index.html`);
+  }, [liveComponent]);
 
   useEffect(() => {
     if (liveComponent) {
