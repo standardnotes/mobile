@@ -229,6 +229,9 @@ export class Compose extends React.Component<{}, State> {
     if (this.statusTimeout) {
       clearTimeout(this.statusTimeout);
     }
+    this.context?.componentGroup.deactivateComponentForArea(
+      ComponentArea.Editor
+    );
   }
 
   /**

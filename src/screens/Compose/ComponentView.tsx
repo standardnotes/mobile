@@ -3,7 +3,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
-import { ButtonType, ComponentArea, LiveItem, SNComponent, SNNote } from '@standardnotes/snjs';
+import { ButtonType, LiveItem, SNComponent, SNNote } from '@standardnotes/snjs';
 import React, {
   useCallback,
   useContext,
@@ -192,9 +192,6 @@ export const ComponentView = ({
     // deinit
     return () => {
       mounted = false;
-      application?.componentGroup.deactivateComponentForArea(
-        ComponentArea.Editor
-      );
       liveComponent?.deinit();
     };
   }, [application, getOfflineEditorUrl, liveComponent]);
