@@ -166,7 +166,7 @@ export const ComponentView = ({
 
   useEffect(() => {
     let mounted = true;
-    const getEditorUrl = async () => {
+    const setEditorUrl = async () => {
       const newUrl = application!.componentManager!.urlForComponent(
         liveComponent!.item
       );
@@ -186,7 +186,7 @@ export const ComponentView = ({
       }
     };
     if (liveComponent) {
-      getEditorUrl();
+      setEditorUrl();
     }
 
     // deinit
