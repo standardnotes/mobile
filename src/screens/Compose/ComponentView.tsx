@@ -302,6 +302,7 @@ export const ComponentView = ({
       {Boolean(url) && (
         <StyledWebview
           allowFileAccess
+          originWhitelist={['*']}
           showWebView={showWebView}
           source={{ uri: offlineUrl ? offlineUrl : url }}
           key={liveComponent?.item.uuid}
