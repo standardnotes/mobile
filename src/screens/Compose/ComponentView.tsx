@@ -180,11 +180,14 @@ export const ComponentView = ({
           'OK'
         );
       } else {
-        setUrl(newUrl);
+        try {
+          const offlineEditorUrl = await getOfflineEditorUrl();
 
-        const offlineEditorUrl = await getOfflineEditorUrl();
-        if (mounted) {
-          setOfflineUrl(offlineEditorUrl);
+          if (mounted) {
+            setOfflineUrl(offlineEditorUrl);
+          }
+        } catch (e) {
+          setUrl(newUrl);
         }
       }
     };
@@ -250,12 +253,7 @@ export const ComponentView = ({
       clearTimeout(timeoutRef.current);
     }
 
-    if (offlineUrl) {
-      setOfflineUrl('');
-      setReadAccessUrl('');
-    } else {
-      onLoadError();
-    }
+    onLoadError();
   };
 
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
@@ -303,7 +301,7 @@ export const ComponentView = ({
             </LockedText>
           </LockedContainer>
         )}
-      {Boolean(url) && (
+      {(Boolean(url) || Boolean(offlineUrl)) && (
         <StyledWebview
           allowFileAccess
           allowingReadAccessToURL={readAccessUrl}
