@@ -55,6 +55,7 @@ export class Compose extends React.Component<{}, State> {
   saveTimeout: number | undefined;
   alreadySaved: boolean = false;
   statusTimeout: number | undefined;
+  downloadingMessageTimeout: number | undefined;
   removeEditorObserver?: () => void;
   removeEditorNoteValueChangeObserver?: () => void;
   removeComponentsObserver?: () => void;
@@ -228,6 +229,9 @@ export class Compose extends React.Component<{}, State> {
     }
     if (this.statusTimeout) {
       clearTimeout(this.statusTimeout);
+    }
+    if (this.downloadingMessageTimeout) {
+      clearTimeout(this.downloadingMessageTimeout);
     }
     this.context?.componentGroup.deactivateComponentForArea(
       ComponentArea.Editor
@@ -410,10 +414,19 @@ export class Compose extends React.Component<{}, State> {
       downloadingEditor: true,
     });
 
-  onDownloadEditorEnd = () =>
-    this.setState({
-      downloadingEditor: false,
-    });
+  onDownloadEditorEnd = () => {
+    if (this.downloadingMessageTimeout) {
+      clearTimeout(this.downloadingMessageTimeout);
+    }
+
+    this.downloadingMessageTimeout = setTimeout(
+      () =>
+        this.setState({
+          downloadingEditor: false,
+        }),
+      100
+    );
+  };
 
   render() {
     const shouldDisplayEditor =
