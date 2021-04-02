@@ -285,6 +285,10 @@ export const ComponentView = ({
       window.parent.postMessage = function(data) {
         window.parent.ReactNativeWebView.postMessage(data);
       };
+      const meta = document.createElement('meta');
+      meta.setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no');
+      meta.setAttribute('name', 'viewport');
+      document.getElementsByTagName('head')[0].appendChild(meta);
       return true;
     })()`;
   };
@@ -322,9 +326,6 @@ export const ComponentView = ({
           hideKeyboardAccessoryView={true}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
           cacheEnabled={true}
-          scalesPageToFit={
-            true /* Android only, not available with WKWebView */
-          }
           autoManageStatusBarEnabled={
             false /* To prevent StatusBar from changing colors when focusing */
           }
