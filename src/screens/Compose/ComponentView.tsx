@@ -61,6 +61,7 @@ export const ComponentView = ({
   const [url, setUrl] = useState('');
   const [showWebView, setShowWebView] = useState<boolean>(true);
   const [offlineUrl, setOfflineUrl] = useState('');
+  const [readAccessUrl, setReadAccessUrl] = useState('');
 
   // Ref
   const webViewRef = useRef<WebView>(null);
@@ -126,6 +127,8 @@ export const ComponentView = ({
     const downloadPath = `${DocumentDirectoryPath}/${editorIdentifier}.zip`;
     const editorDir = `${DocumentDirectoryPath}/editors/${editorIdentifier}`;
     const versionDir = `${editorDir}/${editorVersion}`;
+
+    setReadAccessUrl(versionDir);
 
     const shouldDownload =
       !(await exists(versionDir)) || (await readDir(versionDir)).length === 0;
@@ -249,6 +252,7 @@ export const ComponentView = ({
 
     if (offlineUrl) {
       setOfflineUrl('');
+      setReadAccessUrl('');
     } else {
       onLoadError();
     }
@@ -302,6 +306,7 @@ export const ComponentView = ({
       {Boolean(url) && (
         <StyledWebview
           allowFileAccess
+          allowingReadAccessToURL={readAccessUrl}
           originWhitelist={['*']}
           showWebView={showWebView}
           source={{ uri: offlineUrl ? offlineUrl : url }}
