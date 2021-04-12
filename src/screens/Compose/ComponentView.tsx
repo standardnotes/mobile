@@ -186,7 +186,7 @@ export const ComponentView = ({
           if (mounted) {
             setOfflineUrl(offlineEditorUrl);
           }
-        } catch (e) {
+        } finally {
           setUrl(newUrl);
         }
       }
@@ -331,6 +331,7 @@ export const ComponentView = ({
             false /* To prevent StatusBar from changing colors when focusing */
           }
           injectedJavaScript={defaultInjectedJavaScript()}
+          onContentProcessDidTerminate={() => setOfflineUrl('')}
         />
       )}
     </FlexContainer>
