@@ -77,7 +77,7 @@ export const ComponentView = ({
     });
 
     return removeBlurScreenListener;
-  });
+  }, [navigation]);
 
   useFocusEffect(() => {
     setShowWebView(true);
@@ -198,9 +198,10 @@ export const ComponentView = ({
     // deinit
     return () => {
       mounted = false;
+      application?.componentManager.deactivateComponent(componentUuid);
       liveComponent?.deinit();
     };
-  }, [application, getOfflineEditorUrl, liveComponent]);
+  }, [application, componentUuid, getOfflineEditorUrl, liveComponent]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;

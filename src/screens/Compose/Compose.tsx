@@ -233,9 +233,6 @@ export class Compose extends React.Component<{}, State> {
     if (this.downloadingMessageTimeout) {
       clearTimeout(this.downloadingMessageTimeout);
     }
-    this.context?.componentGroup.deactivateComponentForArea(
-      ComponentArea.Editor
-    );
   }
 
   /**
