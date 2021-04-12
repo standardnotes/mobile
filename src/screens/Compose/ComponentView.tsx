@@ -187,7 +187,9 @@ export const ComponentView = ({
             setOfflineUrl(offlineEditorUrl);
           }
         } finally {
-          setUrl(newUrl);
+          if (mounted) {
+            setUrl(newUrl);
+          }
         }
       }
     };
