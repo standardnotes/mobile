@@ -174,13 +174,13 @@ export class ApplicationState extends ApplicationService {
     );
 
     await this.loadUnlockTiming();
-    this.screenshotPrivacyEnabled =
-      (await this.getScreenshotPrivacyEnabled()) ?? true;
-    this.setAndroidScreenshotPrivacy(this.screenshotPrivacyEnabled);
   }
 
   async onAppLaunch() {
     MobileApplication.setPreviouslyLaunched();
+    this.screenshotPrivacyEnabled =
+      (await this.getScreenshotPrivacyEnabled()) ?? true;
+    this.setAndroidScreenshotPrivacy(this.screenshotPrivacyEnabled);
   }
 
   /**
