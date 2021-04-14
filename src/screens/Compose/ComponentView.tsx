@@ -244,7 +244,7 @@ export const ComponentView = ({
      */
     setTimeout(() => {
       onLoadEnd();
-    }, 1000);
+    }, 100);
   }, [application, liveComponent, onLoadEnd]);
 
   const onLoadStartHandler = () => {
