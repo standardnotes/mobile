@@ -1,3 +1,4 @@
+import { Icon, IconType } from '@Components/Icon';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -10,13 +11,12 @@ import {
   Platform,
   SectionListRenderItem,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import styled, { css } from 'styled-components/native';
 
 export type BottomSheetActionType = {
   text: string;
   key: string;
-  iconName?: string;
+  iconType?: IconType;
   callback?: () => void;
   danger?: boolean;
   centered?: boolean;
@@ -124,8 +124,8 @@ const ActionItem: React.FC<{
       <>
         {action.centered ? null : (
           <ActionIconContainer>
-            {action.iconName ? (
-              <ActionIcon name={action.iconName} size={24} color={'#72767E'} />
+            {action.iconType ? (
+              <ActionIcon type={action.iconType} size={24} color={'#72767E'} />
             ) : null}
           </ActionIconContainer>
         )}

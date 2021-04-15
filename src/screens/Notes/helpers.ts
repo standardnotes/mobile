@@ -1,4 +1,5 @@
 import { BottomSheetSectionType } from '@Components/BottomSheet';
+import { IconType } from '@Components/Icon';
 import { Editor } from '@Lib/editor';
 import {
   useChangeNote,
@@ -9,26 +10,17 @@ import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_NOTE_HISTORY } from '@Screens/screens';
 import { SNNote } from '@standardnotes/snjs/dist/@types';
-import {
-  ICON_ARCHIVE,
-  ICON_BOOKMARK,
-  ICON_FINGER_PRINT,
-  ICON_HISTORY,
-  ICON_LOCK,
-  ICON_SHARE,
-  ICON_TRASH,
-} from '@Style/icons';
 import { useContext } from 'react';
 import { Share } from 'react-native';
 
 // eslint-disable-next-line no-shadow
-enum ActionSection {
+export enum ActionSection {
   History = 'history-section',
   CommonActions = 'common-section',
 }
 
 // eslint-disable-next-line no-shadow
-enum NoteAction {
+export enum NoteAction {
   Pin = 'pin',
   Archive = 'archive',
   Lock = 'lock',
@@ -64,7 +56,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         {
           text: 'Note history',
           key: NoteAction.OpenHistory,
-          iconName: ICON_HISTORY,
+          iconType: IconType.History,
           callback: () => {
             if (!editor?.isTemplateNote) {
               navigation.navigate('HistoryStack', {
@@ -81,7 +73,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         {
           text: note.pinned ? 'Unpin' : 'Pin to top',
           key: NoteAction.Pin,
-          iconName: ICON_BOOKMARK,
+          iconType: IconType.Pin,
           callback: () =>
             changeNote(mutator => {
               mutator.pinned = !note.pinned;
@@ -90,7 +82,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         {
           text: note.archived ? 'Unarchive' : 'Archive',
           key: NoteAction.Archive,
-          iconName: ICON_ARCHIVE,
+          iconType: IconType.Archive,
           callback: () => {
             if (note.locked) {
               application?.alertService.alert(
@@ -106,7 +98,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         {
           text: note.locked ? 'Unlock' : 'Lock',
           key: NoteAction.Lock,
-          iconName: ICON_LOCK,
+          iconType: IconType.Lock,
           callback: () =>
             changeNote(mutator => {
               mutator.locked = !note.locked;
@@ -115,13 +107,13 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         {
           text: note.protected ? 'Unprotect' : 'Protect',
           key: NoteAction.Protect,
-          iconName: ICON_FINGER_PRINT,
+          iconType: IconType.Protect,
           callback: async () => await protectOrUnprotectNote(),
         },
         {
           text: 'Share',
           key: NoteAction.ShareAction,
-          iconName: ICON_SHARE,
+          iconType: IconType.Share,
           callback: () => {
             if (note) {
               application
@@ -162,7 +154,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
     sections[ActionSection.CommonActions].data.push({
       text: 'Move to Trash',
       key: NoteAction.Trash,
-      iconName: ICON_TRASH,
+      iconType: IconType.Trash,
       callback: () => deleteNote(false),
     });
   }
