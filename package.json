@@ -20,6 +20,7 @@
   "dependencies": {
     "@bugsnag/react-native": "^7.5.6",
     "@expo/react-native-action-sheet": "^3.8.0",
+    "@gorhom/bottom-sheet": "^2",
     "@react-native-community/async-storage": "1.12.1",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/segmented-control": "^2.2.2",
