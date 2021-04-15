@@ -3,8 +3,13 @@ import {
   BottomSheetModal,
   BottomSheetSectionList,
 } from '@gorhom/bottom-sheet';
-import React, { useEffect, useRef, useState } from 'react';
-import { Platform, SectionListRenderItem } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Dimensions,
+  LayoutChangeEvent,
+  Platform,
+  SectionListRenderItem,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styled, { css } from 'styled-components/native';
 
@@ -139,10 +144,17 @@ export const BottomSheet: React.FC<Props> = ({
   title,
 }) => {
   const ref = useRef<BottomSheetModal>(null);
-  const snapPoints = ['25%', '50%', '75%', '85%'];
+  const [actionListHeight, setActionListHeight] = useState(0);
+  const [titleContainerHeight, setTitleContainerHeight] = useState(0);
+  const [shouldUpdateSnapPoints, setShouldUpdateSnapPoints] = useState(false);
 
   useEffect(() => {
-    visible ? ref.current?.present() : ref.current?.dismiss();
+    if (visible) {
+      setShouldUpdateSnapPoints(true);
+      ref.current?.present();
+    } else {
+      ref.current?.dismiss();
+    }
   }, [visible]);
 
   const renderActionItem: SectionListRenderItem<BottomSheetActionType> = ({
@@ -150,6 +162,31 @@ export const BottomSheet: React.FC<Props> = ({
   }) => (
     <ActionItem action={item} onActionPress={() => ref.current?.dismiss()} />
   );
+
+  const onTitleContainerLayout = (e: LayoutChangeEvent) => {
+    setTitleContainerHeight(e.nativeEvent.layout.height);
+  };
+
+  const onActionListLayout = (e: LayoutChangeEvent) => {
+    if (shouldUpdateSnapPoints) {
+      setActionListHeight(e.nativeEvent.layout.height);
+      setShouldUpdateSnapPoints(false);
+    }
+  };
+
+  const snapPoints = useMemo(() => {
+    const contentHeight = actionListHeight + titleContainerHeight;
+    const screenHeight = Dimensions.get('window').height;
+    const predefinedPercentages = [0.3, 0.5, 0.7, 0.9];
+    const proportionalHeights = predefinedPercentages.map(
+      percentage => percentage * screenHeight
+    );
+    const points = proportionalHeights.filter(height => height < contentHeight);
+    points.push(contentHeight);
+    return points;
+  }, [actionListHeight, titleContainerHeight]);
+
+  const sectionListStyle = { flexGrow: 0 };
 
   return (
     <BottomSheetModal
@@ -161,11 +198,12 @@ export const BottomSheet: React.FC<Props> = ({
     >
       <>
         {title ? (
-          <TitleContainer>
+          <TitleContainer onLayout={onTitleContainerLayout}>
             <Title>{title}</Title>
           </TitleContainer>
         ) : null}
         <BottomSheetSectionList
+          style={sectionListStyle}
           sections={sections.map((section, index) => ({
             ...section,
             first: index === 0,
@@ -175,6 +213,7 @@ export const BottomSheet: React.FC<Props> = ({
           renderSectionHeader={({ section }) => (
             <SectionSeparator first={section.first} />
           )}
+          onLayout={onActionListLayout}
         />
       </>
     </BottomSheetModal>
