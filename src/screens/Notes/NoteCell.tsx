@@ -2,7 +2,7 @@ import { BottomSheet, useBottomSheet } from '@Components/BottomSheet';
 import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
 import React, { useRef, useState } from 'react';
 import { Text, View } from 'react-native';
-import { ACTION_SECTIONS, useNoteActionSections } from './helpers';
+import { ActionSection, useNoteActionSections } from './helpers';
 import {
   Container,
   DeletedText,
@@ -86,8 +86,8 @@ export const NoteCell = ({
       setBottomSheetSections([noteProtectedSection]);
     } else {
       setBottomSheetSections([
-        actionSections[ACTION_SECTIONS.HISTORY],
-        actionSections[ACTION_SECTIONS.COMMON_ACTIONS],
+        actionSections[ActionSection.History],
+        actionSections[ActionSection.CommonActions],
       ]);
     }
 

@@ -21,22 +21,24 @@ import {
 import { useContext } from 'react';
 import { Share } from 'react-native';
 
-export const ACTION_SECTIONS = {
-  HISTORY: 'history-section',
-  COMMON_ACTIONS: 'common-section',
-};
+// eslint-disable-next-line no-shadow
+enum ActionSection {
+  History = 'history-section',
+  CommonActions = 'common-section',
+}
 
-export const NOTE_ACTIONS = {
-  PIN: 'pin',
-  ARCHIVE: 'archive',
-  LOCK: 'lock',
-  PROTECT: 'protect',
-  OPEN_HISTORY: 'history',
-  SHARE: 'share',
-  TRASH: 'trash',
-  RESTORE: 'restore-note',
-  DELETE_PERMANENTLY: 'delete-forever',
-};
+// eslint-disable-next-line no-shadow
+enum NoteAction {
+  Pin = 'pin',
+  Archive = 'archive',
+  Lock = 'lock',
+  Protect = 'protect',
+  OpenHistory = 'history',
+  ShareAction = 'share',
+  Trash = 'trash',
+  Restore = 'restore-note',
+  DeletePermanently = 'delete-forever',
+}
 
 export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
   const application = useContext(ApplicationContext);
@@ -57,11 +59,11 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
   const navigation = useNavigation();
 
   const sections: Record<string, BottomSheetSectionType> = {
-    [ACTION_SECTIONS.HISTORY]: {
+    [ActionSection.History]: {
       data: [
         {
           text: 'Note history',
-          key: NOTE_ACTIONS.OPEN_HISTORY,
+          key: NoteAction.OpenHistory,
           iconName: ICON_HISTORY,
           callback: () => {
             if (!editor?.isTemplateNote) {
@@ -74,11 +76,11 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         },
       ],
     },
-    [ACTION_SECTIONS.COMMON_ACTIONS]: {
+    [ActionSection.CommonActions]: {
       data: [
         {
           text: note.pinned ? 'Unpin' : 'Pin to top',
-          key: NOTE_ACTIONS.PIN,
+          key: NoteAction.Pin,
           iconName: ICON_BOOKMARK,
           callback: () =>
             changeNote(mutator => {
@@ -87,7 +89,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         },
         {
           text: note.archived ? 'Unarchive' : 'Archive',
-          key: NOTE_ACTIONS.ARCHIVE,
+          key: NoteAction.Archive,
           iconName: ICON_ARCHIVE,
           callback: () => {
             if (note.locked) {
@@ -103,7 +105,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         },
         {
           text: note.locked ? 'Unlock' : 'Lock',
-          key: NOTE_ACTIONS.LOCK,
+          key: NoteAction.Lock,
           iconName: ICON_LOCK,
           callback: () =>
             changeNote(mutator => {
@@ -112,13 +114,13 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         },
         {
           text: note.protected ? 'Unprotect' : 'Protect',
-          key: NOTE_ACTIONS.PROTECT,
+          key: NoteAction.Protect,
           iconName: ICON_FINGER_PRINT,
           callback: async () => await protectOrUnprotectNote(),
         },
         {
           text: 'Share',
-          key: NOTE_ACTIONS.SHARE,
+          key: NoteAction.ShareAction,
           iconName: ICON_SHARE,
           callback: () => {
             if (note) {
@@ -138,11 +140,11 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
   };
 
   if (note.trashed) {
-    sections[ACTION_SECTIONS.COMMON_ACTIONS].data = [
-      ...sections[ACTION_SECTIONS.COMMON_ACTIONS].data,
+    sections[ActionSection.CommonActions].data = [
+      ...sections[ActionSection.CommonActions].data,
       {
         text: 'Restore',
-        key: NOTE_ACTIONS.RESTORE,
+        key: NoteAction.Restore,
         callback: () => {
           changeNote(mutator => {
             mutator.trashed = false;
@@ -151,15 +153,15 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
       },
       {
         text: 'Delete permanently',
-        key: NOTE_ACTIONS.DELETE_PERMANENTLY,
+        key: NoteAction.DeletePermanently,
         callback: async () => deleteNote(true),
         danger: true,
       },
     ];
   } else {
-    sections[ACTION_SECTIONS.COMMON_ACTIONS].data.push({
+    sections[ActionSection.CommonActions].data.push({
       text: 'Move to Trash',
-      key: NOTE_ACTIONS.TRASH,
+      key: NoteAction.Trash,
       iconName: ICON_TRASH,
       callback: () => deleteNote(false),
     });
