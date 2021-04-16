@@ -2,15 +2,10 @@ import { Icon, IconType } from '@Components/Icon';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
-  BottomSheetSectionList,
+  BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Dimensions,
-  LayoutChangeEvent,
-  Platform,
-  SectionListRenderItem,
-} from 'react-native';
+import { Dimensions, LayoutChangeEvent, Platform, View } from 'react-native';
 import styled, { css } from 'styled-components/native';
 
 export type BottomSheetActionType = {
@@ -23,8 +18,8 @@ export type BottomSheetActionType = {
 };
 
 export type BottomSheetSectionType = {
-  data: BottomSheetActionType[];
-  first?: boolean;
+  key: string;
+  actions: BottomSheetActionType[];
 };
 
 type Props = {
@@ -139,6 +134,23 @@ const ActionItem: React.FC<{
   );
 };
 
+const Section: React.FC<{
+  section: BottomSheetSectionType;
+  first: boolean;
+  onActionPress: () => void;
+}> = ({ section, first, onActionPress }) => (
+  <View key={section.key}>
+    <SectionSeparator first={first} />
+    {section.actions.map(action => (
+      <ActionItem
+        key={action.key}
+        action={action}
+        onActionPress={onActionPress}
+      />
+    ))}
+  </View>
+);
+
 export const BottomSheet: React.FC<Props> = ({
   visible,
   onDismiss,
@@ -146,49 +158,41 @@ export const BottomSheet: React.FC<Props> = ({
   title,
 }) => {
   const ref = useRef<BottomSheetModal>(null);
-  const [actionListHeight, setActionListHeight] = useState(0);
-  const [titleContainerHeight, setTitleContainerHeight] = useState(0);
-  const [shouldUpdateSnapPoints, setShouldUpdateSnapPoints] = useState(false);
+  const [titleHeight, setTitleHeight] = useState(0);
+  const [listHeight, setListHeight] = useState(0);
 
   useEffect(() => {
     if (visible) {
-      setShouldUpdateSnapPoints(true);
       ref.current?.present();
-    } else {
-      ref.current?.dismiss();
     }
   }, [visible]);
 
-  const renderActionItem: SectionListRenderItem<BottomSheetActionType> = ({
-    item,
-  }) => (
-    <ActionItem action={item} onActionPress={() => ref.current?.dismiss()} />
-  );
-
-  const onTitleContainerLayout = (e: LayoutChangeEvent) => {
-    setTitleContainerHeight(e.nativeEvent.layout.height);
-  };
-
-  const onActionListLayout = (e: LayoutChangeEvent) => {
-    if (shouldUpdateSnapPoints) {
-      setActionListHeight(e.nativeEvent.layout.height);
-      setShouldUpdateSnapPoints(false);
+  useEffect(() => {
+    if (!title) {
+      setTitleHeight(0);
     }
+  }, [title]);
+
+  const onTitleLayout = (e: LayoutChangeEvent) => {
+    setTitleHeight(e.nativeEvent.layout.height);
   };
+
+  const onListLayout = (e: LayoutChangeEvent) => {
+    setListHeight(e.nativeEvent.layout.height);
+  };
+
+  const contentHeight = useMemo(() => titleHeight + listHeight, [
+    titleHeight,
+    listHeight,
+  ]);
 
   const snapPoints = useMemo(() => {
-    const contentHeight = actionListHeight + titleContainerHeight;
     const screenHeight = Dimensions.get('window').height;
-    const predefinedPercentages = [0.3, 0.5, 0.7, 0.9];
-    const proportionalHeights = predefinedPercentages.map(
-      percentage => percentage * screenHeight
-    );
-    const points = proportionalHeights.filter(height => height < contentHeight);
-    points.push(contentHeight);
-    return points;
-  }, [actionListHeight, titleContainerHeight]);
+    const maxLimit = 0.85 * screenHeight;
+    return contentHeight < maxLimit ? [contentHeight] : [maxLimit];
+  }, [contentHeight]);
 
-  const sectionListStyle = { flexGrow: 0 };
+  // const sectionListStyle = { flexGrow: 0 };
 
   return (
     <BottomSheetModal
@@ -200,24 +204,21 @@ export const BottomSheet: React.FC<Props> = ({
     >
       <>
         {title ? (
-          <TitleContainer onLayout={onTitleContainerLayout}>
+          <TitleContainer onLayout={onTitleLayout}>
             <Title>{title}</Title>
           </TitleContainer>
         ) : null}
-        <BottomSheetSectionList
-          style={sectionListStyle}
-          sections={sections.map((section, index) => ({
-            ...section,
-            first: index === 0,
-          }))}
-          keyExtractor={action => action.key}
-          renderItem={renderActionItem}
-          renderSectionHeader={({ section }) => (
-            <SectionSeparator first={section.first} />
-          )}
-          onLayout={onActionListLayout}
-          stickySectionHeadersEnabled={false}
-        />
+        <BottomSheetScrollView>
+          <View onLayout={onListLayout}>
+            {sections.map((section, index) => (
+              <Section
+                section={section}
+                first={index === 0}
+                onActionPress={() => ref.current?.dismiss()}
+              />
+            ))}
+          </View>
+        </BottomSheetScrollView>
       </>
     </BottomSheetModal>
   );

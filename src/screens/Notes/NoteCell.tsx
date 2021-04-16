@@ -76,7 +76,8 @@ export const NoteCell = ({
 
     if (note.protected) {
       const noteProtectedSection = {
-        data: [
+        key: 'protected-section',
+        actions: [
           {
             text: 'Note Protected',
             key: 'note-protected',

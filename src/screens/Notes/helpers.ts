@@ -17,6 +17,7 @@ import { Share } from 'react-native';
 export enum ActionSection {
   History = 'history-section',
   CommonActions = 'common-section',
+  Listed = 'listed-section',
 }
 
 // eslint-disable-next-line no-shadow
@@ -30,6 +31,7 @@ export enum NoteAction {
   Trash = 'trash',
   Restore = 'restore-note',
   DeletePermanently = 'delete-forever',
+  Listed = 'listed',
 }
 
 export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
@@ -52,7 +54,8 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
 
   const sections: Record<string, BottomSheetSectionType> = {
     [ActionSection.History]: {
-      data: [
+      key: ActionSection.History,
+      actions: [
         {
           text: 'Note history',
           key: NoteAction.OpenHistory,
@@ -69,7 +72,8 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
       ],
     },
     [ActionSection.CommonActions]: {
-      data: [
+      key: ActionSection.CommonActions,
+      actions: [
         {
           text: note.pinned ? 'Unpin' : 'Pin to top',
           key: NoteAction.Pin,
@@ -132,8 +136,8 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
   };
 
   if (note.trashed) {
-    sections[ActionSection.CommonActions].data = [
-      ...sections[ActionSection.CommonActions].data,
+    sections[ActionSection.CommonActions].actions = [
+      ...sections[ActionSection.CommonActions].actions,
       {
         text: 'Restore',
         key: NoteAction.Restore,
@@ -151,7 +155,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
       },
     ];
   } else {
-    sections[ActionSection.CommonActions].data.push({
+    sections[ActionSection.CommonActions].actions.push({
       text: 'Move to Trash',
       key: NoteAction.Trash,
       iconType: IconType.Trash,
