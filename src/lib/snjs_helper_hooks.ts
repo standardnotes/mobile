@@ -503,3 +503,22 @@ export const useProtectOrUnprotectNote = (
 
   return [protectOrUnprotectNote];
 };
+
+export const useListedExtensions = (note: SNNote) => {
+  const LISTED_IDENTIFIER = 'org.standardnotes.listed';
+  // Context
+  const application = React.useContext(ApplicationContext);
+
+  const getListedExtensions = useCallback(() => {
+    return application?.actionsManager
+      .getExtensions()
+      .filter(
+        extension => extension.package_info?.identifier === LISTED_IDENTIFIER
+      )
+      .map(extension => ({
+        name: extension.name,
+        actions: extension.actionsWithContextForItem(note),
+      }));
+  }, [application, note]);
+  return [getListedExtensions];
+};

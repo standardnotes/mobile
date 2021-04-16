@@ -4,13 +4,14 @@ import { Editor } from '@Lib/editor';
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
+  useListedExtensions,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_NOTE_HISTORY } from '@Screens/screens';
 import { SNNote } from '@standardnotes/snjs/dist/@types';
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import { Share } from 'react-native';
 
 // eslint-disable-next-line no-shadow
@@ -50,7 +51,23 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
     },
     editor
   );
+  const [getListedExtensions] = useListedExtensions(note);
   const navigation = useNavigation();
+
+  const getlistedSections = useCallback(
+    () =>
+      (getListedExtensions() || []).map((extension, index) => ({
+        key: `${extension.name}-${index}-section`,
+        actions: [
+          {
+            text: `${extension.name} actions`,
+            key: `${extension.name}-${index}-section`,
+            iconType: IconType.Listed,
+          },
+        ],
+      })),
+    [getListedExtensions]
+  );
 
   const sections: Record<string, BottomSheetSectionType> = {
     [ActionSection.History]: {
@@ -163,5 +180,14 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
     });
   }
 
-  return sections;
+  const getActionSections = (sectionType: ActionSection) => {
+    switch (sectionType) {
+      case ActionSection.Listed:
+        return getlistedSections();
+      default:
+        return [sections[sectionType]];
+    }
+  };
+
+  return getActionSections;
 };

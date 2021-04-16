@@ -37,7 +37,7 @@ export const NoteCell = ({
 }: Props) => {
   // State
   const [selected, setSelected] = useState(false);
-  const actionSections = useNoteActionSections(note);
+  const getActionSections = useNoteActionSections(note);
 
   // Ref
   const selectionTimeout = useRef<number>();
@@ -89,8 +89,9 @@ export const NoteCell = ({
       bottomSheetSections = [noteProtectedSection];
     } else {
       bottomSheetSections = [
-        actionSections[ActionSection.History],
-        actionSections[ActionSection.CommonActions],
+        ...getActionSections(ActionSection.History),
+        ...getActionSections(ActionSection.CommonActions),
+        ...getActionSections(ActionSection.Listed),
       ];
     }
     onLongPressItem(bottomSheetTitle, bottomSheetSections);
