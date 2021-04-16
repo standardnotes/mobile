@@ -1,3 +1,4 @@
+import { BottomSheet, useBottomSheet } from '@Components/BottomSheet';
 import { Chip } from '@Components/Chip';
 import { AppStateEventType, AppStateType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
@@ -73,6 +74,14 @@ export const NoteList = (props: Props) => {
 
   const [collapseSearchBarOnBlur, setCollapseSearchBarOnBlur] = useState(true);
   const [noteListScrolled, setNoteListScrolled] = useState(false);
+
+  const [
+    bottomSheetTitle,
+    bottomSheetSections,
+    bottomSheetVisible,
+    presentBottomSheet,
+    dismissBottomSheet,
+  ] = useBottomSheet();
 
   // Ref
   const opacityAnimationValue = useRef(new Animated.Value(0)).current;
@@ -189,6 +198,7 @@ export const NoteList = (props: Props) => {
         hideDates={props.hideDates}
         hidePreviews={props.hidePreviews}
         highlighted={item.uuid === props.selectedNoteId}
+        onLongPressItem={presentBottomSheet}
       />
     );
   };
@@ -316,6 +326,12 @@ export const NoteList = (props: Props) => {
           <HeaderContainer>{!signedIn && <OfflineBanner />}</HeaderContainer>
         )}
         onScroll={onScroll}
+      />
+      <BottomSheet
+        title={bottomSheetTitle}
+        sections={bottomSheetSections}
+        visible={bottomSheetVisible}
+        onDismiss={dismissBottomSheet}
       />
     </Container>
   );

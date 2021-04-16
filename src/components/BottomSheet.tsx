@@ -119,13 +119,15 @@ const ActionItem: React.FC<{
     onActionPress();
   };
 
+  const ICON_COLOR = '#72767E';
+
   return (
     <ActionItemContainer onPress={onPress}>
       <>
         {action.centered ? null : (
           <ActionIconContainer>
             {action.iconType ? (
-              <ActionIcon type={action.iconType} size={24} color={'#72767E'} />
+              <ActionIcon type={action.iconType} size={24} color={ICON_COLOR} />
             ) : null}
           </ActionIconContainer>
         )}
@@ -214,6 +216,7 @@ export const BottomSheet: React.FC<Props> = ({
             <SectionSeparator first={section.first} />
           )}
           onLayout={onActionListLayout}
+          stickySectionHeadersEnabled={false}
         />
       </>
     </BottomSheetModal>
@@ -225,16 +228,32 @@ export const useBottomSheet = () => {
     BottomSheetSectionType[]
   >([]);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [bottomSheetTitle, setBottomSheetTitle] = useState('');
+
+  const presentBottomSheet = (
+    title: string,
+    sections: BottomSheetSectionType[]
+  ) => {
+    setBottomSheetTitle(title);
+    setBottomSheetSections(sections);
+    setBottomSheetVisible(true);
+  };
+
+  const dismissBottomSheet = () => {
+    setBottomSheetVisible(false);
+  };
 
   return [
+    bottomSheetTitle,
     bottomSheetSections,
-    setBottomSheetSections,
     bottomSheetVisible,
-    setBottomSheetVisible,
+    presentBottomSheet,
+    dismissBottomSheet,
   ] as [
+    string,
     BottomSheetSectionType[],
-    (sections: BottomSheetSectionType[]) => void,
     boolean,
-    (visible: boolean) => void
+    (title: string, sections: BottomSheetSectionType[]) => void,
+    () => void
   ];
 };
