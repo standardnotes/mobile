@@ -15,6 +15,7 @@ export type BottomSheetActionType = {
   callback?: () => void;
   danger?: boolean;
   centered?: boolean;
+  description?: string;
 };
 
 export type BottomSheetSectionType = {
@@ -71,6 +72,9 @@ const SectionSeparator = styled.View<{ first?: boolean }>`
 
 const ActionItemContainer = styled.TouchableOpacity`
   padding: 10px 16px;
+`;
+
+const ActionItemMainInfo = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -84,6 +88,12 @@ const ActionIconContainer = styled.View`
   justify-content: center;
 `;
 
+const ActionIcon = styled(Icon).attrs(({ theme }) => ({
+  color: theme.stylekitNeutralColor,
+}))`
+  text-align: center;
+`;
+
 const ActionText = styled.Text<{ danger?: boolean; centered?: boolean }>`
   color: ${({ theme, danger }) =>
     danger ? theme.stylekitDangerColor : theme.stylekitForegroundColor};
@@ -93,8 +103,11 @@ const ActionText = styled.Text<{ danger?: boolean; centered?: boolean }>`
   text-align: ${({ centered }) => (centered ? 'center' : 'left')};
 `;
 
-const ActionIcon = styled(Icon)`
-  text-align: center;
+const ActionDescription = styled.Text`
+  color: ${({ theme }) => theme.stylekitNeutralColor};
+  font-size: 14px;
+  margin-top: 2px;
+  margin-left: 40px;
 `;
 
 const HandleComponent: React.FC = () => (
@@ -114,22 +127,23 @@ const ActionItem: React.FC<{
     onActionPress();
   };
 
-  const ICON_COLOR = '#72767E';
-
   return (
     <ActionItemContainer onPress={onPress}>
-      <>
+      <ActionItemMainInfo>
         {action.centered ? null : (
           <ActionIconContainer>
             {action.iconType ? (
-              <ActionIcon type={action.iconType} size={24} color={ICON_COLOR} />
+              <ActionIcon type={action.iconType} size={24} />
             ) : null}
           </ActionIconContainer>
         )}
         <ActionText danger={action.danger} centered={action.centered}>
           {action.text}
         </ActionText>
-      </>
+      </ActionItemMainInfo>
+      {action.description && (
+        <ActionDescription>{action.description}</ActionDescription>
+      )}
     </ActionItemContainer>
   );
 };

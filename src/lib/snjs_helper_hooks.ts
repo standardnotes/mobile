@@ -517,6 +517,7 @@ export const useListedExtensions = (note: SNNote) => {
       )
       .map(extension => ({
         name: extension.name,
+        url: extension.url,
         actions: extension.actionsWithContextForItem(note),
       }));
   }, [application, note]);

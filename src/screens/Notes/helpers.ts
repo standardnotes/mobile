@@ -62,6 +62,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
           {
             text: `${extension.name} actions`,
             key: `${extension.name}-${index}-section`,
+            description: extension.url.replace(/(.*)\/extension.*/i, '$1'),
             iconType: IconType.Listed,
           },
         ],
