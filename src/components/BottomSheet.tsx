@@ -214,6 +214,10 @@ export const BottomSheet: React.FC<Props> = ({
   const snapPoints = useMemo(() => {
     const screenHeight = Dimensions.get('window').height;
     const maxLimit = 0.85 * screenHeight;
+
+    if (contentHeight === 0) {
+      return [1];
+    }
     return contentHeight < maxLimit ? [contentHeight] : [maxLimit];
   }, [contentHeight]);
 
