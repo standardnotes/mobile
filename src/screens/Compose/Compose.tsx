@@ -320,41 +320,43 @@ export class Compose extends React.Component<{}, State> {
     isUserModified: boolean,
     dontUpdatePreviews: boolean,
     closeAfterSync: boolean,
-    newNoteText: string | undefined = this.note!.text
+    newNoteText?: string
   ) => {
-    if (!this.note) {
+    const { editor, note } = this;
+    const { title } = this.state;
+
+    if (!note) {
       return;
     }
-    if (this.note?.deleted) {
+    if (note?.deleted) {
       this.context!.alertService!.alert(
         'Attempting to save this note has failed. The note has previously been deleted.'
       );
       return;
     }
-
-    if (this.editor?.isTemplateNote) {
-      await this.editor?.insertTemplatedNote();
+    if (editor?.isTemplateNote) {
+      await editor?.insertTemplatedNote();
       if (this.context?.getAppState().selectedTag?.isSmartTag === false) {
         await this.context.changeItem(
           this.context?.getAppState().selectedTag!.uuid,
           mutator => {
-            mutator.addItemAsRelationship(this.note!);
+            mutator.addItemAsRelationship(note!);
           }
         );
       }
     }
-    if (!this.context?.findItem(this.note!.uuid)) {
+    if (!this.context?.findItem(note!.uuid)) {
       this.context?.alertService!.alert(
         'Attempting to save this note has failed. The note cannot be found.'
       );
       return;
     }
     await this.context!.changeItem(
-      this.note!.uuid,
+      note!.uuid,
       mutator => {
         const noteMutator = mutator as NoteMutator;
-        noteMutator.title = this.state.title!;
-        noteMutator.text = newNoteText;
+        noteMutator.title = title!;
+        noteMutator.text = newNoteText ?? note.text;
         if (!dontUpdatePreviews) {
           const text = newNoteText ?? '';
           const truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT;
@@ -377,7 +379,7 @@ export class Compose extends React.Component<{}, State> {
     this.saveTimeout = setTimeout(() => {
       this.context?.sync();
       if (closeAfterSync) {
-        this.context?.getAppState().closeEditor(this.editor!);
+        this.context?.getAppState().closeEditor(editor!);
       }
     }, syncDebouceMs);
   };
