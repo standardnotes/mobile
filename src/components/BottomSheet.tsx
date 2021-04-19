@@ -217,8 +217,6 @@ export const BottomSheet: React.FC<Props> = ({
     return contentHeight < maxLimit ? [contentHeight] : [maxLimit];
   }, [contentHeight]);
 
-  // const sectionListStyle = { flexGrow: 0 };
-
   return (
     <BottomSheetModal
       ref={ref}
