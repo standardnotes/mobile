@@ -14,7 +14,7 @@ import React, {
 import { Dimensions, LayoutChangeEvent, Platform, View } from 'react-native';
 import styled, { css } from 'styled-components/native';
 
-export type BottomSheetActionType = {
+export interface BottomSheetActionType {
   text: string;
   key: string;
   iconType?: IconType;
@@ -23,7 +23,8 @@ export type BottomSheetActionType = {
   centered?: boolean;
   description?: string;
   dismissSheetOnPress?: boolean;
-};
+  expandableActions?: BottomSheetActionType[];
+}
 
 export type BottomSheetSectionType = {
   key: string;
@@ -125,14 +126,17 @@ const HandleComponent: React.FC = () => (
 
 const ActionItem: React.FC<{
   action: BottomSheetActionType;
-  onActionPress?: () => void;
-}> = ({ action, onActionPress }) => {
+  dismissBottomSheet: () => void;
+  updateExpandedActionKey: () => void;
+}> = ({ action, dismissBottomSheet, updateExpandedActionKey }) => {
   const onPress = () => {
     if (action.callback) {
       action.callback();
     }
-    if (onActionPress) {
-      onActionPress();
+    if (action.dismissSheetOnPress) {
+      dismissBottomSheet();
+    } else if (action.expandableActions) {
+      updateExpandedActionKey();
     }
   };
 
@@ -161,18 +165,29 @@ const Section: React.FC<{
   section: BottomSheetSectionType;
   first: boolean;
   dismissBottomSheet: () => void;
-}> = ({ section, first, dismissBottomSheet }) => (
+  updateExpandedActionKey: (actionKey: string) => void;
+  expandedActionKey: string;
+}> = ({
+  section,
+  first,
+  dismissBottomSheet,
+  updateExpandedActionKey,
+  expandedActionKey,
+}) => (
   <View>
     <SectionSeparator first={first} />
-    {section.actions.map(action => (
-      <ActionItem
-        key={action.key}
-        action={action}
-        onActionPress={
-          action.dismissSheetOnPress ? dismissBottomSheet : undefined
-        }
-      />
-    ))}
+    {section.actions.map(action => {
+      const expanded = expandedActionKey === action.key;
+      const items = expanded ? action.expandableActions : [action];
+      return items!.map(item => (
+        <ActionItem
+          key={item.key}
+          action={item}
+          dismissBottomSheet={dismissBottomSheet}
+          updateExpandedActionKey={() => updateExpandedActionKey(item.key)}
+        />
+      ));
+    })}
   </View>
 );
 
@@ -185,6 +200,7 @@ export const BottomSheet: React.FC<Props> = ({
   const ref = useRef<BottomSheetModal>(null);
   const [titleHeight, setTitleHeight] = useState(0);
   const [listHeight, setListHeight] = useState(0);
+  const [expandedActionKey, setExpandedActionKey] = useState('');
 
   useEffect(() => {
     if (visible) {
@@ -221,6 +237,10 @@ export const BottomSheet: React.FC<Props> = ({
     return contentHeight < maxLimit ? [contentHeight] : [maxLimit];
   }, [contentHeight]);
 
+  const updateExpandedActionKey = (actionKey: string) => {
+    setExpandedActionKey(actionKey);
+  };
+
   return (
     <BottomSheetModal
       ref={ref}
@@ -243,6 +263,8 @@ export const BottomSheet: React.FC<Props> = ({
                 section={section}
                 first={index === 0}
                 dismissBottomSheet={() => ref.current?.dismiss()}
+                updateExpandedActionKey={updateExpandedActionKey}
+                expandedActionKey={expandedActionKey}
               />
             ))}
           </View>

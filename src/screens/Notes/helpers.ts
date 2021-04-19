@@ -59,23 +59,32 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
 
   const listedSections = useMemo(
     () =>
-      (listedExtensions || []).map((extension, index) => ({
-        key: `${extension.name
+      (listedExtensions || []).map((extension, extensionIndex) => {
+        const key = `${extension.name
           .toLowerCase()
           .split(' ')
-          .join('-')}-${index}-section`,
-        actions: [
-          {
-            text: `${extension.name} actions`,
-            key: `${extension.name
-              .toLowerCase()
-              .split(' ')
-              .join('-')}-${index}-action`,
-            description: extension.url.replace(/(.*)\/extension.*/i, '$1'),
-            iconType: IconType.Listed,
-          },
-        ],
-      })),
+          .join('-')}-${extensionIndex}`;
+        const description = extension.url.replace(/(.*)\/extension.*/i, '$1');
+        const expandableActions = extension.actions.map(
+          (action, actionIndex) => ({
+            text: action.label,
+            key: `${key}-${action.label}-action`,
+            iconType: actionIndex === 0 ? IconType.Listed : undefined,
+          })
+        );
+        return {
+          key: `${key}-section`,
+          actions: [
+            {
+              text: `${extension.name} actions`,
+              key: `${key}-action`,
+              description,
+              iconType: IconType.Listed,
+              expandableActions,
+            },
+          ],
+        };
+      }),
     [listedExtensions]
   );
 
