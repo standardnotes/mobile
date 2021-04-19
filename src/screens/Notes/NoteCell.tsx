@@ -1,6 +1,10 @@
-import { BottomSheet, useBottomSheet } from '@Components/BottomSheet';
+import {
+  BottomSheet,
+  BottomSheetSectionType,
+  useBottomSheet,
+} from '@Components/BottomSheet';
 import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { ActionSection, useNoteActionSections } from './helpers';
 import {
@@ -70,32 +74,14 @@ export const NoteCell = ({
     setSelected(false);
   };
 
-  const sections = useMemo(() => {
-    return [
+  useEffect(() => {
+    const sections: BottomSheetSectionType[] = [
       ...getActionSections(ActionSection.History),
       ...getActionSections(ActionSection.CommonActions),
       ...getActionSections(ActionSection.Listed),
     ];
-  }, [getActionSections]);
-
-  useEffect(() => {
-    if (note.protected) {
-      const noteProtectedSection = {
-        key: 'protected-section',
-        actions: [
-          {
-            text: 'Note Protected',
-            key: 'note-protected',
-            danger: true,
-            centered: true,
-          },
-        ],
-      };
-      setBottomSheetSections([noteProtectedSection]);
-    } else {
-      setBottomSheetSections(sections);
-    }
-  }, [note, sections, setBottomSheetSections]);
+    setBottomSheetSections(sections);
+  }, [getActionSections, setBottomSheetSections]);
 
   const onLongPress = () => {
     if (note.errorDecrypting) {
