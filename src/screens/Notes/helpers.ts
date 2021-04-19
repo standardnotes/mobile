@@ -60,11 +60,17 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
   const listedSections = useMemo(
     () =>
       (listedExtensions || []).map((extension, index) => ({
-        key: `${extension.name}-${index}-section`,
+        key: `${extension.name
+          .toLowerCase()
+          .split(' ')
+          .join('-')}-${index}-section`,
         actions: [
           {
             text: `${extension.name} actions`,
-            key: extension.package_info.uuid,
+            key: `${extension.name
+              .toLowerCase()
+              .split(' ')
+              .join('-')}-${index}-action`,
             description: extension.url.replace(/(.*)\/extension.*/i, '$1'),
             iconType: IconType.Listed,
           },

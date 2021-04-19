@@ -162,7 +162,7 @@ const Section: React.FC<{
   first: boolean;
   dismissBottomSheet: () => void;
 }> = ({ section, first, dismissBottomSheet }) => (
-  <View key={section.key}>
+  <View>
     <SectionSeparator first={first} />
     {section.actions.map(action => (
       <ActionItem
@@ -239,6 +239,7 @@ export const BottomSheet: React.FC<Props> = ({
           <View onLayout={onListLayout}>
             {sections.map((section, index) => (
               <Section
+                key={section.key}
                 section={section}
                 first={index === 0}
                 dismissBottomSheet={() => ref.current?.dismiss()}
