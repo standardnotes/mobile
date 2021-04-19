@@ -11,7 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_NOTE_HISTORY } from '@Screens/screens';
 import { SNNote } from '@standardnotes/snjs/dist/@types';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { Share } from 'react-native';
 
 // eslint-disable-next-line no-shadow
@@ -41,37 +41,35 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
   const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note);
   const [deleteNote] = useDeleteNoteWithPrivileges(
     note,
-    async () => {
+    useCallback(async () => {
       await application?.deleteItem(note);
-    },
-    () => {
+    }, [application, note]),
+    useCallback(() => {
       changeNote(mutator => {
         mutator.trashed = true;
       });
-    },
+    }, [changeNote]),
     editor
   );
-  const [getListedExtensions] = useListedExtensions(note);
+  const [listedExtensions] = useListedExtensions(note);
   const navigation = useNavigation();
 
-  const getlistedSections = useCallback(
-    () =>
-      (getListedExtensions() || []).map((extension, index) => ({
-        key: `${extension.name}-${index}-section`,
-        actions: [
-          {
-            text: `${extension.name} actions`,
-            key: `${extension.name}-${index}-section`,
-            description: extension.url.replace(/(.*)\/extension.*/i, '$1'),
-            iconType: IconType.Listed,
-          },
-        ],
-      })),
-    [getListedExtensions]
-  );
+  const listedSections = useMemo(() => {
+    return (listedExtensions || []).map((extension, index) => ({
+      key: `${extension.name}-${index}-section`,
+      actions: [
+        {
+          text: `${extension.name} actions`,
+          key: extension.package_info.uuid,
+          description: extension.url.replace(/(.*)\/extension.*/i, '$1'),
+          iconType: IconType.Listed,
+        },
+      ],
+    }));
+  }, [listedExtensions]);
 
-  const sections: Record<string, BottomSheetSectionType> = {
-    [ActionSection.History]: {
+  const historySection = useMemo(() => {
+    return {
       key: ActionSection.History,
       actions: [
         {
@@ -86,10 +84,14 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
               });
             }
           },
+          dismissSheetOnPress: true,
         },
       ],
-    },
-    [ActionSection.CommonActions]: {
+    };
+  }, [editor, navigation, note]);
+
+  const commonSection = useMemo(() => {
+    const section: BottomSheetSectionType = {
       key: ActionSection.CommonActions,
       actions: [
         {
@@ -100,6 +102,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
             changeNote(mutator => {
               mutator.pinned = !note.pinned;
             }),
+          dismissSheetOnPress: true,
         },
         {
           text: note.archived ? 'Unarchive' : 'Archive',
@@ -116,6 +119,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
               mutator.archived = !note.archived;
             });
           },
+          dismissSheetOnPress: true,
         },
         {
           text: note.locked ? 'Unlock' : 'Lock',
@@ -125,12 +129,14 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
             changeNote(mutator => {
               mutator.locked = !note.locked;
             }),
+          dismissSheetOnPress: true,
         },
         {
           text: note.protected ? 'Unprotect' : 'Protect',
           key: NoteAction.Protect,
           iconType: IconType.Protect,
           callback: async () => await protectOrUnprotectNote(),
+          dismissSheetOnPress: true,
         },
         {
           text: 'Share',
@@ -148,47 +154,64 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
                 });
             }
           },
+          dismissSheetOnPress: true,
         },
       ],
-    },
-  };
+    };
 
-  if (note.trashed) {
-    sections[ActionSection.CommonActions].actions = [
-      ...sections[ActionSection.CommonActions].actions,
-      {
-        text: 'Restore',
-        key: NoteAction.Restore,
-        callback: () => {
-          changeNote(mutator => {
-            mutator.trashed = false;
-          });
+    if (note.trashed) {
+      section.actions = [
+        ...section.actions,
+        {
+          text: 'Restore',
+          key: NoteAction.Restore,
+          callback: () => {
+            changeNote(mutator => {
+              mutator.trashed = false;
+            });
+          },
+          dismissSheetOnPress: true,
         },
-      },
-      {
-        text: 'Delete permanently',
-        key: NoteAction.DeletePermanently,
-        callback: async () => deleteNote(true),
-        danger: true,
-      },
-    ];
-  } else {
-    sections[ActionSection.CommonActions].actions.push({
-      text: 'Move to Trash',
-      key: NoteAction.Trash,
-      iconType: IconType.Trash,
-      callback: () => deleteNote(false),
-    });
-  }
-
-  const getActionSections = (sectionType: ActionSection) => {
-    switch (sectionType) {
-      case ActionSection.Listed:
-        return getlistedSections();
-      default:
-        return [sections[sectionType]];
+        {
+          text: 'Delete permanently',
+          key: NoteAction.DeletePermanently,
+          callback: async () => await deleteNote(true),
+          danger: true,
+          dismissSheetOnPress: true,
+        },
+      ];
+    } else {
+      section.actions.push({
+        text: 'Move to Trash',
+        key: NoteAction.Trash,
+        iconType: IconType.Trash,
+        callback: async () => await deleteNote(false),
+        dismissSheetOnPress: true,
+      });
     }
-  };
+
+    return section;
+  }, [application, changeNote, deleteNote, note, protectOrUnprotectNote]);
+
+  const sections: Record<string, BottomSheetSectionType> = useMemo(
+    () => ({
+      [ActionSection.History]: historySection,
+      [ActionSection.CommonActions]: commonSection,
+    }),
+    [commonSection, historySection]
+  );
+
+  const getActionSections = useCallback(
+    (sectionType: ActionSection) => {
+      switch (sectionType) {
+        case ActionSection.Listed:
+          return listedSections;
+        default:
+          return [sections[sectionType]];
+      }
+    },
+    [listedSections, sections]
+  );
 
   return getActionSections;
 };

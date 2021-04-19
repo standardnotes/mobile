@@ -8,7 +8,7 @@ import {
   SNNote,
   StorageEncryptionPolicies,
 } from '@standardnotes/snjs';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { LockStateType } from './application_state';
 import { Editor } from './editor';
 
@@ -509,17 +509,16 @@ export const useListedExtensions = (note: SNNote) => {
   // Context
   const application = React.useContext(ApplicationContext);
 
-  const getListedExtensions = useCallback(() => {
+  const listedExtensions = useMemo(() => {
     return application?.actionsManager
       .getExtensions()
       .filter(
         extension => extension.package_info?.identifier === LISTED_IDENTIFIER
       )
       .map(extension => ({
-        name: extension.name,
-        url: extension.url,
+        ...extension,
         actions: extension.actionsWithContextForItem(note),
       }));
   }, [application, note]);
-  return [getListedExtensions];
+  return [listedExtensions];
 };

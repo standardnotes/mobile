@@ -4,7 +4,13 @@ import {
   BottomSheetModal,
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Dimensions, LayoutChangeEvent, Platform, View } from 'react-native';
 import styled, { css } from 'styled-components/native';
 
@@ -16,6 +22,7 @@ export type BottomSheetActionType = {
   danger?: boolean;
   centered?: boolean;
   description?: string;
+  dismissSheetOnPress?: boolean;
 };
 
 export type BottomSheetSectionType = {
@@ -118,13 +125,15 @@ const HandleComponent: React.FC = () => (
 
 const ActionItem: React.FC<{
   action: BottomSheetActionType;
-  onActionPress: () => void;
+  onActionPress?: () => void;
 }> = ({ action, onActionPress }) => {
   const onPress = () => {
     if (action.callback) {
       action.callback();
     }
-    onActionPress();
+    if (onActionPress) {
+      onActionPress();
+    }
   };
 
   return (
@@ -151,15 +160,17 @@ const ActionItem: React.FC<{
 const Section: React.FC<{
   section: BottomSheetSectionType;
   first: boolean;
-  onActionPress: () => void;
-}> = ({ section, first, onActionPress }) => (
+  dismissBottomSheet: () => void;
+}> = ({ section, first, dismissBottomSheet }) => (
   <View key={section.key}>
     <SectionSeparator first={first} />
     {section.actions.map(action => (
       <ActionItem
         key={action.key}
         action={action}
-        onActionPress={onActionPress}
+        onActionPress={
+          action.dismissSheetOnPress ? dismissBottomSheet : undefined
+        }
       />
     ))}
   </View>
@@ -228,7 +239,7 @@ export const BottomSheet: React.FC<Props> = ({
               <Section
                 section={section}
                 first={index === 0}
-                onActionPress={() => ref.current?.dismiss()}
+                dismissBottomSheet={() => ref.current?.dismiss()}
               />
             ))}
           </View>
@@ -245,12 +256,8 @@ export const useBottomSheet = () => {
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [bottomSheetTitle, setBottomSheetTitle] = useState('');
 
-  const presentBottomSheet = (
-    title: string,
-    sections: BottomSheetSectionType[]
-  ) => {
+  const presentBottomSheet = (title: string) => {
     setBottomSheetTitle(title);
-    setBottomSheetSections(sections);
     setBottomSheetVisible(true);
   };
 
@@ -262,13 +269,15 @@ export const useBottomSheet = () => {
     bottomSheetTitle,
     bottomSheetSections,
     bottomSheetVisible,
+    setBottomSheetSections,
     presentBottomSheet,
     dismissBottomSheet,
   ] as [
     string,
     BottomSheetSectionType[],
     boolean,
-    (title: string, sections: BottomSheetSectionType[]) => void,
+    React.Dispatch<SetStateAction<BottomSheetSectionType[]>>,
+    (title: string) => void,
     () => void
   ];
 };
