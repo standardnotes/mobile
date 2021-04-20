@@ -8,7 +8,7 @@ import {
   SNNote,
   StorageEncryptionPolicies,
 } from '@standardnotes/snjs';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { LockStateType } from './application_state';
 import { Editor } from './editor';
 
@@ -64,17 +64,7 @@ export const useOutOfSync = () => {
   const [outOfSync, setOutOfSync] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    let isMounted = true;
-    const getOutOfSync = async () => {
-      const outOfSyncInitial = await application?.isOutOfSync();
-      if (isMounted) {
-        setOutOfSync(Boolean(outOfSyncInitial));
-      }
-    };
-    getOutOfSync();
-    return () => {
-      isMounted = false;
-    };
+    setOutOfSync(Boolean(application?.isOutOfSync()));
   }, [application]);
 
   React.useEffect(() => {
@@ -92,6 +82,24 @@ export const useOutOfSync = () => {
   }, [application]);
 
   return [outOfSync];
+};
+
+export const useLastSyncDate = (): Date | undefined => {
+  const application = useContext(ApplicationContext);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | undefined>(
+    application?.getLastSyncDate()
+  );
+
+  useEffect(
+    () =>
+      application?.addEventObserver(() => {
+        setLastRefreshed(application?.getLastSyncDate());
+        return Promise.resolve();
+      }, ApplicationEvent.CompletedFullSync),
+    [application]
+  );
+
+  return lastRefreshed;
 };
 
 export const useIsLocked = () => {

@@ -1,5 +1,10 @@
 import { Circle } from '@Components/Circle';
-import { useIsLocked, useOutOfSync, useSignedIn } from '@Lib/snjs_helper_hooks';
+import {
+  useIsLocked,
+  useLastSyncDate,
+  useOutOfSync,
+  useSignedIn,
+} from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ContentType } from '@standardnotes/snjs';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
@@ -30,6 +35,7 @@ export const SideMenuHero: React.FC<Props> = props => {
   const [signedIn] = useSignedIn();
   const [isLocked] = useIsLocked();
   const [isOutOfSync] = useOutOfSync();
+  const lastSyncDate = useLastSyncDate();
   const [itemsLength, setItemsLength] = useState(0);
 
   useEffect(() => {
@@ -72,9 +78,10 @@ export const SideMenuHero: React.FC<Props> = props => {
     <Cell>
       <Touchable testID={props.testID} onPress={props.onPress}>
         <Title>{textData.title}</Title>
-      </Touchable>
-      <Touchable onPress={props.onPress}>
         <SubTitle>{textData.text}</SubTitle>
+        {lastSyncDate && (
+          <SubTitle>Last refreshed {lastSyncDate.toLocaleString()}</SubTitle>
+        )}
       </Touchable>
       {isOutOfSync && (
         <OutOfSyncContainer onPress={props.onOutOfSyncPress}>
