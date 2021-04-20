@@ -241,13 +241,18 @@ export const BottomSheet: React.FC<Props> = ({
     setExpandedActionKey(actionKey);
   };
 
+  const onDismissSheet = () => {
+    onDismiss();
+    setExpandedActionKey('');
+  };
+
   return (
     <BottomSheetModal
       ref={ref}
       snapPoints={snapPoints}
       handleComponent={HandleComponent}
       backdropComponent={BottomSheetBackdrop}
-      onDismiss={onDismiss}
+      onDismiss={onDismissSheet}
     >
       <>
         {title ? (
