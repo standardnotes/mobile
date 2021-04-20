@@ -42,7 +42,7 @@ export const NoteCell = ({
     bottomSheetTitle,
     bottomSheetSections,
     bottomSheetVisible,
-    setBottomSheetSections,
+    updateBottomSheetSections,
     presentBottomSheet,
     dismissBottomSheet,
   ] = useBottomSheet();
@@ -80,8 +80,8 @@ export const NoteCell = ({
       ...getActionSections(ActionSection.CommonActions),
       ...getActionSections(ActionSection.Listed),
     ];
-    setBottomSheetSections(sections);
-  }, [getActionSections, setBottomSheetSections]);
+    updateBottomSheetSections(sections);
+  }, [getActionSections, updateBottomSheetSections]);
 
   const onLongPress = () => {
     if (note.errorDecrypting) {

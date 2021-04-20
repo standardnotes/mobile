@@ -286,6 +286,13 @@ export const useBottomSheet = () => {
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [bottomSheetTitle, setBottomSheetTitle] = useState('');
 
+  const updateBottomSheetSections = useCallback(
+    (sections: BottomSheetSectionType[]) => {
+      setBottomSheetSections(sections);
+    },
+    [setBottomSheetSections]
+  );
+
   const presentBottomSheet = (title: string) => {
     setBottomSheetTitle(title);
     setBottomSheetVisible(true);
@@ -299,14 +306,14 @@ export const useBottomSheet = () => {
     bottomSheetTitle,
     bottomSheetSections,
     bottomSheetVisible,
-    setBottomSheetSections,
+    updateBottomSheetSections,
     presentBottomSheet,
     dismissBottomSheet,
   ] as [
     string,
     BottomSheetSectionType[],
     boolean,
-    React.Dispatch<SetStateAction<BottomSheetSectionType[]>>,
+    (sections: BottomSheetSectionType[]) => void,
     (title: string) => void,
     () => void
   ];
