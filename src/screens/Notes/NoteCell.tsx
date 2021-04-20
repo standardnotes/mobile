@@ -198,7 +198,7 @@ export const NoteCell = ({
       onLongPress={onLongPress}
     >
       <Container ref={elementRef as any} selected={highlight} padding={padding}>
-        {note.deleted && <DeletedText>Deleting...</DeletedText>}
+        {note.deleted && <DeletedText>Deleting…</DeletedText>}
 
         <NoteCellFlags note={note} highlight={highlight} />
 
