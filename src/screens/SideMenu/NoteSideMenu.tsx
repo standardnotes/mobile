@@ -235,6 +235,12 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   const onEditorPress = useCallback(
     async (selectedComponent?: SNComponent) => {
+      if (note?.locked) {
+        application?.alertService.alert(
+          "This note is locked. If you'd like to edit its options, unlock it, and try again."
+        );
+        return;
+      }
       if (editor?.isTemplateNote) {
         await editor?.insertTemplatedNote();
       }

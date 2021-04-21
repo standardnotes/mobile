@@ -87,7 +87,12 @@ export class Compose extends React.Component<{}, State> {
           {
             title: newNote.title,
           },
-          () => this.reloadComponentEditorState()
+          () => {
+            this.reloadComponentEditorState();
+            if (newNote.dirty) {
+              this.showSavingStatus();
+            }
+          }
         );
       }
     );
@@ -103,14 +108,15 @@ export class Compose extends React.Component<{}, State> {
           this.setState({ title: newNote.title });
         }
 
-        if (newNote.lastSyncBegan) {
+        if (newNote.lastSyncBegan || newNote.dirty) {
           if (newNote.lastSyncEnd) {
             if (
-              newNote.lastSyncBegan?.getTime() > newNote.lastSyncEnd.getTime()
+              newNote.dirty ||
+              newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd.getTime()
             ) {
               this.showSavingStatus();
             } else if (
-              newNote.lastSyncEnd.getTime() > newNote.lastSyncBegan.getTime()
+              newNote.lastSyncEnd.getTime() > newNote.lastSyncBegan!.getTime()
             ) {
               this.showAllChangesSavedStatus();
             }

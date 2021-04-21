@@ -1,5 +1,5 @@
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { ItemSessionHistory, SNNote } from '@standardnotes/snjs';
+import { HistoryEntry, SNNote } from '@standardnotes/snjs';
 import { NoteHistoryEntry } from '@standardnotes/snjs/dist/@types/services/history/entries/note_history_entry';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
@@ -16,7 +16,7 @@ export const SessionHistory: React.FC<Props> = ({ note, onPress }) => {
   const insets = useSafeAreaInsets();
 
   // State
-  const [sessionHistory, setSessionHistory] = useState<ItemSessionHistory>();
+  const [sessionHistory, setSessionHistory] = useState<HistoryEntry[]>();
 
   useEffect(() => {
     if (note) {
@@ -52,7 +52,7 @@ export const SessionHistory: React.FC<Props> = ({ note, onPress }) => {
       initialNumToRender={10}
       windowSize={10}
       keyboardShouldPersistTaps={'never'}
-      data={sessionHistory?.entries as NoteHistoryEntry[]}
+      data={sessionHistory as NoteHistoryEntry[]}
       renderItem={RenderItem}
     />
   );
