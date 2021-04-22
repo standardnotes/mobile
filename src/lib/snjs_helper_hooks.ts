@@ -172,7 +172,7 @@ export const useSyncStatus = () => {
       application!.isEncryptionAvailable() &&
       application!.getStorageEncryptionPolicy() ===
         StorageEncryptionPolicies.Default;
-    if (stats.localDataDone) {
+    if (stats.localDataTotal === 0 || stats.localDataDone) {
       setStatus();
       return;
     }
