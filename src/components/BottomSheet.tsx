@@ -5,16 +5,21 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import React, {
-  SetStateAction,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { Dimensions, LayoutChangeEvent, Platform, View } from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  LayoutChangeEvent,
+  Platform,
+} from 'react-native';
 import styled, { css } from 'styled-components/native';
 
-export interface BottomSheetActionType {
+export type BottomSheetActionType = {
   text: string;
   key: string;
   iconType?: IconType;
@@ -23,13 +28,26 @@ export interface BottomSheetActionType {
   centered?: boolean;
   description?: string;
   dismissSheetOnPress?: boolean;
-  expandableActions?: BottomSheetActionType[];
-}
+};
 
-export type BottomSheetSectionType = {
+export type BottomSheetDefaultSectionType = {
+  expandable: false;
   key: string;
   actions: BottomSheetActionType[];
 };
+
+export type BottomSheetExpandableSectionType = {
+  expandable: true;
+  key: string;
+  actions: BottomSheetActionType[];
+  text: string;
+  iconType?: IconType;
+  description?: string;
+};
+
+export type BottomSheetSectionType =
+  | BottomSheetDefaultSectionType
+  | BottomSheetExpandableSectionType;
 
 type Props = {
   visible: boolean;
@@ -53,6 +71,11 @@ const Handle = styled.View`
   border-radius: 100px;
 `;
 
+const BottomSheetContent = styled.View`
+  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
+  display: flex;
+`;
+
 const TitleContainer = styled.View`
   padding: 20px;
   border-bottom-width: 1px;
@@ -63,6 +86,16 @@ const Title = styled.Text`
   font-weight: ${Platform.OS === 'ios' ? 600 : 'bold'};
   font-size: 16px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
+`;
+
+const SectionContainer = styled.View<{ stackIndex: number }>`
+  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
+  z-index: ${({ stackIndex }) => stackIndex};
+`;
+
+const SectionSeparatorContainer = styled.View`
+  z-index: 2;
+  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
 `;
 
 const SectionSeparator = styled.View<{ first?: boolean }>`
@@ -78,17 +111,24 @@ const SectionSeparator = styled.View<{ first?: boolean }>`
         `};
 `;
 
-const ActionItemContainer = styled.TouchableOpacity`
+const ExpandableSectionContainer = styled.View`
+  background-color: white;
+  z-index: 2;
+`;
+
+const ActionsContainer = styled.View``;
+
+const BottomSheetItemContainer = styled.TouchableOpacity`
   padding: 10px 16px;
 `;
 
-const ActionItemMainInfo = styled.View`
+const ItemMainInfo = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
 `;
 
-const ActionIconContainer = styled.View`
+const ItemIconContainer = styled.View`
   height: 24px;
   width: 24px;
   display: flex;
@@ -96,22 +136,21 @@ const ActionIconContainer = styled.View`
   justify-content: center;
 `;
 
-const ActionIcon = styled(Icon).attrs(({ theme }) => ({
+const ItemIcon = styled(Icon).attrs(({ theme }) => ({
   color: theme.stylekitNeutralColor,
 }))`
   text-align: center;
 `;
 
-const ActionText = styled.Text<{ danger?: boolean; centered?: boolean }>`
+const ItemText = styled.Text<{ danger?: boolean; centered?: boolean }>`
   color: ${({ theme, danger }) =>
     danger ? theme.stylekitDangerColor : theme.stylekitForegroundColor};
   font-size: 16px;
-  width: 100%;
   margin-right: ${({ centered }) => (centered ? 0 : '16px')};
   text-align: ${({ centered }) => (centered ? 'center' : 'left')};
 `;
 
-const ActionDescription = styled.Text`
+const ItemDescription = styled.Text`
   color: ${({ theme }) => theme.stylekitNeutralColor};
   font-size: 14px;
   margin-top: 2px;
@@ -124,72 +163,112 @@ const HandleComponent: React.FC = () => (
   </HandleContainer>
 );
 
+const Item: React.FC<{
+  text: string;
+  onPress: () => void;
+  iconType?: IconType;
+  description?: string;
+  centered?: boolean;
+  danger?: boolean;
+}> = ({ text, onPress, iconType, description, centered, danger }) => {
+  return (
+    <BottomSheetItemContainer onPress={onPress}>
+      <ItemMainInfo>
+        {centered ? null : (
+          <ItemIconContainer>
+            {iconType ? <ItemIcon type={iconType} size={24} /> : null}
+          </ItemIconContainer>
+        )}
+        <ItemText danger={danger} centered={centered}>
+          {text}
+        </ItemText>
+      </ItemMainInfo>
+      {description && <ItemDescription>{description}</ItemDescription>}
+    </BottomSheetItemContainer>
+  );
+};
+
+const ExpandableSectionItem: React.FC<{
+  section: BottomSheetExpandableSectionType;
+  expandSection: () => void;
+}> = ({ section, expandSection }) => (
+  <Item
+    text={section.text}
+    onPress={expandSection}
+    iconType={section.iconType}
+    description={section.description}
+  />
+);
+
 const ActionItem: React.FC<{
   action: BottomSheetActionType;
   dismissBottomSheet: () => void;
-  updateExpandedActionKey: () => void;
-}> = ({ action, dismissBottomSheet, updateExpandedActionKey }) => {
+}> = ({ action, dismissBottomSheet }) => {
   const onPress = () => {
     if (action.callback) {
       action.callback();
     }
     if (action.dismissSheetOnPress) {
       dismissBottomSheet();
-    } else if (action.expandableActions) {
-      updateExpandedActionKey();
     }
   };
 
-  return (
-    <ActionItemContainer onPress={onPress}>
-      <ActionItemMainInfo>
-        {action.centered ? null : (
-          <ActionIconContainer>
-            {action.iconType ? (
-              <ActionIcon type={action.iconType} size={24} />
-            ) : null}
-          </ActionIconContainer>
-        )}
-        <ActionText danger={action.danger} centered={action.centered}>
-          {action.text}
-        </ActionText>
-      </ActionItemMainInfo>
-      {action.description && (
-        <ActionDescription>{action.description}</ActionDescription>
-      )}
-    </ActionItemContainer>
-  );
+  return <Item {...action} onPress={onPress} />;
 };
 
 const Section: React.FC<{
-  section: BottomSheetSectionType;
+  section: BottomSheetSectionType & { animationValue: Animated.Value };
   first: boolean;
   dismissBottomSheet: () => void;
-  updateExpandedActionKey: (actionKey: string) => void;
-  expandedActionKey: string;
-}> = ({
-  section,
-  first,
-  dismissBottomSheet,
-  updateExpandedActionKey,
-  expandedActionKey,
-}) => (
-  <View>
-    <SectionSeparator first={first} />
-    {section.actions.map(action => {
-      const expanded = expandedActionKey === action.key;
-      const items = expanded ? action.expandableActions : [action];
-      return items!.map(item => (
-        <ActionItem
-          key={item.key}
-          action={item}
-          dismissBottomSheet={dismissBottomSheet}
-          updateExpandedActionKey={() => updateExpandedActionKey(item.key)}
-        />
-      ));
-    })}
-  </View>
-);
+  expandSection: () => void;
+  stackIndex: number;
+}> = ({ section, first, dismissBottomSheet, expandSection, stackIndex }) => {
+  const [actionsContainerHeight, setActionsContainerHeight] = useState(0);
+
+  const actionsContainerStyle = section.expandable
+    ? {
+        marginTop: section.animationValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [-actionsContainerHeight, 0],
+        }),
+        opacity: section.animationValue,
+      }
+    : {};
+
+  const onActionsContainerLayout = (e: LayoutChangeEvent) => {
+    setActionsContainerHeight(e.nativeEvent.layout.height);
+  };
+
+  return (
+    <SectionContainer stackIndex={stackIndex}>
+      <SectionSeparatorContainer>
+        <SectionSeparator first={first} />
+      </SectionSeparatorContainer>
+      <>
+        {section.expandable && (
+          <ExpandableSectionContainer>
+            <ExpandableSectionItem
+              section={section}
+              expandSection={expandSection}
+            />
+          </ExpandableSectionContainer>
+        )}
+        <ActionsContainer
+          as={Animated.View}
+          onLayout={onActionsContainerLayout}
+          style={actionsContainerStyle}
+        >
+          {section.actions.map(action => (
+            <ActionItem
+              action={action}
+              dismissBottomSheet={dismissBottomSheet}
+            />
+          ))}
+        </ActionsContainer>
+      </>
+    </SectionContainer>
+  );
+};
 
 export const BottomSheet: React.FC<Props> = ({
   visible,
@@ -200,7 +279,13 @@ export const BottomSheet: React.FC<Props> = ({
   const ref = useRef<BottomSheetModal>(null);
   const [titleHeight, setTitleHeight] = useState(0);
   const [listHeight, setListHeight] = useState(0);
-  const [expandedActionKey, setExpandedActionKey] = useState('');
+
+  const animatedSections = useMemo(() => {
+    return sections.map(section => ({
+      ...section,
+      animationValue: new Animated.Value(0),
+    }));
+  }, [sections]);
 
   useEffect(() => {
     if (visible) {
@@ -237,13 +322,20 @@ export const BottomSheet: React.FC<Props> = ({
     return contentHeight < maxLimit ? [contentHeight] : [maxLimit];
   }, [contentHeight]);
 
-  const updateExpandedActionKey = (actionKey: string) => {
-    setExpandedActionKey(actionKey);
-  };
-
-  const onDismissSheet = () => {
-    onDismiss();
-    setExpandedActionKey('');
+  const expandSection = (sectionKey: string) => {
+    const animations: Animated.CompositeAnimation[] = [];
+    animatedSections.forEach(section => {
+      if (section.expandable) {
+        animations.push(
+          Animated.timing(section.animationValue, {
+            toValue: sectionKey === section.key ? 1 : 0,
+            duration: 250,
+            useNativeDriver: false,
+          })
+        );
+      }
+    });
+    Animated.parallel(animations).start();
   };
 
   return (
@@ -252,7 +344,7 @@ export const BottomSheet: React.FC<Props> = ({
       snapPoints={snapPoints}
       handleComponent={HandleComponent}
       backdropComponent={BottomSheetBackdrop}
-      onDismiss={onDismissSheet}
+      onDismiss={onDismiss}
     >
       <>
         {title ? (
@@ -261,18 +353,18 @@ export const BottomSheet: React.FC<Props> = ({
           </TitleContainer>
         ) : null}
         <BottomSheetScrollView>
-          <View onLayout={onListLayout}>
-            {sections.map((section, index) => (
+          <BottomSheetContent onLayout={onListLayout}>
+            {animatedSections.map((section, index) => (
               <Section
                 key={section.key}
                 section={section}
                 first={index === 0}
                 dismissBottomSheet={() => ref.current?.dismiss()}
-                updateExpandedActionKey={updateExpandedActionKey}
-                expandedActionKey={expandedActionKey}
+                expandSection={() => expandSection(section.key)}
+                stackIndex={sections.length - index}
               />
             ))}
-          </View>
+          </BottomSheetContent>
         </BottomSheetScrollView>
       </>
     </BottomSheetModal>

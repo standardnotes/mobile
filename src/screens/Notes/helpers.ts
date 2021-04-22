@@ -1,5 +1,7 @@
 import {
   BottomSheetActionType,
+  BottomSheetDefaultSectionType,
+  BottomSheetExpandableSectionType,
   BottomSheetSectionType,
 } from '@Components/BottomSheet';
 import { IconType } from '@Components/Icon';
@@ -57,7 +59,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
   const [listedExtensions] = useListedExtensions(note);
   const navigation = useNavigation();
 
-  const listedSections = useMemo(
+  const listedSections: BottomSheetExpandableSectionType[] = useMemo(
     () =>
       (listedExtensions || []).map((extension, extensionIndex) => {
         const key = `${extension.name
@@ -65,24 +67,17 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
           .split(' ')
           .join('-')}-${extensionIndex}`;
         const description = extension.url.replace(/(.*)\/extension.*/i, '$1');
-        const expandableActions = extension.actions.map(
-          (action, actionIndex) => ({
-            text: action.label,
-            key: `${key}-${action.label}-action`,
-            iconType: actionIndex === 0 ? IconType.Listed : undefined,
-          })
-        );
+        const actions = extension.actions.map(action => ({
+          text: action.label,
+          key: `${key}-${action.label}-action`,
+        }));
         return {
+          expandable: true,
           key: `${key}-section`,
-          actions: [
-            {
-              text: `${extension.name} actions`,
-              key: `${key}-action`,
-              description,
-              iconType: IconType.Listed,
-              expandableActions,
-            },
-          ],
+          text: `${extension.name} actions`,
+          description,
+          iconType: IconType.Listed,
+          actions,
         };
       }),
     [listedExtensions]
@@ -106,8 +101,9 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
     [editor, navigation, note]
   );
 
-  const historySection = useMemo(
+  const historySection: BottomSheetDefaultSectionType = useMemo(
     () => ({
+      expandable: false,
       key: ActionSection.History,
       actions: [historyAction],
     }),
@@ -232,7 +228,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
     [deleteNote]
   );
 
-  const commonSection = useMemo(() => {
+  const commonSection: BottomSheetDefaultSectionType = useMemo(() => {
     const trashActions: BottomSheetActionType[] = note.trashed
       ? [restoreAction, deleteAction]
       : [moveToTrashAction];
@@ -248,6 +244,7 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
         ];
 
     const section: BottomSheetSectionType = {
+      expandable: false,
       key: ActionSection.CommonActions,
       actions: actions,
     };
