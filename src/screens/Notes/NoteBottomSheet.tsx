@@ -1,10 +1,12 @@
 import {
+  BottomSheet,
   BottomSheetActionType,
   BottomSheetDefaultSectionType,
   BottomSheetExpandableSectionType,
   BottomSheetSectionType,
 } from '@Components/BottomSheet';
 import { IconType } from '@Components/Icon';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Editor } from '@Lib/editor';
 import {
   useChangeNote,
@@ -15,19 +17,23 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_NOTE_HISTORY } from '@Screens/screens';
-import { SNNote } from '@standardnotes/snjs/dist/@types';
-import { useCallback, useContext, useMemo } from 'react';
+import {
+  Action,
+  SNActionsExtension,
+  SNNote,
+} from '@standardnotes/snjs/dist/@types';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { Share } from 'react-native';
 
 // eslint-disable-next-line no-shadow
-export enum ActionSection {
+enum ActionSection {
   History = 'history-section',
   CommonActions = 'common-section',
   Listed = 'listed-section',
 }
 
 // eslint-disable-next-line no-shadow
-export enum NoteAction {
+enum NoteAction {
   Pin = 'pin',
   Archive = 'archive',
   Lock = 'lock',
@@ -40,7 +46,17 @@ export enum NoteAction {
   Listed = 'listed',
 }
 
-export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
+type Props = {
+  note: SNNote;
+  editor?: Editor;
+  bottomSheetRef: React.RefObject<BottomSheetModal>;
+};
+
+export const NoteBottomSheet: React.FC<Props> = ({
+  note,
+  editor,
+  bottomSheetRef,
+}) => {
   const application = useContext(ApplicationContext);
   const [changeNote] = useChangeNote(note, editor);
   const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note);
@@ -59,28 +75,48 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
   const [listedExtensions] = useListedExtensions(note);
   const navigation = useNavigation();
 
+  const getListedAction = useCallback(
+    (action: Action, extensionKey: string) => {
+      const text = action.label;
+      const key = `${extensionKey}-${action.label}-action`;
+      return {
+        text,
+        key,
+      };
+    },
+    []
+  );
+
+  const getListedExtension = useCallback(
+    (extension: SNActionsExtension, index: number) => {
+      const extensionKey = `${extension.name
+        .toLowerCase()
+        .split(' ')
+        .join('-')}-${index}`;
+      const key = `${extensionKey}-section`;
+      const text = `${extension.name} actions`;
+      const description = extension.url.replace(/(.*)\/extension.*/i, '$1');
+      const actions = extension.actions.map(action =>
+        getListedAction(action, extensionKey)
+      );
+      return {
+        expandable: true,
+        key,
+        text,
+        description,
+        iconType: IconType.Listed,
+        actions,
+      } as BottomSheetExpandableSectionType;
+    },
+    [getListedAction]
+  );
+
   const listedSections: BottomSheetExpandableSectionType[] = useMemo(
     () =>
-      (listedExtensions || []).map((extension, extensionIndex) => {
-        const key = `${extension.name
-          .toLowerCase()
-          .split(' ')
-          .join('-')}-${extensionIndex}`;
-        const description = extension.url.replace(/(.*)\/extension.*/i, '$1');
-        const actions = extension.actions.map(action => ({
-          text: action.label,
-          key: `${key}-${action.label}-action`,
-        }));
-        return {
-          expandable: true,
-          key: `${key}-section`,
-          text: `${extension.name} actions`,
-          description,
-          iconType: IconType.Listed,
-          actions,
-        };
-      }),
-    [listedExtensions]
+      (listedExtensions || []).map((extension, extensionIndex) =>
+        getListedExtension(extension, extensionIndex)
+      ),
+    [listedExtensions, getListedExtension]
   );
 
   const historyAction = useMemo(
@@ -263,27 +299,21 @@ export const useNoteActionSections = (note: SNNote, editor?: Editor) => {
     shareAction,
   ]);
 
-  const sections: Record<string, BottomSheetSectionType> = useMemo(
-    () => ({
-      [ActionSection.History]: historySection,
-      [ActionSection.CommonActions]: commonSection,
-    }),
-    [commonSection, historySection]
-  );
+  const title = note.protected ? note.safeTitle() : note.title;
 
-  const getActionSections = useCallback(
-    (sectionType: ActionSection): BottomSheetSectionType[] | [] => {
-      switch (sectionType) {
-        case ActionSection.Listed:
-          return note.protected ? [] : listedSections;
-        case ActionSection.CommonActions:
-          return [sections[sectionType]];
-        default:
-          return note.protected ? [] : [sections[sectionType]];
-      }
-    },
-    [listedSections, note.protected, sections]
-  );
+  const sections = useMemo(() => {
+    if (note.protected) {
+      return [commonSection];
+    } else {
+      return [historySection, commonSection, ...listedSections];
+    }
+  }, [historySection, commonSection, listedSections, note.protected]);
 
-  return getActionSections;
+  return (
+    <BottomSheet
+      bottomSheetRef={bottomSheetRef}
+      title={title}
+      sections={sections}
+    />
+  );
 };

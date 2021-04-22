@@ -5,6 +5,7 @@ import {
   ButtonType,
   isSameDay,
   NoteMutator,
+  SNActionsExtension,
   SNNote,
   StorageEncryptionPolicies,
 } from '@standardnotes/snjs';
@@ -515,10 +516,13 @@ export const useListedExtensions = (note: SNNote) => {
       .filter(
         extension => extension.package_info?.identifier === LISTED_IDENTIFIER
       )
-      .map(extension => ({
-        ...extension,
-        actions: extension.actionsWithContextForItem(note),
-      }));
+      .map(
+        extension =>
+          ({
+            ...extension,
+            actions: extension.actionsWithContextForItem(note),
+          } as SNActionsExtension)
+      );
   }, [application, note]);
   return [listedExtensions];
 };

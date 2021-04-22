@@ -4,13 +4,7 @@ import {
   BottomSheetModal,
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -271,12 +265,10 @@ const Section: React.FC<{
 };
 
 export const BottomSheet: React.FC<Props> = ({
-  visible,
-  onDismiss,
+  bottomSheetRef,
   sections,
   title,
 }) => {
-  const ref = useRef<BottomSheetModal>(null);
   const [titleHeight, setTitleHeight] = useState(0);
   const [listHeight, setListHeight] = useState(0);
 
@@ -286,12 +278,6 @@ export const BottomSheet: React.FC<Props> = ({
       animationValue: new Animated.Value(0),
     }));
   }, [sections]);
-
-  useEffect(() => {
-    if (visible) {
-      ref.current?.present();
-    }
-  }, [visible]);
 
   useEffect(() => {
     if (!title) {
@@ -340,11 +326,10 @@ export const BottomSheet: React.FC<Props> = ({
 
   return (
     <BottomSheetModal
-      ref={ref}
+      ref={bottomSheetRef}
       snapPoints={snapPoints}
       handleComponent={HandleComponent}
       backdropComponent={BottomSheetBackdrop}
-      onDismiss={onDismiss}
     >
       <>
         {title ? (
@@ -359,7 +344,7 @@ export const BottomSheet: React.FC<Props> = ({
                 key={section.key}
                 section={section}
                 first={index === 0}
-                dismissBottomSheet={() => ref.current?.dismiss()}
+                dismissBottomSheet={() => bottomSheetRef?.current?.dismiss()}
                 expandSection={() => expandSection(section.key)}
                 stackIndex={sections.length - index}
               />
@@ -369,44 +354,4 @@ export const BottomSheet: React.FC<Props> = ({
       </>
     </BottomSheetModal>
   );
-};
-
-export const useBottomSheet = () => {
-  const [bottomSheetSections, setBottomSheetSections] = useState<
-    BottomSheetSectionType[]
-  >([]);
-  const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
-  const [bottomSheetTitle, setBottomSheetTitle] = useState('');
-
-  const updateBottomSheetSections = useCallback(
-    (sections: BottomSheetSectionType[]) => {
-      setBottomSheetSections(sections);
-    },
-    [setBottomSheetSections]
-  );
-
-  const presentBottomSheet = (title: string) => {
-    setBottomSheetTitle(title);
-    setBottomSheetVisible(true);
-  };
-
-  const dismissBottomSheet = () => {
-    setBottomSheetVisible(false);
-  };
-
-  return [
-    bottomSheetTitle,
-    bottomSheetSections,
-    bottomSheetVisible,
-    updateBottomSheetSections,
-    presentBottomSheet,
-    dismissBottomSheet,
-  ] as [
-    string,
-    BottomSheetSectionType[],
-    boolean,
-    (sections: BottomSheetSectionType[]) => void,
-    (title: string) => void,
-    () => void
-  ];
 };

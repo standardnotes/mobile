@@ -1,12 +1,8 @@
-import {
-  BottomSheet,
-  BottomSheetSectionType,
-  useBottomSheet,
-} from '@Components/BottomSheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Text, View } from 'react-native';
-import { ActionSection, useNoteActionSections } from './helpers';
+import { NoteBottomSheet } from './NoteBottomSheet';
 import {
   Container,
   DeletedText,
@@ -36,16 +32,7 @@ export const NoteCell = ({
 }: Props) => {
   // State
   const [selected, setSelected] = useState(false);
-  const getActionSections = useNoteActionSections(note);
-
-  const [
-    bottomSheetTitle,
-    bottomSheetSections,
-    bottomSheetVisible,
-    updateBottomSheetSections,
-    presentBottomSheet,
-    dismissBottomSheet,
-  ] = useBottomSheet();
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
 
   // Ref
   const selectionTimeout = useRef<number>();
@@ -74,22 +61,12 @@ export const NoteCell = ({
     setSelected(false);
   };
 
-  useEffect(() => {
-    const sections: BottomSheetSectionType[] = [
-      ...getActionSections(ActionSection.History),
-      ...getActionSections(ActionSection.CommonActions),
-      ...getActionSections(ActionSection.Listed),
-    ];
-    updateBottomSheetSections(sections);
-  }, [getActionSections, updateBottomSheetSections]);
-
   const onLongPress = () => {
     if (note.errorDecrypting) {
       return;
     }
 
-    const title = note.protected ? note.safeTitle() : note.title;
-    presentBottomSheet(title);
+    bottomSheetRef.current?.present();
   };
 
   const padding = 14;
@@ -160,12 +137,7 @@ export const NoteCell = ({
           )}
         </Container>
       </TouchableContainer>
-      <BottomSheet
-        title={bottomSheetTitle}
-        sections={bottomSheetSections}
-        visible={bottomSheetVisible}
-        onDismiss={dismissBottomSheet}
-      />
+      <NoteBottomSheet note={note} bottomSheetRef={bottomSheetRef} />
     </>
   );
 };
