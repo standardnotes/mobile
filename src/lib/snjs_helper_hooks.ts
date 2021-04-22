@@ -176,7 +176,7 @@ export const useSyncStatus = () => {
       setStatus();
       return;
     }
-    const notesString = `${stats.localDataCurrent}/${stats.localDataTotal} items...`;
+    const notesString = `${stats.localDataCurrent}/${stats.localDataTotal} items…`;
     const loadingStatus = encryption
       ? `Decrypting ${notesString}`
       : `Loading ${notesString}`;
