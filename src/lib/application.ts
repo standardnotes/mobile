@@ -138,7 +138,7 @@ export class MobileApplication extends SNApplication {
     return this.MobileServices.backupsService;
   }
 
-  public getPrefsService() {
+  public getLocalPreferences() {
     return this.MobileServices.prefsService;
   }
 
