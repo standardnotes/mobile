@@ -245,7 +245,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
         mutator.conflictOf = undefined;
       });
     }
-    application!.getAppState().setSelectedTag(tag, true);
+    application?.getAppState().setSelectedTag(tag, true);
     drawerRef?.closeDrawer();
   };
 

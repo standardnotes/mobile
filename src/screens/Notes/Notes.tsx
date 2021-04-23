@@ -60,18 +60,20 @@ export const Notes = React.memo(
     // State
     const [sortBy, setSortBy] = useState<CollectionSort>(() =>
       application!
-        .getPrefsService()
+        .getLocalPreferences()
         .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
     );
     const [sortReverse, setSortReverse] = useState<boolean>(() =>
-      application!.getPrefsService().getValue(PrefKey.SortNotesReverse, false)
+      application!
+        .getLocalPreferences()
+        .getValue(PrefKey.SortNotesReverse, false)
     );
     const [hideDates, setHideDates] = useState<boolean>(() =>
-      application!.getPrefsService().getValue(PrefKey.NotesHideDate, false)
+      application!.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
     );
     const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
       application!
-        .getPrefsService()
+        .getLocalPreferences()
         .getValue(PrefKey.NotesHideNotePreview, false)
     );
     const [notes, setNotes] = useState<SNNote[]>([]);
@@ -485,18 +487,18 @@ export const Notes = React.memo(
 
     const reloadPreferences = useCallback(async () => {
       const newSortBy = application
-        ?.getPrefsService()
+        ?.getLocalPreferences()
         .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt);
       let displayOptionsChanged = false;
 
       const newSortReverse = application
-        ?.getPrefsService()
+        ?.getLocalPreferences()
         .getValue(PrefKey.SortNotesReverse, false);
       const newHidePreview = application!
-        .getPrefsService()
+        .getLocalPreferences()
         .getValue(PrefKey.NotesHideNotePreview, false);
       const newHideDate = application!
-        .getPrefsService()
+        .getLocalPreferences()
         .getValue(PrefKey.NotesHideDate, false);
 
       if (sortBy !== newSortBy) {
