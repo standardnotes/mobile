@@ -76,7 +76,6 @@ export const NoteCell = ({
       return;
     }
     const currentListedExtensions = getListedExtensions();
-    console.log(currentListedExtensions);
     setListedExtensions(currentListedExtensions);
     bottomSheetRef.current?.present();
   };
