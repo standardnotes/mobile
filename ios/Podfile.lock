@@ -301,7 +301,7 @@ PODS:
   - sn-textview (1.0.0):
     - React
   - SNReactNative (1.0.0):
-    - React
+    - React-Core
   - SSZipArchive (2.2.3)
   - TrustKit (1.6.5)
   - Yoga (1.14.0)
@@ -527,7 +527,7 @@ SPEC CHECKSUMS:
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   RNZipArchive: 3dd2de5b7f590d79e83270508b78870bf5a54f36
   sn-textview: f478ee79531da2c7b129c4ea3b20c665e75e1f4b
-  SNReactNative: c47c4fd6d310eea152cc52e23f4fd306491efee3
+  SNReactNative: 3fa6096f78bea7dbd329c897ee854f73666d20db
   SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
   TrustKit: 073855e3adecd317417bda4ac9e9ac54a2e3b9f2
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6

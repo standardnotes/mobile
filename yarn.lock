@@ -7829,7 +7829,7 @@ stacktrace-parser@^0.1.3:
   dependencies:
     type-fest "^0.7.1"
 
-standard-notes-rn@standardnotes/standard-notes-rn#996b016:
+standard-notes-rn@standardnotes/standard-notes-rn#996b016f5a63e0e36fb50a86f5ad41c0c072b41e:
   version "1.0.0"
   resolved "https://codeload.github.com/standardnotes/standard-notes-rn/tar.gz/996b016f5a63e0e36fb50a86f5ad41c0c072b41e"
 
