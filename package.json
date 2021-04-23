@@ -55,8 +55,8 @@
     "react-native-version-info": "^1.1.0",
     "react-native-webview": "^11.0.3",
     "react-navigation-header-buttons": "^6.0.2",
-    "sn-textview": "standardnotes/sn-textview#3b56f5c2c87c24370f00ee5a0cee0da9a9fc66c3",
-    "standard-notes-rn": "standardnotes/standard-notes-rn#996b016",
+    "sn-textview": "standardnotes/sn-textview#14cd6fded5c746569a9c6c365d2edc41913811bb",
+    "standard-notes-rn": "standardnotes/standard-notes-rn#d8e5c21b049dd4b97006688617736efbdb7dc4e7",
     "styled-components": "^5.2.1"
   },
   "devDependencies": {
