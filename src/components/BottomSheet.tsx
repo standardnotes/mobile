@@ -292,16 +292,21 @@ export const BottomSheet: React.FC<Props> = ({
   const [titleHeight, setTitleHeight] = useState(0);
   const [listHeight, setListHeight] = useState(0);
   const [expandedSectionKey, setExpandedSectionKey] = useState('');
+  const [shouldCollapseSections, setShouldCollapseSections] = useState(false);
 
   const animatedSections = useMemo(() => {
     return sections.map(section => {
       const expanded = section.key === expandedSectionKey;
+      let animationValue = 0;
+      if (expanded) {
+        animationValue = shouldCollapseSections ? 0 : 1;
+      }
       return {
         ...section,
-        animationValue: new Animated.Value(expanded ? 1 : 0),
+        animationValue: new Animated.Value(animationValue),
       };
     });
-  }, [expandedSectionKey, sections]);
+  }, [expandedSectionKey, sections, shouldCollapseSections]);
 
   useEffect(() => {
     if (!title) {
@@ -350,12 +355,18 @@ export const BottomSheet: React.FC<Props> = ({
     );
   };
 
+  const onDismiss = () => {
+    setExpandedSectionKey('');
+    setShouldCollapseSections(true);
+  };
+
   return (
     <BottomSheetModal
       ref={bottomSheetRef}
       snapPoints={snapPoints}
       handleComponent={HandleComponent}
       backdropComponent={BottomSheetBackdrop}
+      onDismiss={onDismiss}
     >
       <>
         {title ? (
