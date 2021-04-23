@@ -286,6 +286,7 @@ const Section: React.FC<{
         >
           {section.actions.map(action => (
             <ActionItem
+              key={action.key}
               action={action}
               dismissBottomSheet={dismissBottomSheet}
             />
