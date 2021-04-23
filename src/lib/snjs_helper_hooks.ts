@@ -511,18 +511,21 @@ export const useListedExtensions = (note: SNNote) => {
   const application = React.useContext(ApplicationContext);
 
   const listedExtensions = useMemo(() => {
-    return application?.actionsManager
-      .getExtensions()
-      .filter(
-        extension => extension.package_info?.identifier === LISTED_IDENTIFIER
-      )
-      .map(
-        extension =>
-          ({
-            ...extension,
-            actions: extension.actionsWithContextForItem(note),
-          } as SNActionsExtension)
-      );
-  }, [application, note]);
-  return [listedExtensions];
+    return (application?.actionsManager.getExtensions() || []).filter(
+      extension => extension.package_info?.identifier === LISTED_IDENTIFIER
+    );
+  }, [application]);
+
+  const loadListedExtension = useCallback(
+    async (extension: SNActionsExtension) =>
+      await application?.actionsManager.loadExtensionInContextOfItem(
+        extension,
+        note
+      ),
+    [application, note]
+  );
+  return [listedExtensions, loadListedExtension] as [
+    SNActionsExtension[],
+    (extension: SNActionsExtension) => Promise<SNActionsExtension | undefined>
+  ];
 };

@@ -19,10 +19,18 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_NOTE_HISTORY } from '@Screens/screens';
 import {
   Action,
+  ActionsExtensionMutator,
   SNActionsExtension,
   SNNote,
+  UuidString,
 } from '@standardnotes/snjs/dist/@types';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Share } from 'react-native';
 
 // eslint-disable-next-line no-shadow
@@ -72,33 +80,106 @@ export const NoteBottomSheet: React.FC<Props> = ({
     }, [changeNote]),
     editor
   );
-  const [listedExtensions] = useListedExtensions(note);
+  const [listedExtensions, loadListedExtension] = useListedExtensions(note);
   const navigation = useNavigation();
+  const [listedSections, setListedSections] = useState<
+    BottomSheetSectionType[]
+  >([]);
+  const [shouldReloadListedSections, setShouldReloadListedSections] = useState(
+    true
+  );
+  const [reloadListedExtensionUuid, setReloadListedExtensionUuid] = useState<
+    UuidString | undefined
+  >();
 
-  const getListedAction = useCallback(
-    (action: Action, extensionKey: string) => {
+  const updateAction = useCallback(
+    async (
+      action: Action,
+      extension: SNActionsExtension,
+      params: {
+        running?: boolean;
+        error?: boolean;
+      }
+    ) => {
+      await application?.changeItem(extension.uuid, mutator => {
+        const extensionMutator = mutator as ActionsExtensionMutator;
+        extensionMutator.actions = extension.actions.map(act => {
+          if (
+            act &&
+            params &&
+            act.verb === action.verb &&
+            act.url === action.url
+          ) {
+            return {
+              ...action,
+              running: params?.running,
+              error: params?.error,
+            } as Action;
+          }
+          return act;
+        });
+      });
+    },
+    [application]
+  );
+  const executeAction = useCallback(
+    async (action: Action, extension: SNActionsExtension) => {
+      await updateAction(action, extension, { running: true });
+      const response = await application?.actionsManager!.runAction(
+        action,
+        note,
+        async () => {
+          return '';
+        }
+      );
+      if (response?.error) {
+        await updateAction(action, extension, { error: true });
+        return;
+      }
+      await updateAction(action, extension, { running: false });
+      setReloadListedExtensionUuid(extension.uuid);
+      setShouldReloadListedSections(true);
+    },
+    [application, updateAction, note]
+  );
+
+  const getListedActionItem = useCallback(
+    (action: Action, extension: SNActionsExtension) => {
       const text = action.label;
-      const key = `${extensionKey}-${action.label}-action`;
+      const key = `listed${action.id}-action`;
+      const callback = async () => {
+        await executeAction(action, extension);
+      };
       return {
         text,
         key,
+        callback,
       };
     },
-    []
+    [executeAction]
   );
 
-  const getListedExtension = useCallback(
-    (extension: SNActionsExtension, index: number) => {
-      const extensionKey = `${extension.name
-        .toLowerCase()
-        .split(' ')
-        .join('-')}-${index}`;
-      const key = `${extensionKey}-section`;
-      const text = `${extension.name} actions`;
-      const description = extension.url.replace(/(.*)\/extension.*/i, '$1');
-      const actions = extension.actions.map(action =>
-        getListedAction(action, extensionKey)
-      );
+  const getListedExpandableSection = useCallback(
+    (extension: SNActionsExtension, updatedExtension?: SNActionsExtension) => {
+      const key = updatedExtension
+        ? `listed-${updatedExtension.uuid}-section`
+        : `listed-${extension.uuid}-section`;
+      const text = updatedExtension
+        ? `${updatedExtension.name} actions`
+        : 'Error loading actions';
+      const description = updatedExtension
+        ? updatedExtension.url.replace(/(.*)\/extension.*/i, '$1')
+        : 'Please try again later.';
+      const actions = updatedExtension
+        ? updatedExtension.actions.map(action =>
+            getListedActionItem(action, updatedExtension)
+          )
+        : [
+            {
+              text: 'No actions available',
+              key: `${extension.uuid}-section`,
+            },
+          ];
       return {
         expandable: true,
         key,
@@ -108,16 +189,49 @@ export const NoteBottomSheet: React.FC<Props> = ({
         actions,
       } as BottomSheetExpandableSectionType;
     },
-    [getListedAction]
+    [getListedActionItem]
   );
 
-  const listedSections: BottomSheetExpandableSectionType[] = useMemo(
-    () =>
-      (listedExtensions || []).map((extension, extensionIndex) =>
-        getListedExtension(extension, extensionIndex)
-      ),
-    [listedExtensions, getListedExtension]
+  const getReloadedListedSection = useCallback(
+    async (
+      extension: SNActionsExtension,
+      extensionToReloadUuid?: UuidString
+    ) => {
+      const extensionInContext = extensionToReloadUuid
+        ? await loadListedExtension(extension)
+        : extension;
+      return getListedExpandableSection(extension, extensionInContext);
+    },
+    [getListedExpandableSection, loadListedExtension]
   );
+
+  const reloadListedSections = useCallback(
+    async (extensionToReloadUuid?: UuidString) => {
+      const extensions = listedExtensions;
+      const newSections = await Promise.all(
+        extensions
+          .sort((a: SNActionsExtension, b: SNActionsExtension) =>
+            a.uuid > b.uuid ? 1 : -1
+          )
+          .map(async extension =>
+            getReloadedListedSection(extension, extensionToReloadUuid)
+          )
+      );
+      setListedSections(newSections);
+    },
+    [listedExtensions, getReloadedListedSection]
+  );
+
+  useEffect(() => {
+    if (shouldReloadListedSections) {
+      reloadListedSections(reloadListedExtensionUuid);
+    }
+    setShouldReloadListedSections(false);
+  }, [
+    shouldReloadListedSections,
+    reloadListedExtensionUuid,
+    reloadListedSections,
+  ]);
 
   const historyAction = useMemo(
     () => ({

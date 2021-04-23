@@ -17,7 +17,7 @@ export type BottomSheetActionType = {
   text: string;
   key: string;
   iconType?: IconType;
-  callback?: () => void;
+  callback?: () => Promise<void> | void;
   danger?: boolean;
   centered?: boolean;
   description?: string;
@@ -44,10 +44,9 @@ export type BottomSheetSectionType =
   | BottomSheetExpandableSectionType;
 
 type Props = {
-  visible: boolean;
-  onDismiss: () => void;
   sections: BottomSheetSectionType[];
   title?: string;
+  bottomSheetRef: React.RefObject<BottomSheetModal>;
 };
 
 const HandleContainer = styled.View`
@@ -151,6 +150,18 @@ const ItemDescription = styled.Text`
   margin-left: 40px;
 `;
 
+const ActionContainer = styled.View`
+  display: flex;
+  flex-direction: row;
+`;
+
+const LoadingIndicator = styled.ActivityIndicator.attrs(({ theme }) => ({
+  color: theme.stylekitInfoColor,
+}))`
+  margin-left: auto;
+  margin-right: 16px;
+`;
+
 const HandleComponent: React.FC = () => (
   <HandleContainer>
     <Handle />
@@ -198,16 +209,25 @@ const ActionItem: React.FC<{
   action: BottomSheetActionType;
   dismissBottomSheet: () => void;
 }> = ({ action, dismissBottomSheet }) => {
-  const onPress = () => {
+  const [loading, setLoading] = useState(false);
+
+  const onPress = async () => {
     if (action.callback) {
-      action.callback();
+      setLoading(true);
+      await action.callback();
+      setLoading(false);
     }
     if (action.dismissSheetOnPress) {
       dismissBottomSheet();
     }
   };
 
-  return <Item {...action} onPress={onPress} />;
+  return (
+    <ActionContainer>
+      <Item {...action} onPress={onPress} />
+      {loading && <LoadingIndicator />}
+    </ActionContainer>
+  );
 };
 
 const Section: React.FC<{
@@ -271,13 +291,17 @@ export const BottomSheet: React.FC<Props> = ({
 }) => {
   const [titleHeight, setTitleHeight] = useState(0);
   const [listHeight, setListHeight] = useState(0);
+  const [expandedSectionKey, setExpandedSectionKey] = useState('');
 
   const animatedSections = useMemo(() => {
-    return sections.map(section => ({
-      ...section,
-      animationValue: new Animated.Value(0),
-    }));
-  }, [sections]);
+    return sections.map(section => {
+      const expanded = section.key === expandedSectionKey;
+      return {
+        ...section,
+        animationValue: new Animated.Value(expanded ? 1 : 0),
+      };
+    });
+  }, [expandedSectionKey, sections]);
 
   useEffect(() => {
     if (!title) {
@@ -321,7 +345,9 @@ export const BottomSheet: React.FC<Props> = ({
         );
       }
     });
-    Animated.parallel(animations).start();
+    Animated.parallel(animations).start(() =>
+      setExpandedSectionKey(sectionKey)
+    );
   };
 
   return (
