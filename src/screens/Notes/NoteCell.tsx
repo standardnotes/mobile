@@ -1,5 +1,11 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
+import { useListedExtensions } from '@Lib/snjs_helper_hooks';
+import {
+  CollectionSort,
+  isNullOrUndefined,
+  SNActionsExtension,
+  SNNote,
+} from '@standardnotes/snjs';
 import React, { useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { NoteBottomSheet } from './NoteBottomSheet';
@@ -33,6 +39,10 @@ export const NoteCell = ({
   // State
   const [selected, setSelected] = useState(false);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const [listedExtensions, setListedExtensions] = useState<
+    SNActionsExtension[]
+  >([]);
+  const [getListedExtensions, loadListedExtension] = useListedExtensions(note);
 
   // Ref
   const selectionTimeout = useRef<number>();
@@ -65,7 +75,9 @@ export const NoteCell = ({
     if (note.errorDecrypting) {
       return;
     }
-
+    const currentListedExtensions = getListedExtensions();
+    console.log(currentListedExtensions);
+    setListedExtensions(currentListedExtensions);
     bottomSheetRef.current?.present();
   };
 
@@ -137,7 +149,12 @@ export const NoteCell = ({
           )}
         </Container>
       </TouchableContainer>
-      <NoteBottomSheet note={note} bottomSheetRef={bottomSheetRef} />
+      <NoteBottomSheet
+        note={note}
+        bottomSheetRef={bottomSheetRef}
+        listedExtensions={listedExtensions}
+        loadListedExtension={loadListedExtension}
+      />
     </>
   );
 };

@@ -9,7 +9,7 @@ import {
   SNNote,
   StorageEncryptionPolicies,
 } from '@standardnotes/snjs';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { LockStateType } from './application_state';
 import { Editor } from './editor';
 
@@ -510,7 +510,7 @@ export const useListedExtensions = (note: SNNote) => {
   // Context
   const application = React.useContext(ApplicationContext);
 
-  const listedExtensions = useMemo(() => {
+  const getListedExtensions = useCallback(() => {
     return (application?.actionsManager.getExtensions() || []).filter(
       extension => extension.package_info?.identifier === LISTED_IDENTIFIER
     );
@@ -524,8 +524,8 @@ export const useListedExtensions = (note: SNNote) => {
       ),
     [application, note]
   );
-  return [listedExtensions, loadListedExtension] as [
-    SNActionsExtension[],
+  return [getListedExtensions, loadListedExtension] as [
+    () => SNActionsExtension[],
     (extension: SNActionsExtension) => Promise<SNActionsExtension | undefined>
   ];
 };
