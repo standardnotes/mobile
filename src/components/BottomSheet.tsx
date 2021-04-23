@@ -170,14 +170,15 @@ const HandleComponent: React.FC = () => (
 
 const Item: React.FC<{
   text: string;
-  onPress: () => void;
+  onPress?: () => void;
   iconType?: IconType;
   description?: string;
   centered?: boolean;
   danger?: boolean;
-}> = ({ text, onPress, iconType, description, centered, danger }) => {
+  disabled?: boolean;
+}> = ({ text, onPress, iconType, description, centered, danger, disabled }) => {
   return (
-    <BottomSheetItemContainer onPress={onPress}>
+    <BottomSheetItemContainer onPress={onPress} disabled={disabled}>
       <ItemMainInfo>
         {centered ? null : (
           <ItemIconContainer>
@@ -196,12 +197,14 @@ const Item: React.FC<{
 const ExpandableSectionItem: React.FC<{
   section: BottomSheetExpandableSectionType;
   expandSection: () => void;
-}> = ({ section, expandSection }) => (
+  expanded: boolean;
+}> = ({ section, expandSection, expanded }) => (
   <Item
     text={section.text}
     onPress={expandSection}
     iconType={section.iconType}
     description={section.description}
+    disabled={section.actions.length === 0 || expanded}
   />
 );
 
@@ -224,7 +227,7 @@ const ActionItem: React.FC<{
 
   return (
     <ActionContainer>
-      <Item {...action} onPress={onPress} />
+      <Item {...action} onPress={onPress} disabled={!action.callback} />
       {loading && <LoadingIndicator />}
     </ActionContainer>
   );
@@ -236,7 +239,15 @@ const Section: React.FC<{
   dismissBottomSheet: () => void;
   expandSection: () => void;
   stackIndex: number;
-}> = ({ section, first, dismissBottomSheet, expandSection, stackIndex }) => {
+  expanded: boolean;
+}> = ({
+  section,
+  first,
+  dismissBottomSheet,
+  expandSection,
+  stackIndex,
+  expanded,
+}) => {
   const [actionsContainerHeight, setActionsContainerHeight] = useState(0);
 
   const actionsContainerStyle = section.expandable
@@ -264,6 +275,7 @@ const Section: React.FC<{
             <ExpandableSectionItem
               section={section}
               expandSection={expandSection}
+              expanded={expanded}
             />
           </ExpandableSectionContainer>
         )}
@@ -384,6 +396,7 @@ export const BottomSheet: React.FC<Props> = ({
                 dismissBottomSheet={() => bottomSheetRef?.current?.dismiss()}
                 expandSection={() => expandSection(section.key)}
                 stackIndex={sections.length - index}
+                expanded={section.key === expandedSectionKey}
               />
             ))}
           </BottomSheetContent>

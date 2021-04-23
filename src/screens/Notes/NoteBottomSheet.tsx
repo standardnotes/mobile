@@ -170,16 +170,17 @@ export const NoteBottomSheet: React.FC<Props> = ({
       const description = updatedExtension
         ? updatedExtension.url.replace(/(.*)\/extension.*/i, '$1')
         : 'Please try again later.';
-      const actions = updatedExtension
-        ? updatedExtension.actions.map(action =>
-            getListedActionItem(action, updatedExtension)
-          )
-        : [
-            {
-              text: 'No actions available',
-              key: `${extension.uuid}-section`,
-            },
-          ];
+      const actions =
+        updatedExtension && updatedExtension.actions.length > 0
+          ? updatedExtension.actions.map(action =>
+              getListedActionItem(action, updatedExtension)
+            )
+          : [
+              {
+                text: 'No actions available',
+                key: `${extension.uuid}-section`,
+              },
+            ];
       return {
         expandable: true,
         key,
