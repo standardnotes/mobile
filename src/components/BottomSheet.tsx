@@ -215,13 +215,13 @@ const ActionItem: React.FC<{
   const [loading, setLoading] = useState(false);
 
   const onPress = async () => {
+    if (action.dismissSheetOnPress) {
+      dismissBottomSheet();
+    }
     if (action.callback) {
       setLoading(true);
       await action.callback();
       setLoading(false);
-    }
-    if (action.dismissSheetOnPress) {
-      dismissBottomSheet();
     }
   };
 
