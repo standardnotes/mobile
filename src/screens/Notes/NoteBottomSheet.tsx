@@ -205,10 +205,10 @@ export const NoteBottomSheet: React.FC<Props> = ({
     [getListedExpandableSection, loadListedExtension]
   );
 
-  const reloadListedSections = useCallback(
+  const getReloadedListedSections = useCallback(
     async (extensionToReloadUuid?: UuidString) => {
       const extensions = listedExtensions;
-      const newSections = await Promise.all(
+      return await Promise.all(
         extensions
           .sort((a: SNActionsExtension, b: SNActionsExtension) =>
             a.uuid > b.uuid ? 1 : -1
@@ -217,20 +217,29 @@ export const NoteBottomSheet: React.FC<Props> = ({
             getReloadedListedSection(extension, extensionToReloadUuid)
           )
       );
-      setListedSections(newSections);
     },
     [listedExtensions, getReloadedListedSection]
   );
 
   useEffect(() => {
-    if (shouldReloadListedSections) {
-      reloadListedSections(reloadListedExtensionUuid);
-    }
-    setShouldReloadListedSections(false);
+    let mounted = true;
+    const reloadListedSections = async () => {
+      const newSections = await getReloadedListedSections(
+        reloadListedExtensionUuid
+      );
+      if (mounted) {
+        setListedSections(newSections);
+        setShouldReloadListedSections(false);
+      }
+    };
+    reloadListedSections();
+    return () => {
+      mounted = false;
+    };
   }, [
+    getReloadedListedSections,
     shouldReloadListedSections,
     reloadListedExtensionUuid,
-    reloadListedSections,
   ]);
 
   const historyAction = useMemo(
