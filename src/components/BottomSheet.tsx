@@ -227,7 +227,7 @@ const ActionItem: React.FC<{
 
   return (
     <ActionContainer>
-      <Item {...action} onPress={onPress} disabled={!action.callback} />
+      <Item {...action} onPress={onPress} disabled={loading || !action.callback} />
       {loading && <LoadingIndicator />}
     </ActionContainer>
   );
