@@ -320,6 +320,7 @@ export const BottomSheet: React.FC<Props> = ({
       if (expanded) {
         animationValue = shouldCollapseSections ? 0 : 1;
       }
+      setShouldCollapseSections(false);
       return {
         ...section,
         animationValue: new Animated.Value(animationValue),
