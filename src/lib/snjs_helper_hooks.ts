@@ -505,7 +505,12 @@ export const useProtectOrUnprotectNote = (
   return [protectOrUnprotectNote];
 };
 
-export const useListedExtensions = (note: SNNote) => {
+export const useListedExtensions = (
+  note: SNNote
+): [
+  () => SNActionsExtension[],
+  (extension: SNActionsExtension) => Promise<SNActionsExtension | undefined>
+] => {
   const LISTED_IDENTIFIER = 'org.standardnotes.listed';
   // Context
   const application = React.useContext(ApplicationContext);
@@ -524,8 +529,5 @@ export const useListedExtensions = (note: SNNote) => {
       ),
     [application, note]
   );
-  return [getListedExtensions, loadListedExtension] as [
-    () => SNActionsExtension[],
-    (extension: SNActionsExtension) => Promise<SNActionsExtension | undefined>
-  ];
+  return [getListedExtensions, loadListedExtension];
 };
