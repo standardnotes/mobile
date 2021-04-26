@@ -67,9 +67,12 @@ const Handle = styled.View`
 const BottomSheetContent = styled.View`
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   display: flex;
+  flex: 1;
+  padding: 8px 0 16px;
 `;
 
 const TitleContainer = styled.View`
+  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   padding: 20px;
   border-bottom-width: 1px;
   border-color: ${({ theme }) => theme.stylekitBorderColor};
@@ -93,19 +96,16 @@ const SectionSeparatorContainer = styled.View`
 
 const SectionSeparator = styled.View<{ first?: boolean }>`
   ${({ first }) =>
-    first
-      ? css`
-          margin-bottom: 8px;
-        `
-      : css`
-          height: 1px;
-          background-color: ${({ theme }) => theme.stylekitBorderColor};
-          margin: 8px 0 8px 56px;
-        `};
+    !first &&
+    css`
+      height: 1px;
+      background-color: ${({ theme }) => theme.stylekitBorderColor};
+      margin: 8px 0 8px 56px;
+    `};
 `;
 
 const ExpandableSectionContainer = styled.View`
-  background-color: white;
+  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   z-index: 2;
 `;
 
@@ -379,6 +379,7 @@ export const BottomSheet: React.FC<Props> = ({
       handleComponent={HandleComponent}
       backdropComponent={BottomSheetBackdrop}
       onDismiss={onDismiss}
+      bottomInset={-24}
     >
       <>
         {title ? (
