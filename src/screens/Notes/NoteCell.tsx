@@ -7,7 +7,7 @@ import {
   SNNote,
 } from '@standardnotes/snjs';
 import React, { useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import { NoteBottomSheet } from './NoteBottomSheet';
 import {
   Container,
@@ -46,7 +46,7 @@ export const NoteCell = ({
 
   // Ref
   const selectionTimeout = useRef<number>();
-  const elementRef = useRef<View>(null);
+  const elementRef = useRef(null);
 
   const highlight = Boolean(selected || highlighted);
 
@@ -94,11 +94,7 @@ export const NoteCell = ({
         onPressOut={_onPressOut}
         onLongPress={onLongPress}
       >
-        <Container
-          ref={elementRef as any}
-          selected={highlight}
-          padding={padding}
-        >
+        <Container ref={elementRef} selected={highlight} padding={padding}>
           {note.deleted && <DeletedText>Deleting...</DeletedText>}
 
           <NoteCellFlags note={note} highlight={highlight} />
