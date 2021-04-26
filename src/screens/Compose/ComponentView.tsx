@@ -35,6 +35,7 @@ type Props = {
   onLoadError: () => void;
   onDownloadEditorStart: () => void;
   onDownloadEditorEnd: () => void;
+  offlineOnly?: boolean;
 };
 
 export const ComponentView = ({
@@ -44,6 +45,7 @@ export const ComponentView = ({
   onDownloadEditorStart,
   onDownloadEditorEnd,
   componentUuid,
+  offlineOnly,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -165,6 +167,14 @@ export const ComponentView = ({
     return '';
   }, [liveComponent, onDownloadEditorStart, onDownloadEditorEnd]);
 
+  const onLoadErrorHandler = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    onLoadError();
+  }, [onLoadError, timeoutRef]);
+
   useEffect(() => {
     let mounted = true;
     const setEditorUrl = async () => {
@@ -184,9 +194,13 @@ export const ComponentView = ({
           if (mounted) {
             setOfflineUrl(offlineEditorUrl);
           }
-        } finally {
+        } catch (e) {
           if (mounted) {
-            setUrl(newUrl);
+            if (offlineOnly) {
+              onLoadErrorHandler();
+            } else {
+              setUrl(newUrl);
+            }
           }
         }
       }
@@ -201,7 +215,14 @@ export const ComponentView = ({
       application?.componentManager.deactivateComponent(componentUuid);
       liveComponent?.deinit();
     };
-  }, [application, componentUuid, getOfflineEditorUrl, liveComponent]);
+  }, [
+    application,
+    componentUuid,
+    getOfflineEditorUrl,
+    liveComponent,
+    offlineOnly,
+    onLoadErrorHandler,
+  ]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
@@ -247,14 +268,6 @@ export const ComponentView = ({
 
   const onLoadStartHandler = () => {
     onLoadStart();
-  };
-
-  const onLoadErrorHandler = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    onLoadError();
   };
 
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {

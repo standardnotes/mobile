@@ -537,6 +537,7 @@ export class Compose extends React.Component<{}, State> {
                         }}
                         onDownloadEditorStart={this.onDownloadEditorStart}
                         onDownloadEditorEnd={this.onDownloadEditorEnd}
+                        offlineOnly={this.state.editorComponent?.offlineOnly}
                       />
                     )}
                     {!shouldDisplayEditor &&
