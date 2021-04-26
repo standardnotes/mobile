@@ -112,6 +112,7 @@ const ExpandableSectionContainer = styled.View`
 const ActionsContainer = styled.View``;
 
 const BottomSheetItemContainer = styled.TouchableOpacity`
+  width: 100%;
   padding: 10px 16px;
 `;
 
