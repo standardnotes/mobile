@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useListedExtensions } from '@Lib/snjs_helper_hooks';
+import { useGetListedExtensions } from '@Lib/snjs_helper_hooks';
 import {
   CollectionSort,
   isNullOrUndefined,
@@ -42,7 +42,7 @@ export const NoteCell = ({
   const [listedExtensions, setListedExtensions] = useState<
     SNActionsExtension[]
   >([]);
-  const [getListedExtensions, loadListedExtension] = useListedExtensions(note);
+  const [getListedExtensions] = useGetListedExtensions();
 
   // Ref
   const selectionTimeout = useRef<number>();
@@ -148,7 +148,6 @@ export const NoteCell = ({
         note={note}
         bottomSheetRef={bottomSheetRef}
         listedExtensions={listedExtensions}
-        loadListedExtension={loadListedExtension}
       />
     </>
   );

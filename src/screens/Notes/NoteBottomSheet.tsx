@@ -11,6 +11,7 @@ import { Editor } from '@Lib/editor';
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
+  useLoadListedExtension,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { useNavigation } from '@react-navigation/native';
@@ -50,9 +51,6 @@ type Props = {
   editor?: Editor;
   bottomSheetRef: React.RefObject<BottomSheetModal>;
   listedExtensions: SNActionsExtension[];
-  loadListedExtension: (
-    extension: SNActionsExtension
-  ) => Promise<SNActionsExtension | undefined>;
 };
 
 export const NoteBottomSheet: React.FC<Props> = ({
@@ -60,7 +58,6 @@ export const NoteBottomSheet: React.FC<Props> = ({
   editor,
   bottomSheetRef,
   listedExtensions,
-  loadListedExtension,
 }) => {
   const application = useContext(ApplicationContext);
   const [changeNote] = useChangeNote(note, editor);
@@ -77,6 +74,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
     }, [changeNote]),
     editor
   );
+  const [loadListedExtension] = useLoadListedExtension(note);
   const navigation = useNavigation();
   const [listedSections, setListedSections] = useState<
     BottomSheetSectionType[]
