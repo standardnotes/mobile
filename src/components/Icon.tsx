@@ -8,7 +8,6 @@ import IconShare from '@Style/Icons/ic-share.svg';
 import IconTrash from '@Style/Icons/ic-trash.svg';
 import React from 'react';
 
-// eslint-disable-next-line no-shadow
 export enum IconType {
   Archive = 'ic-archive',
   History = 'ic-history',

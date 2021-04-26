@@ -26,14 +26,12 @@ import {
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Share } from 'react-native';
 
-// eslint-disable-next-line no-shadow
 enum ActionSection {
   History = 'history-section',
   CommonActions = 'common-section',
   Listed = 'listed-section',
 }
 
-// eslint-disable-next-line no-shadow
 enum NoteAction {
   Pin = 'pin',
   Archive = 'archive',

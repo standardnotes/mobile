@@ -36,7 +36,6 @@ import { PrefKey } from './preferences_manager';
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;
 
-// eslint-disable-next-line no-shadow
 export enum AppStateType {
   LosingFocus = 1,
   EnteringBackground = 2,
@@ -47,13 +46,11 @@ export enum AppStateType {
   PreferencesChanged = 7,
 }
 
-// eslint-disable-next-line no-shadow
 export enum LockStateType {
   Locked = 1,
   Unlocked = 2,
 }
 
-// eslint-disable-next-line no-shadow
 export enum AppStateEventType {
   KeyboardChangeEvent = 1,
   TabletModeChange = 2,
@@ -65,19 +62,16 @@ export type TabletModeChangeData = {
   old_isInTabletMode: boolean;
 };
 
-// eslint-disable-next-line no-shadow
 export enum UnlockTiming {
   Immediately = 'immediately',
   OnQuit = 'on-quit',
 }
 
-// eslint-disable-next-line no-shadow
 export enum PasscodeKeyboardType {
   Default = 'default',
   Numeric = 'numeric',
 }
 
-// eslint-disable-next-line no-shadow
 export enum MobileStorageKey {
   PasscodeKeyboardTypeKey = 'passcodeKeyboardType',
 }
