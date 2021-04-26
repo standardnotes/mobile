@@ -7,9 +7,9 @@ import {
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Animated,
-  Dimensions,
   LayoutChangeEvent,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import styled, { css } from 'styled-components/native';
 
@@ -227,7 +227,11 @@ const ActionItem: React.FC<{
 
   return (
     <ActionContainer>
-      <Item {...action} onPress={onPress} disabled={loading || !action.callback} />
+      <Item
+        {...action}
+        onPress={onPress}
+        disabled={loading || !action.callback}
+      />
       {loading && <LoadingIndicator />}
     </ActionContainer>
   );
@@ -306,6 +310,7 @@ export const BottomSheet: React.FC<Props> = ({
   const [listHeight, setListHeight] = useState(0);
   const [expandedSectionKey, setExpandedSectionKey] = useState('');
   const [shouldCollapseSections, setShouldCollapseSections] = useState(false);
+  const { height: screenHeight } = useWindowDimensions();
 
   const animatedSections = useMemo(() => {
     return sections.map(section => {
