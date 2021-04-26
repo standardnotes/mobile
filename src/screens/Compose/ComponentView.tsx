@@ -12,13 +12,7 @@ import React, {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
-import {
-  DocumentDirectoryPath,
-  downloadFile,
-  exists,
-  readDir,
-  unlink,
-} from 'react-native-fs';
+import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
@@ -131,37 +125,41 @@ export const ComponentView = ({
     setReadAccessUrl(versionDir);
 
     const shouldDownload =
-      !(await exists(versionDir)) || (await readDir(versionDir)).length === 0;
+      !(await RNFS.exists(versionDir)) ||
+      (await RNFS.readDir(versionDir)).length === 0;
 
     if (shouldDownload) {
       try {
         onDownloadEditorStart();
         // Delete any previous versions downloads
-        if (await exists(editorDir)) {
-          await unlink(editorDir);
+        if (await RNFS.exists(editorDir)) {
+          await RNFS.unlink(editorDir);
         }
-        await downloadFile({
+        await RNFS.downloadFile({
           fromUrl: downloadUrl,
           toFile: downloadPath,
         }).promise;
         await unzip(downloadPath, versionDir);
         // Delete zip after extraction
-        await unlink(downloadPath);
+        await RNFS.unlink(downloadPath);
       } finally {
         onDownloadEditorEnd();
       }
     }
 
-    const packageDir = await readDir(versionDir);
-    const possibleIndexLocations = [
-      `${packageDir[0].path}/dist/index.html`,
-      `${packageDir[0].path}/index.html`,
-    ];
+    let mainFileName = 'index.html';
+    const packageDir = await RNFS.readDir(versionDir);
+    const packageJsonPath = `${packageDir[0].path}/package.json`;
+    const packageJson = JSON.parse(await RNFS.readFile(packageJsonPath));
 
-    for (const location of possibleIndexLocations) {
-      if (await exists(location)) {
-        return `file://${location}`;
-      }
+    if (packageJson?.sn?.main) {
+      mainFileName = packageJson.sn.main;
+    }
+
+    const mainFilePath = `${packageDir[0].path}/${mainFileName}`;
+
+    if (await RNFS.exists(mainFilePath)) {
+      return `file://${mainFilePath}`;
     }
 
     return '';
@@ -333,7 +331,7 @@ export const ComponentView = ({
             false /* To prevent StatusBar from changing colors when focusing */
           }
           injectedJavaScript={defaultInjectedJavaScript()}
-          onContentProcessDidTerminate={() => setOfflineUrl('')}
+          onContentProcessDidTerminate={onLoadErrorHandler}
         />
       )}
     </FlexContainer>
