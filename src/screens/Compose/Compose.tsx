@@ -181,11 +181,18 @@ export class Compose extends React.Component<{}, State> {
         identifier: 'component-view-' + Math.random(),
         areas: [ComponentArea.Editor],
         actionHandler: (currentComponent, action, data) => {
-          if (action === ComponentAction.SetSize) {
-            this.context?.componentManager!.handleSetSizeEvent(
-              currentComponent,
-              data
-            );
+          switch (action) {
+            case ComponentAction.SetSize:
+              this.context?.componentManager!.handleSetSizeEvent(
+                currentComponent,
+                data
+              );
+              break;
+            case ComponentAction.ThemesActivated:
+              this.setState({
+                loadingWebview: false,
+              });
+              break;
           }
         },
         contextRequestHandler: () => this.note,
@@ -432,7 +439,7 @@ export class Compose extends React.Component<{}, State> {
         this.setState({
           downloadingEditor: false,
         }),
-      100
+      200
     );
   };
 
