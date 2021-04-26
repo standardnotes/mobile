@@ -23,13 +23,7 @@ import {
   SNNote,
   UuidString,
 } from '@standardnotes/snjs/dist/@types';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Share } from 'react-native';
 
 // eslint-disable-next-line no-shadow
@@ -89,9 +83,6 @@ export const NoteBottomSheet: React.FC<Props> = ({
   const [listedSections, setListedSections] = useState<
     BottomSheetSectionType[]
   >([]);
-  const [shouldReloadListedSections, setShouldReloadListedSections] = useState(
-    true
-  );
   const [reloadListedExtensionUuid, setReloadListedExtensionUuid] = useState<
     UuidString | undefined
   >();
@@ -142,7 +133,6 @@ export const NoteBottomSheet: React.FC<Props> = ({
       }
       await updateAction(action, extension, { running: false });
       setReloadListedExtensionUuid(extension.uuid);
-      setShouldReloadListedSections(true);
     },
     [application, updateAction, note]
   );
@@ -223,7 +213,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
           )
       );
     },
-    [listedExtensions, getReloadedListedSection]
+    [getReloadedListedSection, listedExtensions]
   );
 
   useEffect(() => {
@@ -234,208 +224,152 @@ export const NoteBottomSheet: React.FC<Props> = ({
       );
       if (mounted) {
         setListedSections(newSections);
-        setShouldReloadListedSections(false);
       }
     };
     reloadListedSections();
     return () => {
       mounted = false;
     };
-  }, [
-    getReloadedListedSections,
-    shouldReloadListedSections,
-    reloadListedExtensionUuid,
-  ]);
+  }, [getReloadedListedSections, reloadListedExtensionUuid]);
 
-  const historyAction = useMemo(
-    () => ({
-      text: 'Note history',
-      key: NoteAction.OpenHistory,
-      iconType: IconType.History,
-      callback: () => {
-        if (!editor?.isTemplateNote) {
-          navigation.navigate('HistoryStack', {
-            screen: SCREEN_NOTE_HISTORY,
-            params: { noteUuid: note.uuid },
+  const historyAction = {
+    text: 'Note history',
+    key: NoteAction.OpenHistory,
+    iconType: IconType.History,
+    callback: () => {
+      if (!editor?.isTemplateNote) {
+        navigation.navigate('HistoryStack', {
+          screen: SCREEN_NOTE_HISTORY,
+          params: { noteUuid: note.uuid },
+        });
+      }
+    },
+    dismissSheetOnPress: true,
+  };
+
+  const historySection: BottomSheetDefaultSectionType = {
+    expandable: false,
+    key: ActionSection.History,
+    actions: [historyAction],
+  };
+
+  const protectAction = {
+    text: note.protected ? 'Unprotect' : 'Protect',
+    key: NoteAction.Protect,
+    iconType: IconType.Protect,
+    callback: async () => await protectOrUnprotectNote(),
+    dismissSheetOnPress: true,
+  };
+
+  const pinAction = {
+    text: note.pinned ? 'Unpin' : 'Pin to top',
+    key: NoteAction.Pin,
+    iconType: IconType.Pin,
+    callback: () =>
+      changeNote(mutator => {
+        mutator.pinned = !note.pinned;
+      }),
+    dismissSheetOnPress: true,
+  };
+
+  const archiveAction = {
+    text: note.archived ? 'Unarchive' : 'Archive',
+    key: NoteAction.Archive,
+    iconType: IconType.Archive,
+    callback: () => {
+      if (note.locked) {
+        application?.alertService.alert(
+          "This note is locked. If you'd like to archive it, unlock it, and try again."
+        );
+        return;
+      }
+      changeNote(mutator => {
+        mutator.archived = !note.archived;
+      });
+    },
+    dismissSheetOnPress: true,
+  };
+
+  const lockAction = {
+    text: note.locked ? 'Unlock' : 'Lock',
+    key: NoteAction.Lock,
+    iconType: IconType.Lock,
+    callback: () =>
+      changeNote(mutator => {
+        mutator.locked = !note.locked;
+      }),
+    dismissSheetOnPress: true,
+  };
+
+  const shareAction = {
+    text: 'Share',
+    key: NoteAction.ShareAction,
+    iconType: IconType.Share,
+    callback: () => {
+      if (note) {
+        application?.getAppState().performActionWithoutStateChangeImpact(() => {
+          Share.share({
+            title: note.title,
+            message: note.text,
           });
-        }
-      },
-      dismissSheetOnPress: true,
-    }),
-    [editor, navigation, note]
-  );
-
-  const historySection: BottomSheetDefaultSectionType = useMemo(
-    () => ({
-      expandable: false,
-      key: ActionSection.History,
-      actions: [historyAction],
-    }),
-    [historyAction]
-  );
-
-  const protectAction = useMemo(
-    () => ({
-      text: note.protected ? 'Unprotect' : 'Protect',
-      key: NoteAction.Protect,
-      iconType: IconType.Protect,
-      callback: async () => await protectOrUnprotectNote(),
-      dismissSheetOnPress: true,
-    }),
-    [note, protectOrUnprotectNote]
-  );
-
-  const pinAction = useMemo(
-    () => ({
-      text: note.pinned ? 'Unpin' : 'Pin to top',
-      key: NoteAction.Pin,
-      iconType: IconType.Pin,
-      callback: () =>
-        changeNote(mutator => {
-          mutator.pinned = !note.pinned;
-        }),
-      dismissSheetOnPress: true,
-    }),
-    [changeNote, note]
-  );
-
-  const archiveAction = useMemo(
-    () => ({
-      text: note.archived ? 'Unarchive' : 'Archive',
-      key: NoteAction.Archive,
-      iconType: IconType.Archive,
-      callback: () => {
-        if (note.locked) {
-          application?.alertService.alert(
-            "This note is locked. If you'd like to archive it, unlock it, and try again."
-          );
-          return;
-        }
-        changeNote(mutator => {
-          mutator.archived = !note.archived;
         });
-      },
-      dismissSheetOnPress: true,
-    }),
-    [application, changeNote, note]
-  );
+      }
+    },
+    dismissSheetOnPress: true,
+  };
 
-  const lockAction = useMemo(
-    () => ({
-      text: note.locked ? 'Unlock' : 'Lock',
-      key: NoteAction.Lock,
-      iconType: IconType.Lock,
-      callback: () =>
-        changeNote(mutator => {
-          mutator.locked = !note.locked;
-        }),
-      dismissSheetOnPress: true,
-    }),
-    [changeNote, note]
-  );
+  const restoreAction = {
+    text: 'Restore',
+    key: NoteAction.Restore,
+    callback: () => {
+      changeNote(mutator => {
+        mutator.trashed = false;
+      });
+    },
+    dismissSheetOnPress: true,
+  };
 
-  const shareAction = useMemo(
-    () => ({
-      text: 'Share',
-      key: NoteAction.ShareAction,
-      iconType: IconType.Share,
-      callback: () => {
-        if (note) {
-          application
-            ?.getAppState()
-            .performActionWithoutStateChangeImpact(() => {
-              Share.share({
-                title: note.title,
-                message: note.text,
-              });
-            });
-        }
-      },
-      dismissSheetOnPress: true,
-    }),
-    [application, note]
-  );
+  const deleteAction = {
+    text: 'Delete permanently',
+    key: NoteAction.DeletePermanently,
+    callback: async () => await deleteNote(true),
+    danger: true,
+    dismissSheetOnPress: true,
+  };
 
-  const restoreAction = useMemo(
-    () => ({
-      text: 'Restore',
-      key: NoteAction.Restore,
-      callback: () => {
-        changeNote(mutator => {
-          mutator.trashed = false;
-        });
-      },
-      dismissSheetOnPress: true,
-    }),
-    [changeNote]
-  );
+  const moveToTrashAction = {
+    text: 'Move to Trash',
+    key: NoteAction.Trash,
+    iconType: IconType.Trash,
+    callback: async () => await deleteNote(false),
+    dismissSheetOnPress: true,
+  };
 
-  const deleteAction = useMemo(
-    () => ({
-      text: 'Delete permanently',
-      key: NoteAction.DeletePermanently,
-      callback: async () => await deleteNote(true),
-      danger: true,
-      dismissSheetOnPress: true,
-    }),
-    [deleteNote]
-  );
+  const trashActions: BottomSheetActionType[] = note.trashed
+    ? [restoreAction, deleteAction]
+    : [moveToTrashAction];
+  const actions: BottomSheetActionType[] = note.protected
+    ? [protectAction]
+    : [
+        pinAction,
+        archiveAction,
+        lockAction,
+        protectAction,
+        shareAction,
+        ...trashActions,
+      ];
 
-  const moveToTrashAction = useMemo(
-    () => ({
-      text: 'Move to Trash',
-      key: NoteAction.Trash,
-      iconType: IconType.Trash,
-      callback: async () => await deleteNote(false),
-      dismissSheetOnPress: true,
-    }),
-    [deleteNote]
-  );
-
-  const commonSection: BottomSheetDefaultSectionType = useMemo(() => {
-    const trashActions: BottomSheetActionType[] = note.trashed
-      ? [restoreAction, deleteAction]
-      : [moveToTrashAction];
-    const actions: BottomSheetActionType[] = note.protected
-      ? [protectAction]
-      : [
-          pinAction,
-          archiveAction,
-          lockAction,
-          protectAction,
-          shareAction,
-          ...trashActions,
-        ];
-
-    const section: BottomSheetSectionType = {
-      expandable: false,
-      key: ActionSection.CommonActions,
-      actions: actions,
-    };
-
-    return section;
-  }, [
-    archiveAction,
-    deleteAction,
-    lockAction,
-    moveToTrashAction,
-    note.protected,
-    note.trashed,
-    pinAction,
-    protectAction,
-    restoreAction,
-    shareAction,
-  ]);
+  const commonSection: BottomSheetDefaultSectionType = {
+    expandable: false,
+    key: ActionSection.CommonActions,
+    actions: actions,
+  };
 
   const title = note.protected ? note.safeTitle() : note.title;
 
-  const sections = useMemo(() => {
-    if (note.protected) {
-      return [commonSection];
-    } else {
-      return [historySection, commonSection, ...listedSections];
-    }
-  }, [historySection, commonSection, listedSections, note.protected]);
+  const sections = note.protected
+    ? [commonSection]
+    : [historySection, commonSection, ...listedSections];
 
   return (
     <BottomSheet
