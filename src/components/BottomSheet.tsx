@@ -227,7 +227,7 @@ const ActionItem: React.FC<{
 
   return (
     <ActionContainer>
-      <Item {...action} onPress={onPress} disabled={!action.callback} />
+      <Item {...action} onPress={onPress} disabled={loading || !action.callback} />
       {loading && <LoadingIndicator />}
     </ActionContainer>
   );
@@ -335,10 +335,7 @@ export const BottomSheet: React.FC<Props> = ({
     setListHeight(e.nativeEvent.layout.height);
   };
 
-  const contentHeight = useMemo(() => titleHeight + listHeight, [
-    titleHeight,
-    listHeight,
-  ]);
+  const contentHeight = titleHeight + listHeight;
 
   const snapPoints = useMemo(() => {
     const screenHeight = Dimensions.get('window').height;
