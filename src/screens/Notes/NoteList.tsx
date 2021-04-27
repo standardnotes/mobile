@@ -1,11 +1,16 @@
 import { Chip } from '@Components/Chip';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { AppStateEventType, AppStateType } from '@Lib/application_state';
-import { useSignedIn } from '@Lib/snjs_helper_hooks';
+import { useGetListedExtensions, useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
-import { CollectionSort, SNNote } from '@standardnotes/snjs';
+import {
+  CollectionSort,
+  SNActionsExtension,
+  SNNote,
+} from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   Dispatch,
@@ -27,6 +32,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IosSearchBar from 'react-native-search-bar';
 import AndroidSearchBar from 'react-native-search-box';
 import { ThemeContext } from 'styled-components/native';
+import { NoteBottomSheet } from './NoteBottomSheet';
 import { NoteCell } from './NoteCell';
 import {
   Container,
@@ -74,12 +80,19 @@ export const NoteList = (props: Props) => {
   const [collapseSearchBarOnBlur, setCollapseSearchBarOnBlur] = useState(true);
   const [noteListScrolled, setNoteListScrolled] = useState(false);
 
+  const [longPressedNote, setLongPressedNote] = useState<SNNote | undefined>();
+  const [listedExtensions, setListedExtensions] = useState<
+    SNActionsExtension[]
+  >([]);
+  const [getListedExtensions] = useGetListedExtensions();
+
   // Ref
   const opacityAnimationValue = useRef(new Animated.Value(0)).current;
   const marginTopAnimationValue = useRef(new Animated.Value(-40)).current;
   const iosSearchBarInputRef = useRef<IosSearchBar>(null);
   const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
 
   const navigation = useNavigation<
     AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
@@ -180,6 +193,13 @@ export const NoteList = (props: Props) => {
     setNoteListScrolled(true);
   };
 
+  const onLongPressItem = (note: SNNote) => {
+    setLongPressedNote(note);
+    const currentListedExtensions = getListedExtensions();
+    setListedExtensions(currentListedExtensions);
+    bottomSheetRef.current?.present();
+  };
+
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
     return (
       <NoteCell
@@ -189,6 +209,7 @@ export const NoteList = (props: Props) => {
         hideDates={props.hideDates}
         hidePreviews={props.hidePreviews}
         highlighted={item.uuid === props.selectedNoteId}
+        onLongPressItem={() => onLongPressItem(item)}
       />
     );
   };
@@ -317,6 +338,13 @@ export const NoteList = (props: Props) => {
         )}
         onScroll={onScroll}
       />
+      {longPressedNote ? (
+        <NoteBottomSheet
+          note={longPressedNote}
+          bottomSheetRef={bottomSheetRef}
+          listedExtensions={listedExtensions}
+        />
+      ) : null}
     </Container>
   );
 };

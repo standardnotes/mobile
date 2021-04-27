@@ -1,14 +1,6 @@
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useGetListedExtensions } from '@Lib/snjs_helper_hooks';
-import {
-  CollectionSort,
-  isNullOrUndefined,
-  SNActionsExtension,
-  SNNote,
-} from '@standardnotes/snjs';
+import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
 import React, { useRef, useState } from 'react';
 import { Text } from 'react-native';
-import { NoteBottomSheet } from './NoteBottomSheet';
 import {
   Container,
   DeletedText,
@@ -26,6 +18,7 @@ type Props = {
   hideDates: boolean;
   hidePreviews: boolean;
   sortType: CollectionSort;
+  onLongPressItem: () => void;
 };
 
 export const NoteCell = ({
@@ -35,14 +28,10 @@ export const NoteCell = ({
   sortType,
   hideDates,
   hidePreviews,
+  onLongPressItem,
 }: Props) => {
   // State
   const [selected, setSelected] = useState(false);
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const [listedExtensions, setListedExtensions] = useState<
-    SNActionsExtension[]
-  >([]);
-  const [getListedExtensions] = useGetListedExtensions();
 
   // Ref
   const selectionTimeout = useRef<number>();
@@ -75,9 +64,7 @@ export const NoteCell = ({
     if (note.errorDecrypting) {
       return;
     }
-    const currentListedExtensions = getListedExtensions();
-    setListedExtensions(currentListedExtensions);
-    bottomSheetRef.current?.present();
+    onLongPressItem();
   };
 
   const padding = 14;
@@ -87,68 +74,61 @@ export const NoteCell = ({
   const showDetails = !note.errorDecrypting && (!hideDates || note.protected);
 
   return (
-    <>
-      <TouchableContainer
-        onPress={_onPress}
-        onPressIn={_onPressIn}
-        onPressOut={_onPressOut}
-        onLongPress={onLongPress}
-      >
-        <Container ref={elementRef} selected={highlight} padding={padding}>
-          {note.deleted && <DeletedText>Deleting...</DeletedText>}
+    <TouchableContainer
+      onPress={_onPress}
+      onPressIn={_onPressIn}
+      onPressOut={_onPressOut}
+      onLongPress={onLongPress}
+    >
+      <Container ref={elementRef} selected={highlight} padding={padding}>
+        {note.deleted && <DeletedText>Deleting...</DeletedText>}
 
-          <NoteCellFlags note={note} highlight={highlight} />
+        <NoteCellFlags note={note} highlight={highlight} />
 
-          {note.errorDecrypting && !note.waitingForKey && (
-            <NoteText selected={highlight} numberOfLines={2}>
-              {'Please sign in to restore your decryption keys and notes.'}
-            </NoteText>
-          )}
+        {note.errorDecrypting && !note.waitingForKey && (
+          <NoteText selected={highlight} numberOfLines={2}>
+            {'Please sign in to restore your decryption keys and notes.'}
+          </NoteText>
+        )}
 
-          {note.safeTitle().length > 0 && (
-            <TitleText selected={highlight}>{note.title}</TitleText>
-          )}
+        {note.safeTitle().length > 0 && (
+          <TitleText selected={highlight}>{note.title}</TitleText>
+        )}
 
-          {hasPlainPreview && showPreview && (
-            <NoteText selected={highlight} numberOfLines={2}>
-              {note.preview_plain}
-            </NoteText>
-          )}
+        {hasPlainPreview && showPreview && (
+          <NoteText selected={highlight} numberOfLines={2}>
+            {note.preview_plain}
+          </NoteText>
+        )}
 
-          {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
-            <NoteText selected={highlight} numberOfLines={2}>
-              {note.text}
-            </NoteText>
-          )}
+        {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
+          <NoteText selected={highlight} numberOfLines={2}>
+            {note.text}
+          </NoteText>
+        )}
 
-          {showDetails && (
-            <DetailsText
-              numberOfLines={1}
-              selected={highlight}
-              first={!note.title}
-            >
-              {note.protected && (
-                <Text>
-                  Protected
-                  {!hideDates && ' • '}
-                </Text>
-              )}
-              {!hideDates && (
-                <Text>
-                  {sortType === CollectionSort.UpdatedAt
-                    ? 'Modified ' + note.updatedAtString
-                    : note.createdAtString}
-                </Text>
-              )}
-            </DetailsText>
-          )}
-        </Container>
-      </TouchableContainer>
-      <NoteBottomSheet
-        note={note}
-        bottomSheetRef={bottomSheetRef}
-        listedExtensions={listedExtensions}
-      />
-    </>
+        {showDetails && (
+          <DetailsText
+            numberOfLines={1}
+            selected={highlight}
+            first={!note.title}
+          >
+            {note.protected && (
+              <Text>
+                Protected
+                {!hideDates && ' • '}
+              </Text>
+            )}
+            {!hideDates && (
+              <Text>
+                {sortType === CollectionSort.UpdatedAt
+                  ? 'Modified ' + note.updatedAtString
+                  : note.createdAtString}
+              </Text>
+            )}
+          </DetailsText>
+        )}
+      </Container>
+    </TouchableContainer>
   );
 };
