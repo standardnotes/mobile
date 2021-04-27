@@ -12,13 +12,7 @@ import React, {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
-import {
-  DocumentDirectoryPath,
-  downloadFile,
-  exists,
-  readDir,
-  unlink,
-} from 'react-native-fs';
+import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
@@ -41,6 +35,7 @@ type Props = {
   onLoadError: () => void;
   onDownloadEditorStart: () => void;
   onDownloadEditorEnd: () => void;
+  offlineOnly?: boolean;
 };
 
 export const ComponentView = ({
@@ -50,6 +45,7 @@ export const ComponentView = ({
   onDownloadEditorStart,
   onDownloadEditorEnd,
   componentUuid,
+  offlineOnly,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -62,6 +58,10 @@ export const ComponentView = ({
   const [showWebView, setShowWebView] = useState<boolean>(true);
   const [offlineUrl, setOfflineUrl] = useState('');
   const [readAccessUrl, setReadAccessUrl] = useState('');
+  const [
+    downloadingOfflineEditor,
+    setDownloadingOfflineEditor,
+  ] = useState<boolean>(false);
 
   // Ref
   const webViewRef = useRef<WebView>(null);
@@ -131,41 +131,61 @@ export const ComponentView = ({
     setReadAccessUrl(versionDir);
 
     const shouldDownload =
-      !(await exists(versionDir)) || (await readDir(versionDir)).length === 0;
+      !downloadingOfflineEditor &&
+      (!(await RNFS.exists(versionDir)) ||
+        (await RNFS.readDir(versionDir)).length === 0);
 
     if (shouldDownload) {
+      setDownloadingOfflineEditor(true);
+      onDownloadEditorStart();
       try {
-        onDownloadEditorStart();
         // Delete any previous versions downloads
-        if (await exists(editorDir)) {
-          await unlink(editorDir);
+        if (await RNFS.exists(editorDir)) {
+          await RNFS.unlink(editorDir);
         }
-        await downloadFile({
+        await RNFS.downloadFile({
           fromUrl: downloadUrl,
           toFile: downloadPath,
         }).promise;
         await unzip(downloadPath, versionDir);
         // Delete zip after extraction
-        await unlink(downloadPath);
+        await RNFS.unlink(downloadPath);
       } finally {
         onDownloadEditorEnd();
+        setDownloadingOfflineEditor(false);
       }
     }
 
-    const packageDir = await readDir(versionDir);
-    const possibleIndexLocations = [
-      `${packageDir[0].path}/dist/index.html`,
-      `${packageDir[0].path}/index.html`,
-    ];
+    let mainFileName = 'index.html';
+    const packageDir = await RNFS.readDir(versionDir);
+    const packageJsonPath = `${packageDir[0].path}/package.json`;
+    const packageJson = JSON.parse(await RNFS.readFile(packageJsonPath));
 
-    for (const location of possibleIndexLocations) {
-      if (await exists(location)) {
-        return `file://${location}`;
-      }
+    if (packageJson?.sn?.main) {
+      mainFileName = packageJson.sn.main;
+    }
+
+    const mainFilePath = `${packageDir[0].path}/${mainFileName}`;
+
+    if (await RNFS.exists(mainFilePath)) {
+      return `file://${mainFilePath}`;
     }
 
     return '';
-  }, [liveComponent, onDownloadEditorStart, onDownloadEditorEnd]);
+  }, [
+    downloadingOfflineEditor,
+    liveComponent,
+    onDownloadEditorStart,
+    onDownloadEditorEnd,
+  ]);
+
+  const onLoadErrorHandler = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    onLoadError();
+  }, [onLoadError, timeoutRef]);
 
   useEffect(() => {
     let mounted = true;
@@ -186,9 +206,13 @@ export const ComponentView = ({
           if (mounted) {
             setOfflineUrl(offlineEditorUrl);
           }
-        } finally {
+        } catch (e) {
           if (mounted) {
-            setUrl(newUrl);
+            if (offlineOnly) {
+              onLoadErrorHandler();
+            } else {
+              setUrl(newUrl);
+            }
           }
         }
       }
@@ -203,7 +227,14 @@ export const ComponentView = ({
       application?.componentManager.deactivateComponent(componentUuid);
       liveComponent?.deinit();
     };
-  }, [application, componentUuid, getOfflineEditorUrl, liveComponent]);
+  }, [
+    application,
+    componentUuid,
+    getOfflineEditorUrl,
+    liveComponent,
+    offlineOnly,
+    onLoadErrorHandler,
+  ]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
@@ -249,14 +280,6 @@ export const ComponentView = ({
 
   const onLoadStartHandler = () => {
     onLoadStart();
-  };
-
-  const onLoadErrorHandler = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    onLoadError();
   };
 
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
@@ -333,7 +356,7 @@ export const ComponentView = ({
             false /* To prevent StatusBar from changing colors when focusing */
           }
           injectedJavaScript={defaultInjectedJavaScript()}
-          onContentProcessDidTerminate={() => setOfflineUrl('')}
+          onContentProcessDidTerminate={onLoadErrorHandler}
         />
       )}
     </FlexContainer>
