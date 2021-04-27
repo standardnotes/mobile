@@ -220,9 +220,13 @@ const ActionItem: React.FC<{
       dismissBottomSheet();
     }
     if (action.callback) {
-      setLoading(true);
+      if (!action.dismissSheetOnPress) {
+        setLoading(true);
+      }
       await action.callback();
-      setLoading(false);
+      if (!action.dismissSheetOnPress) {
+        setLoading(false);
+      }
     }
   };
 
