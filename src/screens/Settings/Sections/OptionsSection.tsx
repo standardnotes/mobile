@@ -29,7 +29,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   // State
   const [exporting, setExporting] = useState(false);
   const [lastExportDate, setLastExportDate] = useState<Date | undefined>(() =>
-    application?.getPrefsService().getValue(PrefKey.LastExportDate, undefined)
+    application
+      ?.getLocalPreferences()
+      .getValue(PrefKey.LastExportDate, undefined)
   );
 
   const lastExportData = useMemo(() => {
@@ -93,7 +95,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         const exportDate = new Date();
         setLastExportDate(exportDate);
         application
-          ?.getPrefsService()
+          ?.getLocalPreferences()
           .setUserPrefValue(PrefKey.LastExportDate, exportDate);
       }
       setExporting(false);

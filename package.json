@@ -27,7 +27,7 @@
     "@react-navigation/native": "^5.9.3",
     "@react-navigation/stack": "^5.14.3",
     "@standardnotes/sncrypto-common": "1.2.9",
-    "@standardnotes/snjs": "2.0.72",
+    "@standardnotes/snjs": "2.0.75",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
     "react": "16.13.1",
@@ -58,8 +58,8 @@
     "react-native-webview": "^11.0.3",
     "react-native-zip-archive": "^6.0.2",
     "react-navigation-header-buttons": "^6.0.2",
-    "sn-textview": "standardnotes/sn-textview#3b56f5c2c87c24370f00ee5a0cee0da9a9fc66c3",
-    "standard-notes-rn": "standardnotes/standard-notes-rn#996b016",
+    "sn-textview": "standardnotes/sn-textview#14cd6fded5c746569a9c6c365d2edc41913811bb",
+    "standard-notes-rn": "standardnotes/standard-notes-rn#d8e5c21b049dd4b97006688617736efbdb7dc4e7",
     "styled-components": "^5.2.1"
   },
   "devDependencies": {

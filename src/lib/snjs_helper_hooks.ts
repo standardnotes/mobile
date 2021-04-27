@@ -158,10 +158,8 @@ export const useSyncStatus = () => {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const setStatus = useCallback(
-    (status?: string, color?: string) => {
-      application
-        ?.getStatusManager()
-        .setMessage(SCREEN_NOTES, status ?? '', color);
+    (status = '', color?: string) => {
+      application?.getStatusManager().setMessage(SCREEN_NOTES, status, color);
     },
     [application]
   );
@@ -173,11 +171,16 @@ export const useSyncStatus = () => {
       application!.isEncryptionAvailable() &&
       application!.getStorageEncryptionPolicy() ===
         StorageEncryptionPolicies.Default;
-    if (stats.localDataDone) {
+
+    if (
+      stats.localDataCurrent === 0 ||
+      stats.localDataTotal === 0 ||
+      stats.localDataDone
+    ) {
       setStatus();
       return;
     }
-    const notesString = `${stats.localDataCurrent}/${stats.localDataTotal} items...`;
+    const notesString = `${stats.localDataCurrent}/${stats.localDataTotal} items…`;
     const loadingStatus = encryption
       ? `Decrypting ${notesString}`
       : `Loading ${notesString}`;
@@ -213,7 +216,9 @@ export const useSyncStatus = () => {
       setStatus(
         `Syncing ${stats.uploadCompletionCount}/${stats.uploadTotalCount} items...`
       );
-    } else if (!syncStatus.syncInProgress) {
+    } else if (syncStatus.syncInProgress) {
+      setStatus('Syncing…');
+    } else {
       setStatus();
     }
   }, [application, setStatus]);
@@ -232,10 +237,6 @@ export const useSyncStatus = () => {
           setDecrypting(false);
           setLoading(false);
           updateLocalDataStatus();
-        } else if (eventName === ApplicationEvent.WillSync) {
-          if (application.hasAccount() && !completedInitialSync) {
-            setStatus('Syncing...');
-          }
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
           if (
             !completedInitialSync ||
