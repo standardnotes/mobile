@@ -58,6 +58,10 @@ export const ComponentView = ({
   const [showWebView, setShowWebView] = useState<boolean>(true);
   const [offlineUrl, setOfflineUrl] = useState('');
   const [readAccessUrl, setReadAccessUrl] = useState('');
+  const [
+    downloadingOfflineEditor,
+    setDownloadingOfflineEditor,
+  ] = useState<boolean>(false);
 
   // Ref
   const webViewRef = useRef<WebView>(null);
@@ -127,12 +131,14 @@ export const ComponentView = ({
     setReadAccessUrl(versionDir);
 
     const shouldDownload =
-      !(await RNFS.exists(versionDir)) ||
-      (await RNFS.readDir(versionDir)).length === 0;
+      !downloadingOfflineEditor &&
+      (!(await RNFS.exists(versionDir)) ||
+        (await RNFS.readDir(versionDir)).length === 0);
 
     if (shouldDownload) {
+      setDownloadingOfflineEditor(true);
+      onDownloadEditorStart();
       try {
-        onDownloadEditorStart();
         // Delete any previous versions downloads
         if (await RNFS.exists(editorDir)) {
           await RNFS.unlink(editorDir);
@@ -146,6 +152,7 @@ export const ComponentView = ({
         await RNFS.unlink(downloadPath);
       } finally {
         onDownloadEditorEnd();
+        setDownloadingOfflineEditor(false);
       }
     }
 
@@ -165,7 +172,12 @@ export const ComponentView = ({
     }
 
     return '';
-  }, [liveComponent, onDownloadEditorStart, onDownloadEditorEnd]);
+  }, [
+    downloadingOfflineEditor,
+    liveComponent,
+    onDownloadEditorStart,
+    onDownloadEditorEnd,
+  ]);
 
   const onLoadErrorHandler = useCallback(() => {
     if (timeoutRef.current) {
