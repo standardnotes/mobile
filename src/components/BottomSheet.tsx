@@ -342,13 +342,14 @@ export const BottomSheet: React.FC<Props> = ({
     setListHeight(e.nativeEvent.layout.height);
   };
 
-  const contentHeight = titleHeight + listHeight;
-  const maxLimit = 0.85 * screenHeight;
-  let snapPoints = [1];
-
-  if (contentHeight > 0) {
-    snapPoints = contentHeight < maxLimit ? [contentHeight] : [maxLimit];
-  }
+  const snapPoints = useMemo(() => {
+    const contentHeight = titleHeight + listHeight;
+    const maxLimit = 0.85 * screenHeight;
+    if (contentHeight === 0) {
+      return [1];
+    }
+    return contentHeight < maxLimit ? [contentHeight] : [maxLimit];
+  }, [listHeight, titleHeight, screenHeight]);
 
   const expandSection = (sectionKey: string) => {
     const animations: Animated.CompositeAnimation[] = [];
