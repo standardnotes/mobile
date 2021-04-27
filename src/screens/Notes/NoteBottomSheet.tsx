@@ -201,9 +201,15 @@ export const NoteBottomSheet: React.FC<Props> = ({
       const extensions = listedExtensions;
       return await Promise.all(
         extensions
-          .sort((a: SNActionsExtension, b: SNActionsExtension) =>
-            a.uuid > b.uuid ? 1 : -1
-          )
+          .sort((a: SNActionsExtension, b: SNActionsExtension) => {
+            if (a.name === b.name && a.url === b.url) {
+              return a.uuid > b.uuid ? 1 : -1;
+            } else if (a.name === b.name) {
+              return a.url > b.url ? 1 : -1;
+            } else {
+              return a.name > b.name ? 1 : -1;
+            }
+          })
           .map(async extension =>
             getReloadedListedSection(extension, extensionToReloadUuid)
           )
