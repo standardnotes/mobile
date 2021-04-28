@@ -30,6 +30,7 @@ import FlagSecure from 'react-native-flag-secure-android';
 import { hide, show } from 'react-native-privacy-snapshot';
 import VersionInfo from 'react-native-version-info';
 import { MobileApplication } from './application';
+import { associateComponentWithNote } from './component_manager';
 import { Editor } from './editor';
 import { PrefKey } from './preferences_manager';
 
@@ -279,11 +280,20 @@ export class ApplicationState extends ApplicationService {
    * editor's note with an empty one.
    */
   async createEditor(title?: string) {
-    const activeEditor = this.getActiveEditor();
+    let activeEditor = this.getActiveEditor();
     if (!activeEditor || this.multiEditorEnabled) {
-      this.application.editorGroup.createEditor(undefined, title);
+      await this.application.editorGroup.createEditor(undefined, title);
+      activeEditor = this.getActiveEditor();
     } else {
       await activeEditor.reset(title);
+    }
+    const defaultEditor = this.application.componentManager.getDefaultEditor();
+    if (defaultEditor) {
+      await associateComponentWithNote(
+        this.application,
+        defaultEditor,
+        activeEditor.note!
+      );
     }
   }
 
@@ -291,7 +301,7 @@ export class ApplicationState extends ApplicationService {
     const note = this.application.findItem(noteUuid) as SNNote;
     const activeEditor = this.getActiveEditor();
     if (!activeEditor || this.multiEditorEnabled) {
-      this.application.editorGroup.createEditor(noteUuid);
+      await this.application.editorGroup.createEditor(noteUuid);
     } else {
       activeEditor.setNote(note);
     }

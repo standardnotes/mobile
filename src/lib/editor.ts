@@ -14,20 +14,12 @@ export type EditorNoteValueChangeObserver = (
 
 export class Editor {
   public note?: SNNote;
-  private application?: MobileApplication;
   private noteChangeObservers: EditorNoteChangeObserver[] = [];
   private noteValueChangeObservers: EditorNoteValueChangeObserver[] = [];
   private removeStreamObserver?: () => void;
   public isTemplateNote = false;
 
-  constructor(
-    application: MobileApplication,
-    noteUuid?: string,
-    noteTitle?: string
-  ) {
-    this.application = application;
-    this.init(noteUuid, noteTitle);
-  }
+  constructor(private application: MobileApplication) {}
 
   async init(noteUuid?: string, noteTitle?: string) {
     if (noteUuid) {
@@ -51,7 +43,7 @@ export class Editor {
     this.removeStreamObserver = undefined;
     this.noteChangeObservers.length = 0;
     this.noteValueChangeObservers.length = 0;
-    this.application = undefined;
+    (this.application as unknown) = undefined;
   }
 
   private handleNoteStream(notes: SNNote[], source?: PayloadSource) {

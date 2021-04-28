@@ -1,3 +1,4 @@
+import { associateComponentWithNote } from '@Lib/component_manager';
 import { Editor } from '@Lib/editor';
 import {
   useChangeNote,
@@ -220,21 +221,11 @@ export const NoteSideMenu = React.memo((props: Props) => {
     [application, note]
   );
 
-  const associateComponentWithCurrentNote = useCallback(
-    async (component: SNComponent) => {
-      if (note) {
-        return application?.changeItem(component.uuid, m => {
-          const mutator = m as ComponentMutator;
-          mutator.removeDisassociatedItemId(note.uuid);
-          mutator.associateWithItem(note.uuid);
-        });
-      }
-    },
-    [application, note]
-  );
-
   const onEditorPress = useCallback(
     async (selectedComponent?: SNComponent) => {
+      if (!note || !application) {
+        return;
+      }
       if (note?.locked) {
         application?.alertService.alert(
           "This note is locked. If you'd like to edit its options, unlock it, and try again."
@@ -244,7 +235,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       if (editor?.isTemplateNote) {
         await editor?.insertTemplatedNote();
       }
-      const activeEditorComponent = application?.componentManager!.editorForNote(
+      const activeEditorComponent = application.componentManager!.editorForNote(
         note!
       );
       props.drawerRef?.closeDrawer();
@@ -273,14 +264,13 @@ export const NoteSideMenu = React.memo((props: Props) => {
             noteMutator.prefersPlainEditor = false;
           });
         }
-        await associateComponentWithCurrentNote(selectedComponent);
+        await associateComponentWithNote(application, selectedComponent, note);
       }
       /** Dirtying can happen above */
       application?.sync();
     },
     [
       application,
-      associateComponentWithCurrentNote,
       disassociateComponentWithCurrentNote,
       editor,
       note,
