@@ -1,7 +1,6 @@
 import {
   addIfUnique,
   ComponentArea,
-  isNullOrUndefined,
   removeFromArray,
   SNComponent,
   UuidString,
@@ -69,14 +68,8 @@ export class ComponentGroup {
     }
   }
 
-  activeComponentForArea(area: ComponentArea) {
-    return !isNullOrUndefined(this.activeComponentsForArea(area))
-      ? this.activeComponentsForArea(area)[0]
-      : undefined;
-  }
-
-  activeComponentsForArea(area: ComponentArea) {
-    return this.allActiveComponents()?.filter(c => c.area === area);
+  activeComponentForArea(area: ComponentArea): SNComponent | undefined {
+    return this.allActiveComponents()?.filter(c => c.area === area)?.[0];
   }
 
   allComponentsForArea(area: ComponentArea) {

@@ -157,8 +157,8 @@ export const useSyncStatus = () => {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const setStatus = useCallback(
-    (status = '', color?: string) => {
-      application?.getStatusManager().setMessage(SCREEN_NOTES, status, color);
+    (status = '') => {
+      application?.getStatusManager().setMessage(SCREEN_NOTES, status);
     },
     [application]
   );

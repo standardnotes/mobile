@@ -238,6 +238,12 @@ export class Compose extends React.Component<{}, State> {
     if (this.editor) {
       this.context?.editorGroup?.closeEditor(this.editor);
     }
+    if (this.state.editorComponent) {
+      this.context?.componentGroup?.deactivateComponent(
+        this.state.editorComponent,
+        false
+      );
+    }
 
     this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
     if (this.saveTimeout) {
