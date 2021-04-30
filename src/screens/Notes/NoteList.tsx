@@ -209,7 +209,6 @@ export const NoteList = (props: Props) => {
               ref={iosSearchBarInputRef}
               keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
               placeholder="Search"
-              text={searchText}
               hideBackground
               /**
                * keyboardColorForActiveTheme returns the same value as apperance
