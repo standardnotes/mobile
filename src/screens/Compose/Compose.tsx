@@ -40,7 +40,8 @@ const SAVE_TIMEOUT_DEBOUNCE = 250;
 const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
 
 type State = {
-  title: string | undefined;
+  title: string;
+  text: string;
   saveError: boolean;
   editorComponent: SNComponent | undefined;
   webViewError: boolean;
@@ -66,28 +67,31 @@ export class Compose extends React.Component<{}, State> {
   removeAppEventObserver?: () => void;
   removeComponentHandler?: () => void;
 
-  state: State = {
-    title: '',
-    editorComponent: undefined,
-    saveError: false,
-    webViewError: false,
-    loadingWebview: false,
-    downloadingEditor: false,
-  };
+  constructor(
+    props: {},
+    context: React.ContextType<typeof ApplicationContext>
+  ) {
+    super(props);
+    this.context = context;
+    const initialEditor = context?.editorGroup.activeEditor;
+    this.state = {
+      title: initialEditor?.note?.title ?? '',
+      text: initialEditor?.note?.text ?? '',
+      editorComponent: undefined,
+      saveError: false,
+      webViewError: false,
+      loadingWebview: false,
+      downloadingEditor: false,
+    };
+  }
 
   componentDidMount() {
-    const initialEditor = this.context?.editorGroup.activeEditor;
-
-    // eslint-disable-next-line react/no-did-mount-set-state
-    this.setState({
-      title: initialEditor?.note?.safeTitle(),
-    });
-
     this.removeEditorNoteChangeObserver = this.editor?.addNoteChangeObserver(
       newNote => {
         this.setState(
           {
             title: newNote.title,
+            text: newNote.text,
           },
           () => {
             this.reloadComponentEditorState();
@@ -104,10 +108,8 @@ export class Compose extends React.Component<{}, State> {
         if (isPayloadSourceRetrieved(source!)) {
           this.setState({
             title: newNote.title,
+            text: newNote.text,
           });
-        }
-        if (!this.state.title) {
-          this.setState({ title: newNote.title });
         }
 
         if (newNote.lastSyncBegan || newNote.dirty) {
@@ -425,14 +427,14 @@ export class Compose extends React.Component<{}, State> {
     );
   };
 
-  onContentChange = (newNoteText: string) => {
+  onContentChange = (text: string) => {
     if (Platform.OS === 'android' && this.note?.locked) {
       this.context?.alertService?.alert(
         'This note is locked. Please unlock this note to make changes.'
       );
       return;
     }
-    this.saveNote(false, true, false, false, newNoteText);
+    this.saveNote(false, true, false, false, text);
   };
 
   onDownloadEditorStart = () =>
@@ -561,7 +563,7 @@ export class Compose extends React.Component<{}, State> {
                             testID="noteContentField"
                             ref={this.editorViewRef}
                             autoFocus={false}
-                            value={this.note?.text}
+                            value={this.state.text}
                             selectionColor={lighten(
                               theme.stylekitInfoColor,
                               0.35
@@ -579,7 +581,7 @@ export class Compose extends React.Component<{}, State> {
                           ref={this.editorViewRef}
                           autoFocus={false}
                           multiline
-                          value={this.note?.text}
+                          value={this.state.text}
                           keyboardDismissMode={'interactive'}
                           keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
                           selectionColor={lighten(theme.stylekitInfoColor)}

@@ -25,7 +25,7 @@
 		83DCC09F24C0A21200D58E1B /* Red@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD69244F211C0020E9F0 /* Red@2x.png */; };
 		83DCC0A024C0A21200D58E1B /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD68244F211C0020E9F0 /* Red@3x.png */; };
 		83F9431824C1EBC5007014C8 /* Dev.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83F9431724C1EBC5007014C8 /* Dev.xcassets */; };
-		EC7C2A984CBC86DBCA44D3AF /* libPods-StandardNotes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D9673D75406FE1C6B945FF8 /* libPods-StandardNotes.a */; };
+		E64C3F934735F2B562CA753B /* libPods-StandardNotes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55E6A0DCFF3BB9E4D6780121 /* libPods-StandardNotes.a */; };
 		F1AF40B6D465714940D457A3 /* libPods-StandardNotesDev.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 340672DE690D292C12CF8DF2 /* libPods-StandardNotesDev.a */; };
 /* End PBXBuildFile section */
 
@@ -51,7 +51,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = StandardNotes/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = StandardNotes/main.m; sourceTree = "<group>"; };
 		340672DE690D292C12CF8DF2 /* libPods-StandardNotesDev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StandardNotesDev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D9673D75406FE1C6B945FF8 /* libPods-StandardNotes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StandardNotes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		55E6A0DCFF3BB9E4D6780121 /* libPods-StandardNotes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StandardNotes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		810594E7EAEF139BFC2FDD3B /* Pods-StandardNotes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes.release.xcconfig"; path = "Target Support Files/Pods-StandardNotes/Pods-StandardNotes.release.xcconfig"; sourceTree = "<group>"; };
 		8343BD67244F211C0020E9F0 /* Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red.png; sourceTree = "<group>"; };
 		8343BD68244F211C0020E9F0 /* Red@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@3x.png"; sourceTree = "<group>"; };
@@ -81,7 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC7C2A984CBC86DBCA44D3AF /* libPods-StandardNotes.a in Frameworks */,
+				E64C3F934735F2B562CA753B /* libPods-StandardNotes.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,7 +138,7 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				340672DE690D292C12CF8DF2 /* libPods-StandardNotesDev.a */,
-				4D9673D75406FE1C6B945FF8 /* libPods-StandardNotes.a */,
+				55E6A0DCFF3BB9E4D6780121 /* libPods-StandardNotes.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -220,7 +220,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				1DCF3C40742945E814110BC4 /* [CP] Copy Pods Resources */,
+				70E3C42536F9E92E21197CF8 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -469,6 +469,56 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StandardNotesDev/Pods-StandardNotesDev-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		70E3C42536F9E92E21197CF8 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-StandardNotes/Pods-StandardNotes-resources.sh",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StandardNotes/Pods-StandardNotes-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		83DCC09524C0A21200D58E1B /* Start Packager */ = {
