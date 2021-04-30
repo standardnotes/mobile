@@ -117,6 +117,7 @@ export const StyledTextView = React.memo(
     prevProps: ComponentProps<typeof SNTextView>
   ) => {
     if (
+      newProps.value !== prevProps.value ||
       newProps.selectionColor !== prevProps.selectionColor ||
       newProps.handlesColor !== prevProps.handlesColor ||
       newProps.autoFocus !== prevProps.autoFocus ||
