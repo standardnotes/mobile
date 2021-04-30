@@ -402,7 +402,6 @@ export class Compose extends React.Component<{}, State> {
   };
 
   onContentChange = (text: string) => {
-    this.setState({ text });
     if (Platform.OS === 'android' && this.note?.locked) {
       this.context?.alertService?.alert(
         'This note is locked. Please unlock this note to make changes.'
