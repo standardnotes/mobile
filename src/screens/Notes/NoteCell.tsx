@@ -137,7 +137,7 @@ export const NoteCell = ({
       });
 
       options.push({
-        text: note.locked ? 'Enable Editing' : 'Prevent Editing',
+        text: note.locked ? 'Enable editing' : 'Prevent editing',
         key: 'lock',
         callback: () =>
           changeNote(mutator => {
@@ -170,7 +170,7 @@ export const NoteCell = ({
             },
           },
           {
-            text: 'Delete Permanently',
+            text: 'Delete permanently',
             key: 'delete-forever',
             destructive: true,
             callback: async () => deleteNote(true),

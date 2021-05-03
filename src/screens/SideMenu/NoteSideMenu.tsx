@@ -447,7 +447,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       leaveEditor();
     };
 
-    const lockOption = note.locked ? 'Enable Editing' : 'Prevent Editing';
+    const lockOption = note.locked ? 'Enable editing' : 'Prevent editing';
     const lockEvent = () =>
       changeNote(mutator => {
         mutator.locked = !note.locked;
@@ -522,7 +522,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           },
         },
         {
-          text: 'Delete Permanently',
+          text: 'Delete permanently',
           textClass: 'danger' as 'danger',
           key: 'delete-forever',
           onSelect: async () => deleteNote(true),
