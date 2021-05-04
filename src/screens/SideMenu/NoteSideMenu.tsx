@@ -47,11 +47,10 @@ import React, {
 } from 'react';
 import { Platform, Share } from 'react-native';
 import FAB from 'react-native-fab';
-import { FlatList } from 'react-native-gesture-handler';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components/native';
-import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled';
+import { SafeAreaContainer, StyledList } from './NoteSideMenu.styled';
 import { SideMenuOption, SideMenuSection } from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
@@ -74,7 +73,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
     AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
   >();
   const { showActionSheet } = useCustomActionSheet();
-  const styles = useStyles(theme);
 
   // State
   const [editor, setEditor] = useState<Editor | undefined>(undefined);
@@ -596,47 +594,31 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   return (
     <SafeAreaContainer edges={['top', 'bottom', 'right']}>
-      <FlatList
-        style={styles.sections}
-        data={['options-section', 'editors-section', 'tags-section'].map(
-          key => ({
-            key,
-            noteOptions,
-            editorComponents,
-            onTagSelect,
-            selectedTags,
-          })
-        )}
-        renderItem={({ item, index }) =>
-          index === 0 ? (
-            <SideMenuSection
-              title="Options"
-              key={item.key}
-              options={item.noteOptions}
-            />
-          ) : index === 1 ? (
-            <SideMenuSection
-              title="Editors"
-              key={item.key}
-              options={item.editorComponents}
-              collapsed={true}
-            />
-          ) : index === 2 ? (
-            <SideMenuSection title="Tags" key="tags-section">
-              <TagSelectionList
-                key={item.key}
-                hasBottomPadding={Platform.OS === 'android'}
-                contentType={ContentType.Tag}
-                onTagSelect={item.onTagSelect}
-                selectedTags={item.selectedTags}
-                emptyPlaceholder={
-                  'Create a new tag using the tag button in the bottom right corner.'
-                }
-              />
-            </SideMenuSection>
-          ) : null
-        }
-      />
+      <StyledList>
+        <SideMenuSection
+          title="Options"
+          key="options-section"
+          options={noteOptions}
+        />
+        <SideMenuSection
+          title="Editors"
+          key="editors-section"
+          options={editorComponents}
+          collapsed={true}
+        />
+        <SideMenuSection title="Tags" key="tags-section">
+          <TagSelectionList
+            key="tags-section-list"
+            hasBottomPadding={Platform.OS === 'android'}
+            contentType={ContentType.Tag}
+            onTagSelect={onTagSelect}
+            selectedTags={selectedTags}
+            emptyPlaceholder={
+              'Create a new tag using the tag button in the bottom right corner.'
+            }
+          />
+        </SideMenuSection>
+      </StyledList>
 
       <FAB
         buttonColor={theme.stylekitInfoColor}
