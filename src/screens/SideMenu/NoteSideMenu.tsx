@@ -1,3 +1,4 @@
+import { associateComponentWithNote } from '@Lib/component_manager';
 import { Editor } from '@Lib/editor';
 import {
   useChangeNote,
@@ -46,10 +47,11 @@ import React, {
 } from 'react';
 import { Platform, Share } from 'react-native';
 import FAB from 'react-native-fab';
+import { FlatList } from 'react-native-gesture-handler';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components/native';
-import { SafeAreaContainer, StyledList } from './NoteSideMenu.styled';
+import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled';
 import { SideMenuOption, SideMenuSection } from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
@@ -72,6 +74,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
   >();
   const { showActionSheet } = useCustomActionSheet();
+  const styles = useStyles(theme);
 
   // State
   const [editor, setEditor] = useState<Editor | undefined>(undefined);
@@ -220,21 +223,11 @@ export const NoteSideMenu = React.memo((props: Props) => {
     [application, note]
   );
 
-  const associateComponentWithCurrentNote = useCallback(
-    async (component: SNComponent) => {
-      if (note) {
-        return application?.changeItem(component.uuid, m => {
-          const mutator = m as ComponentMutator;
-          mutator.removeDisassociatedItemId(note.uuid);
-          mutator.associateWithItem(note.uuid);
-        });
-      }
-    },
-    [application, note]
-  );
-
   const onEditorPress = useCallback(
     async (selectedComponent?: SNComponent) => {
+      if (!note || !application) {
+        return;
+      }
       if (note?.locked) {
         application?.alertService.alert(
           "This note is locked. If you'd like to edit its options, unlock it, and try again."
@@ -244,7 +237,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       if (editor?.isTemplateNote) {
         await editor?.insertTemplatedNote();
       }
-      const activeEditorComponent = application?.componentManager!.editorForNote(
+      const activeEditorComponent = application.componentManager!.editorForNote(
         note!
       );
       props.drawerRef?.closeDrawer();
@@ -273,14 +266,13 @@ export const NoteSideMenu = React.memo((props: Props) => {
             noteMutator.prefersPlainEditor = false;
           });
         }
-        await associateComponentWithCurrentNote(selectedComponent);
+        await associateComponentWithNote(application, selectedComponent, note);
       }
       /** Dirtying can happen above */
       application?.sync();
     },
     [
       application,
-      associateComponentWithCurrentNote,
       disassociateComponentWithCurrentNote,
       editor,
       note,
@@ -604,31 +596,41 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   return (
     <SafeAreaContainer edges={['top', 'bottom', 'right']}>
-      <StyledList>
-        <SideMenuSection
-          title="Options"
-          key="options-section"
-          options={noteOptions}
-        />
-        <SideMenuSection
-          title="Editors"
-          key="editors-section"
-          options={editorComponents}
-          collapsed={true}
-        />
-        <SideMenuSection title="Tags" key="tags-section">
-          <TagSelectionList
-            key="tags-section-list"
-            hasBottomPadding={Platform.OS === 'android'}
-            contentType={ContentType.Tag}
-            onTagSelect={onTagSelect}
-            selectedTags={selectedTags}
-            emptyPlaceholder={
-              'Create a new tag using the tag button in the bottom right corner.'
-            }
-          />
-        </SideMenuSection>
-      </StyledList>
+      <FlatList
+        style={styles.sections}
+        data={['options-section', 'editors-section', 'tags-section'].map(
+          key => ({
+            key,
+            noteOptions,
+            editorComponents,
+            onTagSelect,
+            selectedTags,
+          })
+        )}
+        renderItem={({ item, index }) =>
+          index === 0 ? (
+            <SideMenuSection title="Options" options={item.noteOptions} />
+          ) : index === 1 ? (
+            <SideMenuSection
+              title="Editors"
+              options={item.editorComponents}
+              collapsed={true}
+            />
+          ) : index === 2 ? (
+            <SideMenuSection title="Tags">
+              <TagSelectionList
+                hasBottomPadding={Platform.OS === 'android'}
+                contentType={ContentType.Tag}
+                onTagSelect={item.onTagSelect}
+                selectedTags={item.selectedTags}
+                emptyPlaceholder={
+                  'Create a new tag using the tag button in the bottom right corner.'
+                }
+              />
+            </SideMenuSection>
+          ) : null
+        }
+      />
 
       <FAB
         buttonColor={theme.stylekitInfoColor}

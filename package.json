@@ -1,7 +1,7 @@
 {
   "name": "StandardNotes",
-  "version": "3.6.7",
-  "user-version": "3.6.7",
+  "version": "3.6.8",
+  "user-version": "3.6.8",
   "private": true,
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -30,8 +30,8 @@
     "@standardnotes/snjs": "2.0.76",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
-    "react": "16.13.1",
-    "react-native": "0.63.4",
+    "react": "^17.0.2",
+    "react-native": "0.64.1",
     "react-native-aes-crypto": "standardnotes/react-native-aes#6430299",
     "react-native-alternate-icons": "standardnotes/react-native-alternate-icons#1d335d",
     "react-native-default-preference": "^1.4.3",

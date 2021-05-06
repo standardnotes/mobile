@@ -15,10 +15,18 @@ pod 'TrustKit', '1.6.5'
 
 target 'StandardNotes' do
   config = use_native_modules!
-  use_react_native!(:path => config["reactNativePath"])
+  use_react_native!(
+    :path => config["reactNativePath"],
+    :hermes_enabled => false,
+  )
 end
 
 target "StandardNotesDev" do
   config = use_native_modules!
-  use_react_native!(:path => config["reactNativePath"])
+  use_react_native!(
+    :path => config["reactNativePath"],
+
+    # Enabling hermes breaks fastlane build (at time of commit)
+    :hermes_enabled => false,
+  )
 end

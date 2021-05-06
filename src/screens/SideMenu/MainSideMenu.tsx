@@ -23,13 +23,14 @@ import React, {
 } from 'react';
 import { Platform } from 'react-native';
 import FAB from 'react-native-fab';
+import { FlatList } from 'react-native-gesture-handler';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components/native';
 import {
   FirstSafeAreaView,
   MainSafeAreaView,
-  SideMenuSectionContainer,
+  useStyles,
 } from './MainSideMenu.styled';
 import { SideMenuHero } from './SideMenuHero';
 import { SideMenuOption, SideMenuSection } from './SideMenuSection';
@@ -51,6 +52,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     application!.getAppState().getSelectedTag()
   );
   const [themes, setThemes] = useState<SNTheme[]>([]);
+  const styles = useStyles(theme);
 
   useEffect(() => {
     const removeTagChangeObserver = application!
@@ -239,15 +241,18 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     onThemeSelect,
   ]);
 
-  const onTagSelect = async (tag: SNTag) => {
-    if (tag.conflictOf) {
-      application!.changeAndSaveItem(tag.uuid, mutator => {
-        mutator.conflictOf = undefined;
-      });
-    }
-    application?.getAppState().setSelectedTag(tag, true);
-    drawerRef?.closeDrawer();
-  };
+  const onTagSelect = useCallback(
+    async (tag: SNTag) => {
+      if (tag.conflictOf) {
+        application!.changeAndSaveItem(tag.uuid, mutator => {
+          mutator.conflictOf = undefined;
+        });
+      }
+      application?.getAppState().setSelectedTag(tag, true);
+      drawerRef?.closeDrawer();
+    },
+    [application, drawerRef]
+  );
 
   const openSettings = () => {
     drawerRef?.closeDrawer();
@@ -266,6 +271,10 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     }
   };
 
+  const selectedTags = useMemo(() => (selectedTag ? [selectedTag] : []), [
+    selectedTag,
+  ]);
+
   return (
     <Fragment>
       <FirstSafeAreaView />
@@ -275,33 +284,46 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
           onPress={openSettings}
           onOutOfSyncPress={outOfSyncPressed}
         />
-        <SideMenuSectionContainer>
-          <SideMenuSection
-            title="Themes"
-            key="themes-section"
-            options={themeOptions}
-            collapsed={true}
-          />
-          <SideMenuSection title="Views" key="views-section">
-            <TagSelectionList
-              key="views-section-list"
-              contentType={ContentType.SmartTag}
-              onTagSelect={onTagSelect}
-              selectedTags={selectedTag ? [selectedTag] : []}
-            />
-          </SideMenuSection>
-
-          <SideMenuSection title="Tags" key="tags-section">
-            <TagSelectionList
-              key="tags-section-list"
-              hasBottomPadding={Platform.OS === 'android'}
-              emptyPlaceholder={'No tags. Create one from the note composer.'}
-              contentType={ContentType.Tag}
-              onTagSelect={onTagSelect}
-              selectedTags={selectedTag ? [selectedTag] : []}
-            />
-          </SideMenuSection>
-        </SideMenuSectionContainer>
+        <FlatList
+          style={styles.sections}
+          data={['themes-section', 'views-section', 'tags-section'].map(
+            key => ({
+              key,
+              themeOptions,
+              onTagSelect,
+              selectedTags,
+            })
+          )}
+          renderItem={({ item, index }) => {
+            return index === 0 ? (
+              <SideMenuSection
+                title="Themes"
+                options={item.themeOptions}
+                collapsed={true}
+              />
+            ) : index === 1 ? (
+              <SideMenuSection title="Views">
+                <TagSelectionList
+                  contentType={ContentType.SmartTag}
+                  onTagSelect={item.onTagSelect}
+                  selectedTags={item.selectedTags}
+                />
+              </SideMenuSection>
+            ) : index === 2 ? (
+              <SideMenuSection title="Tags">
+                <TagSelectionList
+                  hasBottomPadding={Platform.OS === 'android'}
+                  emptyPlaceholder={
+                    'No tags. Create one from the note composer.'
+                  }
+                  contentType={ContentType.Tag}
+                  onTagSelect={item.onTagSelect}
+                  selectedTags={item.selectedTags}
+                />
+              </SideMenuSection>
+            ) : null;
+          }}
+        />
         <FAB
           buttonColor={theme.stylekitInfoColor}
           iconTextColor={theme.stylekitInfoContrastColor}

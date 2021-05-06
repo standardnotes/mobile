@@ -1,8 +1,11 @@
 import {
+  ComponentMutator,
   PermissionDialog,
   SNAlertService,
+  SNApplication,
   SNComponent,
   SNComponentManager,
+  SNNote,
 } from '@standardnotes/snjs';
 import { objectToCss } from '@Style/css_parser';
 import { MobileTheme } from '@Style/theme_service';
@@ -48,4 +51,15 @@ export class ComponentManager extends SNComponentManager {
       return [];
     }
   }
+}
+
+export async function associateComponentWithNote(
+  application: SNApplication,
+  component: SNComponent,
+  note: SNNote
+) {
+  return application.changeItem<ComponentMutator>(component.uuid, mutator => {
+    mutator.removeDisassociatedItemId(note.uuid);
+    mutator.associateWithItem(note.uuid);
+  });
 }
