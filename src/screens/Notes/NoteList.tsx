@@ -100,6 +100,7 @@ export const NoteList = (props: Props) => {
 
   const dismissKeyboard = () => {
     iosSearchBarInputRef.current?.blur();
+    androidSearchBarInputRef.current?.blur();
   };
 
   useEffect(() => {
@@ -194,6 +195,7 @@ export const NoteList = (props: Props) => {
   };
 
   const onLongPressItem = (note: SNNote) => {
+    dismissKeyboard();
     setLongPressedNote(note);
     const currentListedExtensions = getListedExtensions();
     setListedExtensions(currentListedExtensions);
