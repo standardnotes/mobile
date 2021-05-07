@@ -10,6 +10,7 @@ import {
   CollectionSort,
   SNActionsExtension,
   SNNote,
+  UuidString,
 } from '@standardnotes/snjs';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
@@ -80,7 +81,12 @@ export const NoteList = (props: Props) => {
   const [collapseSearchBarOnBlur, setCollapseSearchBarOnBlur] = useState(true);
   const [noteListScrolled, setNoteListScrolled] = useState(false);
 
-  const [longPressedNote, setLongPressedNote] = useState<SNNote | undefined>();
+  const [longPressedNoteId, setLongPressedNoteId] = useState<
+    UuidString | undefined
+  >();
+  const longPressedNote = longPressedNoteId
+    ? (application?.findItem(longPressedNoteId) as SNNote)
+    : undefined;
   const [listedExtensions, setListedExtensions] = useState<
     SNActionsExtension[]
   >([]);
@@ -195,7 +201,7 @@ export const NoteList = (props: Props) => {
 
   const onLongPressItem = (note: SNNote) => {
     dismissKeyboard();
-    setLongPressedNote(note);
+    setLongPressedNoteId(note.uuid);
     const currentListedExtensions = getListedExtensions();
     setListedExtensions(currentListedExtensions);
     bottomSheetRef.current?.present();

@@ -1,11 +1,10 @@
 import {
   BottomSheet,
-  BottomSheetActionType,
+  BottomSheetAction,
   BottomSheetDefaultSectionType,
   BottomSheetExpandableSectionType,
   BottomSheetSectionType,
 } from '@Components/BottomSheet';
-import { IconType } from '@Components/Icon';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Editor } from '@Lib/editor';
 import {
@@ -23,20 +22,21 @@ import {
   SNActionsExtension,
   SNNote,
   UuidString,
-} from '@standardnotes/snjs/dist/@types';
+} from '@standardnotes/snjs';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Share } from 'react-native';
 
 enum ActionSection {
   History = 'history-section',
-  CommonActions = 'common-section',
+  OneShots = 'one-shots-section',
+  Switches = 'switches-section',
   Listed = 'listed-section',
 }
 
-enum NoteAction {
+enum NoteActionKey {
   Pin = 'pin',
   Archive = 'archive',
-  Lock = 'lock',
+  PreventEditing = 'prevent-editing',
   Protect = 'protect',
   OpenHistory = 'history',
   ShareAction = 'share',
@@ -176,7 +176,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
         key,
         text,
         description,
-        iconType: IconType.Listed,
+        iconType: 'listed',
         actions,
       } as BottomSheetExpandableSectionType;
     },
@@ -234,10 +234,10 @@ export const NoteBottomSheet: React.FC<Props> = ({
     };
   }, [getReloadedListedSections, reloadListedExtensionUuid]);
 
-  const historyAction = {
+  const historyAction: BottomSheetAction = {
     text: 'Note history',
-    key: NoteAction.OpenHistory,
-    iconType: IconType.History,
+    key: NoteActionKey.OpenHistory,
+    iconType: 'history',
     callback: () => {
       if (!editor?.isTemplateNote) {
         navigation.navigate('HistoryStack', {
@@ -255,18 +255,18 @@ export const NoteBottomSheet: React.FC<Props> = ({
     actions: [historyAction],
   };
 
-  const protectAction = {
+  const protectAction: BottomSheetAction = {
     text: note.protected ? 'Unprotect' : 'Protect',
-    key: NoteAction.Protect,
-    iconType: IconType.Protect,
+    key: NoteActionKey.Protect,
+    iconType: 'protect',
     callback: async () => await protectOrUnprotectNote(),
     dismissSheetOnPress: true,
   };
 
-  const pinAction = {
+  const pinAction: BottomSheetAction = {
     text: note.pinned ? 'Unpin' : 'Pin to top',
-    key: NoteAction.Pin,
-    iconType: IconType.Pin,
+    key: NoteActionKey.Pin,
+    iconType: 'pin',
     callback: () =>
       changeNote(mutator => {
         mutator.pinned = !note.pinned;
@@ -274,10 +274,10 @@ export const NoteBottomSheet: React.FC<Props> = ({
     dismissSheetOnPress: true,
   };
 
-  const archiveAction = {
+  const archiveAction: BottomSheetAction = {
     text: note.archived ? 'Unarchive' : 'Archive',
-    key: NoteAction.Archive,
-    iconType: IconType.Archive,
+    key: NoteActionKey.Archive,
+    iconType: 'archive',
     callback: () => {
       if (note.locked) {
         application?.alertService.alert(
@@ -292,21 +292,25 @@ export const NoteBottomSheet: React.FC<Props> = ({
     dismissSheetOnPress: true,
   };
 
-  const lockAction = {
-    text: note.locked ? 'Unlock' : 'Lock',
-    key: NoteAction.Lock,
-    iconType: IconType.Lock,
-    callback: () =>
-      changeNote(mutator => {
-        mutator.locked = !note.locked;
-      }),
-    dismissSheetOnPress: true,
+  const preventEditingAction: BottomSheetAction = {
+    text: 'Prevent editing',
+    key: NoteActionKey.PreventEditing,
+    iconType: 'pencilOff',
+    dismissSheetOnPress: false,
+    switch: {
+      onValueChange(value: boolean) {
+        changeNote(mutator => {
+          mutator.locked = value;
+        });
+      },
+      value: note.locked,
+    },
   };
 
-  const shareAction = {
+  const shareAction: BottomSheetAction = {
     text: 'Share',
-    key: NoteAction.ShareAction,
-    iconType: IconType.Share,
+    key: NoteActionKey.ShareAction,
+    iconType: 'share',
     callback: () => {
       if (note) {
         application?.getAppState().performActionWithoutStateChangeImpact(() => {
@@ -320,9 +324,9 @@ export const NoteBottomSheet: React.FC<Props> = ({
     dismissSheetOnPress: true,
   };
 
-  const restoreAction = {
+  const restoreAction: BottomSheetAction = {
     text: 'Restore',
-    key: NoteAction.Restore,
+    key: NoteActionKey.Restore,
     callback: () => {
       changeNote(mutator => {
         mutator.trashed = false;
@@ -331,47 +335,45 @@ export const NoteBottomSheet: React.FC<Props> = ({
     dismissSheetOnPress: true,
   };
 
-  const deleteAction = {
+  const deleteAction: BottomSheetAction = {
     text: 'Delete permanently',
-    key: NoteAction.DeletePermanently,
-    callback: async () => await deleteNote(true),
+    key: NoteActionKey.DeletePermanently,
+    callback: () => deleteNote(true),
     danger: true,
     dismissSheetOnPress: true,
   };
 
-  const moveToTrashAction = {
-    text: 'Move to Trash',
-    key: NoteAction.Trash,
-    iconType: IconType.Trash,
-    callback: async () => await deleteNote(false),
+  const moveToTrashAction: BottomSheetAction = {
+    text: 'Move to trash',
+    key: NoteActionKey.Trash,
+    iconType: 'trash',
+    callback: () => deleteNote(false),
     dismissSheetOnPress: true,
   };
 
-  const trashActions: BottomSheetActionType[] = note.trashed
+  const trashActions: BottomSheetAction[] = note.trashed
     ? [restoreAction, deleteAction]
     : [moveToTrashAction];
-  const actions: BottomSheetActionType[] = note.protected
-    ? [protectAction]
-    : [
-        pinAction,
-        archiveAction,
-        lockAction,
-        protectAction,
-        shareAction,
-        ...trashActions,
-      ];
 
-  const commonSection: BottomSheetDefaultSectionType = {
+  const oneShotsSection: BottomSheetDefaultSectionType = {
     expandable: false,
-    key: ActionSection.CommonActions,
-    actions: actions,
+    key: ActionSection.OneShots,
+    actions: note.protected
+      ? [protectAction]
+      : [pinAction, archiveAction, protectAction, shareAction, ...trashActions],
+  };
+
+  const switchSection: BottomSheetDefaultSectionType = {
+    expandable: false,
+    key: ActionSection.Switches,
+    actions: [preventEditingAction],
   };
 
   const title = note.protected ? note.safeTitle() : note.title;
 
   const sections = note.protected
-    ? [commonSection]
-    : [historySection, commonSection, ...listedSections];
+    ? [oneShotsSection]
+    : [historySection, switchSection, oneShotsSection, ...listedSections];
 
   return (
     <BottomSheet

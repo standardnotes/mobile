@@ -9,31 +9,38 @@ import {
   Animated,
   LayoutChangeEvent,
   Platform,
+  StyleSheet,
+  TouchableOpacity,
   useWindowDimensions,
+  View,
 } from 'react-native';
 import styled, { css } from 'styled-components/native';
+import { SNSwitch } from './SNSwitch';
 
-export type BottomSheetActionType = {
+export type BottomSheetAction = {
   text: string;
   key: string;
   iconType?: IconType;
   callback?: () => Promise<void> | void;
   danger?: boolean;
-  centered?: boolean;
   description?: string;
   dismissSheetOnPress?: boolean;
+  switch?: {
+    onValueChange: (value: boolean) => void;
+    value: boolean;
+  };
 };
 
 export type BottomSheetDefaultSectionType = {
   expandable: false;
   key: string;
-  actions: BottomSheetActionType[];
+  actions: BottomSheetAction[];
 };
 
 export type BottomSheetExpandableSectionType = {
   expandable: true;
   key: string;
-  actions: BottomSheetActionType[];
+  actions: BottomSheetAction[];
   text: string;
   iconType?: IconType;
   description?: string;
@@ -48,6 +55,24 @@ type Props = {
   title?: string;
   bottomSheetRef: React.RefObject<BottomSheetModal>;
 };
+
+const styles = StyleSheet.create({
+  itemMainInfo: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    width: '100%',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+});
 
 const HandleContainer = styled.View`
   background-color: transparent;
@@ -111,17 +136,6 @@ const ExpandableSectionContainer = styled.View`
 
 const ActionsContainer = styled.View``;
 
-const BottomSheetItemContainer = styled.TouchableOpacity`
-  width: 100%;
-  padding: 10px 16px;
-`;
-
-const ItemMainInfo = styled.View`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
-
 const ItemIconContainer = styled.View`
   height: 24px;
   width: 24px;
@@ -149,6 +163,7 @@ const ItemDescription = styled.Text`
   font-size: 14px;
   margin-top: 2px;
   margin-left: 40px;
+  width: 100%;
 `;
 
 const ActionContainer = styled.View`
@@ -169,29 +184,40 @@ const HandleComponent: React.FC = () => (
   </HandleContainer>
 );
 
-const Item: React.FC<{
-  text: string;
-  onPress?: () => void;
-  iconType?: IconType;
-  description?: string;
-  centered?: boolean;
-  danger?: boolean;
-  disabled?: boolean;
-}> = ({ text, onPress, iconType, description, centered, danger, disabled }) => {
-  return (
-    <BottomSheetItemContainer onPress={onPress} disabled={disabled}>
-      <ItemMainInfo>
-        {centered ? null : (
-          <ItemIconContainer>
-            {iconType ? <ItemIcon type={iconType} size={24} /> : null}
-          </ItemIconContainer>
-        )}
-        <ItemText danger={danger} centered={centered}>
-          {text}
-        </ItemText>
-      </ItemMainInfo>
-      {description && <ItemDescription>{description}</ItemDescription>}
-    </BottomSheetItemContainer>
+const Item: React.FC<
+  Omit<BottomSheetAction, 'key' | 'callback'> & {
+    onPress: () => void;
+    disabled: boolean;
+  }
+> = props => {
+  const children = (
+    <>
+      <ItemIconContainer>
+        {props.iconType ? <ItemIcon type={props.iconType} size={24} /> : null}
+      </ItemIconContainer>
+      <ItemText danger={props.danger}>{props.text}</ItemText>
+      <View style={{ flexGrow: 1 }} />
+    </>
+  );
+  return props.switch ? (
+    <View style={styles.itemContainer}>
+      {children}
+      <SNSwitch
+        value={props.switch.value}
+        onValueChange={props.switch.onValueChange}
+      />
+    </View>
+  ) : (
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={props.onPress}
+      disabled={props.disabled}
+    >
+      {children}
+      {props.description && (
+        <ItemDescription>{props.description}</ItemDescription>
+      )}
+    </TouchableOpacity>
   );
 };
 
@@ -210,7 +236,7 @@ const ExpandableSectionItem: React.FC<{
 );
 
 const ActionItem: React.FC<{
-  action: BottomSheetActionType;
+  action: BottomSheetAction;
   dismissBottomSheet: () => void;
 }> = ({ action, dismissBottomSheet }) => {
   const [loading, setLoading] = useState(false);
