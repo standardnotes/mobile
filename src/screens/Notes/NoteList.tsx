@@ -100,7 +100,6 @@ export const NoteList = (props: Props) => {
 
   const dismissKeyboard = () => {
     iosSearchBarInputRef.current?.blur();
-    androidSearchBarInputRef.current?.blur();
   };
 
   useEffect(() => {
