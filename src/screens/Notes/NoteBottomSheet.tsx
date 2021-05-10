@@ -266,7 +266,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
   const pinAction: BottomSheetAction = {
     text: note.pinned ? 'Unpin' : 'Pin to top',
     key: NoteActionKey.Pin,
-    iconType: 'pin',
+    iconType: note.pinned ? 'pinOff' : 'pin',
     callback: () =>
       changeNote(mutator => {
         mutator.pinned = !note.pinned;
@@ -277,7 +277,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
   const archiveAction: BottomSheetAction = {
     text: note.archived ? 'Unarchive' : 'Archive',
     key: NoteActionKey.Archive,
-    iconType: 'archive',
+    iconType: note.archived ? 'unarchive' : 'archive',
     callback: () => {
       if (note.locked) {
         application?.alertService.alert(
