@@ -3,6 +3,8 @@ import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetScrollView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
 } from '@gorhom/bottom-sheet';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
@@ -10,7 +12,6 @@ import {
   LayoutChangeEvent,
   Platform,
   StyleSheet,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -199,14 +200,31 @@ const Item: React.FC<
       <View style={{ flexGrow: 1 }} />
     </>
   );
-  return props.switch ? (
-    <View style={styles.itemContainer}>
-      {children}
-      <SNSwitch
-        value={props.switch.value}
-        onValueChange={props.switch.onValueChange}
-      />
-    </View>
+
+  const switchProps = props.switch;
+
+  return switchProps ? (
+    Platform.OS === 'android' ? (
+      /** Android switches are activated by pressing anywhere on the cell */
+      <TouchableWithoutFeedback
+        onPress={() => switchProps.onValueChange(!switchProps.value)}
+        style={styles.itemContainer}
+      >
+        <View style={{ flexDirection: 'row' }}>
+          {children}
+          <SNSwitch value={switchProps.value} />
+        </View>
+      </TouchableWithoutFeedback>
+    ) : (
+      /** iOS switches are activated only by pressing the switch  */
+      <View style={styles.itemContainer}>
+        {children}
+        <SNSwitch
+          value={switchProps.value}
+          onValueChange={switchProps.onValueChange}
+        />
+      </View>
+    )
   ) : (
     <TouchableOpacity
       style={styles.itemContainer}
@@ -364,22 +382,14 @@ export const BottomSheet: React.FC<Props> = ({
     }
   }, [title]);
 
-  const onTitleLayout = (e: LayoutChangeEvent) => {
-    setTitleHeight(e.nativeEvent.layout.height);
-  };
-
-  const onListLayout = (e: LayoutChangeEvent) => {
-    setListHeight(e.nativeEvent.layout.height);
-  };
-
-  const snapPoints = useMemo(() => {
-    const contentHeight = titleHeight + listHeight;
-    const maxLimit = 0.85 * screenHeight;
-    if (contentHeight === 0) {
-      return [1];
-    }
-    return contentHeight < maxLimit ? [contentHeight] : [maxLimit];
-  }, [listHeight, titleHeight, screenHeight]);
+  let snapPoints: number[];
+  const contentHeight = titleHeight + listHeight;
+  const maxLimit = 0.85 * screenHeight;
+  if (contentHeight === 0) {
+    snapPoints = [1];
+  } else {
+    snapPoints = contentHeight < maxLimit ? [contentHeight] : [maxLimit];
+  }
 
   const expandSection = (sectionKey: string) => {
     const animations: Animated.CompositeAnimation[] = [];
@@ -415,12 +425,20 @@ export const BottomSheet: React.FC<Props> = ({
     >
       <>
         {title ? (
-          <TitleContainer onLayout={onTitleLayout}>
+          <TitleContainer
+            onLayout={(e: LayoutChangeEvent) => {
+              setTitleHeight(e.nativeEvent.layout.height);
+            }}
+          >
             <Title>{title}</Title>
           </TitleContainer>
         ) : null}
         <BottomSheetScrollView>
-          <BottomSheetContent onLayout={onListLayout}>
+          <BottomSheetContent
+            onLayout={(e: LayoutChangeEvent) => {
+              setListHeight(e.nativeEvent.layout.height);
+            }}
+          >
             {animatedSections.map((section, index) => (
               <Section
                 key={section.key}
