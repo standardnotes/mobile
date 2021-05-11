@@ -147,7 +147,6 @@ export const TagSelectionList = React.memo(
     return (
       <>
         <FlatList
-          // eslint-disable-next-line react-native/no-inline-styles
           style={{ paddingBottom: hasBottomPadding ? 30 : 0 }}
           initialNumToRender={10}
           windowSize={10}

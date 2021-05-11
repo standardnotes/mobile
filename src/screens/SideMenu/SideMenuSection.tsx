@@ -1,3 +1,4 @@
+import { IconType } from '@Components/Icon';
 import React, { useMemo, useState } from 'react';
 import { SideMenuCell } from './SideMenuCell';
 import { CollapsedLabel, Header, Root, Title } from './SideMenuSection.styled';
@@ -8,7 +9,7 @@ export type SideMenuOption = {
   textClass?: 'info' | 'danger' | 'warning';
   key?: string;
   iconDesc?: {
-    type: string;
+    type: IconType | 'ascii' | 'circle';
     side?: 'left' | 'right';
     name?: string;
     value?: string;

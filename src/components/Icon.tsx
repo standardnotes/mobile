@@ -1,4 +1,6 @@
 import IconArchive from '@Style/Icons/ic-archive.svg';
+import IconAsterisk from '@Style/Icons/ic-asterisk.svg';
+import IconColorFill from '@Style/Icons/ic-color-fill.svg';
 import IconHistory from '@Style/Icons/ic-history.svg';
 import IconListed from '@Style/Icons/ic-listed.svg';
 import IconPencifOff from '@Style/Icons/ic-pencil-off.svg';
@@ -13,6 +15,8 @@ import React from 'react';
 
 const Icons = {
   archive: IconArchive,
+  asterisk: IconAsterisk,
+  colorFill: IconColorFill,
   unarchive: IconUnarchive,
   history: IconHistory,
   listed: IconListed,

@@ -13,6 +13,7 @@ import {
   useLoadListedExtension,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
+import { str } from '@Lib/strings';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_NOTE_HISTORY } from '@Screens/screens';
@@ -293,7 +294,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
   };
 
   const preventEditingAction: BottomSheetAction = {
-    text: 'Prevent editing',
+    text: str['Prevent editing'],
     key: NoteActionKey.PreventEditing,
     iconType: 'pencilOff',
     dismissSheetOnPress: false,
@@ -344,7 +345,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
   };
 
   const moveToTrashAction: BottomSheetAction = {
-    text: 'Move to trash',
+    text: str['Move to trash'],
     key: NoteActionKey.Trash,
     iconType: 'trash',
     callback: () => deleteNote(false),

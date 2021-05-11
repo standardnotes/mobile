@@ -1,5 +1,6 @@
 import { Icon } from '@Components/Icon';
 import { AppStateEventType } from '@Lib/application_state';
+import { str } from '@Lib/strings';
 import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
@@ -474,7 +475,7 @@ export class Compose extends React.Component<{}, State> {
                     size={16}
                     color={theme.stylekitBackgroundColor}
                   />
-                  <LockedText>Note Locked</LockedText>
+                  <LockedText>{str['Editing disabled']}</LockedText>
                 </LockedContainer>
               )}
               {this.state.webViewError && (

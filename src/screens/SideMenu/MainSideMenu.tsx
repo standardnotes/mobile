@@ -7,7 +7,7 @@ import {
   CustomActionSheetOption,
   useCustomActionSheet,
 } from '@Style/custom_action_sheet';
-import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
+import { ICON_SETTINGS } from '@Style/icons';
 import {
   MobileTheme,
   ThemeService,
@@ -159,8 +159,10 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     return unsubscribeStreamThemes;
   }, [application]);
 
-  const iconDescriptorForTheme = (currentTheme: SNTheme | MobileTheme) => {
-    const desc = {
+  const iconDescriptorForTheme = (
+    currentTheme: SNTheme | MobileTheme
+  ): SideMenuOption['iconDesc'] => {
+    const desc: SideMenuOption['iconDesc'] = {
       type: 'circle',
       side: 'right' as 'right',
     };
@@ -217,10 +219,8 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
         text: 'Get More Themes',
         key: 'get-theme',
         iconDesc: {
-          type: 'icon',
-          name: ThemeService.nameForIcon(ICON_BRUSH),
+          type: 'colorFill',
           side: 'right',
-          size: 17,
         },
         onSelect: () => {
           application?.deviceInterface?.openUrl(

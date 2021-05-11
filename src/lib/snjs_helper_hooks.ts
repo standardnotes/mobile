@@ -12,6 +12,7 @@ import {
 import React, { useCallback, useEffect } from 'react';
 import { LockStateType } from './application_state';
 import { Editor } from './editor';
+import { str } from './strings';
 
 export const useSignedIn = (
   signedInCallback?: () => void,
@@ -290,7 +291,7 @@ export const useDeleteNoteWithPrivileges = (
   const application = React.useContext(ApplicationContext);
 
   const trashNote = useCallback(async () => {
-    const title = 'Move to Trash';
+    const title = str['Move to trash'];
     const message = 'Are you sure you want to move this note to the trash?';
 
     const confirmed = await application?.alertService?.confirm(

@@ -5,6 +5,7 @@ import {
   useDeleteNoteWithPrivileges,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
+import { str } from '@Lib/strings';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
@@ -26,17 +27,7 @@ import {
   SNTag,
 } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import {
-  ICON_ARCHIVE,
-  ICON_BOOKMARK,
-  ICON_FINGER_PRINT,
-  ICON_HISTORY,
-  ICON_LOCK,
-  ICON_MEDICAL,
-  ICON_PRICE_TAG,
-  ICON_SHARE,
-  ICON_TRASH,
-} from '@Style/icons';
+import { ICON_PRICE_TAG } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, {
   useCallback,
@@ -306,14 +297,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
       const setAsDefault = () => {
         if (currentDefault) {
-          application!.changeItem(currentDefault.uuid, m => {
+          application?.changeItem(currentDefault.uuid, m => {
             const mutator = m as ComponentMutator;
             mutator.isMobileDefault = false;
           });
         }
 
         if (component) {
-          application!.changeAndSaveItem(component.uuid, m => {
+          application?.changeAndSaveItem(component.uuid, m => {
             const mutator = m as ComponentMutator;
             mutator.isMobileDefault = true;
           });
@@ -321,7 +312,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       };
 
       const removeAsDefault = () => {
-        application!.changeItem(currentDefault.uuid, m => {
+        application?.changeItem(currentDefault.uuid, m => {
           const mutator = m as ComponentMutator;
           mutator.isMobileDefault = false;
         });
@@ -384,10 +375,8 @@ export const NoteSideMenu = React.memo((props: Props) => {
         text: 'Get More Editors',
         key: 'get-editors',
         iconDesc: {
-          type: 'icon',
-          name: ThemeService.nameForIcon(ICON_MEDICAL),
+          type: 'asterisk',
           side: 'right',
-          size: 17,
         },
         onSelect: () => {
           application?.deviceInterface?.openUrl(
@@ -435,29 +424,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
         mutator.pinned = !note.pinned;
       });
 
-    const archiveOption = note.archived ? 'Unarchive' : 'Archive';
-    const archiveEvent = () => {
-      if (note.locked) {
-        application?.alertService.alert(
-          "This note is locked. If you'd like to archive it, unlock it, and try again."
-        );
-        return;
-      }
-      changeNote(mutator => {
-        mutator.archived = !note.archived;
-      });
-      leaveEditor();
-    };
-
-    const lockOption = note.locked ? 'Unlock' : 'Lock';
-    const lockEvent = () =>
-      changeNote(mutator => {
-        mutator.locked = !note.locked;
-      });
-
-    const protectOption = note.protected ? 'Unprotect' : 'Protect';
-    const protectEvent = async () => await protectOrUnprotectNote();
-
     const openSessionHistory = () => {
       if (!editor?.isTemplateNote) {
         props.drawerRef?.closeDrawer();
@@ -480,40 +446,79 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
     };
 
-    const rawOptions = [
-      { text: pinOption, onSelect: pinEvent, icon: ICON_BOOKMARK },
-      { text: archiveOption, onSelect: archiveEvent, icon: ICON_ARCHIVE },
-      { text: lockOption, onSelect: lockEvent, icon: ICON_LOCK },
-      { text: protectOption, onSelect: protectEvent, icon: ICON_FINGER_PRINT },
+    const options: SideMenuOption[] = [
+      {
+        text: pinOption,
+        key: 'pin',
+        onSelect: pinEvent,
+        iconDesc: {
+          type: 'pin',
+          side: 'right',
+        },
+      },
+      {
+        text: note.archived ? 'Unarchive' : 'Archive',
+        key: 'archive',
+        iconDesc: {
+          type: note.archived ? 'unarchive' : 'archive',
+          side: 'right',
+        },
+        onSelect: () => {
+          if (note.locked) {
+            application?.alertService.alert(
+              "This note is locked. If you'd like to archive it, unlock it, and try again."
+            );
+            return;
+          }
+          changeNote(mutator => {
+            mutator.archived = !note.archived;
+          });
+          leaveEditor();
+        },
+      },
+      {
+        text: note.locked ? str['Enable editing'] : str['Prevent editing'],
+        key: 'preventEditing',
+        iconDesc: {
+          type: 'pencilOff',
+          side: 'right',
+        },
+        onSelect: () =>
+          changeNote(mutator => {
+            mutator.locked = !note.locked;
+          }),
+      },
+      {
+        text: note.protected ? 'Unprotect' : 'Protect',
+        key: 'protect',
+        onSelect: protectOrUnprotectNote,
+        iconDesc: {
+          type: 'protect',
+          side: 'right',
+        },
+      },
       {
         text: 'History',
+        key: 'history',
         onSelect: openSessionHistory,
-        icon: ICON_HISTORY,
+        iconDesc: {
+          type: 'history',
+          side: 'right',
+        },
       },
-      { text: 'Share', onSelect: shareNote, icon: ICON_SHARE },
+      {
+        text: 'Share',
+        key: 'share',
+        onSelect: shareNote,
+        iconDesc: {
+          type: 'share',
+          side: 'right',
+        },
+      },
     ];
 
-    if (!note.trashed) {
-      rawOptions.push({
-        text: 'Move to Trash',
-        onSelect: async () => deleteNote(false),
-        icon: ICON_TRASH,
-      });
-    }
-
-    let options: SideMenuOption[] = rawOptions.map(rawOption => ({
-      text: rawOption.text,
-      key: rawOption.icon,
-      iconDesc: {
-        type: 'icon',
-        side: 'right' as 'right',
-        name: ThemeService.nameForIcon(rawOption.icon),
-      },
-      onSelect: rawOption.onSelect,
-    }));
-
     if (note.trashed) {
-      options = options.concat([
+      options.push(
         {
           text: 'Restore',
           key: 'restore-note',
@@ -527,7 +532,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           text: 'Delete Permanently',
           textClass: 'danger' as 'danger',
           key: 'delete-forever',
-          onSelect: async () => deleteNote(true),
+          onSelect: () => deleteNote(true),
         },
         {
           text: 'Empty Trash',
@@ -550,8 +555,18 @@ export const NoteSideMenu = React.memo((props: Props) => {
               application?.sync();
             }
           },
+        }
+      );
+    } else {
+      options.push({
+        text: str['Move to trash'],
+        key: 'trash',
+        onSelect: async () => deleteNote(false),
+        iconDesc: {
+          type: 'trash',
+          side: 'right',
         },
-      ]);
+      });
     }
 
     return options;

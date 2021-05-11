@@ -1,6 +1,6 @@
 import { Circle } from '@Components/Circle';
+import { Icon } from '@Components/Icon';
 import React, { useContext } from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components/native';
 import {
   CellContent,
@@ -9,7 +9,6 @@ import {
   IconContainerLeft,
   IconContainerRight,
   IconGraphicContainer,
-  RegularText,
   SubText,
   SubTextContainer,
   Text,
@@ -23,13 +22,7 @@ const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
     return null;
   }
 
-  if (desc.type === 'icon' && desc.name) {
-    return (
-      <IconGraphicContainer>
-        <Icon name={desc.name} size={desc.size || 20} color={color} />
-      </IconGraphicContainer>
-    );
-  } else if (desc.type === 'ascii') {
+  if (desc.type === 'ascii') {
     return <IconAscii>{desc.value}</IconAscii>;
   } else if (desc.type === 'circle') {
     return (
@@ -41,7 +34,11 @@ const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
       </IconCircleContainer>
     );
   } else {
-    return <RegularText>*</RegularText>;
+    return (
+      <IconGraphicContainer>
+        <Icon type={desc.type} size={desc.size ?? 20} color={color} />
+      </IconGraphicContainer>
+    );
   }
 };
 
