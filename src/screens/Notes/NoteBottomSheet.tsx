@@ -45,6 +45,7 @@ enum NoteActionKey {
   Restore = 'restore-note',
   DeletePermanently = 'delete-forever',
   Listed = 'listed',
+  PreviewInList = 'preview-in-list',
 }
 
 type Props = {
@@ -308,6 +309,21 @@ export const NoteBottomSheet: React.FC<Props> = ({
     },
   };
 
+  const previewInListAction: BottomSheetAction = {
+    text: str['Preview in list'],
+    key: NoteActionKey.PreviewInList,
+    iconType: 'eye',
+    dismissSheetOnPress: false,
+    switch: {
+      onValueChange(value: boolean) {
+        changeNote(mutator => {
+          mutator.hidePreview = !value;
+        });
+      },
+      value: !note.hidePreview,
+    },
+  };
+
   const shareAction: BottomSheetAction = {
     text: 'Share',
     key: NoteActionKey.ShareAction,
@@ -367,7 +383,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
   const switchSection: BottomSheetDefaultSectionType = {
     expandable: false,
     key: ActionSection.Switches,
-    actions: [preventEditingAction],
+    actions: [previewInListAction, preventEditingAction],
   };
 
   const title = note.protected ? note.safeTitle() : note.title;
