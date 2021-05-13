@@ -57,6 +57,32 @@ type Props = {
   drawerOpen: boolean;
 };
 
+function useEditorComponents(): SNComponent[] {
+  const application = useContext(ApplicationContext);
+  const [components, setComponents] = useState<SNComponent[]>([]);
+  useEffect(() => {
+    if (!application) {
+      return;
+    }
+    const removeComponentsObserver = application.streamItems(
+      ContentType.Component,
+      () => {
+        const displayComponents = sortAlphabetically(
+          application.componentManager.componentsForArea(ComponentArea.Editor)
+        );
+        setComponents(displayComponents);
+      }
+    );
+    return () => {
+      if (application) {
+        removeComponentsObserver();
+      }
+    };
+  }, [application]);
+
+  return components;
+}
+
 export const NoteSideMenu = React.memo((props: Props) => {
   // Context
   const theme = useContext(ThemeContext);
@@ -71,7 +97,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const [editor, setEditor] = useState<Editor | undefined>(undefined);
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
-  const [components, setComponents] = useState<SNComponent[]>([]);
+  const components = useEditorComponents();
 
   const [changeNote] = useChangeNote(note, editor);
   const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note, editor);
@@ -161,29 +187,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
         removeEditorNoteValueChangeObserver();
     };
   }, [editor, note?.uuid, props.drawerOpen, reloadTags]);
-
-  useEffect(() => {
-    let isMounted = true;
-    const removeComponentsObserver = application?.streamItems(
-      ContentType.Component,
-      async () => {
-        if (!note) {
-          return;
-        }
-        const displayComponents = sortAlphabetically(
-          application!.componentManager!.componentsForArea(ComponentArea.Editor)
-        );
-        if (isMounted && props.drawerOpen) {
-          setComponents(displayComponents);
-        }
-      }
-    );
-
-    return () => {
-      isMounted = false;
-      removeComponentsObserver && removeComponentsObserver();
-    };
-  }, [application, note, props.drawerOpen]);
 
   useEffect(() => {
     let isMounted = true;
@@ -338,11 +341,11 @@ export const NoteSideMenu = React.memo((props: Props) => {
     [application, showActionSheet]
   );
 
-  const editorComponents = useMemo(() => {
-    if (!note) {
+  const editors = useMemo(() => {
+    if (!note || !application) {
       return [];
     }
-    const componentEditor = application?.componentManager!.editorForNote(note);
+    const componentEditor = application.componentManager.editorForNote(note);
     const options: SideMenuOption[] = [
       {
         text: 'Plain Editor',
@@ -361,7 +364,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         text: component.name,
         subtext: component.isMobileDefault ? 'Mobile Default' : undefined,
         key: component.uuid || component.name,
-        selected: component === componentEditor,
+        selected: component.uuid === componentEditor?.uuid,
         onSelect: () => {
           onEditorPress(component);
         },
@@ -386,14 +389,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       });
     }
     return options;
-  }, [
-    note,
-    application?.componentManager,
-    application?.deviceInterface,
-    components,
-    onEditorPress,
-    onEdtiorLongPress,
-  ]);
+  }, [note, application, components, onEditorPress, onEdtiorLongPress]);
 
   useFocusEffect(
     useCallback(() => {
@@ -617,7 +613,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           key => ({
             key,
             noteOptions,
-            editorComponents,
+            editorComponents: editors,
             onTagSelect,
             selectedTags,
           })
