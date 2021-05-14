@@ -239,20 +239,6 @@ const Item: React.FC<
   );
 };
 
-const ExpandableSectionItem: React.FC<{
-  section: BottomSheetExpandableSectionType;
-  expandSection: () => void;
-  expanded: boolean;
-}> = ({ section, expandSection, expanded }) => (
-  <Item
-    text={section.text}
-    onPress={expandSection}
-    iconType={section.iconType}
-    description={section.description}
-    disabled={section.actions.length === 0 || expanded}
-  />
-);
-
 const ActionItem: React.FC<{
   action: BottomSheetAction;
   dismissBottomSheet: () => void;
@@ -290,17 +276,10 @@ const Section: React.FC<{
   section: BottomSheetSectionType & { animationValue: Animated.Value };
   first: boolean;
   dismissBottomSheet: () => void;
-  expandSection: () => void;
+  onToggleExpand: () => void;
   stackIndex: number;
   expanded: boolean;
-}> = ({
-  section,
-  first,
-  dismissBottomSheet,
-  expandSection,
-  stackIndex,
-  expanded,
-}) => {
+}> = ({ section, first, dismissBottomSheet, onToggleExpand, stackIndex }) => {
   const [actionsContainerHeight, setActionsContainerHeight] = useState(0);
 
   const actionsContainerStyle = section.expandable
@@ -325,10 +304,12 @@ const Section: React.FC<{
       <>
         {section.expandable && (
           <ExpandableSectionContainer>
-            <ExpandableSectionItem
-              section={section}
-              expandSection={expandSection}
-              expanded={expanded}
+            <Item
+              text={section.text}
+              onPress={onToggleExpand}
+              iconType={section.iconType}
+              description={section.description}
+              disabled={section.actions.length === 0}
             />
           </ExpandableSectionContainer>
         )}
@@ -391,22 +372,36 @@ export const BottomSheet: React.FC<Props> = ({
     snapPoints = contentHeight < maxLimit ? [contentHeight] : [maxLimit];
   }
 
-  const expandSection = (sectionKey: string) => {
-    const animations: Animated.CompositeAnimation[] = [];
-    animatedSections.forEach(section => {
-      if (section.expandable) {
-        animations.push(
+  const toggleExpandSection = ({
+    key: sectionKey,
+    animationValue,
+  }: {
+    key: string;
+    animationValue: Animated.Value;
+  }) => {
+    const duration = 250;
+    const useNativeDriver = false;
+
+    if (expandedSectionKey) {
+      Animated.timing(animationValue, {
+        toValue: 0,
+        duration,
+        useNativeDriver,
+      }).start(() => setExpandedSectionKey(''));
+    } else {
+      const animations = animatedSections
+        .filter(section => section.expandable)
+        .map(section =>
           Animated.timing(section.animationValue, {
             toValue: sectionKey === section.key ? 1 : 0,
-            duration: 250,
-            useNativeDriver: false,
+            duration,
+            useNativeDriver,
           })
         );
-      }
-    });
-    Animated.parallel(animations).start(() =>
-      setExpandedSectionKey(sectionKey)
-    );
+      Animated.parallel(animations).start(() =>
+        setExpandedSectionKey(sectionKey)
+      );
+    }
   };
 
   const onDismiss = () => {
@@ -445,7 +440,9 @@ export const BottomSheet: React.FC<Props> = ({
                 section={section}
                 first={index === 0}
                 dismissBottomSheet={() => bottomSheetRef?.current?.dismiss()}
-                expandSection={() => expandSection(section.key)}
+                onToggleExpand={() => {
+                  toggleExpandSection(section);
+                }}
                 stackIndex={sections.length - index}
                 expanded={section.key === expandedSectionKey}
               />
