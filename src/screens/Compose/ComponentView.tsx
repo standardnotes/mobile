@@ -20,7 +20,10 @@ import React, {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
-import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
+import RNFS, {
+  DocumentDirectoryPath,
+  ExternalDirectoryPath,
+} from 'react-native-fs';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
@@ -97,6 +100,7 @@ export const ComponentView = ({
     downloadingOfflineEditor,
     setDownloadingOfflineEditor,
   ] = useState<boolean>(false);
+  const [loadedOnce, setLoadedOnce] = useState(false);
 
   // Ref
   const webViewRef = useRef<WebView>(null);
@@ -131,7 +135,9 @@ export const ComponentView = ({
         .getValue(PrefKey.DoNotShowAgainUnsupportedEditors, false);
       if (!doNotShowAgainUnsupportedEditors) {
         const confirmed = await application?.alertService?.confirm(
-          'Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.',
+          'Web editors require Android 7.0 or greater. Your version does ' +
+            'not support web editors. Changes you make may not be properly ' +
+            'saved. Please switch to the Plain Editor for the best experience.',
           'Editors Not Supported',
           "Don't show again",
           ButtonType.Info,
@@ -155,7 +161,7 @@ export const ComponentView = ({
 
   const getOfflineEditorUrl = useCallback(async () => {
     if (!liveComponent) {
-      return undefined;
+      return '';
     }
 
     const {
@@ -163,8 +169,10 @@ export const ComponentView = ({
       version: editorVersion,
       download_url: downloadUrl,
     } = liveComponent.item.package_info;
-    const downloadPath = `${DocumentDirectoryPath}/${editorIdentifier}.zip`;
-    const editorDir = `${DocumentDirectoryPath}/editors/${editorIdentifier}`;
+    const basePath =
+      Platform.OS === 'android' ? ExternalDirectoryPath : DocumentDirectoryPath;
+    const downloadPath = `${basePath}/${editorIdentifier}.zip`;
+    const editorDir = `${basePath}/editors/${editorIdentifier}`;
     const versionDir = `${editorDir}/${editorVersion}`;
 
     setReadAccessUrl(versionDir);
@@ -237,14 +245,15 @@ export const ComponentView = ({
       if (!newUrl) {
         application?.alertService!.alert(
           'Re-install Extension',
-          'This extension is not installed correctly. Please use the web or desktop application to reinstall, then try again.',
+          'This extension is not installed correctly. Please use the web ' +
+            'or desktop application to reinstall, then try again.',
           'OK'
         );
       } else {
         try {
           const offlineEditorUrl = await getOfflineEditorUrl();
 
-          if (mounted && offlineEditorUrl) {
+          if (mounted) {
             setOfflineUrl(offlineEditorUrl);
           }
         } catch (e) {
@@ -294,6 +303,8 @@ export const ComponentView = ({
   };
 
   const onFrameLoad = useCallback(() => {
+    setLoadedOnce(true);
+
     /**
      * We have no way of knowing if the webview load is successful or not. We
      * have to wait to see if the error event is fired. Looking at the code,
@@ -301,7 +312,8 @@ export const ComponentView = ({
      * to see if the error event is fired before registering the component
      * window. Otherwise, on error, this component will be dealloced, and a
      * pending postMessage will cause a memory leak crash on Android in the
-     * form of "react native attempt to invoke virtual method double java.lang.double.doublevalue() on a null object reference"
+     * form of "react native attempt to invoke virtual method
+     * double java.lang.double.doublevalue() on a null object reference"
      */
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -383,7 +395,13 @@ export const ComponentView = ({
           allowingReadAccessToURL={readAccessUrl}
           originWhitelist={['*']}
           showWebView={showWebView}
-          source={{ uri: offlineUrl ? offlineUrl : url }}
+          source={
+            /**
+             * Android 10 workaround to avoid access denied errors
+             * https://github.com/react-native-webview/react-native-webview/issues/656#issuecomment-551312436
+             */
+            loadedOnce ? { uri: offlineUrl ? offlineUrl : url } : undefined
+          }
           key={liveComponent?.item.uuid}
           ref={webViewRef}
           /**
