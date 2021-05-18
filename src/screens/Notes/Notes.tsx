@@ -1,7 +1,12 @@
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { AppStateType } from '@Lib/application_state';
 import { Editor } from '@Lib/editor';
 import { PrefKey } from '@Lib/preferences_manager';
-import { useSignedIn, useSyncStatus } from '@Lib/snjs_helper_hooks';
+import {
+  getListedExtensions,
+  useSignedIn,
+  useSyncStatus,
+} from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
@@ -14,6 +19,7 @@ import {
   CollectionSort,
   ContentType,
   NotesDisplayCriteria,
+  SNActionsExtension,
   SNNote,
 } from '@standardnotes/snjs';
 import { ICON_ADD } from '@Style/icons';
@@ -27,6 +33,7 @@ import React, {
 } from 'react';
 import FAB from 'react-native-fab';
 import { ThemeContext } from 'styled-components/native';
+import { NoteBottomSheet } from './NoteBottomSheet';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';
 
@@ -78,6 +85,12 @@ export const Notes = React.memo(
     );
     const [notes, setNotes] = useState<SNNote[]>([]);
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
+    const [longPressedNoteId, setLongPressedNoteId] = useState<
+      SNNote['uuid']
+    >();
+    const longPressedNote = longPressedNoteId
+      ? (application?.findItem(longPressedNoteId) as SNNote)
+      : undefined;
     const [searchText, setSearchText] = useState('');
     const [editor, setEditor] = useState<Editor | undefined>(undefined);
     const [searchOptions, setSearchOptions] = useState<SearchOptions>([]);
@@ -102,13 +115,16 @@ export const Notes = React.memo(
       setIncludeProtectedStarted,
     ] = useState<boolean>(false);
     const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false);
-
+    const [listedExtensions, setListedExtensions] = useState<
+      SNActionsExtension[]
+    >([]);
     // Ref
     const haveDisplayOptions = useRef(false);
     const protectionsEnabled = useRef(
       application!.hasProtectionSources() &&
         application!.areProtectionsEnabled()
     );
+    const bottomSheetRef = useRef<BottomSheetModal>(null);
 
     const reloadTitle = useCallback(
       (newNotes?: SNNote[], newFilter?: string) => {
@@ -602,7 +618,27 @@ export const Notes = React.memo(
           searchOptions={searchOptions}
           shouldFocusSearch={shouldFocusSearch}
           setShouldFocusSearch={setShouldFocusSearch}
+          onLongPressItem={uuid => {
+            setListedExtensions(getListedExtensions(application));
+            setLongPressedNoteId(uuid);
+            bottomSheetRef.current?.present();
+          }}
         />
+        {longPressedNote && (
+          <NoteBottomSheet
+            note={longPressedNote}
+            bottomSheetRef={bottomSheetRef}
+            listedExtensions={listedExtensions}
+            onUnprotect={async uuid => {
+              bottomSheetRef.current?.dismiss();
+              const note = application?.findItem(uuid) as SNNote;
+              if (note) {
+                await application?.unprotectNote(note);
+                bottomSheetRef.current?.present();
+              }
+            }}
+          />
+        )}
         <FAB
           // @ts-ignore style prop does not exist in types
           style={

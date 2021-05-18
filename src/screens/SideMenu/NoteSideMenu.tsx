@@ -489,7 +489,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         key: 'protect',
         onSelect: protectOrUnprotectNote,
         iconDesc: {
-          type: 'protect',
+          type: 'textboxPassword',
           side: 'right',
         },
       },

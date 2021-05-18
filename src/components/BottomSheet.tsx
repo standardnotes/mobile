@@ -55,6 +55,7 @@ type Props = {
   sections: BottomSheetSectionType[];
   title?: string;
   bottomSheetRef: React.RefObject<BottomSheetModal>;
+  onDismiss?: () => void;
 };
 
 const styles = StyleSheet.create({
@@ -335,6 +336,7 @@ export const BottomSheet: React.FC<Props> = ({
   bottomSheetRef,
   sections,
   title,
+  onDismiss,
 }) => {
   const [titleHeight, setTitleHeight] = useState(0);
   const [listHeight, setListHeight] = useState(0);
@@ -404,18 +406,17 @@ export const BottomSheet: React.FC<Props> = ({
     }
   };
 
-  const onDismiss = () => {
-    setExpandedSectionKey('');
-    setShouldCollapseSections(true);
-  };
-
   return (
     <BottomSheetModal
       ref={bottomSheetRef}
       snapPoints={snapPoints}
       handleComponent={HandleComponent}
       backdropComponent={BottomSheetBackdrop}
-      onDismiss={onDismiss}
+      onDismiss={() => {
+        setExpandedSectionKey('');
+        setShouldCollapseSections(true);
+        onDismiss?.();
+      }}
       bottomInset={-24}
     >
       <>

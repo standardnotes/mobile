@@ -1,7 +1,6 @@
 import {
   BottomSheet,
   BottomSheetAction,
-  BottomSheetDefaultSectionType,
   BottomSheetExpandableSectionType,
   BottomSheetSectionType,
 } from '@Components/BottomSheet';
@@ -11,7 +10,6 @@ import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
   useLoadListedExtension,
-  useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { str } from '@Lib/strings';
 import { useNavigation } from '@react-navigation/native';
@@ -53,6 +51,8 @@ type Props = {
   editor?: Editor;
   bottomSheetRef: React.RefObject<BottomSheetModal>;
   listedExtensions: SNActionsExtension[];
+  onUnprotect: (uuid: SNNote['uuid']) => void;
+  onDismiss?: () => void;
 };
 
 export const NoteBottomSheet: React.FC<Props> = ({
@@ -60,10 +60,11 @@ export const NoteBottomSheet: React.FC<Props> = ({
   editor,
   bottomSheetRef,
   listedExtensions,
+  onUnprotect,
+  onDismiss,
 }) => {
   const application = useContext(ApplicationContext);
   const [changeNote] = useChangeNote(note, editor);
-  const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note);
   const [deleteNote] = useDeleteNoteWithPrivileges(
     note,
     useCallback(async () => {
@@ -251,17 +252,20 @@ export const NoteBottomSheet: React.FC<Props> = ({
     dismissSheetOnPress: true,
   };
 
-  const historySection: BottomSheetDefaultSectionType = {
-    expandable: false,
-    key: ActionSection.History,
-    actions: [historyAction],
-  };
-
   const protectAction: BottomSheetAction = {
-    text: note.protected ? 'Unprotect' : 'Protect',
+    text: 'Protect',
     key: NoteActionKey.Protect,
-    iconType: 'protect',
-    callback: async () => await protectOrUnprotectNote(),
+    iconType: 'textboxPassword',
+    switch: {
+      value: note.protected,
+      onValueChange(value) {
+        if (value) {
+          application?.protectNote(note);
+        } else {
+          onUnprotect(note.uuid);
+        }
+      },
+    },
     dismissSheetOnPress: true,
   };
 
@@ -368,35 +372,50 @@ export const NoteBottomSheet: React.FC<Props> = ({
     dismissSheetOnPress: true,
   };
 
-  const trashActions: BottomSheetAction[] = note.trashed
-    ? [restoreAction, deleteAction]
-    : [moveToTrashAction];
-
-  const oneShotsSection: BottomSheetDefaultSectionType = {
-    expandable: false,
-    key: ActionSection.OneShots,
-    actions: note.protected
-      ? [protectAction]
-      : [pinAction, archiveAction, protectAction, shareAction, ...trashActions],
-  };
-
-  const switchSection: BottomSheetDefaultSectionType = {
-    expandable: false,
-    key: ActionSection.Switches,
-    actions: [previewInListAction, preventEditingAction],
-  };
-
-  const title = note.protected ? note.safeTitle() : note.title;
-
-  const sections = note.protected
-    ? [oneShotsSection]
-    : [historySection, switchSection, oneShotsSection, ...listedSections];
-
   return (
     <BottomSheet
       bottomSheetRef={bottomSheetRef}
-      title={title}
-      sections={sections}
+      title={note.title}
+      onDismiss={onDismiss}
+      sections={
+        note.protected
+          ? [
+              {
+                expandable: false,
+                actions: [protectAction],
+                key: ActionSection.Switches,
+              },
+            ]
+          : [
+              {
+                expandable: false,
+                key: ActionSection.History,
+                actions: [historyAction],
+              },
+              {
+                expandable: false,
+                key: ActionSection.Switches,
+                actions: [
+                  previewInListAction,
+                  preventEditingAction,
+                  protectAction,
+                ],
+              },
+              {
+                expandable: false,
+                key: ActionSection.OneShots,
+                actions: [
+                  pinAction,
+                  archiveAction,
+                  shareAction,
+                  ...(note.trashed
+                    ? [restoreAction, deleteAction]
+                    : [moveToTrashAction]),
+                ],
+              },
+              ...listedSections,
+            ]
+      }
     />
   );
 };

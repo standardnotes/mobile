@@ -6,6 +6,7 @@ import {
   isSameDay,
   NoteMutator,
   SNActionsExtension,
+  SNApplication,
   SNNote,
   StorageEncryptionPolicies,
 } from '@standardnotes/snjs';
@@ -502,19 +503,12 @@ export const useProtectOrUnprotectNote = (
   return [protectOrUnprotectNote];
 };
 
-export const useGetListedExtensions = (): [() => SNActionsExtension[]] => {
+export function getListedExtensions(application: SNApplication | undefined) {
   const LISTED_IDENTIFIER = 'org.standardnotes.listed';
-  // Context
-  const application = React.useContext(ApplicationContext);
-
-  const getListedExtensions = useCallback(() => {
-    return (application?.actionsManager.getExtensions() || []).filter(
-      extension => extension.package_info?.identifier === LISTED_IDENTIFIER
-    );
-  }, [application]);
-
-  return [getListedExtensions];
-};
+  return (application?.actionsManager.getExtensions() || []).filter(
+    extension => extension.package_info?.identifier === LISTED_IDENTIFIER
+  );
+}
 
 export const useLoadListedExtension = (
   note: SNNote

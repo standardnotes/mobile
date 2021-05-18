@@ -7,8 +7,8 @@ import IconListed from '@Style/Icons/ic-listed.svg';
 import IconPencifOff from '@Style/Icons/ic-pencil-off.svg';
 import IconPinOff from '@Style/Icons/ic-pin-off.svg';
 import IconPin from '@Style/Icons/ic-pin.svg';
-import IconProtect from '@Style/Icons/ic-protect.svg';
 import IconShare from '@Style/Icons/ic-share.svg';
+import IconTextboxPassword from '@Style/Icons/ic-textbox-password.svg';
 import IconTrash from '@Style/Icons/ic-trash.svg';
 import IconUnarchive from '@Style/Icons/ic-unarchive.svg';
 import IconWarning from '@Style/Icons/ic-warning.svg';
@@ -25,8 +25,8 @@ const Icons = {
   pencilOff: IconPencifOff,
   pin: IconPin,
   pinOff: IconPinOff,
-  protect: IconProtect,
   share: IconShare,
+  textboxPassword: IconTextboxPassword,
   trash: IconTrash,
   warning: IconWarning,
 };
