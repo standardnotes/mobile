@@ -280,22 +280,15 @@ const Section: React.FC<{
   onToggleExpand: () => void;
   stackIndex: number;
   expanded: boolean;
-}> = ({ section, first, dismissBottomSheet, onToggleExpand, stackIndex }) => {
+}> = ({
+  section,
+  first,
+  dismissBottomSheet,
+  onToggleExpand,
+  stackIndex,
+  expanded,
+}) => {
   const [actionsContainerHeight, setActionsContainerHeight] = useState(0);
-
-  const actionsContainerStyle = section.expandable
-    ? {
-        marginTop: section.animationValue.interpolate({
-          inputRange: [0, 1],
-          outputRange: [-actionsContainerHeight, 0],
-        }),
-        opacity: section.animationValue,
-      }
-    : {};
-
-  const onActionsContainerLayout = (e: LayoutChangeEvent) => {
-    setActionsContainerHeight(e.nativeEvent.layout.height);
-  };
 
   return (
     <SectionContainer stackIndex={stackIndex}>
@@ -314,19 +307,33 @@ const Section: React.FC<{
             />
           </ExpandableSectionContainer>
         )}
-        <ActionsContainer
-          as={Animated.View}
-          onLayout={onActionsContainerLayout}
-          style={actionsContainerStyle}
-        >
-          {section.actions.map(action => (
-            <ActionItem
-              key={action.key}
-              action={action}
-              dismissBottomSheet={dismissBottomSheet}
-            />
-          ))}
-        </ActionsContainer>
+        {(!section.expandable || expanded) && (
+          <ActionsContainer
+            as={Animated.View}
+            onLayout={(e: LayoutChangeEvent) => {
+              setActionsContainerHeight(e.nativeEvent.layout.height);
+            }}
+            style={
+              section.expandable
+                ? {
+                    marginTop: section.animationValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-actionsContainerHeight, 0],
+                    }),
+                    opacity: section.animationValue,
+                  }
+                : undefined
+            }
+          >
+            {section.actions.map(action => (
+              <ActionItem
+                key={action.key}
+                action={action}
+                dismissBottomSheet={dismissBottomSheet}
+              />
+            ))}
+          </ActionsContainer>
+        )}
       </>
     </SectionContainer>
   );
@@ -381,7 +388,7 @@ export const BottomSheet: React.FC<Props> = ({
     key: string;
     animationValue: Animated.Value;
   }) => {
-    const duration = 250;
+    const duration = 200;
     const useNativeDriver = false;
 
     if (expandedSectionKey) {

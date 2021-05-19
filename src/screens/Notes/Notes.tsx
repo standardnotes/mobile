@@ -629,11 +629,15 @@ export const Notes = React.memo(
             note={longPressedNote}
             bottomSheetRef={bottomSheetRef}
             listedExtensions={listedExtensions}
+            onDismiss={() => {
+              setLongPressedNoteId(undefined);
+            }}
             onUnprotect={async uuid => {
               bottomSheetRef.current?.dismiss();
               const note = application?.findItem(uuid) as SNNote;
               if (note) {
                 await application?.unprotectNote(note);
+                setLongPressedNoteId(uuid);
                 bottomSheetRef.current?.present();
               }
             }}
