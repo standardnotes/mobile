@@ -621,7 +621,6 @@ export const Notes = React.memo(
           onLongPressItem={uuid => {
             setListedExtensions(getListedExtensions(application));
             setLongPressedNoteId(uuid);
-            bottomSheetRef.current?.present();
           }}
         />
         {longPressedNote && (

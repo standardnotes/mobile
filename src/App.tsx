@@ -1,6 +1,7 @@
 import Bugsnag from '@bugsnag/react-native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { PortalProvider } from '@gorhom/portal';
 import { MobileApplication } from '@Lib/application';
 import { ApplicationGroup } from '@Lib/application_group';
 import { navigationRef } from '@Lib/navigation_service';
@@ -111,7 +112,9 @@ const AppComponent: React.FC<{
             <ActionSheetProvider>
               <BottomSheetModalProvider>
                 <ThemeServiceContext.Provider value={themeService.current}>
-                  <MainStackComponent env={env} />
+                  <PortalProvider>
+                    <MainStackComponent env={env} />
+                  </PortalProvider>
                 </ThemeServiceContext.Provider>
               </BottomSheetModalProvider>
             </ActionSheetProvider>

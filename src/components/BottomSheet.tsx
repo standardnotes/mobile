@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from '@gorhom/bottom-sheet';
-import React, { useEffect, useMemo, useState } from 'react';
+import { Portal } from '@gorhom/portal';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   LayoutChangeEvent,
@@ -16,6 +17,7 @@ import {
   View,
 } from 'react-native';
 import styled, { css } from 'styled-components/native';
+import { BottomSheet as BottomSheet2 } from './BottomSheet2';
 import { SNSwitch } from './SNSwitch';
 
 export type BottomSheetAction = {
@@ -413,6 +415,67 @@ export const BottomSheet: React.FC<Props> = ({
     }
   };
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 450,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+
+  function dismiss(modifier = 1) {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 300 * modifier,
+      useNativeDriver: true,
+    }).start(() => onDismiss?.());
+  }
+
+  if (true) {
+    return (
+      <Portal>
+        <View
+          style={{
+            ...StyleSheet.absoluteFillObject,
+          }}
+        >
+          <Animated.View
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              backgroundColor: 'black',
+              opacity: fadeAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 0.75],
+              }),
+            }}
+          />
+          <BottomSheet2
+            onDismiss={() => {
+              dismiss();
+            }}
+          >
+            {dismissBottomSheet =>
+              animatedSections.map((section, index) => (
+                <Section
+                  key={section.key}
+                  section={section}
+                  first={index === 0}
+                  dismissBottomSheet={dismissBottomSheet}
+                  onToggleExpand={() => {
+                    toggleExpandSection(section);
+                  }}
+                  stackIndex={sections.length - index}
+                  expanded={section.key === expandedSectionKey}
+                />
+              ))
+            }
+          </BottomSheet2>
+        </View>
+      </Portal>
+    );
+  }
   return (
     <BottomSheetModal
       ref={bottomSheetRef}
