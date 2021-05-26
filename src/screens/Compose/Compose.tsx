@@ -228,6 +228,9 @@ export class Compose extends React.Component<{}, State> {
     this.removeComponentGroupObserver = undefined;
     this.removeEditorNoteChangeObserver = undefined;
     this.removeEditorNoteValueChangeObserver = undefined;
+    if (this.editor) {
+      this.context?.editorGroup?.closeEditor(this.editor);
+    }
 
     this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
     if (this.saveTimeout) {
