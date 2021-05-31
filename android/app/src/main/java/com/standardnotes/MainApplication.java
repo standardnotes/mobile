@@ -3,6 +3,7 @@ package com.standardnotes;
 import android.app.Application;
 import android.app.Activity;
 import android.content.Context;
+import android.webkit.WebView;
 
 import com.bugsnag.android.BreadcrumbType;
 import com.bugsnag.android.Configuration;
@@ -64,6 +65,12 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
+
+    // Enable Remote debugging for WebViews
+    String packageName = this.getContext().getPackageName();
+    if (packageName.equals("com.standardnotes.dev")) {
+      WebView.setWebContentsDebuggingEnabled(true);
+    }
 
     rebuildOkHtttp();
 
