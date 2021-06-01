@@ -67,7 +67,7 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
 
     // Enable Remote debugging for WebViews
-    String packageName = this.getContext().getPackageName();
+    String packageName = getApplicationContext().getPackageName();
     if (packageName.equals("com.standardnotes.dev")) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
