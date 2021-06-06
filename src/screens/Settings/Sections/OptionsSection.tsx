@@ -124,7 +124,8 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       application!.alertService!.alert(result.error);
     } else if (result.errorCount) {
       application!.alertService!.alert(
-        `Import complete. ${result.errorCount} items were not imported because there was an error decrypting them. Make sure the password is correct and try again.`
+        `Import complete. ${result.errorCount} items were not imported because ` +
+          'there was an error decrypting them. Make sure the password is correct and try again.'
       );
     } else {
       application!.alertService!.alert(
@@ -152,7 +153,8 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
           await performImport(data);
         } else {
           application!.alertService.alert(
-            'This backup file was created using an unsupported version of the application and cannot be imported here. Please update your application and try again.'
+            'This backup file was created using an unsupported version of the application ' +
+              'and cannot be imported here. Please update your application and try again.'
           );
         }
       } else {
