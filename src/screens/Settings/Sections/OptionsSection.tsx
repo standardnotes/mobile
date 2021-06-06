@@ -158,10 +158,6 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       } else {
         await performImport(data);
       }
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // Do something...
-      }
     } finally {
       setImporting(false);
     }
