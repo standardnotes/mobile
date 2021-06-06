@@ -86,7 +86,7 @@ public class MainApplication extends Application implements ReactApplication {
     }});
 
     SharedPreferences settings = getApplicationContext().getSharedPreferences("react-native", Context.MODE_PRIVATE);
-    String bugsnagOptOut = settings.getString("bugsnagoptout", "false");
+    String bugsnagOptOut = settings.getString("bugsnagoptout", "true");
 
     if (!bugsnagOptOut.equals("true")) {
       Bugsnag.start(this, config);
