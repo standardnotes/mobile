@@ -218,6 +218,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
 
       <ButtonCell
         testID="importData"
+        first={!signedIn}
         leftAligned
         title={importing ? 'Processing...' : 'Import Data'}
         onPress={onImportPress}
@@ -225,7 +226,6 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
 
       <SectionedOptionsTableCell
         testID="exportData"
-        first={!signedIn}
         leftAligned
         options={exportOptions}
         title={exporting ? 'Processing...' : 'Export Data'}
