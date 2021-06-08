@@ -224,6 +224,8 @@ export const ComponentView = ({
     // deinit
     return () => {
       mounted = false;
+      application?.componentManager.deactivateComponent(componentUuid);
+      liveComponent?.deinit();
     };
   }, [
     application,
@@ -233,13 +235,6 @@ export const ComponentView = ({
     offlineOnly,
     onLoadErrorHandler,
   ]);
-
-  useEffect(() => {
-    return () => {
-      application?.componentManager.deactivateComponent(componentUuid);
-      liveComponent?.deinit();
-    };
-  }, [application, componentUuid, liveComponent]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
