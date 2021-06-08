@@ -87,6 +87,7 @@
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.2.1",
     "prettier-plugin-organize-imports": "^1.1.1",
+    "react-native-document-picker": "^5.0.4",
     "react-test-renderer": "16.13.1",
     "replace-in-file": "^6.1.0",
     "typescript": "^3.9.4"
