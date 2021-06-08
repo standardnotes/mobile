@@ -5,11 +5,9 @@ import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
 import {
   ButtonType,
-  ComponentMutator,
+  ComponentArea,
   LiveItem,
-  SNApplication,
   SNComponent,
-  SNLog,
   SNNote,
 } from '@standardnotes/snjs';
 import React, {
@@ -20,16 +18,11 @@ import React, {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
-import RNFS, {
-  DocumentDirectoryPath,
-  ExternalDirectoryPath,
-} from 'react-native-fs';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
-import { unzip } from 'react-native-zip-archive';
 import {
   FlexContainer,
   LockedContainer,
@@ -44,46 +37,13 @@ type Props = {
   onLoadEnd: () => void;
   onLoadStart: () => void;
   onLoadError: () => void;
-  onDownloadEditorStart: () => void;
-  onDownloadEditorEnd: () => void;
-  offlineOnly?: boolean;
 };
-
-async function checkForComponentUpdate(
-  application: SNApplication,
-  component: SNComponent
-) {
-  const { latest_url: latestUrl } = component.package_info;
-  if (!latestUrl) {
-    return;
-  }
-  try {
-    const packageInfo = await fetch(latestUrl).then(r => r.json());
-    if (
-      packageInfo &&
-      packageInfo.version !== component.package_info.version &&
-      application.isStarted()
-    ) {
-      application.changeAndSaveItem<ComponentMutator>(
-        component.uuid,
-        mutator => {
-          mutator.package_info = packageInfo;
-        }
-      );
-    }
-  } catch (error) {
-    SNLog.error(error);
-  }
-}
 
 export const ComponentView = ({
   onLoadEnd,
   onLoadError,
   onLoadStart,
-  onDownloadEditorStart,
-  onDownloadEditorEnd,
   componentUuid,
-  offlineOnly,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -94,13 +54,6 @@ export const ComponentView = ({
   >(() => new LiveItem(componentUuid, application!));
   const [url, setUrl] = useState('');
   const [showWebView, setShowWebView] = useState<boolean>(true);
-  const [offlineUrl, setOfflineUrl] = useState('');
-  const [readAccessUrl, setReadAccessUrl] = useState('');
-  const [
-    downloadingOfflineEditor,
-    setDownloadingOfflineEditor,
-  ] = useState<boolean>(false);
-  const [loadedOnce, setLoadedOnce] = useState(false);
 
   // Ref
   const webViewRef = useRef<WebView>(null);
@@ -116,7 +69,7 @@ export const ComponentView = ({
     });
 
     return removeBlurScreenListener;
-  }, [navigation]);
+  });
 
   useFocusEffect(() => {
     setShowWebView(true);
@@ -135,9 +88,7 @@ export const ComponentView = ({
         .getValue(PrefKey.DoNotShowAgainUnsupportedEditors, false);
       if (!doNotShowAgainUnsupportedEditors) {
         const confirmed = await application?.alertService?.confirm(
-          'Web editors require Android 7.0 or greater. Your version does ' +
-            'not support web editors. Changes you make may not be properly ' +
-            'saved. Please switch to the Plain Editor for the best experience.',
+          'Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.',
           'Editors Not Supported',
           "Don't show again",
           ButtonType.Info,
@@ -159,137 +110,30 @@ export const ComponentView = ({
     }
   }, [application]);
 
-  const getOfflineEditorUrl = useCallback(async () => {
-    if (!liveComponent) {
-      return '';
-    }
-
-    const {
-      identifier: editorIdentifier,
-      version: editorVersion,
-      download_url: downloadUrl,
-    } = liveComponent.item.package_info;
-    const basePath =
-      Platform.OS === 'android' ? ExternalDirectoryPath : DocumentDirectoryPath;
-    const downloadPath = `${basePath}/${editorIdentifier}.zip`;
-    const editorDir = `${basePath}/editors/${editorIdentifier}`;
-    const versionDir = `${editorDir}/${editorVersion}`;
-
-    setReadAccessUrl(versionDir);
-
-    const shouldDownload =
-      !downloadingOfflineEditor &&
-      (!(await RNFS.exists(versionDir)) ||
-        (await RNFS.readDir(versionDir)).length === 0);
-
-    if (application) {
-      checkForComponentUpdate(application, liveComponent.item);
-    }
-
-    if (shouldDownload) {
-      setDownloadingOfflineEditor(true);
-      onDownloadEditorStart();
-      try {
-        // Delete any previous versions downloads
-        if (await RNFS.exists(editorDir)) {
-          await RNFS.unlink(editorDir);
-        }
-        await RNFS.downloadFile({
-          fromUrl: downloadUrl,
-          toFile: downloadPath,
-        }).promise;
-        await unzip(downloadPath, versionDir);
-        // Delete zip after extraction
-        await RNFS.unlink(downloadPath);
-      } finally {
-        onDownloadEditorEnd();
-        setDownloadingOfflineEditor(false);
-      }
-    }
-
-    const packageDir = await RNFS.readDir(versionDir);
-    const packageJsonPath = `${packageDir[0].path}/package.json`;
-    const packageJson = JSON.parse(await RNFS.readFile(packageJsonPath));
-
-    const mainFileName = packageJson?.sn?.main || 'index.html';
-
-    const mainFilePath = `${packageDir[0].path}/${mainFileName}`;
-
-    if (await RNFS.exists(mainFilePath)) {
-      return `file://${mainFilePath}`;
-    }
-
-    return '';
-  }, [
-    application,
-    downloadingOfflineEditor,
-    liveComponent,
-    onDownloadEditorStart,
-    onDownloadEditorEnd,
-  ]);
-
-  const onLoadErrorHandler = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    onLoadError();
-  }, [onLoadError, timeoutRef]);
-
   useEffect(() => {
-    let mounted = true;
-    const setEditorUrl = async () => {
+    if (liveComponent) {
       const newUrl = application!.componentManager!.urlForComponent(
-        liveComponent!.item
+        liveComponent.item
       );
       if (!newUrl) {
         application?.alertService!.alert(
           'Re-install Extension',
-          'This extension is not installed correctly. Please use the web ' +
-            'or desktop application to reinstall, then try again.',
+          'This extension is not installed correctly. Please use the web or desktop application to reinstall, then try again.',
           'OK'
         );
       } else {
-        try {
-          const offlineEditorUrl = await getOfflineEditorUrl();
-
-          if (mounted) {
-            setOfflineUrl(offlineEditorUrl);
-          }
-        } catch (e) {
-          if (mounted) {
-            if (offlineOnly) {
-              onLoadErrorHandler();
-            } else {
-              setUrl(newUrl);
-            }
-          }
-        }
+        setUrl(newUrl);
       }
-    };
-    if (liveComponent) {
-      setEditorUrl();
     }
 
     // deinit
     return () => {
-      mounted = false;
-    };
-  }, [
-    application,
-    componentUuid,
-    getOfflineEditorUrl,
-    liveComponent,
-    offlineOnly,
-    onLoadErrorHandler,
-  ]);
-
-  useEffect(() => {
-    return () => {
-      application?.componentManager.deactivateComponent(componentUuid);
+      application?.componentGroup.deactivateComponentForArea(
+        ComponentArea.Editor
+      );
       liveComponent?.deinit();
     };
-  }, [application, componentUuid, liveComponent]);
+  }, [application, liveComponent]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
@@ -303,8 +147,6 @@ export const ComponentView = ({
   };
 
   const onFrameLoad = useCallback(() => {
-    setLoadedOnce(true);
-
     /**
      * We have no way of knowing if the webview load is successful or not. We
      * have to wait to see if the error event is fired. Looking at the code,
@@ -312,8 +154,7 @@ export const ComponentView = ({
      * to see if the error event is fired before registering the component
      * window. Otherwise, on error, this component will be dealloced, and a
      * pending postMessage will cause a memory leak crash on Android in the
-     * form of "react native attempt to invoke virtual method
-     * double java.lang.double.doublevalue() on a null object reference"
+     * form of "react native attempt to invoke virtual method double java.lang.double.doublevalue() on a null object reference"
      */
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -333,11 +174,18 @@ export const ComponentView = ({
      */
     setTimeout(() => {
       onLoadEnd();
-    }, 200);
+    }, 100);
   }, [application, liveComponent, onLoadEnd]);
 
   const onLoadStartHandler = () => {
     onLoadStart();
+  };
+
+  const onLoadErrorHandler = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    onLoadError();
   };
 
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
@@ -369,10 +217,6 @@ export const ComponentView = ({
       window.parent.postMessage = function(data) {
         window.parent.ReactNativeWebView.postMessage(data);
       };
-      const meta = document.createElement('meta');
-      meta.setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no');
-      meta.setAttribute('name', 'viewport');
-      document.getElementsByTagName('head')[0].appendChild(meta);
       return true;
     })()`;
   };
@@ -389,19 +233,10 @@ export const ComponentView = ({
             </LockedText>
           </LockedContainer>
         )}
-      {(Boolean(url) || Boolean(offlineUrl)) && (
+      {Boolean(url) && (
         <StyledWebview
-          allowFileAccess
-          allowingReadAccessToURL={readAccessUrl}
-          originWhitelist={['*']}
           showWebView={showWebView}
-          source={
-            /**
-             * Android 10 workaround to avoid access denied errors
-             * https://github.com/react-native-webview/react-native-webview/issues/656#issuecomment-551312436
-             */
-            loadedOnce ? { uri: offlineUrl ? offlineUrl : url } : undefined
-          }
+          source={{ uri: url }}
           key={liveComponent?.item.uuid}
           ref={webViewRef}
           /**
@@ -416,11 +251,13 @@ export const ComponentView = ({
           hideKeyboardAccessoryView={true}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
           cacheEnabled={true}
+          scalesPageToFit={
+            true /* Android only, not available with WKWebView */
+          }
           autoManageStatusBarEnabled={
             false /* To prevent StatusBar from changing colors when focusing */
           }
           injectedJavaScript={defaultInjectedJavaScript()}
-          onContentProcessDidTerminate={onLoadErrorHandler}
         />
       )}
     </FlexContainer>
