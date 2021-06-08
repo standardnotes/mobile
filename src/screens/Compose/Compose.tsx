@@ -324,11 +324,6 @@ export class Compose extends React.Component<{}, State> {
   };
 
   reloadComponentEditorState = async () => {
-    this.setState({
-      loadingWebview: false,
-      webViewError: false,
-    });
-
     const associatedEditor = this.context?.componentManager!.editorForNote(
       this.note!
     );
@@ -552,7 +547,6 @@ export class Compose extends React.Component<{}, State> {
                         }}
                         onDownloadEditorStart={this.onDownloadEditorStart}
                         onDownloadEditorEnd={this.onDownloadEditorEnd}
-                        offlineOnly={this.state.editorComponent?.offlineOnly}
                       />
                     )}
                     {!shouldDisplayEditor &&
