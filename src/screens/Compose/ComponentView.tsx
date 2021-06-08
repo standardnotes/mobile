@@ -3,15 +3,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
-import {
-  ButtonType,
-  ComponentMutator,
-  LiveItem,
-  SNApplication,
-  SNComponent,
-  SNLog,
-  SNNote,
-} from '@standardnotes/snjs';
+import { ButtonType, LiveItem, SNComponent, SNNote } from '@standardnotes/snjs';
 import React, {
   useCallback,
   useContext,
@@ -45,33 +37,6 @@ type Props = {
   onDownloadEditorEnd: () => void;
   offlineOnly?: boolean;
 };
-
-async function checkForComponentUpdate(
-  application: SNApplication,
-  component: SNComponent
-) {
-  const { latest_url: latestUrl } = component.package_info;
-  if (!latestUrl) {
-    return;
-  }
-  try {
-    const packageInfo = await fetch(latestUrl).then(r => r.json());
-    if (
-      packageInfo &&
-      packageInfo.version !== component.package_info.version &&
-      application.isStarted()
-    ) {
-      application.changeAndSaveItem<ComponentMutator>(
-        component.uuid,
-        mutator => {
-          mutator.package_info = packageInfo;
-        }
-      );
-    }
-  } catch (error) {
-    SNLog.error(error);
-  }
-}
 
 export const ComponentView = ({
   onLoadEnd,
@@ -154,15 +119,11 @@ export const ComponentView = ({
   }, [application]);
 
   const getOfflineEditorUrl = useCallback(async () => {
-    if (!liveComponent) {
-      return undefined;
-    }
-
     const {
       identifier: editorIdentifier,
       version: editorVersion,
       download_url: downloadUrl,
-    } = liveComponent.item.package_info;
+    } = liveComponent!.item.package_info;
     const downloadPath = `${DocumentDirectoryPath}/${editorIdentifier}.zip`;
     const editorDir = `${DocumentDirectoryPath}/editors/${editorIdentifier}`;
     const versionDir = `${editorDir}/${editorVersion}`;
@@ -173,10 +134,6 @@ export const ComponentView = ({
       !downloadingOfflineEditor &&
       (!(await RNFS.exists(versionDir)) ||
         (await RNFS.readDir(versionDir)).length === 0);
-
-    if (application) {
-      checkForComponentUpdate(application, liveComponent.item);
-    }
 
     if (shouldDownload) {
       setDownloadingOfflineEditor(true);
@@ -199,11 +156,14 @@ export const ComponentView = ({
       }
     }
 
+    let mainFileName = 'index.html';
     const packageDir = await RNFS.readDir(versionDir);
     const packageJsonPath = `${packageDir[0].path}/package.json`;
     const packageJson = JSON.parse(await RNFS.readFile(packageJsonPath));
 
-    const mainFileName = packageJson?.sn?.main || 'index.html';
+    if (packageJson?.sn?.main) {
+      mainFileName = packageJson.sn.main;
+    }
 
     const mainFilePath = `${packageDir[0].path}/${mainFileName}`;
 
@@ -213,7 +173,6 @@ export const ComponentView = ({
 
     return '';
   }, [
-    application,
     downloadingOfflineEditor,
     liveComponent,
     onDownloadEditorStart,
@@ -244,7 +203,7 @@ export const ComponentView = ({
         try {
           const offlineEditorUrl = await getOfflineEditorUrl();
 
-          if (mounted && offlineEditorUrl) {
+          if (mounted) {
             setOfflineUrl(offlineEditorUrl);
           }
         } catch (e) {
