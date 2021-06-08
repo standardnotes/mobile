@@ -3,7 +3,13 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
-import { ButtonType, LiveItem, SNComponent, SNNote } from '@standardnotes/snjs';
+import {
+  ButtonType,
+  ComponentArea,
+  LiveItem,
+  SNComponent,
+  SNNote,
+} from '@standardnotes/snjs';
 import React, {
   useCallback,
   useContext,
@@ -12,19 +18,11 @@ import React, {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
-import {
-  DocumentDirectoryPath,
-  downloadFile,
-  exists,
-  readDir,
-  unlink,
-} from 'react-native-fs';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
-import { unzip } from 'react-native-zip-archive';
 import {
   FlexContainer,
   LockedContainer,
@@ -39,16 +37,12 @@ type Props = {
   onLoadEnd: () => void;
   onLoadStart: () => void;
   onLoadError: () => void;
-  onDownloadEditorStart: () => void;
-  onDownloadEditorEnd: () => void;
 };
 
 export const ComponentView = ({
   onLoadEnd,
   onLoadError,
   onLoadStart,
-  onDownloadEditorStart,
-  onDownloadEditorEnd,
   componentUuid,
 }: Props) => {
   // Context
@@ -60,8 +54,6 @@ export const ComponentView = ({
   >(() => new LiveItem(componentUuid, application!));
   const [url, setUrl] = useState('');
   const [showWebView, setShowWebView] = useState<boolean>(true);
-  const [offlineUrl, setOfflineUrl] = useState('');
-  const [readAccessUrl, setReadAccessUrl] = useState('');
 
   // Ref
   const webViewRef = useRef<WebView>(null);
@@ -77,7 +69,7 @@ export const ComponentView = ({
     });
 
     return removeBlurScreenListener;
-  }, [navigation]);
+  });
 
   useFocusEffect(() => {
     setShowWebView(true);
@@ -118,60 +110,10 @@ export const ComponentView = ({
     }
   }, [application]);
 
-  const getOfflineEditorUrl = useCallback(async () => {
-    const {
-      identifier: editorIdentifier,
-      version: editorVersion,
-      download_url: downloadUrl,
-    } = liveComponent!.item.package_info;
-    const downloadPath = `${DocumentDirectoryPath}/${editorIdentifier}.zip`;
-    const editorDir = `${DocumentDirectoryPath}/editors/${editorIdentifier}`;
-    const versionDir = `${editorDir}/${editorVersion}`;
-
-    setReadAccessUrl(versionDir);
-
-    const shouldDownload =
-      !(await exists(versionDir)) || (await readDir(versionDir)).length === 0;
-
-    if (shouldDownload) {
-      try {
-        onDownloadEditorStart();
-        // Delete any previous versions downloads
-        if (await exists(editorDir)) {
-          await unlink(editorDir);
-        }
-        await downloadFile({
-          fromUrl: downloadUrl,
-          toFile: downloadPath,
-        }).promise;
-        await unzip(downloadPath, versionDir);
-        // Delete zip after extraction
-        await unlink(downloadPath);
-      } finally {
-        onDownloadEditorEnd();
-      }
-    }
-
-    const packageDir = await readDir(versionDir);
-    const possibleIndexLocations = [
-      `${packageDir[0].path}/dist/index.html`,
-      `${packageDir[0].path}/index.html`,
-    ];
-
-    for (const location of possibleIndexLocations) {
-      if (await exists(location)) {
-        return `file://${location}`;
-      }
-    }
-
-    return '';
-  }, [liveComponent, onDownloadEditorStart, onDownloadEditorEnd]);
-
   useEffect(() => {
-    let mounted = true;
-    const setEditorUrl = async () => {
+    if (liveComponent) {
       const newUrl = application!.componentManager!.urlForComponent(
-        liveComponent!.item
+        liveComponent.item
       );
       if (!newUrl) {
         application?.alertService!.alert(
@@ -180,28 +122,18 @@ export const ComponentView = ({
           'OK'
         );
       } else {
-        try {
-          const offlineEditorUrl = await getOfflineEditorUrl();
-
-          if (mounted) {
-            setOfflineUrl(offlineEditorUrl);
-          }
-        } finally {
-          setUrl(newUrl);
-        }
+        setUrl(newUrl);
       }
-    };
-    if (liveComponent) {
-      setEditorUrl();
     }
 
     // deinit
     return () => {
-      mounted = false;
-      application?.componentManager.deactivateComponent(componentUuid);
+      application?.componentGroup.deactivateComponentForArea(
+        ComponentArea.Editor
+      );
       liveComponent?.deinit();
     };
-  }, [application, componentUuid, getOfflineEditorUrl, liveComponent]);
+  }, [application, liveComponent]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
@@ -242,7 +174,7 @@ export const ComponentView = ({
      */
     setTimeout(() => {
       onLoadEnd();
-    }, 1000);
+    }, 100);
   }, [application, liveComponent, onLoadEnd]);
 
   const onLoadStartHandler = () => {
@@ -253,7 +185,6 @@ export const ComponentView = ({
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-
     onLoadError();
   };
 
@@ -286,10 +217,6 @@ export const ComponentView = ({
       window.parent.postMessage = function(data) {
         window.parent.ReactNativeWebView.postMessage(data);
       };
-      const meta = document.createElement('meta');
-      meta.setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no');
-      meta.setAttribute('name', 'viewport');
-      document.getElementsByTagName('head')[0].appendChild(meta);
       return true;
     })()`;
   };
@@ -306,13 +233,10 @@ export const ComponentView = ({
             </LockedText>
           </LockedContainer>
         )}
-      {(Boolean(url) || Boolean(offlineUrl)) && (
+      {Boolean(url) && (
         <StyledWebview
-          allowFileAccess
-          allowingReadAccessToURL={readAccessUrl}
-          originWhitelist={['*']}
           showWebView={showWebView}
-          source={{ uri: offlineUrl ? offlineUrl : url }}
+          source={{ uri: url }}
           key={liveComponent?.item.uuid}
           ref={webViewRef}
           /**
@@ -327,11 +251,13 @@ export const ComponentView = ({
           hideKeyboardAccessoryView={true}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
           cacheEnabled={true}
+          scalesPageToFit={
+            true /* Android only, not available with WKWebView */
+          }
           autoManageStatusBarEnabled={
             false /* To prevent StatusBar from changing colors when focusing */
           }
           injectedJavaScript={defaultInjectedJavaScript()}
-          onContentProcessDidTerminate={() => setOfflineUrl('')}
         />
       )}
     </FlexContainer>

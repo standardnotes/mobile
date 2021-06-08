@@ -23,8 +23,9 @@ import { ThemeContext } from 'styled-components';
 import { ComponentView } from './ComponentView';
 import {
   Container,
-  LoadingText,
   LoadingWebViewContainer,
+  LoadingWebViewSubtitle,
+  LoadingWebViewText,
   LockedContainer,
   LockedText,
   NoteTitleInput,
@@ -46,7 +47,6 @@ type State = {
   editorComponent: SNComponent | undefined;
   webViewError: boolean;
   loadingWebview: boolean;
-  downloadingEditor: boolean;
 };
 
 export class Compose extends React.Component<{}, State> {
@@ -56,7 +56,6 @@ export class Compose extends React.Component<{}, State> {
   saveTimeout: number | undefined;
   alreadySaved: boolean = false;
   statusTimeout: number | undefined;
-  downloadingMessageTimeout: number | undefined;
   removeEditorObserver?: () => void;
   removeEditorNoteValueChangeObserver?: () => void;
   removeComponentsObserver?: () => void;
@@ -81,7 +80,6 @@ export class Compose extends React.Component<{}, State> {
       saveError: false,
       webViewError: false,
       loadingWebview: false,
-      downloadingEditor: false,
     };
   }
 
@@ -246,9 +244,6 @@ export class Compose extends React.Component<{}, State> {
     }
     if (this.statusTimeout) {
       clearTimeout(this.statusTimeout);
-    }
-    if (this.downloadingMessageTimeout) {
-      clearTimeout(this.downloadingMessageTimeout);
     }
   }
 
@@ -425,25 +420,6 @@ export class Compose extends React.Component<{}, State> {
     this.saveNote(false, true, false, false, text);
   };
 
-  onDownloadEditorStart = () =>
-    this.setState({
-      downloadingEditor: true,
-    });
-
-  onDownloadEditorEnd = () => {
-    if (this.downloadingMessageTimeout) {
-      clearTimeout(this.downloadingMessageTimeout);
-    }
-
-    this.downloadingMessageTimeout = setTimeout(
-      () =>
-        this.setState({
-          downloadingEditor: false,
-        }),
-      100
-    );
-  };
-
   render() {
     const shouldDisplayEditor =
       this.state.editorComponent &&
@@ -504,15 +480,12 @@ export class Compose extends React.Component<{}, State> {
                       autoCapitalize={'sentences'}
                       editable={!this.noteLocked}
                     />
-                    {(this.state.downloadingEditor ||
-                      this.state.loadingWebview) && (
+                    {this.state.loadingWebview && (
                       <LoadingWebViewContainer locked={this.noteLocked}>
-                        <LoadingText>
-                          {this.state.downloadingEditor
-                            ? 'Downloading '
-                            : 'Loading '}
-                          {this.state.editorComponent?.name}...
-                        </LoadingText>
+                        <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
+                        <LoadingWebViewSubtitle>
+                          {this.state.editorComponent?.name}
+                        </LoadingWebViewSubtitle>
                       </LoadingWebViewContainer>
                     )}
                     {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
@@ -538,8 +511,6 @@ export class Compose extends React.Component<{}, State> {
                             webViewError: true,
                           });
                         }}
-                        onDownloadEditorStart={this.onDownloadEditorStart}
-                        onDownloadEditorEnd={this.onDownloadEditorEnd}
                       />
                     )}
                     {!shouldDisplayEditor &&
