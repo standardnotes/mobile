@@ -333,7 +333,7 @@ export const useDeleteNoteWithPrivileges = (
     async (permanently: boolean) => {
       if (note?.locked) {
         application?.alertService.alert(
-          "This note is locked. If you'd like to delete it, unlock it, and try again."
+          "This note has editing disabled. If you'd like to delete it, enable editing on it, and try again."
         );
         return;
       }
