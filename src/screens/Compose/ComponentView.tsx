@@ -135,13 +135,6 @@ export const ComponentView = ({
     };
   }, [application, liveComponent]);
 
-  useEffect(() => {
-    return () => {
-      application?.componentManager.deactivateComponent(componentUuid);
-      liveComponent?.deinit();
-    };
-  }, [application, componentUuid, liveComponent]);
-
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
     try {
