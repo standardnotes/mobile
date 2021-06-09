@@ -12,6 +12,8 @@ import { SCREEN_MANAGE_SESSIONS, SCREEN_SETTINGS } from '@Screens/screens';
 import { ButtonType } from '@standardnotes/snjs';
 import moment from 'moment';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs';
 
 type Props = {
   title: string;
@@ -27,6 +29,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   >();
 
   // State
+  const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [lastExportDate, setLastExportDate] = useState<Date | undefined>(() =>
     application
@@ -103,6 +106,65 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     [application]
   );
 
+  const readImportFile = async (fileUri: string): Promise<any> => {
+    return RNFS.readFile(fileUri)
+      .then(result => JSON.parse(result))
+      .catch(() => {
+        application!.alertService!.alert(
+          'Unable to open file. Ensure it is a proper JSON file and try again.'
+        );
+      });
+  };
+
+  const performImport = async (data: any) => {
+    const result = await application!.importData(data);
+    if (!result) {
+      return;
+    } else if ('error' in result) {
+      application!.alertService!.alert(result.error);
+    } else if (result.errorCount) {
+      application!.alertService!.alert(
+        `Import complete. ${result.errorCount} items were not imported because ` +
+          'there was an error decrypting them. Make sure the password is correct and try again.'
+      );
+    } else {
+      application!.alertService!.alert(
+        'Your data has been successfully imported.'
+      );
+    }
+  };
+
+  const onImportPress = async () => {
+    try {
+      const selectedFile = await DocumentPicker.pick({
+        type: [DocumentPicker.types.plainText],
+      });
+      const data = await readImportFile(selectedFile.uri);
+      if (!data) {
+        return;
+      }
+      setImporting(true);
+      if (data.version || data.auth_params || data.keyParams) {
+        const version =
+          data.version || data.keyParams?.version || data.auth_params?.version;
+        if (
+          application!.protocolService.supportedVersions().includes(version)
+        ) {
+          await performImport(data);
+        } else {
+          application!.alertService.alert(
+            'This backup file was created using an unsupported version of the application ' +
+              'and cannot be imported here. Please update your application and try again.'
+          );
+        }
+      } else {
+        await performImport(data);
+      }
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const onExportPress = useCallback(
     async (option: { key: string }) => {
       let encrypted = option.key === 'encrypted';
@@ -154,9 +216,16 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         </>
       )}
 
+      <ButtonCell
+        testID="importData"
+        first={!signedIn}
+        leftAligned
+        title={importing ? 'Processing...' : 'Import Data'}
+        onPress={onImportPress}
+      />
+
       <SectionedOptionsTableCell
         testID="exportData"
-        first={!signedIn}
         leftAligned
         options={exportOptions}
         title={exporting ? 'Processing...' : 'Export Data'}
