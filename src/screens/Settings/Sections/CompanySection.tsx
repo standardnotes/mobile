@@ -28,7 +28,7 @@ type Props = {
 
 export const CompanySection = (props: Props) => {
   const application = useContext(ApplicationContext);
-  const [bugsnagOptOut, setBugsnagOptOut] = useState(false);
+  const [bugsnagOptOut, setBugsnagOptOut] = useState(true);
   const storeName = Platform.OS === 'android' ? 'Play Store' : 'App Store';
 
   const openUrl = (action: keyof typeof URLS) => {

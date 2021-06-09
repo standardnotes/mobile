@@ -69,3 +69,5 @@ ios-release.bundle.map
 
 # HProf
 /android/*.hprof
+
+codeqldb

@@ -123,7 +123,9 @@ export const NoteCell = ({
         callback: () => {
           if (note.locked) {
             application?.alertService.alert(
-              "This note is locked. If you'd like to archive it, unlock it, and try again."
+              `This note has editing disabled. If you'd like to ${
+                note.archived ? 'unarchive' : 'archive'
+              } it, enable editing on it, and try again.`
             );
             return;
           }
@@ -135,7 +137,7 @@ export const NoteCell = ({
       });
 
       options.push({
-        text: note.locked ? 'Unlock' : 'Lock',
+        text: note.locked ? 'Enable editing' : 'Prevent editing',
         key: 'lock',
         callback: () =>
           changeNote(mutator => {
@@ -168,7 +170,7 @@ export const NoteCell = ({
             },
           },
           {
-            text: 'Delete Permanently',
+            text: 'Delete permanently',
             key: 'delete-forever',
             destructive: true,
             callback: async () => deleteNote(true),

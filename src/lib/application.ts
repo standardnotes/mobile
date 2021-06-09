@@ -60,7 +60,10 @@ export class MobileApplication extends SNApplication {
       ],
       VersionInfo.bundleIdentifier?.includes('dev')
         ? 'https://syncing-server-dev.standardnotes.org/'
-        : 'https://sync.standardnotes.org'
+        : 'https://sync.standardnotes.org',
+      VersionInfo.bundleIdentifier?.includes('dev')
+        ? 'https://api-dev.standardnotes.com/'
+        : 'https://api.standardnotes.com'
     );
     this.Uuid = Math.random().toString();
     this.editorGroup = new EditorGroup(this);
@@ -138,7 +141,7 @@ export class MobileApplication extends SNApplication {
     return this.MobileServices.backupsService;
   }
 
-  public getPrefsService() {
+  public getLocalPreferences() {
     return this.MobileServices.prefsService;
   }
 

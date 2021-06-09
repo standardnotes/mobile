@@ -13,17 +13,19 @@ export const PreferencesSection = () => {
   // State
   const [sortBy, setSortBy] = useState<CollectionSort>(() =>
     application!
-      .getPrefsService()
+      .getLocalPreferences()
       .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
   );
   const [sortReverse, setSortReverse] = useState<boolean>(() =>
-    application!.getPrefsService().getValue(PrefKey.SortNotesReverse, false)
+    application!.getLocalPreferences().getValue(PrefKey.SortNotesReverse, false)
   );
   const [hideDates, setHideDates] = useState<boolean>(() =>
-    application!.getPrefsService().getValue(PrefKey.NotesHideDate, false)
+    application!.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
   );
   const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
-    application!.getPrefsService().getValue(PrefKey.NotesHideNotePreview, false)
+    application!
+      .getLocalPreferences()
+      .getValue(PrefKey.NotesHideNotePreview, false)
   );
 
   const sortOptions = useMemo(() => {
@@ -36,24 +38,26 @@ export const PreferencesSection = () => {
 
   const toggleReverseSort = () => {
     application
-      ?.getPrefsService()
+      ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.SortNotesReverse, !sortReverse);
     setSortReverse(value => !value);
   };
 
   const changeSortOption = (key: CollectionSort) => {
-    application?.getPrefsService().setUserPrefValue(PrefKey.SortNotesBy, key);
+    application
+      ?.getLocalPreferences()
+      .setUserPrefValue(PrefKey.SortNotesBy, key);
     setSortBy(key);
   };
   const toggleNotesPreviewHidden = () => {
     application
-      ?.getPrefsService()
+      ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.NotesHideNotePreview, !hidePreviews);
     setHidePreviews(value => !value);
   };
   const toggleNotesDateHidden = () => {
     application
-      ?.getPrefsService()
+      ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.NotesHideDate, !hideDates);
     setHideDates(value => !value);
   };

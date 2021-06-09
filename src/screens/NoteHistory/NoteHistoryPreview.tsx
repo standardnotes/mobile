@@ -11,7 +11,7 @@ import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import { ELIPSIS } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, { useCallback, useContext, useLayoutEffect } from 'react';
-import { YellowBox } from 'react-native';
+import { LogBox } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import {
   Container,
@@ -21,7 +21,7 @@ import {
   TitleContainer,
 } from './NoteHistoryPreview.styled';
 
-YellowBox.ignoreWarnings([
+LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
 ]);
 

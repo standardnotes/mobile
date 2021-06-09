@@ -30,6 +30,7 @@ import FlagSecure from 'react-native-flag-secure-android';
 import { hide, show } from 'react-native-privacy-snapshot';
 import VersionInfo from 'react-native-version-info';
 import { MobileApplication } from './application';
+import { associateComponentWithNote } from './component_manager';
 import { Editor } from './editor';
 import { PrefKey } from './preferences_manager';
 
@@ -102,6 +103,7 @@ export class ApplicationState extends ApplicationService {
   keyboardDidHideListener?: EmitterSubscription;
   keyboardHeight?: number;
   appEventObersever: any;
+  selectedTagRestored = false;
   selectedTag: SNTag = this.application.getSmartTags()[0];
   userPreferences?: SNUserPrefs;
   tabletMode: boolean = false;
@@ -152,24 +154,33 @@ export class ApplicationState extends ApplicationService {
     this.keyboardDidHideListener = undefined;
   }
 
+  restoreSelectedTag() {
+    if (this.selectedTagRestored) {
+      return;
+    }
+    const savedTagUuid: string | undefined = this.prefService.getValue(
+      PrefKey.SelectedTagUuid,
+      undefined
+    );
+
+    if (isNullOrUndefined(savedTagUuid)) {
+      this.selectedTagRestored = true;
+      return;
+    }
+
+    const savedTag =
+      (this.application.findItem(savedTagUuid) as SNTag) ||
+      this.application.getSmartTags().find(tag => tag.uuid === savedTagUuid);
+    if (savedTag) {
+      this.setSelectedTag(savedTag, false);
+      this.selectedTagRestored = true;
+    }
+  }
+
   async onAppStart() {
     this.removePreferencesLoadedListener = this.prefService.addPreferencesLoadedObserver(
       () => {
         this.notifyOfStateChange(AppStateType.PreferencesChanged);
-        const savedTagUuid: string | undefined = this.prefService.getValue(
-          PrefKey.SelectedTagUuid,
-          undefined
-        );
-
-        const savedTag = !isNullOrUndefined(savedTagUuid)
-          ? (this.application.findItem(savedTagUuid) as SNTag) ||
-            this.application
-              .getSmartTags()
-              .find(tag => tag.uuid === savedTagUuid)
-          : undefined;
-        if (savedTag) {
-          this.setSelectedTag(savedTag, false);
-        }
       }
     );
 
@@ -269,11 +280,20 @@ export class ApplicationState extends ApplicationService {
    * editor's note with an empty one.
    */
   async createEditor(title?: string) {
-    const activeEditor = this.getActiveEditor();
+    let activeEditor = this.getActiveEditor();
     if (!activeEditor || this.multiEditorEnabled) {
-      this.application.editorGroup.createEditor(undefined, title);
+      await this.application.editorGroup.createEditor(undefined, title);
+      activeEditor = this.getActiveEditor();
     } else {
       await activeEditor.reset(title);
+    }
+    const defaultEditor = this.application.componentManager.getDefaultEditor();
+    if (defaultEditor) {
+      await associateComponentWithNote(
+        this.application,
+        defaultEditor,
+        activeEditor.note!
+      );
     }
   }
 
@@ -281,7 +301,7 @@ export class ApplicationState extends ApplicationService {
     const note = this.application.findItem(noteUuid) as SNNote;
     const activeEditor = this.getActiveEditor();
     if (!activeEditor || this.multiEditorEnabled) {
-      this.application.editorGroup.createEditor(noteUuid);
+      await this.application.editorGroup.createEditor(noteUuid);
     } else {
       activeEditor.setNote(note);
     }
@@ -386,11 +406,21 @@ export class ApplicationState extends ApplicationService {
   private handleApplicationEvents() {
     this.appEventObersever = this.application.addEventObserver(
       async eventName => {
-        if (eventName === ApplicationEvent.Started) {
-          this.locked = true;
-        } else if (eventName === ApplicationEvent.Launched) {
-          this.locked = false;
-          this.notifyLockStateObservers(LockStateType.Unlocked);
+        switch (eventName) {
+          case ApplicationEvent.LocalDataIncrementalLoad:
+          case ApplicationEvent.LocalDataLoaded: {
+            this.restoreSelectedTag();
+            break;
+          }
+          case ApplicationEvent.Started: {
+            this.locked = true;
+            break;
+          }
+          case ApplicationEvent.Launched: {
+            this.locked = false;
+            this.notifyLockStateObservers(LockStateType.Unlocked);
+            break;
+          }
         }
       }
     );
@@ -399,8 +429,8 @@ export class ApplicationState extends ApplicationService {
   /**
    * Set selected @SNTag
    */
-  public setSelectedTag(tag: SNTag, saveSelection: boolean) {
-    if (this.selectedTag === tag) {
+  public setSelectedTag(tag: SNTag, saveSelection: boolean = true) {
+    if (this.selectedTag.uuid === tag.uuid) {
       return;
     }
     const previousTag = this.selectedTag;
@@ -408,7 +438,7 @@ export class ApplicationState extends ApplicationService {
 
     if (saveSelection) {
       this.application
-        .getPrefsService()
+        .getLocalPreferences()
         .setUserPrefValue(PrefKey.SelectedTagUuid, tag.uuid);
     }
 
@@ -681,7 +711,7 @@ export class ApplicationState extends ApplicationService {
   }
 
   private get prefService() {
-    return this.application.getPrefsService();
+    return this.application.getLocalPreferences();
   }
 
   public getEnvironment() {

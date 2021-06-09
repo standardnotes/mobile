@@ -157,10 +157,8 @@ export const useSyncStatus = () => {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const setStatus = useCallback(
-    (status?: string, color?: string) => {
-      application
-        ?.getStatusManager()
-        .setMessage(SCREEN_NOTES, status ?? '', color);
+    (status = '') => {
+      application?.getStatusManager().setMessage(SCREEN_NOTES, status);
     },
     [application]
   );
@@ -172,11 +170,16 @@ export const useSyncStatus = () => {
       application!.isEncryptionAvailable() &&
       application!.getStorageEncryptionPolicy() ===
         StorageEncryptionPolicies.Default;
-    if (stats.localDataDone) {
+
+    if (
+      stats.localDataCurrent === 0 ||
+      stats.localDataTotal === 0 ||
+      stats.localDataDone
+    ) {
       setStatus();
       return;
     }
-    const notesString = `${stats.localDataCurrent}/${stats.localDataTotal} items...`;
+    const notesString = `${stats.localDataCurrent}/${stats.localDataTotal} items…`;
     const loadingStatus = encryption
       ? `Decrypting ${notesString}`
       : `Loading ${notesString}`;
@@ -212,10 +215,12 @@ export const useSyncStatus = () => {
       setStatus(
         `Syncing ${stats.uploadCompletionCount}/${stats.uploadTotalCount} items...`
       );
-    } else if (!syncStatus.syncInProgress) {
+    } else if (syncStatus.syncInProgress && !completedInitialSync) {
+      setStatus('Syncing…');
+    } else {
       setStatus();
     }
-  }, [application, setStatus]);
+  }, [application, completedInitialSync, setStatus]);
 
   useEffect(() => {
     const unsubscribeAppEvents = application?.addEventObserver(
@@ -231,23 +236,14 @@ export const useSyncStatus = () => {
           setDecrypting(false);
           setLoading(false);
           updateLocalDataStatus();
-        } else if (eventName === ApplicationEvent.WillSync) {
-          if (application.hasAccount() && !completedInitialSync) {
-            setStatus('Syncing...');
-          }
         } else if (eventName === ApplicationEvent.CompletedFullSync) {
-          if (
-            !completedInitialSync ||
-            !application?.getAppState().isInTabletMode
-          ) {
-            setStatus();
-          }
-          if (!completedInitialSync) {
+          if (completedInitialSync) {
+            setRefreshing(false);
+          } else {
             setCompletedInitialSync(true);
             setLoading(false);
-          } else {
-            setRefreshing(false);
           }
+          updateSyncStatus();
         } else if (eventName === ApplicationEvent.LocalDatabaseReadError) {
           application!.alertService!.alert(
             'Unable to load local storage. Please restart the app and try again.'
@@ -337,7 +333,7 @@ export const useDeleteNoteWithPrivileges = (
     async (permanently: boolean) => {
       if (note?.locked) {
         application?.alertService.alert(
-          "This note is locked. If you'd like to delete it, unlock it, and try again."
+          "This note has editing disabled. If you'd like to delete it, enable editing on it, and try again."
         );
         return;
       }

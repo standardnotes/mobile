@@ -231,6 +231,12 @@ export class Compose extends React.Component<{}, State> {
     if (this.editor) {
       this.context?.editorGroup?.closeEditor(this.editor);
     }
+    if (this.state.editorComponent) {
+      this.context?.componentGroup?.deactivateComponent(
+        this.state.editorComponent,
+        false
+      );
+    }
 
     this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
     if (this.saveTimeout) {
@@ -407,7 +413,7 @@ export class Compose extends React.Component<{}, State> {
   onContentChange = (text: string) => {
     if (Platform.OS === 'android' && this.note?.locked) {
       this.context?.alertService?.alert(
-        'This note is locked. Please unlock this note to make changes.'
+        'This note has editing disabled. Please enable editing on this note to make changes.'
       );
       return;
     }
@@ -433,7 +439,7 @@ export class Compose extends React.Component<{}, State> {
                     size={16}
                     color={theme.stylekitBackgroundColor}
                   />
-                  <LockedText>Note Locked</LockedText>
+                  <LockedText>Note Editing Disabled</LockedText>
                 </LockedContainer>
               )}
               {this.state.webViewError && (

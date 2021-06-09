@@ -84,7 +84,7 @@ export const ComponentView = ({
   useEffect(() => {
     const warnUnsupportedEditors = async () => {
       const doNotShowAgainUnsupportedEditors = application
-        ?.getPrefsService()
+        ?.getLocalPreferences()
         .getValue(PrefKey.DoNotShowAgainUnsupportedEditors, false);
       if (!doNotShowAgainUnsupportedEditors) {
         const confirmed = await application?.alertService?.confirm(
@@ -96,7 +96,7 @@ export const ComponentView = ({
         );
         if (confirmed) {
           application
-            ?.getPrefsService()
+            ?.getLocalPreferences()
             .setUserPrefValue(PrefKey.DoNotShowAgainUnsupportedEditors, true);
         }
       }

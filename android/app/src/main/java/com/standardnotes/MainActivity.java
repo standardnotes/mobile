@@ -22,13 +22,12 @@ public class MainActivity extends ReactActivity {
             super(activity, mainComponentName);
         }
 
-
         @Override
         protected Bundle getLaunchOptions() {
             String packageName = this.getContext().getPackageName();
             Bundle props = new Bundle();
             SharedPreferences settings = this.getContext().getSharedPreferences("react-native", Context.MODE_PRIVATE);
-            String bugsnagOptOut = settings.getString("bugsnagoptout", "false");
+            String bugsnagOptOut = settings.getString("bugsnagoptout", "true");
             props.putBoolean("bugsnagOptOut", bugsnagOptOut.equals("true"));
             if (packageName.equals("com.standardnotes.dev")) {
                 props.putString("env", "dev");

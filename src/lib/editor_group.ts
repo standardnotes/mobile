@@ -20,9 +20,10 @@ export class EditorGroup {
     }
   }
 
-  createEditor(noteUuid?: string, noteTitle?: string) {
+  async createEditor(noteUuid?: string, noteTitle?: string) {
     if (this.application) {
-      const editor = new Editor(this.application, noteUuid, noteTitle);
+      const editor = new Editor(this.application);
+      await editor.init(noteUuid, noteTitle);
       this.editors.push(editor);
       this.notifyObservers();
     }
