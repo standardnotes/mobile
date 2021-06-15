@@ -92,7 +92,7 @@ export class BackupsService extends ApplicationService {
   }
 
   private async _exportAndroid(filename: string, data: string) {
-    const filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
+    const filepath = `${RNFS.DocumentDirectoryPath}/${filename}`;
     return RNFS.writeFile(filepath, data).then(() => {
       return filepath;
     });
