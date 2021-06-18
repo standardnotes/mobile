@@ -12,6 +12,7 @@ import { SCREEN_MANAGE_SESSIONS, SCREEN_SETTINGS } from '@Screens/screens';
 import { ButtonType } from '@standardnotes/snjs';
 import moment from 'moment';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { Platform } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 
@@ -109,9 +110,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   const readImportFile = async (fileUri: string): Promise<any> => {
     return RNFS.readFile(fileUri)
       .then(result => JSON.parse(result))
-      .catch(() => {
+      .catch(e => {
         application!.alertService!.alert(
-          'Unable to open file. Ensure it is a proper JSON file and try again.'
+          `Unable to open file. Ensure it is a proper JSON file and try again. ${e.toString()}`
         );
       });
   };
@@ -139,7 +140,11 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       const selectedFile = await DocumentPicker.pick({
         type: [DocumentPicker.types.plainText],
       });
-      const data = await readImportFile(selectedFile.uri);
+      const selectedFileURI =
+        Platform.OS === 'ios'
+          ? decodeURIComponent(selectedFile.uri)
+          : selectedFile.uri;
+      const data = await readImportFile(selectedFileURI);
       if (!data) {
         return;
       }
