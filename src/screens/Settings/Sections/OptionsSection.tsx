@@ -110,9 +110,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   const readImportFile = async (fileUri: string): Promise<any> => {
     return RNFS.readFile(fileUri)
       .then(result => JSON.parse(result))
-      .catch(e => {
+      .catch(() => {
         application!.alertService!.alert(
-          `Unable to open file. Ensure it is a proper JSON file and try again. ${e.toString()}`
+          'Unable to open file. Ensure it is a proper JSON file and try again.'
         );
       });
   };
