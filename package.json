@@ -14,7 +14,9 @@
     "lint": "npm-run-all --parallel lint:*",
     "lint:eslint": "yarn eslint . --ext .ts,.tsx --fix",
     "lint:ts": "tsc --noEmit",
+    "setup": "yarn submodules && yarn install",
     "start": "react-native start",
+    "submodules": "git submodule update --init --force",
     "test": "jest"
   },
   "dependencies": {
