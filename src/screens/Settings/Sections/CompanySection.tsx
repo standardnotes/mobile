@@ -12,9 +12,9 @@ const URLS = {
   feedback: `mailto:help@standardnotes.org?subject=${
     Platform.OS === 'android' ? 'Android' : 'iOS'
   } app feedback (v${ApplicationState.version})`,
-  learn_more: 'https://standardnotes.org',
-  privacy: 'https://standardnotes.org/privacy',
-  help: 'https://standardnotes.org/help',
+  learn_more: 'https://standardnotes.com',
+  privacy: 'https://standardnotes.com/privacy',
+  help: 'https://standardnotes.com/help',
   rate: Platform.select({
     ios:
       'https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8',
@@ -63,10 +63,10 @@ export const CompanySection = (props: Props) => {
   const shareEncryption = () => {
     const title = 'The Unexpected Benefits of Encrypted Writing';
     let message = Platform.OS === 'ios' ? title : '';
-    const url = 'https://standardnotes.org/why-encrypted';
+    const url = 'https://standardnotes.com/why-encrypted';
     // Android ignores url. iOS ignores title.
     if (Platform.OS === 'android') {
-      message += '\n\nhttps://standardnotes.org/why-encrypted';
+      message += '\n\nhttps://standardnotes.com/why-encrypted';
     }
     application?.getAppState().performActionWithoutStateChangeImpact(() => {
       Share.share({ title: title, message: message, url: url });
@@ -77,10 +77,10 @@ export const CompanySection = (props: Props) => {
     const title = 'Standard Notes';
     let message =
       'Check out Standard Notes, a free, open-source, and completely encrypted notes app.';
-    const url = 'https://standardnotes.org';
+    const url = 'https://standardnotes.com';
     // Android ignores url. iOS ignores title.
     if (Platform.OS === 'android') {
-      message += '\n\nhttps://standardnotes.org';
+      message += '\n\nhttps://standardnotes.com';
     }
     application?.getAppState().performActionWithoutStateChangeImpact(() => {
       Share.share({ title: title, message: message, url: url });
@@ -97,7 +97,7 @@ export const CompanySection = (props: Props) => {
         title="Help"
         onPress={() => openUrl('help')}
       >
-        <Label>https://standardnotes.org/help</Label>
+        <Label>https://standardnotes.com/help</Label>
       </ButtonCell>
       <ButtonCell
         leftAligned={true}
@@ -105,7 +105,7 @@ export const CompanySection = (props: Props) => {
         onPress={() => openUrl('feedback')}
       >
         <ContentContainer>
-          <Label>help@standardnotes.org</Label>
+          <Label>help@standardnotes.com</Label>
         </ContentContainer>
       </ButtonCell>
 
@@ -130,7 +130,7 @@ export const CompanySection = (props: Props) => {
         title="Learn About Standard Notes"
         onPress={() => openUrl('learn_more')}
       >
-        <Label>https://standardnotes.org</Label>
+        <Label>https://standardnotes.com</Label>
       </ButtonCell>
 
       <ButtonCell
@@ -138,7 +138,7 @@ export const CompanySection = (props: Props) => {
         title="Our Privacy Manifesto"
         onPress={() => openUrl('privacy')}
       >
-        <Label>https://standardnotes.org/privacy</Label>
+        <Label>https://standardnotes.com/privacy</Label>
       </ButtonCell>
 
       <ButtonCell

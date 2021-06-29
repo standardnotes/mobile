@@ -224,7 +224,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
         },
         onSelect: () => {
           application?.deviceInterface?.openUrl(
-            'https://standardnotes.org/extensions'
+            'https://standardnotes.com/extensions'
           );
         },
       });

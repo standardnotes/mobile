@@ -44,7 +44,7 @@ const useSessions = (): [
         setErrorMessage('An unknown error occured while loading sessions.');
       }
     } else {
-      const newSessions = response.data;
+      const newSessions = response.data as RemoteSession[];
       setSessions(newSessions);
       setErrorMessage('');
     }
