@@ -6847,9 +6847,9 @@ react-native-keychain@^4.0.5:
   resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-4.0.5.tgz#6d3aef8f2789fc0dfa8149b8400d82ff77be361a"
   integrity sha512-TbiO8AO055EPjaxIuKxrCEOB4r81uQCVDFbtcs+e4pEOHxf6z3JgDC0UU0poJElKfCh37b+TFRxQhg6DbsYJBA==
 
-react-native-mail@standardnotes/react-native-mail#bde234de3691982096392824d39cb948053acd1a:
+react-native-mail@standardnotes/react-native-mail#fd26119e67a2ffc5eaa95a9c17049743e39ce2d3:
   version "4.1.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-mail/tar.gz/bde234de3691982096392824d39cb948053acd1a"
+  resolved "https://codeload.github.com/standardnotes/react-native-mail/tar.gz/fd26119e67a2ffc5eaa95a9c17049743e39ce2d3"
 
 react-native-privacy-snapshot@standardnotes/react-native-privacy-snapshot#653e904:
   version "1.0.0"
