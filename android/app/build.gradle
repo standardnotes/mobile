@@ -187,6 +187,11 @@ android {
             getIsDefault().set(true)
         }
     }
+    sourceSets {
+        main {
+            assets.srcDirs = ['../../editors']
+        }
+    }
     buildTypes {
         release {
             minifyEnabled enableProguardInReleaseBuilds

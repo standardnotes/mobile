@@ -1,1 +1,4 @@
 
+[submodule "editors/Editors.bundle/bold-editor"]
+	path = editors/Editors.bundle/bold-editor
+	url = https://github.com/standardnotes/bold-editor

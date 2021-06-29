@@ -221,6 +221,17 @@ export const ComponentView = ({
     })()`;
   };
 
+  const editorUri = () => {
+    const { identifier: editorIdentifier } = liveComponent!.item.package_info;
+    if (editorIdentifier === 'org.standardnotes.bold-editor') {
+      return `${
+        Platform.OS === 'android' ? 'file:///android_asset/' : ''
+      }Editors.bundle/bold-editor/dist/index.html`;
+    } else {
+      return url;
+    }
+  };
+
   return (
     <FlexContainer>
       {liveComponent?.item.valid_until &&
@@ -236,7 +247,9 @@ export const ComponentView = ({
       {Boolean(url) && (
         <StyledWebview
           showWebView={showWebView}
-          source={{ uri: url }}
+          source={{ uri: editorUri() }}
+          originWhitelist={['*']}
+          allowFileAccess
           key={liveComponent?.item.uuid}
           ref={webViewRef}
           /**

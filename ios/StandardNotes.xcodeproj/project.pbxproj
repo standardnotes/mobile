@@ -11,6 +11,8 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		7EFF772E268BD3A800A8815A /* Editors.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7EFF772D268BD3A800A8815A /* Editors.bundle */; };
+		7EFF772F268BD3A800A8815A /* Editors.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7EFF772D268BD3A800A8815A /* Editors.bundle */; };
 		8343BD6A244F211C0020E9F0 /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD67244F211C0020E9F0 /* Red.png */; };
 		8343BD6B244F211C0020E9F0 /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD67244F211C0020E9F0 /* Red.png */; };
 		8343BD6C244F211C0020E9F0 /* Red@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8343BD68244F211C0020E9F0 /* Red@3x.png */; };
@@ -52,6 +54,7 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = StandardNotes/main.m; sourceTree = "<group>"; };
 		340672DE690D292C12CF8DF2 /* libPods-StandardNotesDev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StandardNotesDev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55E6A0DCFF3BB9E4D6780121 /* libPods-StandardNotes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StandardNotes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EFF772D268BD3A800A8815A /* Editors.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Editors.bundle; path = ../editors/Editors.bundle; sourceTree = "<group>"; };
 		810594E7EAEF139BFC2FDD3B /* Pods-StandardNotes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardNotes.release.xcconfig"; path = "Target Support Files/Pods-StandardNotes/Pods-StandardNotes.release.xcconfig"; sourceTree = "<group>"; };
 		8343BD67244F211C0020E9F0 /* Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red.png; sourceTree = "<group>"; };
 		8343BD68244F211C0020E9F0 /* Red@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@3x.png"; sourceTree = "<group>"; };
@@ -153,6 +156,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				7EFF772D268BD3A800A8815A /* Editors.bundle */,
 				83E99B1D24EC4EC5007B8F21 /* SN Dev.entitlements */,
 				13B07FAE1A68108700A75B9A /* StandardNotes */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -316,6 +320,7 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				83A5151724BF164700917BCF /* LaunchScreen.storyboard in Resources */,
 				8343BD6E244F211C0020E9F0 /* Red@2x.png in Resources */,
+				7EFF772E268BD3A800A8815A /* Editors.bundle in Resources */,
 				8343BD6C244F211C0020E9F0 /* Red@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -328,6 +333,7 @@
 				83F9431824C1EBC5007014C8 /* Dev.xcassets in Resources */,
 				83DCC09E24C0A21200D58E1B /* LaunchScreen.storyboard in Resources */,
 				83DCC09F24C0A21200D58E1B /* Red@2x.png in Resources */,
+				7EFF772F268BD3A800A8815A /* Editors.bundle in Resources */,
 				83DCC0A024C0A21200D58E1B /* Red@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
