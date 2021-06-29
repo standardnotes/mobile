@@ -41,7 +41,7 @@
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.9.0",
     "react-native-keychain": "^4.0.5",
-    "react-native-mail": "standardnotes/react-native-mail#f7f74be",
+    "react-native-mail": "standardnotes/react-native-mail#bde234de3691982096392824d39cb948053acd1a",
     "react-native-privacy-snapshot": "standardnotes/react-native-privacy-snapshot#653e904",
     "react-native-reanimated": "^1.13.2",
     "react-native-safe-area-context": "^3.1.9",
