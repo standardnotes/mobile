@@ -29,6 +29,9 @@ import {
   LockedText,
   StyledIcon,
   StyledWebview,
+  DeprecatedContainer,
+  DeprecatedText,
+  DeprecatedIcon
 } from './ComponentView.styled';
 
 type Props = {
@@ -221,6 +224,9 @@ export const ComponentView = ({
     })()`;
   };
 
+  const extensionFlags: string[] = liveComponent?.item.package_info.flags ?? [];
+  const isDeprecatedExtension = extensionFlags.includes('Deprecated');
+
   return (
     <FlexContainer>
       {liveComponent?.item.valid_until &&
@@ -233,6 +239,14 @@ export const ComponentView = ({
             </LockedText>
           </LockedContainer>
         )}
+
+      {isDeprecatedExtension && (
+        <DeprecatedContainer>
+          <DeprecatedIcon />
+          <DeprecatedText>This extension is deprecated.</DeprecatedText>
+        </DeprecatedContainer>
+      )}
+
       {Boolean(url) && (
         <StyledWebview
           showWebView={showWebView}
