@@ -24,14 +24,14 @@ import {
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
 import {
+  DeprecatedContainer,
+  DeprecatedIcon,
+  DeprecatedText,
   FlexContainer,
   LockedContainer,
   LockedText,
   StyledIcon,
   StyledWebview,
-  DeprecatedContainer,
-  DeprecatedText,
-  DeprecatedIcon
 } from './ComponentView.styled';
 
 type Props = {
@@ -224,8 +224,8 @@ export const ComponentView = ({
     })()`;
   };
 
-  const extensionFlags: string[] = liveComponent?.item.package_info.flags ?? [];
-  const isDeprecatedExtension = extensionFlags.includes('Deprecated');
+  const deprecationMessage =
+    liveComponent?.item.package_info.deprecation_message;
 
   return (
     <FlexContainer>
@@ -240,10 +240,12 @@ export const ComponentView = ({
           </LockedContainer>
         )}
 
-      {isDeprecatedExtension && (
+      {liveComponent?.item.isDeprecated && (
         <DeprecatedContainer>
           <DeprecatedIcon />
-          <DeprecatedText>This extension is deprecated.</DeprecatedText>
+          <DeprecatedText>
+            {deprecationMessage || 'This extension is deprecated.'}
+          </DeprecatedText>
         </DeprecatedContainer>
       )}
 
