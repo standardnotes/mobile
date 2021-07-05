@@ -1630,10 +1630,10 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.2.9.tgz#5212a959e4ec563584e42480bfd39ef129c3cbdf"
   integrity sha512-xJ5IUGOZztjSgNP/6XL+Ut5+q9UgSTv6xMtKkcQC5aJxCOkJy9u6RamPLdF00WQgwibxx2tu0e43bKUjTgzMig==
 
-"@standardnotes/snjs@2.7.9":
-  version "2.7.9"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.7.9.tgz#8b2a5d0f6248e1872b2fe68a73307f754528b4c3"
-  integrity sha512-FNiLXdaUb2+WpCteTbfg/iiv4k0UXFzz57RnY1O8X40vEVFVY8VjrJuJxxwDuZqidUZeLIdTMlmfdKWoD+NRDA==
+"@standardnotes/snjs@2.7.14":
+  version "2.7.14"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.7.14.tgz#3c1e57a53cfe61957bbcb253281c5c43611c9acf"
+  integrity sha512-xh71KLOCjodmVdrnNT0zfChB4fy3FaWMvWoh/5iso+myI6tQ8X59+gUM+VuNk9N9rwyItiBvq88BD82RUia8uQ==
   dependencies:
     "@standardnotes/auth" "^2.0.0"
     "@standardnotes/sncrypto-common" "^1.2.9"
@@ -6847,9 +6847,9 @@ react-native-keychain@^4.0.5:
   resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-4.0.5.tgz#6d3aef8f2789fc0dfa8149b8400d82ff77be361a"
   integrity sha512-TbiO8AO055EPjaxIuKxrCEOB4r81uQCVDFbtcs+e4pEOHxf6z3JgDC0UU0poJElKfCh37b+TFRxQhg6DbsYJBA==
 
-react-native-mail@standardnotes/react-native-mail#f7f74be:
+react-native-mail@standardnotes/react-native-mail#fd26119e67a2ffc5eaa95a9c17049743e39ce2d3:
   version "4.1.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-mail/tar.gz/f7f74be22edef77bef6901ca2e2cd4eddc15bbc0"
+  resolved "https://codeload.github.com/standardnotes/react-native-mail/tar.gz/fd26119e67a2ffc5eaa95a9c17049743e39ce2d3"
 
 react-native-privacy-snapshot@standardnotes/react-native-privacy-snapshot#653e904:
   version "1.0.0"

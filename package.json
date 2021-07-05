@@ -1,7 +1,7 @@
 {
   "name": "StandardNotes",
-  "version": "3.6.17",
-  "user-version": "3.6.17",
+  "version": "3.6.18",
+  "user-version": "3.6.18",
   "private": true,
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -26,7 +26,7 @@
     "@react-navigation/native": "^5.9.3",
     "@react-navigation/stack": "^5.14.3",
     "@standardnotes/sncrypto-common": "1.2.9",
-    "@standardnotes/snjs": "2.7.9",
+    "@standardnotes/snjs": "2.7.14",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
     "react": "17.0.1",
@@ -41,7 +41,7 @@
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.9.0",
     "react-native-keychain": "^4.0.5",
-    "react-native-mail": "standardnotes/react-native-mail#f7f74be",
+    "react-native-mail": "standardnotes/react-native-mail#fd26119e67a2ffc5eaa95a9c17049743e39ce2d3",
     "react-native-privacy-snapshot": "standardnotes/react-native-privacy-snapshot#653e904",
     "react-native-reanimated": "^1.13.2",
     "react-native-safe-area-context": "^3.1.9",

@@ -91,19 +91,16 @@ export class BackupsService extends ApplicationService {
   }
 
   private async _exportAndroid(filename: string, data: string) {
-    const filepath = `${RNFS.DownloadDirectoryPath}/${filename}`;
     try {
+      let filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        await RNFS.writeFile(filepath, data);
-        this._showFileSavePromptAndroid(filepath);
-      } else {
-        this.application.alertService.alert(
-          'We need permission to write to the external storage in order to save your backup file.'
-        );
+        filepath = `${RNFS.DownloadDirectoryPath}/${filename}`;
       }
+      await RNFS.writeFile(filepath, data);
+      this._showFileSavePromptAndroid(filepath);
     } catch (err) {
       console.log('Error exporting backup', err);
       this.application.alertService.alert(
