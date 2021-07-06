@@ -241,8 +241,8 @@ export const useSyncStatus = () => {
             setRefreshing(false);
           } else {
             setCompletedInitialSync(true);
-            setLoading(false);
           }
+          setLoading(false);
           updateSyncStatus();
         } else if (eventName === ApplicationEvent.LocalDatabaseReadError) {
           application!.alertService!.alert(
