@@ -307,8 +307,9 @@ PODS:
     - React-Core
   - RNReanimated (1.13.2):
     - React-Core
-  - RNScreens (2.16.1):
+  - RNScreens (3.4.0):
     - React-Core
+    - React-RCTImage
   - RNSearchBar (3.5.1):
     - React-Core
   - RNStoreReview (0.1.5):
@@ -545,7 +546,7 @@ SPEC CHECKSUMS:
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad
-  RNScreens: 45c457af3d2ee9e08fc01e70da87e653d46b1198
+  RNScreens: 21b73c94c9117e1110a79ee0ee80c93ccefed8ce
   RNSearchBar: 5ed8e13ba8a6c701fbd2afdfe4164493d24b2aee
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
