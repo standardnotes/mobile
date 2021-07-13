@@ -427,6 +427,8 @@ export class Compose extends React.Component<{}, State> {
       !this.note?.prefersPlainEditor &&
       !this.state.webViewError;
 
+    const isTemplateNote = this.editor?.isTemplateNote || false;
+
     return (
       <Container>
         <ThemeContext.Consumer>
@@ -520,7 +522,7 @@ export class Compose extends React.Component<{}, State> {
                           <StyledTextView
                             testID="noteContentField"
                             ref={this.editorViewRef}
-                            autoFocus={false}
+                            autoFocus={isTemplateNote}
                             value={this.state.text}
                             selectionColor={lighten(
                               theme.stylekitInfoColor,
@@ -537,7 +539,7 @@ export class Compose extends React.Component<{}, State> {
                         <StyledTextView
                           testID="noteContentField"
                           ref={this.editorViewRef}
-                          autoFocus={false}
+                          autoFocus={isTemplateNote}
                           multiline
                           value={this.state.text}
                           keyboardDismissMode={'interactive'}
