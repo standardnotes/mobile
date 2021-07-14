@@ -75,7 +75,7 @@ export const NoteHistoryPreview = ({
       if (!asCopy) {
         if (originalNote.locked) {
           application?.alertService.alert(
-            "This note has editing disabled. If you'd like to restore a previous version of it, enable editing on it, and try again."
+            "This note has editing disabled. If you'd like to restore it to a previous revision, enable editing and try again."
           );
           return;
         }
