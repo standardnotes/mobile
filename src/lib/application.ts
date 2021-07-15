@@ -60,10 +60,7 @@ export class MobileApplication extends SNApplication {
       ],
       VersionInfo.bundleIdentifier?.includes('dev')
         ? 'https://api-dev.standardnotes.com/'
-        : 'https://api.standardnotes.com',
-      VersionInfo.bundleIdentifier?.includes('dev')
-        ? 'wss://sockets-dev.standardnotes.com/'
-        : 'wss://sockets.standardnotes.com'
+        : 'https://api.standardnotes.com'
     );
     this.Uuid = Math.random().toString();
     this.editorGroup = new EditorGroup(this);
