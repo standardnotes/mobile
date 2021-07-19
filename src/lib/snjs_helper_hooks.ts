@@ -431,14 +431,6 @@ export const useChangeNoteChecks = (
 
     if (editor && editor.isTemplateNote) {
       await editor.insertTemplatedNote();
-      if (application?.getAppState().selectedTag?.isSmartTag === false) {
-        await application?.changeItem(
-          application?.getAppState().selectedTag!.uuid,
-          mutator => {
-            mutator.addItemAsRelationship(note);
-          }
-        );
-      }
     }
 
     if (!application?.findItem(note.uuid)) {

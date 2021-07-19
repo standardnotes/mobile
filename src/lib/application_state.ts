@@ -280,12 +280,21 @@ export class ApplicationState extends ApplicationService {
    * editor's note with an empty one.
    */
   async createEditor(title?: string) {
+    const selectedTagUuid = this.selectedTag
+      ? this.selectedTag.isSmartTag
+        ? undefined
+        : this.selectedTag.uuid
+      : undefined;
     let activeEditor = this.getActiveEditor();
     if (!activeEditor || this.multiEditorEnabled) {
-      await this.application.editorGroup.createEditor(undefined, title);
+      await this.application.editorGroup.createEditor(
+        undefined,
+        title,
+        selectedTagUuid
+      );
       activeEditor = this.getActiveEditor();
     } else {
-      await activeEditor.reset(title);
+      await activeEditor.reset(title, selectedTagUuid);
     }
     const defaultEditor = this.application.componentManager.getDefaultEditor();
     if (defaultEditor) {
