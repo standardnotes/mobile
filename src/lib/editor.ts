@@ -3,6 +3,8 @@ import {
   PayloadSource,
   removeFromArray,
   SNNote,
+  TagMutator,
+  UuidString,
 } from '@standardnotes/snjs';
 import { MobileApplication } from './application';
 
@@ -21,11 +23,11 @@ export class Editor {
 
   constructor(private application: MobileApplication) {}
 
-  async init(noteUuid?: string, noteTitle?: string) {
+  async init(noteUuid?: string, noteTitle?: string, noteTagUuid?: UuidString) {
     if (noteUuid) {
       this.note = this.application?.findItem(noteUuid) as SNNote;
     } else {
-      await this.reset(noteTitle);
+      await this.reset(noteTitle, noteTagUuid);
     }
 
     this.removeStreamObserver = this.application?.streamItems(
@@ -67,13 +69,17 @@ export class Editor {
    * Reverts the editor to a blank state, removing any existing note from view,
    * and creating a placeholder note.
    */
-  async reset(noteTitle?: string) {
+  async reset(noteTitle?: string, noteTagUuid?: UuidString) {
     const note = await this.application?.createTemplateItem(ContentType.Note, {
       text: '',
       title: noteTitle || '',
       references: [],
     });
-
+    if (noteTagUuid) {
+      await this.application.changeItem<TagMutator>(noteTagUuid, m => {
+        m.addItemAsRelationship(note);
+      });
+    }
     this.setNote(note as SNNote, true);
   }
 
