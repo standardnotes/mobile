@@ -7,7 +7,7 @@ platform :ios do
       team_id: ENV["APPLE_TEAM_ID"],
       keychain_name: "snkeychain",
       keychain_password: ENV["MATCH_PASSWORD"],
-      readonly: false,
+      readonly: is_ci,
       type: type
     )
   end
