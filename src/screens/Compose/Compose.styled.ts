@@ -90,14 +90,14 @@ export const StyledKeyboardAvoidngView = styled.KeyboardAvoidingView`
   ${({ theme }) => theme.stylekitBackgroundColor};
 `;
 
-const StyledTextViewComponent = styled(SNTextView)`
+const StyledTextViewComponent = styled(SNTextView)<{ errorState: boolean }>`
   padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   padding-left: ${({ theme }) =>
     theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   padding-right: ${({ theme }) =>
     theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
-  /* padding-bottom: 10px; */
+  padding-bottom: ${({ errorState }) => (errorState ? 26 : 0)}px;
   ${Platform.OS === 'ios' &&
   css`
     height: 96%;
