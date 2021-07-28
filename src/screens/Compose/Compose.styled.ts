@@ -97,7 +97,7 @@ const StyledTextViewComponent = styled(SNTextView)<{ errorState: boolean }>`
     theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   padding-right: ${({ theme }) =>
     theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
-  padding-bottom: ${({ errorState }) => (errorState ? 26 : 0)}px;
+  padding-bottom: ${({ errorState }) => (errorState ? 36 : 10)}px;
   ${Platform.OS === 'ios' &&
   css`
     height: 96%;

@@ -520,7 +520,7 @@ export class Compose extends React.Component<{}, State> {
                             )}
                             handlesColor={theme.stylekitInfoColor}
                             onChangeText={this.onContentChange}
-                            errorState={this.state.webViewError}
+                            errorState={false}
                           />
                         </TextContainer>
                       )}
