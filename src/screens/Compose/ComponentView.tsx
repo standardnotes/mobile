@@ -31,6 +31,9 @@ import {
 } from 'react-native-webview/lib/WebViewTypes';
 import { unzip } from 'react-native-zip-archive';
 import {
+  DeprecatedContainer,
+  DeprecatedIcon,
+  DeprecatedText,
   FlexContainer,
   LockedContainer,
   LockedText,
@@ -377,6 +380,9 @@ export const ComponentView = ({
     })()`;
   };
 
+  const deprecationMessage =
+    liveComponent?.item.package_info.deprecation_message;
+
   return (
     <FlexContainer>
       {liveComponent?.item.valid_until &&
@@ -389,6 +395,14 @@ export const ComponentView = ({
             </LockedText>
           </LockedContainer>
         )}
+      {liveComponent?.item.isDeprecated && (
+        <DeprecatedContainer>
+          <DeprecatedIcon />
+          <DeprecatedText>
+            {deprecationMessage || 'This extension is deprecated.'}
+          </DeprecatedText>
+        </DeprecatedContainer>
+      )}
       {(Boolean(url) || Boolean(offlineUrl)) && (
         <StyledWebview
           allowFileAccess

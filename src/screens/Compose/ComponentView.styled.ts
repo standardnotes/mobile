@@ -1,4 +1,4 @@
-import { ICON_LOCK } from '@Style/icons';
+import { ICON_LOCK, ICON_ALERT } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -44,4 +44,27 @@ export const StyledIcon = styled(Icon).attrs(({ theme }) => ({
   color: theme.stylekitBackgroundColor,
   size: 16,
   name: ThemeService.nameForIcon(ICON_LOCK),
+}))``;
+
+export const DeprecatedContainer = styled.View`
+  justify-content: flex-start;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  background-color: ${({ theme }) => theme.stylekitWarningColor};
+  border-bottom-color: ${({ theme }) => theme.stylekitBorderColor};
+  border-bottom-width: 1px;
+`;
+
+export const DeprecatedText = styled.Text`
+  font-weight: bold;
+  font-size: 12px;
+  color: ${({ theme }) => theme.stylekitBackgroundColor};
+  padding-left: 10px;
+`;
+
+export const DeprecatedIcon = styled(Icon).attrs(({ theme }) => ({
+  color: theme.stylekitBackgroundColor,
+  size: 16,
+  name: ThemeService.nameForIcon(ICON_ALERT),
 }))``;

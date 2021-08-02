@@ -4,14 +4,14 @@
 
 [![Latest release version](https://img.shields.io/github/v/release/standardnotes/mobile)](https://github.com/standardnotes/mobile/releases)
 [![License](https://img.shields.io/github/license/standardnotes/mobile?color=blue)](https://github.com/standardnotes/mobile/blob/master/LICENSE)
-[![Slack](https://img.shields.io/badge/slack-standardnotes-CC2B5E.svg?style=flat&logo=slack)](https://standardnotes.org/slack)
+[![Slack](https://img.shields.io/badge/slack-standardnotes-CC2B5E.svg?style=flat&logo=slack)](https://standardnotes.com/slack)
 [![Twitter Follow](https://img.shields.io/badge/follow-%40standardnotes-blue.svg?style=flat&logo=twitter)](https://twitter.com/standardnotes)
 
 </div>
 
 ## iOS & Android App
 
-[Standard Notes](https://standardnotes.org) is a safe place for your notes, thoughts, and life's work. It focuses on being simple, so you don't have to fight with endless features that slow you down. It encrypts your notes to protect your privacy. And, it's extensible, so you can backup your notes to Dropbox, Google Drive, and other services, as well as install themes, editors, and more.
+[Standard Notes](https://standardnotes.com) is a safe place for your notes, thoughts, and life's work. It focuses on being simple, so you don't have to fight with endless features that slow you down. It encrypts your notes to protect your privacy. And, it's extensible, so you can backup your notes to Dropbox, Google Drive, and other services, as well as install themes, editors, and more.
 
 ### Download Options:
 
@@ -30,15 +30,17 @@ This is a React Native implementation of Standard Notes. React Native allows us 
 3. Install [yarn](https://yarnpkg.com/) if you haven't already.
 4. Install project dependencies via:
 
-  ```shell
-  yarn run init
-  ```
+```shell
+yarn run init
+```
 
 We have two flavors of the app:
-* `dev` which runs connects to development syncing server. To run locally use `yarn ios-dev` or `yarn android-dev` for Android.
-* `prod` which is the equivalent of our production application. To run local use `yarn ios-prod` or `yarn android-prod` for Android.
+
+- `dev` which runs connects to development syncing server. To run locally use `yarn ios-dev` or `yarn android-dev` for Android.
+- `prod` which is the equivalent of our production application. To run local use `yarn ios-prod` or `yarn android-prod` for Android.
 
 If you would like to run the application on your iOS device, you'll need to do so using Xcode.
 
 ## Contributing
-Before contributing, please read our [Longevity Statement](https://standardnotes.org/longevity) to better understand how we approach adding new features. Unlike other projects, adding new features is something we prefer *not* to do, so if you have a feature which you think is absolutely essential, please create a discussion issue first before coding.
+
+Before contributing, please read our [Longevity Statement](https://standardnotes.com/longevity) to better understand how we approach adding new features. Unlike other projects, adding new features is something we prefer _not_ to do, so if you have a feature which you think is absolutely essential, please create a discussion issue first before coding.

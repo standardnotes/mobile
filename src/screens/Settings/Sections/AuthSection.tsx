@@ -50,7 +50,7 @@ export const AuthSection = (props: Props) => {
   const updateServer = useCallback(
     async (host: string) => {
       setServer(host);
-      await application?.setHost(host);
+      await application?.setCustomHost(host);
     },
     [application]
   );
