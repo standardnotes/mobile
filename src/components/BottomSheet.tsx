@@ -391,7 +391,7 @@ export const BottomSheet: React.FC<Props> = ({
     const duration = 200;
     const useNativeDriver = false;
 
-    if (expandedSectionKey) {
+    if (expandedSectionKey === sectionKey) {
       Animated.timing(animationValue, {
         toValue: 0,
         duration,
