@@ -23,8 +23,9 @@ import { ThemeContext } from 'styled-components';
 import { ComponentView } from './ComponentView';
 import {
   Container,
-  LoadingText,
   LoadingWebViewContainer,
+  LoadingWebViewSubtitle,
+  LoadingWebViewText,
   LockedContainer,
   LockedText,
   NoteTitleInput,
@@ -46,7 +47,6 @@ type State = {
   editorComponent: SNComponent | undefined;
   webViewError: boolean;
   loadingWebview: boolean;
-  downloadingEditor: boolean;
 };
 
 export class Compose extends React.Component<{}, State> {
@@ -56,7 +56,6 @@ export class Compose extends React.Component<{}, State> {
   saveTimeout: number | undefined;
   alreadySaved: boolean = false;
   statusTimeout: number | undefined;
-  downloadingMessageTimeout: number | undefined;
   removeEditorObserver?: () => void;
   removeEditorNoteValueChangeObserver?: () => void;
   removeComponentsObserver?: () => void;
@@ -81,7 +80,6 @@ export class Compose extends React.Component<{}, State> {
       saveError: false,
       webViewError: false,
       loadingWebview: false,
-      downloadingEditor: false,
     };
   }
 
@@ -183,18 +181,11 @@ export class Compose extends React.Component<{}, State> {
         identifier: 'component-view-' + Math.random(),
         areas: [ComponentArea.Editor],
         actionHandler: (currentComponent, action, data) => {
-          switch (action) {
-            case ComponentAction.SetSize:
-              this.context?.componentManager!.handleSetSizeEvent(
-                currentComponent,
-                data
-              );
-              break;
-            case ComponentAction.ThemesActivated:
-              this.setState({
-                loadingWebview: false,
-              });
-              break;
+          if (action === ComponentAction.SetSize) {
+            this.context?.componentManager!.handleSetSizeEvent(
+              currentComponent,
+              data
+            );
           }
         },
         contextRequestHandler: () => this.note,
@@ -253,9 +244,6 @@ export class Compose extends React.Component<{}, State> {
     }
     if (this.statusTimeout) {
       clearTimeout(this.statusTimeout);
-    }
-    if (this.downloadingMessageTimeout) {
-      clearTimeout(this.downloadingMessageTimeout);
     }
   }
 
@@ -324,11 +312,6 @@ export class Compose extends React.Component<{}, State> {
   };
 
   reloadComponentEditorState = async () => {
-    this.setState({
-      loadingWebview: false,
-      webViewError: false,
-    });
-
     const associatedEditor = this.context?.componentManager!.editorForNote(
       this.note!
     );
@@ -370,14 +353,6 @@ export class Compose extends React.Component<{}, State> {
     }
     if (editor?.isTemplateNote) {
       await editor?.insertTemplatedNote();
-      if (this.context?.getAppState().selectedTag?.isSmartTag === false) {
-        await this.context.changeItem(
-          this.context?.getAppState().selectedTag!.uuid,
-          mutator => {
-            mutator.addItemAsRelationship(note!);
-          }
-        );
-      }
     }
     if (!this.context?.findItem(note!.uuid)) {
       this.context?.alertService!.alert(
@@ -430,30 +405,11 @@ export class Compose extends React.Component<{}, State> {
   onContentChange = (text: string) => {
     if (Platform.OS === 'android' && this.note?.locked) {
       this.context?.alertService?.alert(
-        'This note is locked. Please unlock this note to make changes.'
+        'This note has editing disabled. Please enable editing on this note to make changes.'
       );
       return;
     }
     this.saveNote(false, true, false, false, text);
-  };
-
-  onDownloadEditorStart = () =>
-    this.setState({
-      downloadingEditor: true,
-    });
-
-  onDownloadEditorEnd = () => {
-    if (this.downloadingMessageTimeout) {
-      clearTimeout(this.downloadingMessageTimeout);
-    }
-
-    this.downloadingMessageTimeout = setTimeout(
-      () =>
-        this.setState({
-          downloadingEditor: false,
-        }),
-      200
-    );
   };
 
   render() {
@@ -516,15 +472,12 @@ export class Compose extends React.Component<{}, State> {
                       autoCapitalize={'sentences'}
                       editable={!this.noteLocked}
                     />
-                    {(this.state.downloadingEditor ||
-                      this.state.loadingWebview) && (
+                    {this.state.loadingWebview && (
                       <LoadingWebViewContainer locked={this.noteLocked}>
-                        <LoadingText>
-                          {this.state.downloadingEditor
-                            ? 'Downloading '
-                            : 'Loading '}
-                          {this.state.editorComponent?.name}...
-                        </LoadingText>
+                        <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
+                        <LoadingWebViewSubtitle>
+                          {this.state.editorComponent?.name}
+                        </LoadingWebViewSubtitle>
                       </LoadingWebViewContainer>
                     )}
                     {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
@@ -550,9 +503,6 @@ export class Compose extends React.Component<{}, State> {
                             webViewError: true,
                           });
                         }}
-                        onDownloadEditorStart={this.onDownloadEditorStart}
-                        onDownloadEditorEnd={this.onDownloadEditorEnd}
-                        offlineOnly={this.state.editorComponent?.offlineOnly}
                       />
                     )}
                     {!shouldDisplayEditor &&
@@ -570,6 +520,7 @@ export class Compose extends React.Component<{}, State> {
                             )}
                             handlesColor={theme.stylekitInfoColor}
                             onChangeText={this.onContentChange}
+                            errorState={false}
                           />
                         </TextContainer>
                       )}
@@ -587,6 +538,7 @@ export class Compose extends React.Component<{}, State> {
                           selectionColor={lighten(theme.stylekitInfoColor)}
                           onChangeText={this.onContentChange}
                           editable={!this.noteLocked}
+                          errorState={this.state.webViewError}
                         />
                       </View>
                     )}

@@ -1,4 +1,4 @@
-import { removeFromArray } from '@standardnotes/snjs';
+import { removeFromArray, UuidString } from '@standardnotes/snjs';
 import { MobileApplication } from './application';
 import { Editor } from './editor';
 
@@ -20,10 +20,14 @@ export class EditorGroup {
     }
   }
 
-  async createEditor(noteUuid?: string, noteTitle?: string) {
+  async createEditor(
+    noteUuid?: string,
+    noteTitle?: string,
+    noteTagUuid?: UuidString
+  ) {
     if (this.application) {
       const editor = new Editor(this.application);
-      await editor.init(noteUuid, noteTitle);
+      await editor.init(noteUuid, noteTitle, noteTagUuid);
       this.editors.push(editor);
       this.notifyObservers();
     }

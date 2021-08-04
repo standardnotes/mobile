@@ -49,7 +49,7 @@ export const NoteCellFlags = ({
 
   if (note.locked) {
     flags.push({
-      text: 'Editing disabled',
+      text: 'Editing Disabled',
       color: theme.stylekitNeutralColor,
     });
   }

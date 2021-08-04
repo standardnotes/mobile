@@ -244,8 +244,8 @@ export const useSyncStatus = () => {
             setRefreshing(false);
           } else {
             setCompletedInitialSync(true);
-            setLoading(false);
           }
+          setLoading(false);
           updateSyncStatus();
         } else if (eventName === ApplicationEvent.LocalDatabaseReadError) {
           application!.alertService!.alert(
@@ -336,7 +336,7 @@ export const useDeleteNoteWithPrivileges = (
     async (permanently: boolean) => {
       if (note?.locked) {
         application?.alertService.alert(
-          "This note is locked. If you'd like to delete it, unlock it, and try again."
+          "This note has editing disabled. If you'd like to delete it, enable editing on it, and try again."
         );
         return;
       }
@@ -434,14 +434,6 @@ export const useChangeNoteChecks = (
 
     if (editor && editor.isTemplateNote) {
       await editor.insertTemplatedNote();
-      if (application?.getAppState().selectedTag?.isSmartTag === false) {
-        await application?.changeItem(
-          application?.getAppState().selectedTag!.uuid,
-          mutator => {
-            mutator.addItemAsRelationship(note);
-          }
-        );
-      }
     }
 
     if (!application?.findItem(note.uuid)) {

@@ -40,11 +40,10 @@ export const NoteHistoryPreview = ({
 
   const restore = useCallback(
     async (asCopy: boolean) => {
+      const originalNote = application?.findItem(originalNoteUuid) as SNNote;
+
       const run = async () => {
         if (asCopy) {
-          const originalNote = application?.findItem(
-            originalNoteUuid
-          ) as SNNote;
           await application?.duplicateItem(originalNote!, {
             ...revision.payload.safeContent,
             title: revision.payload.safeContent.title
@@ -74,6 +73,12 @@ export const NoteHistoryPreview = ({
       };
 
       if (!asCopy) {
+        if (originalNote.locked) {
+          application?.alertService.alert(
+            "This note has editing disabled. If you'd like to restore it to a previous revision, enable editing and try again."
+          );
+          return;
+        }
         const confirmed = await application?.alertService?.confirm(
           "Are you sure you want to replace the current note's contents with what you see in this preview?",
           'Restore note',

@@ -224,7 +224,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
       if (note?.locked) {
         application?.alertService.alert(
-          "This note is locked. If you'd like to edit its options, unlock it, and try again."
+          "This note has editing disabled. If you'd like to edit its options, enable editing on it, and try again."
         );
         return;
       }
@@ -383,7 +383,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         },
         onSelect: () => {
           application?.deviceInterface?.openUrl(
-            'https://standardnotes.org/extensions'
+            'https://standardnotes.com/extensions'
           );
         },
       });
@@ -525,7 +525,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           },
         },
         {
-          text: 'Delete Permanently',
+          text: 'Delete permanently',
           textClass: 'danger' as 'danger',
           key: 'delete-forever',
           onSelect: () => deleteNote(true),

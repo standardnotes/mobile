@@ -3,6 +3,7 @@ package com.standardnotes;
 import android.app.Application;
 import android.app.Activity;
 import android.content.Context;
+import android.webkit.WebView;
 
 import com.bugsnag.android.BreadcrumbType;
 import com.bugsnag.android.Configuration;
@@ -65,6 +66,12 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
 
+    // Enable Remote debugging for WebViews
+    String packageName = getApplicationContext().getPackageName();
+    if (packageName.equals("com.standardnotes.dev")) {
+      WebView.setWebContentsDebuggingEnabled(true);
+    }
+
     rebuildOkHtttp();
 
     Configuration config = Configuration.load(this);
@@ -79,7 +86,7 @@ public class MainApplication extends Application implements ReactApplication {
     }});
 
     SharedPreferences settings = getApplicationContext().getSharedPreferences("react-native", Context.MODE_PRIVATE);
-    String bugsnagOptOut = settings.getString("bugsnagoptout", "false");
+    String bugsnagOptOut = settings.getString("bugsnagoptout", "true");
 
     if (!bugsnagOptOut.equals("true")) {
       Bugsnag.start(this, config);

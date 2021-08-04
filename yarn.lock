@@ -1725,22 +1725,22 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@standardnotes/auth@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-2.0.0.tgz#93f633fd40855f87843f911109e92b29dcbc5a04"
-  integrity sha512-B2NznCm3pzwBvBU/YQfuDrtlEbLO3hNH3QrqSwK2dFwUGAnl5UQPC9FKFWYgly05rWevwMY3IUmiZRzUEVlKsQ==
+"@standardnotes/auth@3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.1.1.tgz#834701c2e14d31eb204bff90457fa05e9183464a"
+  integrity sha512-E9zDYZ1gJkVZBEzd7a1L2haQ4GYeH1lUrY87UmDH1AMYUHW+c0SqZ71af1fBNqGzrx3EZSXk+Qzr7RyOa6N1Mw==
 
 "@standardnotes/sncrypto-common@1.2.9", "@standardnotes/sncrypto-common@^1.2.9":
   version "1.2.9"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.2.9.tgz#5212a959e4ec563584e42480bfd39ef129c3cbdf"
   integrity sha512-xJ5IUGOZztjSgNP/6XL+Ut5+q9UgSTv6xMtKkcQC5aJxCOkJy9u6RamPLdF00WQgwibxx2tu0e43bKUjTgzMig==
 
-"@standardnotes/snjs@2.0.76":
-  version "2.0.76"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.0.76.tgz#69b007b83ef6dc8261a4368750e75db7ccbb3456"
-  integrity sha512-JY0PldVN7zHfN42JNd77jqqwDAaalwiWKg9Odib13ag3X/Vm8OWzyRMPa/4ggMWdwGV8dvraw9IxIYTU0VT+TA==
+"@standardnotes/snjs@2.7.21":
+  version "2.7.21"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.7.21.tgz#db451e5facaf5fa41fa509eb1f304723929c3541"
+  integrity sha512-GhkGk1LJmD494COZkSOgyHaUnGnLWNLlSuCZMTwbw3dgkN5PjobbRhfDvEZaLqjwok+h9nkiQt3hugQ3h6Cy5w==
   dependencies:
-    "@standardnotes/auth" "^2.0.0"
+    "@standardnotes/auth" "3.1.1"
     "@standardnotes/sncrypto-common" "^1.2.9"
 
 "@svgr/babel-plugin-add-jsx-attribute@^4.2.0":
@@ -7310,6 +7310,11 @@ react-native-default-preference@^1.4.3:
   resolved "https://registry.yarnpkg.com/react-native-default-preference/-/react-native-default-preference-1.4.3.tgz#3c6411d32ea4ebc5286fbf5915546fc57a6014f6"
   integrity sha512-sQDYwGEdxwKwXKP/8Intc81FyH33Rv8ZvOxdmPX4NM75RAIVeBc13pdabEqycAimNZoY5IDvGp4o1cTTa5gNrA==
 
+react-native-document-picker@^5.0.4:
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/react-native-document-picker/-/react-native-document-picker-5.0.4.tgz#86a874e093284b21896581985b8b6e13e04a4251"
+  integrity sha512-PN3NYZFgz6McbcfH5Cu3yf3nE4UBAiJYdL26F5cjypOoCFhdfLz0NM13V/tVOLGhWZXNUmI3g4dhPQBthq+pJg==
+
 react-native-fab@standardnotes/react-native-fab#cb60e00:
   version "1.0.8"
   resolved "https://codeload.github.com/standardnotes/react-native-fab/tar.gz/cb60e0067bbd938df5e85838760d8ff87f0cddda"
@@ -7358,9 +7363,9 @@ react-native-keychain@^4.0.5:
   resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-4.0.5.tgz#6d3aef8f2789fc0dfa8149b8400d82ff77be361a"
   integrity sha512-TbiO8AO055EPjaxIuKxrCEOB4r81uQCVDFbtcs+e4pEOHxf6z3JgDC0UU0poJElKfCh37b+TFRxQhg6DbsYJBA==
 
-react-native-mail@standardnotes/react-native-mail#f7f74be:
+react-native-mail@standardnotes/react-native-mail#fd26119e67a2ffc5eaa95a9c17049743e39ce2d3:
   version "4.1.0"
-  resolved "https://codeload.github.com/standardnotes/react-native-mail/tar.gz/f7f74be22edef77bef6901ca2e2cd4eddc15bbc0"
+  resolved "https://codeload.github.com/standardnotes/react-native-mail/tar.gz/fd26119e67a2ffc5eaa95a9c17049743e39ce2d3"
 
 react-native-privacy-snapshot@standardnotes/react-native-privacy-snapshot#653e904:
   version "1.0.0"
@@ -7387,10 +7392,12 @@ react-native-safe-area-context@^3.1.9:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.1.9.tgz#48864ea976b0fa57142a2cc523e1fd3314e7247e"
   integrity sha512-wmcGbdyE/vBSL5IjDPReoJUEqxkZsywZw5gPwsVUV1NBpw5eTIdnL6Y0uNKHE25Z661moxPHQz6kwAkYQyorxA==
 
-react-native-screens@^2.16.1:
-  version "2.16.1"
-  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.16.1.tgz#b105a127378d90018a46daf0c2f6518fca60c06f"
-  integrity sha512-WZ7m0sBDVaHbBnlHxwQnUlI6KNfQKHq+Unfw+VBuAlnSXvT+aw6Bb/K2bUlHzBgvrPjwY3Spc7ZERFuTwRLLwg==
+react-native-screens@3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-3.4.0.tgz#91deeac7630db9f3984053e2ab146d71bba7af4e"
+  integrity sha512-cg+q9MRnVdeOcJyvJtqffoXLur/C2wHA/7IO2+FAipzTlgHbbM1mTuSM7qG+SeiQjoIs4mHOEf7A0ziPKW04sA==
+  dependencies:
+    warn-once "^0.1.0"
 
 react-native-search-bar@standardnotes/react-native-search-bar#7d2139d:
   version "3.5.1"
@@ -7462,11 +7469,6 @@ react-native-webview@^11.0.3:
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
-
-react-native-zip-archive@^6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/react-native-zip-archive/-/react-native-zip-archive-6.0.2.tgz#3594a3072f229c6e99b2121ab955b74ba422850d"
-  integrity sha512-TQVmUvbpVV2WryGaZs6HIzIYaGU55Sz3FmZA4ayqEhJDvkGQxlElXzanIIXsHWcOybrb+9572X0trLNbXIYrRQ==
 
 react-native@0.64.1:
   version "0.64.1"
@@ -9108,6 +9110,11 @@ walker@^1.0.7, walker@~1.0.5:
   integrity sha1-L3+bj9ENZ3JisYqITijRlhjgKPs=
   dependencies:
     makeerror "1.0.x"
+
+warn-once@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/warn-once/-/warn-once-0.1.0.tgz#4f58d89b84f968d0389176aa99e0cf0f14ffd4c8"
+  integrity sha512-recZTSvuaH/On5ZU5ywq66y99lImWqzP93+AiUo9LUwG8gXHW+LJjhOd6REJHm7qb0niYqrEQJvbHSQfuJtTqA==
 
 wcwidth@^1.0.1:
   version "1.0.1"

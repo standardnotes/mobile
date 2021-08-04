@@ -105,10 +105,10 @@ export const Notes = React.memo(
         )
     );
     const [includeArchivedNotes, setIncludeArchivedNotes] = useState<boolean>(
-      true
+      false
     );
     const [includeTrashedNotes, setIncludeTrashedNotes] = useState<boolean>(
-      true
+      false
     );
     const [
       includeProtectedStarted,

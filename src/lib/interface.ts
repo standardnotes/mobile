@@ -289,9 +289,16 @@ export class MobileDeviceInterface extends DeviceInterface {
 
   async getBugsnagOptedOut() {
     try {
-      return (await DefaultPreference.get(BUGSNAG_OPT_OUT_KEY)) === 'true';
+      /**
+       * Checking the absense of the 'bugsnagoptout' preference.
+       * If the value is absent, then error reporting is opt-in by default.
+       */
+      const bugsnagOptedOut =
+        (await DefaultPreference.get(BUGSNAG_OPT_OUT_KEY)) ?? 'true';
+
+      return bugsnagOptedOut === 'true';
     } catch {
-      return false;
+      return true;
     }
   }
 

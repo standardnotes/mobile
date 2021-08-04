@@ -5,7 +5,7 @@ import {
   Platform,
 } from '@standardnotes/snjs';
 import { Base64 } from 'js-base64';
-import { Alert, Share } from 'react-native';
+import { Alert, PermissionsAndroid, Share } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 import Mailer from 'react-native-mail';
@@ -44,8 +44,7 @@ export class BackupsService extends ApplicationService {
             filename
           );
         } else if (result === 'save') {
-          let filepath = await this._exportAndroid(filename, stringifiedData);
-          return this._showFileSavePromptAndroid(filepath);
+          await this._exportAndroid(filename, stringifiedData);
         } else {
           return;
         }
@@ -92,10 +91,22 @@ export class BackupsService extends ApplicationService {
   }
 
   private async _exportAndroid(filename: string, data: string) {
-    const filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
-    return RNFS.writeFile(filepath, data).then(() => {
-      return filepath;
-    });
+    try {
+      let filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        filepath = `${RNFS.DownloadDirectoryPath}/${filename}`;
+      }
+      await RNFS.writeFile(filepath, data);
+      this._showFileSavePromptAndroid(filepath);
+    } catch (err) {
+      console.error('Error exporting backup', err);
+      this.application.alertService.alert(
+        'There was an issue exporting your backup.'
+      );
+    }
   }
 
   private async _openFileAndroid(filepath: string) {
@@ -105,7 +116,7 @@ export class BackupsService extends ApplicationService {
         return true;
       })
       .catch(error => {
-        console.log('Error opening file', error);
+        console.error('Error opening file', error);
         return false;
       });
   }

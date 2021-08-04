@@ -5,11 +5,9 @@ import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
 import {
   ButtonType,
-  ComponentMutator,
+  ComponentArea,
   LiveItem,
-  SNApplication,
   SNComponent,
-  SNLog,
   SNNote,
 } from '@standardnotes/snjs';
 import React, {
@@ -20,14 +18,15 @@ import React, {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
-import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
-import { unzip } from 'react-native-zip-archive';
 import {
+  DeprecatedContainer,
+  DeprecatedIcon,
+  DeprecatedText,
   FlexContainer,
   LockedContainer,
   LockedText,
@@ -41,46 +40,13 @@ type Props = {
   onLoadEnd: () => void;
   onLoadStart: () => void;
   onLoadError: () => void;
-  onDownloadEditorStart: () => void;
-  onDownloadEditorEnd: () => void;
-  offlineOnly?: boolean;
 };
-
-async function checkForComponentUpdate(
-  application: SNApplication,
-  component: SNComponent
-) {
-  const { latest_url: latestUrl } = component.package_info;
-  if (!latestUrl) {
-    return;
-  }
-  try {
-    const packageInfo = await fetch(latestUrl).then(r => r.json());
-    if (
-      packageInfo &&
-      packageInfo.version !== component.package_info.version &&
-      application.isStarted()
-    ) {
-      application.changeAndSaveItem<ComponentMutator>(
-        component.uuid,
-        mutator => {
-          mutator.package_info = packageInfo;
-        }
-      );
-    }
-  } catch (error) {
-    SNLog.error(error);
-  }
-}
 
 export const ComponentView = ({
   onLoadEnd,
   onLoadError,
   onLoadStart,
-  onDownloadEditorStart,
-  onDownloadEditorEnd,
   componentUuid,
-  offlineOnly,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -91,12 +57,6 @@ export const ComponentView = ({
   >(() => new LiveItem(componentUuid, application!));
   const [url, setUrl] = useState('');
   const [showWebView, setShowWebView] = useState<boolean>(true);
-  const [offlineUrl, setOfflineUrl] = useState('');
-  const [readAccessUrl, setReadAccessUrl] = useState('');
-  const [
-    downloadingOfflineEditor,
-    setDownloadingOfflineEditor,
-  ] = useState<boolean>(false);
 
   // Ref
   const webViewRef = useRef<WebView>(null);
@@ -112,7 +72,7 @@ export const ComponentView = ({
     });
 
     return removeBlurScreenListener;
-  }, [navigation]);
+  });
 
   useFocusEffect(() => {
     setShowWebView(true);
@@ -153,86 +113,10 @@ export const ComponentView = ({
     }
   }, [application]);
 
-  const getOfflineEditorUrl = useCallback(async () => {
-    if (!liveComponent) {
-      return undefined;
-    }
-
-    const {
-      identifier: editorIdentifier,
-      version: editorVersion,
-      download_url: downloadUrl,
-    } = liveComponent.item.package_info;
-    const downloadPath = `${DocumentDirectoryPath}/${editorIdentifier}.zip`;
-    const editorDir = `${DocumentDirectoryPath}/editors/${editorIdentifier}`;
-    const versionDir = `${editorDir}/${editorVersion}`;
-
-    setReadAccessUrl(versionDir);
-
-    const shouldDownload =
-      !downloadingOfflineEditor &&
-      (!(await RNFS.exists(versionDir)) ||
-        (await RNFS.readDir(versionDir)).length === 0);
-
-    if (application) {
-      checkForComponentUpdate(application, liveComponent.item);
-    }
-
-    if (shouldDownload) {
-      setDownloadingOfflineEditor(true);
-      onDownloadEditorStart();
-      try {
-        // Delete any previous versions downloads
-        if (await RNFS.exists(editorDir)) {
-          await RNFS.unlink(editorDir);
-        }
-        await RNFS.downloadFile({
-          fromUrl: downloadUrl,
-          toFile: downloadPath,
-        }).promise;
-        await unzip(downloadPath, versionDir);
-        // Delete zip after extraction
-        await RNFS.unlink(downloadPath);
-      } finally {
-        onDownloadEditorEnd();
-        setDownloadingOfflineEditor(false);
-      }
-    }
-
-    const packageDir = await RNFS.readDir(versionDir);
-    const packageJsonPath = `${packageDir[0].path}/package.json`;
-    const packageJson = JSON.parse(await RNFS.readFile(packageJsonPath));
-
-    const mainFileName = packageJson?.sn?.main || 'index.html';
-
-    const mainFilePath = `${packageDir[0].path}/${mainFileName}`;
-
-    if (await RNFS.exists(mainFilePath)) {
-      return `file://${mainFilePath}`;
-    }
-
-    return '';
-  }, [
-    application,
-    downloadingOfflineEditor,
-    liveComponent,
-    onDownloadEditorStart,
-    onDownloadEditorEnd,
-  ]);
-
-  const onLoadErrorHandler = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    onLoadError();
-  }, [onLoadError, timeoutRef]);
-
   useEffect(() => {
-    let mounted = true;
-    const setEditorUrl = async () => {
+    if (liveComponent) {
       const newUrl = application!.componentManager!.urlForComponent(
-        liveComponent!.item
+        liveComponent.item
       );
       if (!newUrl) {
         application?.alertService!.alert(
@@ -241,46 +125,18 @@ export const ComponentView = ({
           'OK'
         );
       } else {
-        try {
-          const offlineEditorUrl = await getOfflineEditorUrl();
-
-          if (mounted && offlineEditorUrl) {
-            setOfflineUrl(offlineEditorUrl);
-          }
-        } catch (e) {
-          if (mounted) {
-            if (offlineOnly) {
-              onLoadErrorHandler();
-            } else {
-              setUrl(newUrl);
-            }
-          }
-        }
+        setUrl(newUrl);
       }
-    };
-    if (liveComponent) {
-      setEditorUrl();
     }
 
     // deinit
     return () => {
-      mounted = false;
-    };
-  }, [
-    application,
-    componentUuid,
-    getOfflineEditorUrl,
-    liveComponent,
-    offlineOnly,
-    onLoadErrorHandler,
-  ]);
-
-  useEffect(() => {
-    return () => {
-      application?.componentManager.deactivateComponent(componentUuid);
+      application?.componentGroup.deactivateComponentForArea(
+        ComponentArea.Editor
+      );
       liveComponent?.deinit();
     };
-  }, [application, componentUuid, liveComponent]);
+  }, [application, liveComponent]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
@@ -321,11 +177,18 @@ export const ComponentView = ({
      */
     setTimeout(() => {
       onLoadEnd();
-    }, 200);
+    }, 100);
   }, [application, liveComponent, onLoadEnd]);
 
   const onLoadStartHandler = () => {
     onLoadStart();
+  };
+
+  const onLoadErrorHandler = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    onLoadError();
   };
 
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
@@ -357,13 +220,12 @@ export const ComponentView = ({
       window.parent.postMessage = function(data) {
         window.parent.ReactNativeWebView.postMessage(data);
       };
-      const meta = document.createElement('meta');
-      meta.setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no');
-      meta.setAttribute('name', 'viewport');
-      document.getElementsByTagName('head')[0].appendChild(meta);
       return true;
     })()`;
   };
+
+  const deprecationMessage =
+    liveComponent?.item.package_info.deprecation_message;
 
   return (
     <FlexContainer>
@@ -377,13 +239,20 @@ export const ComponentView = ({
             </LockedText>
           </LockedContainer>
         )}
-      {(Boolean(url) || Boolean(offlineUrl)) && (
+
+      {liveComponent?.item.isDeprecated && (
+        <DeprecatedContainer>
+          <DeprecatedIcon />
+          <DeprecatedText>
+            {deprecationMessage || 'This extension is deprecated.'}
+          </DeprecatedText>
+        </DeprecatedContainer>
+      )}
+
+      {Boolean(url) && (
         <StyledWebview
-          allowFileAccess
-          allowingReadAccessToURL={readAccessUrl}
-          originWhitelist={['*']}
           showWebView={showWebView}
-          source={{ uri: offlineUrl ? offlineUrl : url }}
+          source={{ uri: url }}
           key={liveComponent?.item.uuid}
           ref={webViewRef}
           /**
@@ -398,11 +267,13 @@ export const ComponentView = ({
           hideKeyboardAccessoryView={true}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
           cacheEnabled={true}
+          scalesPageToFit={
+            true /* Android only, not available with WKWebView */
+          }
           autoManageStatusBarEnabled={
             false /* To prevent StatusBar from changing colors when focusing */
           }
           injectedJavaScript={defaultInjectedJavaScript()}
-          onContentProcessDidTerminate={onLoadErrorHandler}
         />
       )}
     </FlexContainer>
