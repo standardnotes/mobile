@@ -24,6 +24,7 @@ import RNFS, {
   DocumentDirectoryPath,
   ExternalDirectoryPath,
 } from 'react-native-fs';
+import StaticServer from 'react-native-static-server';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
@@ -51,6 +52,11 @@ type Props = {
   onDownloadEditorEnd: () => void;
   offlineOnly?: boolean;
 };
+
+const STATIC_SERVER_PORT = 8080;
+const BASE_PATH =
+  Platform.OS === 'android' ? ExternalDirectoryPath : DocumentDirectoryPath;
+const EDITORS_PATH = '/editors';
 
 async function checkForComponentUpdate(
   application: SNApplication,
@@ -98,12 +104,12 @@ export const ComponentView = ({
   const [url, setUrl] = useState('');
   const [showWebView, setShowWebView] = useState<boolean>(true);
   const [offlineUrl, setOfflineUrl] = useState('');
-  const [readAccessUrl, setReadAccessUrl] = useState('');
   const [
     downloadingOfflineEditor,
     setDownloadingOfflineEditor,
   ] = useState<boolean>(false);
   const [loadedOnce, setLoadedOnce] = useState(false);
+  const [staticServer, setStaticServer] = useState<StaticServer>();
 
   // Ref
   const webViewRef = useRef<WebView>(null);
@@ -162,6 +168,30 @@ export const ComponentView = ({
     }
   }, [application]);
 
+  const downloadEditor = useCallback(
+    async (downloadUrl, downloadPath, editorPath, versionPath) => {
+      setDownloadingOfflineEditor(true);
+      onDownloadEditorStart();
+      try {
+        // Delete any previous versions downloads
+        if (await RNFS.exists(editorPath)) {
+          await RNFS.unlink(editorPath);
+        }
+        await RNFS.downloadFile({
+          fromUrl: downloadUrl,
+          toFile: downloadPath,
+        }).promise;
+        await unzip(downloadPath, versionPath);
+        // Delete zip after extraction
+        await RNFS.unlink(downloadPath);
+      } finally {
+        onDownloadEditorEnd();
+        setDownloadingOfflineEditor(false);
+      }
+    },
+    [onDownloadEditorStart, onDownloadEditorEnd]
+  );
+
   const getOfflineEditorUrl = useCallback(async () => {
     if (!liveComponent) {
       return '';
@@ -172,63 +202,46 @@ export const ComponentView = ({
       version: editorVersion,
       download_url: downloadUrl,
     } = liveComponent.item.package_info;
-    const basePath =
-      Platform.OS === 'android' ? ExternalDirectoryPath : DocumentDirectoryPath;
-    const downloadPath = `${basePath}/${editorIdentifier}.zip`;
-    const editorDir = `${basePath}/editors/${editorIdentifier}`;
-    const versionDir = `${editorDir}/${editorVersion}`;
-
-    setReadAccessUrl(versionDir);
-
+    const downloadPath = `${BASE_PATH}/${editorIdentifier}.zip`;
+    const editorPath = `${BASE_PATH}${EDITORS_PATH}/${editorIdentifier}`;
+    const versionPath = `${editorPath}/${editorVersion}`;
     const shouldDownload =
       !downloadingOfflineEditor &&
-      (!(await RNFS.exists(versionDir)) ||
-        (await RNFS.readDir(versionDir)).length === 0);
+      (!(await RNFS.exists(versionPath)) ||
+        (await RNFS.readDir(versionPath)).length === 0);
+
+    if (shouldDownload) {
+      await downloadEditor(downloadUrl, downloadPath, editorPath, versionPath);
+    }
 
     if (application) {
       checkForComponentUpdate(application, liveComponent.item);
     }
 
-    if (shouldDownload) {
-      setDownloadingOfflineEditor(true);
-      onDownloadEditorStart();
-      try {
-        // Delete any previous versions downloads
-        if (await RNFS.exists(editorDir)) {
-          await RNFS.unlink(editorDir);
-        }
-        await RNFS.downloadFile({
-          fromUrl: downloadUrl,
-          toFile: downloadPath,
-        }).promise;
-        await unzip(downloadPath, versionDir);
-        // Delete zip after extraction
-        await RNFS.unlink(downloadPath);
-      } finally {
-        onDownloadEditorEnd();
-        setDownloadingOfflineEditor(false);
+    if (await RNFS.exists(versionPath)) {
+      const editorDir = await RNFS.readDir(versionPath);
+      const packagePath = editorDir[0].path;
+      const packageJson = JSON.parse(
+        await RNFS.readFile(`${packagePath}/package.json`)
+      );
+      const mainFileName = packageJson?.sn?.main || 'index.html';
+      const mainFilePath = `${packagePath}/${mainFileName}`;
+      const splitPackagePath = packagePath.split(EDITORS_PATH);
+      const relativePackagePath = splitPackagePath[splitPackagePath.length - 1];
+      const relativeMainFilePath = `${relativePackagePath}/${mainFileName}`;
+
+      if ((await RNFS.exists(mainFilePath)) && staticServer?.isRunning) {
+        return `${staticServer.origin}${relativeMainFilePath}`;
       }
-    }
-
-    const packageDir = await RNFS.readDir(versionDir);
-    const packageJsonPath = `${packageDir[0].path}/package.json`;
-    const packageJson = JSON.parse(await RNFS.readFile(packageJsonPath));
-
-    const mainFileName = packageJson?.sn?.main || 'index.html';
-
-    const mainFilePath = `${packageDir[0].path}/${mainFileName}`;
-
-    if (await RNFS.exists(mainFilePath)) {
-      return `file://${mainFilePath}`;
     }
 
     return '';
   }, [
     application,
+    downloadEditor,
     downloadingOfflineEditor,
     liveComponent,
-    onDownloadEditorStart,
-    onDownloadEditorEnd,
+    staticServer,
   ]);
 
   const onLoadErrorHandler = useCallback(() => {
@@ -293,6 +306,24 @@ export const ComponentView = ({
       liveComponent?.deinit();
     };
   }, [application, componentUuid, liveComponent]);
+
+  useEffect(() => {
+    const path = `${BASE_PATH}${EDITORS_PATH}`;
+    let server: StaticServer;
+
+    const startStaticServer = async () => {
+      server = new StaticServer(STATIC_SERVER_PORT, path, {
+        localOnly: true,
+      });
+      await server.start();
+      setStaticServer(server);
+    };
+    startStaticServer();
+
+    return () => {
+      server?.stop();
+    };
+  }, []);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
@@ -405,9 +436,6 @@ export const ComponentView = ({
       )}
       {(Boolean(url) || Boolean(offlineUrl)) && (
         <StyledWebview
-          allowFileAccess
-          allowingReadAccessToURL={readAccessUrl}
-          originWhitelist={['*']}
           showWebView={showWebView}
           source={
             /**

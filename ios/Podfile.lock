@@ -11,6 +11,9 @@ PODS:
     - React-Core (= 0.64.1)
     - React-jsi (= 0.64.1)
     - ReactCommon/turbomodule/core (= 0.64.1)
+  - GCDWebServer (3.5.4):
+    - GCDWebServer/Core (= 3.5.4)
+  - GCDWebServer/Core (3.5.4)
   - glog (0.3.5)
   - RCT-Folly (2020.01.13.00):
     - boost-for-react-native
@@ -219,6 +222,9 @@ PODS:
     - React-Core
   - react-native-sodium (0.5.0):
     - React-Core
+  - react-native-static-server (0.5.0):
+    - GCDWebServer (~> 3.0)
+    - React
   - react-native-version-info (1.1.0):
     - React-Core
   - react-native-webview (11.0.3):
@@ -357,6 +363,7 @@ DEPENDENCIES:
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-segmented-control (from `../node_modules/@react-native-community/segmented-control`)"
   - react-native-sodium (from `../node_modules/react-native-sodium`)
+  - react-native-static-server (from `../node_modules/react-native-static-server`)
   - react-native-version-info (from `../node_modules/react-native-version-info`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -394,6 +401,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - GCDWebServer
     - SSZipArchive
     - TrustKit
 
@@ -444,6 +452,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/segmented-control"
   react-native-sodium:
     :path: "../node_modules/react-native-sodium"
+  react-native-static-server:
+    :path: "../node_modules/react-native-static-server"
   react-native-version-info:
     :path: "../node_modules/react-native-version-info"
   react-native-webview:
@@ -515,6 +525,7 @@ SPEC CHECKSUMS:
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
   FBReactNativeSpec: 893650afcc5d434b48a5b9162db9b89b816bb89a
+  GCDWebServer: 2c156a56c8226e2d5c0c3f208a3621ccffbe3ce4
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: ec2ebc96b7bfba3ca5c32740f5a0c6a014a274d2
@@ -534,6 +545,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
   react-native-segmented-control: 65df6cd0619b780b3843d574a72d4c7cec396097
   react-native-sodium: 6cc4c4c1ea331f9f2b478076e983e09827a7b23f
+  react-native-static-server: 201b2a945a35096be3ae7f43e367c65bcbd61343
   react-native-version-info: 36490da17d2c6b5cc21321c70e433784dee7ed0b
   react-native-webview: 21fdfbdd5a2268195ca013174f8f656f3509de50
   React-perflogger: aad6d4b4a267936b3667260d1f649b6f6069a675
