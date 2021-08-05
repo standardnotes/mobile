@@ -47,6 +47,8 @@ type Props = {
   onLoadError: () => void;
   onDownloadEditorStart: () => void;
   onDownloadEditorEnd: () => void;
+  onDownloadError: () => void;
+  downloadError: boolean;
   offlineOnly?: boolean;
 };
 
@@ -87,6 +89,8 @@ export const ComponentView = ({
   onLoadStart,
   onDownloadEditorStart,
   onDownloadEditorEnd,
+  onDownloadError,
+  downloadError,
   componentUuid,
   offlineOnly,
 }: Props) => {
@@ -180,12 +184,14 @@ export const ComponentView = ({
         await unzip(downloadPath, versionPath);
         // Delete zip after extraction
         await RNFS.unlink(downloadPath);
+      } catch (error) {
+        onDownloadError();
       } finally {
         onDownloadEditorEnd();
         setDownloadingOfflineEditor(false);
       }
     },
-    [onDownloadEditorStart, onDownloadEditorEnd]
+    [onDownloadEditorStart, onDownloadEditorEnd, onDownloadError]
   );
 
   const getOfflineEditorUrl = useCallback(async () => {
@@ -202,6 +208,7 @@ export const ComponentView = ({
     const editorPath = `${BASE_PATH}${EDITORS_PATH}/${editorIdentifier}`;
     const versionPath = `${editorPath}/${editorVersion}`;
     const shouldDownload =
+      !downloadError &&
       !downloadingOfflineEditor &&
       (!(await RNFS.exists(versionPath)) ||
         (await RNFS.readDir(versionPath)).length === 0);
@@ -235,6 +242,7 @@ export const ComponentView = ({
   }, [
     application,
     downloadEditor,
+    downloadError,
     downloadingOfflineEditor,
     liveComponent,
     staticServer,
