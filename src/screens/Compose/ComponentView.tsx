@@ -20,10 +20,7 @@ import React, {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
-import RNFS, {
-  DocumentDirectoryPath,
-  ExternalDirectoryPath,
-} from 'react-native-fs';
+import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import StaticServer from 'react-native-static-server';
 import { WebView } from 'react-native-webview';
 import {
@@ -54,8 +51,7 @@ type Props = {
 };
 
 const STATIC_SERVER_PORT = 8080;
-const BASE_PATH =
-  Platform.OS === 'android' ? ExternalDirectoryPath : DocumentDirectoryPath;
+const BASE_PATH = DocumentDirectoryPath;
 const EDITORS_PATH = '/editors';
 
 async function checkForComponentUpdate(
