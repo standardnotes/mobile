@@ -6890,10 +6890,9 @@ react-native-sodium@standardnotes/react-native-sodium#7e169138801011df42e5eb0ba2
   version "0.5.0"
   resolved "https://codeload.github.com/standardnotes/react-native-sodium/tar.gz/7e169138801011df42e5eb0ba229b8910c3bec2f"
 
-react-native-static-server@^0.5.0:
+react-native-static-server@standardnotes/react-native-static-server#d0c4cb0feae233634ef26fc33118f258192c7b7d:
   version "0.5.0"
-  resolved "https://registry.yarnpkg.com/react-native-static-server/-/react-native-static-server-0.5.0.tgz#4b396082bfe7dfdbba6fe7d7de894de5ba4ebadb"
-  integrity sha512-RGteckPoBZq48p9Y8V67bjZGPxLHKkEOAffLSUJiGC7hkx+H+zuekqCR+04F30NuWB7y+nb8N7Qld2RGjX5DNg==
+  resolved "https://codeload.github.com/standardnotes/react-native-static-server/tar.gz/d0c4cb0feae233634ef26fc33118f258192c7b7d"
 
 react-native-store-review@^0.1.5:
   version "0.1.5"

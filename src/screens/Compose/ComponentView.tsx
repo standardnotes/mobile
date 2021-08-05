@@ -110,6 +110,7 @@ export const ComponentView = ({
   ] = useState<boolean>(false);
   const [loadedOnce, setLoadedOnce] = useState(false);
   const [staticServer, setStaticServer] = useState<StaticServer>();
+  const [staticServerUrl, setStaticServerUrl] = useState('');
 
   // Ref
   const webViewRef = useRef<WebView>(null);
@@ -234,7 +235,7 @@ export const ComponentView = ({
       const relativeMainFilePath = `${relativePackagePath}/${mainFileName}`;
 
       if ((await RNFS.exists(mainFilePath)) && staticServer?.isRunning) {
-        return `${staticServer.origin}${relativeMainFilePath}`;
+        return `${staticServerUrl}${relativeMainFilePath}`;
       }
     }
 
@@ -246,6 +247,7 @@ export const ComponentView = ({
     downloadingOfflineEditor,
     liveComponent,
     staticServer,
+    staticServerUrl,
   ]);
 
   const onLoadErrorHandler = useCallback(() => {
@@ -319,8 +321,9 @@ export const ComponentView = ({
       server = new StaticServer(STATIC_SERVER_PORT, path, {
         localOnly: true,
       });
-      await server.start();
+      const serverUrl = await server.start();
       setStaticServer(server);
+      setStaticServerUrl(serverUrl);
     };
     startStaticServer();
 
