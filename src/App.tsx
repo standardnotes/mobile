@@ -133,7 +133,7 @@ export const App = (props: { env: 'prod' | 'dev'; bugsnagOptOut: boolean }) => {
   >();
 
   useEffect(() => {
-    if (!__DEV__ && !props.bugsnagOptOut) {
+    if (!props.bugsnagOptOut) {
       try {
         Bugsnag.start();
       } catch {

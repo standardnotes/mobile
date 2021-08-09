@@ -279,6 +279,7 @@ export const ComponentView = ({
             setOfflineUrl(offlineEditorUrl);
           }
         } catch (e) {
+          SNLog.error(e);
           if (mounted) {
             if (offlineOnly) {
               onLoadErrorHandler();
@@ -321,9 +322,13 @@ export const ComponentView = ({
       server = new StaticServer(STATIC_SERVER_PORT, path, {
         localOnly: true,
       });
-      const serverUrl = await server.start();
-      setStaticServer(server);
-      setStaticServerUrl(serverUrl);
+      try {
+        const serverUrl = await server.start();
+        setStaticServer(server);
+        setStaticServerUrl(serverUrl);
+      } catch (e) {
+        SNLog.error(e);
+      }
     };
     startStaticServer();
 

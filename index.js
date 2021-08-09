@@ -17,8 +17,8 @@ if (__DEV__ === false) {
   SNLog.onError = Bugsnag.notify;
   SNLog.onLog = Bugsnag.leaveBreadcrumb;
 } else {
-  SNLog.onLog = console.log;
-  SNLog.onError = console.error;
+  SNLog.onError = Bugsnag.notify;
+  SNLog.onLog = Bugsnag.leaveBreadcrumb;
 }
 
 enableAndroidFontFix();
