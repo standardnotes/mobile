@@ -520,6 +520,7 @@ export class Compose extends React.Component<{}, State> {
                             )}
                             handlesColor={theme.stylekitInfoColor}
                             onChangeText={this.onContentChange}
+                            errorState={false}
                           />
                         </TextContainer>
                       )}
@@ -537,6 +538,7 @@ export class Compose extends React.Component<{}, State> {
                           selectionColor={lighten(theme.stylekitInfoColor)}
                           onChangeText={this.onContentChange}
                           editable={!this.noteLocked}
+                          errorState={this.state.webViewError}
                         />
                       </View>
                     )}

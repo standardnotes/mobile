@@ -102,7 +102,7 @@ export class BackupsService extends ApplicationService {
       await RNFS.writeFile(filepath, data);
       this._showFileSavePromptAndroid(filepath);
     } catch (err) {
-      console.log('Error exporting backup', err);
+      console.error('Error exporting backup', err);
       this.application.alertService.alert(
         'There was an issue exporting your backup.'
       );
@@ -116,7 +116,7 @@ export class BackupsService extends ApplicationService {
         return true;
       })
       .catch(error => {
-        console.log('Error opening file', error);
+        console.error('Error opening file', error);
         return false;
       });
   }
