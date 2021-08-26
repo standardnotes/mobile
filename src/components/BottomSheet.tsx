@@ -1,12 +1,13 @@
 import { Icon, IconType } from '@Components/Icon';
 import {
   BottomSheetBackdrop,
+  BottomSheetBackgroundProps,
   BottomSheetModal,
   BottomSheetScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from '@gorhom/bottom-sheet';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Animated,
   LayoutChangeEvent,
@@ -15,7 +16,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import styled, { css } from 'styled-components/native';
+import styled, { css, ThemeContext } from 'styled-components/native';
 import { SNSwitch } from './SNSwitch';
 
 export type BottomSheetAction = {
@@ -92,14 +93,12 @@ const Handle = styled.View`
 `;
 
 const BottomSheetContent = styled.View`
-  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   display: flex;
   flex: 1;
   padding: 8px 0 16px;
 `;
 
 const TitleContainer = styled.View`
-  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   padding: 20px;
   border-bottom-width: 1px;
   border-color: ${({ theme }) => theme.stylekitBorderColor};
@@ -112,13 +111,11 @@ const Title = styled.Text`
 `;
 
 const SectionContainer = styled.View<{ stackIndex: number }>`
-  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   z-index: ${({ stackIndex }) => stackIndex};
 `;
 
 const SectionSeparatorContainer = styled.View`
   z-index: 2;
-  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
 `;
 
 const SectionSeparator = styled.View<{ first?: boolean }>`
@@ -132,7 +129,6 @@ const SectionSeparator = styled.View<{ first?: boolean }>`
 `;
 
 const ExpandableSectionContainer = styled.View`
-  background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   z-index: 2;
 `;
 
@@ -185,6 +181,21 @@ const HandleComponent: React.FC = () => (
     <Handle />
   </HandleContainer>
 );
+
+const Background: React.FC<BottomSheetBackgroundProps> = ({ style }) => {
+  const theme = useContext(ThemeContext);
+  return (
+    <View
+      style={[
+        {
+          backgroundColor: theme.stylekitBackgroundColor,
+          borderRadius: 12,
+        },
+        style,
+      ]}
+    />
+  );
+};
 
 const Item: React.FC<
   Omit<BottomSheetAction, 'key' | 'callback'> & {
@@ -419,6 +430,7 @@ export const BottomSheet: React.FC<Props> = ({
       snapPoints={snapPoints}
       handleComponent={HandleComponent}
       backdropComponent={BottomSheetBackdrop}
+      backgroundComponent={props => <Background {...props} />}
       onDismiss={() => {
         setExpandedSectionKey('');
         setShouldCollapseSections(true);
