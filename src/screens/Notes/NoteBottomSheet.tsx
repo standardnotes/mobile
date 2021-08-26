@@ -152,7 +152,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
     [executeAction]
   );
 
-  const getListedExpandableSection = useCallback(
+  const getListedSection = useCallback(
     (extension: SNActionsExtension, updatedExtension?: SNActionsExtension) => {
       const key = updatedExtension
         ? `listed-${updatedExtension.uuid}-section`
@@ -186,20 +186,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
     [getListedActionItem]
   );
 
-  const getReloadedListedSection = useCallback(
-    async (
-      extension: SNActionsExtension,
-      extensionToReloadUuid?: UuidString
-    ) => {
-      const extensionInContext = extensionToReloadUuid
-        ? await loadListedExtension(extension)
-        : extension;
-      return getListedExpandableSection(extension, extensionInContext);
-    },
-    [getListedExpandableSection, loadListedExtension]
-  );
-
-  const getReloadedListedSections = useCallback(
+  const getListedSections = useCallback(
     async (extensionToReloadUuid?: UuidString) => {
       const extensions = listedExtensions;
       return await Promise.all(
@@ -213,20 +200,25 @@ export const NoteBottomSheet: React.FC<Props> = ({
               return a.name > b.name ? 1 : -1;
             }
           })
-          .map(async extension =>
-            getReloadedListedSection(extension, extensionToReloadUuid)
-          )
+          .map(async extension => {
+            let extensionInContext: SNActionsExtension | undefined = extension;
+            if (
+              extensionToReloadUuid &&
+              extension.uuid === extensionToReloadUuid
+            ) {
+              extensionInContext = await loadListedExtension(extension);
+            }
+            return getListedSection(extension, extensionInContext);
+          })
       );
     },
-    [getReloadedListedSection, listedExtensions]
+    [getListedSection, loadListedExtension, listedExtensions]
   );
 
   useEffect(() => {
     let mounted = true;
     const reloadListedSections = async () => {
-      const newSections = await getReloadedListedSections(
-        reloadListedExtensionUuid
-      );
+      const newSections = await getListedSections(reloadListedExtensionUuid);
       if (mounted) {
         setListedSections(newSections);
       }
@@ -235,7 +227,7 @@ export const NoteBottomSheet: React.FC<Props> = ({
     return () => {
       mounted = false;
     };
-  }, [getReloadedListedSections, reloadListedExtensionUuid]);
+  }, [getListedSections, reloadListedExtensionUuid]);
 
   const historyAction: BottomSheetAction = {
     text: 'Note history',
