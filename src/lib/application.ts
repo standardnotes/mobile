@@ -12,6 +12,7 @@ import {
 } from '@standardnotes/snjs';
 import { Platform } from 'react-native';
 import VersionInfo from 'react-native-version-info';
+import { version } from '../../package.json';
 import { AlertService } from './alert_service';
 import { ApplicationState, UnlockTiming } from './application_state';
 import { BackupsService } from './backups_service';
@@ -60,7 +61,8 @@ export class MobileApplication extends SNApplication {
       ],
       VersionInfo.bundleIdentifier?.includes('dev')
         ? 'https://api-dev.standardnotes.com/'
-        : 'https://api.standardnotes.com'
+        : 'https://api.standardnotes.com',
+      version
     );
     this.Uuid = Math.random().toString();
     this.editorGroup = new EditorGroup(this);
