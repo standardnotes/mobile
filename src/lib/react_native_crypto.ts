@@ -154,4 +154,20 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   public async base64Decode(base64String: Base64String): Promise<string> {
     return Sodium.from_base64(base64String, Sodium.base64_variant_ORIGINAL);
   }
+
+  public hmac1(): Promise<HexString | null> {
+    throw new Error('hmac1 is not implemented on mobile');
+  }
+
+  public generateOtpSecret(): Promise<string> {
+    throw new Error('generateOtpSecret is not implemented on mobile');
+  }
+
+  public hotpToken(): Promise<string> {
+    throw new Error('hotpToken is not implemented on mobile');
+  }
+
+  public totpToken(): Promise<string> {
+    throw new Error('totpToken is not implemented on mobile');
+  }
 }
