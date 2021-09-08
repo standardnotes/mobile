@@ -70,22 +70,17 @@ export const NoteCell = ({
 
   const _onPress = () => {
     setSelected(true);
-    onPressItem(note.uuid);
-    setSelected(false);
+    selectionTimeout.current = setTimeout(() => {
+      setSelected(false);
+      onPressItem(note.uuid);
+    }, 25);
   };
 
   const _onPressIn = () => {
-    // Debounce
-    const delay = 25;
-    selectionTimeout.current = setTimeout(() => {
-      setSelected(true);
-    }, delay);
+    setSelected(true);
   };
 
   const _onPressOut = () => {
-    if (selectionTimeout.current) {
-      clearTimeout(selectionTimeout.current);
-    }
     setSelected(false);
   };
 
@@ -198,6 +193,7 @@ export const NoteCell = ({
       onPressIn={_onPressIn}
       onPressOut={_onPressOut}
       onLongPress={onLongPress}
+      delayPressIn={150}
     >
       <Container ref={elementRef as any} selected={highlight} padding={padding}>
         {note.deleted && <DeletedText>Deleting...</DeletedText>}
