@@ -60,7 +60,7 @@ export class MobileApplication extends SNApplication {
         },
       ],
       VersionInfo.bundleIdentifier?.includes('dev')
-        ? 'https://api-dev.standardnotes.com/'
+        ? 'https://api-dev.standardnotes.com'
         : 'https://api.standardnotes.com',
       version
     );
