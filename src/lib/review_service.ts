@@ -24,7 +24,7 @@ export class ReviewService extends ApplicationService {
   async getRunCount() {
     return this.application?.getValue('runCount').then(runCount => {
       if (runCount) {
-        return JSON.parse(runCount);
+        return JSON.parse(runCount as string);
       }
     });
   }
