@@ -632,21 +632,21 @@ export class ApplicationState extends ApplicationService {
     return this.application.getValue(
       StorageKey.MobileScreenshotPrivacyEnabled,
       StorageValueModes.Default
-    );
+    ) as Promise<boolean | undefined>;
   }
 
   private async getPasscodeTiming(): Promise<UnlockTiming | undefined> {
     return this.application.getValue(
       StorageKey.MobilePasscodeTiming,
       StorageValueModes.Nonwrapped
-    );
+    ) as Promise<UnlockTiming | undefined>;
   }
 
   private async getBiometricsTiming(): Promise<UnlockTiming | undefined> {
     return this.application.getValue(
       StorageKey.MobileBiometricsTiming,
       StorageValueModes.Nonwrapped
-    );
+    ) as Promise<UnlockTiming | undefined>;
   }
 
   public async setScreenshotPrivacyEnabled(enabled: boolean) {
@@ -681,7 +681,7 @@ export class ApplicationState extends ApplicationService {
     return this.application.getValue(
       MobileStorageKey.PasscodeKeyboardTypeKey,
       StorageValueModes.Nonwrapped
-    );
+    ) as Promise<PasscodeKeyboardType>;
   }
 
   public async setPasscodeKeyboardType(type: PasscodeKeyboardType) {
