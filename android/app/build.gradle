@@ -133,11 +133,6 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     flavorDimensions "default"
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     defaultConfig {
         applicationId "com.standardnotes"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -197,6 +192,13 @@ android {
         }
     }
 
+    packagingOptions {
+        pickFirst 'lib/x86_64/libsodium.so'
+        pickFirst 'lib/armeabi-v7a/libsodium.so'
+        pickFirst 'lib/arm64-v8a/libsodium.so'
+        pickFirst 'lib/x86/libsodium.so'
+    }
+
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -248,7 +250,7 @@ dependencies {
 // Run this once to be able to run the application with BUCK
 // puts all compile dependencies into folder libs for BUCK to use
 task copyDownloadableDepsToLibs(type: Copy) {
-    from configurations.compile
+    from configurations.implementation
     into 'libs'
 }
 

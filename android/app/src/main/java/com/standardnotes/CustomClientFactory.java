@@ -27,6 +27,6 @@ public class CustomClientFactory implements OkHttpClientFactory {
                 .writeTimeout(0, TimeUnit.MILLISECONDS)
                 .cookieJar(new ReactCookieJarContainer())
                 .certificatePinner(certificatePinner);
-        return OkHttpClientProvider.enableTls12OnPreLollipop(client).build();
+        return client.build();
     }
 }
