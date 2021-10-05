@@ -131,6 +131,7 @@ def appVersionName = project.hasProperty('versionName') ? project.property('vers
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
+    ndkVersion '21.4.7075529'
     flavorDimensions "default"
 
     compileOptions {
