@@ -93,10 +93,8 @@ export class BackupsService extends ApplicationService {
   private async _exportAndroid(filename: string, data: string) {
     try {
       let filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      const granted = await this._requestStoragePermissionsAndroid();
+      if (granted) {
         filepath = `${RNFS.DownloadDirectoryPath}/${filename}`;
       }
       await RNFS.writeFile(filepath, data);
@@ -164,6 +162,13 @@ export class BackupsService extends ApplicationService {
         }
       }, 2500);
     });
+  }
+
+  private async _requestStoragePermissionsAndroid() {
+    const writeStorageGranted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+    );
+    return writeStorageGranted === PermissionsAndroid.RESULTS.GRANTED;
   }
 
   /* Utils */
