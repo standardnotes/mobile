@@ -32,19 +32,19 @@ export class BackupsService extends ApplicationService {
     const stringifiedData = JSON.stringify(data, null, prettyPrint);
 
     const modifier = encrypted ? 'Encrypted' : 'Decrypted';
-    const filename = `Standard Notes ${modifier} Backup - ${this._formattedDate()}.txt`;
+    const filename = `Standard Notes ${modifier} Backup - ${this.formattedDate()}.txt`;
     if (data) {
       if (this.application?.platform === Platform.Ios) {
-        return this._exportIOS(filename, stringifiedData);
+        return this.exportIOS(filename, stringifiedData);
       } else {
-        const result = await this._showAndroidEmailOrSaveOption();
+        const result = await this.showAndroidEmailOrSaveOption();
         if (result === 'email') {
-          return this._exportViaEmailAndroid(
+          return this.exportViaEmailAndroid(
             Base64.encodeURI(stringifiedData),
             filename
           );
         } else if (result === 'save') {
-          await this._exportAndroid(filename, stringifiedData);
+          await this.exportAndroid(filename, stringifiedData);
         } else {
           return;
         }
@@ -52,7 +52,7 @@ export class BackupsService extends ApplicationService {
     }
   }
 
-  private async _showAndroidEmailOrSaveOption() {
+  private async showAndroidEmailOrSaveOption() {
     try {
       const confirmed = await this.application!.alertService?.confirm(
         'Choose Export Method',
@@ -71,7 +71,7 @@ export class BackupsService extends ApplicationService {
     }
   }
 
-  private async _exportIOS(filename: string, data: string) {
+  private async exportIOS(filename: string, data: string) {
     return new Promise<boolean>(resolve => {
       (this.application! as MobileApplication)
         .getAppState()
@@ -90,15 +90,15 @@ export class BackupsService extends ApplicationService {
     });
   }
 
-  private async _exportAndroid(filename: string, data: string) {
+  private async exportAndroid(filename: string, data: string) {
     try {
       let filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
-      const granted = await this._requestStoragePermissionsAndroid();
+      const granted = await this.requestStoragePermissionsAndroid();
       if (granted) {
         filepath = `${RNFS.DownloadDirectoryPath}/${filename}`;
       }
       await RNFS.writeFile(filepath, data);
-      this._showFileSavePromptAndroid(filepath);
+      this.showFileSavePromptAndroid(filepath);
     } catch (err) {
       console.error('Error exporting backup', err);
       this.application.alertService.alert(
@@ -107,7 +107,7 @@ export class BackupsService extends ApplicationService {
     }
   }
 
-  private async _openFileAndroid(filepath: string) {
+  private async openFileAndroid(filepath: string) {
     return FileViewer.open(filepath)
       .then(() => {
         // success
@@ -119,7 +119,7 @@ export class BackupsService extends ApplicationService {
       });
   }
 
-  private async _showFileSavePromptAndroid(filepath: string) {
+  private async showFileSavePromptAndroid(filepath: string) {
     const confirmed = await this.application!.alertService?.confirm(
       `Your backup file has been saved to your local disk at this location:\n\n${filepath}`,
       'Backup Saved',
@@ -128,12 +128,12 @@ export class BackupsService extends ApplicationService {
       'Done'
     );
     if (confirmed) {
-      this._openFileAndroid(filepath);
+      this.openFileAndroid(filepath);
     }
     return true;
   }
 
-  private async _exportViaEmailAndroid(data: string, filename: string) {
+  private async exportViaEmailAndroid(data: string, filename: string) {
     return new Promise<boolean>(resolve => {
       const fileType = '.json'; // Android creates a tmp file and expects dot with extension
 
@@ -164,7 +164,7 @@ export class BackupsService extends ApplicationService {
     });
   }
 
-  private async _requestStoragePermissionsAndroid() {
+  private async requestStoragePermissionsAndroid() {
     const writeStorageGranted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
     );
@@ -173,7 +173,7 @@ export class BackupsService extends ApplicationService {
 
   /* Utils */
 
-  private _formattedDate() {
+  private formattedDate() {
     return new Date().getTime();
   }
 }
