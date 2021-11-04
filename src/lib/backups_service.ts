@@ -40,7 +40,7 @@ export class BackupsService extends ApplicationService {
         const result = await this.showAndroidEmailOrSaveOption();
         if (result === 'email') {
           return this.exportViaEmailAndroid(
-            Base64.encodeURI(stringifiedData),
+            Base64.encode(stringifiedData),
             filename
           );
         } else if (result === 'save') {
