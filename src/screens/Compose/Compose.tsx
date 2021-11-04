@@ -299,11 +299,11 @@ export class Compose extends React.Component<{}, State> {
   };
 
   get note() {
-    return this.context?.editorGroup.activeEditor.note;
+    return this.context?.editorGroup?.activeEditor?.note;
   }
 
   get editor() {
-    return this.context?.editorGroup.activeEditor;
+    return this.context?.editorGroup?.activeEditor;
   }
 
   dismissKeyboard = () => {
