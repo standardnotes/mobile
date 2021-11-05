@@ -26,7 +26,7 @@ export const LoadingContainer = styled.View`
 `;
 
 interface LoadingTextProps {
-  textAlign: 'left' | 'center' | 'right' | 'justify';
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
 }
 
 export const LoadingText = styled.Text<LoadingTextProps>`
