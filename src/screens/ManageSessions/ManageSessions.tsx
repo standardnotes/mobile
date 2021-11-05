@@ -1,3 +1,4 @@
+import NetInfo from '@react-native-community/netinfo';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled';
 import {
@@ -29,7 +30,23 @@ const useSessions = (): [
   const [refreshing, setRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const getNetworkState = async () => {
+    const networkState = await NetInfo.fetch();
+    return {
+      isOffline: !networkState.isConnected,
+    };
+  };
+
   const getSessions = useCallback(async () => {
+    const { isOffline } = await getNetworkState();
+
+    if (isOffline) {
+      setErrorMessage(
+        'You are offline.\nPlease check your network connection.'
+      );
+      return;
+    }
+
     const response = await application?.getSessions();
 
     if (!response) {
@@ -147,7 +164,7 @@ export const ManageSessions: React.FC = () => {
   if (errorMessage) {
     return (
       <LoadingContainer>
-        <LoadingText>{errorMessage}</LoadingText>
+        <LoadingText textAlign="center">{errorMessage}</LoadingText>
       </LoadingContainer>
     );
   }
