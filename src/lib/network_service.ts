@@ -2,10 +2,6 @@ import NetInfo, { NetInfoConfiguration } from '@react-native-community/netinfo';
 import { removeFromArray } from '@standardnotes/snjs';
 import React, { useEffect, useState } from 'react';
 
-export const NetworkServiceContext = React.createContext<
-  NetworkService | undefined
->(undefined);
-
 export const useIsOffline = () => {
   const networkService = React.useContext(NetworkServiceContext);
   const [isOffline, setIsOffline] = useState(false);
@@ -25,6 +21,10 @@ export const useIsOffline = () => {
 
   return [isOffline];
 };
+
+export const NetworkServiceContext = React.createContext<
+  NetworkService | undefined
+>(undefined);
 
 type NetworkState = {
   /**
