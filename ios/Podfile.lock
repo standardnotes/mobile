@@ -500,10 +500,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   BugsnagReactNative: 1ac1129bdf95273df07cfe4d89750dc3d9d888a3
-  DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
+  DoubleConversion: cde416483dac037923206447da6e1454df403714
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
-  FBReactNativeSpec: 893650afcc5d434b48a5b9162db9b89b816bb89a
-  glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
+  FBReactNativeSpec: 045b6219b306679cc02e02d618e3b5a91d334800
+  glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: ec2ebc96b7bfba3ca5c32740f5a0c6a014a274d2
   RCTTypeSafety: 22567f31e67c3e088c7ac23ea46ab6d4779c0ea5
