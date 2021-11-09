@@ -36,6 +36,8 @@ type MobileServices = {
   statusManager: StatusManager;
 };
 
+const IsDev = VersionInfo.bundleIdentifier?.includes('dev');
+
 export class MobileApplication extends SNApplication {
   private MobileServices!: MobileServices;
   public editorGroup: EditorGroup;
@@ -46,7 +48,6 @@ export class MobileApplication extends SNApplication {
   static previouslyLaunched: boolean = false;
 
   constructor(deviceInterface: MobileDeviceInterface, identifier: string) {
-    const dev = VersionInfo.bundleIdentifier?.includes('dev');
     super(
       Environment.Mobile,
       platformFromString(Platform.OS),
@@ -60,12 +61,12 @@ export class MobileApplication extends SNApplication {
           with: ComponentManager,
         },
       ],
-      dev
+      IsDev
         ? 'https://api-dev.standardnotes.com'
         : 'https://api.standardnotes.com',
       version,
       true,
-      dev
+      IsDev
         ? 'wss://sockets-dev.standardnotes.com'
         : 'wss://sockets.standardnotes.com'
     );
