@@ -394,7 +394,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         },
         onSelect: () => {
           application?.deviceInterface?.openUrl(
-            'https://standardnotes.com/extensions'
+            'https://standardnotes.com/plans'
           );
         },
       });

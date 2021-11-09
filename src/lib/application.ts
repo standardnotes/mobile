@@ -46,6 +46,7 @@ export class MobileApplication extends SNApplication {
   static previouslyLaunched: boolean = false;
 
   constructor(deviceInterface: MobileDeviceInterface, identifier: string) {
+    const dev = VersionInfo.bundleIdentifier?.includes('dev');
     super(
       Environment.Mobile,
       platformFromString(Platform.OS),
@@ -59,11 +60,14 @@ export class MobileApplication extends SNApplication {
           with: ComponentManager,
         },
       ],
-      VersionInfo.bundleIdentifier?.includes('dev')
+      dev
         ? 'https://api-dev.standardnotes.com'
         : 'https://api.standardnotes.com',
       version,
-      VersionInfo.bundleIdentifier?.includes('dev') ? true : false
+      true,
+      dev
+        ? 'wss://sockets-dev.standardnotes.com'
+        : 'wss://sockets.standardnotes.com'
     );
     this.Uuid = Math.random().toString();
     this.editorGroup = new EditorGroup(this);
