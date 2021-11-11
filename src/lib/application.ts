@@ -36,6 +36,8 @@ type MobileServices = {
   statusManager: StatusManager;
 };
 
+const IsDev = VersionInfo.bundleIdentifier?.includes('dev');
+
 export class MobileApplication extends SNApplication {
   private MobileServices!: MobileServices;
   public editorGroup: EditorGroup;
@@ -59,11 +61,14 @@ export class MobileApplication extends SNApplication {
           with: ComponentManager,
         },
       ],
-      VersionInfo.bundleIdentifier?.includes('dev')
+      IsDev
         ? 'https://api-dev.standardnotes.com'
         : 'https://api.standardnotes.com',
       version,
-      VersionInfo.bundleIdentifier?.includes('dev') ? true : false
+      true,
+      IsDev
+        ? 'wss://sockets-dev.standardnotes.com'
+        : 'wss://sockets.standardnotes.com'
     );
     this.Uuid = Math.random().toString();
     this.editorGroup = new EditorGroup(this);

@@ -224,7 +224,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
         },
         onSelect: () => {
           application?.deviceInterface?.openUrl(
-            'https://standardnotes.com/extensions'
+            'https://standardnotes.com/plans'
           );
         },
       });
@@ -262,11 +262,11 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
   const outOfSyncPressed = async () => {
     const confirmed = await application!.alertService!.confirm(
       "We've detected that the data in the current application session may " +
-        'not match the data on the server. This can happen due to poor' +
-        'network conditions, or if a large note fails to download on your ' +
-        'device. To resolve this issue, we recommend first creating a backup ' +
-        'of your data in the Settings screen, then signing out of your account ' +
-        'and signing back in.',
+      'not match the data on the server. This can happen due to poor' +
+      'network conditions, or if a large note fails to download on your ' +
+      'device. To resolve this issue, we recommend first creating a backup ' +
+      'of your data in the Settings screen, then signing out of your account ' +
+      'and signing back in.',
       'Potentially Out of Sync',
       'Open Settings',
       undefined

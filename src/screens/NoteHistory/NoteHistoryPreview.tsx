@@ -57,7 +57,7 @@ export const NoteHistoryPreview = ({
           await application?.changeAndSaveItem(
             originalNoteUuid,
             mutator => {
-              mutator.setContent(revision.payload.safeContent);
+              mutator.unsafe_setCustomContent(revision.payload.safeContent);
             },
             true,
             PayloadSource.RemoteActionRetrieved

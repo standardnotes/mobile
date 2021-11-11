@@ -206,6 +206,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86_64-darwin-18
 
 DEPENDENCIES
   fastlane
@@ -213,4 +214,4 @@ DEPENDENCIES
   fastlane-plugin-bundletool
 
 BUNDLED WITH
-   2.1.4
+   2.2.2

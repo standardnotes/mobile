@@ -9,14 +9,14 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{ 
+{
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSString *bugsnagOptOut = [defaults objectForKey:@"bugsnagoptout"];
 
   BugsnagConfiguration *config = [BugsnagConfiguration loadConfig];
   config.enabledBreadcrumbTypes = BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeLog
   | BSGEnabledBreadcrumbTypeUser | BSGEnabledBreadcrumbTypeState | BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeProcess;
-  
+
   if (![bugsnagOptOut isEqualToString:@"true"]) {
     [Bugsnag startWithConfiguration:config];
   }
@@ -86,6 +86,26 @@
       // The list of domains we want to pin and their configuration
       kTSKPinnedDomains: @{
         @"standardnotes.org" : @{
+          kTSKIncludeSubdomains:@YES,
+
+          kTSKEnforcePinning:@YES,
+
+          // Send reports for pin validation failures so we can track them
+          kTSKReportUris: @[@"https://standard.report-uri.com/r/d/hpkp/reportOnly"],
+
+          // The pinned public keys' Subject Public Key Info hashes
+          kTSKPublicKeyHashes : @[
+            @"Vjs8r4z+80wjNcr1YKepWQboSIRi63WsWXhIMN+eWys=",
+            @"C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=",
+            @"YLh1dUR9y6Kja30RrAn7JKnbQG/uEtLMkBgFF2Fuihg=",
+            @"sRHdihwgkaib1P1gxX8HFszlD+7/gTfNvuAybgLPNis=",
+            @"++MBgDH5WGvL9Bcn5Be30cRcL0f5O+NyoXuWtQdX1aI=",
+            @"f0KW/FtqTjs108NpYj42SrGvOB2PpxIVM8nWxjPqJGE=",
+            @"NqvDJlas/GRcYbcWE8S/IceH9cq77kg0jVhZeAPXq8k=",
+            @"9+ze1cZgR9KO1kZrVDxA4HQ6voHRCSVNz4RdTCx4U8U="
+          ],
+        },
+        @"standardnotes.com" : @{
           kTSKIncludeSubdomains:@YES,
 
           kTSKEnforcePinning:@YES,
