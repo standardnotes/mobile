@@ -1,7 +1,7 @@
 {
-  "name": "StandardNotes",
-  "version": "3.9.1",
-  "user-version": "3.9.1",
+  "name": "standardnotes-mobile",
+  "version": "3.9.2",
+  "user-version": "3.9.2",
   "private": true,
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -26,7 +26,7 @@
     "@react-navigation/native": "^5.9.3",
     "@react-navigation/stack": "^5.14.3",
     "@standardnotes/sncrypto-common": "1.5.2",
-    "@standardnotes/snjs": "2.17.1",
+    "@standardnotes/snjs": "2.17.9",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
     "react": "17.0.1",
