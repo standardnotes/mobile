@@ -435,7 +435,7 @@ export class ThemeService {
 
     return new Promise(async resolve => {
       try {
-        const response = await fetch(url, {
+        const response = await fetch(url!, {
           method: 'GET',
         });
         const data = await response.text();
