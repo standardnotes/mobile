@@ -229,16 +229,15 @@ export const ComponentView = ({
 
   return (
     <FlexContainer>
-      {liveComponent?.item.valid_until &&
-        liveComponent?.item.valid_until <= new Date() && (
-          <LockedContainer>
-            <StyledIcon />
-            <LockedText>
-              Extended expired. Editors are in a read-only state. To edit
-              immediately, please switch to the Plain Editor.
-            </LockedText>
-          </LockedContainer>
-        )}
+      {liveComponent?.item.isExpired && (
+        <LockedContainer>
+          <StyledIcon />
+          <LockedText>
+            Extended expired. Editors are in a read-only state. To edit
+            immediately, please switch to the Plain Editor.
+          </LockedText>
+        </LockedContainer>
+      )}
 
       {liveComponent?.item.isDeprecated && (
         <DeprecatedContainer>
