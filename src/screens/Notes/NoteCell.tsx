@@ -4,7 +4,7 @@ import {
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
+import { CollectionSort, SNNote } from '@standardnotes/snjs';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
@@ -20,6 +20,7 @@ import {
   TouchableContainer,
 } from './NoteCell.styled';
 import { NoteCellFlags } from './NoteCellFlags';
+import { NotePreview } from './NotePreview';
 
 type Props = {
   note: SNNote;
@@ -183,8 +184,6 @@ export const NoteCell = ({
 
   const padding = 14;
   const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
-  const hasPlainPreview =
-    !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
   const showDetails = !note.errorDecrypting && (!hideDates || note.protected);
 
   return (
@@ -210,17 +209,11 @@ export const NoteCell = ({
           <TitleText selected={highlight}>{note.title}</TitleText>
         )}
 
-        {hasPlainPreview && showPreview && (
-          <NoteText selected={highlight} numberOfLines={2}>
-            {note.preview_plain}
-          </NoteText>
-        )}
-
-        {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
-          <NoteText selected={highlight} numberOfLines={2}>
-            {note.text}
-          </NoteText>
-        )}
+        <NotePreview
+          note={note}
+          showPreview={showPreview}
+          highlight={highlight}
+        />
 
         {showDetails && (
           <DetailsText
