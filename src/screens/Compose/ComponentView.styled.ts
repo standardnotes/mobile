@@ -17,7 +17,7 @@ export const LockedContainer = styled.View`
   flex-direction: row;
   align-items: center;
   padding: 10px;
-  background-color: ${({ theme }) => theme.stylekitDangerColor};
+  background-color: ${({ theme }) => theme.stylekitWarningColor};
   border-bottom-color: ${({ theme }) => theme.stylekitBorderColor};
   border-bottom-width: 1px;
 `;

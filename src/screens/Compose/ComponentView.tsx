@@ -233,7 +233,7 @@ export const ComponentView = ({
         <LockedContainer>
           <StyledIcon />
           <LockedText>
-            Extended expired. Editors are in a read-only state. To edit
+            Subscription expired. Editors are in a read-only state. To edit
             immediately, please switch to the Plain Editor.
           </LockedText>
         </LockedContainer>

@@ -1620,7 +1620,7 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@standardnotes/auth@^3.8.1":
+"@standardnotes/auth@3.8.3", "@standardnotes/auth@^3.8.1":
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.8.3.tgz#6e627c1a1a9ebf91d97f52950d099bf7704382e3"
   integrity sha512-wz056b3pv8IIX74lYaqjCUvnw3NSow+ex5pn/VlGxg8r7gq19WsmgyXP2BoE7nqKddO1JMlFok+4gdnutYF0Cw==
@@ -1639,11 +1639,12 @@
   dependencies:
     "@standardnotes/auth" "^3.8.1"
 
-"@standardnotes/features@^1.8.2":
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.8.2.tgz#ecc8162ca80ee3740468aa55a64c23b519c13505"
-  integrity sha512-EYeYYT/WBIh7fMVTVhsy0INjVdyHVtnH90pbZQHNPpsUkLdj05DzuyxUKjsc0oxiskmZjPOVSfXt8l3RL5Av4g==
+"@standardnotes/features@^1.10.1":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.10.1.tgz#5b5a59d2d69751ca040a270d04a08662b1591bfc"
+  integrity sha512-fN7WyR8jeaAsDWkm4a6SSz3JZeaNfL+CkmWAYqxRI5XoXZlWy+kBVaYWaGe7vI4T6ncwdhxRTjE7mirG4PEQ6g==
   dependencies:
+    "@standardnotes/auth" "3.8.3"
     "@standardnotes/common" "^1.2.1"
 
 "@standardnotes/settings@^1.2.1":
@@ -1656,15 +1657,15 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"
   integrity sha512-+OQ6gajTcVSHruw33T52MHyBDKL1vRCfQBXQn4tt4+bCfBAe+PFLkEQMHp35bg5twCfg9+wUf2KhmNNSNyBBZw==
 
-"@standardnotes/snjs@2.17.9":
-  version "2.17.9"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.17.9.tgz#9e7402252c6acda6471cc9d887516f17b6bd2cb2"
-  integrity sha512-Hi57vIByRD5qEOFfQrq/qILH5qRgngyn57qhHE2yKDsX//CTDsdqKGKVZbG0W54rQ+JxYUfjAuBPR/pxIVTi6w==
+"@standardnotes/snjs@2.19.5":
+  version "2.19.5"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.19.5.tgz#5765aa97e8b2de246d3c8a5b64a938993bcc75ea"
+  integrity sha512-bjQGa69xVWjBZWj2c6nG5BXvIcFwQXzghIXOPNUHe9ljQtU6gCUAYjeNZ+nQiry1tnNuds6IteeZNq3f4L/duw==
   dependencies:
     "@standardnotes/auth" "^3.8.1"
     "@standardnotes/common" "^1.2.1"
     "@standardnotes/domain-events" "^2.5.1"
-    "@standardnotes/features" "^1.8.2"
+    "@standardnotes/features" "^1.10.1"
     "@standardnotes/settings" "^1.2.1"
     "@standardnotes/sncrypto-common" "^1.5.2"
 
