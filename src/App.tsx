@@ -3,6 +3,7 @@ import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { MobileApplication } from '@Lib/application';
 import { ApplicationGroup } from '@Lib/application_group';
 import { navigationRef } from '@Lib/navigation_service';
+import { NetworkService, NetworkServiceContext } from '@Lib/network_service';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { DeinitSource } from '@standardnotes/snjs';
 import { MobileThemeVariables } from '@Style/Themes/styled-components';
@@ -126,6 +127,9 @@ const AppComponent: React.FC<{
 const AppGroupInstance = new ApplicationGroup();
 AppGroupInstance.initialize();
 
+const networkServiceInstance = new NetworkService();
+networkServiceInstance.registerObservers();
+
 export const App = (props: { env: 'prod' | 'dev'; bugsnagOptOut: boolean }) => {
   const applicationGroupRef = useRef(AppGroupInstance);
   const [application, setApplication] = useState<
@@ -152,14 +156,17 @@ export const App = (props: { env: 'prod' | 'dev'; bugsnagOptOut: boolean }) => {
     );
     return removeAppChangeObserver;
   }, [applicationGroupRef.current.primaryApplication]);
+
   return (
     <ApplicationContext.Provider value={application}>
       {application && (
-        <AppComponent
-          env={props.env}
-          key={application.Uuid}
-          application={application}
-        />
+        <NetworkServiceContext.Provider value={networkServiceInstance}>
+          <AppComponent
+            env={props.env}
+            key={application.Uuid}
+            application={application}
+          />
+        </NetworkServiceContext.Provider>
       )}
     </ApplicationContext.Provider>
   );

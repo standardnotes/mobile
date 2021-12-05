@@ -25,10 +25,15 @@ export const LoadingContainer = styled.View`
   justify-content: center;
 `;
 
-export const LoadingText = styled.Text`
+interface LoadingTextProps {
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
+}
+
+export const LoadingText = styled.Text<LoadingTextProps>`
   position: absolute;
   opacity: 0.5;
   color: ${props => props.theme.stylekitForegroundColor};
+  text-align: ${props => props.textAlign ?? 'left'};
 `;
 
 export const HeaderContainer = styled.View`
