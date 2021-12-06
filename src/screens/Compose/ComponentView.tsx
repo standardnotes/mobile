@@ -136,7 +136,7 @@ export const ComponentView = ({
       }
     };
 
-    checkIfSupportsAdvancedEditors();
+    warnIfUnsupportedEditors();
   }, [application]);
 
   useEffect(() => {
