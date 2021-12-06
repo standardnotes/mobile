@@ -85,7 +85,7 @@ export const ComponentView = ({
   }, [application, liveComponent?.item.uuid, componentUuid]);
 
   useEffect(() => {
-    const checkIfSupportsAdvancedEditors = async () => {
+    const warnIfUnsupportedEditors = async () => {
       let platformVersionRequirements;
 
       switch (Platform.OS) {
