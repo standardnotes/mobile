@@ -39,9 +39,10 @@ export const TagSelectionList = React.memo(
   }: Props) => {
     // Context
     const application = useContext(ApplicationContext);
-    const navigation = useNavigation<
-      AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
-    >();
+    const navigation =
+      useNavigation<
+        AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+      >();
     const { showActionSheet } = useCustomActionSheet();
 
     // State
@@ -118,29 +119,72 @@ export const TagSelectionList = React.memo(
         },
       ]);
     };
-    const rendetItem: ListRenderItem<SNTag | SNSmartTag> = ({ item }) => {
+
+    // Nesting
+
+    const [showFolders, setShowFolders] = useState(true);
+
+    let renderedTags = tags;
+
+    if (showFolders && contentType === ContentType.Tag) {
+      renderedTags = tags.filter(
+        tag => !(application?.getTagParent(tag) || false)
+      );
+    }
+
+    const renderItem: ListRenderItem<SNTag | SNSmartTag> = ({ item }) => {
+      if (!application) {
+        return null;
+      }
+
       let title = item.deleted ? 'Deleting...' : item.title;
       if (item.errorDecrypting) {
         title = 'Unable to Decrypt';
       }
 
+      let children: (SNTag | SNSmartTag)[] = [];
+
+      if (showFolders && item.content_type === ContentType.Tag) {
+        const rawChildren = application
+          .getTagChildren(item)
+          .map(tag => tag.uuid);
+        children = tags.filter(tag => rawChildren.includes(tag.uuid));
+      }
+
       return (
-        <SideMenuCell
-          onSelect={() => onTagSelect(item)}
-          onLongPress={() => onTagLongPress(item)}
-          text={title}
-          iconDesc={{
-            side: 'left',
-            type: 'ascii',
-            value: '#',
-          }}
-          key={item.uuid}
-          selected={
-            selectedTags.findIndex(
-              selectedTag => selectedTag.uuid === item.uuid
-            ) > -1
-          }
-        />
+        <>
+          <SideMenuCell
+            onSelect={() => onTagSelect(item)}
+            onLongPress={() => onTagLongPress(item)}
+            text={title}
+            iconDesc={{
+              side: 'left',
+              type: 'ascii',
+              value: '#',
+            }}
+            key={item.uuid}
+            selected={
+              selectedTags.findIndex(
+                selectedTag => selectedTag.uuid === item.uuid
+              ) > -1
+            }
+          />
+          {children && (
+            <FlatList
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{
+                paddingBottom: hasBottomPadding ? 30 : 0,
+                paddingLeft: 20,
+              }}
+              initialNumToRender={10}
+              windowSize={10}
+              maxToRenderPerBatch={10}
+              data={children}
+              keyExtractor={item => item.uuid}
+              renderItem={renderItem}
+            />
+          )}
+        </>
       );
     };
 
@@ -152,9 +196,9 @@ export const TagSelectionList = React.memo(
           initialNumToRender={10}
           windowSize={10}
           maxToRenderPerBatch={10}
-          data={tags}
+          data={renderedTags}
           keyExtractor={item => item.uuid}
-          renderItem={rendetItem}
+          renderItem={renderItem}
         />
 
         {tags.length === 0 && (
