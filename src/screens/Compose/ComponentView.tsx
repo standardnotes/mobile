@@ -85,18 +85,49 @@ export const ComponentView = ({
   }, [application, liveComponent?.item.uuid, componentUuid]);
 
   useEffect(() => {
-    const warnUnsupportedEditors = async () => {
+    const warnIfUnsupportedEditors = async () => {
+      let platformVersionRequirements;
+
+      switch (Platform.OS) {
+        case 'ios':
+          if (parseInt(Platform.Version.toString(), 10) < 11) {
+            // WKWebView has issues on iOS < 11
+            platformVersionRequirements = 'iOS 11 or greater';
+          }
+          break;
+        case 'android':
+          if (Platform.Version <= 23) {
+            /**
+             * postMessage doesn't work on Android <= 6 (API version 23)
+             * https://github.com/facebook/react-native/issues/11594
+             */
+            platformVersionRequirements = 'Android 7.0 or greater';
+          }
+          break;
+      }
+
+      if (!platformVersionRequirements) {
+        return;
+      }
+
       const doNotShowAgainUnsupportedEditors = application
         ?.getLocalPreferences()
         .getValue(PrefKey.DoNotShowAgainUnsupportedEditors, false);
+
       if (!doNotShowAgainUnsupportedEditors) {
+        const alertText =
+          `Web editors require ${platformVersionRequirements}. ` +
+          'Your version does not support web editors. ' +
+          'Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.';
+
         const confirmed = await application?.alertService?.confirm(
-          'Web editors require Android 7.0 or greater. Your version does not support web editors. Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.',
+          alertText,
           'Editors Not Supported',
           "Don't show again",
           ButtonType.Info,
           'OK'
         );
+
         if (confirmed) {
           application
             ?.getLocalPreferences()
@@ -104,13 +135,8 @@ export const ComponentView = ({
         }
       }
     };
-    if (Platform.OS === 'android' && Platform.Version <= 23) {
-      /**
-       * postMessage doesn't work on Android <= 6 (API version 23)
-       * https://github.com/facebook/react-native/issues/11594
-       */
-      warnUnsupportedEditors();
-    }
+
+    warnIfUnsupportedEditors();
   }, [application]);
 
   useEffect(() => {
