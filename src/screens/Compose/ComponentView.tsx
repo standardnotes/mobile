@@ -157,12 +157,13 @@ export const ComponentView = ({
 
     // deinit
     return () => {
+      application?.componentManager.onComponentIframeDestroyed(componentUuid);
       application?.componentGroup.deactivateComponentForArea(
         ComponentArea.Editor
       );
       liveComponent?.deinit();
     };
-  }, [application, liveComponent]);
+  }, [application, liveComponent, componentUuid]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
