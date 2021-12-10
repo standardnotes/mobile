@@ -1662,10 +1662,10 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"
   integrity sha512-+OQ6gajTcVSHruw33T52MHyBDKL1vRCfQBXQn4tt4+bCfBAe+PFLkEQMHp35bg5twCfg9+wUf2KhmNNSNyBBZw==
 
-"@standardnotes/snjs@2.20.1":
-  version "2.20.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.20.1.tgz#4813adbfd16a1c373357bd4c7ece3085abf142b4"
-  integrity sha512-wJILt7YerLFaZTKoIZaCkqSuvpVWoVKqCVjP0KNHrMknnbgMHZygHqrb9sr57JL1AcNCkAULEFS/kev2GYTG3Q==
+"@standardnotes/snjs@2.20.3":
+  version "2.20.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.20.3.tgz#11fe962dfb017be459e856b9fbc6311c5046a0b0"
+  integrity sha512-FHog3p3SuMvTXsEl76UenbjY8PS6VL/b6MjaC9whJR5ZwsvmLwE0G16dWZ+z+izm+CsRaHMWU8R2cy7RG7HjZg==
   dependencies:
     "@standardnotes/auth" "^3.8.1"
     "@standardnotes/common" "^1.2.1"
@@ -6980,7 +6980,7 @@ react-native-version-info@^1.1.0:
   resolved "https://registry.yarnpkg.com/react-native-version-info/-/react-native-version-info-1.1.0.tgz#1407de863cae4dbbeeadb9c173a295a7774b6884"
   integrity sha512-0QmJjdKyaW+G/TiOWkwzGVv1G3FPnWrPH5SYWloUpv8WA7onuQESYHdLyjfCUInYI/FHVeEynE2VomOOsda8wQ==
 
-react-native-webview@^11.0.3:
+react-native-webview@11.0.3:
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-11.0.3.tgz#7235ee46d3df30443734bd5e5ba3c28588413e83"
   integrity sha512-or0MP5JthBGXX1/MNePdR7NC0LJXtr1F0yb0wrvEZ0iqSl1xh4yJ4s225qpkPdq3m8bDWMUpM0FGKad26rddOg==

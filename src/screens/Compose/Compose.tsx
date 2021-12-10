@@ -325,11 +325,11 @@ export class Compose extends React.Component<{}, State> {
       }
     } else if (associatedEditor.uuid !== this.state.editorComponent?.uuid) {
       await this.context?.componentGroup.activateComponent(associatedEditor);
+    } else {
+      this.context?.componentManager!.contextItemDidChangeInArea(
+        ComponentArea.Editor
+      );
     }
-
-    this.context?.componentManager!.contextItemDidChangeInArea(
-      ComponentArea.Editor
-    );
   };
 
   saveNote = async (
