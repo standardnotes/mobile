@@ -46,12 +46,12 @@ export class NetworkService {
   private observers: NetworkChangeObserver[] = [];
   private removeNetworkChangeListener?: () => void;
 
-  constructor(configuration?: NetInfoConfiguration) {
-    if (configuration) {
-      NetInfo.configure({
-        ...configuration,
-      });
-    }
+  constructor() {
+    const configuration = {
+      reachabilityUrl: 'https://api.standardnotes.com/healthcheck',
+    } as NetInfoConfiguration;
+
+    NetInfo.configure(configuration);
   }
 
   deinit() {
