@@ -59,7 +59,7 @@ export class PreferencesManager extends ApplicationService {
 
   private async loadPreferences() {
     const preferences = await this.application.getValue(PREFS_KEY);
-    this.userPreferences = preferences ?? {};
+    this.userPreferences = (preferences as Preferences) ?? {};
     this.notifyObserversOfPreferencesLoaded();
   }
 

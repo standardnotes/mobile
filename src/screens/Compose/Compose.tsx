@@ -149,11 +149,11 @@ export class Compose extends React.Component<{}, State> {
 
     this.removeComponentGroupObserver = this.context?.componentGroup.addChangeObserver(
       async () => {
-        const newEditor = this.context?.componentGroup.activeComponentForArea(
-          ComponentArea.Editor
+        const editorForNote = this.context?.componentManager.editorForNote(
+          this.note!
         );
         this.setState({
-          editorComponent: newEditor,
+          editorComponent: editorForNote,
         });
       }
     );
@@ -314,11 +314,11 @@ export class Compose extends React.Component<{}, State> {
   };
 
   get note() {
-    return this.context?.editorGroup.activeEditor.note;
+    return this.context?.editorGroup?.activeEditor?.note;
   }
 
   get editor() {
-    return this.context?.editorGroup.activeEditor;
+    return this.context?.editorGroup?.activeEditor;
   }
 
   dismissKeyboard = () => {
@@ -347,11 +347,11 @@ export class Compose extends React.Component<{}, State> {
       }
     } else if (associatedEditor.uuid !== this.state.editorComponent?.uuid) {
       await this.context?.componentGroup.activateComponent(associatedEditor);
+    } else {
+      this.context?.componentManager!.contextItemDidChangeInArea(
+        ComponentArea.Editor
+      );
     }
-
-    this.context?.componentManager!.contextItemDidChangeInArea(
-      ComponentArea.Editor
-    );
   };
 
   saveNote = async (

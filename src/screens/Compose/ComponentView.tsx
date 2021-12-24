@@ -139,20 +139,49 @@ export const ComponentView = ({
   }, [application, liveComponent?.item.uuid, componentUuid]);
 
   useEffect(() => {
-    const warnUnsupportedEditors = async () => {
+    const warnIfUnsupportedEditors = async () => {
+      let platformVersionRequirements;
+
+      switch (Platform.OS) {
+        case 'ios':
+          if (parseInt(Platform.Version.toString(), 10) < 11) {
+            // WKWebView has issues on iOS < 11
+            platformVersionRequirements = 'iOS 11 or greater';
+          }
+          break;
+        case 'android':
+          if (Platform.Version <= 23) {
+            /**
+             * postMessage doesn't work on Android <= 6 (API version 23)
+             * https://github.com/facebook/react-native/issues/11594
+             */
+            platformVersionRequirements = 'Android 7.0 or greater';
+          }
+          break;
+      }
+
+      if (!platformVersionRequirements) {
+        return;
+      }
+
       const doNotShowAgainUnsupportedEditors = application
         ?.getLocalPreferences()
         .getValue(PrefKey.DoNotShowAgainUnsupportedEditors, false);
+
       if (!doNotShowAgainUnsupportedEditors) {
+        const alertText =
+          `Web editors require ${platformVersionRequirements}. ` +
+          'Your version does not support web editors. ' +
+          'Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.';
+
         const confirmed = await application?.alertService?.confirm(
-          'Web editors require Android 7.0 or greater. Your version does ' +
-            'not support web editors. Changes you make may not be properly ' +
-            'saved. Please switch to the Plain Editor for the best experience.',
+          alertText,
           'Editors Not Supported',
           "Don't show again",
           ButtonType.Info,
           'OK'
         );
+
         if (confirmed) {
           application
             ?.getLocalPreferences()
@@ -160,13 +189,8 @@ export const ComponentView = ({
         }
       }
     };
-    if (Platform.OS === 'android' && Platform.Version <= 23) {
-      /**
-       * postMessage doesn't work on Android <= 6 (API version 23)
-       * https://github.com/facebook/react-native/issues/11594
-       */
-      warnUnsupportedEditors();
-    }
+
+    warnIfUnsupportedEditors();
   }, [application]);
 
   const downloadEditor = useCallback(
@@ -268,7 +292,7 @@ export const ComponentView = ({
         application?.alertService!.alert(
           'Re-install Extension',
           'This extension is not installed correctly. Please use the web ' +
-            'or desktop application to reinstall, then try again.',
+          'or desktop application to reinstall, then try again.',
           'OK'
         );
       } else {
@@ -334,8 +358,13 @@ export const ComponentView = ({
 
     return () => {
       server?.stop();
+      application?.componentManager.onComponentIframeDestroyed(componentUuid);
+      application?.componentGroup.deactivateComponentForArea(
+        ComponentArea.Editor
+      );
+      liveComponent?.deinit();
     };
-  }, []);
+  }, [application, liveComponent, componentUuid]);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
@@ -428,55 +457,59 @@ export const ComponentView = ({
 
   return (
     <FlexContainer>
-      {liveComponent?.item.valid_until &&
-        liveComponent?.item.valid_until <= new Date() && (
-          <LockedContainer>
-            <StyledIcon />
-            <LockedText>
-              Extended expired. Editors are in a read-only state. To edit
-              immediately, please switch to the Plain Editor.
-            </LockedText>
-          </LockedContainer>
-        )}
-      {liveComponent?.item.isDeprecated && (
-        <DeprecatedContainer>
-          <DeprecatedIcon />
-          <DeprecatedText>
-            {deprecationMessage || 'This extension is deprecated.'}
-          </DeprecatedText>
-        </DeprecatedContainer>
+      {liveComponent?.item.isExpired && (
+        <LockedContainer>
+          <StyledIcon />
+          <LockedText>
+            Subscription expired. Editors are in a read-only state. To edit
+            immediately, please switch to the Plain Editor.
+          </LockedText>
+        </LockedContainer>
       )}
-      {(Boolean(url) || Boolean(offlineUrl)) && (
-        <StyledWebview
-          showWebView={showWebView}
-          source={
+
+      {
+        liveComponent?.item.isDeprecated && (
+          <DeprecatedContainer>
+            <DeprecatedIcon />
+            <DeprecatedText>
+              {deprecationMessage || 'This extension is deprecated.'}
+            </DeprecatedText>
+          </DeprecatedContainer>
+        )
+      }
+      {
+        (Boolean(url) || Boolean(offlineUrl)) && (
+          <StyledWebview
+            showWebView={showWebView}
+            source={
+              /**
+               * Android 10 workaround to avoid access denied errors
+               * https://github.com/react-native-webview/react-native-webview/issues/656#issuecomment-551312436
+               */
+              loadedOnce ? { uri: offlineUrl ? offlineUrl : url } : undefined
+            }
+            key={liveComponent?.item.uuid}
+            ref={webViewRef}
             /**
-             * Android 10 workaround to avoid access denied errors
-             * https://github.com/react-native-webview/react-native-webview/issues/656#issuecomment-551312436
+             * onLoad and onLoadEnd seem to be the same exact thing, except
+             * that when an error occurs, onLoadEnd is called twice, whereas
+             * onLoad is called once (what we want)
              */
-            loadedOnce ? { uri: offlineUrl ? offlineUrl : url } : undefined
-          }
-          key={liveComponent?.item.uuid}
-          ref={webViewRef}
-          /**
-           * onLoad and onLoadEnd seem to be the same exact thing, except
-           * that when an error occurs, onLoadEnd is called twice, whereas
-           * onLoad is called once (what we want)
-           */
-          onLoad={onFrameLoad}
-          onLoadStart={onLoadStartHandler}
-          onError={onLoadErrorHandler}
-          onMessage={onMessage}
-          hideKeyboardAccessoryView={true}
-          onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-          cacheEnabled={true}
-          autoManageStatusBarEnabled={
-            false /* To prevent StatusBar from changing colors when focusing */
-          }
-          injectedJavaScript={defaultInjectedJavaScript()}
-          onContentProcessDidTerminate={onLoadErrorHandler}
-        />
-      )}
-    </FlexContainer>
+            onLoad={onFrameLoad}
+            onLoadStart={onLoadStartHandler}
+            onError={onLoadErrorHandler}
+            onMessage={onMessage}
+            hideKeyboardAccessoryView={true}
+            onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+            cacheEnabled={true}
+            autoManageStatusBarEnabled={
+              false /* To prevent StatusBar from changing colors when focusing */
+            }
+            injectedJavaScript={defaultInjectedJavaScript()}
+            onContentProcessDidTerminate={onLoadErrorHandler}
+          />
+        )
+      }
+    </FlexContainer >
   );
 };

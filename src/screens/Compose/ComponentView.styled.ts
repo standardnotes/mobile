@@ -1,4 +1,4 @@
-import { ICON_LOCK, ICON_ALERT } from '@Style/icons';
+import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -17,7 +17,7 @@ export const LockedContainer = styled.View`
   flex-direction: row;
   align-items: center;
   padding: 10px;
-  background-color: ${({ theme }) => theme.stylekitDangerColor};
+  background-color: ${({ theme }) => theme.stylekitWarningColor};
   border-bottom-color: ${({ theme }) => theme.stylekitBorderColor};
   border-bottom-width: 1px;
 `;

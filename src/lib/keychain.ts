@@ -21,7 +21,7 @@ export default class Keychain {
     return RCTKeychain.getGenericPassword()
       .then(function (credentials) {
         if (!credentials || !credentials.password) {
-          console.log('===Keychain value missing===');
+          console.log('Keychain value empty');
           return null;
         } else {
           const keys = JSON.parse(credentials.password);

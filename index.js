@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler';
+import 'react-native-url-polyfill/auto';
 import Bugsnag from '@bugsnag/react-native';
 import { enableScreens } from 'react-native-screens';
 import { SNLog } from '@standardnotes/snjs';

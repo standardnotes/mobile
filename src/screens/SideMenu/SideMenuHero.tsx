@@ -30,20 +30,24 @@ export const SideMenuHero: React.FC<Props> = props => {
   const [signedIn] = useSignedIn();
   const [isLocked] = useIsLocked();
   const [isOutOfSync] = useOutOfSync();
-  const [itemsLength, setItemsLength] = useState(0);
+  const [itemsCount, setItemsCount] = useState(0);
 
   useEffect(() => {
+    const observedContentTypes = [ContentType.Note, ContentType.Tag];
     const removeStreamItems = application?.streamItems(
-      [ContentType.Note, ContentType.Tag],
-      items => {
-        if (items.length !== itemsLength) {
-          setItemsLength(items.length);
+      observedContentTypes,
+      _items => {
+        const notesAndTagsCount =
+          application?.getItems(observedContentTypes).length ?? 0;
+
+        if (notesAndTagsCount !== itemsCount) {
+          setItemsCount(notesAndTagsCount);
         }
       }
     );
 
     return removeStreamItems;
-  }, [application, itemsLength]);
+  }, [application, itemsCount]);
 
   const textData = useMemo(() => {
     const hasEncryption = application?.isEncryptionAvailable();
@@ -58,7 +62,7 @@ export const SideMenuHero: React.FC<Props> = props => {
       const user = application?.getUser();
       const email = user?.email;
       const itemsStatus =
-        itemsLength + '/' + itemsLength + ' notes and tags encrypted';
+        itemsCount + '/' + itemsCount + ' notes and tags encrypted';
       return {
         title: email,
         text: itemsStatus,
@@ -66,7 +70,7 @@ export const SideMenuHero: React.FC<Props> = props => {
     } else {
       return { text: '', title: '' };
     }
-  }, [application, signedIn, itemsLength, isLocked]);
+  }, [application, signedIn, itemsCount, isLocked]);
 
   return (
     <Cell>

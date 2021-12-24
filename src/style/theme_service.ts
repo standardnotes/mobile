@@ -435,7 +435,7 @@ export class ThemeService {
 
     return new Promise(async resolve => {
       try {
-        const response = await fetch(url, {
+        const response = await fetch(url!, {
           method: 'GET',
         });
         const data = await response.text();
@@ -506,7 +506,7 @@ export class ThemeService {
         CACHED_THEMES_KEY,
         StorageValueModes.Nonwrapped
       )) || [];
-    const themes = rawValue.map((rawPayload: RawPayload) => {
+    const themes = (rawValue as RawPayload[]).map((rawPayload: RawPayload) => {
       const payload = CreateMaxPayloadFromAnyObject(rawPayload);
       return new MobileTheme(payload);
     });

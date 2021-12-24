@@ -9,7 +9,7 @@ import { Platform, Share } from 'react-native';
 import { ContentContainer, Label } from './CompanySection.styled';
 
 const URLS = {
-  feedback: `mailto:help@standardnotes.org?subject=${
+  feedback: `mailto:help@standardnotes.com?subject=${
     Platform.OS === 'android' ? 'Android' : 'iOS'
   } app feedback (v${ApplicationState.version})`,
   learn_more: 'https://standardnotes.com',
