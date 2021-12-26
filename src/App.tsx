@@ -130,7 +130,7 @@ AppGroupInstance.initialize();
 const networkServiceInstance = new NetworkService();
 networkServiceInstance.registerObservers();
 
-export const App = (props: { env: 'prod' | 'dev'; bugsnagOptOut: boolean }) => {
+export const App = (props: { env: 'prod' | 'dev'; bugsnagOptOut: true }) => {
   const applicationGroupRef = useRef(AppGroupInstance);
   const [application, setApplication] = useState<
     MobileApplication | undefined

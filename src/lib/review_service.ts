@@ -11,7 +11,6 @@ export class ReviewService extends ApplicationService {
     ) {
       return;
     }
-
     const runCount = await this.getRunCount();
     this.setRunCount(runCount + 1);
     if (RUN_COUNTS_BEFORE_REVIEW.includes(runCount)) {
@@ -20,16 +19,10 @@ export class ReviewService extends ApplicationService {
       }, 1000);
     }
   }
-
   async getRunCount() {
-    return this.application?.getValue('runCount').then(runCount => {
-      if (runCount) {
-        return JSON.parse(runCount as string);
-      }
-    });
+    return Number(this.application?.getValue('runCount'));
   }
-
   async setRunCount(runCount: number) {
-    return this.application?.setValue('runCount', JSON.stringify(runCount));
+    return this.application?.setValue('runCount', runCount);
   }
 }

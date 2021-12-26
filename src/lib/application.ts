@@ -16,7 +16,6 @@ import { version } from '../../package.json';
 import { AlertService } from './alert_service';
 import { ApplicationState, UnlockTiming } from './application_state';
 import { BackupsService } from './backups_service';
-import { ComponentGroup } from './component_group';
 import { ComponentManager } from './component_manager';
 import { EditorGroup } from './editor_group';
 import { InstallationService } from './installation_service';
@@ -41,10 +40,8 @@ const IsDev = VersionInfo.bundleIdentifier?.includes('dev');
 export class MobileApplication extends SNApplication {
   private MobileServices!: MobileServices;
   public editorGroup: EditorGroup;
-  public componentGroup: ComponentGroup;
   private startedDeinit: boolean = false;
   public Uuid: string; // UI remounts when Uuid changes
-
   static previouslyLaunched: boolean = false;
 
   constructor(deviceInterface: MobileDeviceInterface, identifier: string) {
@@ -72,7 +69,11 @@ export class MobileApplication extends SNApplication {
     );
     this.Uuid = Math.random().toString();
     this.editorGroup = new EditorGroup(this);
-    this.componentGroup = new ComponentGroup(this);
+    this.mobileComponentManager.initialize(this.protocolService);
+  }
+
+  get mobileComponentManager(): ComponentManager {
+    return this.componentManager as ComponentManager;
   }
 
   static getPreviouslyLaunched() {
@@ -99,7 +100,6 @@ export class MobileApplication extends SNApplication {
     }
     this.MobileServices = {} as MobileServices;
     this.editorGroup.deinit();
-    this.componentGroup.deinit();
     super.deinit(source);
   }
 

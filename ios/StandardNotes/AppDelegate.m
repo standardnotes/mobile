@@ -11,7 +11,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSString *bugsnagOptOut = [defaults objectForKey:@"bugsnagoptout"];
+  NSString *bugsnagOptOut = [defaults objectForKey:@"bugsnagoptout"] ?: @"true";
 
   BugsnagConfiguration *config = [BugsnagConfiguration loadConfig];
   config.enabledBreadcrumbTypes = BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeLog

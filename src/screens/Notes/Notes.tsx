@@ -88,7 +88,7 @@ export const Notes = React.memo(
       () =>
         !(
           application!.hasProtectionSources() &&
-          application!.areProtectionsEnabled()
+          !application!.hasUnprotectedAccessSession()
         )
     );
     const [includeArchivedNotes, setIncludeArchivedNotes] = useState<boolean>(
@@ -107,7 +107,7 @@ export const Notes = React.memo(
     const haveDisplayOptions = useRef(false);
     const protectionsEnabled = useRef(
       application!.hasProtectionSources() &&
-        application!.areProtectionsEnabled()
+      !application!.hasUnprotectedAccessSession()
     );
 
     const reloadTitle = useCallback(
@@ -243,10 +243,10 @@ export const Notes = React.memo(
         const searchQuery =
           searchText || searchFilter
             ? {
-                query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
-                includeProtectedNoteText:
-                  includeProtected ?? includeProtectedNoteText,
-              }
+              query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
+              includeProtectedNoteText:
+                includeProtected ?? includeProtectedNoteText,
+            }
             : undefined;
 
         let applyFilters = false;
@@ -323,7 +323,7 @@ export const Notes = React.memo(
     const reloadSearchOptions = useCallback(() => {
       const protections =
         application?.hasProtectionSources() &&
-        application?.areProtectionsEnabled();
+        !application!.hasUnprotectedAccessSession();
 
       if (protections !== protectionsEnabled.current) {
         protectionsEnabled.current = !!protections;

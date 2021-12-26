@@ -2,15 +2,14 @@ import { AppStateEventType } from '@Lib/application_state';
 import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
+import { ComponentAction } from '@standardnotes/features';
 import {
   ApplicationEvent,
-  ComponentAction,
-  ComponentArea,
+  ComponentViewer,
   ContentType,
   isPayloadSourceInternalChange,
   isPayloadSourceRetrieved,
   NoteMutator,
-  SNComponent,
 } from '@standardnotes/snjs';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
@@ -43,11 +42,11 @@ type State = {
   title: string;
   text: string;
   saveError: boolean;
-  editorComponent: SNComponent | undefined;
   webViewError: boolean;
   downloadError: boolean;
   loadingWebview: boolean;
   downloadingEditor: boolean;
+  componentViewer?: ComponentViewer;
 };
 
 export class Compose extends React.Component<{}, State> {
@@ -63,7 +62,6 @@ export class Compose extends React.Component<{}, State> {
   removeComponentsObserver?: () => void;
   removeEditorNoteChangeObserver?: () => void;
   removeStreamComponents?: () => void;
-  removeComponentGroupObserver?: () => void;
   removeStateEventObserver?: () => void;
   removeAppEventObserver?: () => void;
   removeComponentHandler?: () => void;
@@ -78,7 +76,7 @@ export class Compose extends React.Component<{}, State> {
     this.state = {
       title: initialEditor?.note?.title ?? '',
       text: initialEditor?.note?.text ?? '',
-      editorComponent: undefined,
+      componentViewer: undefined,
       saveError: false,
       webViewError: false,
       downloadError: false,
@@ -147,17 +145,6 @@ export class Compose extends React.Component<{}, State> {
       }
     );
 
-    this.removeComponentGroupObserver = this.context?.componentGroup.addChangeObserver(
-      async () => {
-        const editorForNote = this.context?.componentManager.editorForNote(
-          this.note!
-        );
-        this.setState({
-          editorComponent: editorForNote,
-        });
-      }
-    );
-
     this.removeAppEventObserver = this.context?.addEventObserver(
       async eventName => {
         if (eventName === ApplicationEvent.CompletedFullSync) {
@@ -177,30 +164,6 @@ export class Compose extends React.Component<{}, State> {
         } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
           this.showErrorStatus('Offline Saving Issue (changes not saved)');
         }
-      }
-    );
-
-    this.removeComponentHandler = this.context?.componentManager!.registerHandler(
-      {
-        identifier: 'component-view-' + Math.random(),
-        areas: [ComponentArea.Editor],
-        actionHandler: (currentComponent, action, data) => {
-          switch (action) {
-            case ComponentAction.SetSize:
-              this.context?.componentManager!.handleSetSizeEvent(
-                currentComponent,
-                data
-              );
-              break;
-            case ComponentAction.ThemesActivated:
-              this.setState({
-                downloadError: false,
-                loadingWebview: false,
-              });
-              break;
-          }
-        },
-        contextRequestHandler: () => this.note,
       }
     );
 
@@ -229,7 +192,6 @@ export class Compose extends React.Component<{}, State> {
     this.removeEditorNoteChangeObserver &&
       this.removeEditorNoteChangeObserver();
     this.removeAppEventObserver && this.removeAppEventObserver();
-    this.removeComponentGroupObserver && this.removeComponentGroupObserver();
     this.removeStreamComponents && this.removeStreamComponents();
     this.removeStateEventObserver && this.removeStateEventObserver();
     this.removeComponentHandler && this.removeComponentHandler();
@@ -237,19 +199,11 @@ export class Compose extends React.Component<{}, State> {
     this.removeComponentHandler = undefined;
     this.removeStreamComponents = undefined;
     this.removeAppEventObserver = undefined;
-    this.removeComponentGroupObserver = undefined;
     this.removeEditorNoteChangeObserver = undefined;
     this.removeEditorNoteValueChangeObserver = undefined;
     if (this.editor) {
       this.context?.editorGroup?.closeEditor(this.editor);
     }
-    if (this.state.editorComponent) {
-      this.context?.componentGroup?.deactivateComponent(
-        this.state.editorComponent,
-        false
-      );
-    }
-
     this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
@@ -326,6 +280,10 @@ export class Compose extends React.Component<{}, State> {
     this.editorViewRef.current?.blur();
   };
 
+  get componentManager() {
+    return this.context?.mobileComponentManager!;
+  }
+
   reloadComponentEditorState = async () => {
     this.setState({
       downloadingEditor: false,
@@ -334,23 +292,39 @@ export class Compose extends React.Component<{}, State> {
       webViewError: false,
     });
 
-    const associatedEditor = this.context?.componentManager!.editorForNote(
-      this.note!
-    );
+    const associatedEditor = this.componentManager.editorForNote(this.note!);
 
     if (!associatedEditor) {
-      /** No editor */
-      if (this.state.editorComponent) {
-        await this.context?.componentGroup.deactivateComponent(
-          this.state.editorComponent
+      if (this.state.componentViewer) {
+        this.componentManager.destroyComponentViewer(
+          this.state.componentViewer
+        );
+        this.setState({ componentViewer: undefined });
+      }
+    } else if (
+      associatedEditor.uuid !== this.state.componentViewer?.component.uuid
+    ) {
+      if (this.state.componentViewer) {
+        this.componentManager.destroyComponentViewer(
+          this.state.componentViewer
         );
       }
-    } else if (associatedEditor.uuid !== this.state.editorComponent?.uuid) {
-      await this.context?.componentGroup.activateComponent(associatedEditor);
-    } else {
-      this.context?.componentManager!.contextItemDidChangeInArea(
-        ComponentArea.Editor
-      );
+      if (this.componentManager.isComponentThirdParty(associatedEditor)) {
+        await this.componentManager.preloadThirdPartyIndexPath(
+          associatedEditor
+        );
+      }
+      this.setState({
+        componentViewer: this.componentManager.createComponentViewer(
+          associatedEditor,
+          this.note?.uuid,
+          action => {
+            if (action === ComponentAction.ThemesActivated) {
+              this.onWebViewThemeLoad?.();
+            }
+          }
+        ),
+      });
     }
   };
 
@@ -445,6 +419,12 @@ export class Compose extends React.Component<{}, State> {
       loadingWebview: false,
     });
 
+  onWebViewThemeLoad = () =>
+    this.setState({
+      downloadError: false,
+      loadingWebview: false,
+    });
+
   onLoadWebViewError = () =>
     this.setState({
       loadingWebview: false,
@@ -478,7 +458,7 @@ export class Compose extends React.Component<{}, State> {
 
   render() {
     const shouldDisplayEditor =
-      this.state.editorComponent &&
+      this.state.componentViewer &&
       Boolean(this.note) &&
       !this.note?.prefersPlainEditor &&
       !this.state.webViewError;
@@ -506,7 +486,7 @@ export class Compose extends React.Component<{}, State> {
                     color={theme.stylekitBackgroundColor}
                   />
                   <LockedText>
-                    Unable to load {this.state.editorComponent?.name}
+                    Unable to load {this.state.componentViewer?.component.name}
                   </LockedText>
                   <WebViewReloadButton
                     onPress={() => {
@@ -528,7 +508,8 @@ export class Compose extends React.Component<{}, State> {
                     color={theme.stylekitBackgroundColor}
                   />
                   <LockedText>
-                    Unable to download {this.state.editorComponent?.name}
+                    Unable to download{' '}
+                    {this.state.componentViewer?.component.name}
                   </LockedText>
                   <WebViewReloadButton
                     onPress={() => {
@@ -559,29 +540,26 @@ export class Compose extends React.Component<{}, State> {
                     />
                     {(this.state.downloadingEditor ||
                       this.state.loadingWebview) && (
-                      <LoadingWebViewContainer locked={this.noteLocked}>
-                        <LoadingText>
-                          {this.state.downloadingEditor
-                            ? 'Downloading '
-                            : 'Loading '}
-                          {this.state.editorComponent?.name}...
-                        </LoadingText>
-                      </LoadingWebViewContainer>
-                    )}
+                        <LoadingWebViewContainer locked={this.noteLocked}>
+                          <LoadingText>
+                            {this.state.downloadingEditor
+                              ? 'Downloading '
+                              : 'Loading '}
+                            {this.state.componentViewer?.component.name}...
+                          </LoadingText>
+                        </LoadingWebViewContainer>
+                      )}
                     {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
                     {shouldDisplayEditor && (
                       <ComponentView
-                        key={this.state.editorComponent!.uuid}
-                        componentUuid={this.state.editorComponent!.uuid}
-                        note={this.note!}
+                        key={this.state.componentViewer?.component.uuid}
+                        componentViewer={this.state.componentViewer!}
                         onLoadStart={this.onLoadWebViewStart}
                         onLoadEnd={this.onLoadWebViewEnd}
                         onLoadError={this.onLoadWebViewError}
                         onDownloadEditorStart={this.onDownloadEditorStart}
                         onDownloadEditorEnd={this.onDownloadEditorEnd}
                         onDownloadError={this.onDownloadError}
-                        downloadError={this.state.downloadError}
-                        offlineOnly={this.state.editorComponent?.offlineOnly}
                       />
                     )}
                     {!shouldDisplayEditor &&
