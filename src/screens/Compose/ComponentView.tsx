@@ -60,9 +60,14 @@ export const ComponentView = ({
 
   // State
   const [showWebView, setShowWebView] = useState<boolean>(true);
-  const [loadedOnce, setLoadedOnce] = useState(false);
+  const [requiresLocalEditor, setRequiresLocalEditor] = useState<boolean>(
+    false
+  );
+  const [localEditorReady, setLocalEditorReady] = useState<boolean>(false);
 
   // Ref
+  const loadedOnce = useRef<boolean>(false);
+  const lastIframeLoadedUrl = useRef<string | undefined>();
   const webViewRef = useRef<WebView>(null);
   const timeoutRef = useRef<number | undefined>(undefined);
 
@@ -146,23 +151,27 @@ export const ComponentView = ({
   }, [onLoadError, timeoutRef]);
 
   useEffect(() => {
-    const asyncFunc = async () => {
-      const componentManager = application!.mobileComponentManager;
-      const component = componentViewer.component;
+    const componentManager = application!.mobileComponentManager;
+    const component = componentViewer.component;
+    const isDownloadable = componentManager.isEditorDownloadable(component);
+    setRequiresLocalEditor(isDownloadable);
 
-      if (componentManager.isEditorDownloadable(component)) {
-        onDownloadEditorStart();
-        const { error } = await componentManager.downloadEditorOffline(
-          component
-        );
-        onDownloadEditorEnd();
-        if (error) {
-          onDownloadError();
+    if (isDownloadable) {
+      const asyncFunc = async () => {
+        if (await componentManager.doesEditorNeedDownload(component)) {
+          onDownloadEditorStart();
+          const { error } = await componentManager.downloadEditorOffline(
+            component
+          );
+          onDownloadEditorEnd();
+          if (error) {
+            onDownloadError();
+          }
         }
-      }
-    };
-
-    asyncFunc();
+        setLocalEditorReady(true);
+      };
+      asyncFunc();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [componentViewer]);
 
@@ -178,7 +187,12 @@ export const ComponentView = ({
   };
 
   const onFrameLoad = useCallback(() => {
-    setLoadedOnce(true);
+    loadedOnce.current = true;
+
+    log('Iframe did load');
+
+    /** The first request can typically be 'about:blank', which we want to ignore */
+    const isComponentUrl = lastIframeLoadedUrl.current === componentViewer.url!;
 
     /**
      * We have no way of knowing if the webview load is successful or not. We
@@ -194,25 +208,30 @@ export const ComponentView = ({
       clearTimeout(timeoutRef.current);
     }
 
-    timeoutRef.current = setTimeout(() => {
-      componentViewer?.setWindow(webViewRef.current);
-    }, 1);
-
-    /**
-     * The parent will remove their loading screen on load end. We want to
-     * delay this by 100 to avoid flicker that may result if using a dark theme.
-     * This delay will allow editor to load its theme.
-     */
+    if (isComponentUrl) {
+      log('Setting component viewer webview');
+      timeoutRef.current = setTimeout(() => {
+        componentViewer?.setWindow(webViewRef.current);
+      }, 1);
+      /**
+       * The parent will remove their loading screen on load end. We want to
+       * delay this to avoid flicker that may result if using a dark theme.
+       * This delay will allow editor to load its theme.
+       */
+    }
     setTimeout(() => {
       onLoadEnd();
-    }, 200);
-  }, [onLoadEnd, componentViewer]);
+    }, 25);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onLoadStartHandler = () => {
     onLoadStart();
   };
 
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
+    log('Setting last iframe URL to', request.url);
+    lastIframeLoadedUrl.current = request.url;
     /**
      * We want to handle link clicks within an editor by opening the browser
      * instead of loading inline. On iOS, onShouldStartLoadWithRequest is
@@ -251,6 +270,9 @@ export const ComponentView = ({
 
   const deprecationMessage = componentViewer.component.deprecationMessage;
 
+  const renderWebview =
+    !requiresLocalEditor || (requiresLocalEditor && localEditorReady);
+
   return (
     <FlexContainer>
       {componentViewer.component.isExpired && (
@@ -272,35 +294,37 @@ export const ComponentView = ({
         </DeprecatedContainer>
       )}
 
-      <StyledWebview
-        showWebView={showWebView}
-        source={
+      {renderWebview && (
+        <StyledWebview
+          showWebView={showWebView}
+          source={
+            /**
+             * Android 10 workaround to avoid access denied errors
+             * https://github.com/react-native-webview/react-native-webview/issues/656#issuecomment-551312436
+             */
+            loadedOnce.current ? { uri: componentViewer.url! } : undefined
+          }
+          key={componentViewer.component.uuid}
+          ref={webViewRef}
           /**
-           * Android 10 workaround to avoid access denied errors
-           * https://github.com/react-native-webview/react-native-webview/issues/656#issuecomment-551312436
+           * onLoad and onLoadEnd seem to be the same exact thing, except
+           * that when an error occurs, onLoadEnd is called twice, whereas
+           * onLoad is called once (what we want)
            */
-          loadedOnce ? { uri: componentViewer.url! } : undefined
-        }
-        key={componentViewer.component.uuid}
-        ref={webViewRef}
-        /**
-         * onLoad and onLoadEnd seem to be the same exact thing, except
-         * that when an error occurs, onLoadEnd is called twice, whereas
-         * onLoad is called once (what we want)
-         */
-        onLoad={onFrameLoad}
-        onLoadStart={onLoadStartHandler}
-        onError={onLoadErrorHandler}
-        onMessage={onMessage}
-        hideKeyboardAccessoryView={true}
-        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-        cacheEnabled={true}
-        autoManageStatusBarEnabled={
-          false /* To prevent StatusBar from changing colors when focusing */
-        }
-        injectedJavaScript={defaultInjectedJavaScript()}
-        onContentProcessDidTerminate={onLoadErrorHandler}
-      />
+          onLoad={onFrameLoad}
+          onLoadStart={onLoadStartHandler}
+          onError={onLoadErrorHandler}
+          onMessage={onMessage}
+          hideKeyboardAccessoryView={true}
+          onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+          cacheEnabled={true}
+          autoManageStatusBarEnabled={
+            false /* To prevent StatusBar from changing colors when focusing */
+          }
+          injectedJavaScript={defaultInjectedJavaScript()}
+          onContentProcessDidTerminate={onLoadErrorHandler}
+        />
+      )}
     </FlexContainer>
   );
 };

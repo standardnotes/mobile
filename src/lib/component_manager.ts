@@ -38,6 +38,7 @@ export class ComponentManager extends SNComponentManager {
 
   public async initialize(protocolService: SNProtocolService) {
     this.protocolService = protocolService;
+    this.loggingEnabled = true;
     await this.createServer();
   }
 
@@ -67,12 +68,12 @@ export class ComponentManager extends SNComponentManager {
     const nativeFeature = this.nativeFeatureForIdentifier(identifier);
     const downloadUrl =
       nativeFeature?.download_url || component.package_info?.download_url;
-    return !downloadUrl;
+    return !!downloadUrl;
   }
 
-  public async downloadEditorOffline(
+  public async doesEditorNeedDownload(
     component: SNComponent
-  ): Promise<{ error?: boolean }> {
+  ): Promise<boolean> {
     const identifier = component.identifier;
     const nativeFeature = this.nativeFeatureForIdentifier(identifier);
     const downloadUrl =
@@ -95,9 +96,19 @@ export class ComponentManager extends SNComponentManager {
       !existingPackageJson ||
       isRightVersionGreaterThanLeft(existingVersion, version);
 
-    if (!shouldDownload) {
-      this.log(`Not downloading editor ${identifier}`);
-      return {};
+    return shouldDownload;
+  }
+
+  public async downloadEditorOffline(
+    component: SNComponent
+  ): Promise<{ error?: boolean }> {
+    const identifier = component.identifier;
+    const nativeFeature = this.nativeFeatureForIdentifier(identifier);
+    const downloadUrl =
+      nativeFeature?.download_url || component.package_info?.download_url;
+
+    if (!downloadUrl) {
+      throw Error('Attempting to download editor with no download url');
     }
 
     try {

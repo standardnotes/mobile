@@ -408,34 +408,39 @@ export class Compose extends React.Component<{}, State> {
     this.saveNote(false, true, false, false, text);
   };
 
-  onLoadWebViewStart = () =>
+  onLoadWebViewStart = () => {
     this.setState({
       loadingWebview: true,
       webViewError: false,
     });
+  };
 
-  onLoadWebViewEnd = () =>
+  onLoadWebViewEnd = () => {
     this.setState({
       loadingWebview: false,
     });
+  };
 
-  onWebViewThemeLoad = () =>
+  onWebViewThemeLoad = () => {
     this.setState({
       downloadError: false,
       loadingWebview: false,
     });
+  };
 
-  onLoadWebViewError = () =>
+  onLoadWebViewError = () => {
     this.setState({
       loadingWebview: false,
       webViewError: true,
     });
+  };
 
-  onDownloadEditorStart = () =>
+  onDownloadEditorStart = () => {
     this.setState({
       downloadingEditor: true,
       downloadError: false,
     });
+  };
 
   onDownloadEditorEnd = () => {
     if (this.downloadingMessageTimeout) {
