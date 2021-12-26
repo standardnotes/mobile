@@ -1,17 +1,21 @@
+/* eslint-disable prettier/prettier */
 import { PrefKey } from '@Lib/preferences_manager';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
+import { ComponentArea, Features } from '@standardnotes/features';
 import {
   ButtonType,
-  ComponentMutator,
+  FeatureIdentifier,
+  isRightVersionGreaterThanLeft,
   LiveItem,
-  SNApplication,
   SNComponent,
   SNLog,
   SNNote,
 } from '@standardnotes/snjs';
+import { FeatureDescription } from '@standardnotes/features';
+const FeatureChecksums = require('@standardnotes/features/dist/static/checksums.json');
 import React, {
   useCallback,
   useContext,
@@ -53,35 +57,16 @@ type Props = {
 };
 
 const STATIC_SERVER_PORT = 8080;
-const BASE_PATH = DocumentDirectoryPath;
+const BASE_DOCUMENTS_PATH = DocumentDirectoryPath;
 const EDITORS_PATH = '/editors';
 
-async function checkForComponentUpdate(
-  application: SNApplication,
-  component: SNComponent
-) {
-  const { latest_url: latestUrl } = component.package_info;
-  if (!latestUrl) {
-    return;
+const log = (message?: any, ...optionalParams: any[]) => {
+  const LOGGING_ENABLED = true;
+  if (LOGGING_ENABLED) {
+    console.log(message, optionalParams, '\n\n');
+    console.log('\n\n');
   }
-  try {
-    const packageInfo = await fetch(latestUrl).then(r => r.json());
-    if (
-      packageInfo &&
-      packageInfo.version !== component.package_info.version &&
-      application.isStarted()
-    ) {
-      application.changeAndSaveItem<ComponentMutator>(
-        component.uuid,
-        mutator => {
-          mutator.package_info = packageInfo;
-        }
-      );
-    }
-  } catch (error) {
-    SNLog.error(error);
-  }
-}
+};
 
 export const ComponentView = ({
   onLoadEnd,
@@ -101,9 +86,8 @@ export const ComponentView = ({
   const [liveComponent, setLiveComponent] = useState<
     LiveItem<SNComponent> | undefined
   >(() => new LiveItem(componentUuid, application!));
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState<string | undefined>();
   const [showWebView, setShowWebView] = useState<boolean>(true);
-  const [offlineUrl, setOfflineUrl] = useState('');
   const [
     downloadingOfflineEditor,
     setDownloadingOfflineEditor,
@@ -193,85 +177,168 @@ export const ComponentView = ({
     warnIfUnsupportedEditors();
   }, [application]);
 
+  const passesChecksumValidation = useCallback(
+    async (filePath: string, featureIdentifier: FeatureIdentifier) => {
+      log('Performing checksum verification on', filePath);
+      const zipContents = await RNFS.readFile(filePath, 'base64');
+      const checksum = await application!.protocolService.crypto.sha256(zipContents);
+      log(`Got checksum ${checksum} for ${featureIdentifier}`);
+
+      const desiredChecksum = FeatureChecksums[featureIdentifier]?.base64;
+      if (!desiredChecksum) {
+        log(`Checksum is missing for ${featureIdentifier}; aborting installation`);
+        onDownloadError();
+        return false;
+      }
+      if (checksum !== desiredChecksum) {
+        log(`Checksums don't match for ${featureIdentifier}; ${checksum} != ${desiredChecksum}; aborting install`);
+        onDownloadError();
+        return false;
+      }
+
+      return true;
+    }, [application, onDownloadError]);
+
   const downloadEditor = useCallback(
-    async (downloadUrl, downloadPath, editorPath, versionPath) => {
+    async (identifier: FeatureIdentifier, downloadUrl) => {
       setDownloadingOfflineEditor(true);
       onDownloadEditorStart();
+
       try {
-        // Delete any previous versions downloads
-        if (await RNFS.exists(editorPath)) {
-          await RNFS.unlink(editorPath);
+        const tmpLocation = `${BASE_DOCUMENTS_PATH}/${identifier}.zip`;
+
+        if (await RNFS.exists(tmpLocation)) {
+          log('Deleting file at', tmpLocation);
+          await RNFS.unlink(tmpLocation);
         }
+
+        log('Downloading editor', identifier, 'from url', downloadUrl, 'to location', tmpLocation);
         await RNFS.downloadFile({
           fromUrl: downloadUrl,
-          toFile: downloadPath,
+          toFile: tmpLocation,
         }).promise;
-        await unzip(downloadPath, versionPath);
-        // Delete zip after extraction
-        await RNFS.unlink(downloadPath);
+        log('Finished download to tmp location', tmpLocation);
+
+        const requireChecksumVerification = !!nativeFeatureForIdentifier(identifier);
+        if (requireChecksumVerification) {
+          const passes = await passesChecksumValidation(tmpLocation, identifier);
+          if (!passes) {
+            return;
+          }
+        }
+
+        const editorPath = pathForEditor(identifier);
+        log(`Attempting to unzip ${tmpLocation} to ${editorPath}`);
+        await unzip(tmpLocation, editorPath);
+        log('Unzipped editor to', editorPath);
+        await RNFS.unlink(tmpLocation);
       } catch (error) {
         onDownloadError();
+        console.error(error);
       } finally {
         onDownloadEditorEnd();
         setDownloadingOfflineEditor(false);
       }
     },
-    [onDownloadEditorStart, onDownloadEditorEnd, onDownloadError]
+    [onDownloadEditorStart, onDownloadEditorEnd, onDownloadError, passesChecksumValidation]
   );
+
+  const pathForEditor = (identifier: FeatureIdentifier) => {
+    return `${BASE_DOCUMENTS_PATH}${EDITORS_PATH}/${identifier}`;
+  };
+
+  const nativeFeatureForIdentifier = (identifier: FeatureIdentifier) => {
+    return Features.find((feature: FeatureDescription) => feature.identifier === identifier);
+  };
+
+  const getDownloadedEditorPackageJsonFile = useCallback(async (
+    identifier: FeatureIdentifier
+  ): Promise<Record<string, any> | undefined> => {
+    const editorPath = pathForEditor(identifier);
+    if (!await RNFS.exists(editorPath)) {
+      return undefined;
+    }
+    const filePath = `${editorPath}/package.json`;
+    if (!await RNFS.exists(filePath)) {
+      return undefined;
+    }
+    const fileContents = await RNFS.readFile(filePath);
+    if (!fileContents) {
+      return undefined;
+    }
+    const packageJson = JSON.parse(fileContents);
+    return packageJson;
+  }, []);
 
   const getOfflineEditorUrl = useCallback(async () => {
     if (!liveComponent) {
-      return '';
+      return undefined;
     }
 
-    const {
-      identifier: editorIdentifier,
-      version: editorVersion,
-      download_url: downloadUrl,
-    } = liveComponent.item.package_info;
-    const downloadPath = `${BASE_PATH}/${editorIdentifier}.zip`;
-    const editorPath = `${BASE_PATH}${EDITORS_PATH}/${editorIdentifier}`;
-    const versionPath = `${editorPath}/${editorVersion}`;
+    const identifier = liveComponent.item.package_info.identifier;
+    const nativeFeature = nativeFeatureForIdentifier(identifier);
+    const version = nativeFeature?.version || liveComponent.item.package_info.version;
+    const downloadUrl = nativeFeature?.download_url || liveComponent.item.package_info.download_url;
+
+    const existingPackageJson = await getDownloadedEditorPackageJsonFile(
+      identifier
+    );
+    const existingVersion = existingPackageJson?.version;
+    log('Existing package version', existingVersion);
+
     const shouldDownload =
       !downloadError &&
       !downloadingOfflineEditor &&
-      (!(await RNFS.exists(versionPath)) ||
-        (await RNFS.readDir(versionPath)).length === 0);
+      (!existingPackageJson ||
+        isRightVersionGreaterThanLeft(existingVersion, version));
 
     if (shouldDownload) {
-      await downloadEditor(downloadUrl, downloadPath, editorPath, versionPath);
+      await downloadEditor(identifier, downloadUrl);
+    } else {
+      log(`Not downloading editor ${identifier}`, downloadError, downloadingOfflineEditor);
     }
 
-    if (application) {
-      checkForComponentUpdate(application, liveComponent.item);
+    const editorPath = pathForEditor(identifier);
+    if (!(await RNFS.exists(editorPath))) {
+      log(`No editor exists at path ${editorPath}, not using offline editor`);
+      return undefined;
     }
 
-    if (await RNFS.exists(versionPath)) {
-      const editorDir = await RNFS.readDir(versionPath);
-      const packagePath = editorDir[0].path;
-      const packageJson = JSON.parse(
-        await RNFS.readFile(`${packagePath}/package.json`)
+    let mainFilePath, mainFileName;
+
+    if (nativeFeature) {
+      mainFileName = nativeFeature.index_path;
+      mainFilePath = `${editorPath}/${nativeFeature.index_path}`;
+    } else {
+      const packageJson = await getDownloadedEditorPackageJsonFile(
+        identifier
       );
-      const mainFileName = packageJson?.sn?.main || 'index.html';
-      const mainFilePath = `${packagePath}/${mainFileName}`;
-      const splitPackagePath = packagePath.split(EDITORS_PATH);
-      const relativePackagePath = splitPackagePath[splitPackagePath.length - 1];
-      const relativeMainFilePath = `${relativePackagePath}/${mainFileName}`;
-
-      if ((await RNFS.exists(mainFilePath)) && staticServer?.isRunning) {
-        return `${staticServerUrl}${relativeMainFilePath}`;
-      }
+      mainFileName = packageJson?.sn?.main || 'index.html';
+      mainFilePath = `${editorPath}/${mainFileName}`;
     }
 
-    return '';
+    const splitPackagePath = editorPath.split(EDITORS_PATH);
+    const relativePackagePath = splitPackagePath[splitPackagePath.length - 1];
+    const relativeMainFilePath = `${relativePackagePath}/${mainFileName}`;
+
+    if (!(await staticServer?.isRunning())) {
+      log('Server is not running; cannot use offline editor');
+      return undefined;
+    }
+
+    if ((await RNFS.exists(mainFilePath))) {
+      return `${staticServerUrl}${relativeMainFilePath}`;
+    } else {
+      log(`No editor exists at path ${mainFilePath}. Not using offline editor.`);
+    }
   }, [
-    application,
     downloadEditor,
     downloadError,
     downloadingOfflineEditor,
     liveComponent,
     staticServer,
     staticServerUrl,
+    getDownloadedEditorPackageJsonFile,
   ]);
 
   const onLoadErrorHandler = useCallback(() => {
@@ -283,53 +350,45 @@ export const ComponentView = ({
   }, [onLoadError, timeoutRef]);
 
   useEffect(() => {
-    let mounted = true;
-    const setEditorUrl = async () => {
-      const newUrl = application!.componentManager!.urlForComponent(
+    if (!staticServerUrl) {
+      return;
+    }
+    const asyncFunc = async () => {
+      const offlineEditorUrl = await getOfflineEditorUrl();
+      if (offlineEditorUrl) {
+        log('Using offline URL', offlineEditorUrl);
+        setUrl(offlineEditorUrl);
+        return;
+      }
+
+      const requiredOffline = offlineOnly || nativeFeatureForIdentifier(
+        liveComponent!.item.identifier
+      );
+      if (requiredOffline) {
+        log('No offline URL available but is required; not loading any editor.');
+        onLoadErrorHandler();
+        return;
+      }
+
+      const hostedUrl = application!.componentManager.urlForComponent(
         liveComponent!.item
       );
-      if (!newUrl) {
+      log('Using hosted URL', hostedUrl);
+      setUrl(hostedUrl as any);
+
+      if (!hostedUrl) {
         application?.alertService!.alert(
           'Re-install Extension',
           'This extension is not installed correctly. Please use the web ' +
           'or desktop application to reinstall, then try again.',
           'OK'
         );
-      } else {
-        try {
-          const offlineEditorUrl = await getOfflineEditorUrl();
-
-          if (mounted) {
-            setOfflineUrl(offlineEditorUrl);
-          }
-        } catch (e) {
-          SNLog.error(e);
-          if (mounted) {
-            if (offlineOnly) {
-              onLoadErrorHandler();
-            } else {
-              setUrl(newUrl);
-            }
-          }
-        }
       }
     };
-    if (liveComponent) {
-      setEditorUrl();
-    }
 
-    // deinit
-    return () => {
-      mounted = false;
-    };
-  }, [
-    application,
-    componentUuid,
-    getOfflineEditorUrl,
-    liveComponent,
-    offlineOnly,
-    onLoadErrorHandler,
-  ]);
+    asyncFunc();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveComponent, staticServerUrl]);
 
   useEffect(() => {
     return () => {
@@ -339,7 +398,7 @@ export const ComponentView = ({
   }, [application, componentUuid, liveComponent]);
 
   useEffect(() => {
-    const path = `${BASE_PATH}${EDITORS_PATH}`;
+    const path = `${BASE_DOCUMENTS_PATH}${EDITORS_PATH}`;
     let server: StaticServer;
 
     const startStaticServer = async () => {
@@ -350,8 +409,8 @@ export const ComponentView = ({
         const serverUrl = await server.start();
         setStaticServer(server);
         setStaticServerUrl(serverUrl);
-      } catch (e) {
-        SNLog.error(e);
+      } catch (e: unknown) {
+        SNLog.error(e as any);
       }
     };
     startStaticServer();
@@ -371,7 +430,7 @@ export const ComponentView = ({
     try {
       data = JSON.parse(event.nativeEvent.data);
     } catch (e) {
-      console.log('Message is not valid JSON, returning');
+      log('Message is not valid JSON, returning');
       return;
     }
     application!.componentManager?.handleMessage(liveComponent!.item!, data);
@@ -467,49 +526,45 @@ export const ComponentView = ({
         </LockedContainer>
       )}
 
-      {
-        liveComponent?.item.isDeprecated && (
-          <DeprecatedContainer>
-            <DeprecatedIcon />
-            <DeprecatedText>
-              {deprecationMessage || 'This extension is deprecated.'}
-            </DeprecatedText>
-          </DeprecatedContainer>
-        )
-      }
-      {
-        (Boolean(url) || Boolean(offlineUrl)) && (
-          <StyledWebview
-            showWebView={showWebView}
-            source={
-              /**
-               * Android 10 workaround to avoid access denied errors
-               * https://github.com/react-native-webview/react-native-webview/issues/656#issuecomment-551312436
-               */
-              loadedOnce ? { uri: offlineUrl ? offlineUrl : url } : undefined
-            }
-            key={liveComponent?.item.uuid}
-            ref={webViewRef}
+      {liveComponent?.item.isDeprecated && (
+        <DeprecatedContainer>
+          <DeprecatedIcon />
+          <DeprecatedText>
+            {deprecationMessage || 'This extension is deprecated.'}
+          </DeprecatedText>
+        </DeprecatedContainer>
+      )}
+      {(Boolean(url)) && (
+        <StyledWebview
+          showWebView={showWebView}
+          source={
             /**
-             * onLoad and onLoadEnd seem to be the same exact thing, except
-             * that when an error occurs, onLoadEnd is called twice, whereas
-             * onLoad is called once (what we want)
+             * Android 10 workaround to avoid access denied errors
+             * https://github.com/react-native-webview/react-native-webview/issues/656#issuecomment-551312436
              */
-            onLoad={onFrameLoad}
-            onLoadStart={onLoadStartHandler}
-            onError={onLoadErrorHandler}
-            onMessage={onMessage}
-            hideKeyboardAccessoryView={true}
-            onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-            cacheEnabled={true}
-            autoManageStatusBarEnabled={
-              false /* To prevent StatusBar from changing colors when focusing */
-            }
-            injectedJavaScript={defaultInjectedJavaScript()}
-            onContentProcessDidTerminate={onLoadErrorHandler}
-          />
-        )
-      }
-    </FlexContainer >
+            loadedOnce ? { uri: url! } : undefined
+          }
+          key={liveComponent?.item.uuid}
+          ref={webViewRef}
+          /**
+           * onLoad and onLoadEnd seem to be the same exact thing, except
+           * that when an error occurs, onLoadEnd is called twice, whereas
+           * onLoad is called once (what we want)
+           */
+          onLoad={onFrameLoad}
+          onLoadStart={onLoadStartHandler}
+          onError={onLoadErrorHandler}
+          onMessage={onMessage}
+          hideKeyboardAccessoryView={true}
+          onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+          cacheEnabled={true}
+          autoManageStatusBarEnabled={
+            false /* To prevent StatusBar from changing colors when focusing */
+          }
+          injectedJavaScript={defaultInjectedJavaScript()}
+          onContentProcessDidTerminate={onLoadErrorHandler}
+        />
+      )}
+    </FlexContainer>
   );
 };

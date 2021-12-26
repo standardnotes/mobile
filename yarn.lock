@@ -1632,6 +1632,11 @@
   dependencies:
     "@standardnotes/common" "^1.2.1"
 
+"@standardnotes/common@1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.2.1.tgz#9db212db86ccbf08b347da02549b3dbe4bedbb02"
+  integrity sha512-HilBxS50CBlC6TJvy1mrnhGVDzOH63M/Jf+hyMxQ0Vt1nYzpd0iyxVEUrgMh7ZiyO1b9CLnCDED99Jy9rnZWVQ==
+
 "@standardnotes/common@^1.2.1":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.3.0.tgz#d3376ebe146cbe43577a0980fc09ea01fd18eb3a"
@@ -1651,6 +1656,14 @@
   dependencies:
     "@standardnotes/auth" "3.8.3"
     "@standardnotes/common" "^1.2.1"
+
+"@standardnotes/features@^1.14.1-beta-testing.0":
+  version "1.14.1-beta-testing.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.14.1-beta-testing.0.tgz#78328e730f8befcbe5dbac70abd53e66617b414d"
+  integrity sha512-SoJV4HgjlujrYFQYzyPuPldyPS3+ZwMOgCSsY0iOGmyrgJO+4sMwtDaqR0OvCdUN+CWlSNHjh//ku8ACZtQEuA==
+  dependencies:
+    "@standardnotes/auth" "3.8.3"
+    "@standardnotes/common" "1.2.1"
 
 "@standardnotes/settings@^1.2.1":
   version "1.2.1"
