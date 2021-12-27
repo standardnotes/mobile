@@ -40,7 +40,7 @@ type Props = {
 };
 
 const log = (message?: any, ...optionalParams: any[]) => {
-  const LOGGING_ENABLED = true;
+  const LOGGING_ENABLED = false;
   if (LOGGING_ENABLED) {
     console.log(message, optionalParams, '\n\n');
     console.log('\n\n');

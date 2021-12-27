@@ -38,7 +38,6 @@ export class ComponentManager extends SNComponentManager {
 
   public async initialize(protocolService: SNProtocolService) {
     this.protocolService = protocolService;
-    this.loggingEnabled = true;
     await this.createServer();
   }
 
