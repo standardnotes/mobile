@@ -4,6 +4,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
 import { ButtonType, ComponentViewer } from '@standardnotes/snjs';
+import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
   useContext,
@@ -57,6 +58,7 @@ export const ComponentView = ({
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+  const themeService = useContext(ThemeServiceContext);
 
   // State
   const [showWebView, setShowWebView] = useState<boolean>(true);
@@ -66,7 +68,6 @@ export const ComponentView = ({
   const [localEditorReady, setLocalEditorReady] = useState<boolean>(false);
 
   // Ref
-  const loadedOnce = useRef<boolean>(false);
   const lastIframeLoadedUrl = useRef<string | undefined>();
   const webViewRef = useRef<WebView>(null);
   const timeoutRef = useRef<number | undefined>(undefined);
@@ -153,19 +154,20 @@ export const ComponentView = ({
   useEffect(() => {
     const componentManager = application!.mobileComponentManager;
     const component = componentViewer.component;
-    const isDownloadable = componentManager.isEditorDownloadable(component);
+    const isDownloadable = componentManager.isComponentDownloadable(component);
     setRequiresLocalEditor(isDownloadable);
 
     if (isDownloadable) {
       const asyncFunc = async () => {
-        if (await componentManager.doesEditorNeedDownload(component)) {
+        if (await componentManager.doesComponentNeedDownload(component)) {
           onDownloadEditorStart();
-          const { error } = await componentManager.downloadEditorOffline(
+          const { error } = await componentManager.downloadComponentOffline(
             component
           );
           onDownloadEditorEnd();
           if (error) {
             onDownloadError();
+            onLoadError();
           }
         }
         setLocalEditorReady(true);
@@ -173,7 +175,7 @@ export const ComponentView = ({
       asyncFunc();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [componentViewer]);
+  }, []);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
@@ -187,12 +189,10 @@ export const ComponentView = ({
   };
 
   const onFrameLoad = useCallback(() => {
-    loadedOnce.current = true;
-
     log('Iframe did load');
 
     /** The first request can typically be 'about:blank', which we want to ignore */
-    const isComponentUrl = lastIframeLoadedUrl.current === componentViewer.url!;
+    const isRootUrl = lastIframeLoadedUrl.current === componentViewer.url!;
 
     /**
      * We have no way of knowing if the webview load is successful or not. We
@@ -208,7 +208,7 @@ export const ComponentView = ({
       clearTimeout(timeoutRef.current);
     }
 
-    if (isComponentUrl) {
+    if (isRootUrl) {
       log('Setting component viewer webview');
       timeoutRef.current = setTimeout(() => {
         componentViewer?.setWindow(webViewRef.current);
@@ -218,10 +218,12 @@ export const ComponentView = ({
        * delay this to avoid flicker that may result if using a dark theme.
        * This delay will allow editor to load its theme.
        */
+      const isDarkTheme = themeService?.isLikelyUsingDarkColorTheme();
+      const delayToAvoidFlicker = isDarkTheme ? 50 : 0;
+      setTimeout(() => {
+        onLoadEnd();
+      }, delayToAvoidFlicker);
     }
-    setTimeout(() => {
-      onLoadEnd();
-    }, 25);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -297,13 +299,7 @@ export const ComponentView = ({
       {renderWebview && (
         <StyledWebview
           showWebView={showWebView}
-          source={
-            /**
-             * Android 10 workaround to avoid access denied errors
-             * https://github.com/react-native-webview/react-native-webview/issues/656#issuecomment-551312436
-             */
-            loadedOnce.current ? { uri: componentViewer.url! } : undefined
-          }
+          source={{ uri: componentViewer.url! }}
           key={componentViewer.component.uuid}
           ref={webViewRef}
           /**

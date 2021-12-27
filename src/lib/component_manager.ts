@@ -26,7 +26,7 @@ const FeatureChecksums = require('@standardnotes/features/dist/static/checksums.
 
 const STATIC_SERVER_PORT = 8080;
 const BASE_DOCUMENTS_PATH = DocumentDirectoryPath;
-const EDITORS_PATH = '/editors';
+const COMPONENTS_PATH = '/components';
 
 export class ComponentManager extends SNComponentManager {
   private mobileActiveTheme?: MobileTheme;
@@ -43,7 +43,7 @@ export class ComponentManager extends SNComponentManager {
   }
 
   private async createServer() {
-    const path = `${BASE_DOCUMENTS_PATH}${EDITORS_PATH}`;
+    const path = `${BASE_DOCUMENTS_PATH}${COMPONENTS_PATH}`;
     let server: StaticServer;
 
     server = new StaticServer(STATIC_SERVER_PORT, path, {
@@ -63,7 +63,7 @@ export class ComponentManager extends SNComponentManager {
     this.staticServer!.stop();
   }
 
-  public isEditorDownloadable(component: SNComponent): boolean {
+  public isComponentDownloadable(component: SNComponent): boolean {
     const identifier = component.identifier;
     const nativeFeature = this.nativeFeatureForIdentifier(identifier);
     const downloadUrl =
@@ -71,7 +71,15 @@ export class ComponentManager extends SNComponentManager {
     return !!downloadUrl;
   }
 
-  public async doesEditorNeedDownload(
+  public async uninstallComponent(component: SNComponent) {
+    const path = this.pathForComponent(component.identifier);
+    if (await RNFS.exists(path)) {
+      this.log('Deleting dir at', path);
+      await RNFS.unlink(path);
+    }
+  }
+
+  public async doesComponentNeedDownload(
     component: SNComponent
   ): Promise<boolean> {
     const identifier = component.identifier;
@@ -80,12 +88,12 @@ export class ComponentManager extends SNComponentManager {
       nativeFeature?.download_url || component.package_info?.download_url;
 
     if (!downloadUrl) {
-      throw Error('Attempting to download editor with no download url');
+      throw Error('Attempting to download component with no download url');
     }
 
     const version = nativeFeature?.version || component.package_info?.version;
 
-    const existingPackageJson = await this.getDownloadedEditorPackageJsonFile(
+    const existingPackageJson = await this.getDownloadedComponentPackageJsonFile(
       identifier
     );
     const existingVersion = existingPackageJson?.version;
@@ -99,7 +107,7 @@ export class ComponentManager extends SNComponentManager {
     return shouldDownload;
   }
 
-  public async downloadEditorOffline(
+  public async downloadComponentOffline(
     component: SNComponent
   ): Promise<{ error?: boolean }> {
     const identifier = component.identifier;
@@ -108,20 +116,20 @@ export class ComponentManager extends SNComponentManager {
       nativeFeature?.download_url || component.package_info?.download_url;
 
     if (!downloadUrl) {
-      throw Error('Attempting to download editor with no download url');
+      throw Error('Attempting to download component with no download url');
     }
 
     try {
-      await this.performDownloadEditor(identifier, downloadUrl);
+      await this.performDownloadComponent(identifier, downloadUrl);
     } catch (e: unknown) {
       console.error(e);
       return { error: true };
     }
 
-    const editorPath = this.pathForEditor(identifier);
-    if (!(await RNFS.exists(editorPath))) {
+    const componentPath = this.pathForComponent(identifier);
+    if (!(await RNFS.exists(componentPath))) {
       this.log(
-        `No editor exists at path ${editorPath}, not using offline editor`
+        `No component exists at path ${componentPath}, not using offline component`
       );
       return { error: true };
     }
@@ -135,15 +143,17 @@ export class ComponentManager extends SNComponentManager {
     );
   }
 
-  public isComponentThirdParty(component: SNComponent): boolean {
-    return !this.nativeFeatureForIdentifier(component.identifier);
+  public isComponentThirdParty(identifier: FeatureIdentifier): boolean {
+    return !this.nativeFeatureForIdentifier(identifier);
   }
 
-  public async preloadThirdPartyIndexPath(component: SNComponent) {
-    const packageJson = await this.getDownloadedEditorPackageJsonFile(
-      component.identifier
+  public async preloadThirdPartyIndexPathFromDisk(
+    identifier: FeatureIdentifier
+  ) {
+    const packageJson = await this.getDownloadedComponentPackageJsonFile(
+      identifier
     );
-    this.thirdPartyIndexPaths[component.identifier] =
+    this.thirdPartyIndexPaths[identifier] =
       packageJson?.sn?.main || 'index.html';
   }
 
@@ -175,7 +185,7 @@ export class ComponentManager extends SNComponentManager {
     return true;
   }
 
-  private async performDownloadEditor(
+  private async performDownloadComponent(
     identifier: FeatureIdentifier,
     downloadUrl: string
   ) {
@@ -187,17 +197,24 @@ export class ComponentManager extends SNComponentManager {
     }
 
     this.log(
-      'Downloading editor',
+      'Downloading component',
       identifier,
       'from url',
       downloadUrl,
       'to location',
       tmpLocation
     );
-    await RNFS.downloadFile({
+
+    const result = await RNFS.downloadFile({
       fromUrl: downloadUrl,
       toFile: tmpLocation,
     }).promise;
+
+    if (!String(result.statusCode).startsWith('2')) {
+      console.error(`Error downloading file ${downloadUrl}`);
+      return false;
+    }
+
     this.log('Finished download to tmp location', tmpLocation);
 
     const requireChecksumVerification = !!this.nativeFeatureForIdentifier(
@@ -213,34 +230,47 @@ export class ComponentManager extends SNComponentManager {
       }
     }
 
-    const editorPath = this.pathForEditor(identifier);
-    this.log(`Attempting to unzip ${tmpLocation} to ${editorPath}`);
-    await unzip(tmpLocation, editorPath);
-    this.log('Unzipped editor to', editorPath);
+    const componentPath = this.pathForComponent(identifier);
+    this.log(`Attempting to unzip ${tmpLocation} to ${componentPath}`);
+    await unzip(tmpLocation, componentPath);
+    this.log('Unzipped component to', componentPath);
     await RNFS.unlink(tmpLocation);
     return true;
   }
 
-  private pathForEditor(identifier: FeatureIdentifier) {
-    return `${BASE_DOCUMENTS_PATH}${EDITORS_PATH}/${identifier}`;
+  private pathForComponent(identifier: FeatureIdentifier) {
+    return `${BASE_DOCUMENTS_PATH}${COMPONENTS_PATH}/${identifier}`;
   }
 
-  private async getDownloadedEditorPackageJsonFile(
-    identifier: FeatureIdentifier
-  ): Promise<Record<string, any> | undefined> {
-    const editorPath = this.pathForEditor(identifier);
-    if (!(await RNFS.exists(editorPath))) {
+  public async getFile(identifier: FeatureIdentifier, relativePath: string) {
+    const componentPath = this.pathForComponent(identifier);
+    if (!(await RNFS.exists(componentPath))) {
       return undefined;
     }
-    const filePath = `${editorPath}/package.json`;
+    const filePath = `${componentPath}/${relativePath}`;
     if (!(await RNFS.exists(filePath))) {
       return undefined;
     }
     const fileContents = await RNFS.readFile(filePath);
-    if (!fileContents) {
+    return fileContents;
+  }
+
+  public async getIndexFile(identifier: FeatureIdentifier) {
+    if (this.isComponentThirdParty(identifier)) {
+      await this.preloadThirdPartyIndexPathFromDisk(identifier);
+    }
+    const relativePath = this.getIndexFileRelativePath(identifier);
+    return this.getFile(identifier, relativePath!);
+  }
+
+  private async getDownloadedComponentPackageJsonFile(
+    identifier: FeatureIdentifier
+  ): Promise<Record<string, any> | undefined> {
+    const file = await this.getFile(identifier, 'package.json');
+    if (!file) {
       return undefined;
     }
-    const packageJson = JSON.parse(fileContents);
+    const packageJson = JSON.parse(file);
     return packageJson;
   }
 
@@ -254,6 +284,15 @@ export class ComponentManager extends SNComponentManager {
       'Cancel'
     );
     dialog.callback(approved);
+  }
+
+  private getIndexFileRelativePath(identifier: FeatureIdentifier) {
+    const nativeFeature = this.nativeFeatureForIdentifier(identifier);
+    if (nativeFeature) {
+      return nativeFeature.index_path;
+    } else {
+      return this.thirdPartyIndexPaths[identifier];
+    }
   }
 
   /** @override */
@@ -274,21 +313,16 @@ export class ComponentManager extends SNComponentManager {
       return super.urlForComponent(component);
     }
 
-    const editorPath = this.pathForEditor(identifier);
-    let mainFileName;
+    const componentPath = this.pathForComponent(identifier);
+    const indexFilePath = this.getIndexFileRelativePath(identifier);
 
-    if (nativeFeature) {
-      mainFileName = nativeFeature.index_path;
-    } else {
-      mainFileName = this.thirdPartyIndexPaths[identifier];
-      if (!mainFileName) {
-        throw Error('Third party index path was not preloaded');
-      }
+    if (!indexFilePath) {
+      throw Error('Third party index path was not preloaded');
     }
 
-    const splitPackagePath = editorPath.split(EDITORS_PATH);
+    const splitPackagePath = componentPath.split(COMPONENTS_PATH);
     const relativePackagePath = splitPackagePath[splitPackagePath.length - 1];
-    const relativeMainFilePath = `${relativePackagePath}/${mainFileName}`;
+    const relativeMainFilePath = `${relativePackagePath}/${indexFilePath}`;
     return `${this.staticServerUrl}${relativeMainFilePath}`;
   }
 

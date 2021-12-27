@@ -1,5 +1,4 @@
 import { MobileApplication } from '@Lib/application';
-import { ComponentManager } from '@Lib/component_manager';
 import {
   ApplicationEvent,
   ContentType,
@@ -39,6 +38,8 @@ const DARK_THEME_KEY = 'darkThemeKey';
 const CACHED_THEMES_KEY = 'cachedThemesKey';
 
 type ThemeChangeObserver = () => Promise<void> | void;
+
+type ThemeVariables = Record<string, string>;
 
 type MobileThemeContent = {
   variables: MobileThemeVariables;
@@ -209,6 +210,15 @@ export class ThemeService {
     return this.activeThemeId && this.themes[this.activeThemeId];
   }
 
+  public isLikelyUsingDarkColorTheme() {
+    const activeTheme = this.getActiveTheme();
+    if (!activeTheme) {
+      return false;
+    }
+
+    return activeTheme.uuid !== SystemThemeTint.Blue;
+  }
+
   private onColorSchemeChange() {
     this.resolveInitialThemeForMode();
   }
@@ -373,8 +383,7 @@ export class ThemeService {
     this.addTheme(updatedTheme);
     this.variables = updatedTheme.mobileContent.variables;
     if (this.application?.isLaunched() && this.application.componentManager) {
-      (this.application
-        .componentManager as ComponentManager).setMobileActiveTheme(
+      this.application.mobileComponentManager.setMobileActiveTheme(
         updatedTheme
       );
     }
@@ -417,15 +426,30 @@ export class ThemeService {
     );
   }
 
-  private async downloadTheme(theme: SNTheme) {
-    let errorBlock = (error: null) => {
-      console.error('Theme download error', error);
-    };
+  private async downloadTheme(
+    theme: SNTheme
+  ): Promise<ThemeVariables | undefined> {
+    const componentManager = this.application?.mobileComponentManager;
+    if (componentManager?.isComponentDownloadable(theme)) {
+      if (await componentManager.doesComponentNeedDownload(theme)) {
+        await componentManager.downloadComponentOffline(theme);
+      }
+
+      const file = await componentManager.getIndexFile(theme.identifier);
+      if (!file) {
+        console.error(`Did not find local index file for ${theme.identifier}`);
+        return undefined;
+      }
+      const variables: ThemeVariables = CSSParser.cssToObject(file);
+      if (!variables || Object.keys(variables).length === 0) {
+        return undefined;
+      }
+      return variables;
+    }
 
     let url = theme.hosted_url;
-
     if (!url) {
-      errorBlock(null);
+      console.error('Theme download error');
       return;
     }
 
@@ -433,21 +457,19 @@ export class ThemeService {
       url = url.replace('localhost', '10.0.2.2');
     }
 
-    return new Promise(async resolve => {
-      try {
-        const response = await fetch(url!, {
-          method: 'GET',
-        });
-        const data = await response.text();
-        let variables = CSSParser.cssToObject(data);
-        if (!variables || Object.keys(variables).length === 0) {
-          resolve(undefined);
-        }
-        resolve(variables);
-      } catch (e) {
-        resolve(null);
+    try {
+      const response = await fetch(url!, {
+        method: 'GET',
+      });
+      const data = await response.text();
+      const variables: ThemeVariables = CSSParser.cssToObject(data);
+      if (!variables || Object.keys(variables).length === 0) {
+        return undefined;
       }
-    });
+      return variables;
+    } catch (e) {
+      return undefined;
+    }
   }
 
   activateSystemTheme(themeId: string) {
@@ -481,6 +503,7 @@ export class ThemeService {
           isSystemTheme: false,
           isInitial: false,
           package_info: {
+            ...theme.payload.safeContent.package_info,
             dock_icon: {
               type: 'circle',
               background_color: finalVariables.stylekitInfoColor,
@@ -522,15 +545,6 @@ export class ThemeService {
       themes.map(t => t.payloadRepresentation()),
       StorageValueModes.Nonwrapped
     );
-  }
-
-  private async decacheThemes() {
-    if (this.application) {
-      return this.application.removeValue(
-        CACHED_THEMES_KEY,
-        StorageValueModes.Nonwrapped
-      );
-    }
   }
 
   public async downloadThemeAndReload(theme: SNTheme) {

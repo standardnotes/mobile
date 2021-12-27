@@ -10,6 +10,7 @@ import {
   isPayloadSourceInternalChange,
   isPayloadSourceRetrieved,
   NoteMutator,
+  SNComponent,
 } from '@standardnotes/snjs';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
@@ -71,6 +72,7 @@ export class Compose extends React.Component<{}, State> {
     context: React.ContextType<typeof ApplicationContext>
   ) {
     super(props);
+
     this.context = context;
     const initialEditor = context?.editorGroup.activeEditor;
     this.state = {
@@ -205,6 +207,9 @@ export class Compose extends React.Component<{}, State> {
       this.context?.editorGroup?.closeEditor(this.editor);
     }
     this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
+    if (this.state.componentViewer) {
+      this.componentManager.destroyComponentViewer(this.state.componentViewer);
+    }
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
     }
@@ -309,24 +314,42 @@ export class Compose extends React.Component<{}, State> {
           this.state.componentViewer
         );
       }
-      if (this.componentManager.isComponentThirdParty(associatedEditor)) {
-        await this.componentManager.preloadThirdPartyIndexPath(
-          associatedEditor
+      if (
+        this.componentManager.isComponentThirdParty(associatedEditor.identifier)
+      ) {
+        await this.componentManager.preloadThirdPartyIndexPathFromDisk(
+          associatedEditor.identifier
         );
       }
-      this.setState({
-        componentViewer: this.componentManager.createComponentViewer(
-          associatedEditor,
-          this.note?.uuid,
-          action => {
-            if (action === ComponentAction.ThemesActivated) {
-              this.onWebViewThemeLoad?.();
-            }
-          }
-        ),
-      });
+      this.loadComponentViewer(associatedEditor);
     }
   };
+
+  loadComponentViewer(component: SNComponent) {
+    this.setState({
+      componentViewer: this.componentManager.createComponentViewer(
+        component,
+        this.note?.uuid
+      ),
+    });
+  }
+
+  async forceReloadExistingEditor() {
+    if (this.state.componentViewer) {
+      this.componentManager.destroyComponentViewer(this.state.componentViewer);
+    }
+
+    this.setState({
+      componentViewer: undefined,
+      loadingWebview: false,
+      webViewError: false,
+    });
+
+    const associatedEditor = this.componentManager.editorForNote(this.note!);
+    if (associatedEditor) {
+      this.loadComponentViewer(associatedEditor);
+    }
+  }
 
   saveNote = async (
     bypassDebouncer: boolean,
@@ -421,13 +444,6 @@ export class Compose extends React.Component<{}, State> {
     });
   };
 
-  onWebViewThemeLoad = () => {
-    this.setState({
-      downloadError: false,
-      loadingWebview: false,
-    });
-  };
-
   onLoadWebViewError = () => {
     this.setState({
       loadingWebview: false,
@@ -483,7 +499,7 @@ export class Compose extends React.Component<{}, State> {
                   <LockedText>Note Editing Disabled</LockedText>
                 </LockedContainer>
               )}
-              {this.state.webViewError && (
+              {(this.state.webViewError || this.state.downloadError) && (
                 <LockedContainer>
                   <Icon
                     name={ThemeService.nameForIcon(ICON_ALERT)}
@@ -495,35 +511,10 @@ export class Compose extends React.Component<{}, State> {
                   </LockedText>
                   <WebViewReloadButton
                     onPress={() => {
-                      this.setState({
-                        loadingWebview: false,
-                        webViewError: false,
-                      });
+                      this.forceReloadExistingEditor();
                     }}
                   >
                     <WebViewReloadButtonText>Reload</WebViewReloadButtonText>
-                  </WebViewReloadButton>
-                </LockedContainer>
-              )}
-              {this.state.downloadError && (
-                <LockedContainer>
-                  <Icon
-                    name={ThemeService.nameForIcon(ICON_ALERT)}
-                    size={16}
-                    color={theme.stylekitBackgroundColor}
-                  />
-                  <LockedText>
-                    Unable to download{' '}
-                    {this.state.componentViewer?.component.name}
-                  </LockedText>
-                  <WebViewReloadButton
-                    onPress={() => {
-                      this.setState({
-                        downloadError: false,
-                      });
-                    }}
-                  >
-                    <WebViewReloadButtonText>Retry</WebViewReloadButtonText>
                   </WebViewReloadButton>
                 </LockedContainer>
               )}
@@ -543,21 +534,20 @@ export class Compose extends React.Component<{}, State> {
                       autoCapitalize={'sentences'}
                       editable={!this.noteLocked}
                     />
-                    {(this.state.downloadingEditor ||
-                      this.state.loadingWebview) && (
-                        <LoadingWebViewContainer locked={this.noteLocked}>
-                          <LoadingText>
-                            {this.state.downloadingEditor
-                              ? 'Downloading '
-                              : 'Loading '}
-                            {this.state.componentViewer?.component.name}...
-                          </LoadingText>
-                        </LoadingWebViewContainer>
-                      )}
+                    {this.state.downloadingEditor ||
+                      (this.state.loadingWebview &&
+                        themeService?.isLikelyUsingDarkColorTheme() && (
+                          <LoadingWebViewContainer locked={this.noteLocked}>
+                            <LoadingText>
+                              {'Loading '}
+                              {this.state.componentViewer?.component.name}...
+                            </LoadingText>
+                          </LoadingWebViewContainer>
+                        ))}
                     {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
                     {shouldDisplayEditor && (
                       <ComponentView
-                        key={this.state.componentViewer?.component.uuid}
+                        key={this.state.componentViewer?.identifier}
                         componentViewer={this.state.componentViewer!}
                         onLoadStart={this.onLoadWebViewStart}
                         onLoadEnd={this.onLoadWebViewEnd}
@@ -567,6 +557,7 @@ export class Compose extends React.Component<{}, State> {
                         onDownloadError={this.onDownloadError}
                       />
                     )}
+
                     {!shouldDisplayEditor &&
                       !isNullOrUndefined(this.note) &&
                       Platform.OS === 'android' && (
