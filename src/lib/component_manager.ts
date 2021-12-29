@@ -303,15 +303,11 @@ export class ComponentManager extends SNComponentManager {
       return `data:text/css;base64,${encoded}`;
     }
 
-    const identifier = component.identifier;
-    const nativeFeature = this.nativeFeatureForIdentifier(identifier);
-    const downloadUrl =
-      nativeFeature?.download_url || component.package_info?.download_url;
-
-    if (!downloadUrl) {
+    if (!this.isComponentDownloadable(component)) {
       return super.urlForComponent(component);
     }
 
+    const identifier = component.identifier;
     const componentPath = this.pathForComponent(identifier);
     const indexFilePath = this.getIndexFileRelativePath(identifier);
 
