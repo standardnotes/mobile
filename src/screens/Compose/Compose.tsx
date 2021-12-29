@@ -4,8 +4,6 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import {
   ApplicationEvent,
-  ComponentAction,
-  ComponentArea,
   ContentType,
   isPayloadSourceInternalChange,
   isPayloadSourceRetrieved,
@@ -176,21 +174,21 @@ export class Compose extends React.Component<{}, State> {
       }
     );
 
-    this.removeComponentHandler = this.context?.componentManager!.registerHandler(
-      {
-        identifier: 'component-view-' + Math.random(),
-        areas: [ComponentArea.Editor],
-        actionHandler: (currentComponent, action, data) => {
-          if (action === ComponentAction.SetSize) {
-            this.context?.componentManager!.handleSetSizeEvent(
-              currentComponent,
-              data
-            );
-          }
-        },
-        contextRequestHandler: () => this.note,
-      }
-    );
+    // this.removeComponentHandler = this.context?.componentManager!.registerHandler(
+    //   {
+    //     identifier: 'component-view-' + Math.random(),
+    //     areas: [ComponentArea.Editor],
+    //     actionHandler: (currentComponent, action, data) => {
+    //       if (action === ComponentAction.SetSize) {
+    //         this.context?.componentManager!.handleSetSizeEvent(
+    //           currentComponent,
+    //           data
+    //         );
+    //       }
+    //     },
+    //     contextRequestHandler: () => this.note,
+    //   }
+    // );
 
     this.removeStateEventObserver = this.context
       ?.getAppState()
@@ -326,9 +324,9 @@ export class Compose extends React.Component<{}, State> {
     } else if (associatedEditor.uuid !== this.state.editorComponent?.uuid) {
       await this.context?.componentGroup.activateComponent(associatedEditor);
     } else {
-      this.context?.componentManager!.contextItemDidChangeInArea(
-        ComponentArea.Editor
-      );
+      // this.context?.componentManager!.contextItemDidChangeInArea(
+      //   ComponentArea.Editor
+      // );
     }
   };
 
