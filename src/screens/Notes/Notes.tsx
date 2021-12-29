@@ -81,16 +81,23 @@ export const Notes = React.memo(
     const [searchText, setSearchText] = useState('');
     const [editor, setEditor] = useState<Editor | undefined>(undefined);
     const [searchOptions, setSearchOptions] = useState<SearchOptions>([]);
+
+    const areNotesCurrentlyProtected = useCallback(() => {
+      if (!application) {
+        return true;
+      }
+
+      return (
+        application.hasProtectionSources() &&
+        !application.hasUnprotectedAccessSession()
+      );
+    }, [application]);
+
     const [
       includeProtectedNoteText,
       setIncludeProtectedNoteText,
-    ] = useState<boolean>(
-      () =>
-        !(
-          application!.hasProtectionSources() &&
-          application!.areProtectionsEnabled()
-        )
-    );
+    ] = useState<boolean>(!areNotesCurrentlyProtected());
+
     const [includeArchivedNotes, setIncludeArchivedNotes] = useState<boolean>(
       false
     );
@@ -105,10 +112,7 @@ export const Notes = React.memo(
 
     // Ref
     const haveDisplayOptions = useRef(false);
-    const protectionsEnabled = useRef(
-      application!.hasProtectionSources() &&
-        application!.areProtectionsEnabled()
-    );
+    const protectionsEnabled = useRef(areNotesCurrentlyProtected());
 
     const reloadTitle = useCallback(
       (newNotes?: SNNote[], newFilter?: string) => {
@@ -321,13 +325,11 @@ export const Notes = React.memo(
     }, [includeTrashedNotes, reloadNotesDisplayOptions]);
 
     const reloadSearchOptions = useCallback(() => {
-      const protections =
-        application?.hasProtectionSources() &&
-        application?.areProtectionsEnabled();
+      const currentlyProtected = areNotesCurrentlyProtected();
 
-      if (protections !== protectionsEnabled.current) {
-        protectionsEnabled.current = !!protections;
-        setIncludeProtectedNoteText(!protections);
+      if (currentlyProtected !== protectionsEnabled.current) {
+        protectionsEnabled.current = !!currentlyProtected;
+        setIncludeProtectedNoteText(!currentlyProtected);
       }
 
       const selectedTag = application?.getAppState().selectedTag;
@@ -361,6 +363,7 @@ export const Notes = React.memo(
       includeProtectedNoteText,
       includeArchivedNotes,
       includeTrashedNotes,
+      areNotesCurrentlyProtected,
       toggleIncludeProtected,
       toggleIncludeArchived,
       toggleIncludeTrashed,

@@ -27,7 +27,7 @@
     "@react-navigation/native": "^5.9.3",
     "@react-navigation/stack": "^5.14.3",
     "@standardnotes/sncrypto-common": "1.5.2",
-    "@standardnotes/snjs": "2.20.3",
+    "@standardnotes/snjs": "2.30.0",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
     "react": "17.0.1",
