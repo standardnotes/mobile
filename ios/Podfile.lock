@@ -11,6 +11,9 @@ PODS:
     - React-Core (= 0.64.1)
     - React-jsi (= 0.64.1)
     - ReactCommon/turbomodule/core (= 0.64.1)
+  - GCDWebServer (3.5.4):
+    - GCDWebServer/Core (= 3.5.4)
+  - GCDWebServer/Core (3.5.4)
   - glog (0.3.5)
   - RCT-Folly (2020.01.13.00):
     - boost-for-react-native
@@ -213,12 +216,17 @@ PODS:
     - React-Core
   - react-native-mail (4.1.0):
     - React-Core
+  - react-native-netinfo (6.0.6):
+    - React-Core
   - react-native-safe-area-context (3.1.9):
     - React-Core
   - react-native-segmented-control (2.2.2):
     - React-Core
   - react-native-sodium (0.5.0):
     - React-Core
+  - react-native-static-server (0.5.0):
+    - GCDWebServer (~> 3.0)
+    - React
   - react-native-version-info (1.1.0):
     - React-Core
   - react-native-webview (11.0.3):
@@ -316,10 +324,18 @@ PODS:
     - React
   - RNVectorIcons (7.1.0):
     - React
+  - RNZipArchive (6.0.2):
+    - React-Core
+    - RNZipArchive/Core (= 6.0.2)
+    - SSZipArchive (= 2.2.3)
+  - RNZipArchive/Core (6.0.2):
+    - React-Core
+    - SSZipArchive (= 2.2.3)
   - sn-textview (1.0.1):
     - React-Core
   - SNReactNative (1.0.1):
     - React-Core
+  - SSZipArchive (2.2.3)
   - TrustKit (1.6.5)
   - Yoga (1.14.0)
 
@@ -346,9 +362,11 @@ DEPENDENCIES:
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-mail (from `../node_modules/react-native-mail`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-segmented-control (from `../node_modules/@react-native-community/segmented-control`)"
   - react-native-sodium (from `../node_modules/react-native-sodium`)
+  - react-native-static-server (from `../node_modules/react-native-static-server`)
   - react-native-version-info (from `../node_modules/react-native-version-info`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -377,6 +395,7 @@ DEPENDENCIES:
   - RNSearchBar (from `../node_modules/react-native-search-bar`)
   - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - RNZipArchive (from `../node_modules/react-native-zip-archive`)
   - sn-textview (from `../node_modules/sn-textview`)
   - SNReactNative (from `../node_modules/standard-notes-rn`)
   - TrustKit (= 1.6.5)
@@ -385,6 +404,8 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - GCDWebServer
+    - SSZipArchive
     - TrustKit
 
 EXTERNAL SOURCES:
@@ -428,12 +449,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-mail:
     :path: "../node_modules/react-native-mail"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-segmented-control:
     :path: "../node_modules/@react-native-community/segmented-control"
   react-native-sodium:
     :path: "../node_modules/react-native-sodium"
+  react-native-static-server:
+    :path: "../node_modules/react-native-static-server"
   react-native-version-info:
     :path: "../node_modules/react-native-version-info"
   react-native-webview:
@@ -490,6 +515,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-store-review/ios"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
+  RNZipArchive:
+    :path: "../node_modules/react-native-zip-archive"
   sn-textview:
     :path: "../node_modules/sn-textview"
   SNReactNative:
@@ -503,6 +530,7 @@ SPEC CHECKSUMS:
   DoubleConversion: cde416483dac037923206447da6e1454df403714
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
   FBReactNativeSpec: 045b6219b306679cc02e02d618e3b5a91d334800
+  GCDWebServer: 2c156a56c8226e2d5c0c3f208a3621ccffbe3ce4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: ec2ebc96b7bfba3ca5c32740f5a0c6a014a274d2
@@ -519,9 +547,11 @@ SPEC CHECKSUMS:
   react-native-document-picker: 1a7518132d4a06b67f459be9bb1464a567d2b3b4
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-mail: 5fe7239a5b5c1e858d425501c03d1ab977434122
+  react-native-netinfo: 40b91995cd49c33ae57996486db76f0af067b630
   react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
   react-native-segmented-control: 65df6cd0619b780b3843d574a72d4c7cec396097
   react-native-sodium: 6cc4c4c1ea331f9f2b478076e983e09827a7b23f
+  react-native-static-server: 201b2a945a35096be3ae7f43e367c65bcbd61343
   react-native-version-info: 36490da17d2c6b5cc21321c70e433784dee7ed0b
   react-native-webview: 21fdfbdd5a2268195ca013174f8f656f3509de50
   React-perflogger: aad6d4b4a267936b3667260d1f649b6f6069a675
@@ -550,11 +580,13 @@ SPEC CHECKSUMS:
   RNSearchBar: 5ed8e13ba8a6c701fbd2afdfe4164493d24b2aee
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
+  RNZipArchive: 3dd2de5b7f590d79e83270508b78870bf5a54f36
   sn-textview: 0211237b3e0edeeb23aed2a9c47b78af35a81e95
   SNReactNative: b5e9e529c175c13f3a618e27c76cf3071213d5e1
+  SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
   TrustKit: 073855e3adecd317417bda4ac9e9ac54a2e3b9f2
   Yoga: a7de31c64fe738607e7a3803e3f591a4b1df7393
 
-PODFILE CHECKSUM: 3f737e1e00a82037a88b8818c81a7c17327450dc
+PODFILE CHECKSUM: 10f66a1bc5a5ddb6961376eb64bdc486a83928b6
 
 COCOAPODS: 1.10.1

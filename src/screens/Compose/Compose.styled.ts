@@ -66,14 +66,7 @@ export const LoadingWebViewContainer = styled.View<{ locked?: boolean }>`
   justify-content: center;
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
 `;
-export const LoadingWebViewText = styled.Text`
-  padding-left: 0px;
-  color: ${({ theme }) => theme.stylekitForegroundColor};
-  opacity: 0.7;
-  font-size: 22px;
-  font-weight: bold;
-`;
-export const LoadingWebViewSubtitle = styled.Text`
+export const LoadingText = styled.Text`
   padding-left: 0px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   opacity: 0.7;

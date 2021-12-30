@@ -1,6 +1,5 @@
 import 'react-native-gesture-handler';
 import 'react-native-url-polyfill/auto';
-import Bugsnag from '@bugsnag/react-native';
 import { enableScreens } from 'react-native-screens';
 import { SNLog } from '@standardnotes/snjs';
 
@@ -15,11 +14,11 @@ if (__DEV__ === false) {
   console.log = () => {};
   console.warn = () => {};
   console.error = () => {};
-  SNLog.onError = Bugsnag.notify;
-  SNLog.onLog = Bugsnag.leaveBreadcrumb;
-} else {
-  SNLog.onLog = console.log;
   SNLog.onError = console.error;
+  SNLog.onLog = console.log;
+} else {
+  SNLog.onError = console.error;
+  SNLog.onLog = console.log;
 }
 
 enableAndroidFontFix();
