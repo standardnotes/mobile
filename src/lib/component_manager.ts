@@ -52,7 +52,7 @@ export class ComponentManager extends SNComponentManager {
       const serverUrl = await server.start();
       this.staticServer = server;
       this.staticServerUrl = serverUrl;
-    } catch (e: unknown) {
+    } catch (e) {
       SNLog.error(e as any);
     }
   }
@@ -101,7 +101,7 @@ export class ComponentManager extends SNComponentManager {
 
     const shouldDownload =
       !existingPackageJson ||
-      isRightVersionGreaterThanLeft(existingVersion, version);
+      isRightVersionGreaterThanLeft(existingVersion, version!);
 
     return shouldDownload;
   }
@@ -120,7 +120,7 @@ export class ComponentManager extends SNComponentManager {
 
     try {
       await this.performDownloadComponent(identifier, downloadUrl);
-    } catch (e: unknown) {
+    } catch (e) {
       console.error(e);
       return { error: true };
     }

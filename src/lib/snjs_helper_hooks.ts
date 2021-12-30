@@ -397,7 +397,7 @@ export const useProtectionSessionExpiry = () => {
   useEffect(() => {
     const removeProtectionLengthSubscriber = application?.addEventObserver(
       async event => {
-        if (event === ApplicationEvent.ProtectionSessionExpiryDateChanged) {
+        if (event === ApplicationEvent.UnprotectedSessionBegan) {
           setProtectionsDisabledUntil(getProtectionsDisabledUntil());
         }
       }
