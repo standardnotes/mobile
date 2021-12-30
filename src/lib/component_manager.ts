@@ -22,7 +22,7 @@ import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import StaticServer from 'react-native-static-server';
 import { unzip } from 'react-native-zip-archive';
 
-const FeatureChecksums = require('@standardnotes/features/dist/static/checksums.json');
+const FeatureChecksums = require('@standardnotes/components/dist/checksums.json');
 
 const STATIC_SERVER_PORT = 8080;
 const BASE_DOCUMENTS_PATH = DocumentDirectoryPath;

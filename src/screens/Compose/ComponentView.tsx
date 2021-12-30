@@ -68,7 +68,7 @@ export const ComponentView = ({
   const [localEditorReady, setLocalEditorReady] = useState<boolean>(false);
 
   // Ref
-  const lastIframeLoadedUrl = useRef<string | undefined>();
+  const didLoadRootUrl = useRef<boolean>(false);
   const webViewRef = useRef<WebView>(null);
   const timeoutRef = useRef<number | undefined>(undefined);
 
@@ -191,9 +191,6 @@ export const ComponentView = ({
   const onFrameLoad = useCallback(() => {
     log('Iframe did load');
 
-    /** The first request can typically be 'about:blank', which we want to ignore */
-    const isRootUrl = lastIframeLoadedUrl.current === componentViewer.url!;
-
     /**
      * We have no way of knowing if the webview load is successful or not. We
      * have to wait to see if the error event is fired. Looking at the code,
@@ -208,7 +205,7 @@ export const ComponentView = ({
       clearTimeout(timeoutRef.current);
     }
 
-    if (isRootUrl) {
+    if (didLoadRootUrl.current === true) {
       log('Setting component viewer webview');
       timeoutRef.current = setTimeout(() => {
         componentViewer?.setWindow(webViewRef.current);
@@ -233,7 +230,10 @@ export const ComponentView = ({
 
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
     log('Setting last iframe URL to', request.url);
-    lastIframeLoadedUrl.current = request.url;
+    /** The first request can typically be 'about:blank', which we want to ignore */
+    if (!didLoadRootUrl.current) {
+      didLoadRootUrl.current = request.url === componentViewer.url!;
+    }
     /**
      * We want to handle link clicks within an editor by opening the browser
      * instead of loading inline. On iOS, onShouldStartLoadWithRequest is
