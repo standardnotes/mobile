@@ -272,8 +272,7 @@ export const ComponentView = ({
 
   const deprecationMessage = componentViewer.component.deprecationMessage;
 
-  const renderWebview =
-    !requiresLocalEditor || (requiresLocalEditor && localEditorReady);
+  const renderWebview = !requiresLocalEditor || localEditorReady;
 
   return (
     <FlexContainer>

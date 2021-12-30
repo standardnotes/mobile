@@ -2,7 +2,6 @@ import { AppStateEventType } from '@Lib/application_state';
 import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
-import { ComponentAction } from '@standardnotes/features';
 import {
   ApplicationEvent,
   ComponentViewer,
