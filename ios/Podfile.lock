@@ -1,7 +1,7 @@
 PODS:
   - boost-for-react-native (1.63.0)
-  - BugsnagReactNative (7.5.6):
-    - React
+  - BugsnagReactNative (7.14.1):
+    - React-Core
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.64.1)
   - FBReactNativeSpec (0.64.1):
@@ -521,7 +521,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BugsnagReactNative: 1ac1129bdf95273df07cfe4d89750dc3d9d888a3
+  BugsnagReactNative: d6988f685aae2de5ecda1f5ca39f03661759d416
   DoubleConversion: cde416483dac037923206447da6e1454df403714
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
   FBReactNativeSpec: 045b6219b306679cc02e02d618e3b5a91d334800
