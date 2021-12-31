@@ -1,3 +1,4 @@
+import { ComponentLoadingError } from '@Lib/component_manager';
 import { PrefKey } from '@Lib/preferences_manager';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -16,6 +17,7 @@ import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
+  WebViewErrorEvent,
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
 import {
@@ -33,10 +35,9 @@ type Props = {
   componentViewer: ComponentViewer;
   onLoadEnd: () => void;
   onLoadStart: () => void;
-  onLoadError: () => void;
+  onLoadError: (error: ComponentLoadingError, desc?: string) => void;
   onDownloadEditorStart: () => void;
   onDownloadEditorEnd: () => void;
-  onDownloadError: () => void;
 };
 
 const log = (message?: any, ...optionalParams: any[]) => {
@@ -47,13 +48,15 @@ const log = (message?: any, ...optionalParams: any[]) => {
   }
 };
 
+/** On Android, webview.onShouldStartLoadWithRequest is not called by react-native-webview*/
+const SupportsShouldLoadRequestHandler = Platform.OS === 'ios';
+
 export const ComponentView = ({
   onLoadEnd,
   onLoadError,
   onLoadStart,
   onDownloadEditorStart,
   onDownloadEditorEnd,
-  onDownloadError,
   componentViewer,
 }: Props) => {
   // Context
@@ -143,13 +146,20 @@ export const ComponentView = ({
     warnIfUnsupportedEditors();
   }, [application]);
 
-  const onLoadErrorHandler = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+  const onLoadErrorHandler = useCallback(
+    (error?: WebViewErrorEvent) => {
+      log('On load error', error);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
-    onLoadError();
-  }, [onLoadError, timeoutRef]);
+      onLoadError(
+        ComponentLoadingError.Unknown,
+        error?.nativeEvent?.description
+      );
+    },
+    [onLoadError, timeoutRef]
+  );
 
   useEffect(() => {
     const componentManager = application!.mobileComponentManager;
@@ -161,13 +171,13 @@ export const ComponentView = ({
       const asyncFunc = async () => {
         if (await componentManager.doesComponentNeedDownload(component)) {
           onDownloadEditorStart();
-          const { error } = await componentManager.downloadComponentOffline(
+          const error = await componentManager.downloadComponentOffline(
             component
           );
+          log('Download component error', error);
           onDownloadEditorEnd();
           if (error) {
-            onDownloadError();
-            onLoadError();
+            onLoadError(error);
           }
         }
         setLocalEditorReady(true);
@@ -189,7 +199,7 @@ export const ComponentView = ({
   };
 
   const onFrameLoad = useCallback(() => {
-    log('Iframe did load');
+    log('Iframe did load', webViewRef.current?.props.source);
 
     /**
      * We have no way of knowing if the webview load is successful or not. We
@@ -205,7 +215,7 @@ export const ComponentView = ({
       clearTimeout(timeoutRef.current);
     }
 
-    if (didLoadRootUrl.current === true) {
+    if (didLoadRootUrl.current === true || !SupportsShouldLoadRequestHandler) {
       log('Setting component viewer webview');
       timeoutRef.current = setTimeout(() => {
         componentViewer?.setWindow(webViewRef.current);
@@ -309,15 +319,17 @@ export const ComponentView = ({
           onLoad={onFrameLoad}
           onLoadStart={onLoadStartHandler}
           onError={onLoadErrorHandler}
+          onHttpError={() => onLoadErrorHandler()}
           onMessage={onMessage}
           hideKeyboardAccessoryView={true}
+          setSupportMultipleWindows={false}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
           cacheEnabled={true}
           autoManageStatusBarEnabled={
             false /* To prevent StatusBar from changing colors when focusing */
           }
           injectedJavaScript={defaultInjectedJavaScript()}
-          onContentProcessDidTerminate={onLoadErrorHandler}
+          onContentProcessDidTerminate={() => onLoadErrorHandler()}
         />
       )}
     </FlexContainer>

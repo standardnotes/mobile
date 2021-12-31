@@ -22,6 +22,14 @@ import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import StaticServer from 'react-native-static-server';
 import { unzip } from 'react-native-zip-archive';
 
+export enum ComponentLoadingError {
+  FailedDownload = 'FailedDownload',
+  ChecksumMismatch = 'ChecksumMismatch',
+  LocalServerFailure = 'LocalServerFailure',
+  DoesntExist = 'DoesntExist',
+  Unknown = 'Unknown',
+}
+
 const FeatureChecksums = require('@standardnotes/components/dist/checksums.json');
 
 const STATIC_SERVER_PORT = 8080;
@@ -37,6 +45,7 @@ export class ComponentManager extends SNComponentManager {
   private thirdPartyIndexPaths: Record<string, string> = {};
 
   public async initialize(protocolService: SNProtocolService) {
+    this.loggingEnabled = false;
     this.protocolService = protocolService;
     await this.createServer();
   }
@@ -53,6 +62,11 @@ export class ComponentManager extends SNComponentManager {
       this.staticServer = server;
       this.staticServerUrl = serverUrl;
     } catch (e) {
+      this.alertService.alert(
+        'Unable to start component server. ' +
+          'Editors other than the Plain Editor will fail to load. ' +
+          'Please restart the app and try again.'
+      );
       SNLog.error(e as any);
     }
   }
@@ -108,7 +122,7 @@ export class ComponentManager extends SNComponentManager {
 
   public async downloadComponentOffline(
     component: SNComponent
-  ): Promise<{ error?: boolean }> {
+  ): Promise<ComponentLoadingError | undefined> {
     const identifier = component.identifier;
     const nativeFeature = this.nativeFeatureForIdentifier(identifier);
     const downloadUrl =
@@ -118,11 +132,16 @@ export class ComponentManager extends SNComponentManager {
       throw Error('Attempting to download component with no download url');
     }
 
+    let error;
     try {
-      await this.performDownloadComponent(identifier, downloadUrl);
+      error = await this.performDownloadComponent(identifier, downloadUrl);
     } catch (e) {
       console.error(e);
-      return { error: true };
+      return ComponentLoadingError.Unknown;
+    }
+
+    if (error) {
+      return error;
     }
 
     const componentPath = this.pathForComponent(identifier);
@@ -130,10 +149,10 @@ export class ComponentManager extends SNComponentManager {
       this.log(
         `No component exists at path ${componentPath}, not using offline component`
       );
-      return { error: true };
+      return ComponentLoadingError.DoesntExist;
     }
 
-    return {};
+    return error;
   }
 
   public nativeFeatureForIdentifier(identifier: FeatureIdentifier) {
@@ -187,7 +206,7 @@ export class ComponentManager extends SNComponentManager {
   private async performDownloadComponent(
     identifier: FeatureIdentifier,
     downloadUrl: string
-  ) {
+  ): Promise<ComponentLoadingError | undefined> {
     const tmpLocation = `${BASE_DOCUMENTS_PATH}/${identifier}.zip`;
 
     if (await RNFS.exists(tmpLocation)) {
@@ -211,7 +230,7 @@ export class ComponentManager extends SNComponentManager {
 
     if (!String(result.statusCode).startsWith('2')) {
       console.error(`Error downloading file ${downloadUrl}`);
-      return false;
+      return ComponentLoadingError.FailedDownload;
     }
 
     this.log('Finished download to tmp location', tmpLocation);
@@ -225,16 +244,33 @@ export class ComponentManager extends SNComponentManager {
         identifier
       );
       if (!passes) {
-        return false;
+        return ComponentLoadingError.ChecksumMismatch;
       }
     }
 
     const componentPath = this.pathForComponent(identifier);
+
     this.log(`Attempting to unzip ${tmpLocation} to ${componentPath}`);
     await unzip(tmpLocation, componentPath);
     this.log('Unzipped component to', componentPath);
+
+    const directoryContents = await RNFS.readDir(componentPath);
+    const isNestedArchive =
+      directoryContents.length === 1 && directoryContents[0].isDirectory();
+    if (isNestedArchive) {
+      this.log(
+        'Component download includes base level dir that is not its identifier, fixing...'
+      );
+      const nestedDir = directoryContents[0];
+      const tmpMovePath = `${BASE_DOCUMENTS_PATH}/${identifier}`;
+      await RNFS.moveFile(nestedDir.path, tmpMovePath);
+      await RNFS.unlink(componentPath);
+      await RNFS.moveFile(tmpMovePath, componentPath);
+      this.log(
+        `Moved directory from ${directoryContents[0].path} to ${componentPath}`
+      );
+    }
     await RNFS.unlink(tmpLocation);
-    return true;
   }
 
   private pathForComponent(identifier: FeatureIdentifier) {

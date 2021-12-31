@@ -1,4 +1,5 @@
 import { AppStateEventType } from '@Lib/application_state';
+import { ComponentLoadingError } from '@Lib/component_manager';
 import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
@@ -42,8 +43,8 @@ type State = {
   title: string;
   text: string;
   saveError: boolean;
-  webViewError: boolean;
-  downloadError: boolean;
+  webViewError?: ComponentLoadingError;
+  webViewErrorDesc?: string;
   loadingWebview: boolean;
   downloadingEditor: boolean;
   componentViewer?: ComponentViewer;
@@ -79,8 +80,7 @@ export class Compose extends React.Component<{}, State> {
       text: initialEditor?.note?.text ?? '',
       componentViewer: undefined,
       saveError: false,
-      webViewError: false,
-      downloadError: false,
+      webViewError: undefined,
       loadingWebview: false,
       downloadingEditor: false,
     };
@@ -291,9 +291,8 @@ export class Compose extends React.Component<{}, State> {
   reloadComponentEditorState = async () => {
     this.setState({
       downloadingEditor: false,
-      downloadError: false,
       loadingWebview: false,
-      webViewError: false,
+      webViewError: undefined,
     });
 
     const associatedEditor = this.componentManager.editorForNote(this.note!);
@@ -341,7 +340,7 @@ export class Compose extends React.Component<{}, State> {
     this.setState({
       componentViewer: undefined,
       loadingWebview: false,
-      webViewError: false,
+      webViewError: undefined,
     });
 
     const associatedEditor = this.componentManager.editorForNote(this.note!);
@@ -433,7 +432,7 @@ export class Compose extends React.Component<{}, State> {
   onLoadWebViewStart = () => {
     this.setState({
       loadingWebview: true,
-      webViewError: false,
+      webViewError: undefined,
     });
   };
 
@@ -443,17 +442,17 @@ export class Compose extends React.Component<{}, State> {
     });
   };
 
-  onLoadWebViewError = () => {
+  onLoadWebViewError = (error: ComponentLoadingError, desc?: string) => {
     this.setState({
       loadingWebview: false,
-      webViewError: true,
+      webViewError: error,
+      webViewErrorDesc: desc,
     });
   };
 
   onDownloadEditorStart = () => {
     this.setState({
       downloadingEditor: true,
-      downloadError: false,
     });
   };
 
@@ -467,14 +466,38 @@ export class Compose extends React.Component<{}, State> {
         this.setState({
           downloadingEditor: false,
         }),
-      this.state.downloadError ? 0 : 200
+      this.state.webViewError ? 0 : 200
     );
   };
 
-  onDownloadError = () =>
-    this.setState({
-      downloadError: true,
-    });
+  getErrorText(): string {
+    let text = '';
+    switch (this.state.webViewError) {
+      case ComponentLoadingError.ChecksumMismatch:
+        text = 'The remote editor signature differs from the expected value.';
+        break;
+      case ComponentLoadingError.DoesntExist:
+        text = 'The local editor files do not exist.';
+        break;
+      case ComponentLoadingError.FailedDownload:
+        text = 'The editor failed to download.';
+        break;
+      case ComponentLoadingError.LocalServerFailure:
+        text = 'The local component server has an error.';
+        break;
+      case ComponentLoadingError.Unknown:
+        text = 'An unknown error occured.';
+        break;
+      default:
+        break;
+    }
+
+    if (this.state.webViewErrorDesc) {
+      text += `Webview Error: ${this.state.webViewErrorDesc}`;
+    }
+
+    return text;
+  }
 
   render() {
     const shouldDisplayEditor =
@@ -498,7 +521,7 @@ export class Compose extends React.Component<{}, State> {
                   <LockedText>Note Editing Disabled</LockedText>
                 </LockedContainer>
               )}
-              {(this.state.webViewError || this.state.downloadError) && (
+              {this.state.webViewError && (
                 <LockedContainer>
                   <Icon
                     name={ThemeService.nameForIcon(ICON_ALERT)}
@@ -506,7 +529,8 @@ export class Compose extends React.Component<{}, State> {
                     color={theme.stylekitBackgroundColor}
                   />
                   <LockedText>
-                    Unable to load {this.state.componentViewer?.component.name}
+                    Unable to load {this.state.componentViewer?.component.name}{' '}
+                    — {this.getErrorText()}
                   </LockedText>
                   <WebViewReloadButton
                     onPress={() => {
@@ -553,7 +577,6 @@ export class Compose extends React.Component<{}, State> {
                         onLoadError={this.onLoadWebViewError}
                         onDownloadEditorStart={this.onDownloadEditorStart}
                         onDownloadEditorEnd={this.onDownloadEditorEnd}
-                        onDownloadError={this.onDownloadError}
                       />
                     )}
 
@@ -590,9 +613,7 @@ export class Compose extends React.Component<{}, State> {
                           selectionColor={lighten(theme.stylekitInfoColor)}
                           onChangeText={this.onContentChange}
                           editable={!this.noteLocked}
-                          errorState={
-                            this.state.webViewError || this.state.downloadError
-                          }
+                          errorState={!!this.state.webViewError}
                         />
                       </View>
                     )}

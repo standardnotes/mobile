@@ -14,9 +14,8 @@ export const LockedContainer = styled.View`
   justify-content: flex-start;
   flex-direction: row;
   align-items: center;
-  height: 26px;
-  max-height: 26px;
   padding-left: ${PADDING}px;
+  padding: 8px;
   background-color: ${({ theme }) => theme.stylekitNeutralColor};
   border-bottom-color: ${({ theme }) => theme.stylekitBorderColor};
   border-bottom-width: 1px;
@@ -26,6 +25,7 @@ export const LockedText = styled.Text`
   font-size: 12px;
   color: ${({ theme }) => theme.stylekitBackgroundColor};
   padding-left: 10px;
+  padding-right: 100px;
 `;
 export const WebViewReloadButton = styled.TouchableOpacity`
   position: absolute;
