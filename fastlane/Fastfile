@@ -1,12 +1,14 @@
-fastlane_version "2.181.0"
+# frozen_string_literal: true
+
+fastlane_version '2.181.0'
 
 platform :ios do
   def sign_ios(type = 'appstore')
     match(
-      git_url: ENV["MATCH_CERTIFICATES_URL"],
-      team_id: ENV["APPLE_TEAM_ID"],
-      keychain_name: "snkeychain",
-      keychain_password: ENV["MATCH_PASSWORD"],
+      git_url: ENV['MATCH_CERTIFICATES_URL'],
+      team_id: ENV['APPLE_TEAM_ID'],
+      keychain_name: 'snkeychain',
+      keychain_password: ENV['MATCH_PASSWORD'],
       readonly: is_ci,
       type: type
     )
@@ -14,19 +16,19 @@ platform :ios do
 
   def build_ios(scheme)
     increment_version_number(
-      version_number: ENV["PACKAGE_VERSION"],
-      xcodeproj: "ios/StandardNotes.xcodeproj",
+      version_number: ENV['PACKAGE_VERSION'],
+      xcodeproj: 'ios/StandardNotes.xcodeproj'
     )
     increment_build_number(
-      build_number: ENV["BUILD_NUMBER"],
-      xcodeproj: "ios/StandardNotes.xcodeproj",
+      build_number: ENV['BUILD_NUMBER'],
+      xcodeproj: 'ios/StandardNotes.xcodeproj'
     )
     gym(
-      workspace: "ios/StandardNotes.xcworkspace",
+      workspace: 'ios/StandardNotes.xcworkspace',
       scheme: scheme,
       output_name: scheme,
       silent: true,
-      xcargs: "DEBUG_INFORMATION_FORMAT=dwarf-with-dsym"
+      xcargs: 'DEBUG_INFORMATION_FORMAT=dwarf-with-dsym'
     )
   end
 
@@ -34,36 +36,36 @@ platform :ios do
     sign_ios
     build_ios(scheme)
     app_store_connect_api_key(
-      key_id: ENV["APPSTORE_CONNECT_KEY_ID"],
-      issuer_id: ENV["APPSTORE_CONNECT_KEY_ISSUER_ID"],
-      key_filepath: "ios/Authkey.p8",
-      in_house: false, # optional but may be required if using match/sigh
+      key_id: ENV['APPSTORE_CONNECT_KEY_ID'],
+      issuer_id: ENV['APPSTORE_CONNECT_KEY_ISSUER_ID'],
+      key_filepath: 'ios/Authkey.p8',
+      in_house: false # optional but may be required if using match/sigh
     )
     upload_to_testflight(
-      apple_id: ENV["APPLE_APP_ID"],
+      apple_id: ENV['APPLE_APP_ID']
     )
     # refresh_dsyms
   end
 
-  desc "Deploy dev app"
+  desc 'Deploy dev app'
   lane :dev do
-    deploy_ios "StandardNotesDev"
+    deploy_ios 'StandardNotesDev'
   end
 
-  desc "Deploy production app"
+  desc 'Deploy production app'
   lane :prod do
-    deploy_ios "StandardNotes"
+    deploy_ios 'StandardNotes'
   end
 
-  desc "Setup iOS for running on CI"
+  desc 'Setup iOS for running on CI'
   lane :setup do
     setup_project
   end
 
   private_lane :setup_project do
     create_keychain(
-      name: "snkeychain",
-      password: ENV["MATCH_PASSWORD"],
+      name: 'snkeychain',
+      password: ENV['MATCH_PASSWORD'],
       default_keychain: true,
       unlock: true,
       timeout: 3600,
@@ -75,25 +77,24 @@ platform :ios do
     download_dsyms(
       wait_for_dsym_processing: true,
       wait_timeout: 900,
-      version: ENV["PACKAGE_VERSION"],
-      build_number: ENV["BUILD_NUMBER"]
+      version: ENV['PACKAGE_VERSION'],
+      build_number: ENV['BUILD_NUMBER']
     ) # Download dSYM files from iTC
-    upload_symbols_to_bugsnag   # Upload them to Bugsnag
+    upload_symbols_to_bugsnag # Upload them to Bugsnag
   end
-
 end
 
 platform :android do
   def build_android(variant, versionCode)
     gradle(
-      task: "bundle",
-      project_dir: "android/",
-      build_type: "Release",
+      task: 'bundle',
+      project_dir: 'android/',
+      build_type: 'Release',
       flavor: variant,
       properties: {
-        "versionName" => "#{ENV["PACKAGE_VERSION"]}",
-        "versionCode" => versionCode
-      },
+        'versionName' => (ENV['PACKAGE_VERSION']).to_s,
+        'versionCode' => versionCode
+      }
     )
   end
 
@@ -101,36 +102,36 @@ platform :android do
     build_android(variant, versionCode)
     upload_to_play_store(
       track: track,
-      json_key_data: "#{ENV["GOOGLE_PLAY_JSON_KEY_DATA"]}",
+      json_key_data: (ENV['GOOGLE_PLAY_JSON_KEY_DATA']).to_s,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
     bundletool(
       ks_path: 'android/app/keystore.keystore',
-      ks_password: ENV["ANDROID_KEYSTORE_PASSWORD"],
-      ks_key_alias: ENV["ANDROID_KEYSTORE_ALIAS"],
-      ks_key_alias_password: ENV["ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD"],
+      ks_password: ENV['ANDROID_KEYSTORE_PASSWORD'],
+      ks_key_alias: ENV['ANDROID_KEYSTORE_ALIAS'],
+      ks_key_alias_password: ENV['ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD'],
       bundletool_version: '1.0.0',
       aab_path: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
       apk_output_path: "android/app/build/outputs/apk/#{variant}/release/app-#{variant}-release.apk",
-      verbose: true,
+      verbose: true
     )
     # code here runs in the parent directory
-    Dir.chdir("..") do
+    Dir.chdir('..') do
       sh("yarn bugsnag-sourcemaps upload --api-key=#{ENV['BUGSNAG_APIKEY']} --app-version=#{versionCode} --minifiedFile=android/app/build/generated/assets/react/#{variant}/release/index.android.bundle --source-map=android/app/build/generated/sourcemaps/react/#{variant}/release/index.android.bundle.map --minified-url=index.android.bundle --upload-sources")
     end
   end
 
-  desc "Deploy dev app"
+  desc 'Deploy dev app'
   lane :dev do
-    version = 300021000 + ENV['BUILD_NUMBER'].to_i
+    version = 300_021_000 + ENV['BUILD_NUMBER'].to_i
     deploy_android 'dev', version
   end
 
-  desc "Deploy production app"
+  desc 'Deploy production app'
   lane :prod do
-    version = 3000220 + ENV['BUILD_NUMBER'].to_i
+    version = 3_000_220 + ENV['BUILD_NUMBER'].to_i
     deploy_android 'prod', version
   end
 end
