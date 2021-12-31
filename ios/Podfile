@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-platform :ios, '10.0'
+platform :ios, '11.0'
 # Standard Notes Specific
 pod 'TrustKit', '1.6.5'
 
@@ -16,25 +18,25 @@ pod 'TrustKit', '1.6.5'
 target 'StandardNotes' do
   config = use_native_modules!
   use_react_native!(
-    :path => config["reactNativePath"],
-    :hermes_enabled => false,
+    path: config['reactNativePath'],
+    hermes_enabled: false
   )
 end
 
-target "StandardNotesDev" do
+target 'StandardNotesDev' do
   config = use_native_modules!
   use_react_native!(
-    :path => config["reactNativePath"],
+    path: config['reactNativePath'],
 
     # Enabling hermes breaks fastlane build (at time of commit)
-    :hermes_enabled => false,
+    hermes_enabled: false
   )
 end
 
-# post_install do |installer|
-#   installer.pods_project.targets.each do |target|
-#     target.build_configurations.each do |config|
-#       config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
-#     end
-#   end
-# end
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
+    end
+  end
+end
