@@ -216,8 +216,6 @@ PODS:
     - React-Core
   - react-native-mail (4.1.0):
     - React-Core
-  - react-native-netinfo (6.0.6):
-    - React-Core
   - react-native-safe-area-context (3.1.9):
     - React-Core
   - react-native-segmented-control (2.2.2):
@@ -362,7 +360,6 @@ DEPENDENCIES:
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-mail (from `../node_modules/react-native-mail`)
-  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-segmented-control (from `../node_modules/@react-native-community/segmented-control`)"
   - react-native-sodium (from `../node_modules/react-native-sodium`)
@@ -449,8 +446,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-mail:
     :path: "../node_modules/react-native-mail"
-  react-native-netinfo:
-    :path: "../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-segmented-control:
@@ -547,7 +542,6 @@ SPEC CHECKSUMS:
   react-native-document-picker: 1a7518132d4a06b67f459be9bb1464a567d2b3b4
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-mail: 5fe7239a5b5c1e858d425501c03d1ab977434122
-  react-native-netinfo: 40b91995cd49c33ae57996486db76f0af067b630
   react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
   react-native-segmented-control: 65df6cd0619b780b3843d574a72d4c7cec396097
   react-native-sodium: 6cc4c4c1ea331f9f2b478076e983e09827a7b23f

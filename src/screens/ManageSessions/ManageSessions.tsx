@@ -1,4 +1,3 @@
-import { useIsOffline } from '@Lib/network_service';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled';
 import {
@@ -90,7 +89,6 @@ export const ManageSessions: React.FC = () => {
   const { showActionSheet } = useCustomActionSheet();
   const theme = useContext(ThemeContext);
   const insets = useSafeAreaInsets();
-  const [isOffline] = useIsOffline();
 
   const [
     sessions,
@@ -145,16 +143,6 @@ export const ManageSessions: React.FC = () => {
       />
     );
   };
-
-  if (isOffline) {
-    return (
-      <LoadingContainer>
-        <LoadingText textAlign="center">
-          {'You are offline.\nPlease check your network connection.'}
-        </LoadingText>
-      </LoadingContainer>
-    );
-  }
 
   if (errorMessage) {
     return (
