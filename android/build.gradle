@@ -9,6 +9,7 @@ buildscript {
         compileSdkVersion = 30
         targetSdkVersion = 30
         androidXCore = "1.6.0"
+        ndkVersion = "21.4.7075529"
     }
     repositories {
         google()
@@ -17,7 +18,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:4.2.1')
+        classpath('com.android.tools.build:gradle:4.2.2')
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 
         // NOTE: Do not place your application dependencies here; they belong
