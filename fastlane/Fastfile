@@ -33,6 +33,7 @@ platform :ios do
   end
 
   def deploy_ios(scheme)
+    xcversion(version: '13.2')
     sign_ios
     build_ios(scheme)
     app_store_connect_api_key(
