@@ -11,7 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1C2EEB3B45F4EB07AC795C77 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		1C2EEB3B45F4EB07AC795C77 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		33BB1B14071EBE5978EBF3A8 /* libPods-StandardNotes-StandardNotesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04FCB5A3A3387CA3CFC82AA3 /* libPods-StandardNotes-StandardNotesTests.a */; };
 		BC8DEA834BF198E8511F04FF /* libPods-StandardNotesDev.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 51F2D747BE02C2A1BCFEEFD1 /* libPods-StandardNotesDev.a */; };
 		CD7D5ECA27800609005FE1BF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CD7D5EC927800608005FE1BF /* LaunchScreen.storyboard */; };
@@ -62,6 +62,8 @@
 		CD7D5EDF278015D2005FE1BF /* StandardNotesDev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StandardNotesDev.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7D5EE127801645005FE1BF /* StandardNotesDev-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "StandardNotesDev-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CD7D5EE2278016E3005FE1BF /* Dev.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Dev.xcassets; sourceTree = "<group>"; };
+		CD7D5EE427801EFD005FE1BF /* SNDev.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SNDev.entitlements; sourceTree = "<group>"; };
+		CD7D5EE527801F10005FE1BF /* StandardNotes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = StandardNotes.entitlements; path = StandardNotes/StandardNotes.entitlements; sourceTree = "<group>"; };
 		CD7D83FD277FF8CB00915D89 /* Red@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@3x.png"; sourceTree = "<group>"; };
 		CD7D83FE277FF8CB00915D89 /* Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red.png; sourceTree = "<group>"; };
 		CD7D83FF277FF8CB00915D89 /* Red@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Red@2x.png"; sourceTree = "<group>"; };
@@ -81,7 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1C2EEB3B45F4EB07AC795C77 /* BuildFile in Frameworks */,
+				1C2EEB3B45F4EB07AC795C77 /* (null) in Frameworks */,
 				DD3D1CE428EC1C8BA0C49211 /* libPods-StandardNotes.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -132,6 +134,7 @@
 			children = (
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
+				CD7D5EE527801F10005FE1BF /* StandardNotes.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				CD7D83FE277FF8CB00915D89 /* Red.png */,
@@ -170,6 +173,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				CD7D5EE127801645005FE1BF /* StandardNotesDev-Info.plist */,
+				CD7D5EE427801EFD005FE1BF /* SNDev.entitlements */,
 				CD7D5EE2278016E3005FE1BF /* Dev.xcassets */,
 				0D0B9F98B8FBE9ED9C11F260 /* Pods */,
 			);
@@ -670,7 +674,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Blue;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = StandardNotes/StandardNotesRelease.entitlements;
+				CODE_SIGN_ENTITLEMENTS = StandardNotes/StandardNotes.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -854,7 +858,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = StandardNotes/StandardNotesRelease.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SNDev.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
