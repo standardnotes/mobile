@@ -47,7 +47,7 @@ jobs:
           name: dev.apk
           path: android/app/build/outputs/apk/dev/release/app-dev-release.apk
   ios:
-    runs-on: macos-latest
+    runs-on: macos-11
     timeout-minutes: 90
     if: "!contains(github.event.head_commit.message, 'skip ci')"
     steps:
