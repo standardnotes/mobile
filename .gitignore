@@ -21,6 +21,8 @@ DerivedData
 *.ipa
 *.xcuserstate
 
+.env
+
 # Android/IntelliJ
 #
 build/
@@ -28,6 +30,7 @@ build/
 .gradle
 local.properties
 *.iml
+*.hprof
 
 # node.js
 #

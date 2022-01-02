@@ -1,15 +1,11 @@
+import { ComponentLoadingError } from '@Lib/component_manager';
 import { PrefKey } from '@Lib/preferences_manager';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
-import {
-  ButtonType,
-  ComponentArea,
-  LiveItem,
-  SNComponent,
-  SNNote,
-} from '@standardnotes/snjs';
+import { ButtonType, ComponentViewer } from '@standardnotes/snjs';
+import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   useCallback,
   useContext,
@@ -21,6 +17,7 @@ import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import {
   OnShouldStartLoadWithRequest,
+  WebViewErrorEvent,
   WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes';
 import {
@@ -35,30 +32,46 @@ import {
 } from './ComponentView.styled';
 
 type Props = {
-  componentUuid: string;
-  note: SNNote;
+  componentViewer: ComponentViewer;
   onLoadEnd: () => void;
   onLoadStart: () => void;
-  onLoadError: () => void;
+  onLoadError: (error: ComponentLoadingError, desc?: string) => void;
+  onDownloadEditorStart: () => void;
+  onDownloadEditorEnd: () => void;
 };
+
+const log = (message?: any, ...optionalParams: any[]) => {
+  const LOGGING_ENABLED = false;
+  if (LOGGING_ENABLED) {
+    console.log(message, optionalParams, '\n\n');
+    console.log('\n\n');
+  }
+};
+
+/** On Android, webview.onShouldStartLoadWithRequest is not called by react-native-webview*/
+const SupportsShouldLoadRequestHandler = Platform.OS === 'ios';
 
 export const ComponentView = ({
   onLoadEnd,
   onLoadError,
   onLoadStart,
-  componentUuid,
+  onDownloadEditorStart,
+  onDownloadEditorEnd,
+  componentViewer,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+  const themeService = useContext(ThemeServiceContext);
 
   // State
-  const [liveComponent, setLiveComponent] = useState<
-    LiveItem<SNComponent> | undefined
-  >(() => new LiveItem(componentUuid, application!));
-  const [url, setUrl] = useState('');
   const [showWebView, setShowWebView] = useState<boolean>(true);
+  const [requiresLocalEditor, setRequiresLocalEditor] = useState<boolean>(
+    false
+  );
+  const [localEditorReady, setLocalEditorReady] = useState<boolean>(false);
 
   // Ref
+  const didLoadRootUrl = useRef<boolean>(false);
   const webViewRef = useRef<WebView>(null);
   const timeoutRef = useRef<number | undefined>(undefined);
 
@@ -72,17 +85,11 @@ export const ComponentView = ({
     });
 
     return removeBlurScreenListener;
-  });
+  }, [navigation]);
 
   useFocusEffect(() => {
     setShowWebView(true);
   });
-
-  useEffect(() => {
-    if (liveComponent?.item.uuid !== componentUuid) {
-      setLiveComponent(new LiveItem(componentUuid, application!));
-    }
-  }, [application, liveComponent?.item.uuid, componentUuid]);
 
   useEffect(() => {
     const warnIfUnsupportedEditors = async () => {
@@ -139,44 +146,61 @@ export const ComponentView = ({
     warnIfUnsupportedEditors();
   }, [application]);
 
-  useEffect(() => {
-    if (liveComponent) {
-      const newUrl = application!.componentManager!.urlForComponent(
-        liveComponent.item
-      );
-      if (!newUrl) {
-        application?.alertService!.alert(
-          'Re-install Extension',
-          'This extension is not installed correctly. Please use the web or desktop application to reinstall, then try again.',
-          'OK'
-        );
-      } else {
-        setUrl(newUrl);
+  const onLoadErrorHandler = useCallback(
+    (error?: WebViewErrorEvent) => {
+      log('On load error', error);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
-    }
 
-    // deinit
-    return () => {
-      application?.componentManager.onComponentIframeDestroyed(componentUuid);
-      application?.componentGroup.deactivateComponentForArea(
-        ComponentArea.Editor
+      onLoadError(
+        ComponentLoadingError.Unknown,
+        error?.nativeEvent?.description
       );
-      liveComponent?.deinit();
-    };
-  }, [application, liveComponent, componentUuid]);
+    },
+    [onLoadError, timeoutRef]
+  );
+
+  useEffect(() => {
+    const componentManager = application!.mobileComponentManager;
+    const component = componentViewer.component;
+    const isDownloadable = componentManager.isComponentDownloadable(component);
+    setRequiresLocalEditor(isDownloadable);
+
+    if (isDownloadable) {
+      const asyncFunc = async () => {
+        if (await componentManager.doesComponentNeedDownload(component)) {
+          onDownloadEditorStart();
+          const error = await componentManager.downloadComponentOffline(
+            component
+          );
+          log('Download component error', error);
+          onDownloadEditorEnd();
+          if (error) {
+            onLoadError(error);
+          }
+        }
+        setLocalEditorReady(true);
+      };
+      asyncFunc();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onMessage = (event: WebViewMessageEvent) => {
     let data;
     try {
       data = JSON.parse(event.nativeEvent.data);
     } catch (e) {
-      console.log('Message is not valid JSON, returning');
+      log('Message is not valid JSON, returning');
       return;
     }
-    application!.componentManager?.handleMessage(liveComponent!.item!, data);
+    componentViewer?.handleMessage(data);
   };
 
   const onFrameLoad = useCallback(() => {
+    log('Iframe did load', webViewRef.current?.props.source);
+
     /**
      * We have no way of knowing if the webview load is successful or not. We
      * have to wait to see if the error event is fired. Looking at the code,
@@ -184,41 +208,42 @@ export const ComponentView = ({
      * to see if the error event is fired before registering the component
      * window. Otherwise, on error, this component will be dealloced, and a
      * pending postMessage will cause a memory leak crash on Android in the
-     * form of "react native attempt to invoke virtual method double java.lang.double.doublevalue() on a null object reference"
+     * form of "react native attempt to invoke virtual method
+     * double java.lang.double.doublevalue() on a null object reference"
      */
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    timeoutRef.current = setTimeout(() => {
-      application!.componentManager?.registerComponentWindow(
-        liveComponent!.item!,
-        webViewRef.current
-      );
-    }, 1);
-
-    /**
-     * The parent will remove their loading screen on load end. We want to
-     * delay this by 100 to avoid flicker that may result if using a dark theme.
-     * This delay will allow editor to load its theme.
-     */
-    setTimeout(() => {
-      onLoadEnd();
-    }, 100);
-  }, [application, liveComponent, onLoadEnd]);
+    if (didLoadRootUrl.current === true || !SupportsShouldLoadRequestHandler) {
+      log('Setting component viewer webview');
+      timeoutRef.current = setTimeout(() => {
+        componentViewer?.setWindow(webViewRef.current);
+      }, 1);
+      /**
+       * The parent will remove their loading screen on load end. We want to
+       * delay this to avoid flicker that may result if using a dark theme.
+       * This delay will allow editor to load its theme.
+       */
+      const isDarkTheme = themeService?.isLikelyUsingDarkColorTheme();
+      const delayToAvoidFlicker = isDarkTheme ? 50 : 0;
+      setTimeout(() => {
+        onLoadEnd();
+      }, delayToAvoidFlicker);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onLoadStartHandler = () => {
     onLoadStart();
   };
 
-  const onLoadErrorHandler = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    onLoadError();
-  };
-
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
+    log('Setting last iframe URL to', request.url);
+    /** The first request can typically be 'about:blank', which we want to ignore */
+    if (!didLoadRootUrl.current) {
+      didLoadRootUrl.current = request.url === componentViewer.url!;
+    }
     /**
      * We want to handle link clicks within an editor by opening the browser
      * instead of loading inline. On iOS, onShouldStartLoadWithRequest is
@@ -234,7 +259,7 @@ export const ComponentView = ({
 
     if (
       (Platform.OS === 'ios' && request.navigationType === 'click') ||
-      (Platform.OS === 'android' && request.url !== url)
+      (Platform.OS === 'android' && request.url !== componentViewer.url!)
     ) {
       application!.deviceInterface!.openUrl(request.url);
       return false;
@@ -247,16 +272,21 @@ export const ComponentView = ({
       window.parent.postMessage = function(data) {
         window.parent.ReactNativeWebView.postMessage(data);
       };
+      const meta = document.createElement('meta');
+      meta.setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no');
+      meta.setAttribute('name', 'viewport');
+      document.getElementsByTagName('head')[0].appendChild(meta);
       return true;
     })()`;
   };
 
-  const deprecationMessage =
-    liveComponent?.item.package_info.deprecation_message;
+  const deprecationMessage = componentViewer.component.deprecationMessage;
+
+  const renderWebview = !requiresLocalEditor || localEditorReady;
 
   return (
     <FlexContainer>
-      {liveComponent?.item.isExpired && (
+      {componentViewer.component.isExpired && (
         <LockedContainer>
           <StyledIcon />
           <LockedText>
@@ -266,7 +296,7 @@ export const ComponentView = ({
         </LockedContainer>
       )}
 
-      {liveComponent?.item.isDeprecated && (
+      {componentViewer.component.isDeprecated && (
         <DeprecatedContainer>
           <DeprecatedIcon />
           <DeprecatedText>
@@ -275,11 +305,11 @@ export const ComponentView = ({
         </DeprecatedContainer>
       )}
 
-      {Boolean(url) && (
+      {renderWebview && (
         <StyledWebview
           showWebView={showWebView}
-          source={{ uri: url }}
-          key={liveComponent?.item.uuid}
+          source={{ uri: componentViewer.url! }}
+          key={componentViewer.component.uuid}
           ref={webViewRef}
           /**
            * onLoad and onLoadEnd seem to be the same exact thing, except
@@ -289,17 +319,17 @@ export const ComponentView = ({
           onLoad={onFrameLoad}
           onLoadStart={onLoadStartHandler}
           onError={onLoadErrorHandler}
+          onHttpError={() => onLoadErrorHandler()}
           onMessage={onMessage}
           hideKeyboardAccessoryView={true}
+          setSupportMultipleWindows={false}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
           cacheEnabled={true}
-          scalesPageToFit={
-            true /* Android only, not available with WKWebView */
-          }
           autoManageStatusBarEnabled={
             false /* To prevent StatusBar from changing colors when focusing */
           }
           injectedJavaScript={defaultInjectedJavaScript()}
+          onContentProcessDidTerminate={() => onLoadErrorHandler()}
         />
       )}
     </FlexContainer>

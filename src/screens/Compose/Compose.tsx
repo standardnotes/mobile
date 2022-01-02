@@ -1,11 +1,11 @@
 import { AppStateEventType } from '@Lib/application_state';
+import { ComponentLoadingError } from '@Lib/component_manager';
 import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import {
   ApplicationEvent,
-  ComponentAction,
-  ComponentArea,
+  ComponentViewer,
   ContentType,
   isPayloadSourceInternalChange,
   isPayloadSourceRetrieved,
@@ -23,9 +23,8 @@ import { ThemeContext } from 'styled-components';
 import { ComponentView } from './ComponentView';
 import {
   Container,
+  LoadingText,
   LoadingWebViewContainer,
-  LoadingWebViewSubtitle,
-  LoadingWebViewText,
   LockedContainer,
   LockedText,
   NoteTitleInput,
@@ -44,9 +43,11 @@ type State = {
   title: string;
   text: string;
   saveError: boolean;
-  editorComponent: SNComponent | undefined;
-  webViewError: boolean;
+  webViewError?: ComponentLoadingError;
+  webViewErrorDesc?: string;
   loadingWebview: boolean;
+  downloadingEditor: boolean;
+  componentViewer?: ComponentViewer;
 };
 
 export class Compose extends React.Component<{}, State> {
@@ -56,12 +57,12 @@ export class Compose extends React.Component<{}, State> {
   saveTimeout: number | undefined;
   alreadySaved: boolean = false;
   statusTimeout: number | undefined;
+  downloadingMessageTimeout: number | undefined;
   removeEditorObserver?: () => void;
   removeEditorNoteValueChangeObserver?: () => void;
   removeComponentsObserver?: () => void;
   removeEditorNoteChangeObserver?: () => void;
   removeStreamComponents?: () => void;
-  removeComponentGroupObserver?: () => void;
   removeStateEventObserver?: () => void;
   removeAppEventObserver?: () => void;
   removeComponentHandler?: () => void;
@@ -71,15 +72,17 @@ export class Compose extends React.Component<{}, State> {
     context: React.ContextType<typeof ApplicationContext>
   ) {
     super(props);
+
     this.context = context;
     const initialEditor = context?.editorGroup.activeEditor;
     this.state = {
       title: initialEditor?.note?.title ?? '',
       text: initialEditor?.note?.text ?? '',
-      editorComponent: undefined,
+      componentViewer: undefined,
       saveError: false,
-      webViewError: false,
+      webViewError: undefined,
       loadingWebview: false,
+      downloadingEditor: false,
     };
   }
 
@@ -143,17 +146,6 @@ export class Compose extends React.Component<{}, State> {
       }
     );
 
-    this.removeComponentGroupObserver = this.context?.componentGroup.addChangeObserver(
-      async () => {
-        const editorForNote = this.context?.componentManager.editorForNote(
-          this.note!
-        );
-        this.setState({
-          editorComponent: editorForNote,
-        });
-      }
-    );
-
     this.removeAppEventObserver = this.context?.addEventObserver(
       async eventName => {
         if (eventName === ApplicationEvent.CompletedFullSync) {
@@ -173,22 +165,6 @@ export class Compose extends React.Component<{}, State> {
         } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
           this.showErrorStatus('Offline Saving Issue (changes not saved)');
         }
-      }
-    );
-
-    this.removeComponentHandler = this.context?.componentManager!.registerHandler(
-      {
-        identifier: 'component-view-' + Math.random(),
-        areas: [ComponentArea.Editor],
-        actionHandler: (currentComponent, action, data) => {
-          if (action === ComponentAction.SetSize) {
-            this.context?.componentManager!.handleSetSizeEvent(
-              currentComponent,
-              data
-            );
-          }
-        },
-        contextRequestHandler: () => this.note,
       }
     );
 
@@ -217,7 +193,6 @@ export class Compose extends React.Component<{}, State> {
     this.removeEditorNoteChangeObserver &&
       this.removeEditorNoteChangeObserver();
     this.removeAppEventObserver && this.removeAppEventObserver();
-    this.removeComponentGroupObserver && this.removeComponentGroupObserver();
     this.removeStreamComponents && this.removeStreamComponents();
     this.removeStateEventObserver && this.removeStateEventObserver();
     this.removeComponentHandler && this.removeComponentHandler();
@@ -225,25 +200,23 @@ export class Compose extends React.Component<{}, State> {
     this.removeComponentHandler = undefined;
     this.removeStreamComponents = undefined;
     this.removeAppEventObserver = undefined;
-    this.removeComponentGroupObserver = undefined;
     this.removeEditorNoteChangeObserver = undefined;
     this.removeEditorNoteValueChangeObserver = undefined;
     if (this.editor) {
       this.context?.editorGroup?.closeEditor(this.editor);
     }
-    if (this.state.editorComponent) {
-      this.context?.componentGroup?.deactivateComponent(
-        this.state.editorComponent,
-        false
-      );
-    }
-
     this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
+    if (this.state.componentViewer) {
+      this.componentManager.destroyComponentViewer(this.state.componentViewer);
+    }
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
     }
     if (this.statusTimeout) {
       clearTimeout(this.statusTimeout);
+    }
+    if (this.downloadingMessageTimeout) {
+      clearTimeout(this.downloadingMessageTimeout);
     }
   }
 
@@ -311,26 +284,70 @@ export class Compose extends React.Component<{}, State> {
     this.editorViewRef.current?.blur();
   };
 
+  get componentManager() {
+    return this.context?.mobileComponentManager!;
+  }
+
   reloadComponentEditorState = async () => {
-    const associatedEditor = this.context?.componentManager!.editorForNote(
-      this.note!
-    );
+    this.setState({
+      downloadingEditor: false,
+      loadingWebview: false,
+      webViewError: undefined,
+    });
+
+    const associatedEditor = this.componentManager.editorForNote(this.note!);
 
     if (!associatedEditor) {
-      /** No editor */
-      if (this.state.editorComponent) {
-        await this.context?.componentGroup.deactivateComponent(
-          this.state.editorComponent
+      if (this.state.componentViewer) {
+        this.componentManager.destroyComponentViewer(
+          this.state.componentViewer
+        );
+        this.setState({ componentViewer: undefined });
+      }
+    } else if (
+      associatedEditor.uuid !== this.state.componentViewer?.component.uuid
+    ) {
+      if (this.state.componentViewer) {
+        this.componentManager.destroyComponentViewer(
+          this.state.componentViewer
         );
       }
-    } else if (associatedEditor.uuid !== this.state.editorComponent?.uuid) {
-      await this.context?.componentGroup.activateComponent(associatedEditor);
-    } else {
-      this.context?.componentManager!.contextItemDidChangeInArea(
-        ComponentArea.Editor
-      );
+      if (
+        this.componentManager.isComponentThirdParty(associatedEditor.identifier)
+      ) {
+        await this.componentManager.preloadThirdPartyIndexPathFromDisk(
+          associatedEditor.identifier
+        );
+      }
+      this.loadComponentViewer(associatedEditor);
     }
   };
+
+  loadComponentViewer(component: SNComponent) {
+    this.setState({
+      componentViewer: this.componentManager.createComponentViewer(
+        component,
+        this.note?.uuid
+      ),
+    });
+  }
+
+  async forceReloadExistingEditor() {
+    if (this.state.componentViewer) {
+      this.componentManager.destroyComponentViewer(this.state.componentViewer);
+    }
+
+    this.setState({
+      componentViewer: undefined,
+      loadingWebview: false,
+      webViewError: undefined,
+    });
+
+    const associatedEditor = this.componentManager.editorForNote(this.note!);
+    if (associatedEditor) {
+      this.loadComponentViewer(associatedEditor);
+    }
+  }
 
   saveNote = async (
     bypassDebouncer: boolean,
@@ -412,9 +429,79 @@ export class Compose extends React.Component<{}, State> {
     this.saveNote(false, true, false, false, text);
   };
 
+  onLoadWebViewStart = () => {
+    this.setState({
+      loadingWebview: true,
+      webViewError: undefined,
+    });
+  };
+
+  onLoadWebViewEnd = () => {
+    this.setState({
+      loadingWebview: false,
+    });
+  };
+
+  onLoadWebViewError = (error: ComponentLoadingError, desc?: string) => {
+    this.setState({
+      loadingWebview: false,
+      webViewError: error,
+      webViewErrorDesc: desc,
+    });
+  };
+
+  onDownloadEditorStart = () => {
+    this.setState({
+      downloadingEditor: true,
+    });
+  };
+
+  onDownloadEditorEnd = () => {
+    if (this.downloadingMessageTimeout) {
+      clearTimeout(this.downloadingMessageTimeout);
+    }
+
+    this.downloadingMessageTimeout = setTimeout(
+      () =>
+        this.setState({
+          downloadingEditor: false,
+        }),
+      this.state.webViewError ? 0 : 200
+    );
+  };
+
+  getErrorText(): string {
+    let text = '';
+    switch (this.state.webViewError) {
+      case ComponentLoadingError.ChecksumMismatch:
+        text = 'The remote editor signature differs from the expected value.';
+        break;
+      case ComponentLoadingError.DoesntExist:
+        text = 'The local editor files do not exist.';
+        break;
+      case ComponentLoadingError.FailedDownload:
+        text = 'The editor failed to download.';
+        break;
+      case ComponentLoadingError.LocalServerFailure:
+        text = 'The local component server has an error.';
+        break;
+      case ComponentLoadingError.Unknown:
+        text = 'An unknown error occured.';
+        break;
+      default:
+        break;
+    }
+
+    if (this.state.webViewErrorDesc) {
+      text += `Webview Error: ${this.state.webViewErrorDesc}`;
+    }
+
+    return text;
+  }
+
   render() {
     const shouldDisplayEditor =
-      this.state.editorComponent &&
+      this.state.componentViewer &&
       Boolean(this.note) &&
       !this.note?.prefersPlainEditor &&
       !this.state.webViewError;
@@ -442,14 +529,12 @@ export class Compose extends React.Component<{}, State> {
                     color={theme.stylekitBackgroundColor}
                   />
                   <LockedText>
-                    Unable to load {this.state.editorComponent?.name}
+                    Unable to load {this.state.componentViewer?.component.name}{' '}
+                    — {this.getErrorText()}
                   </LockedText>
                   <WebViewReloadButton
                     onPress={() => {
-                      this.setState({
-                        loadingWebview: false,
-                        webViewError: false,
-                      });
+                      this.forceReloadExistingEditor();
                     }}
                   >
                     <WebViewReloadButtonText>Reload</WebViewReloadButtonText>
@@ -472,39 +557,29 @@ export class Compose extends React.Component<{}, State> {
                       autoCapitalize={'sentences'}
                       editable={!this.noteLocked}
                     />
-                    {this.state.loadingWebview && (
-                      <LoadingWebViewContainer locked={this.noteLocked}>
-                        <LoadingWebViewText>{'LOADING'}</LoadingWebViewText>
-                        <LoadingWebViewSubtitle>
-                          {this.state.editorComponent?.name}
-                        </LoadingWebViewSubtitle>
-                      </LoadingWebViewContainer>
-                    )}
+                    {(this.state.downloadingEditor ||
+                      (this.state.loadingWebview &&
+                        themeService?.isLikelyUsingDarkColorTheme())) && (
+                        <LoadingWebViewContainer locked={this.noteLocked}>
+                          <LoadingText>
+                            {'Loading '}
+                            {this.state.componentViewer?.component.name}...
+                          </LoadingText>
+                        </LoadingWebViewContainer>
+                      )}
                     {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
                     {shouldDisplayEditor && (
                       <ComponentView
-                        key={this.state.editorComponent!.uuid}
-                        componentUuid={this.state.editorComponent!.uuid}
-                        note={this.note!}
-                        onLoadStart={() => {
-                          this.setState({
-                            loadingWebview: true,
-                            webViewError: false,
-                          });
-                        }}
-                        onLoadEnd={() => {
-                          this.setState({
-                            loadingWebview: false,
-                          });
-                        }}
-                        onLoadError={() => {
-                          this.setState({
-                            loadingWebview: false,
-                            webViewError: true,
-                          });
-                        }}
+                        key={this.state.componentViewer?.identifier}
+                        componentViewer={this.state.componentViewer!}
+                        onLoadStart={this.onLoadWebViewStart}
+                        onLoadEnd={this.onLoadWebViewEnd}
+                        onLoadError={this.onLoadWebViewError}
+                        onDownloadEditorStart={this.onDownloadEditorStart}
+                        onDownloadEditorEnd={this.onDownloadEditorEnd}
                       />
                     )}
+
                     {!shouldDisplayEditor &&
                       !isNullOrUndefined(this.note) &&
                       Platform.OS === 'android' && (
@@ -538,7 +613,7 @@ export class Compose extends React.Component<{}, State> {
                           selectionColor={lighten(theme.stylekitInfoColor)}
                           onChangeText={this.onContentChange}
                           editable={!this.noteLocked}
-                          errorState={this.state.webViewError}
+                          errorState={!!this.state.webViewError}
                         />
                       </View>
                     )}
