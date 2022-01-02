@@ -1752,10 +1752,10 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"
   integrity sha512-+OQ6gajTcVSHruw33T52MHyBDKL1vRCfQBXQn4tt4+bCfBAe+PFLkEQMHp35bg5twCfg9+wUf2KhmNNSNyBBZw==
 
-"@standardnotes/snjs@2.31.18":
-  version "2.31.18"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.31.18.tgz#657d5c22d82b43bfecf5b3156bd2fd07c8f752b0"
-  integrity sha512-IfOVlMXLEZNsFa+H8dBSQLdR4+Jyxp9khmW5ALlgzEGHgL1d4xln5GVBSdUfR3oajbzhSnic5T0e5UuBxbKxqA==
+"@standardnotes/snjs@2.31.20":
+  version "2.31.20"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.31.20.tgz#f33f35aae09ab0ce2652adc1a0c91852a3c00062"
+  integrity sha512-rPHHzPKdNe546Zis9UCpO1pNU0Wd6P0y7nxlDzpitqGsXFEdBbcGbPkdw6tBIvQ2KvpkL0/U50FrzRU6NteXLg==
   dependencies:
     "@standardnotes/auth" "3.8.1"
     "@standardnotes/common" "1.2.1"
