@@ -1,16 +1,25 @@
+import { IconType } from '@Components/Icon';
+import { ApplicationState } from '@Lib/application_state';
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
+import {
+  CollectionSort,
+  FeatureIdentifier,
+  isNullOrUndefined,
+  sanitizeHtmlString,
+  SNNote,
+} from '@standardnotes/snjs';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
 } from '@Style/custom_action_sheet';
-import React, { useContext, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { ThemeServiceContext } from '@Style/theme_service';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import {
   Container,
   DeletedText,
@@ -30,7 +39,506 @@ type Props = {
   sortType: CollectionSort;
 };
 
+type NoteFlag = {
+  text: string;
+  class: 'Info' | 'Neutral' | 'Warning' | 'Success' | 'Danger';
+};
+
+const flagsForNote = (note: SNNote) => {
+  const flags = [] as NoteFlag[];
+  if (note.conflictOf) {
+    flags.push({
+      text: 'Conflicted Copy',
+      class: 'Danger',
+    });
+  }
+  if (note.errorDecrypting) {
+    if (note.waitingForKey) {
+      flags.push({
+        text: 'Waiting For Keys',
+        class: 'Info',
+      });
+    } else {
+      flags.push({
+        text: 'Missing Keys',
+        class: 'Danger',
+      });
+    }
+  }
+  if (note.deleted) {
+    flags.push({
+      text: 'Deletion Pending Sync',
+      class: 'Danger',
+    });
+  }
+  return flags;
+};
+
+export const getIconForEditor = (
+  identifier: FeatureIdentifier | undefined
+): [IconType, number] => {
+  switch (identifier) {
+    case FeatureIdentifier.BoldEditor:
+    case FeatureIdentifier.PlusEditor:
+      return ['rich-text', 1];
+    case FeatureIdentifier.MarkdownBasicEditor:
+    case FeatureIdentifier.MarkdownMathEditor:
+    case FeatureIdentifier.MarkdownMinimistEditor:
+    case FeatureIdentifier.MarkdownProEditor:
+      return ['markdown', 2];
+    case FeatureIdentifier.TokenVaultEditor:
+      return ['authenticator', 6];
+    case FeatureIdentifier.SheetsEditor:
+      return ['spreadsheets', 5];
+    case FeatureIdentifier.TaskEditor:
+      return ['tasks', 3];
+    case FeatureIdentifier.CodeEditor:
+      return ['code', 4];
+    default:
+      return ['plain-text', 1];
+  }
+};
+
+const tagsForNote = (note: SNNote, appState: ApplicationState): string[] => {
+  /* if (hideTags) {
+    return [];
+  } */
+  const selectedTag = appState.selectedTag;
+  if (!selectedTag) {
+    return [];
+  }
+  const tags = appState.getNoteTags(note);
+  if (!selectedTag.isSmartTag && tags.length === 1) {
+    return [];
+  }
+  return tags.map(tag => tag.title);
+};
+
 export const NoteCell = ({
+  note,
+  onPressItem,
+  highlighted,
+  sortType,
+  hideDates,
+  hidePreviews,
+}: Props) => {
+  const themeService = useContext(ThemeServiceContext);
+  const application = useContext(ApplicationContext);
+  const flags = flagsForNote(note);
+  const showModifiedDate = sortType === CollectionSort.UpdatedAt;
+  //const editorForNote = application?.componentManager.editorForNote(note);
+  //const [icon, tint] = getIconForEditor(editorForNote?.identifier);
+  const [styles, setStyles] = useState<StyleSheet.NamedStyles<any>>();
+  const [tags, setTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (application) {
+      setTags(tagsForNote(note, application.getAppState()));
+    }
+  }, [application, note]);
+
+  useEffect(() => {
+    if (themeService?.variables) {
+      setStyles(
+        StyleSheet.create({
+          noteItem: {
+            flexShrink: 1,
+            flexDirection: 'row',
+            alignItems: 'stretch',
+            ...Platform.select({
+              web: {
+                cursor: 'pointer',
+              },
+              default: {},
+            }),
+          },
+          noteItemSelected: {
+            ...Platform.select({
+              web: {
+                backgroundColor: 'var(--sn-stylekit-grey-5)',
+                borderLeft: '2px solid var(--sn-stylekit-info-color)',
+              },
+              default: {
+                backgroundColor:
+                  themeService?.variables?.stylekitBackgroundColor ?? '#ffffff',
+              },
+            }),
+          },
+          icon: {
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            ...Platform.select({
+              web: {
+                padding: '0.9rem',
+                paddingRight: '0.625rem',
+              },
+              default: {
+                padding: 14.4,
+                paddingRight: 10,
+              },
+            }),
+          },
+          meta: {
+            flexShrink: 1,
+            width: '100%',
+            paddingLeft: 0,
+            ...Platform.select({
+              web: {
+                padding: '0.9rem',
+                borderBottom: '1px solid var(--sn-stylekit-border-color)',
+              },
+              default: {
+                padding: 14.4,
+                borderBottomWidth: 1,
+                borderStyle: 'solid',
+                borderBottomColor: themeService.variables.stylekitBorderColor,
+              },
+            }),
+          },
+          nameContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          },
+          tagsContainer: {
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            ...Platform.select({
+              web: {
+                gap: '.5rem',
+                fontSize: '0.725rem',
+                marginTop: '0.325rem',
+              },
+              default: {
+                fontSize: 11.6,
+                marginTop: 5.2,
+              },
+            }),
+          },
+          tag: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            ...Platform.select({
+              web: {
+                display: 'inline-flex',
+                borderRadius: '0.125rem',
+                backgroundColor: 'var(--sn-stylekit-grey-4-opacity-variant)',
+                paddingTop: '0.25rem',
+                paddingBottom: '0.25rem',
+                paddingLeft: '0.325rem',
+                paddingRight: '0.375rem',
+              },
+              default: {
+                backgroundColor:
+                  themeService.variables.stylekitGrey4OpacityVariant,
+                paddingTop: 4,
+                paddingBottom: 4,
+                paddingLeft: 5.2,
+                paddingRight: 6,
+                marginRight: 10,
+                marginBottom: 4,
+                borderRadius: 2,
+              },
+            }),
+          },
+          tagLabel: {
+            ...Platform.select({
+              web: {
+                color: 'var(--sn-stylekit-foreground-color)',
+              },
+              default: {
+                color: themeService.variables.stylekitForegroundColor,
+              },
+            }),
+          },
+          title: {
+            fontWeight: '600',
+            overflow: 'hidden',
+            ...Platform.select({
+              web: {
+                lineHeight: 1.3,
+                fontFamily: 'var(--sn-stylekit-sans-serif-font)',
+                display: 'inline-flex',
+                fontSize: '1rem',
+                textOverflow: 'ellipsis',
+                color: 'var(--sn-stylekit-foreground-color)',
+              },
+              default: {
+                fontSize: 16,
+                lineHeight: 20.8,
+                color: themeService.variables.stylekitForegroundColor,
+              },
+            }),
+          },
+          extraInfo: {
+            opacity: 0.5,
+            fontFamily: 'var(--sn-stylekit-sans-serif-font)',
+            ...Platform.select({
+              web: {
+                fontSize: '0.75rem',
+                lineHeight: 1.4,
+                color: 'var(--sn-stylekit-foreground-color)',
+                marginTop: '0.25rem',
+              },
+              default: {
+                fontSize: 12,
+                lineHeight: 15.6,
+                color: themeService.variables.stylekitForegroundColor,
+                marginTop: 4,
+              },
+            }),
+          },
+          flagIcons: {
+            flexDirection: 'row',
+          },
+          flagIcon: {
+            ...Platform.select({
+              web: {
+                marginLeft: '0.375rem',
+              },
+              default: {
+                marginLeft: 6,
+              },
+            }),
+          },
+          noteFlags: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            ...Platform.select({
+              web: {
+                marginTop: '0.25rem',
+              },
+              default: {
+                marginTop: 4,
+              },
+            }),
+          },
+          noteFlag: {
+            padding: 4,
+            paddingLeft: 6,
+            paddingRight: 6,
+            marginRight: 4,
+            marginTop: 4,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            fontFamily: 'var(--sn-stylekit-sans-serif-font)',
+            ...Platform.select({
+              web: {
+                display: 'inline-flex',
+                fontSize: '1rem',
+                textOverflow: 'ellipsis',
+                borderRadius: 'var(--sn-stylekit-general-border-radius)',
+              },
+              default: {
+                fontSize: 16,
+                borderRadius: 1,
+              },
+            }),
+          },
+          noteFlagInfo: {
+            ...Platform.select({
+              web: {
+                backgroundColor: 'var(--sn-stylekit-info-color)',
+                color: 'var(--sn-stylekit-info-contrast-color)',
+              },
+              default: {
+                backgroundColor: themeService.variables.stylekitInfoColor,
+                color: themeService.variables.stylekitInfoContrastColor,
+              },
+            }),
+          },
+          noteFlagSuccess: {
+            ...Platform.select({
+              web: {
+                backgroundColor: 'var(--sn-stylekit-success-color)',
+                color: 'var(--sn-stylekit-success-contrast-color)',
+              },
+              default: {
+                backgroundColor: themeService.variables.stylekitSuccessColor,
+                color: themeService.variables.stylekitSuccessContrastColor,
+              },
+            }),
+          },
+          noteFlagWarning: {
+            ...Platform.select({
+              web: {
+                backgroundColor: 'var(--sn-stylekit-warning-color)',
+                color: 'var(--sn-stylekit-warning-contrast-color)',
+              },
+              default: {
+                backgroundColor: themeService.variables.stylekitWarningColor,
+                color: themeService.variables.stylekitWarningContrastColor,
+              },
+            }),
+          },
+          noteFlagNeutral: {
+            ...Platform.select({
+              web: {
+                backgroundColor: 'var(--sn-stylekit-neutral-color)',
+                color: 'var(--sn-stylekit-neutral-contrast-color)',
+              },
+              default: {
+                backgroundColor: themeService.variables.stylekitNeutralColor,
+                color: themeService.variables.stylekitNeutralContrastColor,
+              },
+            }),
+          },
+          noteFlagDanger: {
+            ...Platform.select({
+              web: {
+                backgroundColor: 'var(--sn-stylekit-danger-color)',
+                color: 'var(--sn-stylekit-danger-contrast-color)',
+              },
+              default: {
+                backgroundColor: themeService.variables.stylekitDangerColor,
+                color: themeService.variables.stylekitDangerContrastColor,
+              },
+            }),
+          },
+          textPreview: {
+            fontFamily: 'var(--sn-stylekit-sans-serif-font)',
+            overflow: 'hidden',
+            ...Platform.select({
+              web: {
+                lineHeight: 1.3,
+                color: 'var(--sn-stylekit-foreground-color)',
+                '-webkit-box-orient': 'vertical',
+                '-webkit-line-clamp': '1',
+                fontSize: 'var(--sn-stylekit-font-size-h3)',
+                display: '-webkit-box',
+                marginTop: '0.15rem',
+              },
+              default: {
+                color: themeService.variables.stylekitForegroundColor,
+                lineHeight: 18.59,
+                fontSize: 14.3,
+                marginTop: 2.4,
+              },
+            }),
+          },
+        })
+      );
+    }
+  }, [themeService?.variables]);
+
+  return styles ? (
+    <View
+      style={[styles.noteItem, highlighted && styles.noteItemSelected]}
+      //id={`note-${note.uuid}`}
+      //onClick={onClick}
+      //onContextMenu={onContextMenu}
+      //className={'note-item'}
+    >
+      <View style={styles.icon}>
+        {/* <Icon type={icon} className={`color-accessory-tint-${tint}`} /> */}
+      </View>
+      <View style={styles.meta}>
+        <View style={styles.nameContainer}>
+          <Text style={styles.title}>{note.title}</Text>
+          <View style={styles.flagIcons}>
+            {note.locked && (
+              <View>
+                {/* <Icon
+                  type="pencil-off"
+                  className="sn-icon--small color-info"
+                  ariaHidden={true}
+                /> */}
+              </View>
+            )}
+            {note.trashed && (
+              <View style={styles.flagIcon}>
+                {/* <Icon
+                  type="trash-filled"
+                  className="sn-icon--small color-danger"
+                  ariaHidden={true}
+                /> */}
+              </View>
+            )}
+            {note.archived && (
+              <View style={styles.flagIcon}>
+                {/* <Icon
+                  type="archive"
+                  className="sn-icon--mid color-accessory-tint-3"
+                  ariaHidden={true}
+                /> */}
+              </View>
+            )}
+            {note.pinned && (
+              <View style={styles.flagIcon}>
+                {/* <Icon
+                  type="pin-filled"
+                  className="sn-icon--small color-info"
+                  ariaHidden={true}
+                /> */}
+              </View>
+            )}
+          </View>
+        </View>
+        {!hidePreviews && !note.hidePreview && !note.protected ? (
+          <View>
+            {note.preview_html && Platform.OS === 'web' ? (
+              <div
+                className="html-preview"
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHtmlString(note.preview_html),
+                }}
+              />
+            ) : null}
+            {!note.preview_html && note.preview_plain ? (
+              <Text
+                numberOfLines={1}
+                ellipsizeMode={'tail'}
+                style={styles.textPreview}
+              >
+                {note.preview_plain}
+              </Text>
+            ) : null}
+            {!note.preview_html && !note.preview_plain && note.text ? (
+              <Text style={styles.textPreview}>{note.text}</Text>
+            ) : null}
+          </View>
+        ) : null}
+        {!hideDates || note.protected ? (
+          <Text style={styles.extraInfo}>
+            {note.protected && `Protected${hideDates ? '' : ' • '}`}
+            {!hideDates &&
+              showModifiedDate &&
+              `Modified ${note.updatedAtString || 'Now'}`}
+            {!hideDates && !showModifiedDate
+              ? note.createdAtString || 'Now'
+              : null}
+          </Text>
+        ) : null}
+        {tags.length ? (
+          <View style={styles.tagsContainer}>
+            {tags.map(tag => (
+              <View style={styles.tag} key={tag + Math.random()}>
+                {/* <Icon
+                  type="hashtag"
+                  className="sn-icon--small color-grey-1 mr-1"
+                /> */}
+                <Text style={styles.tagLabel}>{tag}</Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+        {flags.length ? (
+          <View style={styles.noteFlags}>
+            {flags.map(flag => (
+              <Text style={[styles.noteFlag, styles[`noteFlag${flag.class}`]]}>
+                {flag.text}
+              </Text>
+            ))}
+          </View>
+        ) : null}
+      </View>
+    </View>
+  ) : null;
+};
+
+export const _NoteCell = ({
   note,
   onPressItem,
   highlighted,
