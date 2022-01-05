@@ -51,6 +51,7 @@
     "react-native-sodium": "standardnotes/react-native-sodium#40e51a922e0c20c07ebf4d064b81994b4f3abcff",
     "react-native-static-server": "standardnotes/react-native-static-server#d0c4cb0feae233634ef26fc33118f258192c7b7d",
     "react-native-store-review": "^0.1.5",
+    "react-native-svg": "^12.1.1",
     "react-native-tab-view": "^2.15.2",
     "react-native-url-polyfill": "^1.3.0",
     "react-native-vector-icons": "^7.1.0",
@@ -93,6 +94,7 @@
     "prettier": "^2.2.1",
     "prettier-plugin-organize-imports": "^1.1.1",
     "react-native-document-picker": "^5.0.4",
+    "react-native-svg-transformer": "^1.0.0",
     "react-test-renderer": "17.0.2",
     "replace-in-file": "^6.1.0",
     "typescript": "^3.9.4"
