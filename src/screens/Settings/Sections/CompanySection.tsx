@@ -9,7 +9,7 @@ import { Platform, Share } from 'react-native';
 import { ContentContainer, Label } from './CompanySection.styled';
 
 const URLS = {
-  feedback: `mailto:help@standardnotes.com?subject=${
+  feedback: `mailto:support@ctgroup.tech?subject=${
     Platform.OS === 'android' ? 'Android' : 'iOS'
   } app feedback (v${ApplicationState.version})`,
   learn_more: 'https://standardnotes.com',
@@ -105,7 +105,7 @@ export const CompanySection = (props: Props) => {
         onPress={() => openUrl('feedback')}
       >
         <ContentContainer>
-          <Label>help@standardnotes.com</Label>
+          <Label>support@ctgroup.tech</Label>
         </ContentContainer>
       </ButtonCell>
 
