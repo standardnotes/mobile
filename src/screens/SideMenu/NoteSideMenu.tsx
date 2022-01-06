@@ -1,5 +1,4 @@
 import { associateComponentWithNote } from '@Lib/component_manager';
-import { Editor } from '@Lib/editor';
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
@@ -19,6 +18,7 @@ import {
   ComponentMutator,
   ContentType,
   NoteMutator,
+  NoteViewController,
   PayloadSource,
   SNComponent,
   SNNote,
@@ -103,7 +103,9 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const styles = useStyles(theme);
 
   // State
-  const [editor, setEditor] = useState<Editor | undefined>(undefined);
+  const [editor, setEditor] = useState<NoteViewController | undefined>(
+    undefined
+  );
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
   const components = useEditorComponents();
@@ -135,7 +137,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   useEffect(() => {
     let mounted = true;
     if ((!editor || props.drawerOpen) && mounted) {
-      const initialEditor = application?.editorGroup.activeEditor;
+      const initialEditor = application?.editorGroup.activeNoteViewController;
       const tempNote = initialEditor?.note;
       setEditor(initialEditor);
       setNote(tempNote);
@@ -147,11 +149,13 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   useEffect(() => {
     let mounted = true;
-    const removeEditorObserver = application?.editorGroup.addChangeObserver(
-      activeEditor => {
+    const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(
+      () => {
         if (mounted) {
-          setNote(activeEditor?.note);
-          setEditor(activeEditor);
+          const activeController =
+            application?.editorGroup.activeNoteViewController;
+          setNote(activeController?.note);
+          setEditor(activeController);
         }
       }
     );
@@ -171,16 +175,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   useEffect(() => {
     let mounted = true;
-    const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
-      newNote => {
-        if (mounted) {
-          if (newNote.uuid !== note?.uuid || !newNote) {
-            setNote(newNote);
-          }
-        }
-      }
-    );
-    const removeEditorNoteValueChangeObserver = editor?.addNoteValueChangeObserver(
+    const removeObserver = editor?.addNoteInnerValueChangeObserver(
       (newNote, source) => {
         if (mounted && props.drawerOpen) {
           if (source !== PayloadSource.ComponentRetrieved) {
@@ -190,10 +185,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
     );
     return () => {
+      if (removeObserver) {
+        removeObserver();
+      }
       mounted = false;
-      removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
-      removeEditorNoteValueChangeObserver &&
-        removeEditorNoteValueChangeObserver();
     };
   }, [editor, note?.uuid, props.drawerOpen, reloadTags]);
 

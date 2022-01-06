@@ -1,5 +1,4 @@
 import { AppStateType } from '@Lib/application_state';
-import { Editor } from '@Lib/editor';
 import { PrefKey } from '@Lib/preferences_manager';
 import { useSignedIn, useSyncStatus } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -79,7 +78,6 @@ export const Notes = React.memo(
     const [notes, setNotes] = useState<SNNote[]>([]);
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
     const [searchText, setSearchText] = useState('');
-    const [editor, setEditor] = useState<Editor | undefined>(undefined);
     const [searchOptions, setSearchOptions] = useState<SearchOptions>([]);
     const [
       includeProtectedNoteText,
@@ -198,18 +196,10 @@ export const Notes = React.memo(
 
     useEffect(() => {
       let mounted = true;
-      const removeEditorObserver = application?.editorGroup.addChangeObserver(
+      const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(
         activeEditor => {
           if (mounted) {
-            setEditor(activeEditor);
             setSelectedNoteId(activeEditor?.note?.uuid);
-          }
-        }
-      );
-      const removeEditorNoteChangeObserver = editor?.addNoteChangeObserver(
-        newNote => {
-          if (mounted) {
-            setSelectedNoteId(newNote?.uuid);
           }
         }
       );
@@ -217,9 +207,8 @@ export const Notes = React.memo(
       return () => {
         mounted = false;
         removeEditorObserver && removeEditorObserver();
-        removeEditorNoteChangeObserver && removeEditorNoteChangeObserver();
       };
-    }, [application, editor]);
+    }, [application]);
 
     /**
      * Note that reloading display options destroys the current index and rebuilds it,
@@ -425,8 +414,9 @@ export const Notes = React.memo(
               application?.getAppState().closeActiveEditor();
             }
           } else {
-            const activeNote = application?.getAppState().getActiveEditor()
-              ?.note;
+            const activeNote = application
+              ?.getAppState()
+              .getActiveNoteController()?.note;
             if (activeNote) {
               const discarded = activeNote.deleted || activeNote.trashed;
               if (

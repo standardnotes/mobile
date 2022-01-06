@@ -5,12 +5,12 @@ import {
   ButtonType,
   isSameDay,
   NoteMutator,
+  NoteViewController,
   SNNote,
   StorageEncryptionPolicies,
 } from '@standardnotes/snjs';
 import React, { useCallback, useEffect } from 'react';
 import { LockStateType } from './application_state';
-import { Editor } from './editor';
 
 export const useSignedIn = (
   signedInCallback?: () => void,
@@ -135,7 +135,7 @@ export const useHasEditor = () => {
   const [hasEditor, setHasEditor] = React.useState<boolean>(false);
 
   useEffect(() => {
-    const removeEditorObserver = application?.editorGroup.addChangeObserver(
+    const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(
       newEditor => {
         setHasEditor(Boolean(newEditor));
       }
@@ -283,7 +283,7 @@ export const useDeleteNoteWithPrivileges = (
   note: SNNote,
   onDeleteCallback: () => void,
   onTrashCallback: () => void,
-  editor?: Editor
+  editor?: NoteViewController
 ) => {
   // Context
   const application = React.useContext(ApplicationContext);
@@ -412,7 +412,7 @@ export const useProtectionSessionExpiry = () => {
 
 export const useChangeNoteChecks = (
   note: SNNote | undefined,
-  editor: Editor | undefined = undefined
+  editor: NoteViewController | undefined = undefined
 ) => {
   // Context
   const application = React.useContext(ApplicationContext);
@@ -448,7 +448,7 @@ export const useChangeNoteChecks = (
 
 export const useChangeNote = (
   note: SNNote | undefined,
-  editor: Editor | undefined = undefined
+  editor: NoteViewController | undefined = undefined
 ) => {
   // Context
   const application = React.useContext(ApplicationContext);
@@ -472,7 +472,7 @@ export const useChangeNote = (
 
 export const useProtectOrUnprotectNote = (
   note: SNNote | undefined,
-  editor: Editor | undefined = undefined
+  editor: NoteViewController | undefined = undefined
 ) => {
   // Context
   const application = React.useContext(ApplicationContext);
