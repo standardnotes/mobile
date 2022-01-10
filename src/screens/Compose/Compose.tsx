@@ -5,11 +5,14 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import {
   ApplicationEvent,
+  ComponentMutator,
   ComponentViewer,
   ContentType,
   isPayloadSourceInternalChange,
   isPayloadSourceRetrieved,
+  ItemMutator,
   NoteMutator,
+  PayloadSource,
   SNComponent,
 } from '@standardnotes/snjs';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
@@ -85,24 +88,30 @@ export class Compose extends React.Component<{}, State> {
 
   componentDidMount() {
     this.removeNoteInnerValueObserver = this.editor?.addNoteInnerValueChangeObserver(
-      (newNote, source) => {
+      (note, source) => {
         if (isPayloadSourceRetrieved(source!)) {
           this.setState({
-            title: newNote.title,
-            text: newNote.text,
+            title: note.title,
+            text: note.text,
           });
         }
 
-        if (newNote.lastSyncBegan || newNote.dirty) {
-          if (newNote.lastSyncEnd) {
+        const isTemplateNoteInsertedToBeInteractableWithEditor =
+          source === PayloadSource.Constructor && note.dirty;
+        if (isTemplateNoteInsertedToBeInteractableWithEditor) {
+          return;
+        }
+
+        if (note.lastSyncBegan || note.dirty) {
+          if (note.lastSyncEnd) {
             if (
-              newNote.dirty ||
-              newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd.getTime()
+              note.dirty ||
+              note.lastSyncBegan!.getTime() > note.lastSyncEnd.getTime()
             ) {
               this.showSavingStatus();
             } else if (
               this.context?.getStatusManager().hasMessage(SCREEN_COMPOSE) &&
-              newNote.lastSyncEnd.getTime() > newNote.lastSyncBegan!.getTime()
+              note.lastSyncEnd.getTime() > note.lastSyncBegan!.getTime()
             ) {
               this.showAllChangesSavedStatus();
             }
@@ -262,6 +271,18 @@ export class Compose extends React.Component<{}, State> {
     return this.context?.mobileComponentManager!;
   }
 
+  async associateComponentWithCurrentNote(component: SNComponent) {
+    const note = this.note;
+    if (!note) {
+      return;
+    }
+    return this.context?.changeItem(component.uuid, (m: ItemMutator) => {
+      const mutator = m as ComponentMutator;
+      mutator.removeDisassociatedItemId(note.uuid);
+      mutator.associateWithItem(note.uuid);
+    });
+  }
+
   reloadComponentEditorState = async () => {
     this.setState({
       downloadingEditor: false,
@@ -270,6 +291,12 @@ export class Compose extends React.Component<{}, State> {
     });
 
     const associatedEditor = this.componentManager.editorForNote(this.note!);
+
+    /** Editors cannot interact with template notes so the note must be inserted */
+    if (associatedEditor && this.editor?.isTemplateNote) {
+      await this.editor?.insertTemplatedNote();
+      this.associateComponentWithCurrentNote(associatedEditor);
+    }
 
     if (!associatedEditor) {
       if (this.state.componentViewer) {
