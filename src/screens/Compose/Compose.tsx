@@ -416,12 +416,12 @@ export class Compose extends React.Component<{}, State> {
       {
         title: newTitle,
       },
-      () => this.saveNote(false, true, false, false)
+      () => this.saveNote(false, true, true, false)
     );
   };
 
   onContentChange = (text: string) => {
-    if (Platform.OS === 'android' && this.note?.locked) {
+    if (this.note?.locked) {
       this.context?.alertService?.alert(
         'This note has editing disabled. Please enable editing on this note to make changes.'
       );
