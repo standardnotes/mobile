@@ -5,11 +5,14 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import {
   ApplicationEvent,
+  ComponentMutator,
   ComponentViewer,
   ContentType,
   isPayloadSourceInternalChange,
   isPayloadSourceRetrieved,
+  ItemMutator,
   NoteMutator,
+  PayloadSource,
   SNComponent,
 } from '@standardnotes/snjs';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
@@ -58,10 +61,8 @@ export class Compose extends React.Component<{}, State> {
   alreadySaved: boolean = false;
   statusTimeout: number | undefined;
   downloadingMessageTimeout: number | undefined;
-  removeEditorObserver?: () => void;
-  removeEditorNoteValueChangeObserver?: () => void;
+  removeNoteInnerValueObserver?: () => void;
   removeComponentsObserver?: () => void;
-  removeEditorNoteChangeObserver?: () => void;
   removeStreamComponents?: () => void;
   removeStateEventObserver?: () => void;
   removeAppEventObserver?: () => void;
@@ -72,9 +73,8 @@ export class Compose extends React.Component<{}, State> {
     context: React.ContextType<typeof ApplicationContext>
   ) {
     super(props);
-
     this.context = context;
-    const initialEditor = context?.editorGroup.activeEditor;
+    const initialEditor = context?.editorGroup.activeNoteViewController;
     this.state = {
       title: initialEditor?.note?.title ?? '',
       text: initialEditor?.note?.text ?? '',
@@ -87,41 +87,31 @@ export class Compose extends React.Component<{}, State> {
   }
 
   componentDidMount() {
-    this.removeEditorNoteChangeObserver = this.editor?.addNoteChangeObserver(
-      newNote => {
-        this.setState(
-          {
-            title: newNote.title,
-            text: newNote.text,
-          },
-          () => {
-            this.reloadComponentEditorState();
-            if (newNote.dirty) {
-              this.showSavingStatus();
-            }
-          }
-        );
-      }
-    );
-
-    this.removeEditorNoteValueChangeObserver = this.editor?.addNoteValueChangeObserver(
-      (newNote, source) => {
+    this.removeNoteInnerValueObserver = this.editor?.addNoteInnerValueChangeObserver(
+      (note, source) => {
         if (isPayloadSourceRetrieved(source!)) {
           this.setState({
-            title: newNote.title,
-            text: newNote.text,
+            title: note.title,
+            text: note.text,
           });
         }
 
-        if (newNote.lastSyncBegan || newNote.dirty) {
-          if (newNote.lastSyncEnd) {
+        const isTemplateNoteInsertedToBeInteractableWithEditor =
+          source === PayloadSource.Constructor && note.dirty;
+        if (isTemplateNoteInsertedToBeInteractableWithEditor) {
+          return;
+        }
+
+        if (note.lastSyncBegan || note.dirty) {
+          if (note.lastSyncEnd) {
             if (
-              newNote.dirty ||
-              newNote.lastSyncBegan!.getTime() > newNote.lastSyncEnd.getTime()
+              note.dirty ||
+              note.lastSyncBegan!.getTime() > note.lastSyncEnd.getTime()
             ) {
               this.showSavingStatus();
             } else if (
-              newNote.lastSyncEnd.getTime() > newNote.lastSyncBegan!.getTime()
+              this.context?.getStatusManager().hasMessage(SCREEN_COMPOSE) &&
+              note.lastSyncEnd.getTime() > note.lastSyncBegan!.getTime()
             ) {
               this.showAllChangesSavedStatus();
             }
@@ -188,25 +178,18 @@ export class Compose extends React.Component<{}, State> {
 
   componentWillUnmount() {
     this.dismissKeyboard();
-    this.removeEditorNoteValueChangeObserver &&
-      this.removeEditorNoteValueChangeObserver();
-    this.removeEditorNoteChangeObserver &&
-      this.removeEditorNoteChangeObserver();
+    this.removeNoteInnerValueObserver && this.removeNoteInnerValueObserver();
     this.removeAppEventObserver && this.removeAppEventObserver();
     this.removeStreamComponents && this.removeStreamComponents();
     this.removeStateEventObserver && this.removeStateEventObserver();
     this.removeComponentHandler && this.removeComponentHandler();
     this.removeStateEventObserver = undefined;
+    this.removeNoteInnerValueObserver = undefined;
     this.removeComponentHandler = undefined;
     this.removeStreamComponents = undefined;
     this.removeAppEventObserver = undefined;
-    this.removeEditorNoteChangeObserver = undefined;
-    this.removeEditorNoteValueChangeObserver = undefined;
-    if (this.editor) {
-      this.context?.editorGroup?.closeEditor(this.editor);
-    }
     this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, '');
-    if (this.state.componentViewer) {
+    if (this.state.componentViewer && this.componentManager) {
       this.componentManager.destroyComponentViewer(this.state.componentViewer);
     }
     if (this.saveTimeout) {
@@ -272,11 +255,11 @@ export class Compose extends React.Component<{}, State> {
   };
 
   get note() {
-    return this.context?.editorGroup?.activeEditor?.note;
+    return this.editor?.note;
   }
 
   get editor() {
-    return this.context?.editorGroup?.activeEditor;
+    return this.context?.editorGroup?.activeNoteViewController;
   }
 
   dismissKeyboard = () => {
@@ -288,6 +271,18 @@ export class Compose extends React.Component<{}, State> {
     return this.context?.mobileComponentManager!;
   }
 
+  async associateComponentWithCurrentNote(component: SNComponent) {
+    const note = this.note;
+    if (!note) {
+      return;
+    }
+    return this.context?.changeItem(component.uuid, (m: ItemMutator) => {
+      const mutator = m as ComponentMutator;
+      mutator.removeDisassociatedItemId(note.uuid);
+      mutator.associateWithItem(note.uuid);
+    });
+  }
+
   reloadComponentEditorState = async () => {
     this.setState({
       downloadingEditor: false,
@@ -296,6 +291,12 @@ export class Compose extends React.Component<{}, State> {
     });
 
     const associatedEditor = this.componentManager.editorForNote(this.note!);
+
+    /** Editors cannot interact with template notes so the note must be inserted */
+    if (associatedEditor && this.editor?.isTemplateNote) {
+      await this.editor?.insertTemplatedNote();
+      this.associateComponentWithCurrentNote(associatedEditor);
+    }
 
     if (!associatedEditor) {
       if (this.state.componentViewer) {
@@ -415,12 +416,12 @@ export class Compose extends React.Component<{}, State> {
       {
         title: newTitle,
       },
-      () => this.saveNote(false, true, false, false)
+      () => this.saveNote(false, true, true, false)
     );
   };
 
   onContentChange = (text: string) => {
-    if (Platform.OS === 'android' && this.note?.locked) {
+    if (this.note?.locked) {
       this.context?.alertService?.alert(
         'This note has editing disabled. Please enable editing on this note to make changes.'
       );

@@ -6,6 +6,7 @@ import {
   ChallengeValidation,
   DeinitSource,
   Environment,
+  NoteGroupController,
   platformFromString,
   SNApplication,
   SNComponentManager,
@@ -17,7 +18,6 @@ import { AlertService } from './alert_service';
 import { ApplicationState, UnlockTiming } from './application_state';
 import { BackupsService } from './backups_service';
 import { ComponentManager } from './component_manager';
-import { EditorGroup } from './editor_group';
 import { InstallationService } from './installation_service';
 import { MobileDeviceInterface } from './interface';
 import { push } from './navigation_service';
@@ -39,7 +39,7 @@ const IsDev = VersionInfo.bundleIdentifier?.includes('dev');
 
 export class MobileApplication extends SNApplication {
   private MobileServices!: MobileServices;
-  public editorGroup: EditorGroup;
+  public editorGroup: NoteGroupController;
   private startedDeinit: boolean = false;
   public Uuid: string; // UI remounts when Uuid changes
   static previouslyLaunched: boolean = false;
@@ -68,7 +68,7 @@ export class MobileApplication extends SNApplication {
         : 'wss://sockets.standardnotes.com'
     );
     this.Uuid = Math.random().toString();
-    this.editorGroup = new EditorGroup(this);
+    this.editorGroup = new NoteGroupController(this);
     this.mobileComponentManager.initialize(this.protocolService);
   }
 

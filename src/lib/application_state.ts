@@ -7,6 +7,7 @@ import {
   ChallengeValidation,
   ContentType,
   isNullOrUndefined,
+  NoteViewController,
   PayloadSource,
   removeFromArray,
   SNNote,
@@ -31,7 +32,6 @@ import { hide, show } from 'react-native-privacy-snapshot';
 import VersionInfo from 'react-native-version-info';
 import { MobileApplication } from './application';
 import { associateComponentWithNote } from './component_manager';
-import { Editor } from './editor';
 import { PrefKey } from './preferences_manager';
 
 const pjson = require('../../package.json');
@@ -285,35 +285,34 @@ export class ApplicationState extends ApplicationService {
         ? undefined
         : this.selectedTag.uuid
       : undefined;
-    let activeEditor = this.getActiveEditor();
-    if (!activeEditor || this.multiEditorEnabled) {
-      await this.application.editorGroup.createEditor(
-        undefined,
-        title,
-        selectedTagUuid
-      );
-      activeEditor = this.getActiveEditor();
-    } else {
-      await activeEditor.reset(title, selectedTagUuid);
-    }
+
+    this.application.editorGroup.closeActiveNoteView();
+
+    await this.application.editorGroup.createNoteView(
+      undefined,
+      title,
+      selectedTagUuid
+    );
+
     const defaultEditor = this.application.componentManager.getDefaultEditor();
     if (defaultEditor) {
       await associateComponentWithNote(
         this.application,
         defaultEditor,
-        activeEditor.note!
+        this.getActiveNoteController().note!
       );
     }
   }
 
   async openEditor(noteUuid: string) {
     const note = this.application.findItem(noteUuid) as SNNote;
-    const activeEditor = this.getActiveEditor();
-    if (!activeEditor || this.multiEditorEnabled) {
-      await this.application.editorGroup.createEditor(noteUuid);
-    } else {
-      activeEditor.setNote(note);
+    const activeEditor = this.getActiveNoteController();
+    if (activeEditor) {
+      this.application.editorGroup.closeActiveNoteView();
     }
+
+    await this.application.editorGroup.createNoteView(noteUuid);
+
     if (note && note.conflictOf) {
       InteractionManager.runAfterInteractions(() => {
         this.application?.changeAndSaveItem(note.uuid, mutator => {
@@ -323,27 +322,27 @@ export class ApplicationState extends ApplicationService {
     }
   }
 
-  getActiveEditor() {
-    return this.application.editorGroup.editors[0];
+  getActiveNoteController() {
+    return this.application.editorGroup.noteControllers[0];
   }
 
   getEditors() {
-    return this.application.editorGroup.editors;
+    return this.application.editorGroup.noteControllers;
   }
 
-  closeEditor(editor: Editor) {
+  closeEditor(editor: NoteViewController) {
     this.notifyOfStateChange(AppStateType.EditorClosed);
-    this.application.editorGroup.closeEditor(editor);
+    this.application.editorGroup.closeNoteView(editor);
   }
 
   closeActiveEditor() {
     this.notifyOfStateChange(AppStateType.EditorClosed);
-    this.application.editorGroup.closeActiveEditor();
+    this.application.editorGroup.closeActiveNoteView();
   }
 
   closeAllEditors() {
     this.notifyOfStateChange(AppStateType.EditorClosed);
-    this.application.editorGroup.closeAllEditors();
+    this.application.editorGroup.closeAllNoteViews();
   }
 
   editorForNote(note: SNNote) {

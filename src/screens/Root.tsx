@@ -5,6 +5,7 @@ import {
 } from '@Lib/application_state';
 import { useHasEditor, useIsLocked } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { UuidString } from '@standardnotes/snjs/dist/@types';
 import { ThemeService } from '@Style/theme_service';
 import { hexToRGBA } from '@Style/utils';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
@@ -33,6 +34,7 @@ export const Root = () => {
   const [, setX] = useState<number | undefined>(undefined);
   const [hasEditor] = useHasEditor();
   const [noteListCollapsed, setNoteListCollapsed] = useState<boolean>(false);
+  const [activeNoteId, setActiveNoteId] = useState<UuidString | undefined>();
   const [shouldSplitLayout, setShouldSplitLayout] = useState<
     boolean | undefined
   >(false);
@@ -75,12 +77,20 @@ export const Root = () => {
           }
         }
       );
+    const removeNoteObserver = application?.editorGroup.addActiveControllerChangeObserver(
+      activeController => {
+        setActiveNoteId(activeController?.note.uuid);
+      }
+    );
     return () => {
       if (removeApplicationStateEventHandler) {
         removeApplicationStateEventHandler();
       }
       if (removeStateObserver) {
         removeStateObserver();
+      }
+      if (removeNoteObserver) {
+        removeNoteObserver();
       }
     };
   }, [application]);
@@ -141,9 +151,9 @@ export const Root = () => {
           shouldSplitLayout={shouldSplitLayout}
         />
       </NotesContainer>
-      {hasEditor && shouldSplitLayout && (
+      {activeNoteId && hasEditor && shouldSplitLayout && (
         <ComposeContainer>
-          <Compose />
+          <Compose key={activeNoteId} />
           <ExpandTouchable
             style={{ bottom: collapseIconBottomPosition }}
             onPress={toggleNoteList}
