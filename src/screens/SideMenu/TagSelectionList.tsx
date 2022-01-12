@@ -39,10 +39,9 @@ export const TagSelectionList = React.memo(
   }: Props) => {
     // Context
     const application = useContext(ApplicationContext);
-    const navigation =
-      useNavigation<
-        AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
-      >();
+    const navigation = useNavigation<
+      AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+    >();
     const { showActionSheet } = useCustomActionSheet();
 
     // State
@@ -121,16 +120,14 @@ export const TagSelectionList = React.memo(
     };
 
     // Nesting
+    const isRootTag = (tag: SNTag | SNSmartTag): boolean =>
+      !(application?.getTagParent(tag) || false);
 
-    const [showFolders, setShowFolders] = useState(true);
+    const isRegularTag = (tag: SNTag | SNSmartTag): boolean =>
+      tag.content_type === ContentType.Tag;
 
-    let renderedTags = tags;
-
-    if (showFolders && contentType === ContentType.Tag) {
-      renderedTags = tags.filter(
-        tag => !(application?.getTagParent(tag) || false)
-      );
-    }
+    const showFolders = contentType === ContentType.Tag;
+    const renderedTags = showFolders ? tags.filter(isRootTag) : tags;
 
     const renderItem: ListRenderItem<SNTag | SNSmartTag> = ({ item }) => {
       if (!application) {
@@ -144,12 +141,16 @@ export const TagSelectionList = React.memo(
 
       let children: (SNTag | SNSmartTag)[] = [];
 
-      if (showFolders && item.content_type === ContentType.Tag) {
+      if (showFolders && isRegularTag(item)) {
         const rawChildren = application
           .getTagChildren(item)
           .map(tag => tag.uuid);
         children = tags.filter(tag => rawChildren.includes(tag.uuid));
       }
+
+      const isSelected = selectedTags.some(
+        selectedTag => selectedTag.uuid === item.uuid
+      );
 
       return (
         <>
@@ -163,24 +164,20 @@ export const TagSelectionList = React.memo(
               value: '#',
             }}
             key={item.uuid}
-            selected={
-              selectedTags.findIndex(
-                selectedTag => selectedTag.uuid === item.uuid
-              ) > -1
-            }
+            selected={isSelected}
           />
           {children && (
             <FlatList
               // eslint-disable-next-line react-native/no-inline-styles
               style={{
                 paddingBottom: hasBottomPadding ? 30 : 0,
-                paddingLeft: 20,
+                paddingLeft: 15,
               }}
               initialNumToRender={10}
               windowSize={10}
               maxToRenderPerBatch={10}
               data={children}
-              keyExtractor={item => item.uuid}
+              keyExtractor={childTag => childTag.uuid}
               renderItem={renderItem}
             />
           )}
@@ -200,7 +197,6 @@ export const TagSelectionList = React.memo(
           keyExtractor={item => item.uuid}
           renderItem={renderItem}
         />
-
         {tags.length === 0 && (
           <EmptyPlaceholder>{emptyPlaceholder}</EmptyPlaceholder>
         )}
