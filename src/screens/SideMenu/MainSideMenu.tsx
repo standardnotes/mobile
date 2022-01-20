@@ -318,6 +318,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
             ) : index === 2 ? (
               <SideMenuSection title="Tags">
                 <TagSelectionList
+                  hasBottomPadding={Platform.OS === 'android'}
                   emptyPlaceholder={
                     'No tags. Create one from the note composer.'
                   }
