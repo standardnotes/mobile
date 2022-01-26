@@ -52,13 +52,13 @@ type AppStackNavigatorParamList = {
 
 export type AppStackNavigationProp<
   T extends keyof AppStackNavigatorParamList
-  > = {
-    navigation: CompositeNavigationProp<
-      ModalStackNavigationProp<'AppStack'>['navigation'],
-      StackNavigationProp<AppStackNavigatorParamList, T>
-    >;
-    route: RouteProp<AppStackNavigatorParamList, T>;
-  };
+> = {
+  navigation: CompositeNavigationProp<
+    ModalStackNavigationProp<'AppStack'>['navigation'],
+    StackNavigationProp<AppStackNavigatorParamList, T>
+  >;
+  route: RouteProp<AppStackNavigatorParamList, T>;
+};
 
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 
@@ -201,10 +201,16 @@ export const AppStackComponent = (
                 const screenStatus = isInTabletMode
                   ? composeStatus || notesStatus
                   : notesStatus;
+
+                const title = route.params?.title ?? (children || '');
+                const subtitle = [screenStatus?.status, route.params?.subTitle]
+                  .filter(x => !!x)
+                  .join(' • ');
+
                 return (
                   <HeaderTitleView
-                    title={route.params?.title ?? (children || '')}
-                    subtitle={screenStatus?.status}
+                    title={title}
+                    subtitle={subtitle}
                     subtitleColor={screenStatus?.color}
                   />
                 );
