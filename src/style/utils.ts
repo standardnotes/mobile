@@ -1,3 +1,4 @@
+import { Color } from '@Root/constants';
 import { isNullOrUndefined } from '@standardnotes/snjs';
 import { Platform, ScaledSize } from 'react-native';
 import { MobileTheme } from './theme_service';
@@ -127,3 +128,24 @@ export function hexToRGBA(hex: string, alpha: number) {
     throw new Error('Bad Hex');
   }
 }
+
+export const getTintColorForEditor = (tint: number): string | undefined => {
+  const {
+    ScienceBlue,
+    DeepBlush,
+    Corn,
+    PurpleHeart,
+    MountainMeadow,
+    Jaffa,
+  } = Color;
+
+  const tintColorsMap = new Map([
+    [1, ScienceBlue],
+    [2, DeepBlush],
+    [3, Corn],
+    [4, PurpleHeart],
+    [5, MountainMeadow],
+    [6, Jaffa],
+  ]);
+  return tintColorsMap.get(tint);
+};

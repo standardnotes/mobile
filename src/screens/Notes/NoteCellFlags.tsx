@@ -33,34 +33,6 @@ export const NoteCellFlags = ({
 
   let flags = [];
 
-  if (note.pinned) {
-    flags.push({
-      text: 'Pinned',
-      color: theme.stylekitInfoColor,
-    });
-  }
-
-  if (note.archived) {
-    flags.push({
-      text: 'Archived',
-      color: theme.stylekitWarningColor,
-    });
-  }
-
-  if (note.locked) {
-    flags.push({
-      text: 'Editing Disabled',
-      color: theme.stylekitNeutralColor,
-    });
-  }
-
-  if (note.trashed) {
-    flags.push({
-      text: 'Deleted',
-      color: theme.stylekitDangerColor,
-    });
-  }
-
   if (note.errorDecrypting) {
     if (note.waitingForKey) {
       flags.push({
