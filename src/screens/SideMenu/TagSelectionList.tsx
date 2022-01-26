@@ -8,6 +8,7 @@ import {
   ContentType,
   SNSmartTag,
   SNTag,
+  UuidString,
 } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import React, {
@@ -19,6 +20,7 @@ import React, {
 } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
 import { SideMenuCell } from './SideMenuCell';
+import { TagDraggingInstructions } from './TagDraggingInstruction';
 import { EmptyPlaceholder } from './TagSelectionList.styled';
 
 type Props = {
@@ -94,30 +96,67 @@ export const TagSelectionList = React.memo(
       return removeStreamTags;
     }, [application, contentType, streamTags]);
 
-    const onTagLongPress = (tag: SNTag | SNSmartTag) => {
-      showActionSheet(tag.title, [
-        {
-          text: 'Rename',
-          callback: () =>
-            navigation.navigate(SCREEN_INPUT_MODAL_TAG, { tagUuid: tag.uuid }),
-        },
-        {
-          text: 'Delete',
-          destructive: true,
-          callback: async () => {
-            const confirmed = await application?.alertService.confirm(
-              'Are you sure you want to delete this tag? Deleting a tag will not delete its notes.',
-              undefined,
-              'Delete',
-              ButtonType.Danger
-            );
-            if (confirmed) {
-              await application!.deleteItem(tag);
-            }
+    // Tag Selection and edition
+    const [dragging, setDragging] = useState<UuidString | null>(null);
+    const upToDateDraggingTag = dragging
+      ? (application?.findItem(dragging) as SNTag)
+      : null;
+
+    const onTagLongPress = useCallback(
+      (tag: SNTag | SNSmartTag) => {
+        showActionSheet(tag.title, [
+          {
+            text: 'Rename',
+            callback: () =>
+              navigation.navigate(SCREEN_INPUT_MODAL_TAG, {
+                tagUuid: tag.uuid,
+              }),
           },
-        },
-      ]);
-    };
+          {
+            text: 'Move',
+            callback: () => setDragging(tag.uuid),
+          },
+          {
+            text: 'Delete',
+            destructive: true,
+            callback: async () => {
+              const confirmed = await application?.alertService.confirm(
+                'Are you sure you want to delete this tag? Deleting a tag will not delete its notes.',
+                undefined,
+                'Delete',
+                ButtonType.Danger
+              );
+              if (confirmed) {
+                await application!.deleteItem(tag);
+              }
+            },
+          },
+        ]);
+      },
+      [showActionSheet, setDragging, navigation, application]
+    );
+
+    const onTagPress = useCallback(
+      (tag: SNTag | SNSmartTag) => {
+        if (!upToDateDraggingTag) {
+          return onTagSelect(tag);
+        } else {
+          // TODO: use Uuids
+          // TODO: use a global tap to deselect?
+
+          const isValidDroptarget = application?.isValidTagParent(
+            tag.uuid,
+            upToDateDraggingTag.uuid
+          );
+
+          if (isValidDroptarget) {
+            application?.setTagParent(tag, upToDateDraggingTag);
+            setDragging(null);
+          }
+        }
+      },
+      [application, upToDateDraggingTag, setDragging, onTagSelect]
+    );
 
     // Nesting
     const isRootTag = (tag: SNTag | SNSmartTag): boolean =>
@@ -152,10 +191,21 @@ export const TagSelectionList = React.memo(
         selectedTag => selectedTag.uuid === item.uuid
       );
 
+      const isDragging = !!dragging;
+
+      const isBeingDragged = item.uuid === dragging;
+
+      const isValidDroptarget =
+        dragging && application.isValidTagParent(item.uuid, dragging);
+
+      const userIsEncouragedToTap = isDragging
+        ? !isBeingDragged && isValidDroptarget
+        : true;
+
       return (
         <>
           <SideMenuCell
-            onSelect={() => onTagSelect(item)}
+            onSelect={() => onTagPress(item)}
             onLongPress={() => onTagLongPress(item)}
             text={title}
             iconDesc={{
@@ -163,6 +213,7 @@ export const TagSelectionList = React.memo(
               type: 'ascii',
               value: '#',
             }}
+            dimmed={!userIsEncouragedToTap}
             key={item.uuid}
             selected={isSelected}
           />
@@ -184,8 +235,23 @@ export const TagSelectionList = React.memo(
       );
     };
 
+    const onUnset = useCallback(() => {
+      if (!upToDateDraggingTag) {
+        return;
+      }
+
+      application?.unsetTagParent(upToDateDraggingTag);
+      setDragging(null);
+    }, [application, upToDateDraggingTag]);
+
     return (
       <>
+        {upToDateDraggingTag && (
+          <TagDraggingInstructions
+            onUnset={onUnset}
+            dragging={upToDateDraggingTag}
+          />
+        )}
         <FlatList
           // eslint-disable-next-line react-native/no-inline-styles
           style={{ paddingBottom: hasBottomPadding ? 30 : 0 }}

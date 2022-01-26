@@ -30,6 +30,7 @@ export const IconContainerRight = styled(IconContainer)`
 `;
 export const TextContainer = styled.View<{
   isSubtext: boolean;
+  dimmed?: boolean;
   selected?: boolean;
 }>`
   min-height: ${props => (props.isSubtext ? 38 : 24)}px;
@@ -39,6 +40,11 @@ export const TextContainer = styled.View<{
     css`
       border-bottom-color: ${theme.stylekitInfoColor};
       border-bottom-width: 2px;
+    `}
+  ${({ dimmed }) =>
+    dimmed &&
+    css`
+      opacity: 0.5;
     `}
 `;
 const BaseText = styled.Text`

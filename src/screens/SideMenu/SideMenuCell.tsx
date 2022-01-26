@@ -66,6 +66,7 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
       : hasIcon
       ? 'left'
       : null;
+
   return (
     <Touchable
       isSubtext={Boolean(props.subtext)}
@@ -80,6 +81,7 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
         )}
 
         <TextContainer
+          dimmed={props.dimmed}
           selected={props.selected}
           isSubtext={Boolean(props.subtext)}
         >
