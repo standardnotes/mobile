@@ -97,6 +97,7 @@ export const TagSelectionList = React.memo(
     }, [application, contentType, streamTags]);
 
     // Tag Selection and edition
+    const isDraggable = contentType === ContentType.Tag;
     const [dragging, setDragging] = useState<UuidString | null>(null);
     const upToDateDraggingTag = dragging
       ? (application?.findItem(dragging) as SNTag)
@@ -104,6 +105,15 @@ export const TagSelectionList = React.memo(
 
     const onTagLongPress = useCallback(
       (tag: SNTag | SNSmartTag) => {
+        const moveOption = isDraggable
+          ? [
+              {
+                text: 'Move',
+                callback: () => setDragging(tag.uuid),
+              },
+            ]
+          : [];
+
         showActionSheet(tag.title, [
           {
             text: 'Rename',
@@ -112,10 +122,7 @@ export const TagSelectionList = React.memo(
                 tagUuid: tag.uuid,
               }),
           },
-          {
-            text: 'Move',
-            callback: () => setDragging(tag.uuid),
-          },
+          ...moveOption,
           {
             text: 'Delete',
             destructive: true,
@@ -133,7 +140,7 @@ export const TagSelectionList = React.memo(
           },
         ]);
       },
-      [showActionSheet, setDragging, navigation, application]
+      [isDraggable, showActionSheet, setDragging, navigation, application]
     );
 
     const onTagPress = useCallback(

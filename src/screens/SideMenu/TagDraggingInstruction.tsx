@@ -14,7 +14,7 @@ export const TagDraggingInstructions: React.FC<Props> = React.memo(
       <View>
         <Text>Tap any other tag to move {dragging.title} there.</Text>
         <Touchable isSubtext={false} onPress={onUnset}>
-          <Text>Tap here to move it out of any folder.</Text>
+          <Text>Tap here to remove the tag from its folder.</Text>
         </Touchable>
       </View>
     );
