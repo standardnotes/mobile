@@ -3,6 +3,7 @@ import { IconType } from '@standardnotes/snjs/dist/@types/types';
 import React, { useContext } from 'react';
 import { ThemeContext } from 'styled-components';
 import ArchiveIcon from '../style/Images/ic-archive.svg';
+import AuthenticatorIcon from '../style/Images/ic-authenticator.svg';
 import CodeIcon from '../style/Images/ic-code.svg';
 import MarkdownIcon from '../style/Images/ic-markdown.svg';
 import PencilOffIcon from '../style/Images/ic-pencil-off.svg';
@@ -21,6 +22,7 @@ const ICONS = {
   markdown: MarkdownIcon,
   spreadsheets: SpreadsheetsIcon,
   tasks: TasksIcon,
+  authenticator: AuthenticatorIcon,
   'trash-filled': TrashFilledIcon,
   'pin-filled': PinFilledIcon,
   archive: ArchiveIcon,
@@ -35,6 +37,7 @@ export type TEditorIcon = Extract<
   | 'markdown'
   | 'spreadsheets'
   | 'tasks'
+  | 'authenticator'
   | 'trash-filled'
   | 'pin-filled'
   | 'archive'
@@ -51,6 +54,10 @@ export const SnIcon = ({ type, fill, styles = {} }: Props) => {
   const fillColor = fill || theme.stylekitPalSky;
 
   const IconComponent = ICONS[type];
+
+  if (!IconComponent) {
+    return null;
+  }
 
   return (
     <IconComponent
