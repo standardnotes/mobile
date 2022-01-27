@@ -1,7 +1,7 @@
 import { iconStyles } from '@Components/Icon.styled';
-import { Color } from '@Root/constants';
 import { IconType } from '@standardnotes/snjs/dist/@types/types';
-import React from 'react';
+import React, { useContext } from 'react';
+import { ThemeContext } from 'styled-components';
 import ArchiveIcon from '../style/Images/ic-archive.svg';
 import CodeIcon from '../style/Images/ic-code.svg';
 import MarkdownIcon from '../style/Images/ic-markdown.svg';
@@ -26,7 +26,7 @@ const ICONS = {
   archive: ArchiveIcon,
 };
 
-export type EditorIconType = Extract<
+export type TEditorIcon = Extract<
   IconType,
   | 'pencil-off'
   | 'plain-text'
@@ -41,17 +41,20 @@ export type EditorIconType = Extract<
 >;
 
 type Props = {
-  type: EditorIconType;
+  type: TEditorIcon;
   fill?: string;
   styles?: Record<string, unknown>;
 };
 
-export const Icon = ({ type, fill = Color.PalSky, styles = {} }: Props) => {
+export const SnIcon = ({ type, fill, styles = {} }: Props) => {
+  const theme = useContext(ThemeContext);
+  const fillColor = fill || theme.stylekitPalSky;
+
   const IconComponent = ICONS[type];
 
   return (
     <IconComponent
-      fill={fill}
+      fill={fillColor}
       style={{
         ...iconStyles.icon,
         ...styles,

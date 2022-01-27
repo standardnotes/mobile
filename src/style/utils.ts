@@ -1,6 +1,6 @@
-import { Color } from '@Root/constants';
 import { isNullOrUndefined } from '@standardnotes/snjs';
 import { Platform, ScaledSize } from 'react-native';
+import { DefaultTheme } from 'styled-components/native';
 import { MobileTheme } from './theme_service';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';
@@ -129,23 +129,26 @@ export function hexToRGBA(hex: string, alpha: number) {
   }
 }
 
-export const getTintColorForEditor = (tint: number): string | undefined => {
+export const getTintColorForEditor = (
+  theme: DefaultTheme,
+  tint: number
+): string | undefined => {
   const {
-    ScienceBlue,
-    DeepBlush,
-    Corn,
-    PurpleHeart,
-    MountainMeadow,
-    Jaffa,
-  } = Color;
+    stylekitScienceBlue,
+    stylekitDeepBlush,
+    stylekitCorn,
+    stylekitPurpleHeart,
+    stylekitMountainMeadow,
+    stylekitJaffa,
+  } = theme;
 
   const tintColorsMap = new Map([
-    [1, ScienceBlue],
-    [2, DeepBlush],
-    [3, Corn],
-    [4, PurpleHeart],
-    [5, MountainMeadow],
-    [6, Jaffa],
+    [1, stylekitScienceBlue],
+    [2, stylekitDeepBlush],
+    [3, stylekitCorn],
+    [4, stylekitPurpleHeart],
+    [5, stylekitMountainMeadow],
+    [6, stylekitJaffa],
   ]);
   return tintColorsMap.get(tint);
 };

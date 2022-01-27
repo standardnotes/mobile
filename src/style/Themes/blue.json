@@ -37,5 +37,12 @@
 	"stylekitInputBorderColor": "#e3e3e3",
 	"stylekitScrollbarThumbColor": "#dfdfdf",
 	"stylekitScrollbarTrackBorderColor": "#E7E7E7",
+	"stylekitPalSky": "#72767E",
+	"stylekitCorn": "#EBAD00",
+	"stylekitScienceBlue": "#086DD6",
+	"stylekitDeepBlush": "#EA6595",
+	"stylekitPurpleHeart": "#7049CF",
+	"stylekitMountainMeadow": "#1AA772",
+	"stylekitJaffa": "#F28C52",
 	"statusBar": ""
 }

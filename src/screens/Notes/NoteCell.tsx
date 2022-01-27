@@ -1,4 +1,4 @@
-import { EditorIconType, Icon } from '@Components/Icon';
+import { SnIcon, TEditorIcon } from '@Components/SnIcon';
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
@@ -14,6 +14,7 @@ import {
 import { getTintColorForEditor } from '@Style/utils';
 import React, { useContext, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
+import { ThemeContext } from 'styled-components';
 import {
   Container,
   CustomFlexContainer,
@@ -47,6 +48,7 @@ export const NoteCell = ({
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+  const theme = useContext(ThemeContext);
 
   const [changeNote] = useChangeNote(note);
   const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note);
@@ -197,7 +199,7 @@ export const NoteCell = ({
   const editorForNote = application?.componentManager.editorForNote(note);
   const [icon, tint] = application?.getIconAndTintForEditor(
     editorForNote?.identifier
-  ) as [EditorIconType, number];
+  ) as [TEditorIcon, number];
 
   return (
     <TouchableContainer
@@ -213,9 +215,9 @@ export const NoteCell = ({
         distance={padding}
       >
         <CustomFlexContainer>
-          <Icon
+          <SnIcon
             type={icon}
-            fill={getTintColorForEditor(tint)}
+            fill={getTintColorForEditor(theme, tint)}
             styles={styles.editorIcon}
           />
           <NoteDataContainer distance={padding}>
@@ -230,8 +232,10 @@ export const NoteCell = ({
             )}
 
             <NoteTitleContainer>
-              {note.safeTitle().length > 0 && (
+              {note.safeTitle().length > 0 ? (
                 <TitleText selected={highlight}>{note.title}</TitleText>
+              ) : (
+                <Text />
               )}
               <NoteCellIconFlags note={note} />
             </NoteTitleContainer>
