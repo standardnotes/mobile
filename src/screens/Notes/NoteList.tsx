@@ -53,6 +53,7 @@ type Props = {
   sortType: CollectionSort;
   hideDates: boolean;
   hidePreviews: boolean;
+  hideEditorIcon: boolean;
   decrypting: boolean;
   loading: boolean;
   hasRefreshControl: boolean;
@@ -188,6 +189,7 @@ export const NoteList = (props: Props) => {
         sortType={props.sortType}
         hideDates={props.hideDates}
         hidePreviews={props.hidePreviews}
+        hideEditorIcon={props.hideEditorIcon}
         highlighted={item.uuid === props.selectedNoteId}
       />
     );

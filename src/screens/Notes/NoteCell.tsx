@@ -35,6 +35,7 @@ type Props = {
   onPressItem: (noteUuid: SNNote['uuid']) => void;
   hideDates: boolean;
   hidePreviews: boolean;
+  hideEditorIcon: boolean;
   sortType: CollectionSort;
 };
 
@@ -45,6 +46,7 @@ export const NoteCell = ({
   sortType,
   hideDates,
   hidePreviews,
+  hideEditorIcon,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -215,11 +217,13 @@ export const NoteCell = ({
         distance={padding}
       >
         <CustomFlexContainer>
-          <SnIcon
-            type={icon}
-            fill={getTintColorForEditor(theme, tint)}
-            styles={styles.editorIcon}
-          />
+          {!hideEditorIcon && (
+            <SnIcon
+              type={icon}
+              fill={getTintColorForEditor(theme, tint)}
+              styles={styles.editorIcon}
+            />
+          )}
           <NoteDataContainer distance={padding}>
             {note.deleted && <DeletedText>Deleting...</DeletedText>}
 
