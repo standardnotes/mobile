@@ -197,7 +197,7 @@ export const NoteCell = ({
   const showDetails = !note.errorDecrypting && (!hideDates || note.protected);
 
   const editorForNote = application?.componentManager.editorForNote(note);
-  const [icon, tint] = application?.getIconAndTintForEditor(
+  const [icon, tint] = application?.iconsController.getIconAndTintForEditor(
     editorForNote?.identifier
   ) as [TEditorIcon, number];
 

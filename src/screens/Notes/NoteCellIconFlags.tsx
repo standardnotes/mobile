@@ -20,7 +20,7 @@ type TFlagIcon = {
 
 export const NoteCellIconFlags = ({ note }: Props) => {
   const theme = useContext(ThemeContext);
-  const { stylekitCorn, stylekitDangerColor } = theme;
+  const { stylekitCorn, stylekitDangerColor, stylekitInfoColor } = theme;
 
   const flagIcons = [] as TFlagIcon[];
 
@@ -33,6 +33,7 @@ export const NoteCellIconFlags = ({ note }: Props) => {
   if (note.locked) {
     flagIcons.push({
       icon: 'pencil-off',
+      fillColor: stylekitInfoColor,
     });
   }
   if (note.trashed) {
@@ -44,6 +45,7 @@ export const NoteCellIconFlags = ({ note }: Props) => {
   if (note.pinned) {
     flagIcons.push({
       icon: 'pin-filled',
+      fillColor: stylekitInfoColor,
     });
   }
   return flagIcons.length ? (

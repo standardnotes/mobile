@@ -6,6 +6,7 @@ import {
   ChallengeValidation,
   DeinitSource,
   Environment,
+  IconsController,
   NoteGroupController,
   platformFromString,
   SNApplication,
@@ -40,6 +41,7 @@ const IsDev = VersionInfo.bundleIdentifier?.includes('dev');
 export class MobileApplication extends SNApplication {
   private MobileServices!: MobileServices;
   public editorGroup: NoteGroupController;
+  public iconsController: IconsController;
   private startedDeinit: boolean = false;
   public Uuid: string; // UI remounts when Uuid changes
   static previouslyLaunched: boolean = false;
@@ -69,6 +71,7 @@ export class MobileApplication extends SNApplication {
     );
     this.Uuid = Math.random().toString();
     this.editorGroup = new NoteGroupController(this);
+    this.iconsController = new IconsController();
     this.mobileComponentManager.initialize(this.protocolService);
   }
 
@@ -100,6 +103,7 @@ export class MobileApplication extends SNApplication {
     }
     this.MobileServices = {} as MobileServices;
     this.editorGroup.deinit();
+    this.iconsController.deinit();
     super.deinit(source);
   }
 

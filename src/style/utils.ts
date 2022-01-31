@@ -134,7 +134,7 @@ export const getTintColorForEditor = (
   tint: number
 ): string | undefined => {
   const {
-    stylekitScienceBlue,
+    stylekitInfoColor,
     stylekitDeepBlush,
     stylekitCorn,
     stylekitPurpleHeart,
@@ -143,7 +143,7 @@ export const getTintColorForEditor = (
   } = theme;
 
   const tintColorsMap = new Map([
-    [1, stylekitScienceBlue],
+    [1, stylekitInfoColor],
     [2, stylekitDeepBlush],
     [3, stylekitCorn],
     [4, stylekitPurpleHeart],

@@ -1,5 +1,5 @@
 import { iconStyles } from '@Components/Icon.styled';
-import { IconType } from '@standardnotes/snjs/dist/@types/types';
+import { IconType } from '@standardnotes/snjs';
 import React, { useContext } from 'react';
 import { ThemeContext } from 'styled-components';
 import ArchiveIcon from '../style/Images/ic-archive.svg';
