@@ -75,6 +75,11 @@ export const Notes = React.memo(
         .getLocalPreferences()
         .getValue(PrefKey.NotesHideNotePreview, false)
     );
+    const [hideEditorIcon, setHideEditorIcon] = useState<boolean>(() =>
+      application!
+        .getLocalPreferences()
+        .getValue(PrefKey.NotesHideEditorIcon, false)
+    );
     const [notes, setNotes] = useState<SNNote[]>([]);
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
     const [searchText, setSearchText] = useState('');
@@ -105,7 +110,7 @@ export const Notes = React.memo(
     const haveDisplayOptions = useRef(false);
     const protectionsEnabled = useRef(
       application!.hasProtectionSources() &&
-      !application!.hasUnprotectedAccessSession()
+        !application!.hasUnprotectedAccessSession()
     );
 
     const reloadTitle = useCallback(
@@ -232,10 +237,10 @@ export const Notes = React.memo(
         const searchQuery =
           searchText || searchFilter
             ? {
-              query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
-              includeProtectedNoteText:
-                includeProtected ?? includeProtectedNoteText,
-            }
+                query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
+                includeProtectedNoteText:
+                  includeProtected ?? includeProtectedNoteText,
+              }
             : undefined;
 
         let applyFilters = false;
@@ -490,6 +495,9 @@ export const Notes = React.memo(
       const newHideDate = application!
         .getLocalPreferences()
         .getValue(PrefKey.NotesHideDate, false);
+      const newHideEditorIcon = application!
+        .getLocalPreferences()
+        .getValue(PrefKey.NotesHideEditorIcon, false);
 
       if (sortBy !== newSortBy) {
         setSortBy(newSortBy);
@@ -507,6 +515,10 @@ export const Notes = React.memo(
         setHideDates(newHideDate);
         displayOptionsChanged = true;
       }
+      if (hideEditorIcon !== newHideEditorIcon) {
+        setHideEditorIcon(newHideEditorIcon);
+        displayOptionsChanged = true;
+      }
 
       if (displayOptionsChanged) {
         reloadNotesDisplayOptions(undefined, {
@@ -521,6 +533,7 @@ export const Notes = React.memo(
       sortReverse,
       hidePreviews,
       hideDates,
+      hideEditorIcon,
       reloadNotes,
       reloadNotesDisplayOptions,
     ]);
@@ -584,6 +597,7 @@ export const Notes = React.memo(
           loading={loading}
           hidePreviews={hidePreviews}
           hideDates={hideDates}
+          hideEditorIcon={hideEditorIcon}
           selectedNoteId={
             application?.getAppState().isInTabletMode
               ? selectedNoteId

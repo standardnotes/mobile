@@ -390,6 +390,8 @@ PODS:
     - React-Core
   - RNStoreReview (0.1.5):
     - React
+  - RNSVG (12.1.1):
+    - React
   - RNVectorIcons (7.1.0):
     - React
   - RNZipArchive (6.0.2):
@@ -486,6 +488,7 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSearchBar (from `../node_modules/react-native-search-bar`)
   - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
   - sn-textview (from `../node_modules/sn-textview`)
@@ -620,6 +623,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-search-bar"
   RNStoreReview:
     :path: "../node_modules/react-native-store-review/ios"
+  RNSVG:
+    :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   RNZipArchive:
@@ -635,7 +640,7 @@ SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   BugsnagReactNative: d6988f685aae2de5ecda1f5ca39f03661759d416
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
-  DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
+  DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: e5569e42a1c79ca00521846c223173a57aca1fe1
   FBReactNativeSpec: fe08c1cd7e2e205718d77ad14b34957cce949b58
   Flipper: 30e8eeeed6abdc98edaf32af0cda2f198be4b733
@@ -649,7 +654,7 @@ SPEC CHECKSUMS:
   FlipperKit: d8d346844eca5d9120c17d441a2f38596e8ed2b9
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   GCDWebServer: 2c156a56c8226e2d5c0c3f208a3621ccffbe3ce4
-  glog: 5337263514dd6f09803962437687240c5dc39aa4
+  glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
   RCT-Folly: a21c126816d8025b547704b777a2ba552f3d9fa9
@@ -699,6 +704,7 @@ SPEC CHECKSUMS:
   RNScreens: 21b73c94c9117e1110a79ee0ee80c93ccefed8ce
   RNSearchBar: 5ed8e13ba8a6c701fbd2afdfe4164493d24b2aee
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
+  RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   RNZipArchive: 3dd2de5b7f590d79e83270508b78870bf5a54f36
   sn-textview: 0211237b3e0edeeb23aed2a9c47b78af35a81e95

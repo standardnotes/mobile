@@ -22,6 +22,11 @@ export const PreferencesSection = () => {
   const [hideDates, setHideDates] = useState<boolean>(() =>
     application!.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
   );
+  const [hideEditorIcon, setHideEditorIcon] = useState<boolean>(() =>
+    application!
+      .getLocalPreferences()
+      .getValue(PrefKey.NotesHideEditorIcon, false)
+  );
   const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
     application!
       .getLocalPreferences()
@@ -60,6 +65,12 @@ export const PreferencesSection = () => {
       ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.NotesHideDate, !hideDates);
     setHideDates(value => !value);
+  };
+  const toggleNotesEditorIconHidden = () => {
+    application
+      ?.getLocalPreferences()
+      .setUserPrefValue(PrefKey.NotesHideEditorIcon, !hideEditorIcon);
+    setHideEditorIcon(value => !value);
   };
 
   return (
@@ -101,8 +112,14 @@ export const PreferencesSection = () => {
         <SectionedAccessoryTableCell
           onPress={toggleNotesDateHidden}
           text={'Hide note dates'}
-          last
           selected={() => hideDates}
+        />
+
+        <SectionedAccessoryTableCell
+          onPress={toggleNotesEditorIconHidden}
+          text={'Hide editor icons'}
+          last
+          selected={() => hideEditorIcon}
         />
       </TableSection>
     </>

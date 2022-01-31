@@ -1,21 +1,29 @@
+import { SnIcon, TEditorIcon } from '@Components/SnIcon';
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { NoteCellIconFlags } from '@Screens/Notes/NoteCellIconFlags';
 import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
 } from '@Style/custom_action_sheet';
+import { getTintColorForEditor } from '@Style/utils';
 import React, { useContext, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
+import { ThemeContext } from 'styled-components';
 import {
   Container,
+  CustomFlexContainer,
   DeletedText,
   DetailsText,
+  NoteDataContainer,
   NoteText,
+  NoteTitleContainer,
+  styles,
   TitleText,
   TouchableContainer,
 } from './NoteCell.styled';
@@ -27,6 +35,7 @@ type Props = {
   onPressItem: (noteUuid: SNNote['uuid']) => void;
   hideDates: boolean;
   hidePreviews: boolean;
+  hideEditorIcon: boolean;
   sortType: CollectionSort;
 };
 
@@ -37,9 +46,11 @@ export const NoteCell = ({
   sortType,
   hideDates,
   hidePreviews,
+  hideEditorIcon,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
+  const theme = useContext(ThemeContext);
 
   const [changeNote] = useChangeNote(note);
   const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note);
@@ -187,6 +198,11 @@ export const NoteCell = ({
     !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
   const showDetails = !note.errorDecrypting && (!hideDates || note.protected);
 
+  const editorForNote = application?.componentManager.editorForNote(note);
+  const [icon, tint] = application?.iconsController.getIconAndTintForEditor(
+    editorForNote?.identifier
+  ) as [TEditorIcon, number];
+
   return (
     <TouchableContainer
       onPress={_onPress}
@@ -195,54 +211,74 @@ export const NoteCell = ({
       onLongPress={onLongPress}
       delayPressIn={150}
     >
-      <Container ref={elementRef as any} selected={highlight} padding={padding}>
-        {note.deleted && <DeletedText>Deleting...</DeletedText>}
+      <Container
+        ref={elementRef as any}
+        selected={highlight}
+        distance={padding}
+      >
+        <CustomFlexContainer>
+          {!hideEditorIcon && (
+            <SnIcon
+              type={icon}
+              fill={getTintColorForEditor(theme, tint)}
+              styles={styles.editorIcon}
+            />
+          )}
+          <NoteDataContainer distance={padding}>
+            {note.deleted && <DeletedText>Deleting...</DeletedText>}
 
-        <NoteCellFlags note={note} highlight={highlight} />
+            <NoteCellFlags note={note} highlight={highlight} />
 
-        {note.errorDecrypting && !note.waitingForKey && (
-          <NoteText selected={highlight} numberOfLines={2}>
-            {'Please sign in to restore your decryption keys and notes.'}
-          </NoteText>
-        )}
-
-        {note.safeTitle().length > 0 && (
-          <TitleText selected={highlight}>{note.title}</TitleText>
-        )}
-
-        {hasPlainPreview && showPreview && (
-          <NoteText selected={highlight} numberOfLines={2}>
-            {note.preview_plain}
-          </NoteText>
-        )}
-
-        {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
-          <NoteText selected={highlight} numberOfLines={2}>
-            {note.text}
-          </NoteText>
-        )}
-
-        {showDetails && (
-          <DetailsText
-            numberOfLines={1}
-            selected={highlight}
-            first={!note.title}
-          >
-            {note.protected && (
-              <Text>
-                Protected
-                {!hideDates && ' • '}
-              </Text>
+            {note.errorDecrypting && !note.waitingForKey && (
+              <NoteText selected={highlight} numberOfLines={2}>
+                {'Please sign in to restore your decryption keys and notes.'}
+              </NoteText>
             )}
-            {!hideDates && (
-              <Text>
-                {sortType === CollectionSort.UpdatedAt
-                  ? 'Modified ' + note.updatedAtString
-                  : note.createdAtString}
-              </Text>
+
+            <NoteTitleContainer>
+              {note.safeTitle().length > 0 ? (
+                <TitleText selected={highlight}>{note.title}</TitleText>
+              ) : (
+                <Text />
+              )}
+              <NoteCellIconFlags note={note} />
+            </NoteTitleContainer>
+
+            {hasPlainPreview && showPreview && (
+              <NoteText selected={highlight} numberOfLines={2}>
+                {note.preview_plain}
+              </NoteText>
             )}
-          </DetailsText>
-        )}
+
+            {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
+              <NoteText selected={highlight} numberOfLines={2}>
+                {note.text}
+              </NoteText>
+            )}
+
+            {showDetails && (
+              <DetailsText
+                numberOfLines={1}
+                selected={highlight}
+                first={!note.title}
+              >
+                {note.protected && (
+                  <Text>
+                    Protected
+                    {!hideDates && ' • '}
+                  </Text>
+                )}
+                {!hideDates && (
+                  <Text>
+                    {sortType === CollectionSort.UpdatedAt
+                      ? 'Modified ' + note.updatedAtString
+                      : note.createdAtString}
+                  </Text>
+                )}
+              </DetailsText>
+            )}
+          </NoteDataContainer>
+        </CustomFlexContainer>
       </Container>
     </TouchableContainer>
   );

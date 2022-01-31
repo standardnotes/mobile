@@ -15,6 +15,7 @@ export enum PrefKey {
   LastExportDate = 'lastExportDate',
   DoNotShowAgainUnsupportedEditors = 'doNotShowAgainUnsupportedEditors',
   SelectedTagUuid = 'selectedTagUuid',
+  NotesHideEditorIcon = 'hideEditorIcon',
 }
 
 type Preferences = Record<PrefKey, any>;
