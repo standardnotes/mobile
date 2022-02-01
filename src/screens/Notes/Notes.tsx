@@ -106,7 +106,6 @@ export const Notes = React.memo(
     ] = useState<boolean>(false);
     const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false);
 
-    // Ref
     const haveDisplayOptions = useRef(false);
     const protectionsEnabled = useRef(
       application!.hasProtectionSources() &&
@@ -129,7 +128,7 @@ export const Notes = React.memo(
         } else if (selectedTag) {
           title = selectedTag.title;
           if (selectedTag.parentId) {
-            const parents = application.getTagParentChain(selectedTag);
+            const parents = application!.getTagParentChain(selectedTag);
             const hierarchy = parents.map(tag => tag.title).join(' ⫽ ');
             subTitle = hierarchy.length > 0 ? `in ${hierarchy}` : undefined;
           }
@@ -137,7 +136,7 @@ export const Notes = React.memo(
 
         navigation.setParams({
           title,
-          ...(subTitle ? { subTitle } : {}),
+          subTitle,
         });
       },
       [application, navigation, searchText]
