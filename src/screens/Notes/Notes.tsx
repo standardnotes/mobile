@@ -110,7 +110,7 @@ export const Notes = React.memo(
     const haveDisplayOptions = useRef(false);
     const protectionsEnabled = useRef(
       application!.hasProtectionSources() &&
-        !application!.hasUnprotectedAccessSession()
+      !application!.hasUnprotectedAccessSession()
     );
 
     const reloadTitle = useCallback(
@@ -127,10 +127,12 @@ export const Notes = React.memo(
               ? `${resultCount} search result`
               : `${resultCount} search results`;
         } else if (selectedTag) {
-          const parents = application.getTagParentChain(selectedTag);
-          const hierarchy = parents.map(tag => tag.title).join(' ⫽ ');
-          subTitle = hierarchy.length > 0 ? `in ${hierarchy}` : undefined;
           title = selectedTag.title;
+          if (selectedTag.parentId) {
+            const parents = application.getTagParentChain(selectedTag);
+            const hierarchy = parents.map(tag => tag.title).join(' ⫽ ');
+            subTitle = hierarchy.length > 0 ? `in ${hierarchy}` : undefined;
+          }
         }
 
         navigation.setParams({
@@ -243,10 +245,10 @@ export const Notes = React.memo(
         const searchQuery =
           searchText || searchFilter
             ? {
-                query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
-                includeProtectedNoteText:
-                  includeProtected ?? includeProtectedNoteText,
-              }
+              query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
+              includeProtectedNoteText:
+                includeProtected ?? includeProtectedNoteText,
+            }
             : undefined;
 
         let applyFilters = false;
