@@ -119,10 +119,8 @@ export const TagSelectionList = React.memo(
       ]);
     };
 
-    // Nesting
     const isRootTag = (tag: SNTag | SNSmartTag): boolean =>
       !(application?.getTagParent(tag) || false);
-
     const isRegularTag = (tag: SNTag | SNSmartTag): boolean =>
       tag.content_type === ContentType.Tag;
 
@@ -170,7 +168,7 @@ export const TagSelectionList = React.memo(
             <FlatList
               // eslint-disable-next-line react-native/no-inline-styles
               style={{
-                paddingLeft: 15,
+                paddingLeft: 25,
               }}
               initialNumToRender={10}
               windowSize={10}

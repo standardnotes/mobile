@@ -106,31 +106,38 @@ export const Notes = React.memo(
     ] = useState<boolean>(false);
     const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false);
 
-    // Ref
     const haveDisplayOptions = useRef(false);
     const protectionsEnabled = useRef(
       application!.hasProtectionSources() &&
-        !application!.hasUnprotectedAccessSession()
+      !application!.hasUnprotectedAccessSession()
     );
 
     const reloadTitle = useCallback(
       (newNotes?: SNNote[], newFilter?: string) => {
         let title = '';
+        let subTitle: string | undefined;
+
+        const selectedTag = application?.getAppState().selectedTag;
+
         if (newNotes && (newFilter ?? searchText).length > 0) {
           const resultCount = newNotes.length;
           title =
             resultCount === 1
               ? `${resultCount} search result`
               : `${resultCount} search results`;
-        } else if (application?.getAppState().selectedTag) {
-          title = application.getAppState().selectedTag!.title;
+        } else if (selectedTag) {
+          title = selectedTag.title;
+          if (selectedTag.parentId) {
+            const parents = application!.getTagParentChain(selectedTag);
+            const hierarchy = parents.map(tag => tag.title).join(' ⫽ ');
+            subTitle = hierarchy.length > 0 ? `in ${hierarchy}` : undefined;
+          }
         }
 
-        if (title) {
-          navigation.setParams({
-            title,
-          });
-        }
+        navigation.setParams({
+          title,
+          subTitle,
+        });
       },
       [application, navigation, searchText]
     );
@@ -237,10 +244,10 @@ export const Notes = React.memo(
         const searchQuery =
           searchText || searchFilter
             ? {
-                query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
-                includeProtectedNoteText:
-                  includeProtected ?? includeProtectedNoteText,
-              }
+              query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
+              includeProtectedNoteText:
+                includeProtected ?? includeProtectedNoteText,
+            }
             : undefined;
 
         let applyFilters = false;
