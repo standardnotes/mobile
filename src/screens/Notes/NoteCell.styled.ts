@@ -12,17 +12,11 @@ export const Container = styled.View<{ selected: boolean; distance: number }>`
   background-color: ${({ theme, selected }) =>
     selected ? theme.stylekitInfoColor : theme.stylekitBackgroundColor};
 `;
-export const CustomFlexContainer = styled.View`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-`;
 export const NoteDataContainer = styled.View<{ distance: number }>`
   border-bottom-color: ${({ theme }) =>
     hexToRGBA(theme.stylekitBorderColor, 0.75)};
   border-bottom-width: 1px;
   padding-bottom: ${props => props.distance}px;
-  margin-left: 10px;
   flex-grow: 1;
   flex-shrink: 1;
   padding-right: ${props => props.distance}px;
@@ -75,6 +69,7 @@ export const NoteTitleContainer = styled.View`
 export const styles = StyleSheet.create({
   editorIcon: {
     marginTop: 2,
+    marginRight: 10,
     width: 16,
     height: 16,
   },

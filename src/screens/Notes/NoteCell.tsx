@@ -17,7 +17,6 @@ import { Text, View } from 'react-native';
 import { ThemeContext } from 'styled-components';
 import {
   Container,
-  CustomFlexContainer,
   DeletedText,
   DetailsText,
   NoteDataContainer,
@@ -216,69 +215,67 @@ export const NoteCell = ({
         selected={highlight}
         distance={padding}
       >
-        <CustomFlexContainer>
-          {!hideEditorIcon && (
-            <SnIcon
-              type={icon}
-              fill={getTintColorForEditor(theme, tint)}
-              styles={styles.editorIcon}
-            />
+        {!hideEditorIcon && (
+          <SnIcon
+            type={icon}
+            fill={getTintColorForEditor(theme, tint)}
+            styles={styles.editorIcon}
+          />
+        )}
+        <NoteDataContainer distance={padding}>
+          {note.deleted && <DeletedText>Deleting...</DeletedText>}
+
+          <NoteCellFlags note={note} highlight={highlight} />
+
+          {note.errorDecrypting && !note.waitingForKey && (
+            <NoteText selected={highlight} numberOfLines={2}>
+              {'Please sign in to restore your decryption keys and notes.'}
+            </NoteText>
           )}
-          <NoteDataContainer distance={padding}>
-            {note.deleted && <DeletedText>Deleting...</DeletedText>}
 
-            <NoteCellFlags note={note} highlight={highlight} />
-
-            {note.errorDecrypting && !note.waitingForKey && (
-              <NoteText selected={highlight} numberOfLines={2}>
-                {'Please sign in to restore your decryption keys and notes.'}
-              </NoteText>
+          <NoteTitleContainer>
+            {note.safeTitle().length > 0 ? (
+              <TitleText selected={highlight}>{note.title}</TitleText>
+            ) : (
+              <Text />
             )}
+            <NoteCellIconFlags note={note} />
+          </NoteTitleContainer>
 
-            <NoteTitleContainer>
-              {note.safeTitle().length > 0 ? (
-                <TitleText selected={highlight}>{note.title}</TitleText>
-              ) : (
-                <Text />
+          {hasPlainPreview && showPreview && (
+            <NoteText selected={highlight} numberOfLines={2}>
+              {note.preview_plain}
+            </NoteText>
+          )}
+
+          {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
+            <NoteText selected={highlight} numberOfLines={2}>
+              {note.text}
+            </NoteText>
+          )}
+
+          {showDetails && (
+            <DetailsText
+              numberOfLines={1}
+              selected={highlight}
+              first={!note.title}
+            >
+              {note.protected && (
+                <Text>
+                  Protected
+                  {!hideDates && ' • '}
+                </Text>
               )}
-              <NoteCellIconFlags note={note} />
-            </NoteTitleContainer>
-
-            {hasPlainPreview && showPreview && (
-              <NoteText selected={highlight} numberOfLines={2}>
-                {note.preview_plain}
-              </NoteText>
-            )}
-
-            {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
-              <NoteText selected={highlight} numberOfLines={2}>
-                {note.text}
-              </NoteText>
-            )}
-
-            {showDetails && (
-              <DetailsText
-                numberOfLines={1}
-                selected={highlight}
-                first={!note.title}
-              >
-                {note.protected && (
-                  <Text>
-                    Protected
-                    {!hideDates && ' • '}
-                  </Text>
-                )}
-                {!hideDates && (
-                  <Text>
-                    {sortType === CollectionSort.UpdatedAt
-                      ? 'Modified ' + note.updatedAtString
-                      : note.createdAtString}
-                  </Text>
-                )}
-              </DetailsText>
-            )}
-          </NoteDataContainer>
-        </CustomFlexContainer>
+              {!hideDates && (
+                <Text>
+                  {sortType === CollectionSort.UpdatedAt
+                    ? 'Modified ' + note.updatedAtString
+                    : note.createdAtString}
+                </Text>
+              )}
+            </DetailsText>
+          )}
+        </NoteDataContainer>
       </Container>
     </TouchableContainer>
   );
