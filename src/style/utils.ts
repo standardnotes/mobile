@@ -1,5 +1,6 @@
 import { isNullOrUndefined } from '@standardnotes/snjs';
 import { Platform, ScaledSize } from 'react-native';
+import { DefaultTheme } from 'styled-components/native';
 import { MobileTheme } from './theme_service';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';
@@ -127,3 +128,27 @@ export function hexToRGBA(hex: string, alpha: number) {
     throw new Error('Bad Hex');
   }
 }
+
+export const getTintColorForEditor = (
+  theme: DefaultTheme,
+  tint: number
+): string | undefined => {
+  const {
+    stylekitInfoColor,
+    stylekitDeepBlush,
+    stylekitCorn,
+    stylekitPurpleHeart,
+    stylekitMountainMeadow,
+    stylekitJaffa,
+  } = theme;
+
+  const tintColorsMap = new Map([
+    [1, stylekitInfoColor],
+    [2, stylekitDeepBlush],
+    [3, stylekitCorn],
+    [4, stylekitPurpleHeart],
+    [5, stylekitMountainMeadow],
+    [6, stylekitJaffa],
+  ]);
+  return tintColorsMap.get(tint);
+};

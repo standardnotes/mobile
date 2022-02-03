@@ -75,6 +75,11 @@ export const Notes = React.memo(
         .getLocalPreferences()
         .getValue(PrefKey.NotesHideNotePreview, false)
     );
+    const [hideEditorIcon, setHideEditorIcon] = useState<boolean>(() =>
+      application!
+        .getLocalPreferences()
+        .getValue(PrefKey.NotesHideEditorIcon, false)
+    );
     const [notes, setNotes] = useState<SNNote[]>([]);
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
     const [searchText, setSearchText] = useState('');
@@ -101,7 +106,6 @@ export const Notes = React.memo(
     ] = useState<boolean>(false);
     const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false);
 
-    // Ref
     const haveDisplayOptions = useRef(false);
     const protectionsEnabled = useRef(
       application!.hasProtectionSources() &&
@@ -111,21 +115,29 @@ export const Notes = React.memo(
     const reloadTitle = useCallback(
       (newNotes?: SNNote[], newFilter?: string) => {
         let title = '';
+        let subTitle: string | undefined;
+
+        const selectedTag = application?.getAppState().selectedTag;
+
         if (newNotes && (newFilter ?? searchText).length > 0) {
           const resultCount = newNotes.length;
           title =
             resultCount === 1
               ? `${resultCount} search result`
               : `${resultCount} search results`;
-        } else if (application?.getAppState().selectedTag) {
-          title = application.getAppState().selectedTag!.title;
+        } else if (selectedTag) {
+          title = selectedTag.title;
+          if (selectedTag.parentId) {
+            const parents = application!.getTagParentChain(selectedTag);
+            const hierarchy = parents.map(tag => tag.title).join(' ⫽ ');
+            subTitle = hierarchy.length > 0 ? `in ${hierarchy}` : undefined;
+          }
         }
 
-        if (title) {
-          navigation.setParams({
-            title,
-          });
-        }
+        navigation.setParams({
+          title,
+          subTitle,
+        });
       },
       [application, navigation, searchText]
     );
@@ -490,6 +502,9 @@ export const Notes = React.memo(
       const newHideDate = application!
         .getLocalPreferences()
         .getValue(PrefKey.NotesHideDate, false);
+      const newHideEditorIcon = application!
+        .getLocalPreferences()
+        .getValue(PrefKey.NotesHideEditorIcon, false);
 
       if (sortBy !== newSortBy) {
         setSortBy(newSortBy);
@@ -507,6 +522,10 @@ export const Notes = React.memo(
         setHideDates(newHideDate);
         displayOptionsChanged = true;
       }
+      if (hideEditorIcon !== newHideEditorIcon) {
+        setHideEditorIcon(newHideEditorIcon);
+        displayOptionsChanged = true;
+      }
 
       if (displayOptionsChanged) {
         reloadNotesDisplayOptions(undefined, {
@@ -521,6 +540,7 @@ export const Notes = React.memo(
       sortReverse,
       hidePreviews,
       hideDates,
+      hideEditorIcon,
       reloadNotes,
       reloadNotesDisplayOptions,
     ]);
@@ -584,6 +604,7 @@ export const Notes = React.memo(
           loading={loading}
           hidePreviews={hidePreviews}
           hideDates={hideDates}
+          hideEditorIcon={hideEditorIcon}
           selectedNoteId={
             application?.getAppState().isInTabletMode
               ? selectedNoteId
