@@ -1,7 +1,7 @@
 import {
   FeatureDescription,
   FeatureIdentifier,
-  Features,
+  GetFeatures,
 } from '@standardnotes/features';
 import {
   ComponentMutator,
@@ -156,7 +156,7 @@ export class ComponentManager extends SNComponentManager {
   }
 
   public nativeFeatureForIdentifier(identifier: FeatureIdentifier) {
-    return Features.find(
+    return GetFeatures().find(
       (feature: FeatureDescription) => feature.identifier === identifier
     );
   }

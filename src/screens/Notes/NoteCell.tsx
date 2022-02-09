@@ -19,9 +19,10 @@ import {
   Container,
   DeletedText,
   DetailsText,
+  FlexContainer,
+  NoteContentsContainer,
   NoteDataContainer,
   NoteText,
-  NoteTitleContainer,
   styles,
   TitleText,
   TouchableContainer,
@@ -101,7 +102,7 @@ export const NoteCell = ({
 
     if (note.protected) {
       showActionSheet(
-        note.safeTitle(),
+        note.title,
         [
           {
             text: 'Note Protected',
@@ -183,7 +184,7 @@ export const NoteCell = ({
         ]);
       }
       showActionSheet(
-        note.safeTitle(),
+        note.title,
         options,
         undefined,
         elementRef.current ?? undefined
@@ -233,26 +234,27 @@ export const NoteCell = ({
             </NoteText>
           )}
 
-          <NoteTitleContainer>
-            {note.safeTitle().length > 0 ? (
-              <TitleText selected={highlight}>{note.title}</TitleText>
-            ) : (
-              <Text />
-            )}
+          <FlexContainer>
+            <NoteContentsContainer>
+              {note.title.length > 0 ? (
+                <TitleText selected={highlight}>{note.title}</TitleText>
+              ) : (
+                <View />
+              )}
+              {hasPlainPreview && showPreview && (
+                <NoteText selected={highlight} numberOfLines={2}>
+                  {note.preview_plain}
+                </NoteText>
+              )}
+
+              {!hasPlainPreview && showPreview && note.text.length > 0 && (
+                <NoteText selected={highlight} numberOfLines={2}>
+                  {note.text}
+                </NoteText>
+              )}
+            </NoteContentsContainer>
             <NoteCellIconFlags note={note} />
-          </NoteTitleContainer>
-
-          {hasPlainPreview && showPreview && (
-            <NoteText selected={highlight} numberOfLines={2}>
-              {note.preview_plain}
-            </NoteText>
-          )}
-
-          {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
-            <NoteText selected={highlight} numberOfLines={2}>
-              {note.text}
-            </NoteText>
-          )}
+          </FlexContainer>
 
           {showDetails && (
             <DetailsText
