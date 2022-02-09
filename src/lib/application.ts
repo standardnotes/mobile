@@ -64,7 +64,6 @@ export class MobileApplication extends SNApplication {
         ? 'https://api-dev.standardnotes.com'
         : 'https://api.standardnotes.com',
       version,
-      true,
       IsDev
         ? 'wss://sockets-dev.standardnotes.com'
         : 'wss://sockets.standardnotes.com'
