@@ -7,7 +7,7 @@ const FlagIconsContainer = styled.View`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  align-items: center;
+  margin-top: 2px;
 `;
 type Props = {
   note: SNNote;

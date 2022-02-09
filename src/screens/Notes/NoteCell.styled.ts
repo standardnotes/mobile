@@ -27,11 +27,10 @@ export const DeletedText = styled.Text`
 `;
 export const NoteText = styled.Text<{ selected: boolean }>`
   font-size: 15px;
-  margin-top: 4px;
   color: ${({ theme, selected }) =>
     selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
   opacity: 0.8;
-  line-height: 21px;
+  line-height: 19px;
 `;
 export const TitleText = styled.Text<{ selected: boolean }>`
   font-weight: bold;
@@ -40,6 +39,7 @@ export const TitleText = styled.Text<{ selected: boolean }>`
     selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
   flex-grow: 1;
   flex-shrink: 1;
+  margin-bottom: 4px;
 `;
 export const TagsContainter = styled.View`
   flex: 1;
@@ -61,10 +61,14 @@ export const DetailsText = styled(TagText)<{ first: boolean }>`
       margin-top: 5px;
     `}
 `;
-export const NoteTitleContainer = styled.View`
+export const FlexContainer = styled.View`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+`;
+export const NoteContentsContainer = styled.View`
+  display: flex;
+  flex-shrink: 1;
 `;
 export const styles = StyleSheet.create({
   editorIcon: {
