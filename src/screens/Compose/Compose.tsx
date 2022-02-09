@@ -561,13 +561,13 @@ export class Compose extends React.Component<{}, State> {
                     {(this.state.downloadingEditor ||
                       (this.state.loadingWebview &&
                         themeService?.isLikelyUsingDarkColorTheme())) && (
-                        <LoadingWebViewContainer locked={this.noteLocked}>
-                          <LoadingText>
-                            {'Loading '}
-                            {this.state.componentViewer?.component.name}...
-                          </LoadingText>
-                        </LoadingWebViewContainer>
-                      )}
+                      <LoadingWebViewContainer locked={this.noteLocked}>
+                        <LoadingText>
+                          {'Loading '}
+                          {this.state.componentViewer?.component.name}...
+                        </LoadingText>
+                      </LoadingWebViewContainer>
+                    )}
                     {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
                     {shouldDisplayEditor && (
                       <ComponentView

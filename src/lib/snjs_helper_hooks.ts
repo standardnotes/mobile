@@ -304,7 +304,7 @@ export const useDeleteNoteWithPrivileges = (
   }, [application?.alertService, onTrashCallback]);
 
   const deleteNotePermanently = useCallback(async () => {
-    const title = `Delete ${note!.safeTitle()}`;
+    const title = `Delete ${note!.title}`;
     const message = 'Are you sure you want to permanently delete this note?';
     if (editor?.isTemplateNote) {
       application?.alertService!.alert(

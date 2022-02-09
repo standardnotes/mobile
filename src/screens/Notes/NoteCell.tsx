@@ -102,7 +102,7 @@ export const NoteCell = ({
 
     if (note.protected) {
       showActionSheet(
-        note.safeTitle(),
+        note.title,
         [
           {
             text: 'Note Protected',
@@ -184,7 +184,7 @@ export const NoteCell = ({
         ]);
       }
       showActionSheet(
-        note.safeTitle(),
+        note.title,
         options,
         undefined,
         elementRef.current ?? undefined
@@ -236,7 +236,7 @@ export const NoteCell = ({
 
           <FlexContainer>
             <NoteContentsContainer>
-              {note.safeTitle().length > 0 ? (
+              {note.title.length > 0 ? (
                 <TitleText selected={highlight}>{note.title}</TitleText>
               ) : (
                 <View />
@@ -247,7 +247,7 @@ export const NoteCell = ({
                 </NoteText>
               )}
 
-              {!hasPlainPreview && showPreview && note.safeText().length > 0 && (
+              {!hasPlainPreview && showPreview && note.text.length > 0 && (
                 <NoteText selected={highlight} numberOfLines={2}>
                   {note.text}
                 </NoteText>
