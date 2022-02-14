@@ -1,18 +1,18 @@
 import { iconStyles } from '@Components/Icon.styled';
 import { IconType } from '@standardnotes/snjs';
+import ArchiveIcon from '@standardnotes/stylekit/dist/icons/ic-archive.svg';
+import AuthenticatorIcon from '@standardnotes/stylekit/dist/icons/ic-authenticator.svg';
+import CodeIcon from '@standardnotes/stylekit/dist/icons/ic-code.svg';
+import MarkdownIcon from '@standardnotes/stylekit/dist/icons/ic-markdown.svg';
+import PencilOffIcon from '@standardnotes/stylekit/dist/icons/ic-pencil-off.svg';
+import PinFilledIcon from '@standardnotes/stylekit/dist/icons/ic-pin-filled.svg';
+import SpreadsheetsIcon from '@standardnotes/stylekit/dist/icons/ic-spreadsheets.svg';
+import TasksIcon from '@standardnotes/stylekit/dist/icons/ic-tasks.svg';
+import PlainTextIcon from '@standardnotes/stylekit/dist/icons/ic-text-paragraph.svg';
+import RichTextIcon from '@standardnotes/stylekit/dist/icons/ic-text-rich.svg';
+import TrashFilledIcon from '@standardnotes/stylekit/dist/icons/ic-trash-filled.svg';
 import React, { useContext } from 'react';
 import { ThemeContext } from 'styled-components';
-import ArchiveIcon from '../style/Images/ic-archive.svg';
-import AuthenticatorIcon from '../style/Images/ic-authenticator.svg';
-import CodeIcon from '../style/Images/ic-code.svg';
-import MarkdownIcon from '../style/Images/ic-markdown.svg';
-import PencilOffIcon from '../style/Images/ic-pencil-off.svg';
-import PinFilledIcon from '../style/Images/ic-pin-filled.svg';
-import SpreadsheetsIcon from '../style/Images/ic-spreadsheets.svg';
-import TasksIcon from '../style/Images/ic-tasks.svg';
-import PlainTextIcon from '../style/Images/ic-text-paragraph.svg';
-import RichTextIcon from '../style/Images/ic-text-rich.svg';
-import TrashFilledIcon from '../style/Images/ic-trash-filled.svg';
 
 const ICONS = {
   'pencil-off': PencilOffIcon,
