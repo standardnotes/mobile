@@ -1,6 +1,6 @@
 import { hexToRGBA } from '@Style/utils';
 import { StyleSheet } from 'react-native';
-import styled, { css } from 'styled-components/native';
+import styled from 'styled-components/native';
 
 export const TouchableContainer = styled.TouchableWithoutFeedback``;
 export const Container = styled.View<{ selected: boolean; distance: number }>`
@@ -53,13 +53,9 @@ export const TagText = styled.Text<{ selected: boolean }>`
     selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
   opacity: ${props => (props.selected ? 0.8 : 0.5)};
 `;
-export const DetailsText = styled(TagText)<{ first: boolean }>`
-  margin-right: 0px;
-  ${({ first }) =>
-    !first &&
-    css`
-      margin-top: 5px;
-    `}
+export const DetailsText = styled(TagText)`
+  margin-right: 0;
+  margin-top: 5px;
 `;
 export const FlexContainer = styled.View`
   display: flex;
