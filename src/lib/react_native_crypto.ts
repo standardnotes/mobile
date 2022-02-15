@@ -7,7 +7,7 @@ import {
   Utf8String,
 } from '@standardnotes/sncrypto-common';
 import Aes from 'react-native-aes-crypto';
-import Sodium from 'react-native-sodium';
+import * as Sodium from 'react-native-sodium-jsi';
 
 export class SNReactNativeCrypto implements SNPureCrypto {
   deinit(): void {}
@@ -26,8 +26,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
   public async generateRandomKey(bits: number): Promise<string> {
     const bytes = bits / 8;
-    const result = await Sodium.randombytes_buf(bytes);
-    return result;
+    const result = Sodium.randombytes_buf(bytes);
+    return Promise.resolve(result);
   }
 
   aes256CbcEncrypt(
@@ -76,13 +76,15 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     bytes: number,
     length: number
   ): Promise<HexString> {
-    return Sodium.crypto_pwhash(
-      length,
-      password,
-      salt,
-      iterations,
-      bytes,
-      Sodium.crypto_pwhash_ALG_DEFAULT
+    return Promise.resolve(
+      Sodium.crypto_pwhash(
+        length,
+        password,
+        salt,
+        iterations,
+        bytes,
+        Sodium.constants.crypto_pwhash_ALG_DEFAULT
+      )
     );
   }
 
@@ -92,11 +94,13 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     key: HexString,
     assocData: Utf8String
   ): Promise<Base64String> {
-    return Sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-      plaintext,
-      nonce,
-      key,
-      assocData
+    return Promise.resolve(
+      Sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+        plaintext,
+        nonce,
+        key,
+        assocData
+      )
     );
   }
 
@@ -107,15 +111,15 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     assocData: Utf8String
   ): Promise<string | null> {
     try {
-      const result = await Sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+      const result = Sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
         ciphertext,
         nonce,
         key,
         assocData
       );
-      return result;
+      return Promise.resolve(result);
     } catch (e) {
-      return null;
+      return Promise.resolve(null);
     }
   }
 
@@ -127,7 +131,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   }
 
   public async generateUUID() {
-    const randomBuf = await Sodium.randombytes_buf(16);
+    const randomBuf = Sodium.randombytes_buf(16);
     const tempBuf = new Uint8Array(randomBuf.length / 2);
 
     for (let i = 0; i < randomBuf.length; i += 2) {
@@ -136,23 +140,22 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
     const buf = new Uint32Array(tempBuf.buffer);
     let idx = -1;
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-      /[xy]/g,
-      function (c) {
+    return Promise.resolve(
+      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         idx++;
         const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15;
         const v = c === 'x' ? r : (r & 0x3) | 0x8;
         return v.toString(16);
-      }
+      })
     );
   }
 
   public async base64Encode(text: Utf8String): Promise<string> {
-    return Sodium.to_base64(text, Sodium.base64_variant_ORIGINAL);
+    return Promise.resolve(Sodium.to_base64(text));
   }
 
   public async base64Decode(base64String: Base64String): Promise<string> {
-    return Sodium.from_base64(base64String, Sodium.base64_variant_ORIGINAL);
+    return Promise.resolve(Sodium.from_base64(base64String));
   }
 
   public hmac1(): Promise<HexString | null> {
