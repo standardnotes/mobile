@@ -123,13 +123,6 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     }
   }
 
-  /**
-   * Not implemented in SNReactNativeCrypto
-   */
-  public generateUUIDSync(): never {
-    throw new Error('generateUUIDSync not implemented on mobile');
-  }
-
   public generateUUID() {
     const randomBuf = Sodium.randombytes_buf(16);
     const tempBuf = new Uint8Array(randomBuf.length / 2);
@@ -140,13 +133,14 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
     const buf = new Uint32Array(tempBuf.buffer);
     let idx = -1;
-    return Promise.resolve(
-      'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+      /[xy]/g,
+      function (c) {
         idx++;
         const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15;
         const v = c === 'x' ? r : (r & 0x3) | 0x8;
         return v.toString(16);
-      })
+      }
     );
   }
 
