@@ -1,7 +1,7 @@
 {
   "name": "standardnotes-mobile",
-  "version": "3.10.3",
-  "user-version": "3.10.3",
+  "version": "3.11.0-beta.1",
+  "user-version": "3.11.0-beta.1",
   "private": true,
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -25,8 +25,8 @@
     "@react-native-community/segmented-control": "^2.2.2",
     "@react-navigation/native": "^5.9.3",
     "@react-navigation/stack": "^5.14.3",
-    "@standardnotes/sncrypto-common": "1.6.0",
-    "@standardnotes/snjs": "2.59.2",
+    "@standardnotes/sncrypto-common": "1.7.0",
+    "@standardnotes/snjs": "2.60.0",
     "@standardnotes/stylekit": "5.5.0",
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
