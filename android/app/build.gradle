@@ -206,13 +206,6 @@ android {
         }
     }
 
-    packagingOptions {
-        pickFirst 'lib/x86_64/libsodium.so'
-        pickFirst 'lib/armeabi-v7a/libsodium.so'
-        pickFirst 'lib/arm64-v8a/libsodium.so'
-        pickFirst 'lib/x86/libsodium.so'
-    }
-
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
