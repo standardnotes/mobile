@@ -2570,10 +2570,10 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.7.0.tgz#6ad96afeaa031c26e45cbaf527bb511b803f998d"
   integrity sha512-Dke13reJMLQFXa7y9EqZYEeZG5Ouy+32qWEsQISLjLRPrTuNwyNXee2mdPh6c9uNZxOQwrdHxVGfqzJ2iy3RpQ==
 
-"@standardnotes/snjs@2.60.4":
-  version "2.60.4"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.60.4.tgz#58e7b1925b8b5867271a8f564d2a39d3f5428f0e"
-  integrity sha512-8WzhYQiDY/NP0ehqYJLgjG6W4PYpKUsuROmaCe1b/6zy4C8ev5kuMEiHaamh1d6RF1fkWqXB3Mm1p+Zbai/8dA==
+"@standardnotes/snjs@2.61.0":
+  version "2.61.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.61.0.tgz#0628fdb17c97f810fda0a989557184e394e4e555"
+  integrity sha512-2j/WfHPMRxwD6K857HHCWZbmK2zL4nZc7a+jY0rgfZd4yzU/wFwy3iUxV//a/IDQ9XUKAFQnyVjGnMS/oaWzsA==
   dependencies:
     "@standardnotes/auth" "^3.16.1"
     "@standardnotes/common" "^1.11.0"
