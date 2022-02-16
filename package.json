@@ -49,7 +49,7 @@
     "react-native-screens": "3.4.0",
     "react-native-search-bar": "standardnotes/react-native-search-bar#7d2139d",
     "react-native-search-box": "standardnotes/react-native-search-box#c0de5bab18cb418fef75ef2c2cd921304142e492",
-    "react-native-sodium-jsi": "https://github.com/standardnotes/react-native-sodium-jsi#f6a8ab12f2927ca35682741e875a8df759036bd0",
+    "react-native-sodium-jsi": "https://github.com/standardnotes/react-native-sodium-jsi#79bb64011056fea0d5c12c7165d3cc6dbf479cfd",
     "react-native-static-server": "standardnotes/react-native-static-server#d0c4cb0feae233634ef26fc33118f258192c7b7d",
     "react-native-store-review": "^0.1.5",
     "react-native-svg": "^12.1.1",
