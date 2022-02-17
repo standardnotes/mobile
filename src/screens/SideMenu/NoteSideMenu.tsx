@@ -12,11 +12,14 @@ import {
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_NOTE_HISTORY,
 } from '@Screens/screens';
+import { Listed } from '@Screens/SideMenu/Listed';
 import {
   ButtonType,
   ComponentArea,
   ComponentMutator,
   ContentType,
+  ListedAccount,
+  ListedAccountInfo,
   NoteMutator,
   NoteViewController,
   PayloadSource,
@@ -108,6 +111,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
   );
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
+  const [listedAccounts, setListedAccounts] = useState<ListedAccount[]>([]);
+  const [listedAccountDetails, setListedAccountDetails] = useState<
+    (ListedAccountInfo | undefined)[]
+  >([]);
   const components = useEditorComponents();
 
   const [changeNote] = useChangeNote(note, editor);
@@ -133,6 +140,29 @@ export const NoteSideMenu = React.memo((props: Props) => {
     },
     editor
   );
+
+  const loadListedAccounts = useCallback(async () => {
+    if (!application) {
+      return;
+    }
+    const accounts = await application.getListedAccounts();
+    setListedAccounts(accounts);
+  }, [application]);
+
+  const loadListedAccountsDetails = useCallback(async () => {
+    if (!application) {
+      return;
+    }
+    const listedAccountsArray = [];
+    for (const listedAccountItem of listedAccounts) {
+      const listedItemInfo = await application.getListedAccountInfo(
+        listedAccountItem,
+        note?.uuid
+      );
+      listedAccountsArray.push(listedItemInfo);
+    }
+    setListedAccountDetails(listedAccountsArray);
+  }, [application, listedAccounts, note?.uuid]);
 
   useEffect(() => {
     let mounted = true;
@@ -207,6 +237,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
       };
     });
   }, [application, note, props.drawerOpen, reloadTags]);
+
+  useEffect(() => {
+    const loadListedData = async () => {
+      await loadListedAccounts();
+      await loadListedAccountsDetails();
+    };
+    loadListedData();
+  }, [loadListedAccounts, loadListedAccountsDetails]);
 
   const disassociateComponentWithCurrentNote = useCallback(
     async (component: SNComponent) => {
@@ -589,15 +627,18 @@ export const NoteSideMenu = React.memo((props: Props) => {
     <SafeAreaContainer edges={['top', 'bottom', 'right']}>
       <FlatList
         style={styles.sections}
-        data={['options-section', 'editors-section', 'tags-section'].map(
-          key => ({
-            key,
-            noteOptions,
-            editorComponents: editors,
-            onTagSelect,
-            selectedTags,
-          })
-        )}
+        data={[
+          'options-section',
+          'editors-section',
+          'tags-section',
+          'listed-section',
+        ].map(key => ({
+          key,
+          noteOptions,
+          editorComponents: editors,
+          onTagSelect,
+          selectedTags,
+        }))}
         renderItem={({ item, index }) =>
           index === 0 ? (
             <SideMenuSection title="Options" options={item.noteOptions} />
@@ -617,6 +658,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
                 emptyPlaceholder={
                   'Create a new tag using the tag button in the bottom right corner.'
                 }
+              />
+            </SideMenuSection>
+          ) : index === 3 && listedAccounts.length > 0 ? (
+            <SideMenuSection title="Listed" collapsed={true}>
+              <Listed
+                note={note}
+                listedAccountDetails={listedAccountDetails}
+                getListedAccountsDetails={loadListedAccountsDetails}
               />
             </SideMenuSection>
           ) : null
