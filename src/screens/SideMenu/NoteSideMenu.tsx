@@ -141,13 +141,18 @@ export const NoteSideMenu = React.memo((props: Props) => {
     editor
   );
 
-  const loadListedAccounts = useCallback(async () => {
+  const memoizedListedAccounts = useMemo(async () => {
     if (!application) {
-      return;
-    }
+      return [];
+    };
     const accounts = await application.getListedAccounts();
-    setListedAccounts(accounts);
+    return accounts;
   }, [application]);
+
+  const loadListedAccounts = useCallback(async () => {
+    const accounts = await memoizedListedAccounts;
+    setListedAccounts(accounts);
+  }, [memoizedListedAccounts]);
 
   const loadListedAccountsDetails = useCallback(async () => {
     if (!application) {
