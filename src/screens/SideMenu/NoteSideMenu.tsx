@@ -144,7 +144,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const memoizedListedAccounts = useMemo(async () => {
     if (!application) {
       return [];
-    };
+    }
     const accounts = await application.getListedAccounts();
     return accounts;
   }, [application]);
@@ -628,53 +628,74 @@ export const NoteSideMenu = React.memo((props: Props) => {
     return null;
   }
 
+  enum MenuSections {
+    OptionsSection = 'options-section',
+    EditorsSection = 'editors-section',
+    ListedSection = 'listed-section',
+    TagsSection = 'tags-section',
+  }
+
   return (
     <SafeAreaContainer edges={['top', 'bottom', 'right']}>
       <FlatList
         style={styles.sections}
-        data={[
-          'options-section',
-          'editors-section',
-          'tags-section',
-          'listed-section',
-        ].map(key => ({
+        data={Object.values(MenuSections).map(key => ({
           key,
           noteOptions,
           editorComponents: editors,
           onTagSelect,
           selectedTags,
         }))}
-        renderItem={({ item, index }) =>
-          index === 0 ? (
-            <SideMenuSection title="Options" options={item.noteOptions} />
-          ) : index === 1 ? (
-            <SideMenuSection
-              title="Editors"
-              options={item.editorComponents}
-              collapsed={true}
-            />
-          ) : index === 2 ? (
-            <SideMenuSection title="Tags">
-              <TagSelectionList
-                hasBottomPadding={Platform.OS === 'android'}
-                contentType={ContentType.Tag}
-                onTagSelect={item.onTagSelect}
-                selectedTags={item.selectedTags}
-                emptyPlaceholder={
-                  'Create a new tag using the tag button in the bottom right corner.'
-                }
+        renderItem={({ item }) => {
+          const {
+            OptionsSection,
+            EditorsSection,
+            ListedSection,
+            TagsSection,
+          } = MenuSections;
+
+          if (item.key === OptionsSection) {
+            return (
+              <SideMenuSection title="Options" options={item.noteOptions} />
+            );
+          }
+          if (item.key === EditorsSection) {
+            return (
+              <SideMenuSection
+                title="Editors"
+                options={item.editorComponents}
+                collapsed={true}
               />
-            </SideMenuSection>
-          ) : index === 3 && listedAccounts.length > 0 ? (
-            <SideMenuSection title="Listed" collapsed={true}>
-              <Listed
-                note={note}
-                listedAccountDetails={listedAccountDetails}
-                getListedAccountsDetails={loadListedAccountsDetails}
-              />
-            </SideMenuSection>
-          ) : null
-        }
+            );
+          }
+          if (item.key === ListedSection && listedAccounts.length > 0) {
+            return (
+              <SideMenuSection title="Listed" collapsed={true}>
+                <Listed
+                  note={note}
+                  listedAccountDetails={listedAccountDetails}
+                  getListedAccountsDetails={loadListedAccountsDetails}
+                />
+              </SideMenuSection>
+            );
+          }
+          if (item.key === TagsSection) {
+            return (
+              <SideMenuSection title="Tags">
+                <TagSelectionList
+                  hasBottomPadding={Platform.OS === 'android'}
+                  contentType={ContentType.Tag}
+                  onTagSelect={item.onTagSelect}
+                  selectedTags={item.selectedTags}
+                  emptyPlaceholder={
+                    'Create a new tag using the tag button in the bottom right corner.'
+                  }
+                />
+              </SideMenuSection>
+            );
+          }
+          return null;
+        }}
       />
 
       <FAB
