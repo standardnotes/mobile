@@ -30,7 +30,7 @@ export const Listed: FC<TProps> = ({ note }) => {
 
   const { showActionSheet } = useCustomActionSheet();
 
-  const loadListedAccountsDetails = useCallback(
+  const getListedAccountsDetails = useCallback(
     async (accounts: ListedAccount[]) => {
       if (!application) {
         return;
@@ -49,7 +49,7 @@ export const Listed: FC<TProps> = ({ note }) => {
             : { display_name: listedAccountItem.authorId }
         );
       }
-      setListedAccountDetails(listedAccountsArray);
+      return listedAccountsArray;
     },
     [application, note?.uuid]
   );
@@ -61,8 +61,8 @@ export const Listed: FC<TProps> = ({ note }) => {
     const accounts = await application.getListedAccounts();
     setListedAccounts(accounts);
 
-    await loadListedAccountsDetails(accounts);
-  }, [application, loadListedAccountsDetails]);
+    setListedAccountDetails((await getListedAccountsDetails(accounts)) || []);
+  }, [application, getListedAccountsDetails]);
 
   const registerNewAccount = useCallback(() => {
     if (!application || isRequestingAccount) {
@@ -110,7 +110,7 @@ export const Listed: FC<TProps> = ({ note }) => {
     return (item as ListedAccountInfo).author_url !== undefined;
   };
 
-  const showActionsMenu = (item: TListedAccountItem) => {
+  const showActionsMenu = (item: TListedAccountItem, index: number) => {
     if (!application) {
       return;
     }
@@ -131,8 +131,12 @@ export const Listed: FC<TProps> = ({ note }) => {
           if (!response || response.error) {
             return;
           }
-          await loadListedAccountsDetails(listedAccounts);
-          showActionsMenu(item);
+          const listedDetails = (await getListedAccountsDetails(
+            listedAccounts
+          )) as TListedAccountItem[];
+          setListedAccountDetails(listedDetails);
+
+          showActionsMenu(listedDetails[index], index);
         },
       }))
     );
@@ -141,13 +145,12 @@ export const Listed: FC<TProps> = ({ note }) => {
   if (!application) {
     return null;
   }
-
   return (
     <View>
       {listedAccountDetails.length > 0 && (
         <FlatList
           data={listedAccountDetails}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             if (!item) {
               return null;
             }
@@ -155,7 +158,7 @@ export const Listed: FC<TProps> = ({ note }) => {
               <>
                 <SideMenuCell
                   text={item.display_name}
-                  onSelect={() => showActionsMenu(item)}
+                  onSelect={() => showActionsMenu(item, index)}
                 />
                 {!isRequestingAccount && !doesListedItemHaveActions(item) && (
                   <CantLoadActionsText>
