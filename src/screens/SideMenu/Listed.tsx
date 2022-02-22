@@ -1,5 +1,6 @@
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
+  CantLoadActionsText,
   CreateBlogContainer,
   LearnMore,
 } from '@Screens/SideMenu/Listed.styled';
@@ -67,9 +68,9 @@ export const Listed: FC<TProps> = ({ note }) => {
     if (!application || isRequestingAccount) {
       return;
     }
-    setIsRequestingAccount(true);
 
     const requestAccount = async () => {
+      setIsRequestingAccount(true);
       const account = await application.requestNewListedAccount();
       if (account) {
         const openSettings = await application.alertService.confirm(
@@ -156,6 +157,11 @@ export const Listed: FC<TProps> = ({ note }) => {
                   text={item.display_name}
                   onSelect={() => showActionsMenu(item)}
                 />
+                {!isRequestingAccount && !doesListedItemHaveActions(item) && (
+                  <CantLoadActionsText>
+                    Unable to load actions
+                  </CantLoadActionsText>
+                )}
               </>
             );
           }}
