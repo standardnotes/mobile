@@ -491,8 +491,8 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
-  - sn-textview (from `../node_modules/sn-textview`)
-  - SNReactNative (from `../node_modules/standard-notes-rn`)
+  - "sn-textview (from `../node_modules/@standardnotes/react-native-textview`)"
+  - "SNReactNative (from `../node_modules/@standardnotes/react-native-utils`)"
   - TrustKit (= 1.6.5)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -630,9 +630,9 @@ EXTERNAL SOURCES:
   RNZipArchive:
     :path: "../node_modules/react-native-zip-archive"
   sn-textview:
-    :path: "../node_modules/sn-textview"
+    :path: "../node_modules/@standardnotes/react-native-textview"
   SNReactNative:
-    :path: "../node_modules/standard-notes-rn"
+    :path: "../node_modules/@standardnotes/react-native-utils"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -640,7 +640,7 @@ SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   BugsnagReactNative: d6988f685aae2de5ecda1f5ca39f03661759d416
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
-  DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
+  DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: e5569e42a1c79ca00521846c223173a57aca1fe1
   FBReactNativeSpec: fe08c1cd7e2e205718d77ad14b34957cce949b58
   Flipper: 30e8eeeed6abdc98edaf32af0cda2f198be4b733
@@ -654,7 +654,7 @@ SPEC CHECKSUMS:
   FlipperKit: d8d346844eca5d9120c17d441a2f38596e8ed2b9
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   GCDWebServer: 2c156a56c8226e2d5c0c3f208a3621ccffbe3ce4
-  glog: 5337263514dd6f09803962437687240c5dc39aa4
+  glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
   RCT-Folly: a21c126816d8025b547704b777a2ba552f3d9fa9
