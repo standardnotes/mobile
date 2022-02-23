@@ -1,10 +1,13 @@
+import { SnIcon } from '@Components/SnIcon';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
   CantLoadActionsText,
   CreateBlogContainer,
-  LearnMore,
+  ListedItemRow,
+  styles,
 } from '@Screens/SideMenu/Listed.styled';
 import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell';
+import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
 import { ButtonType, ListedAccount, SNNote } from '@standardnotes/snjs';
 import { ListedAccountInfo } from '@standardnotes/snjs/dist/@types/services/api/responses';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
@@ -155,35 +158,57 @@ export const Listed: FC<TProps> = ({ note }) => {
               return null;
             }
             return (
-              <>
-                <SideMenuCell
-                  text={item.display_name}
-                  onSelect={() => showActionsMenu(item, index)}
-                />
+              <View>
+                <ListedItemRow>
+                  <SideMenuCell
+                    text={item.display_name}
+                    onSelect={() => showActionsMenu(item, index)}
+                    iconDesc={{
+                      side: 'left',
+                      type: SideMenuOptionIconDescriptionType.CustomComponent,
+                      value: (
+                        <SnIcon type={'notes'} styles={styles.blogItemIcon} />
+                      ),
+                    }}
+                  />
+                </ListedItemRow>
                 {!isRequestingAccount && !doesListedItemHaveActions(item) && (
                   <CantLoadActionsText>
                     Unable to load actions
                   </CantLoadActionsText>
                 )}
-              </>
+              </View>
             );
           }}
         />
       )}
       <CreateBlogContainer>
-        <SideMenuCell
-          text={
-            isRequestingAccount ? 'Creating account...' : 'Create New Author'
-          }
-          onSelect={registerNewAccount}
-        />
-        <LearnMore
-          onPress={() => {
-            application.deviceInterface.openUrl('https://listed.to');
-          }}
-        >
-          Learn more
-        </LearnMore>
+        <ListedItemRow>
+          <SideMenuCell
+            text={
+              isRequestingAccount ? 'Creating account...' : 'Create New Author'
+            }
+            onSelect={registerNewAccount}
+            iconDesc={{
+              side: 'left',
+              type: SideMenuOptionIconDescriptionType.CustomComponent,
+              value: <SnIcon type={'user-add'} styles={styles.blogItemIcon} />,
+            }}
+          />
+        </ListedItemRow>
+        <ListedItemRow>
+          <SideMenuCell
+            text={'Learn more'}
+            onSelect={() =>
+              application.deviceInterface.openUrl('https://listed.to')
+            }
+            iconDesc={{
+              side: 'left',
+              type: SideMenuOptionIconDescriptionType.CustomComponent,
+              value: <SnIcon type={'open-in'} styles={styles.blogItemIcon} />,
+            }}
+          />
+        </ListedItemRow>
       </CreateBlogContainer>
     </View>
   );

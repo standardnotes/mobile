@@ -53,7 +53,7 @@ import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components/native';
 import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled';
-import { SideMenuOption, SideMenuSection } from './SideMenuSection';
+import { SideMenuOption, SideMenuOptionIconDescriptionType, SideMenuSection } from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
 function sortAlphabetically(array: SNComponent[]): SNComponent[] {
@@ -383,7 +383,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         text: 'Get More Editors',
         key: 'get-editors',
         iconDesc: {
-          type: 'icon',
+          type: SideMenuOptionIconDescriptionType.Icon,
           name: ThemeService.nameForIcon(ICON_MEDICAL),
           side: 'right',
           size: 17,
@@ -497,7 +497,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       text: rawOption.text,
       key: rawOption.icon,
       iconDesc: {
-        type: 'icon',
+        type: SideMenuOptionIconDescriptionType.Icon,
         side: 'right' as 'right',
         name: ThemeService.nameForIcon(rawOption.icon),
       },
