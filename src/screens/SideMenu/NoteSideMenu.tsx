@@ -12,6 +12,7 @@ import {
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_NOTE_HISTORY,
 } from '@Screens/screens';
+import { Listed } from '@Screens/SideMenu/Listed';
 import {
   ButtonType,
   ComponentArea,
@@ -52,7 +53,7 @@ import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components/native';
 import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled';
-import { SideMenuOption, SideMenuSection } from './SideMenuSection';
+import { SideMenuOption, SideMenuOptionIconDescriptionType, SideMenuSection } from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
 function sortAlphabetically(array: SNComponent[]): SNComponent[] {
@@ -382,7 +383,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         text: 'Get More Editors',
         key: 'get-editors',
         iconDesc: {
-          type: 'icon',
+          type: SideMenuOptionIconDescriptionType.Icon,
           name: ThemeService.nameForIcon(ICON_MEDICAL),
           side: 'right',
           size: 17,
@@ -496,7 +497,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       text: rawOption.text,
       key: rawOption.icon,
       iconDesc: {
-        type: 'icon',
+        type: SideMenuOptionIconDescriptionType.Icon,
         side: 'right' as 'right',
         name: ThemeService.nameForIcon(rawOption.icon),
       },
@@ -585,42 +586,70 @@ export const NoteSideMenu = React.memo((props: Props) => {
     return null;
   }
 
+  enum MenuSections {
+    OptionsSection = 'options-section',
+    EditorsSection = 'editors-section',
+    ListedSection = 'listed-section',
+    TagsSection = 'tags-section',
+  }
+
   return (
     <SafeAreaContainer edges={['top', 'bottom', 'right']}>
       <FlatList
         style={styles.sections}
-        data={['options-section', 'editors-section', 'tags-section'].map(
-          key => ({
-            key,
-            noteOptions,
-            editorComponents: editors,
-            onTagSelect,
-            selectedTags,
-          })
-        )}
-        renderItem={({ item, index }) =>
-          index === 0 ? (
-            <SideMenuSection title="Options" options={item.noteOptions} />
-          ) : index === 1 ? (
-            <SideMenuSection
-              title="Editors"
-              options={item.editorComponents}
-              collapsed={true}
-            />
-          ) : index === 2 ? (
-            <SideMenuSection title="Tags">
-              <TagSelectionList
-                hasBottomPadding={Platform.OS === 'android'}
-                contentType={ContentType.Tag}
-                onTagSelect={item.onTagSelect}
-                selectedTags={item.selectedTags}
-                emptyPlaceholder={
-                  'Create a new tag using the tag button in the bottom right corner.'
-                }
+        data={Object.values(MenuSections).map(key => ({
+          key,
+          noteOptions,
+          editorComponents: editors,
+          onTagSelect,
+          selectedTags,
+        }))}
+        renderItem={({ item }) => {
+          const {
+            OptionsSection,
+            EditorsSection,
+            ListedSection,
+            TagsSection,
+          } = MenuSections;
+
+          if (item.key === OptionsSection) {
+            return (
+              <SideMenuSection title="Options" options={item.noteOptions} />
+            );
+          }
+          if (item.key === EditorsSection) {
+            return (
+              <SideMenuSection
+                title="Editors"
+                options={item.editorComponents}
+                collapsed={true}
               />
-            </SideMenuSection>
-          ) : null
-        }
+            );
+          }
+          if (item.key === ListedSection) {
+            return (
+              <SideMenuSection title="Listed" collapsed={true}>
+                <Listed note={note} />
+              </SideMenuSection>
+            );
+          }
+          if (item.key === TagsSection) {
+            return (
+              <SideMenuSection title="Tags">
+                <TagSelectionList
+                  hasBottomPadding={Platform.OS === 'android'}
+                  contentType={ContentType.Tag}
+                  onTagSelect={item.onTagSelect}
+                  selectedTags={item.selectedTags}
+                  emptyPlaceholder={
+                    'Create a new tag using the tag button in the bottom right corner.'
+                  }
+                />
+              </SideMenuSection>
+            );
+          }
+          return null;
+        }}
       />
 
       <FAB

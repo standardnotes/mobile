@@ -16,22 +16,24 @@ import {
   TextContainer,
   Touchable,
 } from './SideMenuCell.styled';
-import { SideMenuOption } from './SideMenuSection';
+import { SideMenuOptionIconDescriptionType, SideMenuOption } from './SideMenuSection';
 
 const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
   if (!desc) {
     return null;
   }
 
-  if (desc.type === 'icon' && desc.name) {
+  if (desc.type === SideMenuOptionIconDescriptionType.Icon && desc.name) {
     return (
       <IconGraphicContainer>
         <Icon name={desc.name} size={desc.size || 20} color={color} />
       </IconGraphicContainer>
     );
-  } else if (desc.type === 'ascii') {
+  }
+  if (desc.type === SideMenuOptionIconDescriptionType.Ascii) {
     return <IconAscii>{desc.value}</IconAscii>;
-  } else if (desc.type === 'circle') {
+  }
+  if (desc.type === SideMenuOptionIconDescriptionType.Circle) {
     return (
       <IconCircleContainer>
         <Circle
@@ -40,9 +42,11 @@ const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
         />
       </IconCircleContainer>
     );
-  } else {
-    return <RegularText>*</RegularText>;
   }
+  if (desc.type === SideMenuOptionIconDescriptionType.CustomComponent) {
+    return desc.value;
+  }
+  return <RegularText>*</RegularText>;
 };
 
 export const SideMenuCell: React.FC<SideMenuOption> = props => {

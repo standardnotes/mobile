@@ -20,6 +20,7 @@ import React, {
 import { FlatList, ListRenderItem } from 'react-native';
 import { SideMenuCell } from './SideMenuCell';
 import { EmptyPlaceholder } from './TagSelectionList.styled';
+import {SideMenuOptionIconDescriptionType} from "@Screens/SideMenu/SideMenuSection";
 
 type Props = {
   contentType: ContentType.Tag | ContentType.SmartTag;
@@ -158,7 +159,7 @@ export const TagSelectionList = React.memo(
             text={title}
             iconDesc={{
               side: 'left',
-              type: 'ascii',
+              type: SideMenuOptionIconDescriptionType.Ascii,
               value: '#',
             }}
             key={item.uuid}

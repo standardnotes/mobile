@@ -33,7 +33,7 @@ import {
   useStyles,
 } from './MainSideMenu.styled';
 import { SideMenuHero } from './SideMenuHero';
-import { SideMenuOption, SideMenuSection } from './SideMenuSection';
+import { SideMenuOptionIconDescriptionType, SideMenuOption, SideMenuSection } from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
 type Props = {
@@ -163,7 +163,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
 
   const iconDescriptorForTheme = (currentTheme: SNTheme | MobileTheme) => {
     const desc = {
-      type: 'circle',
+      type: SideMenuOptionIconDescriptionType.Circle,
       side: 'right' as 'right',
     };
 
@@ -218,7 +218,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
         text: 'Get More Themes',
         key: 'get-theme',
         iconDesc: {
-          type: 'icon',
+          type: SideMenuOptionIconDescriptionType.Icon,
           name: ThemeService.nameForIcon(ICON_BRUSH),
           side: 'right',
           size: 17,

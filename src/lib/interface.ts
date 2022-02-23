@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import { ApplicationIdentifier, DeviceInterface } from '@standardnotes/snjs';
+import { ApplicationIdentifier, AbstractDevice } from '@standardnotes/snjs';
 import { Alert, Linking, Platform } from 'react-native';
 import DefaultPreference from 'react-native-default-preference';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
@@ -45,7 +45,7 @@ const showLoadFailForItemIds = (failedItemIds: string[]) => {
   Alert.alert('Unable to load item(s)', text);
 };
 
-export class MobileDeviceInterface extends DeviceInterface {
+export class MobileDeviceInterface extends AbstractDevice {
   constructor() {
     super(setTimeout, setInterval);
   }

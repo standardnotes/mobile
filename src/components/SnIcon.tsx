@@ -4,6 +4,8 @@ import ArchiveIcon from '@standardnotes/stylekit/dist/icons/ic-archive.svg';
 import AuthenticatorIcon from '@standardnotes/stylekit/dist/icons/ic-authenticator.svg';
 import CodeIcon from '@standardnotes/stylekit/dist/icons/ic-code.svg';
 import MarkdownIcon from '@standardnotes/stylekit/dist/icons/ic-markdown.svg';
+import NotesIcon from '@standardnotes/stylekit/dist/icons/ic-notes.svg';
+import OpenInIcon from '@standardnotes/stylekit/dist/icons/ic-open-in.svg';
 import PencilOffIcon from '@standardnotes/stylekit/dist/icons/ic-pencil-off.svg';
 import PinFilledIcon from '@standardnotes/stylekit/dist/icons/ic-pin-filled.svg';
 import SpreadsheetsIcon from '@standardnotes/stylekit/dist/icons/ic-spreadsheets.svg';
@@ -11,6 +13,7 @@ import TasksIcon from '@standardnotes/stylekit/dist/icons/ic-tasks.svg';
 import PlainTextIcon from '@standardnotes/stylekit/dist/icons/ic-text-paragraph.svg';
 import RichTextIcon from '@standardnotes/stylekit/dist/icons/ic-text-rich.svg';
 import TrashFilledIcon from '@standardnotes/stylekit/dist/icons/ic-trash-filled.svg';
+import UserAddIcon from '@standardnotes/stylekit/dist/icons/ic-user-add.svg';
 import React, { useContext } from 'react';
 import { ThemeContext } from 'styled-components';
 
@@ -26,6 +29,9 @@ const ICONS = {
   'trash-filled': TrashFilledIcon,
   'pin-filled': PinFilledIcon,
   archive: ArchiveIcon,
+  'user-add': UserAddIcon,
+  'open-in': OpenInIcon,
+  notes: NotesIcon,
 };
 
 export type TEditorIcon = Extract<
@@ -42,9 +48,10 @@ export type TEditorIcon = Extract<
   | 'pin-filled'
   | 'archive'
 >;
+export type TGeneralIcon = Extract<IconType, 'user-add' | 'open-in' | 'notes'>;
 
 type Props = {
-  type: TEditorIcon;
+  type: TEditorIcon | TGeneralIcon;
   fill?: string;
   styles?: Record<string, unknown>;
 };
