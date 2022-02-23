@@ -88,7 +88,7 @@ export const Listed: FC<TProps> = ({ note }) => {
         const openSettings = await application.alertService.confirm(
           'Your new Listed blog has been successfully created!' +
             ' You can publish a new post to your blog from Standard Notes via the' +
-            ' <i>Actions</i> menu in the editor pane. Open your blog settings to begin setting it up.',
+            ' Actions menu in the editor pane. Open your blog settings to begin setting it up.',
           undefined,
           'Open Settings',
           ButtonType.Info,
