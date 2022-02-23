@@ -12,7 +12,7 @@ import { ButtonType, ListedAccount, SNNote } from '@standardnotes/snjs';
 import { ListedAccountInfo } from '@standardnotes/snjs/dist/@types/services/api/responses';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 
 type TProps = {
   note: SNNote;
@@ -25,11 +25,18 @@ type TListedAccountItem =
 export const Listed: FC<TProps> = ({ note }) => {
   const application = useContext(ApplicationContext);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isActionInProgress, setIsActionInProgress] = useState(false);
   const [isRequestingAccount, setIsRequestingAccount] = useState(false);
+
   const [listedAccounts, setListedAccounts] = useState<ListedAccount[]>([]);
   const [listedAccountDetails, setListedAccountDetails] = useState<
     TListedAccountItem[]
   >([]);
+  const [
+    authorUrlWithInProgressAction,
+    setAuthorUrlWithInProgressAction,
+  ] = useState<string | null>(null);
 
   const { showActionSheet } = useCustomActionSheet();
 
@@ -61,10 +68,12 @@ export const Listed: FC<TProps> = ({ note }) => {
     if (!application) {
       return [];
     }
+    setIsLoading(true);
     const accounts = await application.getListedAccounts();
     setListedAccounts(accounts);
 
     setListedAccountDetails((await getListedAccountsDetails(accounts)) || []);
+    setIsLoading(false);
   }, [application, getListedAccountsDetails]);
 
   const registerNewAccount = useCallback(() => {
@@ -126,12 +135,17 @@ export const Listed: FC<TProps> = ({ note }) => {
       item.actions.map(action => ({
         text: action.label,
         callback: async () => {
+          setIsActionInProgress(true);
+          setAuthorUrlWithInProgressAction(item.author_url);
+
           const response = await application.actionsManager.runAction(
             action,
             note
           );
 
           if (!response || response.error) {
+            setIsActionInProgress(false);
+            setAuthorUrlWithInProgressAction(null);
             return;
           }
           const listedDetails = (await getListedAccountsDetails(
@@ -140,6 +154,8 @@ export const Listed: FC<TProps> = ({ note }) => {
           setListedAccountDetails(listedDetails);
 
           showActionsMenu(listedDetails[index], index);
+          setIsActionInProgress(false);
+          setAuthorUrlWithInProgressAction(null);
         },
       }))
     );
@@ -150,6 +166,7 @@ export const Listed: FC<TProps> = ({ note }) => {
   }
   return (
     <View>
+      {isLoading && <ActivityIndicator style={styles.loadingIndicator} />}
       {listedAccountDetails.length > 0 && (
         <FlatList
           data={listedAccountDetails}
@@ -171,8 +188,15 @@ export const Listed: FC<TProps> = ({ note }) => {
                       ),
                     }}
                   />
+                  {isActionInProgress &&
+                    (item as ListedAccountInfo).author_url ===
+                      authorUrlWithInProgressAction && (
+                      <ActivityIndicator
+                        style={styles.blogActionInProgressIndicator}
+                      />
+                    )}
                 </ListedItemRow>
-                {!isRequestingAccount && !doesListedItemHaveActions(item) && (
+                {!isLoading && !doesListedItemHaveActions(item) && (
                   <CantLoadActionsText>
                     Unable to load actions
                   </CantLoadActionsText>
@@ -195,6 +219,9 @@ export const Listed: FC<TProps> = ({ note }) => {
               value: <SnIcon type={'user-add'} styles={styles.blogItemIcon} />,
             }}
           />
+          {isRequestingAccount && (
+            <ActivityIndicator style={styles.blogActionInProgressIndicator} />
+          )}
         </ListedItemRow>
         <ListedItemRow>
           <SideMenuCell

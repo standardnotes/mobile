@@ -5,6 +5,18 @@ export const styles = StyleSheet.create({
   blogItemIcon: {
     marginTop: -6,
   },
+  loadingIndicator: {
+    alignSelf: 'flex-start',
+  },
+  blogActionInProgressIndicator: {
+    marginTop: -5,
+    marginLeft: 6,
+    transform: [
+      {
+        scale: 0.8,
+      },
+    ],
+  },
 });
 export const CreateBlogContainer = styled.View`
   margin-bottom: 8px;
