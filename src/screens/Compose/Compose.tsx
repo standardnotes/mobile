@@ -21,7 +21,7 @@ import { lighten } from '@Style/utils';
 import React, { createRef } from 'react';
 import { Keyboard, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import SNTextView from 'sn-textview';
+import SNTextView from '@standardnotes/react-native-textview';
 import { ThemeContext } from 'styled-components';
 import { ComponentView } from './ComponentView';
 import {
