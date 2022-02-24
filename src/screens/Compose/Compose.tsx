@@ -3,6 +3,7 @@ import { ComponentLoadingError } from '@Lib/component_manager';
 import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
+import SNTextView from '@standardnotes/react-native-textview';
 import {
   ApplicationEvent,
   ComponentMutator,
@@ -21,7 +22,6 @@ import { lighten } from '@Style/utils';
 import React, { createRef } from 'react';
 import { Keyboard, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import SNTextView from '@standardnotes/react-native-textview';
 import { ThemeContext } from 'styled-components';
 import { ComponentView } from './ComponentView';
 import {
@@ -52,6 +52,9 @@ type State = {
   downloadingEditor: boolean;
   componentViewer?: ComponentViewer;
 };
+
+const EditingIsDisabledText =
+  'This note has editing disabled. Please enable editing on this note to make changes.';
 
 export class Compose extends React.Component<{}, State> {
   static contextType = ApplicationContext;
@@ -412,6 +415,10 @@ export class Compose extends React.Component<{}, State> {
   };
 
   onTitleChange = (newTitle: string) => {
+    if (this.note?.locked) {
+      this.context?.alertService?.alert(EditingIsDisabledText);
+      return;
+    }
     this.setState(
       {
         title: newTitle,
@@ -422,9 +429,7 @@ export class Compose extends React.Component<{}, State> {
 
   onContentChange = (text: string) => {
     if (this.note?.locked) {
-      this.context?.alertService?.alert(
-        'This note has editing disabled. Please enable editing on this note to make changes.'
-      );
+      this.context?.alertService?.alert(EditingIsDisabledText);
       return;
     }
     this.saveNote(false, true, false, false, text);
@@ -556,7 +561,6 @@ export class Compose extends React.Component<{}, State> {
                       keyboardAppearance={themeService?.keyboardColorForActiveTheme()}
                       autoCorrect={true}
                       autoCapitalize={'sentences'}
-                      editable={!this.noteLocked}
                     />
                     {(this.state.downloadingEditor ||
                       (this.state.loadingWebview &&
