@@ -279,7 +279,7 @@ PODS:
     - glog
   - react-native-aes (1.3.9):
     - React-Core
-  - react-native-document-picker (5.0.4):
+  - react-native-document-picker (8.0.0):
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
     - React-Core
@@ -289,7 +289,7 @@ PODS:
     - React-Core
   - react-native-segmented-control (2.2.2):
     - React-Core
-  - react-native-sodium-jsi (1.0.0):
+  - react-native-sodium-jsi (1.1.2):
     - React-Core
   - react-native-static-server (0.5.0):
     - GCDWebServer (~> 3.0)
@@ -640,7 +640,7 @@ SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   BugsnagReactNative: d6988f685aae2de5ecda1f5ca39f03661759d416
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
-  DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
+  DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
   FBLazyVector: e5569e42a1c79ca00521846c223173a57aca1fe1
   FBReactNativeSpec: fe08c1cd7e2e205718d77ad14b34957cce949b58
   Flipper: 30e8eeeed6abdc98edaf32af0cda2f198be4b733
@@ -654,7 +654,7 @@ SPEC CHECKSUMS:
   FlipperKit: d8d346844eca5d9120c17d441a2f38596e8ed2b9
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   GCDWebServer: 2c156a56c8226e2d5c0c3f208a3621ccffbe3ce4
-  glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
+  glog: 5337263514dd6f09803962437687240c5dc39aa4
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
   RCT-Folly: a21c126816d8025b547704b777a2ba552f3d9fa9
@@ -670,12 +670,12 @@ SPEC CHECKSUMS:
   React-jsinspector: d0374f7509d407d2264168b6d0fad0b54e300b85
   React-logger: 933f80c97c633ee8965d609876848148e3fef438
   react-native-aes: a13199300208e4eda1df14506a276415561e02bd
-  react-native-document-picker: 1a7518132d4a06b67f459be9bb1464a567d2b3b4
+  react-native-document-picker: 429972f7ece4463aa5bcdd789622b3a674a3c5d1
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-mail: 5fe7239a5b5c1e858d425501c03d1ab977434122
   react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
   react-native-segmented-control: 65df6cd0619b780b3843d574a72d4c7cec396097
-  react-native-sodium-jsi: 546d6caf98889940311af86752e97f3757c75263
+  react-native-sodium-jsi: 5ae46b869ef509dce094a02ce8ab17b0cae52aee
   react-native-static-server: 201b2a945a35096be3ae7f43e367c65bcbd61343
   react-native-version-info: 36490da17d2c6b5cc21321c70e433784dee7ed0b
   react-native-webview: e89bf2dba26a04cda967814df3ed1be99f291233

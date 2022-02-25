@@ -7,11 +7,7 @@ import {
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
-import {
-  SCREEN_COMPOSE,
-  SCREEN_INPUT_MODAL_TAG,
-  SCREEN_NOTE_HISTORY,
-} from '@Screens/screens';
+import { SCREEN_COMPOSE, SCREEN_NOTE_HISTORY } from '@Screens/screens';
 import { Listed } from '@Screens/SideMenu/Listed';
 import {
   ButtonType,
@@ -39,6 +35,7 @@ import {
   ICON_TRASH,
 } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
+import { Base64 } from 'js-base64';
 import React, {
   useCallback,
   useContext,
@@ -47,13 +44,19 @@ import React, {
   useState,
 } from 'react';
 import { Platform, Share } from 'react-native';
+import { pickSingle } from 'react-native-document-picker';
 import FAB from 'react-native-fab';
+import { read } from 'react-native-fs';
 import { FlatList } from 'react-native-gesture-handler';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components/native';
 import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled';
-import { SideMenuOption, SideMenuOptionIconDescriptionType, SideMenuSection } from './SideMenuSection';
+import {
+  SideMenuOption,
+  SideMenuOptionIconDescriptionType,
+  SideMenuSection,
+} from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
 function sortAlphabetically(array: SNComponent[]): SNComponent[] {
@@ -582,6 +585,43 @@ export const NoteSideMenu = React.memo((props: Props) => {
     [application, note, reloadTags, selectedTags]
   );
 
+  const uploadFile = async () => {
+    const result = await pickSingle();
+    if (!result.uri || !result.size) {
+      return;
+    }
+    const uri = Platform.OS === 'ios' ? decodeURI(result.uri) : result.uri;
+    console.log('picked file', result.name, result.size, result.type, uri);
+    const size = result.size;
+    const operation = await application!.files.beginNewFileUpload();
+    const onChunk = async (
+      chunk: Uint8Array,
+      index: number,
+      isLast: boolean
+    ) => {
+      await application!.files.pushBytesForUpload(
+        operation,
+        chunk,
+        index,
+        isLast
+      );
+    };
+
+    const data = await read(uri, size, 0, 'base64');
+    const bytes = Base64.toUint8Array(data);
+    await onChunk(bytes, 1, true);
+
+    const fileObj = await application!.files.finishUpload(
+      operation,
+      result.name,
+      result.type!
+    );
+
+    application!.alertService.alert(
+      `Successfully uploaded file ${fileObj.nameWithExt}`
+    );
+  };
+
   if (!editor || !note) {
     return null;
   }
@@ -655,9 +695,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       <FAB
         buttonColor={theme.stylekitInfoColor}
         iconTextColor={theme.stylekitInfoContrastColor}
-        onClickAction={() =>
-          navigation.navigate(SCREEN_INPUT_MODAL_TAG, { noteUuid: note.uuid })
-        }
+        onClickAction={() => uploadFile()}
         visible={true}
         size={30}
         iconTextComponent={

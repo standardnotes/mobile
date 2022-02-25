@@ -138,7 +138,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     tag: SodiumConstant = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PUSH
   ): Uint8Array {
     const encryptedBuffer = Sodium.crypto_secretstream_xchacha20poly1305_push(
-      encryptor.state as never,
+      encryptor,
       plainBuffer,
       assocData,
       tag
@@ -171,7 +171,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     }
 
     const result = Sodium.crypto_secretstream_xchacha20poly1305_pull(
-      decryptor.state as never,
+      decryptor,
       encryptedBuffer,
       assocData
     );
