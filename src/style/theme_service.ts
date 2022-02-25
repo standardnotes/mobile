@@ -1,4 +1,5 @@
 import { MobileApplication } from '@Lib/application';
+import { RawPayload } from '@standardnotes/payloads';
 import {
   ApplicationEvent,
   ContentType,
@@ -10,7 +11,6 @@ import {
   StorageValueModes,
   UuidString,
 } from '@standardnotes/snjs';
-import { RawPayload } from '@standardnotes/snjs/dist/@types/protocol/payloads/generator';
 import CSSParser from '@Style/css_parser';
 import {
   DARK_CONTENT,

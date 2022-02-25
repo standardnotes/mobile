@@ -47,27 +47,30 @@ export class MobileApplication extends SNApplication {
   static previouslyLaunched: boolean = false;
 
   constructor(deviceInterface: MobileDeviceInterface, identifier: string) {
-    super(
-      Environment.Mobile,
-      platformFromString(Platform.OS),
-      deviceInterface,
-      new SNReactNativeCrypto(),
-      new AlertService(),
+    super({
+      environment: Environment.Mobile,
+      platform: platformFromString(Platform.OS),
+      deviceInterface: deviceInterface,
+      crypto: new SNReactNativeCrypto(),
+      alertService: new AlertService(),
       identifier,
-      [
+      swapClasses: [
         {
           swap: SNComponentManager,
           with: ComponentManager,
         },
       ],
-      IsDev
+      defaultHost: IsDev
         ? 'https://api-dev.standardnotes.com'
         : 'https://api.standardnotes.com',
-      version,
-      IsDev
+      defaultFilesHost: IsDev
+        ? 'https://files-dev.standardnotes.com'
+        : 'https://files.standardnotes.com',
+      appVersion: version,
+      webSocketUrl: IsDev
         ? 'wss://sockets-dev.standardnotes.com'
-        : 'wss://sockets.standardnotes.com'
-    );
+        : 'wss://sockets.standardnotes.com',
+    });
     this.Uuid = Math.random().toString();
     this.editorGroup = new NoteGroupController(this);
     this.iconsController = new IconsController();
