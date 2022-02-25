@@ -3,6 +3,10 @@ import {
   Base64String,
   HexString,
   SNPureCrypto,
+  SodiumConstant,
+  StreamDecryptor,
+  StreamDecryptorResult,
+  StreamEncryptor,
   timingSafeEqual,
   Utf8String,
 } from '@standardnotes/sncrypto-common';
@@ -121,6 +125,62 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     } catch (e) {
       return null;
     }
+  }
+
+  public xchacha20StreamInitEncryptor(key: HexString): StreamEncryptor {
+    return Sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
+  }
+
+  public xchacha20StreamEncryptorPush(
+    encryptor: StreamEncryptor,
+    plainBuffer: Uint8Array,
+    assocData: Utf8String,
+    tag: SodiumConstant = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PUSH
+  ): Uint8Array {
+    const encryptedBuffer = Sodium.crypto_secretstream_xchacha20poly1305_push(
+      encryptor.state as never,
+      plainBuffer,
+      assocData,
+      tag
+    );
+    return encryptedBuffer;
+  }
+
+  public xchacha20StreamInitDecryptor(
+    header: Base64String,
+    key: HexString
+  ): StreamDecryptor {
+    const state = Sodium.crypto_secretstream_xchacha20poly1305_init_pull(
+      header,
+      key
+    );
+
+    return { state };
+  }
+
+  public xchacha20StreamDecryptorPush(
+    decryptor: StreamDecryptor,
+    encryptedBuffer: Uint8Array,
+    assocData: Utf8String
+  ): StreamDecryptorResult | false {
+    if (
+      encryptedBuffer.length <
+      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
+    ) {
+      throw new Error('Invalid ciphertext size');
+    }
+
+    const result = Sodium.crypto_secretstream_xchacha20poly1305_pull(
+      decryptor.state as never,
+      encryptedBuffer,
+      assocData
+    );
+
+    if ((result as unknown) === false) {
+      return false;
+    }
+
+    return result;
   }
 
   public generateUUID() {
