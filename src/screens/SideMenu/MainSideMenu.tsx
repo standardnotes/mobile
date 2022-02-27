@@ -2,7 +2,7 @@ import { AppStateType } from '@Lib/application_state';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_SETTINGS } from '@Screens/screens';
-import { ContentType, SNTag, SNTheme } from '@standardnotes/snjs';
+import { ContentType, SmartView, SNTag, SNTheme } from '@standardnotes/snjs';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
@@ -33,7 +33,11 @@ import {
   useStyles,
 } from './MainSideMenu.styled';
 import { SideMenuHero } from './SideMenuHero';
-import { SideMenuOptionIconDescriptionType, SideMenuOption, SideMenuSection } from './SideMenuSection';
+import {
+  SideMenuOption,
+  SideMenuOptionIconDescriptionType,
+  SideMenuSection,
+} from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
 type Props = {
@@ -243,7 +247,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
   ]);
 
   const onTagSelect = useCallback(
-    async (tag: SNTag) => {
+    async (tag: SNTag | SmartView) => {
       if (tag.conflictOf) {
         application!.changeAndSaveItem(tag.uuid, mutator => {
           mutator.conflictOf = undefined;
@@ -263,11 +267,11 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
   const outOfSyncPressed = async () => {
     const confirmed = await application!.alertService!.confirm(
       "We've detected that the data in the current application session may " +
-      'not match the data on the server. This can happen due to poor ' +
-      'network conditions, or if a large note fails to download on your ' +
-      'device. To resolve this issue, we recommend first creating a backup ' +
-      'of your data in the Settings screen, then signing out of your account ' +
-      'and signing back in.',
+        'not match the data on the server. This can happen due to poor ' +
+        'network conditions, or if a large note fails to download on your ' +
+        'device. To resolve this issue, we recommend first creating a backup ' +
+        'of your data in the Settings screen, then signing out of your account ' +
+        'and signing back in.',
       'Potentially Out of Sync',
       'Open Settings',
       undefined
@@ -277,9 +281,10 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     }
   };
 
-  const selectedTags = useMemo(() => (selectedTag ? [selectedTag] : []), [
-    selectedTag,
-  ]);
+  const selectedTags: SNTag[] | SmartView[] = useMemo(
+    () => (selectedTag ? ([selectedTag] as SNTag[] | SmartView[]) : []),
+    [selectedTag]
+  );
 
   return (
     <Fragment>
@@ -310,7 +315,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
             ) : index === 1 ? (
               <SideMenuSection title="Views">
                 <TagSelectionList
-                  contentType={ContentType.SmartTag}
+                  contentType={ContentType.SmartView}
                   onTagSelect={item.onTagSelect}
                   selectedTags={item.selectedTags}
                 />

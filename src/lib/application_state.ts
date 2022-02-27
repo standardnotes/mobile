@@ -10,12 +10,13 @@ import {
   NoteViewController,
   PayloadSource,
   removeFromArray,
+  SmartView,
   SNNote,
-  SNSmartTag,
   SNTag,
   SNUserPrefs,
   StorageKey,
   StorageValueModes,
+  SystemViewId,
 } from '@standardnotes/snjs';
 import {
   AppState,
@@ -37,7 +38,6 @@ import { PrefKey } from './preferences_manager';
 const pjson = require('../../package.json');
 const { PlatformConstants } = NativeModules;
 
-// eslint-disable-next-line no-shadow
 export enum AppStateType {
   LosingFocus = 1,
   EnteringBackground = 2,
@@ -48,13 +48,11 @@ export enum AppStateType {
   PreferencesChanged = 7,
 }
 
-// eslint-disable-next-line no-shadow
 export enum LockStateType {
   Locked = 1,
   Unlocked = 2,
 }
 
-// eslint-disable-next-line no-shadow
 export enum AppStateEventType {
   KeyboardChangeEvent = 1,
   TabletModeChange = 2,
@@ -66,19 +64,16 @@ export type TabletModeChangeData = {
   old_isInTabletMode: boolean;
 };
 
-// eslint-disable-next-line no-shadow
 export enum UnlockTiming {
   Immediately = 'immediately',
   OnQuit = 'on-quit',
 }
 
-// eslint-disable-next-line no-shadow
 export enum PasscodeKeyboardType {
   Default = 'default',
   Numeric = 'numeric',
 }
 
-// eslint-disable-next-line no-shadow
 export enum MobileStorageKey {
   PasscodeKeyboardTypeKey = 'passcodeKeyboardType',
 }
@@ -104,7 +99,7 @@ export class ApplicationState extends ApplicationService {
   keyboardHeight?: number;
   appEventObersever: any;
   selectedTagRestored = false;
-  selectedTag: SNTag = this.application.getSmartTags()[0];
+  selectedTag: SNTag | SmartView = this.application.getSmartViews()[0];
   userPreferences?: SNUserPrefs;
   tabletMode: boolean = false;
   ignoreStateChanges: boolean = false;
@@ -170,7 +165,7 @@ export class ApplicationState extends ApplicationService {
 
     const savedTag =
       (this.application.findItem(savedTagUuid) as SNTag) ||
-      this.application.getSmartTags().find(tag => tag.uuid === savedTagUuid);
+      this.application.getSmartViews().find(tag => tag.uuid === savedTagUuid);
     if (savedTag) {
       this.setSelectedTag(savedTag, false);
       this.selectedTagRestored = true;
@@ -281,7 +276,7 @@ export class ApplicationState extends ApplicationService {
    */
   async createEditor(title?: string) {
     const selectedTagUuid = this.selectedTag
-      ? this.selectedTag.isSmartTag
+      ? this.selectedTag instanceof SmartView
         ? undefined
         : this.selectedTag.uuid
       : undefined;
@@ -389,9 +384,21 @@ export class ApplicationState extends ApplicationService {
             }
             if (note.deleted) {
               this.closeEditor(editor);
-            } else if (note.trashed && !this.selectedTag?.isTrashTag) {
+            } else if (
+              note.trashed &&
+              !(
+                this.selectedTag instanceof SmartView &&
+                this.selectedTag.uuid === SystemViewId.TrashedNotes
+              )
+            ) {
               this.closeEditor(editor);
-            } else if (note.archived && !this.selectedTag?.isArchiveTag) {
+            } else if (
+              note.archived &&
+              !(
+                this.selectedTag instanceof SmartView &&
+                this.selectedTag.uuid === SystemViewId.ArchivedNotes
+              )
+            ) {
               this.closeEditor(editor);
             }
           }
@@ -437,7 +444,7 @@ export class ApplicationState extends ApplicationService {
   /**
    * Set selected @SNTag
    */
-  public setSelectedTag(tag: SNTag, saveSelection: boolean = true) {
+  public setSelectedTag(tag: SNTag | SmartView, saveSelection: boolean = true) {
     if (this.selectedTag.uuid === tag.uuid) {
       return;
     }
@@ -468,9 +475,9 @@ export class ApplicationState extends ApplicationService {
   /**
    * @returns notes this tag references
    */
-  public getTagNotes(tag: SNTag) {
-    if (tag.isSmartTag) {
-      return this.application.notesMatchingSmartTag(tag as SNSmartTag);
+  public getTagNotes(tag: SNTag | SmartView) {
+    if (tag instanceof SmartView) {
+      return this.application.notesMatchingSmartView(tag);
     } else {
       return this.application.referencesForItem(tag).filter(ref => {
         return ref.content_type === ContentType.Note;
