@@ -21,9 +21,9 @@ import {
   NoteMutator,
   NoteViewController,
   PayloadSource,
+  SmartView,
   SNComponent,
   SNNote,
-  SNSmartTag,
   SNTag,
 } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
@@ -53,7 +53,11 @@ import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components/native';
 import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled';
-import { SideMenuOption, SideMenuOptionIconDescriptionType, SideMenuSection } from './SideMenuSection';
+import {
+  SideMenuOption,
+  SideMenuOptionIconDescriptionType,
+  SideMenuSection,
+} from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
 function sortAlphabetically(array: SNComponent[]): SNComponent[] {
@@ -560,7 +564,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   ]);
 
   const onTagSelect = useCallback(
-    async (tag: SNTag | SNSmartTag) => {
+    async (tag: SNTag | SmartView) => {
       const isSelected =
         selectedTags.findIndex(selectedTag => selectedTag.uuid === tag.uuid) >
         -1;

@@ -13,7 +13,10 @@ import {
   CollectionSort,
   ContentType,
   NotesDisplayCriteria,
+  SmartView,
   SNNote,
+  SNTag,
+  SystemViewId,
 } from '@standardnotes/snjs';
 import { ICON_ADD } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
@@ -109,7 +112,7 @@ export const Notes = React.memo(
     const haveDisplayOptions = useRef(false);
     const protectionsEnabled = useRef(
       application!.hasProtectionSources() &&
-      !application!.hasUnprotectedAccessSession()
+        !application!.hasUnprotectedAccessSession()
     );
 
     const reloadTitle = useCallback(
@@ -127,7 +130,7 @@ export const Notes = React.memo(
               : `${resultCount} search results`;
         } else if (selectedTag) {
           title = selectedTag.title;
-          if (selectedTag.parentId) {
+          if (selectedTag instanceof SNTag && selectedTag.parentId) {
             const parents = application!.getTagParentChain(selectedTag);
             const hierarchy = parents.map(tag => tag.title).join(' ⫽ ');
             subTitle = hierarchy.length > 0 ? `in ${hierarchy}` : undefined;
@@ -244,10 +247,10 @@ export const Notes = React.memo(
         const searchQuery =
           searchText || searchFilter
             ? {
-              query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
-              includeProtectedNoteText:
-                includeProtected ?? includeProtectedNoteText,
-            }
+                query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
+                includeProtectedNoteText:
+                  includeProtected ?? includeProtectedNoteText,
+              }
             : undefined;
 
         let applyFilters = false;
@@ -261,7 +264,8 @@ export const Notes = React.memo(
           sortProperty: sortOptions?.sortBy ?? (sortBy! as CollectionSort),
           sortDirection:
             sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
-          tags: tag ? [tag] : [],
+          tags: tag instanceof SNTag ? [tag] : [],
+          views: tag instanceof SmartView ? [tag] : [],
           searchQuery: searchQuery,
           includeArchived:
             applyFilters && (includeArchived ?? includeArchivedNotes),
@@ -340,7 +344,13 @@ export const Notes = React.memo(
         },
       ];
 
-      if (!selectedTag?.isArchiveTag && !selectedTag?.isTrashTag) {
+      const isArchiveView =
+        selectedTag instanceof SmartView &&
+        selectedTag.uuid === SystemViewId.ArchivedNotes;
+      const isTrashView =
+        selectedTag instanceof SmartView &&
+        selectedTag.uuid === SystemViewId.TrashedNotes;
+      if (!isArchiveView && !isTrashView) {
         setSearchOptions([
           ...options,
           {
@@ -431,10 +441,11 @@ export const Notes = React.memo(
               .getActiveNoteController()?.note;
             if (activeNote) {
               const discarded = activeNote.deleted || activeNote.trashed;
-              if (
-                discarded &&
-                !application?.getAppState().selectedTag?.isTrashTag
-              ) {
+              const isTrashView =
+                application?.getAppState().selectedTag instanceof SmartView &&
+                application?.getAppState().selectedTag.uuid ===
+                  SystemViewId.TrashedNotes;
+              if (discarded && !isTrashView) {
                 selectNextOrCreateNew(renderedNotes);
               }
             } else {
