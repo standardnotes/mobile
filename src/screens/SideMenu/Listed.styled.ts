@@ -1,9 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 
 export const styles = StyleSheet.create({
   blogItemIcon: {
-    marginTop: -6,
+    marginTop: Platform.OS === 'ios' ? -6 : -3,
   },
   loadingIndicator: {
     alignSelf: 'flex-start',

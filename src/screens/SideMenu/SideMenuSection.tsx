@@ -41,7 +41,9 @@ export const SideMenuSection: React.FC<Props> = React.memo(props => {
     return props.options || [];
   }, [props.options]);
   const collapsedLabel =
-    options.length > 0 ? options.length + ' Options' : 'Tap to expand';
+    options.length > 0
+      ? 'Tap to expand ' + options.length + ' options'
+      : 'Tap to expand';
   return (
     <Root>
       <Header collapsed={collapsed} onPress={() => setCollapsed(!collapsed)}>
