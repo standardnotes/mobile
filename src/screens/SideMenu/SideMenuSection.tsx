@@ -42,7 +42,7 @@ export const SideMenuSection: React.FC<Props> = React.memo(props => {
   }, [props.options]);
   const collapsedLabel =
     options.length > 0
-      ? 'Tap to expand ' + options.length + ' Options'
+      ? 'Tap to expand ' + options.length + ' options'
       : 'Tap to expand';
   return (
     <Root>
