@@ -575,9 +575,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             mutator.removeItemAsRelationship(note);
           });
         } else {
-          await application?.changeItem(tag.uuid, mutator => {
-            mutator.addItemAsRelationship(note);
-          });
+          await application?.addTagHierarchyToNote(note, tag as SNTag);
         }
       }
       reloadTags();
