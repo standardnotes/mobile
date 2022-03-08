@@ -407,7 +407,7 @@ export class Compose extends React.Component<{}, State> {
       ? SAVE_TIMEOUT_NO_DEBOUNCE
       : SAVE_TIMEOUT_DEBOUNCE;
     this.saveTimeout = setTimeout(() => {
-      this.context?.sync();
+      this.context?.sync.sync();
       if (closeAfterSync) {
         this.context?.getAppState().closeEditor(editor!);
       }

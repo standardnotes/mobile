@@ -70,7 +70,7 @@ export const TagInputModal = (props: Props) => {
       }
     }
 
-    application?.sync();
+    application?.sync.sync();
     props.navigation.goBack();
   }, [
     application,

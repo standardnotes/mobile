@@ -8,8 +8,12 @@ import {
 } from '@Screens/SideMenu/Listed.styled';
 import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell';
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
-import { ButtonType, ListedAccount, SNNote } from '@standardnotes/snjs';
-import { ListedAccountInfo } from '@standardnotes/snjs/dist/@types/services/api/responses';
+import {
+  ButtonType,
+  ListedAccount,
+  ListedAccountInfo,
+  SNNote,
+} from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';

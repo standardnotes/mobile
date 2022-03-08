@@ -1,10 +1,10 @@
+import SNReactNative from '@standardnotes/react-native-utils';
 import {
   ApplicationService,
   ButtonType,
   isNullOrUndefined,
   StorageValueModes,
 } from '@standardnotes/snjs';
-import SNReactNative from '@standardnotes/react-native-utils';
 
 const FIRST_RUN_KEY = 'first_run';
 

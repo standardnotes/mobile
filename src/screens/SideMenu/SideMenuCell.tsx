@@ -16,7 +16,10 @@ import {
   TextContainer,
   Touchable,
 } from './SideMenuCell.styled';
-import { SideMenuOptionIconDescriptionType, SideMenuOption } from './SideMenuSection';
+import {
+  SideMenuOption,
+  SideMenuOptionIconDescriptionType,
+} from './SideMenuSection';
 
 const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
   if (!desc) {

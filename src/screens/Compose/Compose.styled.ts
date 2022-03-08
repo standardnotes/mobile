@@ -1,6 +1,6 @@
+import SNTextView from '@standardnotes/react-native-textview';
 import React, { ComponentProps } from 'react';
 import { Platform } from 'react-native';
-import SNTextView from '@standardnotes/react-native-textview';
 import styled, { css } from 'styled-components/native';
 
 const PADDING = 14;
@@ -83,7 +83,7 @@ export const StyledKeyboardAvoidngView = styled.KeyboardAvoidingView`
   ${({ theme }) => theme.stylekitBackgroundColor};
 `;
 
-const StyledTextViewComponent = styled(SNTextView) <{ errorState: boolean }>`
+const StyledTextViewComponent = styled(SNTextView)<{ errorState: boolean }>`
   padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   padding-left: ${({ theme }) =>

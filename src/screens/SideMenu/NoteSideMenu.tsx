@@ -272,7 +272,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         await associateComponentWithNote(application, selectedComponent, note);
       }
       /** Dirtying can happen above */
-      application?.sync();
+      application?.sync.sync();
     },
     [
       application,
@@ -543,7 +543,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
               if (!application?.getAppState().isInTabletMode) {
                 navigation.popToTop();
               }
-              application?.sync();
+              application?.sync.sync();
             }
           },
         },
@@ -575,13 +575,11 @@ export const NoteSideMenu = React.memo((props: Props) => {
             mutator.removeItemAsRelationship(note);
           });
         } else {
-          await application?.changeItem(tag.uuid, mutator => {
-            mutator.addItemAsRelationship(note);
-          });
+          await application?.addTagHierarchyToNote(note, tag as SNTag);
         }
       }
       reloadTags();
-      application?.sync();
+      application?.sync.sync();
     },
     [application, note, reloadTags, selectedTags]
   );

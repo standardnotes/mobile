@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import { ApplicationIdentifier, AbstractDevice } from '@standardnotes/snjs';
+import { AbstractDevice, ApplicationIdentifier } from '@standardnotes/snjs';
 import { Alert, Linking, Platform } from 'react-native';
 import DefaultPreference from 'react-native-default-preference';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
