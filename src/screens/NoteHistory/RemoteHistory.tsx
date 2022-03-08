@@ -1,7 +1,10 @@
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled';
-import { RevisionListEntry, SNNote } from '@standardnotes/snjs';
-import { NoteHistoryEntry } from '@standardnotes/snjs/dist/@types/services/history/entries/NoteHistoryEntry';
+import {
+  NoteHistoryEntry,
+  RevisionListEntry,
+  SNNote,
+} from '@standardnotes/snjs';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
