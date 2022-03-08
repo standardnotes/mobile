@@ -272,7 +272,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         await associateComponentWithNote(application, selectedComponent, note);
       }
       /** Dirtying can happen above */
-      application?.sync();
+      application?.sync.sync();
     },
     [
       application,
@@ -543,7 +543,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
               if (!application?.getAppState().isInTabletMode) {
                 navigation.popToTop();
               }
-              application?.sync();
+              application?.sync.sync();
             }
           },
         },
@@ -579,7 +579,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         }
       }
       reloadTags();
-      application?.sync();
+      application?.sync.sync();
     },
     [application, note, reloadTags, selectedTags]
   );

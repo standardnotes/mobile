@@ -257,10 +257,7 @@ export const NoteCell = ({
           </FlexContainer>
 
           {showDetails && (
-            <DetailsText
-              numberOfLines={1}
-              selected={highlight}
-            >
+            <DetailsText numberOfLines={1} selected={highlight}>
               {note.protected && (
                 <Text>
                   Protected

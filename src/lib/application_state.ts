@@ -1,3 +1,4 @@
+import { InternalEventBus } from '@standardnotes/services';
 import {
   ApplicationEvent,
   ApplicationService,
@@ -113,7 +114,7 @@ export class ApplicationState extends ApplicationService {
   removePreferencesLoadedListener?: () => void;
 
   constructor(application: MobileApplication) {
-    super(application);
+    super(application, new InternalEventBus());
     this.application = application;
     this.setTabletModeEnabled(this.isTabletDevice);
     this.handleApplicationEvents();

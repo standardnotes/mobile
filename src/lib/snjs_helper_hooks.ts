@@ -66,7 +66,7 @@ export const useOutOfSync = () => {
   React.useEffect(() => {
     let isMounted = true;
     const getOutOfSync = async () => {
-      const outOfSyncInitial = await application?.isOutOfSync();
+      const outOfSyncInitial = await application?.sync.isOutOfSync();
       if (isMounted) {
         setOutOfSync(Boolean(outOfSyncInitial));
       }
@@ -164,7 +164,7 @@ export const useSyncStatus = () => {
   );
 
   const updateLocalDataStatus = useCallback(() => {
-    const syncStatus = application!.getSyncStatus();
+    const syncStatus = application!.sync.getSyncStatus();
     const stats = syncStatus.getStats();
     const encryption =
       application!.isEncryptionAvailable() &&
@@ -203,7 +203,7 @@ export const useSyncStatus = () => {
   }, [application, completedInitialSync, updateLocalDataStatus]);
 
   const updateSyncStatus = useCallback(() => {
-    const syncStatus = application!.getSyncStatus();
+    const syncStatus = application!.sync.getSyncStatus();
     const stats = syncStatus.getStats();
     if (syncStatus.hasError()) {
       setRefreshing(false);

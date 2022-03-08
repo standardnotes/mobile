@@ -11,7 +11,7 @@ import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens';
-import { NoteHistoryEntry } from '@standardnotes/snjs/dist/@types/services/history/entries/note_history_entry';
+import { NoteHistoryEntry } from '@standardnotes/snjs/dist/@types/services/history/entries/NoteHistoryEntry';
 import { ICON_CHECKMARK } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, { useContext } from 'react';

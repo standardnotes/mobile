@@ -558,7 +558,7 @@ export const Notes = React.memo(
 
     const onRefresh = useCallback(() => {
       startRefreshing();
-      application?.sync();
+      application?.sync.sync();
     }, [application, startRefreshing]);
 
     const onSearchChange = useCallback(

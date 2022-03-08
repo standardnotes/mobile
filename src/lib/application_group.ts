@@ -1,3 +1,4 @@
+import { InternalEventBus } from '@standardnotes/services';
 import {
   ApplicationDescriptor,
   DeviceInterface,
@@ -31,12 +32,16 @@ export class ApplicationGroup extends SNApplicationGroup {
       deviceInterface as MobileDeviceInterface,
       descriptor.identifier
     );
+    const internalEventBus = new InternalEventBus();
     const applicationState = new ApplicationState(application);
-    const reviewService = new ReviewService(application);
-    const backupsService = new BackupsService(application);
-    const prefsService = new PreferencesManager(application);
-    const installationService = new InstallationService(application);
-    const statusManager = new StatusManager(application);
+    const reviewService = new ReviewService(application, internalEventBus);
+    const backupsService = new BackupsService(application, internalEventBus);
+    const prefsService = new PreferencesManager(application, internalEventBus);
+    const installationService = new InstallationService(
+      application,
+      internalEventBus
+    );
+    const statusManager = new StatusManager(application, internalEventBus);
     application.setMobileServices({
       applicationState,
       reviewService,

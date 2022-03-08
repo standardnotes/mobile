@@ -50,7 +50,7 @@ export const Root = () => {
       ?.getAppState()
       .addStateChangeObserver(state => {
         if (state === AppStateType.GainingFocus) {
-          application.sync();
+          application.sync.sync();
         }
       });
     const removeApplicationStateEventHandler = application
