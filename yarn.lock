@@ -2573,6 +2573,11 @@
     "@standardnotes/auth" "^3.17.3"
     "@standardnotes/common" "^1.15.3"
 
+"@standardnotes/filepicker@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/filepicker/-/filepicker-1.5.0.tgz#bbf47984373e2a2c4e0f27b3a76dfa6b47bd0881"
+  integrity sha512-CkA7eHSq11Tu7D8TVavJ1loMT1ZkQxDCPD733r7Qs/i+KRCJgklf02VWh1K3YuulPd518cMNN3hwKUpJOKyy/g==
+
 "@standardnotes/payloads@^1.4.1":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@standardnotes/payloads/-/payloads-1.4.1.tgz#5da68ecc55920080223518c5d5d186380d1a43ca"
@@ -8288,10 +8293,12 @@ react-native-default-preference@^1.4.3:
   resolved "https://registry.yarnpkg.com/react-native-default-preference/-/react-native-default-preference-1.4.3.tgz#3c6411d32ea4ebc5286fbf5915546fc57a6014f6"
   integrity sha512-sQDYwGEdxwKwXKP/8Intc81FyH33Rv8ZvOxdmPX4NM75RAIVeBc13pdabEqycAimNZoY5IDvGp4o1cTTa5gNrA==
 
-react-native-document-picker@^5.0.4:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/react-native-document-picker/-/react-native-document-picker-5.0.4.tgz#86a874e093284b21896581985b8b6e13e04a4251"
-  integrity sha512-PN3NYZFgz6McbcfH5Cu3yf3nE4UBAiJYdL26F5cjypOoCFhdfLz0NM13V/tVOLGhWZXNUmI3g4dhPQBthq+pJg==
+react-native-document-picker@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-document-picker/-/react-native-document-picker-8.0.0.tgz#f760f89049cda668be8b1cfb31a484af19716f35"
+  integrity sha512-4O1FNOJHzfZ7BBFOJhNoeCKHSjthFtZyMEWJsAxX1ORdShGSa6miLvTHtQjpCDMNWSoPU1C7fXLNNPrv8GAarQ==
+  dependencies:
+    invariant "^2.2.4"
 
 react-native-fab@standardnotes/react-native-fab#cb60e00:
   version "1.0.8"
