@@ -1,5 +1,5 @@
-import { SnIcon, TEditorIcon } from '@Components/SnIcon';
-import { SNNote } from '@standardnotes/snjs';
+import { SnIcon } from '@Components/SnIcon';
+import { IconType, SNNote } from '@standardnotes/snjs';
 import React, { useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components/native';
 
@@ -14,7 +14,7 @@ type Props = {
 };
 
 type TFlagIcon = {
-  icon: TEditorIcon;
+  icon: IconType;
   fillColor?: string;
 };
 

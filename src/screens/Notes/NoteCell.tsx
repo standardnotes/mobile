@@ -1,4 +1,4 @@
-import { SnIcon, TEditorIcon } from '@Components/SnIcon';
+import { SnIcon } from '@Components/SnIcon';
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
@@ -7,6 +7,7 @@ import {
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { NoteCellIconFlags } from '@Screens/Notes/NoteCellIconFlags';
 import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
+import { IconType } from '@standardnotes/snjs/dist/@types/types';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
@@ -201,7 +202,7 @@ export const NoteCell = ({
   const editorForNote = application?.componentManager.editorForNote(note);
   const [icon, tint] = application?.iconsController.getIconAndTintForEditor(
     editorForNote?.identifier
-  ) as [TEditorIcon, number];
+  ) as [IconType, number];
 
   return (
     <TouchableContainer
