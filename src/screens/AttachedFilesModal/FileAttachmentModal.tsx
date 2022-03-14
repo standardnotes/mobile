@@ -305,6 +305,10 @@ export const FileAttachmentModal: FC<Props> = ({
     return authorizedFiles.length > 0 && authorizedFiles.includes(file);
   };
 
+  const renameFile = async (file: SNFile, fileName: string) => {
+    await application.items.renameFile(file, fileName);
+  };
+
   const handleFileAction = async (action: PopoverFileItemAction) => {
     if (!application) {
       return false;
@@ -349,8 +353,7 @@ export const FileAttachmentModal: FC<Props> = ({
         break;
       }
       case PopoverFileItemActionType.RenameFile:
-        // await renameFile(file, action.payload.name);
-        console.log('rename file');
+        await renameFile(file, action.payload.name);
         break;
     }
 

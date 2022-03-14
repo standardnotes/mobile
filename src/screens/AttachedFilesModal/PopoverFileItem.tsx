@@ -6,6 +6,7 @@ import {
   FileDetailsContainer,
   FileIconContainer,
   FileName,
+  FileNameTextInput,
 } from '@Screens/AttachedFilesModal/PopoverFileItem.styled';
 import { formatSizeToReadableString } from '@standardnotes/filepicker';
 import { IconType, SNFile } from '@standardnotes/snjs';
@@ -36,23 +37,27 @@ export const PopoverFileItem: FC<PopoverFileItemProps> = ({
   const { showActionSheet } = useCustomActionSheet();
 
   const [isRenamingFile, setIsRenamingFile] = useState(false);
+  const [fileName, setFileName] = useState(file.name);
 
-  /*const renameFile = async (file: SNFile, name: string) => {
-    const didRename = await handleFileAction({
+  const renameFile = async (name: string) => {
+    if (name.trim() === '') {
+      application?.alertService.alert('File name cannot be empty');
+      setFileName(file.name);
+      return;
+    }
+    await handleFileAction({
       type: PopoverFileItemActionType.RenameFile,
       payload: {
         file,
         name,
       },
     });
-    if (didRename) {
-      setIsRenamingFile(false);
-    }
+    setIsRenamingFile(false);
   };
 
-  const handleFileNameInput = (event: Event) => {
-    console.log('handle file name input');
-  };*/
+  const handleFileNameInputBlur = () => {
+    renameFile(fileName);
+  };
 
   const showActionsMenu = () => {
     const actions = [
@@ -81,12 +86,14 @@ export const PopoverFileItem: FC<PopoverFileItemProps> = ({
       },
       {
         text: 'Rename',
-        callback: () => console.log('rename'),
+        callback: () => {
+          setIsRenamingFile(true);
+        },
       },
     ];
     showActionSheet('Choose action', actions);
   };
-  // console.log('file is', JSON.stringify(file));
+
   if (!application) {
     return null;
   }
@@ -102,9 +109,16 @@ export const PopoverFileItem: FC<PopoverFileItemProps> = ({
           <FileIconContainer>{iconForFileType}</FileIconContainer>
           <FileDetailsContainer>
             {isRenamingFile ? (
-              <Text>Input for renaming</Text>
+              <FileNameTextInput
+                autoCapitalize={'none'}
+                autoCorrect={false}
+                autoFocus={true}
+                value={fileName}
+                onChangeText={newName => setFileName(newName)}
+                onBlur={handleFileNameInputBlur}
+              />
             ) : (
-              <FileName>{file.name}</FileName>
+              <FileName>{fileName}</FileName>
             )}
             <FileDateAndSizeContainer>
               <Text>
