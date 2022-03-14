@@ -63,9 +63,6 @@ export class MobileApplication extends SNApplication {
       defaultHost: IsDev
         ? 'https://api-dev.standardnotes.com'
         : 'https://api.standardnotes.com',
-      defaultFilesHost: IsDev
-        ? 'https://files-dev.standardnotes.com'
-        : 'https://files.standardnotes.com',
       appVersion: version,
       webSocketUrl: IsDev
         ? 'wss://sockets-dev.standardnotes.com'
