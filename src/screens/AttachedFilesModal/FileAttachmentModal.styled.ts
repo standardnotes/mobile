@@ -40,6 +40,7 @@ export const useFileAttachmentStyles = (theme: DefaultTheme) => {
     noAttachmentsIconContainer: {
       alignItems: 'center',
       marginTop: 24,
+      width: '100%',
     },
     noAttachmentsIcon: {
       marginTop: 24,
@@ -74,6 +75,27 @@ export const ModalViewContainer = styled.View<{ hasAttachedFiles: boolean }>`
   width: 100%;
 }
 `;
+export const FilterTextInputContainer = styled.View`
+  flex-direction: row;
+  padding: 12px 8px;
+  border-bottom-width: 1px;
+  border-style: solid;
+  border-color: ${({ theme }) => theme.stylekitIron};
+  position: relative;
+`;
+export const FilterTextInput = styled.TextInput`
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.stylekitIron};
+  border-radius: 4px;
+  padding: 4px 8px;
+  flex-grow: 1;
+`;
+export const ClearFilterTextIconContainer = styled.View`
+  position: absolute;
+  top: 60%;
+  right: 16px;
+`;
+
 export const AttachedFilesList = styled.View`
   align-items: flex-start;
   flex-grow: 1;

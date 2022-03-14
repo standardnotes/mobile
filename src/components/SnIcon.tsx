@@ -3,6 +3,7 @@ import { IconType } from '@standardnotes/snjs';
 import ArchiveIcon from '@standardnotes/stylekit/dist/icons/ic-archive.svg';
 import AttachmentFileIcon from '@standardnotes/stylekit/dist/icons/ic-attachment-file.svg';
 import AuthenticatorIcon from '@standardnotes/stylekit/dist/icons/ic-authenticator.svg';
+import ClearCircleFilledIcon from '@standardnotes/stylekit/dist/icons/ic-clear-circle-filled.svg';
 import CodeIcon from '@standardnotes/stylekit/dist/icons/ic-code.svg';
 import FileDocIcon from '@standardnotes/stylekit/dist/icons/ic-file-doc.svg';
 import FileImageIcon from '@standardnotes/stylekit/dist/icons/ic-file-image.svg';
@@ -59,22 +60,8 @@ const ICONS: Partial<TIcons> = {
   'file-ppt': FilePptIcon,
   'file-xls': FileXlsIcon,
   'file-zip': FileZipIcon,
+  'clear-circle-filled': ClearCircleFilledIcon,
 };
-
-export type TEditorIcon = Extract<
-  IconType,
-  | 'pencil-off'
-  | 'plain-text'
-  | 'rich-text'
-  | 'code'
-  | 'markdown'
-  | 'spreadsheets'
-  | 'tasks'
-  | 'authenticator'
-  | 'trash-filled'
-  | 'pin-filled'
-  | 'archive'
->;
 
 type Props = {
   type: IconType;

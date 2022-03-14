@@ -2,6 +2,9 @@ import { SnIcon } from '@Components/SnIcon';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import {
   AttachedFilesList,
+  ClearFilterTextIconContainer,
+  FilterTextInput,
+  FilterTextInputContainer,
   ModalViewContainer,
   useFileAttachmentStyles,
 } from '@Screens/AttachedFilesModal/FileAttachmentModal.styled';
@@ -16,17 +19,17 @@ import {
   SNFile,
   SNNote,
 } from '@standardnotes/snjs';
-import { useCustomActionSheet } from '@Style/custom_action_sheet';
+// import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import { ICON_CLOSE } from '@Style/icons';
-import { Base64 } from 'js-base64';
+// import { Base64 } from 'js-base64';
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { Modal, Platform, Text, View } from 'react-native';
-import DocumentPicker, {
+import { Modal, Text, TouchableOpacity, View } from 'react-native';
+/*import DocumentPicker, {
   DocumentPickerResponse,
   isInProgress,
   pickSingle,
 } from 'react-native-document-picker';
-import { read } from 'react-native-fs';
+import { read } from 'react-native-fs';*/
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components/native';
 
@@ -49,11 +52,12 @@ export const FileAttachmentModal: FC<Props> = ({
   const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
   const styles = useFileAttachmentStyles(theme);
-  const { showActionSheet } = useCustomActionSheet();
+  // const { showActionSheet } = useCustomActionSheet();
 
   const [currentTab, setCurrentTab] = useState(Tabs.AttachedFiles);
   const [attachedFiles, setAttachedFiles] = useState<SNFile[]>([]);
   const [allFiles, setAllFiles] = useState<SNFile[]>([]);
+  const [searchString, setSearchString] = useState('');
 
   const reloadAttachedFiles = useCallback(() => {
     if (!application) {
@@ -94,8 +98,17 @@ export const FileAttachmentModal: FC<Props> = ({
     };
   }, [application, reloadAllFiles, reloadAttachedFiles]);
 
+  if (!application) {
+    return null;
+  }
+
   const filesList =
     currentTab === Tabs.AttachedFiles ? attachedFiles : allFiles;
+  const filteredList = searchString
+    ? filesList.filter(file =>
+        file.name.toLowerCase().includes(searchString.toLowerCase())
+      )
+    : filesList;
 
   const { AttachedFiles, AllFiles } = Tabs;
   const {
@@ -109,7 +122,7 @@ export const FileAttachmentModal: FC<Props> = ({
     noAttachmentsIconContainer,
   } = styles;
 
-  const [selectedFile, setSelectedFile] = useState<DocumentPickerResponse[]>(
+  /*const [selectedFile, setSelectedFile] = useState<DocumentPickerResponse[]>(
     []
   );
   const handleDocumentSelection = async () => {
@@ -122,9 +135,9 @@ export const FileAttachmentModal: FC<Props> = ({
     } catch (err) {
       console.warn(err);
     }
-  };
+  };*/
 
-  const handleError = (err: unknown) => {
+  /*const handleError = (err: unknown) => {
     if (DocumentPicker.isCancel(err)) {
       console.warn('cancelled');
       // User cancelled the picker, exit any dialogs or menus and move on
@@ -135,21 +148,28 @@ export const FileAttachmentModal: FC<Props> = ({
     } else {
       throw err;
     }
-  };
+  };*/
 
-  const uploadFile = async () => {
+  /*const uploadFile = async () => {
     if (!application) {
       return;
     }
     try {
-      const result = await pickSingle(); // TODO: allow picking not only single (pickSingle), but multiple
-      if (!result.uri || !result.size) {
+      const fileResult = await pickSingle(); // TODO: allow picking not only single (pickSingle), but multiple
+      if (!fileResult.uri || !fileResult.size) {
         return;
       }
-      const uri = Platform.OS === 'ios' ? decodeURI(result.uri) : result.uri;
-      console.log('picked file', result.name, result.size, result.type, uri);
+      const uri =
+        Platform.OS === 'ios' ? decodeURI(fileResult.uri) : fileResult.uri;
+      console.log(
+        'picked file',
+        fileResult.name,
+        fileResult.size,
+        fileResult.type,
+        uri
+      );
 
-      const size = result.size;
+      const size = fileResult.size;
       const operation = await application.files.beginNewFileUpload();
       const onChunk = async (
         chunk: Uint8Array,
@@ -168,19 +188,24 @@ export const FileAttachmentModal: FC<Props> = ({
       const bytes = Base64.toUint8Array(data);
       await onChunk(bytes, 1, true);
 
-      const fileObj = await application.files.finishUpload(
+      /!*const fileObj = await application.files.finishUpload(
         operation,
-        result.name,
-        result.type!
-      );
+        fileResult.name,
+        fileResult.type!
+      );*!/
+      const fileObj = await application.files.finishUpload(operation, {
+        name: fileResult.name,
+        mimeType: fileResult.type as string,
+      });
 
       application.alertService.alert(
-        `Successfully uploaded file ${fileObj.nameWithExt}`
+        // `Uploaded file ${fileObj.nameWithExt}`
+        `Uploaded file ${fileObj.name}`
       );
     } catch (e) {
       handleError(e);
     }
-  };
+  };*/
 
   const deleteFile = async (file: SNFile) => {
     if (!application) {
@@ -191,7 +216,7 @@ export const FileAttachmentModal: FC<Props> = ({
       confirmButtonStyle: 'danger',
     });*/
     const shouldDelete = application.alertService.confirm(
-      `Are you sure you want to permanently delete "${file.nameWithExt}"?`,
+      `Are you sure you want to permanently delete "${file.name}"?`,
       'Delete file',
       'Delete'
     );
@@ -213,13 +238,31 @@ export const FileAttachmentModal: FC<Props> = ({
 
   const downloadFile = async (file: SNFile) => {
     // appState.files.downloadFile(file);
-    console.log('downloading...');
+    // console.log('downloading...', JSON.stringify(file));
+    try {
+      console.log('file is', JSON.stringify(file));
+      await application.files.downloadFile(
+        file,
+        async (decryptedBytes: Uint8Array) => {
+          /*if (isUsingStreamingSaver) {
+            await saver.pushBytes(decryptedBytes);
+          } else {
+            saver.saveFile(file.name, decryptedBytes);
+          }*/
+          console.log('onDecryptedbytes...', decryptedBytes);
+        }
+      );
+    } catch (error) {
+      console.error(error);
+
+      /*addToast({
+        type: ToastType.Error,
+        message: 'There was an error while downloading the file',
+      });*/
+    }
   };
 
   const attachFileToNote = async (file: SNFile) => {
-    if (!application) {
-      return;
-    }
     await application.items.associateFileWithNote(file, note);
   };
 
@@ -328,6 +371,9 @@ export const FileAttachmentModal: FC<Props> = ({
     ];
     showActionSheet('Choose file to upload', actions);
   };*/
+  const handleFilter = (textToSearch: string) => {
+    setSearchString(textToSearch);
+  };
 
   return (
     <View>
@@ -366,10 +412,28 @@ export const FileAttachmentModal: FC<Props> = ({
                 style={closeIcon}
               />
             </View>
+            <FilterTextInputContainer>
+              <FilterTextInput
+                onChangeText={textToSearch => {
+                  handleFilter(textToSearch);
+                }}
+                placeholder={'Search files...'}
+                autoCapitalize={'none'}
+                autoCorrect={false}
+                value={searchString}
+              />
+              {searchString.length > 0 && (
+                <ClearFilterTextIconContainer>
+                  <TouchableOpacity onPress={() => setSearchString('')}>
+                    <SnIcon type="clear-circle-filled" width={18} height={18} />
+                  </TouchableOpacity>
+                </ClearFilterTextIconContainer>
+              )}
+            </FilterTextInputContainer>
 
-            {filesList.length > 0 ? (
+            {filteredList.length > 0 ? (
               <AttachedFilesList>
-                {filesList.map((file: SNFile) => {
+                {filteredList.map((file: SNFile) => {
                   return (
                     <PopoverFileItem
                       key={file.uuid}
@@ -388,7 +452,11 @@ export const FileAttachmentModal: FC<Props> = ({
                   width={72}
                   height={72}
                 />
-                <Text>No files attached to this note</Text>
+                <Text>
+                  {searchString
+                    ? 'No result found'
+                    : 'No files attached to this note'}
+                </Text>
               </View>
             )}
 
