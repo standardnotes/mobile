@@ -137,9 +137,14 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
 
   const onImportPress = async () => {
     try {
-      const selectedFile = await DocumentPicker.pick({
-        type: [DocumentPicker.types.plainText],
-      });
+      const selectedFile = (
+        await DocumentPicker.pick({
+          type: [DocumentPicker.types.plainText],
+        })
+      )[0];
+      if (!selectedFile) {
+        return;
+      }
       const selectedFileURI =
         Platform.OS === 'ios'
           ? decodeURIComponent(selectedFile.uri)

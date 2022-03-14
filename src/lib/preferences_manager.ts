@@ -5,7 +5,6 @@ import {
 } from '@standardnotes/snjs';
 import { MobileApplication } from './application';
 
-// eslint-disable-next-line no-shadow
 export enum PrefKey {
   SortNotesBy = 'sortBy',
   SortNotesReverse = 'sortReverse',
