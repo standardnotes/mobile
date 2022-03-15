@@ -3583,7 +3583,7 @@ balanced-match@^1.0.0:
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
 
-base-64@^0.1.0:
+base-64@0.1.0, base-64@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/base-64/-/base-64-0.1.0.tgz#780a99c84e7d600260361511c4877613bf24f6bb"
   integrity sha1-eAqZyE59YAJgNhURxId2E78k9rs=
@@ -8387,10 +8387,10 @@ react-native-search-box@standardnotes/react-native-search-box#c0de5bab18cb418fef
   dependencies:
     prop-types "^15.5.10"
 
-react-native-sodium-jsi@1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/react-native-sodium-jsi/-/react-native-sodium-jsi-1.1.3.tgz#163e9bbd3dfb7ee312eeb579c45ad3274203115b"
-  integrity sha512-HdCdxfahCf4PkGDyO2uNwLNiunbh1yolMpsIBmq8Fhn3mNXEevWeZyu9KMtBqxmG5SjhJ+ZoFLm0TPiM6gqJYQ==
+react-native-sodium-jsi@1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/react-native-sodium-jsi/-/react-native-sodium-jsi-1.1.4.tgz#93c88852cb568ef7665f9464a5f75d01d59c67fa"
+  integrity sha512-afjQM8vMXaH4ztc04Q6b4sbynvBahUgocZ3h77CKo6AxqaTrmIIsFNxZ/tBFcMtV7xJNTSFnp4p3sOov71wU8w==
   dependencies:
     "@standardnotes/sncrypto-common" "^1.7.1"
 
