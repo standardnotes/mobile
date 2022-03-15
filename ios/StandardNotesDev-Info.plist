@@ -116,13 +116,6 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>bugsnag</key>
-	<dict>
-		<key>apiKey</key>
-		<string>ba1cad5922ac743322c4051f0249e999</string>
-		<key>releaseStage</key>
-		<string>dev</string>
-	</dict>
 	<key>supportsAlternateIcons</key>
 	<true/>
 </dict>
