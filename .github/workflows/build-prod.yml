@@ -29,7 +29,6 @@ jobs:
         env:
           PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
           BUILD_NUMBER: ${{ github.run_number }}
-          BUGSNAG_APIKEY: ${{ secrets.BUGSNAG_APIKEY }}
           ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
           ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -90,20 +89,4 @@ jobs:
           BUILD_NUMBER: ${{ github.run_number }}
         with:
           lane: 'ios prod'
-      - name: Upload sourcemaps to bugsnag
-        run: |
-          yarn react-native bundle \
-            --platform ios \
-            --dev false \
-            --entry-file index.js \
-            --bundle-output ios-release.bundle \
-            --sourcemap-output ios-release.bundle.map
-          curl --http1.1 https://upload.bugsnag.com/react-native-source-map \
-            -F apiKey="${{ secrets.BUGSNAG_APIKEY }}" \
-            -F appVersion="${{ env.PACKAGE_VERSION }}" \
-            -F appBundleVersion="${{ github.run_number }}" \
-            -F dev=false \
-            -F platform=ios \
-            -F sourceMap=@ios-release.bundle.map \
-            -F bundle=@ios-release.bundle \
-            -F projectRoot=`pwd`
+
