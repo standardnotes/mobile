@@ -14,22 +14,16 @@ import com.facebook.soloader.SoLoader;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
 import java.util.List;
 
 import com.facebook.react.modules.network.OkHttpClientProvider;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.database.CursorWindow;
 import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.kristiansorens.flagsecure.FlagSecure;
-
-import org.standardnotes.SNReactNative.SNReactNativePackage;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -70,17 +64,6 @@ public class MainApplication extends Application implements ReactApplication {
     }
 
     rebuildOkHtttp();
-
-    Configuration config = Configuration.load(this);
-    config.setEnabledBreadcrumbTypes(new HashSet<BreadcrumbType>() {{
-      add(BreadcrumbType.NAVIGATION);
-      add(BreadcrumbType.STATE);
-      add(BreadcrumbType.PROCESS);
-      add(BreadcrumbType.MANUAL);
-      add(BreadcrumbType.USER);
-      add(BreadcrumbType.LOG);
-      add(BreadcrumbType.ERROR);
-    }});
 
     SoLoader.init(this, /* native exopackage */ false);
 
