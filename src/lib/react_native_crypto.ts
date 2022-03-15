@@ -4,9 +4,7 @@ import {
   HexString,
   SNPureCrypto,
   SodiumConstant,
-  StreamDecryptor,
   StreamDecryptorResult,
-  StreamEncryptor,
   timingSafeEqual,
   Utf8String,
 } from '@standardnotes/sncrypto-common';
@@ -127,29 +125,34 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     }
   }
 
-  public xchacha20StreamInitEncryptor(key: HexString): StreamEncryptor {
-    return Sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
+  public xchacha20StreamInitEncryptor(
+    key: HexString
+  ): Sodium.MobileStreamEncryptor {
+    const encryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_push(
+      key
+    );
+    return encryptor;
   }
 
   public xchacha20StreamEncryptorPush(
-    encryptor: StreamEncryptor,
+    encryptor: Sodium.MobileStreamEncryptor,
     plainBuffer: Uint8Array,
     assocData: Utf8String,
     tag: SodiumConstant = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PUSH
   ): Uint8Array {
     const encryptedBuffer = Sodium.crypto_secretstream_xchacha20poly1305_push(
       encryptor,
-      plainBuffer,
+      plainBuffer.buffer,
       assocData,
       tag
     );
-    return encryptedBuffer;
+    return new Uint8Array(encryptedBuffer);
   }
 
   public xchacha20StreamInitDecryptor(
     header: Base64String,
     key: HexString
-  ): StreamDecryptor {
+  ): Sodium.MobileStreamDecryptor {
     const decryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_pull(
       header,
       key
@@ -158,7 +161,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   }
 
   public xchacha20StreamDecryptorPush(
-    decryptor: StreamDecryptor,
+    decryptor: Sodium.MobileStreamDecryptor,
     encryptedBuffer: Uint8Array,
     assocData: Utf8String
   ): StreamDecryptorResult | false {
@@ -171,15 +174,18 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
     const result = Sodium.crypto_secretstream_xchacha20poly1305_pull(
       decryptor,
-      encryptedBuffer,
+      encryptedBuffer.buffer,
       assocData
     );
 
-    if ((result as unknown) === false) {
+    if (!result) {
       return false;
     }
 
-    return result;
+    return {
+      message: new Uint8Array(result.message),
+      tag: result.tag,
+    };
   }
 
   public generateUUID() {
