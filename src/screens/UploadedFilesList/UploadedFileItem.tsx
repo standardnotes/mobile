@@ -1,5 +1,13 @@
 import { SnIcon } from '@Components/SnIcon';
+import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { AppStackNavigationProp } from '@Root/AppStack';
+import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_FILE_NAME } from '@Screens/screens';
+import { formatSizeToReadableString } from '@standardnotes/filepicker';
+import { IconType, SNFile } from '@standardnotes/snjs';
+import { useCustomActionSheet } from '@Style/custom_action_sheet';
+import React, { FC, useContext, useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 import {
   FileDataContainer,
   FileDateAndSizeContainer,
@@ -7,37 +15,36 @@ import {
   FileIconContainer,
   FileName,
   FileNameTextInput,
-} from '@Screens/AttachedFilesModal/PopoverFileItem.styled';
-import { formatSizeToReadableString } from '@standardnotes/filepicker';
-import { IconType, SNFile } from '@standardnotes/snjs';
-import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import React, { FC, useContext, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+} from './UploadedFileItem.styled';
 import {
-  PopoverFileItemAction,
-  PopoverFileItemActionType,
-} from './PopoverFileItemAction';
+  UploadedFileItemAction,
+  UploadedFileItemActionType,
+} from './UploadedFileItemAction';
 
 const renderIconForFileType = (iconType: IconType) => {
-  return <SnIcon type={iconType} />;
+  return <SnIcon type={iconType} width={32} height={32} />;
 };
 
-export type PopoverFileItemProps = {
+export type UploadedFileItemProps = {
   file: SNFile;
   isAttachedToNote: boolean;
-  handleFileAction: (action: PopoverFileItemAction) => Promise<boolean>;
+  handleFileAction: (action: UploadedFileItemAction) => Promise<boolean>;
 };
 
-export const PopoverFileItem: FC<PopoverFileItemProps> = ({
+export const UploadedFileItem: FC<UploadedFileItemProps> = ({
   file,
   isAttachedToNote,
   handleFileAction,
 }) => {
   const application = useContext(ApplicationContext);
+  const navigation = useNavigation<
+    AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+  >();
   const { showActionSheet } = useCustomActionSheet();
 
   const [isRenamingFile, setIsRenamingFile] = useState(false);
   const [fileName, setFileName] = useState(file.name);
+  const [isFileProtected, setIsFileProtected] = useState(file.protected);
 
   const renameFile = async (name: string) => {
     if (name.trim() === '') {
@@ -46,7 +53,7 @@ export const PopoverFileItem: FC<PopoverFileItemProps> = ({
       return;
     }
     await handleFileAction({
-      type: PopoverFileItemActionType.RenameFile,
+      type: UploadedFileItemActionType.RenameFile,
       payload: {
         file,
         name,
@@ -66,29 +73,42 @@ export const PopoverFileItem: FC<PopoverFileItemProps> = ({
         callback: isAttachedToNote
           ? () =>
               handleFileAction({
-                type: PopoverFileItemActionType.DetachFileToNote,
+                type: UploadedFileItemActionType.DetachFileToNote,
                 payload: file,
               })
           : () =>
               handleFileAction({
-                type: PopoverFileItemActionType.AttachFileToNote,
+                type: UploadedFileItemActionType.AttachFileToNote,
                 payload: file,
               }),
+      },
+      {
+        text: `${isFileProtected ? 'Disable' : 'Enable'} Password protection`,
+        callback: () => {
+          handleFileAction({
+            type: UploadedFileItemActionType.ToggleFileProtection,
+            payload: file,
+            callback: isProtected => {
+              setIsFileProtected(isProtected);
+            },
+          });
+        },
       },
       {
         text: 'Download',
         callback: () => {
           handleFileAction({
-            type: PopoverFileItemActionType.DownloadFile,
+            type: UploadedFileItemActionType.DownloadFile,
             payload: file,
           });
         },
       },
       {
         text: 'Rename',
-        callback: () => {
-          setIsRenamingFile(true);
-        },
+        callback: () =>
+          navigation.navigate(SCREEN_INPUT_MODAL_FILE_NAME, {
+            fileUuid: file.uuid,
+          }),
       },
     ];
     showActionSheet('Choose action', actions);

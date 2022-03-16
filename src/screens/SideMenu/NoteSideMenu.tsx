@@ -7,11 +7,11 @@ import {
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
-import { FileAttachmentModal } from '@Screens/AttachedFilesModal/FileAttachmentModal';
 import {
   SCREEN_COMPOSE,
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_NOTE_HISTORY,
+  SCREEN_UPLOADED_FILES_LIST,
 } from '@Screens/screens';
 import { Listed } from '@Screens/SideMenu/Listed';
 import { FeatureIdentifier } from '@standardnotes/features';
@@ -117,7 +117,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
   );
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
-  const [isFilesModalVisible, setIsFilesModalVisible] = useState(false);
   const [attachedFilesLength, setAttachedFilesLength] = useState(0);
   const components = useEditorComponents();
 
@@ -151,6 +150,21 @@ export const NoteSideMenu = React.memo((props: Props) => {
       return;
     }
     setAttachedFilesLength(application.items.getFilesForNote(note).length);
+  }, [application, note]);
+
+  useEffect(() => {
+    if (!application || !note) {
+      return;
+    }
+    const removeFilesObserver = application.streamItems(
+      ContentType.File,
+      () => {
+        setAttachedFilesLength(application.items.getFilesForNote(note).length);
+      }
+    );
+    return () => {
+      removeFilesObserver();
+    };
   }, [application, note]);
 
   useEffect(() => {
@@ -490,8 +504,8 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
     };
 
-    const openFilesPopover = () => {
-      setIsFilesModalVisible(true);
+    const openFilesScreen = () => {
+      navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note });
     };
 
     const isEntitledToFiles =
@@ -517,7 +531,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         text: `Files${
           attachedFilesLength > 0 ? ` (${attachedFilesLength})` : ''
         }`,
-        onSelect: openFilesPopover,
+        onSelect: openFilesScreen,
         icon: ICON_ATTACH,
       });
     }
@@ -698,11 +712,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
         iconTextComponent={
           <Icon name={ThemeService.nameForIcon(ICON_PRICE_TAG)} />
         }
-      />
-      <FileAttachmentModal
-        isModalVisible={isFilesModalVisible}
-        setIsModalVisible={setIsFilesModalVisible}
-        note={note}
       />
     </SafeAreaContainer>
   );

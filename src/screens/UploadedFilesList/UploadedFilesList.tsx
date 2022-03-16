@@ -1,68 +1,45 @@
 import { SnIcon } from '@Components/SnIcon';
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { ModalStackNavigationProp } from '@Root/ModalStack';
+import { SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
+import { UploadedFileItem } from '@Screens/UploadedFilesList/UploadedFileItem';
+import {
+  UploadedFileItemAction,
+  UploadedFileItemActionType,
+} from '@Screens/UploadedFilesList/UploadedFileItemAction';
+import { ChallengeReason, ContentType, SNFile } from '@standardnotes/snjs';
+import { Buffer } from 'buffer';
+import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import RNFS from 'react-native-fs';
+import { ThemeContext } from 'styled-components/native';
 import {
   AttachedFilesList,
   ClearFilterTextIconContainer,
   FilterTextInput,
   FilterTextInputContainer,
   ModalViewContainer,
-  useFileAttachmentStyles,
-} from '@Screens/AttachedFilesModal/FileAttachmentModal.styled';
-import { PopoverFileItem } from '@Screens/AttachedFilesModal/PopoverFileItem';
-import {
-  PopoverFileItemAction,
-  PopoverFileItemActionType,
-} from '@Screens/AttachedFilesModal/PopoverFileItemAction';
-import {
-  ChallengeReason,
-  ContentType,
-  SNFile,
-  SNNote,
-} from '@standardnotes/snjs';
-import { ICON_CLOSE } from '@Style/icons';
-import { Buffer } from 'buffer';
-import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { Modal, Text, TouchableOpacity, View } from 'react-native';
-import RNFS from 'react-native-fs';
-/*import DocumentPicker, {
-  DocumentPickerResponse,
-  isInProgress,
-  pickSingle,
-} from 'react-native-document-picker';
-import { read } from 'react-native-fs';*/
-import Icon from 'react-native-vector-icons/Ionicons';
-import { ThemeContext } from 'styled-components/native';
-
-type Props = {
-  note: SNNote;
-  isModalVisible: boolean;
-  setIsModalVisible: (isVisible: boolean) => void;
-};
+  useUploadedFilesListStyles,
+} from './UploadedFilesList.styled';
 
 enum Tabs {
   AttachedFiles,
   AllFiles,
 }
 
-// TODO: this file is too big, try to split it if it stays a such
-export const FileAttachmentModal: FC<Props> = ({
-  note,
-  isModalVisible,
-  setIsModalVisible,
-}) => {
+type Props = ModalStackNavigationProp<typeof SCREEN_UPLOADED_FILES_LIST>;
+
+export const UploadedFilesList: FC<Props> = props => {
   const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
-  const styles = useFileAttachmentStyles(theme);
-  // const { showActionSheet } = useCustomActionSheet();
+  const styles = useUploadedFilesListStyles(theme);
 
   const [currentTab, setCurrentTab] = useState(Tabs.AttachedFiles);
   const [attachedFiles, setAttachedFiles] = useState<SNFile[]>([]);
   const [allFiles, setAllFiles] = useState<SNFile[]>([]);
   const [searchString, setSearchString] = useState('');
-  /*const [
-    isFileProtectionModalVisible,
-    setIsFileProtectionModalVisible,
-  ] = useState(false);*/
+
+  const note = props.route.params.note;
 
   const reloadAttachedFiles = useCallback(() => {
     if (!application) {
@@ -122,7 +99,6 @@ export const FileAttachmentModal: FC<Props> = ({
     headerTabContainer,
     headerTab,
     activeTab,
-    closeIcon,
     noAttachmentsIcon,
     noAttachmentsIconContainer,
   } = styles;
@@ -314,20 +290,20 @@ export const FileAttachmentModal: FC<Props> = ({
     await application.items.renameFile(file, fileName);
   };
 
-  const handleFileAction = async (action: PopoverFileItemAction) => {
+  const handleFileAction = async (action: UploadedFileItemAction) => {
     if (!application) {
       return false;
     }
 
     const file =
-      action.type !== PopoverFileItemActionType.RenameFile
+      action.type !== UploadedFileItemActionType.RenameFile
         ? action.payload
         : action.payload.file;
     let isAuthorizedForAction = true;
 
     if (
       file.protected &&
-      action.type !== PopoverFileItemActionType.ToggleFileProtection
+      action.type !== UploadedFileItemActionType.ToggleFileProtection
     ) {
       isAuthorizedForAction = await authorizeProtectedActionForFile(
         file,
@@ -340,26 +316,24 @@ export const FileAttachmentModal: FC<Props> = ({
     }
 
     switch (action.type) {
-      case PopoverFileItemActionType.AttachFileToNote:
+      case UploadedFileItemActionType.AttachFileToNote:
         await attachFileToNote(file);
         break;
-      case PopoverFileItemActionType.DetachFileToNote:
+      case UploadedFileItemActionType.DetachFileToNote:
         await detachFileFromNote(file);
         break;
-      case PopoverFileItemActionType.DeleteFile:
+      case UploadedFileItemActionType.DeleteFile:
         await deleteFile(file);
         break;
-      case PopoverFileItemActionType.DownloadFile:
+      case UploadedFileItemActionType.DownloadFile:
         await downloadFile(file);
         break;
-      case PopoverFileItemActionType.ToggleFileProtection: {
-        // setIsFileProtectionModalVisible(true);
+      case UploadedFileItemActionType.ToggleFileProtection: {
         const isProtected = await toggleFileProtection(file);
-        console.log('new isProtected became', isProtected);
         action.callback(isProtected);
         break;
       }
-      case PopoverFileItemActionType.RenameFile:
+      case UploadedFileItemActionType.RenameFile:
         await renameFile(file, action.payload.name);
         break;
     }
@@ -368,114 +342,74 @@ export const FileAttachmentModal: FC<Props> = ({
     return true;
   };
 
-  /*const showActionsMenu = () => {
-    const actions = [
-      {
-        text: 'Attach from files',
-        callback: uploadFile,
-      },
-      {
-        text: 'Attach from Camera or Photo Library',
-        callback: () => console.log('camera or photo lib'),
-      },
-    ];
-    showActionSheet('Choose file to upload', actions);
-  };*/
   const handleFilter = (textToSearch: string) => {
     setSearchString(textToSearch);
   };
 
-  const handleSwitchFileProtection = () => {
-    console.log('handle switch');
-  };
-
   return (
-    <View>
-      <Modal
-        animationType={'slide'}
-        transparent={false}
-        visible={isModalVisible}
-        onRequestClose={() => {
-          setIsModalVisible(false);
-        }}
-      >
-        <View style={centeredView}>
-          <ModalViewContainer hasAttachedFiles={filesList.length > 0}>
-            <View style={header}>
-              <View style={headerTabContainer}>
-                <View
-                  style={[
-                    headerTab,
-                    currentTab === AttachedFiles ? activeTab : {},
-                  ]}
-                >
-                  <Text onPress={() => setCurrentTab(AttachedFiles)}>
-                    Attached
-                  </Text>
-                </View>
-                <View
-                  style={[headerTab, currentTab === AllFiles ? activeTab : {}]}
-                >
-                  <Text onPress={() => setCurrentTab(AllFiles)}>All files</Text>
-                </View>
-              </View>
-              <Icon
-                name={ICON_CLOSE}
-                size={20}
-                onPress={() => setIsModalVisible(false)}
-                style={closeIcon}
-              />
+    <View style={centeredView}>
+      <ModalViewContainer hasAttachedFiles={filesList.length > 0}>
+        <View style={header}>
+          <View style={headerTabContainer}>
+            <View
+              style={[headerTab, currentTab === AttachedFiles ? activeTab : {}]}
+            >
+              <Text onPress={() => setCurrentTab(AttachedFiles)}>Attached</Text>
             </View>
-            <FilterTextInputContainer>
-              <FilterTextInput
-                onChangeText={textToSearch => {
-                  handleFilter(textToSearch);
-                }}
-                placeholder={'Search files...'}
-                autoCapitalize={'none'}
-                autoCorrect={false}
-                value={searchString}
-              />
-              {searchString.length > 0 && (
-                <ClearFilterTextIconContainer>
-                  <TouchableOpacity onPress={() => setSearchString('')}>
-                    <SnIcon type="clear-circle-filled" width={18} height={18} />
-                  </TouchableOpacity>
-                </ClearFilterTextIconContainer>
-              )}
-            </FilterTextInputContainer>
+            <View style={[headerTab, currentTab === AllFiles ? activeTab : {}]}>
+              <Text onPress={() => setCurrentTab(AllFiles)}>All files</Text>
+            </View>
+          </View>
+        </View>
+        <FilterTextInputContainer>
+          <FilterTextInput
+            onChangeText={textToSearch => {
+              handleFilter(textToSearch);
+            }}
+            placeholder={'Search files...'}
+            autoCapitalize={'none'}
+            autoCorrect={false}
+            value={searchString}
+          />
+          {searchString.length > 0 && (
+            <ClearFilterTextIconContainer>
+              <TouchableOpacity onPress={() => setSearchString('')}>
+                <SnIcon type="clear-circle-filled" width={18} height={18} />
+              </TouchableOpacity>
+            </ClearFilterTextIconContainer>
+          )}
+        </FilterTextInputContainer>
 
-            {filteredList.length > 0 ? (
-              <AttachedFilesList>
-                {filteredList.map((file: SNFile) => {
-                  return (
-                    <PopoverFileItem
-                      key={file.uuid}
-                      file={file}
-                      isAttachedToNote={attachedFiles.includes(file)}
-                      handleFileAction={handleFileAction}
-                      // handlePress={() => showActionsMenu()}
-                    />
-                  );
-                })}
-              </AttachedFilesList>
-            ) : (
-              <View style={noAttachmentsIconContainer}>
-                <SnIcon
-                  type={'files-illustration'}
-                  styles={noAttachmentsIcon}
-                  width={72}
-                  height={72}
+        {filteredList.length > 0 ? (
+          <AttachedFilesList>
+            {filteredList.map((file: SNFile) => {
+              return (
+                <UploadedFileItem
+                  key={file.uuid}
+                  file={file}
+                  isAttachedToNote={attachedFiles.includes(file)}
+                  handleFileAction={handleFileAction}
                 />
-                <Text>
-                  {searchString
-                    ? 'No result found'
-                    : 'No files attached to this note'}
-                </Text>
-              </View>
-            )}
+              );
+            })}
+          </AttachedFilesList>
+        ) : (
+          <View style={noAttachmentsIconContainer}>
+            <SnIcon
+              type={'files-illustration'}
+              styles={noAttachmentsIcon}
+              width={72}
+              height={72}
+            />
+            <Text>
+              {searchString
+                ? 'No result found'
+                : 'No files attached to this note'}
+            </Text>
+          </View>
+        )}
 
-            {/*<Pressable
+        {/*<Pressable
               style={[button, buttonClose]}
               onPress={() => setIsModalVisible(false)}
             >
@@ -487,16 +421,7 @@ export const FileAttachmentModal: FC<Props> = ({
                 onPress={showActionsMenu}
               />
             </Pressable>*/}
-
-            {/*{isFileProtectionModalVisible && (
-              <ToggleFileProtectionModal
-                // isModalVisible={isFileProtectionModalVisible}
-                handleChange={handleSwitchFileProtection}
-              />
-            )}*/}
-          </ModalViewContainer>
-        </View>
-      </Modal>
+      </ModalViewContainer>
     </View>
   );
 };

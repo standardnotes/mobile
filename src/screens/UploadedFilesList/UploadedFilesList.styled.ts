@@ -2,13 +2,12 @@ import { StyleSheet } from 'react-native';
 import styled, { DefaultTheme } from 'styled-components/native';
 
 // TODO: clean up all unneeded classes here
-export const useFileAttachmentStyles = (theme: DefaultTheme) => {
+export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
   return StyleSheet.create({
     centeredView: {
       flex: 1,
       justifyContent: 'flex-start',
       alignItems: 'center',
-      marginTop: 56,
       width: '100%',
 
       flexGrow: 1,
@@ -33,9 +32,6 @@ export const useFileAttachmentStyles = (theme: DefaultTheme) => {
       borderBottomColor: theme.stylekitInfoColor,
       borderBottomWidth: 2,
       backgroundColor: '#2b6fcf0f',
-    },
-    closeIcon: {
-      textAlign: 'right',
     },
     noAttachmentsIconContainer: {
       alignItems: 'center',

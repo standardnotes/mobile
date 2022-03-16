@@ -1,6 +1,6 @@
 import { SNFile } from '@standardnotes/snjs';
 
-export enum PopoverFileItemActionType {
+export enum UploadedFileItemActionType {
   AttachFileToNote,
   DetachFileToNote,
   DeleteFile,
@@ -9,22 +9,22 @@ export enum PopoverFileItemActionType {
   ToggleFileProtection,
 }
 
-export type PopoverFileItemAction =
+export type UploadedFileItemAction =
   | {
       type: Exclude<
-        PopoverFileItemActionType,
-        | PopoverFileItemActionType.RenameFile
-        | PopoverFileItemActionType.ToggleFileProtection
+        UploadedFileItemActionType,
+        | UploadedFileItemActionType.RenameFile
+        | UploadedFileItemActionType.ToggleFileProtection
       >;
       payload: SNFile;
     }
   | {
-      type: PopoverFileItemActionType.ToggleFileProtection;
+      type: UploadedFileItemActionType.ToggleFileProtection;
       payload: SNFile;
       callback: (isProtected: boolean) => void;
     }
   | {
-      type: PopoverFileItemActionType.RenameFile;
+      type: UploadedFileItemActionType.RenameFile;
       payload: {
         file: SNFile;
         name: string;
