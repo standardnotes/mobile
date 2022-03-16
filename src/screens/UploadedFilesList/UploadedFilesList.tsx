@@ -225,7 +225,7 @@ export const UploadedFilesList: FC<Props> = props => {
           const base64String = new Buffer(decryptedBytes).toString('base64');
           const path = `${RNFS.DocumentDirectoryPath}/${file.name}`;
 
-          await RNFS.writeFile(path, base64String, 'base64');
+          await RNFS.appendFile(path, base64String, 'base64');
         }
       );
     } catch (error) {
