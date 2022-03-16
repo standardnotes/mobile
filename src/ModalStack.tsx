@@ -22,8 +22,9 @@ import {
   SCREEN_UPLOADED_FILES_LIST,
 } from '@Screens/screens';
 import { Settings } from '@Screens/Settings/Settings';
+import { UploadedFileItemAction } from '@Screens/UploadedFilesList/UploadedFileItemAction';
 import { UploadedFilesList } from '@Screens/UploadedFilesList/UploadedFilesList';
-import {Challenge, DeinitSource, SNNote} from '@standardnotes/snjs';
+import { Challenge, DeinitSource, SNFile, SNNote } from '@standardnotes/snjs';
 import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, { useContext } from 'react';
@@ -45,7 +46,8 @@ type ModalStackNavigatorParamList = {
     noteUuid?: string;
   };
   [SCREEN_INPUT_MODAL_FILE_NAME]: HeaderTitleParams & {
-    fileUuid?: string;
+    file: SNFile;
+    handleFileAction: (action: UploadedFileItemAction) => Promise<boolean>;
   };
   [SCREEN_UPLOADED_FILES_LIST]: HeaderTitleParams & {
     note: SNNote;
