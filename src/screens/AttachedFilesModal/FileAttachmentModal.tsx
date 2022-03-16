@@ -19,11 +19,11 @@ import {
   SNFile,
   SNNote,
 } from '@standardnotes/snjs';
-// import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import { ICON_CLOSE } from '@Style/icons';
-// import { Base64 } from 'js-base64';
+import { Buffer } from 'buffer';
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import RNFS from 'react-native-fs';
 /*import DocumentPicker, {
   DocumentPickerResponse,
   isInProgress,
@@ -44,6 +44,7 @@ enum Tabs {
   AllFiles,
 }
 
+// TODO: this file is too big, try to split it if it stays a such
 export const FileAttachmentModal: FC<Props> = ({
   note,
   isModalVisible,
@@ -58,6 +59,10 @@ export const FileAttachmentModal: FC<Props> = ({
   const [attachedFiles, setAttachedFiles] = useState<SNFile[]>([]);
   const [allFiles, setAllFiles] = useState<SNFile[]>([]);
   const [searchString, setSearchString] = useState('');
+  /*const [
+    isFileProtectionModalVisible,
+    setIsFileProtectionModalVisible,
+  ] = useState(false);*/
 
   const reloadAttachedFiles = useCallback(() => {
     if (!application) {
@@ -237,23 +242,18 @@ export const FileAttachmentModal: FC<Props> = ({
   };
 
   const downloadFile = async (file: SNFile) => {
-    // appState.files.downloadFile(file);
-    // console.log('downloading...', JSON.stringify(file));
     try {
-      console.log('file is', JSON.stringify(file));
       await application.files.downloadFile(
         file,
         async (decryptedBytes: Uint8Array) => {
-          /*if (isUsingStreamingSaver) {
-            await saver.pushBytes(decryptedBytes);
-          } else {
-            saver.saveFile(file.name, decryptedBytes);
-          }*/
-          console.log('onDecryptedbytes...', decryptedBytes);
+          const base64String = new Buffer(decryptedBytes).toString('base64');
+          const path = `${RNFS.DocumentDirectoryPath}/${file.name}`;
+
+          await RNFS.writeFile(path, base64String, 'base64');
         }
       );
     } catch (error) {
-      console.error(error);
+      console.error('An error occurred: ', error);
 
       /*addToast({
         type: ToastType.Error,
@@ -274,17 +274,22 @@ export const FileAttachmentModal: FC<Props> = ({
   };
 
   const toggleFileProtection = async (file: SNFile) => {
-    if (!application) {
+    try {
+      if (!application) {
+        return file.protected;
+      }
+      let result: SNFile | undefined;
+      if (file.protected) {
+        result = await application.protections.unprotectFile(file);
+      } else {
+        result = await application.protections.protectFile(file);
+      }
+      const isProtected = result ? result.protected : file.protected;
+      return isProtected;
+    } catch (error) {
+      console.log('An error occurred: ', error);
       return file.protected;
     }
-    let result: SNFile | undefined;
-    if (file.protected) {
-      result = await application.protections.unprotectFile(file);
-    } else {
-      result = await application.protections.protectFile(file);
-    }
-    const isProtected = result ? result.protected : file.protected;
-    return isProtected;
   };
 
   /*const reloadAttachedFilesLength = () => {
@@ -348,7 +353,9 @@ export const FileAttachmentModal: FC<Props> = ({
         await downloadFile(file);
         break;
       case PopoverFileItemActionType.ToggleFileProtection: {
+        // setIsFileProtectionModalVisible(true);
         const isProtected = await toggleFileProtection(file);
+        console.log('new isProtected became', isProtected);
         action.callback(isProtected);
         break;
       }
@@ -376,6 +383,10 @@ export const FileAttachmentModal: FC<Props> = ({
   };*/
   const handleFilter = (textToSearch: string) => {
     setSearchString(textToSearch);
+  };
+
+  const handleSwitchFileProtection = () => {
+    console.log('handle switch');
   };
 
   return (
@@ -443,6 +454,7 @@ export const FileAttachmentModal: FC<Props> = ({
                       file={file}
                       isAttachedToNote={attachedFiles.includes(file)}
                       handleFileAction={handleFileAction}
+                      // handlePress={() => showActionsMenu()}
                     />
                   );
                 })}
@@ -475,6 +487,13 @@ export const FileAttachmentModal: FC<Props> = ({
                 onPress={showActionsMenu}
               />
             </Pressable>*/}
+
+            {/*{isFileProtectionModalVisible && (
+              <ToggleFileProtectionModal
+                // isModalVisible={isFileProtectionModalVisible}
+                handleChange={handleSwitchFileProtection}
+              />
+            )}*/}
           </ModalViewContainer>
         </View>
       </Modal>
