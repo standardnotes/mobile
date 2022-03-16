@@ -27,9 +27,6 @@
         android:theme="@style/AppTheme"
         tools:targetApi="n">
 
-      <meta-data android:name="com.bugsnag.android.API_KEY"
-        android:value="ba1cad5922ac743322c4051f0249e999"/>
-
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

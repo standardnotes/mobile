@@ -2,7 +2,6 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-#import <Bugsnag/Bugsnag.h>
 #import <WebKit/WKWebsiteDataStore.h>
 #import <TrustKit/TrustKit.h>
 
@@ -11,15 +10,6 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSString *bugsnagOptOut = [defaults objectForKey:@"bugsnagoptout"] ?: @"true";
-
-  BugsnagConfiguration *config = [BugsnagConfiguration loadConfig];
-  config.enabledBreadcrumbTypes = BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeLog
-  | BSGEnabledBreadcrumbTypeUser | BSGEnabledBreadcrumbTypeState | BSGEnabledBreadcrumbTypeNavigation | BSGEnabledBreadcrumbTypeProcess;
-
-  if (![bugsnagOptOut isEqualToString:@"true"]) {
-    [Bugsnag startWithConfiguration:config];
-  }
 
   [self configurePinning];
 
@@ -29,7 +19,7 @@
 
   NSString *CFBundleIdentifier = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
 
-  NSDictionary * initialProperties = @{@"env" : [CFBundleIdentifier isEqualToString:@"com.standardnotes.standardnotes.dev"] ? @"dev" : @"prod", @"bugsnagOptOut": [bugsnagOptOut isEqualToString:@"true"] ? @YES : @NO};
+  NSDictionary * initialProperties = @{@"env" : [CFBundleIdentifier isEqualToString:@"com.standardnotes.standardnotes.dev"] ? @"dev" : @"prod"};
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge

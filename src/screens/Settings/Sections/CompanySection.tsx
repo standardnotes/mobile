@@ -2,9 +2,8 @@ import { ButtonCell } from '@Components/ButtonCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { ApplicationState } from '@Lib/application_state';
-import { MobileDeviceInterface } from '@Lib/interface';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { Platform, Share } from 'react-native';
 import { ContentContainer, Label } from './CompanySection.styled';
 
@@ -28,37 +27,11 @@ type Props = {
 
 export const CompanySection = (props: Props) => {
   const application = useContext(ApplicationContext);
-  const [bugsnagOptOut, setBugsnagOptOut] = useState(true);
   const storeName = Platform.OS === 'android' ? 'Play Store' : 'App Store';
 
   const openUrl = (action: keyof typeof URLS) => {
     application?.deviceInterface!.openUrl(URLS[action]);
   };
-
-  useEffect(() => {
-    const getOptedOut = async () => {
-      const optedOut = await (application?.deviceInterface as MobileDeviceInterface).getBugsnagOptedOut();
-      setBugsnagOptOut(optedOut);
-    };
-    getOptedOut();
-  }, [application?.deviceInterface]);
-
-  const toggleBugnsagOptOut = useCallback(
-    async (optOut: boolean) => {
-      try {
-        await (application?.deviceInterface as MobileDeviceInterface).setBusgnagOptedOut(
-          optOut
-        );
-        setBugsnagOptOut(optOut);
-        application?.alertService.alert(
-          'Please restart the app to fully apply the requested changes.'
-        );
-      } catch {
-        application?.alertService.alert('An error occured. Please try again.');
-      }
-    },
-    [application?.alertService, application?.deviceInterface]
-  );
 
   const shareEncryption = () => {
     const title = 'The Unexpected Benefits of Encrypted Writing';
@@ -139,20 +112,6 @@ export const CompanySection = (props: Props) => {
         onPress={() => openUrl('privacy')}
       >
         <Label>https://standardnotes.com/privacy</Label>
-      </ButtonCell>
-
-      <ButtonCell
-        leftAligned={true}
-        title={
-          bugsnagOptOut ? 'Enable Error Reporting' : 'Disable Error Reporting'
-        }
-        onPress={() => toggleBugnsagOptOut(!bugsnagOptOut)}
-      >
-        <Label>
-          {
-            'Help us improve Standard Notes by automatically submitting anonymized error reports.'
-          }
-        </Label>
       </ButtonCell>
 
       <ButtonCell
