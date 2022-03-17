@@ -386,6 +386,8 @@ PODS:
     - React-RCTImage
   - RNSearchBar (3.5.1):
     - React-Core
+  - RNShare (7.3.7):
+    - React-Core
   - RNStoreReview (0.1.5):
     - React
   - RNSVG (12.1.1):
@@ -484,6 +486,7 @@ DEPENDENCIES:
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSearchBar (from `../node_modules/react-native-search-bar`)
+  - RNShare (from `../node_modules/react-native-share`)
   - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -616,6 +619,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSearchBar:
     :path: "../node_modules/react-native-search-bar"
+  RNShare:
+    :path: "../node_modules/react-native-share"
   RNStoreReview:
     :path: "../node_modules/react-native-store-review/ios"
   RNSVG:
@@ -697,6 +702,7 @@ SPEC CHECKSUMS:
   RNReanimated: 514a11da3a2bcc6c3dfd9de32b38e2b9bf101926
   RNScreens: 21b73c94c9117e1110a79ee0ee80c93ccefed8ce
   RNSearchBar: 5ed8e13ba8a6c701fbd2afdfe4164493d24b2aee
+  RNShare: f116bbb04f310c665ca483d0bd1e88cf59b3b334
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59

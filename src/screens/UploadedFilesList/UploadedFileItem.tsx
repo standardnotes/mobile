@@ -7,7 +7,7 @@ import { formatSizeToReadableString } from '@standardnotes/filepicker';
 import { IconType, SNFile } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import React, { FC, useContext, useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import {
   FileDataContainer,
   FileDateAndSizeContainer,
@@ -77,6 +77,15 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({
         },
       },
       {
+        text: 'Share',
+        callback: () => {
+          handleFileAction({
+            type: UploadedFileItemActionType.ShareFile,
+            payload: file,
+          });
+        },
+      },
+      {
         text: 'Download',
         callback: () => {
           handleFileAction({
@@ -94,7 +103,11 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({
           }),
       },
     ];
-    showActionSheet('Choose action', actions);
+    const osDependentActions =
+      Platform.OS === 'ios'
+        ? actions.filter(action => action.text !== 'Download')
+        : [...actions];
+    showActionSheet('Choose action', osDependentActions);
   };
 
   if (!application) {

@@ -4,6 +4,7 @@ export enum UploadedFileItemActionType {
   AttachFileToNote,
   DetachFileToNote,
   DeleteFile,
+  ShareFile,
   DownloadFile,
   RenameFile,
   ToggleFileProtection,

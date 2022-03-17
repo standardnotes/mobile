@@ -8069,6 +8069,11 @@ react-native-search-box@standardnotes/react-native-search-box#c0de5bab18cb418fef
   dependencies:
     prop-types "^15.5.10"
 
+react-native-share@^7.3.7:
+  version "7.3.7"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-7.3.7.tgz#f5eed0bf657ec8c5c45e3fe7a88611d28cc8f734"
+  integrity sha512-WYXAqyNZeKKk3Kvsv4N3tJuLNw8k+HM+ymKnWFRomoSerD5syJqmBHgw1HwED8iV3zH11lXJw3rha9+H80XUHQ==
+
 react-native-sodium-jsi@1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/react-native-sodium-jsi/-/react-native-sodium-jsi-1.1.6.tgz#ce969208255ceed039cd95793c1aee6163abed34"

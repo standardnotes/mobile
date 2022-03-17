@@ -10,8 +10,13 @@ import {
 import { ChallengeReason, ContentType, SNFile } from '@standardnotes/snjs';
 import { Buffer } from 'buffer';
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import RNFS from 'react-native-fs';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import RNFS, {
+  DocumentDirectoryPath,
+  exists,
+  ExternalDirectoryPath,
+} from 'react-native-fs';
+import RNShare from 'react-native-share';
 import { ThemeContext } from 'styled-components/native';
 import {
   AttachedFilesList,
@@ -202,7 +207,7 @@ export const UploadedFilesList: FC<Props> = props => {
       'Delete'
     );
     if (shouldDelete) {
-      // TODO: show something instead of toast
+      // TODO: show some toast
       await application.deleteItem(file);
       /*const deletingToastId = addToast({
         type: ToastType.Loading,
@@ -217,17 +222,59 @@ export const UploadedFilesList: FC<Props> = props => {
     }
   };
 
-  const downloadFile = async (file: SNFile) => {
+  const deleteFileAtPath = async (path: string) => {
+    await RNFS.unlink(path);
+  };
+
+  const shareFile = (file: SNFile, path: string) => {
+    application
+      .getAppState()
+      .performActionWithoutStateChangeImpact(async () => {
+        try {
+          const shareDialogResponse = await RNShare.open({
+            url: `file://${path}`,
+            failOnCancel: false,
+          });
+          // On Android this response is always returns {success: false}, there is an open issue for that
+          //  https://github.com/react-native-share/react-native-share/issues/1059
+          console.log('shareDialogResponse is', shareDialogResponse);
+        } catch (error) {
+          error && console.log('An error has occurred: ', error);
+        } finally {
+          try {
+            // RNFS.unlink(path);
+            deleteFileAtPath(path);
+          } catch (error) {
+            console.log(error.message);
+          }
+        }
+      });
+  };
+
+  const downloadFile = async (file: SNFile, showShareScreen = false) => {
     try {
+      let path = '';
+
       await application.files.downloadFile(
         file,
         async (decryptedBytes: Uint8Array) => {
           const base64String = new Buffer(decryptedBytes).toString('base64');
-          const path = `${RNFS.DocumentDirectoryPath}/${file.name}`;
+          const directory =
+            Platform.OS === 'ios'
+              ? DocumentDirectoryPath
+              : ExternalDirectoryPath;
+          path = `${directory}/${file.name}`;
 
+          if (await exists(path)) {
+            await deleteFileAtPath(path);
+          }
           await RNFS.appendFile(path, base64String, 'base64');
         }
       );
+
+      if (showShareScreen) {
+        shareFile(file, path);
+      }
     } catch (error) {
       console.error('An error occurred: ', error);
 
@@ -324,6 +371,9 @@ export const UploadedFilesList: FC<Props> = props => {
         break;
       case UploadedFileItemActionType.DeleteFile:
         await deleteFile(file);
+        break;
+      case UploadedFileItemActionType.ShareFile:
+        await downloadFile(file, true);
         break;
       case UploadedFileItemActionType.DownloadFile:
         await downloadFile(file);
