@@ -139,7 +139,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     try {
       const selectedFile = await DocumentPicker.pick({
         type: [DocumentPicker.types.plainText],
-      });
+      })[0];
       const selectedFileURI =
         Platform.OS === 'ios'
           ? decodeURIComponent(selectedFile.uri)
