@@ -35,7 +35,7 @@
     "js-base64": "^3.5.2",
     "moment": "^2.29.1",
     "react": "17.0.2",
-    "react-native": "0.66.4",
+    "react-native": "0.67.4",
     "react-native-aes-crypto": "standardnotes/react-native-aes#6430299",
     "react-native-alternate-icons": "standardnotes/react-native-alternate-icons#1d335d",
     "react-native-default-preference": "^1.4.3",
