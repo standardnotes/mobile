@@ -20,7 +20,7 @@ const SIGN_IN_TEXT = 'Sign in or register to backup your notes';
 export const OfflineBanner: React.FC = () => {
   const navigation = useNavigation();
   const onPress = () => {
-    navigation.navigate(SCREEN_SETTINGS);
+    navigation.navigate(SCREEN_SETTINGS as never);
   };
 
   return (

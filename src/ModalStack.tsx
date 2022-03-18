@@ -31,7 +31,7 @@ import { ApplicationContext } from './ApplicationContext';
 import { AppStackComponent } from './AppStack';
 import { HistoryStack } from './HistoryStack';
 
-type ModalStackNavigatorParamList = {
+export type ModalStackNavigatorParamList = {
   AppStack: undefined;
   HistoryStack: undefined;
   [SCREEN_SETTINGS]: undefined;
@@ -68,11 +68,11 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
     <MainStack.Navigator
       screenOptions={{
         gestureEnabled: false,
+        presentation: 'modal',
         headerStyle: {
           backgroundColor: theme.stylekitContrastBackgroundColor,
         },
       }}
-      mode="modal"
       initialRouteName="AppStack"
     >
       <MainStack.Screen

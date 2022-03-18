@@ -261,7 +261,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
 
   const openSettings = () => {
     drawerRef?.closeDrawer();
-    navigation?.navigate(SCREEN_SETTINGS);
+    navigation?.navigate(SCREEN_SETTINGS as never);
   };
 
   const outOfSyncPressed = async () => {

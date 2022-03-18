@@ -42,7 +42,7 @@ import { HeaderTitleParams } from './App';
 import { ApplicationContext } from './ApplicationContext';
 import { ModalStackNavigationProp } from './ModalStack';
 
-type AppStackNavigatorParamList = {
+export type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
   [SCREEN_COMPOSE]: HeaderTitleParams | undefined;
   [SCREEN_VIEW_PROTECTED_NOTE]: {
