@@ -2683,10 +2683,15 @@
     "@standardnotes/features" "^1.34.10"
     "@standardnotes/utils" "^1.3.0"
 
-"@standardnotes/react-native-textview@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/react-native-textview/-/react-native-textview-1.0.1.tgz#09804215cb4fd24483a502e2744e766639df9081"
-  integrity sha512-+zgH7PwvyfuLWyvd7rT9P9ssW/sakDXoG/6LQI3ytQUENkPeHJTvBEKsQEV61HO6QCZLiVPiHorVIhf0+I/TdA==
+"@standardnotes/react-native-aes@^1.4.3":
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/react-native-aes/-/react-native-aes-1.4.3.tgz#e8e9aa7d3fce8622ab520002b2260bee03a23b8b"
+  integrity sha512-yY5tDIvvjweEMYdpd2cRGW9BqaUxb82n7Gr3iR1REYny7rrYPCCj+kS76D589mISYNa1TiTXwccvEd9zV1iYzg==
+
+"@standardnotes/react-native-textview@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/react-native-textview/-/react-native-textview-1.0.2.tgz#8b22a58b9f5d3eb4fcd3e062f0db285147e85227"
+  integrity sha512-X3hOiZuWpUdr6JWBZxLC25tlrpVFWnQ5Cf27UsEreUV7W1N6QvQ1ozckH3Yk7D06Ee5b/+6unSuESU5q/pHI0A==
 
 "@standardnotes/react-native-utils@1.0.1":
   version "1.0.1"
@@ -8119,10 +8124,6 @@ react-is@^17.0.1:
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
-
-react-native-aes-crypto@standardnotes/react-native-aes#6430299:
-  version "1.3.9"
-  resolved "https://codeload.github.com/standardnotes/react-native-aes/tar.gz/64302996fc8bfe098d34e785190d36519c5fa270"
 
 react-native-alternate-icons@standardnotes/react-native-alternate-icons#1d335d:
   version "0.3.0"
