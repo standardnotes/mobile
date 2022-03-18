@@ -59,7 +59,7 @@ export const useCustomActionSheet = () => {
         anchor: anchor ? findNodeHandle(anchor) ?? undefined : undefined,
       },
       buttonIndex => {
-        let option = tempOptions[buttonIndex];
+        let option = tempOptions[buttonIndex!];
         option.callback && option.callback(option);
       }
     );
