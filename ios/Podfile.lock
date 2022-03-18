@@ -277,24 +277,28 @@ PODS:
     - glog
   - react-native-aes (1.3.9):
     - React-Core
-  - react-native-document-picker (5.0.4):
+  - react-native-document-picker (8.0.0):
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
     - React-Core
   - react-native-mail (4.1.0):
     - React-Core
-  - react-native-safe-area-context (3.1.9):
-    - React-Core
+  - react-native-safe-area-context (4.2.1):
+    - RCT-Folly
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - ReactCommon/turbomodule/core
   - react-native-segmented-control (2.2.2):
     - React-Core
-  - react-native-sodium-jsi (1.1.3):
+  - react-native-sodium-jsi (1.1.7):
     - React-Core
   - react-native-static-server (0.5.0):
     - GCDWebServer (~> 3.0)
     - React
-  - react-native-version-info (1.1.0):
+  - react-native-version-info (1.1.1):
     - React-Core
-  - react-native-webview (11.15.0):
+  - react-native-webview (11.17.2):
     - React-Core
   - React-perflogger (0.67.4)
   - React-RCTActionSheet (0.67.4):
@@ -365,38 +369,64 @@ PODS:
     - React
   - RNCAsyncStorage (1.12.1):
     - React-Core
-  - RNCMaskedView (0.1.10):
+  - RNCMaskedView (0.1.11):
     - React
   - RNDefaultPreference (1.4.3):
     - React
-  - RNFileViewer (2.1.4):
+  - RNFileViewer (2.1.5):
     - React-Core
-  - RNFS (2.16.6):
-    - React
-  - RNGestureHandler (1.9.0):
+  - RNFS (2.19.0):
     - React-Core
-  - RNKeychain (4.0.5):
-    - React
+  - RNGestureHandler (2.3.2):
+    - React-Core
+  - RNKeychain (8.0.0):
+    - React-Core
   - RNPrivacySnapshot (1.0.0):
     - React-Core
-  - RNReanimated (1.13.3):
+  - RNReanimated (2.4.1):
+    - DoubleConversion
+    - FBLazyVector
+    - FBReactNativeSpec
+    - glog
+    - RCT-Folly
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - React-callinvoker
     - React-Core
-  - RNScreens (3.4.0):
+    - React-Core/DevSupport
+    - React-Core/RCTWebSocket
+    - React-CoreModules
+    - React-cxxreact
+    - React-jsi
+    - React-jsiexecutor
+    - React-jsinspector
+    - React-RCTActionSheet
+    - React-RCTAnimation
+    - React-RCTBlob
+    - React-RCTImage
+    - React-RCTLinking
+    - React-RCTNetwork
+    - React-RCTSettings
+    - React-RCTText
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - RNScreens (3.13.1):
     - React-Core
     - React-RCTImage
   - RNSearchBar (3.5.1):
     - React-Core
-  - RNStoreReview (0.1.5):
-    - React
-  - RNSVG (12.1.1):
-    - React
-  - RNVectorIcons (7.1.0):
-    - React
-  - RNZipArchive (6.0.2):
+  - RNStoreReview (0.2.0):
     - React-Core
-    - RNZipArchive/Core (= 6.0.2)
+  - RNSVG (12.3.0):
+    - React-Core
+  - RNVectorIcons (9.1.0):
+    - React-Core
+  - RNZipArchive (6.0.6):
+    - React-Core
+    - RNZipArchive/Core (= 6.0.6)
     - SSZipArchive (= 2.2.3)
-  - RNZipArchive/Core (6.0.2):
+  - RNZipArchive/Core (6.0.6):
     - React-Core
     - SSZipArchive (= 2.2.3)
   - sn-textview (1.0.1):
@@ -665,15 +695,15 @@ SPEC CHECKSUMS:
   React-jsinspector: f4775ea9118cbe1f72b834f0f842baa7a99508d8
   React-logger: a1f028f6d8639a3f364ef80419e5e862e1115250
   react-native-aes: a13199300208e4eda1df14506a276415561e02bd
-  react-native-document-picker: 1a7518132d4a06b67f459be9bb1464a567d2b3b4
+  react-native-document-picker: 429972f7ece4463aa5bcdd789622b3a674a3c5d1
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-mail: 5fe7239a5b5c1e858d425501c03d1ab977434122
-  react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
+  react-native-safe-area-context: 806f8370bf9fc9db90a3413aaa1aab0d2e22fdf3
   react-native-segmented-control: 65df6cd0619b780b3843d574a72d4c7cec396097
-  react-native-sodium-jsi: e86fb6bc2f48b5148c1339b07b18a7f3799d17a3
+  react-native-sodium-jsi: 42be5954ce2e66a56f1907e35e2561bcc54a0472
   react-native-static-server: 201b2a945a35096be3ae7f43e367c65bcbd61343
-  react-native-version-info: 36490da17d2c6b5cc21321c70e433784dee7ed0b
-  react-native-webview: e89bf2dba26a04cda967814df3ed1be99f291233
+  react-native-version-info: a106f23009ac0db4ee00de39574eb546682579b9
+  react-native-webview: 380c1a03ec94b7ed764dac8db1e7c9952d08c93a
   React-perflogger: 0afaf2f01a47fd0fc368a93bfbb5bd3b26db6e7f
   React-RCTActionSheet: 59f35c4029e0b532fc42114241a06e170b7431a2
   React-RCTAnimation: aae4f4bed122e78bdab72f7118d291d70a932ce2
@@ -688,20 +718,20 @@ SPEC CHECKSUMS:
   ReactCommon: 07d0c460b9ba9af3eaf1b8f5abe7daaad28c9c4e
   ReactNativeAlternateIcons: b2a8a729d9d9756ed0652c352694f190407f297f
   RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
-  RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
+  RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNDefaultPreference: 2f8d6d54230edbd78708ada8d63bb275e5a8415b
-  RNFileViewer: 83cc066ad795b1f986791d03b56fe0ee14b6a69f
-  RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
-  RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
-  RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
+  RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
+  RNFS: fc610f78fdf8bfc89a9e5cc2f898519f4dba1002
+  RNGestureHandler: 6e757e487a4834e7280e98e9bac66d2d9c575e9c
+  RNKeychain: 4f63aada75ebafd26f4bc2c670199461eab85d94
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
-  RNReanimated: 514a11da3a2bcc6c3dfd9de32b38e2b9bf101926
-  RNScreens: 21b73c94c9117e1110a79ee0ee80c93ccefed8ce
+  RNReanimated: 32c91e28f5780937b8efc07ddde1bab8d373fe0b
+  RNScreens: 40a2cb40a02a609938137a1e0acfbf8fc9eebf19
   RNSearchBar: 5ed8e13ba8a6c701fbd2afdfe4164493d24b2aee
-  RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
-  RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
-  RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
-  RNZipArchive: 3dd2de5b7f590d79e83270508b78870bf5a54f36
+  RNStoreReview: d7d2a006e14030fe101cac9da487a17f98d73eff
+  RNSVG: 302bfc9905bd8122f08966dc2ce2d07b7b52b9f8
+  RNVectorIcons: 7923e585eaeb139b9f4531d25a125a1500162a0b
+  RNZipArchive: 9e6af1bebc9c7ddb42893bc4e70804321227c3ec
   sn-textview: 0211237b3e0edeeb23aed2a9c47b78af35a81e95
   SNReactNative: b5e9e529c175c13f3a618e27c76cf3071213d5e1
   SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
