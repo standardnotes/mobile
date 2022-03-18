@@ -10,7 +10,7 @@
     "isolatedModules": false,
     "strict": true,
     "skipLibCheck": true,
-    // "noImplicitAny": false,
+    "noImplicitAny": false,
     "moduleResolution": "node",
     "baseUrl": "src",
     "allowSyntheticDefaultImports": true,

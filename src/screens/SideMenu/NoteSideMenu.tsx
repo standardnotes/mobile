@@ -51,7 +51,7 @@ import FAB from 'react-native-fab';
 import { FlatList } from 'react-native-gesture-handler';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled';
 import {
   SideMenuOption,

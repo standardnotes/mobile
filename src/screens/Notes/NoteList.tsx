@@ -26,7 +26,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import IosSearchBar from 'react-native-search-bar';
 import AndroidSearchBar from 'react-native-search-box';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import { NoteCell } from './NoteCell';
 import {
   Container,

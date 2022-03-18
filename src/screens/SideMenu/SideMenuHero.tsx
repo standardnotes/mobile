@@ -4,7 +4,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { ContentType } from '@standardnotes/snjs';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ViewProps } from 'react-native';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import {
   Cell,
   IconCircle,

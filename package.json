@@ -47,7 +47,7 @@
     "react-native-keychain": "^4.0.5",
     "react-native-mail": "standardnotes/react-native-mail#fd26119e67a2ffc5eaa95a9c17049743e39ce2d3",
     "react-native-privacy-snapshot": "standardnotes/react-native-privacy-snapshot#653e904",
-    "react-native-reanimated": "^1.13.3",
+    "react-native-reanimated": "^2.4.1",
     "react-native-safe-area-context": "^3.1.9",
     "react-native-screens": "3.4.0",
     "react-native-search-bar": "standardnotes/react-native-search-bar#7d2139d",

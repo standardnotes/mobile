@@ -28,7 +28,7 @@ import React, {
   useState,
 } from 'react';
 import FAB from 'react-native-fab';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import { NoteList } from './NoteList';
 import { StyledIcon } from './Notes.styled';
 

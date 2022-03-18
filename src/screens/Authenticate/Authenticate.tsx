@@ -38,7 +38,7 @@ import {
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { hide } from 'react-native-privacy-snapshot';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import {
   BaseView,
   Input,
