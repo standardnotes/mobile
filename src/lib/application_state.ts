@@ -174,11 +174,10 @@ export class ApplicationState extends ApplicationService {
   }
 
   async onAppStart() {
-    this.removePreferencesLoadedListener = this.prefService.addPreferencesLoadedObserver(
-      () => {
+    this.removePreferencesLoadedListener =
+      this.prefService.addPreferencesLoadedObserver(() => {
         this.notifyOfStateChange(AppStateType.PreferencesChanged);
-      }
-    );
+      });
 
     await this.loadUnlockTiming();
   }
@@ -627,12 +626,14 @@ export class ApplicationState extends ApplicationService {
    * while non-app cycle events are custom events like locking and unlocking
    */
   isAppVisibilityChange(state: AppStateType) {
-    return ([
-      AppStateType.LosingFocus,
-      AppStateType.EnteringBackground,
-      AppStateType.GainingFocus,
-      AppStateType.ResumingFromBackground,
-    ] as Array<AppStateType>).includes(state);
+    return (
+      [
+        AppStateType.LosingFocus,
+        AppStateType.EnteringBackground,
+        AppStateType.GainingFocus,
+        AppStateType.ResumingFromBackground,
+      ] as Array<AppStateType>
+    ).includes(state);
   }
 
   private async getScreenshotPrivacyEnabled(): Promise<boolean | undefined> {

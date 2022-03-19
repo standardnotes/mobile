@@ -82,9 +82,8 @@ export const NoteList = (props: Props) => {
   const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
   const noteListRef = useRef<FlatList>(null);
 
-  const navigation = useNavigation<
-    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
-  >();
+  const navigation =
+    useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>();
 
   const dismissKeyboard = () => {
     iosSearchBarInputRef.current?.blur();

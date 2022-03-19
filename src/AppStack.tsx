@@ -50,15 +50,14 @@ export type AppStackNavigatorParamList = {
   };
 };
 
-export type AppStackNavigationProp<
-  T extends keyof AppStackNavigatorParamList
-> = {
-  navigation: CompositeNavigationProp<
-    ModalStackNavigationProp<'AppStack'>['navigation'],
-    StackNavigationProp<AppStackNavigatorParamList, T>
-  >;
-  route: RouteProp<AppStackNavigatorParamList, T>;
-};
+export type AppStackNavigationProp<T extends keyof AppStackNavigatorParamList> =
+  {
+    navigation: CompositeNavigationProp<
+      ModalStackNavigationProp<'AppStack'>['navigation'],
+      StackNavigationProp<AppStackNavigatorParamList, T>
+    >;
+    route: RouteProp<AppStackNavigatorParamList, T>;
+  };
 
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 

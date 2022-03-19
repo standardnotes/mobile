@@ -200,7 +200,9 @@ export const Authenticate = ({
 
   const checkForBiometrics = useCallback(
     async () =>
-      (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(),
+      (
+        application?.deviceInterface as MobileDeviceInterface
+      ).getDeviceBiometricsAvailability(),
     [application]
   );
 

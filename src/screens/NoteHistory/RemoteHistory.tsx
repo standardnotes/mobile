@@ -20,9 +20,8 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   const insets = useSafeAreaInsets();
 
   // State
-  const [remoteHistoryList, setRemoteHistoryList] = useState<
-    RevisionListEntry[]
-  >();
+  const [remoteHistoryList, setRemoteHistoryList] =
+    useState<RevisionListEntry[]>();
   const [fetchingRemoteHistory, setFetchingRemoteHistory] = useState(false);
 
   useEffect(() => {
@@ -31,9 +30,8 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
     const fetchRemoteHistoryList = async () => {
       if (note) {
         setFetchingRemoteHistory(true);
-        const newRemoteHistory = await application?.historyManager?.remoteHistoryForItem(
-          note
-        );
+        const newRemoteHistory =
+          await application?.historyManager?.remoteHistoryForItem(note);
         if (isMounted) {
           setFetchingRemoteHistory(false);
           setRemoteHistoryList(newRemoteHistory);
@@ -49,10 +47,8 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
 
   const onItemPress = useCallback(
     async (item: RevisionListEntry) => {
-      const remoteRevision = await application?.historyManager!.fetchRemoteRevision(
-        note.uuid,
-        item
-      );
+      const remoteRevision =
+        await application?.historyManager!.fetchRemoteRevision(note.uuid, item);
       if (remoteRevision) {
         onPress(
           item.uuid,

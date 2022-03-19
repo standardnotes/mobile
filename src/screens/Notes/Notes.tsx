@@ -49,9 +49,10 @@ export const Notes = React.memo(
     // Context
     const application = useContext(ApplicationContext);
     const theme = useContext(ThemeContext);
-    const navigation = useNavigation<
-      AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
-    >();
+    const navigation =
+      useNavigation<
+        AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
+      >();
 
     /**
      * Update sync status
@@ -87,26 +88,20 @@ export const Notes = React.memo(
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>();
     const [searchText, setSearchText] = useState('');
     const [searchOptions, setSearchOptions] = useState<SearchOptions>([]);
-    const [
-      includeProtectedNoteText,
-      setIncludeProtectedNoteText,
-    ] = useState<boolean>(
-      () =>
-        !(
-          application!.hasProtectionSources() &&
-          !application!.hasUnprotectedAccessSession()
-        )
-    );
-    const [includeArchivedNotes, setIncludeArchivedNotes] = useState<boolean>(
-      false
-    );
-    const [includeTrashedNotes, setIncludeTrashedNotes] = useState<boolean>(
-      false
-    );
-    const [
-      includeProtectedStarted,
-      setIncludeProtectedStarted,
-    ] = useState<boolean>(false);
+    const [includeProtectedNoteText, setIncludeProtectedNoteText] =
+      useState<boolean>(
+        () =>
+          !(
+            application!.hasProtectionSources() &&
+            !application!.hasUnprotectedAccessSession()
+          )
+      );
+    const [includeArchivedNotes, setIncludeArchivedNotes] =
+      useState<boolean>(false);
+    const [includeTrashedNotes, setIncludeTrashedNotes] =
+      useState<boolean>(false);
+    const [includeProtectedStarted, setIncludeProtectedStarted] =
+      useState<boolean>(false);
     const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false);
 
     const haveDisplayOptions = useRef(false);
@@ -211,13 +206,14 @@ export const Notes = React.memo(
 
     useEffect(() => {
       let mounted = true;
-      const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(
-        activeEditor => {
-          if (mounted) {
-            setSelectedNoteId(activeEditor?.note?.uuid);
+      const removeEditorObserver =
+        application?.editorGroup.addActiveControllerChangeObserver(
+          activeEditor => {
+            if (mounted) {
+              setSelectedNoteId(activeEditor?.note?.uuid);
+            }
           }
-        }
-      );
+        );
 
       return () => {
         mounted = false;
@@ -291,7 +287,8 @@ export const Notes = React.memo(
 
       if (includeProtected) {
         setIncludeProtectedStarted(true);
-        allowToggling = await application?.authorizeSearchingProtectedNotesText();
+        allowToggling =
+          await application?.authorizeSearchingProtectedNotesText();
       }
 
       setIncludeProtectedStarted(false);

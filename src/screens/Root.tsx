@@ -77,11 +77,12 @@ export const Root = () => {
           }
         }
       );
-    const removeNoteObserver = application?.editorGroup.addActiveControllerChangeObserver(
-      activeController => {
-        setActiveNoteId(activeController?.note.uuid);
-      }
-    );
+    const removeNoteObserver =
+      application?.editorGroup.addActiveControllerChangeObserver(
+        activeController => {
+          setActiveNoteId(activeController?.note.uuid);
+        }
+      );
     return () => {
       if (removeApplicationStateEventHandler) {
         removeApplicationStateEventHandler();

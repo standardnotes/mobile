@@ -106,9 +106,8 @@ export class ComponentManager extends SNComponentManager {
 
     const version = nativeFeature?.version || component.package_info?.version;
 
-    const existingPackageJson = await this.getDownloadedComponentPackageJsonFile(
-      identifier
-    );
+    const existingPackageJson =
+      await this.getDownloadedComponentPackageJsonFile(identifier);
     const existingVersion = existingPackageJson?.version;
     this.log('Existing package version', existingVersion);
     this.log('Latest package version', version);
@@ -235,9 +234,8 @@ export class ComponentManager extends SNComponentManager {
 
     this.log('Finished download to tmp location', tmpLocation);
 
-    const requireChecksumVerification = !!this.nativeFeatureForIdentifier(
-      identifier
-    );
+    const requireChecksumVerification =
+      !!this.nativeFeatureForIdentifier(identifier);
     if (requireChecksumVerification) {
       const passes = await this.passesChecksumValidation(
         tmpLocation,

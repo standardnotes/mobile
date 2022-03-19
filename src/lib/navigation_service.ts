@@ -3,11 +3,12 @@ import { AppStackNavigatorParamList } from '@Root/AppStack';
 import { ModalStackNavigatorParamList } from '@Root/ModalStack';
 import * as React from 'react';
 
-export const navigationRef = React.createRef<
-  NavigationContainerRef<
-    AppStackNavigatorParamList & ModalStackNavigatorParamList
-  >
->();
+export const navigationRef =
+  React.createRef<
+    NavigationContainerRef<
+      AppStackNavigatorParamList & ModalStackNavigatorParamList
+    >
+  >();
 
 export function navigate(
   name: keyof AppStackNavigatorParamList | keyof ModalStackNavigatorParamList,

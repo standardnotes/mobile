@@ -15,8 +15,7 @@ const URLS = {
   privacy: 'https://standardnotes.com/privacy',
   help: 'https://standardnotes.com/help',
   rate: Platform.select({
-    ios:
-      'https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8',
+    ios: 'https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8',
     android: 'market://details?id=com.standardnotes',
   }) as string,
 };

@@ -128,9 +128,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   public xchacha20StreamInitEncryptor(
     key: HexString
   ): Sodium.MobileStreamEncryptor {
-    const encryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_push(
-      key
-    );
+    const encryptor =
+      Sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
     return encryptor;
   }
 

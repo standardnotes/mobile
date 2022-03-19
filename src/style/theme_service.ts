@@ -51,7 +51,7 @@ type MobileThemeContent = {
 
 export class MobileTheme extends SNTheme {
   get mobileContent() {
-    return (this.safeContent as any) as MobileThemeContent;
+    return this.safeContent as any as MobileThemeContent;
   }
 
   static BuildTheme(variables?: MobileThemeVariables) {
@@ -69,7 +69,6 @@ export class MobileTheme extends SNTheme {
   }
 }
 
-// eslint-disable-next-line no-shadow
 enum SystemThemeTint {
   Blue = 'Blue',
   Dark = 'Dark',
