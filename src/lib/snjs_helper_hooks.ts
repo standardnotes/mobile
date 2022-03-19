@@ -135,11 +135,10 @@ export const useHasEditor = () => {
   const [hasEditor, setHasEditor] = React.useState<boolean>(false);
 
   useEffect(() => {
-    const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(
-      newEditor => {
+    const removeEditorObserver =
+      application?.editorGroup.addActiveControllerChangeObserver(newEditor => {
         setHasEditor(Boolean(newEditor));
-      }
-    );
+      });
     return removeEditorObserver;
   }, [application]);
 
@@ -389,10 +388,8 @@ export const useProtectionSessionExpiry = () => {
   }, [application]);
 
   // State
-  const [
-    protectionsDisabledUntil,
-    setProtectionsDisabledUntil,
-  ] = React.useState(getProtectionsDisabledUntil());
+  const [protectionsDisabledUntil, setProtectionsDisabledUntil] =
+    React.useState(getProtectionsDisabledUntil());
 
   useEffect(() => {
     const removeProtectionLengthSubscriber = application?.addEventObserver(

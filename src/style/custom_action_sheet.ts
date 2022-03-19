@@ -1,7 +1,7 @@
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import React, { useContext } from 'react';
 import { findNodeHandle } from 'react-native';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 
 export type CustomActionSheetOption =
   | {
@@ -59,7 +59,7 @@ export const useCustomActionSheet = () => {
         anchor: anchor ? findNodeHandle(anchor) ?? undefined : undefined,
       },
       buttonIndex => {
-        let option = tempOptions[buttonIndex];
+        let option = tempOptions[buttonIndex!];
         option.callback && option.callback(option);
       }
     );

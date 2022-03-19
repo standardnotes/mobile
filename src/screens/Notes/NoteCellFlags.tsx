@@ -1,6 +1,12 @@
 import { SNNote } from '@standardnotes/snjs';
 import React, { useContext } from 'react';
-import styled, { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
+import styled from 'styled-components/native';
+
+type NoteFlag = {
+  text: string;
+  color: string;
+};
 
 const FlagsContainer = styled.View`
   flex-direction: row;
@@ -31,7 +37,7 @@ export const NoteCellFlags = ({
 }) => {
   const theme = useContext(ThemeContext);
 
-  let flags = [];
+  let flags: NoteFlag[] = [];
 
   if (note.errorDecrypting) {
     if (note.waitingForKey) {

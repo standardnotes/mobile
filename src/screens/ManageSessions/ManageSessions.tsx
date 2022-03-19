@@ -10,7 +10,7 @@ import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { FlatList, ListRenderItem, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import { SessionCell } from './SessionCell';
 
 const useSessions = (): [

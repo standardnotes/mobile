@@ -1,16 +1,14 @@
 /* eslint-disable no-bitwise */
+import Aes from '@standardnotes/react-native-aes';
 import {
   Base64String,
   HexString,
   SNPureCrypto,
   SodiumConstant,
-  StreamDecryptor,
   StreamDecryptorResult,
-  StreamEncryptor,
   timingSafeEqual,
   Utf8String,
 } from '@standardnotes/sncrypto-common';
-import Aes from 'react-native-aes-crypto';
 import * as Sodium from 'react-native-sodium-jsi';
 
 export class SNReactNativeCrypto implements SNPureCrypto {
@@ -127,39 +125,42 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     }
   }
 
-  public xchacha20StreamInitEncryptor(key: HexString): StreamEncryptor {
-    return Sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
+  public xchacha20StreamInitEncryptor(
+    key: HexString
+  ): Sodium.MobileStreamEncryptor {
+    const encryptor =
+      Sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
+    return encryptor;
   }
 
   public xchacha20StreamEncryptorPush(
-    encryptor: StreamEncryptor,
+    encryptor: Sodium.MobileStreamEncryptor,
     plainBuffer: Uint8Array,
     assocData: Utf8String,
     tag: SodiumConstant = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PUSH
   ): Uint8Array {
     const encryptedBuffer = Sodium.crypto_secretstream_xchacha20poly1305_push(
-      encryptor.state as never,
-      plainBuffer,
+      encryptor,
+      plainBuffer.buffer,
       assocData,
       tag
     );
-    return encryptedBuffer;
+    return new Uint8Array(encryptedBuffer);
   }
 
   public xchacha20StreamInitDecryptor(
     header: Base64String,
     key: HexString
-  ): StreamDecryptor {
-    const state = Sodium.crypto_secretstream_xchacha20poly1305_init_pull(
+  ): Sodium.MobileStreamDecryptor {
+    const decryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_pull(
       header,
       key
     );
-
-    return { state };
+    return decryptor;
   }
 
   public xchacha20StreamDecryptorPush(
-    decryptor: StreamDecryptor,
+    decryptor: Sodium.MobileStreamDecryptor,
     encryptedBuffer: Uint8Array,
     assocData: Utf8String
   ): StreamDecryptorResult | false {
@@ -171,16 +172,19 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     }
 
     const result = Sodium.crypto_secretstream_xchacha20poly1305_pull(
-      decryptor.state as never,
-      encryptedBuffer,
+      decryptor,
+      encryptedBuffer.buffer,
       assocData
     );
 
-    if ((result as unknown) === false) {
+    if (!result) {
       return false;
     }
 
-    return result;
+    return {
+      message: new Uint8Array(result.message),
+      tag: result.tag,
+    };
   }
 
   public generateUUID() {

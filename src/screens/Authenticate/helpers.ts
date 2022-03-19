@@ -8,7 +8,6 @@ export const isInActiveState = (state: AuthenticationValueStateType) =>
   state !== AuthenticationValueStateType.WaitingInput &&
   state !== AuthenticationValueStateType.Success;
 
-// eslint-disable-next-line no-shadow
 export enum AuthenticationValueStateType {
   WaitingTurn = 0,
   WaitingInput = 1,

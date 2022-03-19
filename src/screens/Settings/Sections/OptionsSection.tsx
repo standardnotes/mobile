@@ -25,9 +25,10 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   // Context
   const application = useContext(ApplicationContext);
   const [signedIn] = useSignedIn();
-  const navigation = useNavigation<
-    ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
-  >();
+  const navigation =
+    useNavigation<
+      ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
+    >();
 
   // State
   const [importing, setImporting] = useState(false);
@@ -87,7 +88,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         ButtonType.Danger
       )
     ) {
-      await application!.signOut();
+      await application!.user.signOut();
     }
   };
 
@@ -137,9 +138,10 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
 
   const onImportPress = async () => {
     try {
-      const selectedFile = await DocumentPicker.pick({
+      const selectedFiles = await DocumentPicker.pick({
         type: [DocumentPicker.types.plainText],
       });
+      const selectedFile = selectedFiles[0];
       const selectedFileURI =
         Platform.OS === 'ios'
           ? decodeURIComponent(selectedFile.uri)

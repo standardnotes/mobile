@@ -2,7 +2,8 @@ import { SectionedTableCellTouchableHighlight } from '@Components/SectionedTable
 import React, { useContext } from 'react';
 import { Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import styled, { css, ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
+import styled, { css } from 'styled-components/native';
 
 type Props = {
   testID?: string;
@@ -111,7 +112,7 @@ export const SectionedAccessoryTableCell: React.FC<Props> = props => {
   if (props.color) {
     color = props.color;
   }
-  let icon = null;
+  let icon: any = null;
 
   if (iconName) {
     icon = (

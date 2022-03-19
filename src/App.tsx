@@ -132,13 +132,12 @@ export const App = (props: { env: 'prod' | 'dev' }) => {
   >();
 
   useEffect(() => {
-    const removeAppChangeObserver = applicationGroupRef.current.addApplicationChangeObserver(
-      () => {
+    const removeAppChangeObserver =
+      applicationGroupRef.current.addApplicationChangeObserver(() => {
         const mobileApplication = applicationGroupRef.current
           .primaryApplication as MobileApplication;
         setApplication(mobileApplication);
-      }
-    );
+      });
     return removeAppChangeObserver;
   }, [applicationGroupRef.current.primaryApplication]);
 

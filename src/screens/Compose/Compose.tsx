@@ -60,10 +60,10 @@ export class Compose extends React.Component<{}, State> {
   static contextType = ApplicationContext;
   context: React.ContextType<typeof ApplicationContext>;
   editorViewRef: React.RefObject<SNTextView> = createRef();
-  saveTimeout: number | undefined;
+  saveTimeout: ReturnType<typeof setTimeout> | undefined;
   alreadySaved: boolean = false;
-  statusTimeout: number | undefined;
-  downloadingMessageTimeout: number | undefined;
+  statusTimeout: ReturnType<typeof setTimeout> | undefined;
+  downloadingMessageTimeout: ReturnType<typeof setTimeout> | undefined;
   removeNoteInnerValueObserver?: () => void;
   removeComponentsObserver?: () => void;
   removeStreamComponents?: () => void;
@@ -90,8 +90,8 @@ export class Compose extends React.Component<{}, State> {
   }
 
   componentDidMount() {
-    this.removeNoteInnerValueObserver = this.editor?.addNoteInnerValueChangeObserver(
-      (note, source) => {
+    this.removeNoteInnerValueObserver =
+      this.editor?.addNoteInnerValueChangeObserver((note, source) => {
         if (isPayloadSourceRetrieved(source!)) {
           this.setState({
             title: note.title,
@@ -122,8 +122,7 @@ export class Compose extends React.Component<{}, State> {
             this.showSavingStatus();
           }
         }
-      }
-    );
+      });
 
     this.removeStreamComponents = this.context?.streamItems(
       ContentType.Component,

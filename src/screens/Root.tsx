@@ -11,7 +11,7 @@ import { hexToRGBA } from '@Style/utils';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import { Compose } from './Compose/Compose';
 import { Notes } from './Notes/Notes';
 import {
@@ -77,11 +77,12 @@ export const Root = () => {
           }
         }
       );
-    const removeNoteObserver = application?.editorGroup.addActiveControllerChangeObserver(
-      activeController => {
-        setActiveNoteId(activeController?.note.uuid);
-      }
-    );
+    const removeNoteObserver =
+      application?.editorGroup.addActiveControllerChangeObserver(
+        activeController => {
+          setActiveNoteId(activeController?.note.uuid);
+        }
+      );
     return () => {
       if (removeApplicationStateEventHandler) {
         removeApplicationStateEventHandler();

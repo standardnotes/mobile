@@ -65,19 +65,19 @@ export const ComponentView = ({
 
   // State
   const [showWebView, setShowWebView] = useState<boolean>(true);
-  const [requiresLocalEditor, setRequiresLocalEditor] = useState<boolean>(
-    false
-  );
+  const [requiresLocalEditor, setRequiresLocalEditor] =
+    useState<boolean>(false);
   const [localEditorReady, setLocalEditorReady] = useState<boolean>(false);
 
   // Ref
   const didLoadRootUrl = useRef<boolean>(false);
   const webViewRef = useRef<WebView>(null);
-  const timeoutRef = useRef<number | undefined>(undefined);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
-  const navigation = useNavigation<
-    AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']
-  >();
+  const navigation =
+    useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>();
 
   useEffect(() => {
     const removeBlurScreenListener = navigation.addListener('blur', () => {
@@ -238,34 +238,35 @@ export const ComponentView = ({
     onLoadStart();
   };
 
-  const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
-    log('Setting last iframe URL to', request.url);
-    /** The first request can typically be 'about:blank', which we want to ignore */
-    if (!didLoadRootUrl.current) {
-      didLoadRootUrl.current = request.url === componentViewer.url!;
-    }
-    /**
-     * We want to handle link clicks within an editor by opening the browser
-     * instead of loading inline. On iOS, onShouldStartLoadWithRequest is
-     * called for all requests including the initial request to load the editor.
-     * On iOS, clicks in the editors have a navigationType of 'click', but on
-     * Android, this is not the case (no navigationType).
-     * However, on Android, this function is not called for the initial request.
-     * So that might be one way to determine if this request is a click or the
-     * actual editor load request. But I don't think it's safe to rely on this
-     * being the case in the future. So on Android, we'll handle url loads only
-     * if the url isn't equal to the editor url.
-     */
+  const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest =
+    request => {
+      log('Setting last iframe URL to', request.url);
+      /** The first request can typically be 'about:blank', which we want to ignore */
+      if (!didLoadRootUrl.current) {
+        didLoadRootUrl.current = request.url === componentViewer.url!;
+      }
+      /**
+       * We want to handle link clicks within an editor by opening the browser
+       * instead of loading inline. On iOS, onShouldStartLoadWithRequest is
+       * called for all requests including the initial request to load the editor.
+       * On iOS, clicks in the editors have a navigationType of 'click', but on
+       * Android, this is not the case (no navigationType).
+       * However, on Android, this function is not called for the initial request.
+       * So that might be one way to determine if this request is a click or the
+       * actual editor load request. But I don't think it's safe to rely on this
+       * being the case in the future. So on Android, we'll handle url loads only
+       * if the url isn't equal to the editor url.
+       */
 
-    if (
-      (Platform.OS === 'ios' && request.navigationType === 'click') ||
-      (Platform.OS === 'android' && request.url !== componentViewer.url!)
-    ) {
-      application!.deviceInterface!.openUrl(request.url);
-      return false;
-    }
-    return true;
-  };
+      if (
+        (Platform.OS === 'ios' && request.navigationType === 'click') ||
+        (Platform.OS === 'android' && request.url !== componentViewer.url!)
+      ) {
+        application!.deviceInterface!.openUrl(request.url);
+        return false;
+      }
+      return true;
+    };
 
   const defaultInjectedJavaScript = () => {
     return `(function() {

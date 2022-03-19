@@ -1,7 +1,7 @@
 import { Circle } from '@Components/Circle';
 import React, { useContext } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import {
   CellContent,
   IconAscii,

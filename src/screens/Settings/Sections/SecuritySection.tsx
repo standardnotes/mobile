@@ -24,9 +24,10 @@ type Props = {
 };
 
 export const SecuritySection = (props: Props) => {
-  const navigation = useNavigation<
-    ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
-  >();
+  const navigation =
+    useNavigation<
+      ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
+    >();
   // Context
   const application = useContext(ApplicationContext);
 
@@ -68,7 +69,9 @@ export const SecuritySection = (props: Props) => {
     };
     getHasBiometrics();
     const hasBiometricsSupport = async () => {
-      const hasBiometricsAvailable = await (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability();
+      const hasBiometricsAvailable = await (
+        application?.deviceInterface as MobileDeviceInterface
+      ).getDeviceBiometricsAvailability();
       if (mounted) {
         setSupportsBiometrics(hasBiometricsAvailable);
       }
