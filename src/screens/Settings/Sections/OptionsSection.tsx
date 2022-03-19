@@ -88,7 +88,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         ButtonType.Danger
       )
     ) {
-      await application!.signOut();
+      await application!.user.signOut();
     }
   };
 

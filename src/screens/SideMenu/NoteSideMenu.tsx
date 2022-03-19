@@ -101,9 +101,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
   // Context
   const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
-  const navigation = useNavigation<
-    AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
-  >();
+  const navigation =
+    useNavigation<
+      AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+    >();
   const { showActionSheet } = useCustomActionSheet();
   const styles = useStyles(theme);
 
@@ -154,16 +155,15 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   useEffect(() => {
     let mounted = true;
-    const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(
-      () => {
+    const removeEditorObserver =
+      application?.editorGroup.addActiveControllerChangeObserver(() => {
         if (mounted) {
           const activeController =
             application?.editorGroup.activeNoteViewController;
           setNote(activeController?.note);
           setEditor(activeController);
         }
-      }
-    );
+      });
 
     return () => {
       mounted = false;
@@ -575,7 +575,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             mutator.removeItemAsRelationship(note);
           });
         } else {
-          await application?.addTagHierarchyToNote(note, tag as SNTag);
+          await application?.items.addTagToNote(note, tag as SNTag, true);
         }
       }
       reloadTags();
@@ -607,12 +607,8 @@ export const NoteSideMenu = React.memo((props: Props) => {
           selectedTags,
         }))}
         renderItem={({ item }) => {
-          const {
-            OptionsSection,
-            EditorsSection,
-            ListedSection,
-            TagsSection,
-          } = MenuSections;
+          const { OptionsSection, EditorsSection, ListedSection, TagsSection } =
+            MenuSections;
 
           if (item.key === OptionsSection) {
             return (
