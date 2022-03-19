@@ -26,7 +26,7 @@ jobs:
       - name: Ruby Setup for Fastlane
         uses: actions/setup-ruby@v1
         with:
-          ruby-version: '2.7'
+          ruby-version: '2.7.4'
       - name: Install dependencies
         run: yarn install
       - name: fastlane
