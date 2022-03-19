@@ -1,8 +1,9 @@
 const faker = require('faker');
-import { by, device, element, expect, waitFor } from 'detox';
+import Detox, { by, device, element, expect, waitFor } from 'detox';
 
-// eslint-disable-next-line no-undef
-export const expectToBeVisible = async (testedElement: Detox.DetoxAny) => {
+export const expectToBeVisible = async (
+  testedElement: Detox.IndexableNativeElement
+) => {
   try {
     await expect(testedElement).toBeVisible();
     return true;
@@ -13,13 +14,10 @@ export const expectToBeVisible = async (testedElement: Detox.DetoxAny) => {
 
 const checkAfterReinstall = async () => {
   if (device.getPlatform() === 'ios') {
-    let alertVisible = await expectToBeVisible(
-      element(
-        by
-          .label('Delete Local Data')
-          .and(by.type('_UIAlertControllerActionView'))
-      )
+    const alertElement = element(
+      by.label('Delete Local Data').and(by.type('_UIAlertControllerActionView'))
     );
+    let alertVisible = await expectToBeVisible(alertElement);
     if (alertVisible) {
       await element(
         by
@@ -59,5 +57,5 @@ export const openComposeNewNoteScreen = async () => {
 export const randomCredentials = {
   email: faker.internet.exampleEmail(),
   password: faker.internet.password(),
-  syncServerUrl: 'https://app-dev.standardnotes.org',
+  syncServerUrl: 'https://app-dev.standardnotes.com',
 };

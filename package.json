@@ -18,6 +18,9 @@
     "test": "jest",
     "postinstall": "patch-package"
   },
+  "resolutions": {
+    "@types/react": "^17"
+  },
   "dependencies": {
     "@expo/react-native-action-sheet": "^3.13.0",
     "@react-native-community/async-storage": "1.12.1",
@@ -68,20 +71,21 @@
     "react-native-webview": "11.17.2",
     "react-native-zip-archive": "^6.0.6",
     "react-navigation-header-buttons": "^9.0.1",
-    "styled-components": "^5.3.3"
+    "styled-components": "5.3.3",
+    "@types/styled-components-react-native": "5.1.3"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
     "@babel/preset-typescript": "^7.16.7",
     "@babel/runtime": "^7.17.8",
-    "@react-native-community/eslint-config": "^2.0.0",
+    "@react-native-community/eslint-config": "^3.0.1",
     "@types/detox": "^18.1.0",
     "@types/faker": "^6.6.9",
     "@types/jest": "^27.4.1",
     "@types/js-base64": "^3.3.1",
-    "@types/react-native": "0.67.3",
     "@types/react-native-vector-icons": "^6.4.10",
-    "@types/styled-components": "5.1.24",
+    "@types/react-native": "^0.67.3",
+    "@types/react-test-renderer": "^17.0.1",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
     "babel-jest": "^27.5.1",
