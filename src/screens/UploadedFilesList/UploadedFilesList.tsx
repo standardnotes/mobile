@@ -253,33 +253,47 @@ export const UploadedFilesList: FC<Props> = props => {
         } catch (error) {
           Toast.show({
             type: 'error',
-            text1: 'There was an error while sharing the file'
+            text1: 'There was an error while sharing the file',
           });
         }
       });
   };
 
+  const getDestinationPath = (fileName: string, showShareScreen: boolean) => {
+    let path = '';
+
+    let directory = DocumentDirectoryPath;
+    let tmpInFileName = '';
+
+    if (Platform.OS === 'android') {
+      directory = ExternalDirectoryPath;
+
+      if (showShareScreen) {
+        tmpInFileName = 'tmp-';
+      }
+    }
+    path = `${directory}/${tmpInFileName}${fileName}`;
+
+    if (Platform.OS === 'android') {
+      // On Android, the downloaded files are saved very deep (in “Android/com.standardnotes/files” folder).
+      // Change it to store in "Downloads" folder
+      path = path.replace(
+        /\/Android\/data\/com.standardnotes(\.dev)?\/files/i,
+        '/Download/'
+      );
+    }
+    return path;
+  };
+
   const downloadFile = async (file: SNFile, showShareScreen = false) => {
     try {
-      let path = '';
-
       Toast.show({
         type: 'info',
         text1: 'Preparing file...',
         autoHide: false,
       });
 
-      let directory = DocumentDirectoryPath;
-      let tmpInFileName = '';
-
-      if (Platform.OS === 'android') {
-        directory = ExternalDirectoryPath;
-
-        if (showShareScreen) {
-          tmpInFileName = 'tmp-';
-        }
-      }
-      path = `${directory}/${tmpInFileName}${file.name}`;
+      const path = getDestinationPath(file.name, showShareScreen);
 
       // Overwrite any existing file with that name
       await deleteFileAtPath(path);
