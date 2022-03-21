@@ -4,27 +4,27 @@ import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
 import { UploadedFileItem } from '@Screens/UploadedFilesList/UploadedFileItem';
 import {
-  UploadedFileItemAction,
-  UploadedFileItemActionType,
+UploadedFileItemAction,
+UploadedFileItemActionType
 } from '@Screens/UploadedFilesList/UploadedFileItemAction';
-import { ChallengeReason, ContentType, SNFile } from '@standardnotes/snjs';
+import { ChallengeReason,ContentType,SNFile } from '@standardnotes/snjs';
 import { Buffer } from 'buffer';
-import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
-import RNFS, {
-  DocumentDirectoryPath,
-  exists,
-  ExternalDirectoryPath,
+import React,{ FC,useCallback,useContext,useEffect,useState } from 'react';
+import { Platform,Text,TouchableOpacity,View } from 'react-native';
+import RNFS,{
+DocumentDirectoryPath,
+exists,
+ExternalDirectoryPath
 } from 'react-native-fs';
 import RNShare from 'react-native-share';
 import { ThemeContext } from 'styled-components/native';
 import {
-  AttachedFilesList,
-  ClearFilterTextIconContainer,
-  FilterTextInput,
-  FilterTextInputContainer,
-  ModalViewContainer,
-  useUploadedFilesListStyles,
+AttachedFilesList,
+ClearFilterTextIconContainer,
+FilterTextInput,
+FilterTextInputContainer,
+ModalViewContainer,
+useUploadedFilesListStyles
 } from './UploadedFilesList.styled';
 
 enum Tabs {
@@ -201,7 +201,7 @@ export const UploadedFilesList: FC<Props> = props => {
       text: `Are you sure you want to permanently delete "${file.nameWithExt}"?`,
       confirmButtonStyle: 'danger',
     });*/
-    const shouldDelete = application.alertService.confirm(
+    const shouldDelete = await application.alertService.confirm(
       `Are you sure you want to permanently delete "${file.name}"?`,
       'Delete file',
       'Delete'
@@ -245,7 +245,7 @@ export const UploadedFilesList: FC<Props> = props => {
             // RNFS.unlink(path);
             deleteFileAtPath(path);
           } catch (error) {
-            console.log(error.message);
+            console.log(error);
           }
         }
       });
@@ -326,10 +326,11 @@ export const UploadedFilesList: FC<Props> = props => {
     if (!application) {
       return false;
     }
-    const authorizedFiles = await application.protections.authorizeProtectedActionForFiles(
-      [file],
-      challengeReason
-    );
+    const authorizedFiles =
+      await application.protections.authorizeProtectedActionForFiles(
+        [file],
+        challengeReason
+      );
     return authorizedFiles.length > 0 && authorizedFiles.includes(file);
   };
 

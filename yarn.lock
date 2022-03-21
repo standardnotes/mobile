@@ -1825,6 +1825,11 @@
     "@standardnotes/auth" "^3.17.8"
     "@standardnotes/common" "^1.16.1"
 
+"@standardnotes/filepicker@^1.10.0":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/filepicker/-/filepicker-1.10.1.tgz#451e8b80a670c35f4de5a1a17535b26876d4b92b"
+  integrity sha512-7q535TdXT0vKaIPvFDRPgcACrPAEs6Rgbw4pi8jLGY/Rodfty0zCN3z4NeDb/IdOGPpM8QYhKMLpYoZcKDjIMQ==
+
 "@standardnotes/payloads@^1.4.14":
   version "1.4.14"
   resolved "https://registry.yarnpkg.com/@standardnotes/payloads/-/payloads-1.4.14.tgz#f89eebc1d3920d4759b38bfad892f821d48cf1bd"
@@ -7274,6 +7279,11 @@ react-native-search-box@standardnotes/react-native-search-box#c0de5bab18cb418fef
   resolved "https://codeload.github.com/standardnotes/react-native-search-box/tar.gz/c0de5bab18cb418fef75ef2c2cd921304142e492"
   dependencies:
     prop-types "^15.5.10"
+
+react-native-share@^7.3.7:
+  version "7.3.7"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-7.3.7.tgz#f5eed0bf657ec8c5c45e3fe7a88611d28cc8f734"
+  integrity sha512-WYXAqyNZeKKk3Kvsv4N3tJuLNw8k+HM+ymKnWFRomoSerD5syJqmBHgw1HwED8iV3zH11lXJw3rha9+H80XUHQ==
 
 react-native-sodium-jsi@1.1.7:
   version "1.1.7"
