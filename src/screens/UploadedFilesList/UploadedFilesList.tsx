@@ -250,6 +250,12 @@ export const UploadedFilesList: FC<Props> = props => {
           if (Platform.OS === 'android') {
             await deleteFileAtPath(path);
           }
+          if (shareDialogResponse.success) {
+            Toast.show({
+              type: 'success',
+              text1: 'Successfully shared file',
+            });
+          }
         } catch (error) {
           Toast.show({
             type: 'error',
