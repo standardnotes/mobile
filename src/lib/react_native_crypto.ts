@@ -1,4 +1,5 @@
 /* eslint-disable no-bitwise */
+import Aes from '@standardnotes/react-native-aes';
 import {
   Base64String,
   HexString,
@@ -8,7 +9,6 @@ import {
   timingSafeEqual,
   Utf8String,
 } from '@standardnotes/sncrypto-common';
-import Aes from 'react-native-aes-crypto';
 import * as Sodium from 'react-native-sodium-jsi';
 
 export class SNReactNativeCrypto implements SNPureCrypto {
@@ -128,9 +128,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
   public xchacha20StreamInitEncryptor(
     key: HexString
   ): Sodium.MobileStreamEncryptor {
-    const encryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_push(
-      key
-    );
+    const encryptor =
+      Sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
     return encryptor;
   }
 

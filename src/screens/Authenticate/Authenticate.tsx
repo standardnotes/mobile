@@ -5,8 +5,8 @@ import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { AppStateType, PasscodeKeyboardType } from '@Lib/application_state';
 import { MobileDeviceInterface } from '@Lib/interface';
+import { HeaderHeightContext } from '@react-navigation/elements';
 import { useFocusEffect } from '@react-navigation/native';
-import { HeaderHeightContext } from '@react-navigation/stack';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
@@ -38,7 +38,7 @@ import {
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import { hide } from 'react-native-privacy-snapshot';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import {
   BaseView,
   Input,
@@ -200,7 +200,9 @@ export const Authenticate = ({
 
   const checkForBiometrics = useCallback(
     async () =>
-      (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(),
+      (
+        application?.deviceInterface as MobileDeviceInterface
+      ).getDeviceBiometricsAvailability(),
     [application]
   );
 

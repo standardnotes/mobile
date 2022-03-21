@@ -40,9 +40,10 @@ export const TagSelectionList = React.memo(
   }: Props) => {
     // Context
     const application = useContext(ApplicationContext);
-    const navigation = useNavigation<
-      AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
-    >();
+    const navigation =
+      useNavigation<
+        AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+      >();
     const { showActionSheet } = useCustomActionSheet();
 
     // State

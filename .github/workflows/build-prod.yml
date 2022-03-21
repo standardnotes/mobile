@@ -21,9 +21,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Ruby Setup for Fastlane
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: '2.7'
+        uses: ruby/setup-ruby@v1
       - name: fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:

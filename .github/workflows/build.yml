@@ -24,9 +24,7 @@ jobs:
           echo "${{ secrets.DEV_KEYSTORE }}" > keystore.keystore.asc
           gpg -d --passphrase "${{ secrets.DEV_KEYSTORE_PASSPHRASE }}" --batch keystore.keystore.asc > android/app/keystore.keystore
       - name: Ruby Setup for Fastlane
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: '2.7'
+        uses: ruby/setup-ruby@v1
       - name: Install dependencies
         run: yarn install
       - name: fastlane
@@ -57,6 +55,8 @@ jobs:
           echo "PACKAGE_VERSION=$(grep '"version"' package.json | cut -d '"' -f 4)" >> $GITHUB_ENV
       - name: Set longer yarn timeout
         run: yarn config set network-timeout 300000
+      - name: Ruby Setup for Fastlane
+        uses: ruby/setup-ruby@v1
       - name: Install dependencies
         run: yarn run init
       - name: Set ssh connection to Github

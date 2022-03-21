@@ -37,10 +37,8 @@ export const Listed: FC<TProps> = ({ note }) => {
   const [listedAccountDetails, setListedAccountDetails] = useState<
     TListedAccountItem[]
   >([]);
-  const [
-    authorUrlWithInProgressAction,
-    setAuthorUrlWithInProgressAction,
-  ] = useState<string | null>(null);
+  const [authorUrlWithInProgressAction, setAuthorUrlWithInProgressAction] =
+    useState<string | null>(null);
 
   const { showActionSheet } = useCustomActionSheet();
 

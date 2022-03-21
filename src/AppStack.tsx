@@ -42,7 +42,7 @@ import { HeaderTitleParams } from './App';
 import { ApplicationContext } from './ApplicationContext';
 import { ModalStackNavigationProp } from './ModalStack';
 
-type AppStackNavigatorParamList = {
+export type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams;
   [SCREEN_COMPOSE]: HeaderTitleParams | undefined;
   [SCREEN_VIEW_PROTECTED_NOTE]: {
@@ -50,15 +50,14 @@ type AppStackNavigatorParamList = {
   };
 };
 
-export type AppStackNavigationProp<
-  T extends keyof AppStackNavigatorParamList
-> = {
-  navigation: CompositeNavigationProp<
-    ModalStackNavigationProp<'AppStack'>['navigation'],
-    StackNavigationProp<AppStackNavigatorParamList, T>
-  >;
-  route: RouteProp<AppStackNavigatorParamList, T>;
-};
+export type AppStackNavigationProp<T extends keyof AppStackNavigatorParamList> =
+  {
+    navigation: CompositeNavigationProp<
+      ModalStackNavigationProp<'AppStack'>['navigation'],
+      StackNavigationProp<AppStackNavigatorParamList, T>
+    >;
+    route: RouteProp<AppStackNavigatorParamList, T>;
+  };
 
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 

@@ -74,3 +74,5 @@ ios-release.bundle.map
 /android/*.hprof
 
 codeqldb
+
+vendor/bundle

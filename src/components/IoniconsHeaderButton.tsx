@@ -4,7 +4,7 @@ import {
   HeaderButton,
   HeaderButtonProps,
 } from 'react-navigation-header-buttons';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 
 export const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {
   // the `passMeFurther` variable here contains props from <Item .../> as well as <HeaderButtons ... />

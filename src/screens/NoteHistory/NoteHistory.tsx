@@ -16,7 +16,7 @@ import {
   TabBar,
   TabView,
 } from 'react-native-tab-view';
-import { ThemeContext } from 'styled-components/native';
+import { ThemeContext } from 'styled-components';
 import { IosTabBarContainer } from './NoteHistory.styled';
 import { RemoteHistory } from './RemoteHistory';
 import { SessionHistory } from './SessionHistory';
