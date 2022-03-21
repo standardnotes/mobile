@@ -8,6 +8,7 @@ import { MobileThemeVariables } from '@Style/Themes/styled-components';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
 import { ApplicationContext } from './ApplicationContext';
 import { MainStackComponent } from './ModalStack';
@@ -114,6 +115,7 @@ const AppComponent: React.FC<{
           </ThemeProvider>
         </>
       )}
+      <Toast />
     </NavigationContainer>
   );
 };

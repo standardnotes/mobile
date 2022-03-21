@@ -4,27 +4,28 @@ import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
 import { UploadedFileItem } from '@Screens/UploadedFilesList/UploadedFileItem';
 import {
-UploadedFileItemAction,
-UploadedFileItemActionType
+  UploadedFileItemAction,
+  UploadedFileItemActionType,
 } from '@Screens/UploadedFilesList/UploadedFileItemAction';
-import { ChallengeReason,ContentType,SNFile } from '@standardnotes/snjs';
+import { ChallengeReason, ContentType, SNFile } from '@standardnotes/snjs';
 import { Buffer } from 'buffer';
-import React,{ FC,useCallback,useContext,useEffect,useState } from 'react';
-import { Platform,Text,TouchableOpacity,View } from 'react-native';
-import RNFS,{
-DocumentDirectoryPath,
-exists,
-ExternalDirectoryPath
+import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import RNFS, {
+  DocumentDirectoryPath,
+  exists,
+  ExternalDirectoryPath,
 } from 'react-native-fs';
 import RNShare from 'react-native-share';
+import Toast from 'react-native-toast-message';
 import { ThemeContext } from 'styled-components/native';
 import {
-AttachedFilesList,
-ClearFilterTextIconContainer,
-FilterTextInput,
-FilterTextInputContainer,
-ModalViewContainer,
-useUploadedFilesListStyles
+  AttachedFilesList,
+  ClearFilterTextIconContainer,
+  FilterTextInput,
+  FilterTextInputContainer,
+  ModalViewContainer,
+  useUploadedFilesListStyles,
 } from './UploadedFilesList.styled';
 
 enum Tabs {
@@ -235,17 +236,16 @@ export const UploadedFilesList: FC<Props> = props => {
             url: `file://${path}`,
             failOnCancel: false,
           });
-          // On Android this response is always returns {success: false}, there is an open issue for that
+          // TODO: On Android this response always returns {success: false}, there is an open issue for that
           //  https://github.com/react-native-share/react-native-share/issues/1059
           console.log('shareDialogResponse is', shareDialogResponse);
         } catch (error) {
-          error && console.log('An error has occurred: ', error);
+          console.log('There was an error while sharing the file');
         } finally {
           try {
-            // RNFS.unlink(path);
             deleteFileAtPath(path);
           } catch (error) {
-            console.log(error);
+            console.log('There was an error during file sharing cleanup');
           }
         }
       });
@@ -254,6 +254,12 @@ export const UploadedFilesList: FC<Props> = props => {
   const downloadFile = async (file: SNFile, showShareScreen = false) => {
     try {
       let path = '';
+
+      Toast.show({
+        type: 'info',
+        text1: 'Preparing file...',
+        autoHide: false,
+      });
 
       await application.files.downloadFile(
         file,
@@ -272,16 +278,23 @@ export const UploadedFilesList: FC<Props> = props => {
         }
       );
 
+      Toast.hide();
+
       if (showShareScreen) {
         shareFile(file, path);
+        return;
       }
+      Toast.show({
+        type: 'success',
+        text1: 'Download',
+        text2: 'Successfully downloaded file',
+      });
     } catch (error) {
-      console.error('An error occurred: ', error);
-
-      /*addToast({
-        type: ToastType.Error,
-        message: 'There was an error while downloading the file',
-      });*/
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'There was an error while downloading the file',
+      });
     }
   };
 
