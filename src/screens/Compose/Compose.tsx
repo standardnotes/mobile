@@ -278,11 +278,14 @@ export class Compose extends React.Component<{}, State> {
     if (!note) {
       return;
     }
-    return this.context?.changeItem(component.uuid, (m: ItemMutator) => {
-      const mutator = m as ComponentMutator;
-      mutator.removeDisassociatedItemId(note.uuid);
-      mutator.associateWithItem(note.uuid);
-    });
+    return this.context?.mutator.changeItem(
+      component.uuid,
+      (m: ItemMutator) => {
+        const mutator = m as ComponentMutator;
+        mutator.removeDisassociatedItemId(note.uuid);
+        mutator.associateWithItem(note.uuid);
+      }
+    );
   }
 
   reloadComponentEditorState = async () => {
@@ -374,13 +377,13 @@ export class Compose extends React.Component<{}, State> {
     if (editor?.isTemplateNote) {
       await editor?.insertTemplatedNote();
     }
-    if (!this.context?.findItem(note!.uuid)) {
+    if (!this.context?.items.findItem(note!.uuid)) {
       this.context?.alertService!.alert(
         'Attempting to save this note has failed. The note cannot be found.'
       );
       return;
     }
-    await this.context!.changeItem(
+    await this.context!.mutator.changeItem(
       note!.uuid,
       mutator => {
         const noteMutator = mutator as NoteMutator;

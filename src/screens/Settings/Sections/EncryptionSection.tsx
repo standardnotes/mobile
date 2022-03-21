@@ -61,7 +61,10 @@ export const EncryptionSection = (props: Props) => {
       sourceString = application?.hasAccount() ? 'Account Keys' : 'Passcode';
     }
 
-    const items = application!.getItems([ContentType.Note, ContentType.Tag]);
+    const items = application!.items.getItems([
+      ContentType.Note,
+      ContentType.Tag,
+    ]);
     const itemsStatus =
       items.length + '/' + items.length + ' notes and tags encrypted';
 

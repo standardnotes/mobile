@@ -48,15 +48,17 @@ export const TagSelectionList = React.memo(
 
     // State
     const [tags, setTags] = useState<SNTag[] | SmartView[]>(() =>
-      contentType === ContentType.SmartView ? application!.getSmartViews() : []
+      contentType === ContentType.SmartView
+        ? application!.items.getSmartViews()
+        : []
     );
     const displayOptionsSet = useRef<boolean>(false);
 
     const reloadTags = useCallback(() => {
       if (contentType === ContentType.SmartView) {
-        setTags(application!.getSmartViews());
+        setTags(application!.items.getSmartViews());
       } else {
-        setTags(application!.getDisplayableItems(contentType) as SNTag[]);
+        setTags(application!.items.getDisplayableItems(contentType) as SNTag[]);
       }
     }, [application, contentType]);
 
@@ -73,7 +75,7 @@ export const TagSelectionList = React.memo(
               if (matchingTag.deleted) {
                 application
                   .getAppState()
-                  .setSelectedTag(application!.getSmartViews()[0], true);
+                  .setSelectedTag(application!.items.getSmartViews()[0], true);
               }
             }
           }
@@ -83,7 +85,7 @@ export const TagSelectionList = React.memo(
 
     useEffect(() => {
       if (!displayOptionsSet.current) {
-        application!.setDisplayOptions(
+        application!.items.setDisplayOptions(
           contentType,
           CollectionSort.Title,
           'dsc'
@@ -114,7 +116,7 @@ export const TagSelectionList = React.memo(
               ButtonType.Danger
             );
             if (confirmed) {
-              await application!.deleteItem(tag);
+              await application!.mutator.deleteItem(tag);
             }
           },
         },
@@ -122,7 +124,7 @@ export const TagSelectionList = React.memo(
     };
 
     const isRootTag = (tag: SNTag | SmartView): boolean =>
-      tag instanceof SmartView || !application?.getTagParent(tag);
+      tag instanceof SmartView || !application?.items.getTagParent(tag.uuid);
 
     const showFolders = contentType === ContentType.Tag;
     const renderedTags = showFolders
@@ -142,8 +144,8 @@ export const TagSelectionList = React.memo(
       let children: SNTag[] = [];
 
       if (showFolders && item instanceof SNTag) {
-        const rawChildren = application
-          .getTagChildren(item)
+        const rawChildren = application.items
+          .getTagChildren(item.uuid)
           .map(tag => tag.uuid);
         children = (tags as SNTag[]).filter((tag: SNTag) =>
           rawChildren.includes(tag.uuid)

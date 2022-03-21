@@ -67,7 +67,7 @@ export const NoteCell = ({
   const [deleteNote] = useDeleteNoteWithPrivileges(
     note,
     async () => {
-      await application?.deleteItem(note);
+      await application?.mutator.deleteItem(note);
     },
     () => {
       changeNote(mutator => {

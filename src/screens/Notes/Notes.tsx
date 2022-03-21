@@ -126,7 +126,9 @@ export const Notes = React.memo(
         } else if (selectedTag) {
           title = selectedTag.title;
           if (selectedTag instanceof SNTag && selectedTag.parentId) {
-            const parents = application!.getTagParentChain(selectedTag);
+            const parents = application!.items.getTagParentChain(
+              selectedTag.uuid
+            );
             const hierarchy = parents.map(tag => tag.title).join(' ⫽ ');
             subTitle = hierarchy.length > 0 ? `in ${hierarchy}` : undefined;
           }
@@ -167,7 +169,7 @@ export const Notes = React.memo(
 
     const onNoteSelect = useCallback(
       async (noteUuid: SNNote['uuid']) => {
-        const note = application?.findItem(noteUuid) as SNNote;
+        const note = application?.items.findItem(noteUuid) as SNNote;
         if (note) {
           if (note.errorDecrypting) {
             if (note.waitingForKey) {
@@ -268,7 +270,7 @@ export const Notes = React.memo(
           includeTrashed:
             applyFilters && (includeTrashed ?? includeTrashedNotes),
         });
-        application!.setNotesDisplayCriteria(criteria);
+        application!.items.setNotesDisplayCriteria(criteria);
       },
       [
         application,
@@ -417,7 +419,7 @@ export const Notes = React.memo(
           reloadNotesDisplayOptions();
         }
 
-        const newNotes = application!.getDisplayableItems(
+        const newNotes = application!.items.getDisplayableItems(
           ContentType.Note
         ) as SNNote[];
         let renderedNotes: SNNote[] = newNotes;

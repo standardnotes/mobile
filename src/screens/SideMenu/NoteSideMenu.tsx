@@ -122,7 +122,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const [deleteNote] = useDeleteNoteWithPrivileges(
     note!,
     async () => {
-      await application?.deleteItem(note!);
+      await application?.mutator.deleteItem(note!);
       props.drawerRef?.closeDrawer();
       if (!application?.getAppState().isInTabletMode) {
         navigation.popToTop();
@@ -216,7 +216,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const disassociateComponentWithCurrentNote = useCallback(
     async (component: SNComponent) => {
       if (note) {
-        return application?.changeItem(component.uuid, m => {
+        return application?.mutator.changeItem(component.uuid, m => {
           const mutator = m as ComponentMutator;
           mutator.removeAssociatedItemId(note.uuid);
           mutator.disassociateWithItem(note.uuid);
@@ -246,7 +246,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       props.drawerRef?.closeDrawer();
       if (!selectedComponent) {
         if (!note?.prefersPlainEditor) {
-          await application?.changeItem(note!.uuid, mutator => {
+          await application?.mutator.changeItem(note!.uuid, mutator => {
             const noteMutator = mutator as NoteMutator;
             noteMutator.prefersPlainEditor = true;
           });
@@ -264,7 +264,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         }
         const prefersPlain = note!.prefersPlainEditor;
         if (prefersPlain) {
-          await application?.changeItem(note!.uuid, mutator => {
+          await application?.mutator.changeItem(note!.uuid, mutator => {
             const noteMutator = mutator as NoteMutator;
             noteMutator.prefersPlainEditor = false;
           });
@@ -309,14 +309,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
       const setAsDefault = () => {
         if (currentDefault) {
-          application!.changeItem(currentDefault.uuid, m => {
+          application!.mutator.changeItem(currentDefault.uuid, m => {
             const mutator = m as ComponentMutator;
             mutator.isMobileDefault = false;
           });
         }
 
         if (component) {
-          application!.changeAndSaveItem(component.uuid, m => {
+          application!.mutator.changeAndSaveItem(component.uuid, m => {
             const mutator = m as ComponentMutator;
             mutator.isMobileDefault = true;
           });
@@ -324,7 +324,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       };
 
       const removeAsDefault = () => {
-        application!.changeItem(currentDefault.uuid, m => {
+        application!.mutator.changeItem(currentDefault.uuid, m => {
           const mutator = m as ComponentMutator;
           mutator.isMobileDefault = false;
         });
@@ -530,7 +530,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           textClass: 'danger' as 'danger',
           key: 'empty trash',
           onSelect: async () => {
-            const count = application?.getTrashedItems().length;
+            const count = application?.items.trashedItems.length;
             const confirmed = await application?.alertService?.confirm(
               `Are you sure you want to permanently delete ${count} notes?`,
               'Empty Trash',
@@ -538,7 +538,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
               ButtonType.Danger
             );
             if (confirmed) {
-              await application?.emptyTrash();
+              await application?.mutator.emptyTrash();
               props.drawerRef?.closeDrawer();
               if (!application?.getAppState().isInTabletMode) {
                 navigation.popToTop();
@@ -571,7 +571,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
       if (note) {
         if (isSelected) {
-          await application?.changeItem(tag.uuid, mutator => {
+          await application?.mutator.changeItem(tag.uuid, mutator => {
             mutator.removeItemAsRelationship(note);
           });
         } else {

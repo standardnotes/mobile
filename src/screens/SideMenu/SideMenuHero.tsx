@@ -38,7 +38,7 @@ export const SideMenuHero: React.FC<Props> = props => {
       observedContentTypes,
       _items => {
         const notesAndTagsCount =
-          application?.getItems(observedContentTypes).length ?? 0;
+          application?.items.getItems(observedContentTypes).length ?? 0;
 
         if (notesAndTagsCount !== itemsCount) {
           setItemsCount(notesAndTagsCount);

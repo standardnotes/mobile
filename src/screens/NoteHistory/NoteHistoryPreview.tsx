@@ -40,11 +40,13 @@ export const NoteHistoryPreview = ({
 
   const restore = useCallback(
     async (asCopy: boolean) => {
-      const originalNote = application?.findItem(originalNoteUuid) as SNNote;
+      const originalNote = application?.items.findItem(
+        originalNoteUuid
+      ) as SNNote;
 
       const run = async () => {
         if (asCopy) {
-          await application?.duplicateItem(originalNote!, {
+          await application?.mutator.duplicateItem(originalNote!, {
             ...revision.payload.safeContent,
             title: revision.payload.safeContent.title
               ? revision.payload.safeContent.title + ' (copy)'
@@ -54,7 +56,7 @@ export const NoteHistoryPreview = ({
           // @ts-expect-error
           navigation.navigate(SCREEN_NOTES);
         } else {
-          await application?.changeAndSaveItem(
+          await application?.mutator.changeAndSaveItem(
             originalNoteUuid,
             mutator => {
               mutator.unsafe_setCustomContent(revision.payload.safeContent);

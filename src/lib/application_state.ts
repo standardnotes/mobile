@@ -100,7 +100,7 @@ export class ApplicationState extends ApplicationService {
   keyboardHeight?: number;
   appEventObersever: any;
   selectedTagRestored = false;
-  selectedTag: SNTag | SmartView = this.application.getSmartViews()[0];
+  selectedTag: SNTag | SmartView = this.application.items.getSmartViews()[0];
   userPreferences?: SNUserPrefs;
   tabletMode: boolean = false;
   ignoreStateChanges: boolean = false;
@@ -165,8 +165,10 @@ export class ApplicationState extends ApplicationService {
     }
 
     const savedTag =
-      (this.application.findItem(savedTagUuid) as SNTag) ||
-      this.application.getSmartViews().find(tag => tag.uuid === savedTagUuid);
+      (this.application.items.findItem(savedTagUuid) as SNTag) ||
+      this.application.items
+        .getSmartViews()
+        .find(tag => tag.uuid === savedTagUuid);
     if (savedTag) {
       this.setSelectedTag(savedTag, false);
       this.selectedTagRestored = true;
@@ -300,7 +302,7 @@ export class ApplicationState extends ApplicationService {
   }
 
   async openEditor(noteUuid: string) {
-    const note = this.application.findItem(noteUuid) as SNNote;
+    const note = this.application.items.findItem(noteUuid) as SNNote;
     const activeEditor = this.getActiveNoteController();
     if (activeEditor) {
       this.application.editorGroup.closeActiveNoteView();
@@ -310,7 +312,7 @@ export class ApplicationState extends ApplicationService {
 
     if (note && note.conflictOf) {
       InteractionManager.runAfterInteractions(() => {
-        this.application?.changeAndSaveItem(note.uuid, mutator => {
+        this.application?.mutator.changeAndSaveItem(note.uuid, mutator => {
           mutator.conflictOf = undefined;
         });
       });
@@ -467,9 +469,11 @@ export class ApplicationState extends ApplicationService {
    * @returns tags that are referencing note
    */
   public getNoteTags(note: SNNote) {
-    return this.application.referencingForItem(note).filter(ref => {
-      return ref.content_type === ContentType.Tag;
-    }) as SNTag[];
+    return this.application.items
+      .itemsReferencingItem(note.uuid)
+      .filter(ref => {
+        return ref.content_type === ContentType.Tag;
+      }) as SNTag[];
   }
 
   /**
@@ -477,9 +481,9 @@ export class ApplicationState extends ApplicationService {
    */
   public getTagNotes(tag: SNTag | SmartView) {
     if (tag instanceof SmartView) {
-      return this.application.notesMatchingSmartView(tag);
+      return this.application.items.notesMatchingSmartView(tag);
     } else {
-      return this.application.referencesForItem(tag).filter(ref => {
+      return this.application.items.referencesForItem(tag.uuid).filter(ref => {
         return ref.content_type === ContentType.Note;
       }) as SNNote[];
     }
