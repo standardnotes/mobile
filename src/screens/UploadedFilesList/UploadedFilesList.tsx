@@ -224,7 +224,11 @@ export const UploadedFilesList: FC<Props> = props => {
   };
 
   const deleteFileAtPath = async (path: string) => {
-    await RNFS.unlink(path);
+    try {
+      if (await exists(path)) {
+        await RNFS.unlink(path);
+      }
+    } catch (err) {}
   };
 
   const shareFile = (file: SNFile, path: string) => {
@@ -239,14 +243,18 @@ export const UploadedFilesList: FC<Props> = props => {
           // TODO: On Android this response always returns {success: false}, there is an open issue for that
           //  https://github.com/react-native-share/react-native-share/issues/1059
           console.log('shareDialogResponse is', shareDialogResponse);
-        } catch (error) {
-          console.log('There was an error while sharing the file');
-        } finally {
-          try {
-            deleteFileAtPath(path);
-          } catch (error) {
-            console.log('There was an error during file sharing cleanup');
+
+          // On iOS the user can store files locally from "Share" screen, so we don't show "Download" option there.
+          // For Android the user has a separate "Download" action for the file, therefore after the file is shared,
+          // it's not needed anymore and we remove it from the storage.
+          if (Platform.OS === 'android') {
+            await deleteFileAtPath(path);
           }
+        } catch (error) {
+          Toast.show({
+            type: 'error',
+            text1: 'There was an error while sharing the file'
+          });
         }
       });
   };
@@ -261,19 +269,26 @@ export const UploadedFilesList: FC<Props> = props => {
         autoHide: false,
       });
 
+      let directory = DocumentDirectoryPath;
+      let tmpInFileName = '';
+
+      if (Platform.OS === 'android') {
+        directory = ExternalDirectoryPath;
+
+        if (showShareScreen) {
+          tmpInFileName = 'tmp-';
+        }
+      }
+      path = `${directory}/${tmpInFileName}${file.name}`;
+
+      // Overwrite any existing file with that name
+      await deleteFileAtPath(path);
+
       await application.files.downloadFile(
         file,
         async (decryptedBytes: Uint8Array) => {
           const base64String = new Buffer(decryptedBytes).toString('base64');
-          const directory =
-            Platform.OS === 'ios'
-              ? DocumentDirectoryPath
-              : ExternalDirectoryPath;
-          path = `${directory}/${file.name}`;
 
-          if (await exists(path)) {
-            await deleteFileAtPath(path);
-          }
           await RNFS.appendFile(path, base64String, 'base64');
         }
       );
@@ -281,12 +296,12 @@ export const UploadedFilesList: FC<Props> = props => {
       Toast.hide();
 
       if (showShareScreen) {
-        shareFile(file, path);
+        await shareFile(file, path);
         return;
       }
       Toast.show({
         type: 'success',
-        text1: 'Download',
+        text1: 'Success',
         text2: 'Successfully downloaded file',
       });
     } catch (error) {
@@ -327,10 +342,6 @@ export const UploadedFilesList: FC<Props> = props => {
       return file.protected;
     }
   };
-
-  /*const reloadAttachedFilesLength = () => {
-    setAttachedFilesLength(application.items.getFilesForNote(note).length);
-  };*/
 
   const authorizeProtectedActionForFile = async (
     file: SNFile,
