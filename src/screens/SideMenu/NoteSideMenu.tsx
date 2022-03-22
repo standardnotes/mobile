@@ -14,6 +14,7 @@ import {
 } from '@Screens/screens';
 import { Listed } from '@Screens/SideMenu/Listed';
 import {
+  ApplicationEvent,
   ButtonType,
   ComponentArea,
   ComponentMutator,
@@ -21,6 +22,7 @@ import {
   NoteMutator,
   NoteViewController,
   PayloadSource,
+  PrefKey,
   SmartView,
   SNComponent,
   SNNote,
@@ -114,6 +116,28 @@ export const NoteSideMenu = React.memo((props: Props) => {
   );
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
+
+  const [shouldAddTagHierarchy, setShouldAddTagHierachy] = useState(() =>
+    application!.getPreference(PrefKey.NoteAddToParentFolders, true)
+  );
+
+  useEffect(() => {
+    if (!application) return;
+
+    const removeEventObserver = application.addSingleEventObserver(
+      ApplicationEvent.PreferencesChanged,
+      async () => {
+        setShouldAddTagHierachy(
+          application.getPreference(PrefKey.NoteAddToParentFolders, true)
+        );
+      }
+    );
+
+    return () => {
+      removeEventObserver();
+    };
+  }, [application]);
+
   const components = useEditorComponents();
 
   const [changeNote] = useChangeNote(note, editor);
@@ -564,7 +588,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   ]);
 
   const onTagSelect = useCallback(
-    async (tag: SNTag | SmartView) => {
+    async (tag: SNTag | SmartView, addTagHierachy: boolean) => {
       const isSelected =
         selectedTags.findIndex(selectedTag => selectedTag.uuid === tag.uuid) >
         -1;
@@ -575,7 +599,11 @@ export const NoteSideMenu = React.memo((props: Props) => {
             mutator.removeItemAsRelationship(note);
           });
         } else {
-          await application?.items.addTagToNote(note, tag as SNTag, true);
+          await application?.items.addTagToNote(
+            note,
+            tag as SNTag,
+            addTagHierachy
+          );
         }
       }
       reloadTags();
@@ -637,7 +665,9 @@ export const NoteSideMenu = React.memo((props: Props) => {
                 <TagSelectionList
                   hasBottomPadding={Platform.OS === 'android'}
                   contentType={ContentType.Tag}
-                  onTagSelect={item.onTagSelect}
+                  onTagSelect={tag =>
+                    item.onTagSelect(tag, shouldAddTagHierarchy)
+                  }
                   selectedTags={item.selectedTags}
                   emptyPlaceholder={
                     'Create a new tag using the tag button in the bottom right corner.'
