@@ -72,7 +72,7 @@ export const NoteCell = ({
     () => {
       changeNote(mutator => {
         mutator.trashed = true;
-      });
+      }, false);
     },
     undefined
   );
@@ -120,7 +120,7 @@ export const NoteCell = ({
         callback: () =>
           changeNote(mutator => {
             mutator.pinned = !note.pinned;
-          }),
+          }, false),
       });
 
       options.push({
@@ -138,7 +138,7 @@ export const NoteCell = ({
 
           changeNote(mutator => {
             mutator.archived = !note.archived;
-          });
+          }, false);
         },
       });
 
@@ -148,7 +148,7 @@ export const NoteCell = ({
         callback: () =>
           changeNote(mutator => {
             mutator.locked = !note.locked;
-          }),
+          }, false),
       });
 
       options.push({
@@ -172,7 +172,7 @@ export const NoteCell = ({
             callback: () => {
               changeNote(mutator => {
                 mutator.trashed = false;
-              });
+              }, false);
             },
           },
           {

@@ -447,18 +447,24 @@ export const useChangeNote = (
   note: SNNote | undefined,
   editor: NoteViewController | undefined = undefined
 ) => {
-  // Context
   const application = React.useContext(ApplicationContext);
 
   const [canChangeNote] = useChangeNoteChecks(note, editor);
 
   const changeNote = useCallback(
-    async (mutate: (mutator: NoteMutator) => void) => {
+    async (
+      mutate: (mutator: NoteMutator) => void,
+      updateTimestamps: boolean
+    ) => {
       if (await canChangeNote()) {
-        await application?.mutator.changeAndSaveItem(note!.uuid, mutator => {
-          const noteMutator = mutator as NoteMutator;
-          mutate(noteMutator);
-        });
+        await application?.mutator.changeAndSaveItem(
+          note!.uuid,
+          mutator => {
+            const noteMutator = mutator as NoteMutator;
+            mutate(noteMutator);
+          },
+          updateTimestamps
+        );
       }
     },
     [application, note, canChangeNote]

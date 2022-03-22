@@ -131,7 +131,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     () => {
       changeNote(mutator => {
         mutator.trashed = true;
-      });
+      }, false);
       props.drawerRef?.closeDrawer();
       if (!application?.getAppState().isInTabletMode) {
         navigation.popToTop();
@@ -246,10 +246,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
       props.drawerRef?.closeDrawer();
       if (!selectedComponent) {
         if (!note?.prefersPlainEditor) {
-          await application?.mutator.changeItem(note!.uuid, mutator => {
-            const noteMutator = mutator as NoteMutator;
-            noteMutator.prefersPlainEditor = true;
-          });
+          await application?.mutator.changeItem(
+            note!.uuid,
+            mutator => {
+              const noteMutator = mutator as NoteMutator;
+              noteMutator.prefersPlainEditor = true;
+            },
+            false
+          );
         }
         if (
           activeEditorComponent?.isExplicitlyEnabledForItem(note!.uuid) ||
@@ -264,10 +268,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
         }
         const prefersPlain = note!.prefersPlainEditor;
         if (prefersPlain) {
-          await application?.mutator.changeItem(note!.uuid, mutator => {
-            const noteMutator = mutator as NoteMutator;
-            noteMutator.prefersPlainEditor = false;
-          });
+          await application?.mutator.changeItem(
+            note!.uuid,
+            mutator => {
+              const noteMutator = mutator as NoteMutator;
+              noteMutator.prefersPlainEditor = false;
+            },
+            false
+          );
         }
         await associateComponentWithNote(application, selectedComponent, note);
       }
@@ -429,7 +437,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const pinEvent = () =>
       changeNote(mutator => {
         mutator.pinned = !note.pinned;
-      });
+      }, false);
 
     const archiveOption = note.archived ? 'Unarchive' : 'Archive';
     const archiveEvent = () => {
@@ -441,7 +449,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
       changeNote(mutator => {
         mutator.archived = !note.archived;
-      });
+      }, false);
       leaveEditor();
     };
 
@@ -449,7 +457,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const lockEvent = () =>
       changeNote(mutator => {
         mutator.locked = !note.locked;
-      });
+      }, false);
 
     const protectOption = note.protected ? 'Unprotect' : 'Protect';
     const protectEvent = async () => await protectOrUnprotectNote();
@@ -516,7 +524,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           onSelect: () => {
             changeNote(mutator => {
               mutator.trashed = false;
-            });
+            }, false);
           },
         },
         {

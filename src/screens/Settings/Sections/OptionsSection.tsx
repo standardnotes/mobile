@@ -123,7 +123,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     if (!result) {
       return;
     } else if ('error' in result) {
-      application!.alertService!.alert(result.error);
+      application!.alertService!.alert(result.error.text);
     } else if (result.errorCount) {
       application!.alertService!.alert(
         `Import complete. ${result.errorCount} items were not imported because ` +
