@@ -1,3 +1,5 @@
+import { TEnvironment } from '@Root/App';
+
 export function isNullOrUndefined(value: unknown) {
   return value === null || value === undefined;
 }
@@ -33,4 +35,8 @@ export function isSameDay(dateA: Date, dateB: Date) {
     dateA.getMonth() === dateB.getMonth() &&
     dateA.getDate() === dateB.getDate()
   );
+}
+
+export function isUnfinishedFeaturesEnabled(env: TEnvironment): boolean {
+  return env === 'dev' || __DEV__;
 }

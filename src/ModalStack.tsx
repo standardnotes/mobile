@@ -31,7 +31,7 @@ import React, { useContext } from 'react';
 import { Platform } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ThemeContext } from 'styled-components';
-import { HeaderTitleParams } from './App';
+import { HeaderTitleParams, TEnvironment } from './App';
 import { ApplicationContext } from './ApplicationContext';
 import { AppStackComponent } from './AppStack';
 import { HistoryStack } from './HistoryStack';
@@ -72,7 +72,7 @@ export type ModalStackNavigationProp<
 
 const MainStack = createStackNavigator<ModalStackNavigatorParamList>();
 
-export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
+export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
 
@@ -92,7 +92,7 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
         options={{
           headerShown: false,
         }}
-        component={AppStackComponent}
+        component={props => <AppStackComponent {...props} env={env} />}
       />
       <MainStack.Screen
         options={{

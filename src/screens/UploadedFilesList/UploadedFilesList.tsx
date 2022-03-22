@@ -63,7 +63,7 @@ export const UploadedFilesList: FC<Props> = props => {
       return [];
     }
     setAllFiles(
-      application
+      application.items
         .getItems(ContentType.File)
         .sort((a, b) => (a.created_at < b.created_at ? 1 : -1)) as SNFile[]
     );
@@ -209,7 +209,7 @@ export const UploadedFilesList: FC<Props> = props => {
     );
     if (shouldDelete) {
       // TODO: show some toast
-      await application.deleteItem(file);
+      await application.mutator.deleteItem(file);
       /*const deletingToastId = addToast({
         type: ToastType.Loading,
         message: `Deleting file "${file.nameWithExt}"...`,

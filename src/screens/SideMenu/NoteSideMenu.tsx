@@ -1,66 +1,68 @@
 import { associateComponentWithNote } from '@Lib/component_manager';
 import {
-  useChangeNote,
-  useDeleteNoteWithPrivileges,
-  useProtectOrUnprotectNote,
+useChangeNote,
+useDeleteNoteWithPrivileges,
+useProtectOrUnprotectNote
 } from '@Lib/snjs_helper_hooks';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { isUnfinishedFeaturesEnabled } from '@Lib/utils';
+import { useFocusEffect,useNavigation } from '@react-navigation/native';
+import { TEnvironment } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import {
-  SCREEN_COMPOSE,
-  SCREEN_INPUT_MODAL_TAG,
-  SCREEN_NOTE_HISTORY,
-  SCREEN_UPLOADED_FILES_LIST,
+SCREEN_COMPOSE,
+SCREEN_INPUT_MODAL_TAG,
+SCREEN_NOTE_HISTORY,
+SCREEN_UPLOADED_FILES_LIST
 } from '@Screens/screens';
 import { Listed } from '@Screens/SideMenu/Listed';
 import { FeatureIdentifier } from '@standardnotes/features';
 import {
-  ButtonType,
-  ComponentArea,
-  ComponentMutator,
-  ContentType,
-  FeatureStatus,
-  NoteMutator,
-  NoteViewController,
-  PayloadSource,
-  SmartView,
-  SNComponent,
-  SNNote,
-  SNTag,
+ButtonType,
+ComponentArea,
+ComponentMutator,
+ContentType,
+FeatureStatus,
+NoteMutator,
+NoteViewController,
+PayloadSource,
+SmartView,
+SNComponent,
+SNNote,
+SNTag
 } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import {
-  ICON_ARCHIVE,
-  ICON_ATTACH,
-  ICON_BOOKMARK,
-  ICON_FINGER_PRINT,
-  ICON_HISTORY,
-  ICON_LOCK,
-  ICON_MEDICAL,
-  ICON_PRICE_TAG,
-  ICON_SHARE,
-  ICON_TRASH,
+ICON_ARCHIVE,
+ICON_ATTACH,
+ICON_BOOKMARK,
+ICON_FINGER_PRINT,
+ICON_HISTORY,
+ICON_LOCK,
+ICON_MEDICAL,
+ICON_PRICE_TAG,
+ICON_SHARE,
+ICON_TRASH
 } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
+import React,{
+useCallback,
+useContext,
+useEffect,
+useMemo,
+useState
 } from 'react';
-import { Platform, Share } from 'react-native';
+import { Platform,Share } from 'react-native';
 import FAB from 'react-native-fab';
 import { FlatList } from 'react-native-gesture-handler';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from 'styled-components';
-import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled';
+import { SafeAreaContainer,useStyles } from './NoteSideMenu.styled';
 import {
-  SideMenuOption,
-  SideMenuOptionIconDescriptionType,
-  SideMenuSection,
+SideMenuOption,
+SideMenuOptionIconDescriptionType,
+SideMenuSection
 } from './SideMenuSection';
 import { TagSelectionList } from './TagSelectionList';
 
@@ -73,6 +75,7 @@ function sortAlphabetically(array: SNComponent[]): SNComponent[] {
 type Props = {
   drawerRef: DrawerLayout | null;
   drawerOpen: boolean;
+  env: TEnvironment;
 };
 
 function useEditorComponents(): SNComponent[] {
@@ -525,8 +528,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       { text: 'Share', onSelect: shareNote, icon: ICON_SHARE },
     ];
 
-    // TODO: Vardan: should we also check `enabledUnfinishedFeatures` in below condition as in web? (NoteView.tsx)
-    if (isEntitledToFiles) {
+    if (isUnfinishedFeaturesEnabled(props.env) && isEntitledToFiles) {
       rawOptions.push({
         text: `Files${
           attachedFilesLength > 0 ? ` (${attachedFilesLength})` : ''
@@ -607,6 +609,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     navigation,
     note,
     props.drawerRef,
+    props.env,
     protectOrUnprotectNote,
   ]);
 

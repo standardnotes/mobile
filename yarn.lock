@@ -1897,6 +1897,11 @@
     "@standardnotes/auth" "^3.17.10"
     "@standardnotes/common" "^1.16.2"
 
+"@standardnotes/filepicker@^1.10.1":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/filepicker/-/filepicker-1.10.1.tgz#451e8b80a670c35f4de5a1a17535b26876d4b92b"
+  integrity sha512-7q535TdXT0vKaIPvFDRPgcACrPAEs6Rgbw4pi8jLGY/Rodfty0zCN3z4NeDb/IdOGPpM8QYhKMLpYoZcKDjIMQ==
+
 "@standardnotes/payloads@^1.4.17":
   version "1.4.17"
   resolved "https://registry.yarnpkg.com/@standardnotes/payloads/-/payloads-1.4.17.tgz#767541732e37fac5ab540916150c0d71863e8cd8"
@@ -8218,6 +8223,11 @@ react-native-search-box@standardnotes/react-native-search-box#c0de5bab18cb418fef
   dependencies:
     prop-types "^15.5.10"
 
+react-native-share@^7.3.7:
+  version "7.3.7"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-7.3.7.tgz#f5eed0bf657ec8c5c45e3fe7a88611d28cc8f734"
+  integrity sha512-WYXAqyNZeKKk3Kvsv4N3tJuLNw8k+HM+ymKnWFRomoSerD5syJqmBHgw1HwED8iV3zH11lXJw3rha9+H80XUHQ==
+
 react-native-sodium-jsi@1.1.7:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/react-native-sodium-jsi/-/react-native-sodium-jsi-1.1.7.tgz#b2f9e76fb1b3bc47cb862a99b321f49b2dc60868"
@@ -8255,6 +8265,11 @@ react-native-tab-view@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-3.1.1.tgz#1f8d7a835ab4f5b1b1407ec8dddc1053b53fa3c6"
   integrity sha512-M5pRN6utQfytKWoKlKVzg5NbkYu308qNoW1khGTtEOTs1k14p2dHJ/BWOJoJYHKbPVUyZldbG9MFT7gUl4YHnw==
+
+react-native-toast-message@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-toast-message/-/react-native-toast-message-2.1.2.tgz#c7fd78252d829e6a69e82320acd6fa878bb0e910"
+  integrity sha512-nLySPAhxovSisRoorpxQxUBchQJjypDit3SCaMmQMOZh3pUH0Q72XRUFingBCq19i849v+A082fdcfqGlkuiFg==
 
 react-native-url-polyfill@^1.3.0:
   version "1.3.0"
