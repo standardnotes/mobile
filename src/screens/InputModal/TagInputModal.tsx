@@ -31,7 +31,9 @@ export const TagInputModal = (props: Props) => {
 
   useEffect(() => {
     if (props.route.params.tagUuid) {
-      const tag = application?.findItem(props.route.params.tagUuid) as SNTag;
+      const tag = application?.items.findItem(
+        props.route.params.tagUuid
+      ) as SNTag;
       setText(tag.title);
     }
   }, [application, props.route.params.tagUuid]);
@@ -46,23 +48,25 @@ export const TagInputModal = (props: Props) => {
 
   const onSubmit = useCallback(async () => {
     if (props.route.params.tagUuid) {
-      const tag = application?.findItem(props.route.params.tagUuid) as SNTag;
-      await application?.changeItem(tag.uuid, mutator => {
+      const tag = application?.items.findItem(
+        props.route.params.tagUuid
+      ) as SNTag;
+      await application?.mutator.changeItem(tag.uuid, mutator => {
         const tagMutator = mutator as TagMutator;
         tagMutator.title = text;
         if (props.route.params.noteUuid) {
-          const note = application.findItem(props.route.params.noteUuid);
+          const note = application.items.findItem(props.route.params.noteUuid);
           if (note) {
             tagMutator.addItemAsRelationship(note);
           }
         }
       });
     } else {
-      const tag = await application!.findOrCreateTag(text);
+      const tag = await application!.mutator.findOrCreateTag(text);
       if (props.route.params.noteUuid) {
-        await application?.changeItem(tag.uuid, mutator => {
+        await application?.mutator.changeItem(tag.uuid, mutator => {
           const tagMutator = mutator as TagMutator;
-          const note = application.findItem(props.route.params.noteUuid!);
+          const note = application.items.findItem(props.route.params.noteUuid!);
           if (note) {
             tagMutator.addItemAsRelationship(note);
           }

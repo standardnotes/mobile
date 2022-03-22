@@ -119,7 +119,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   };
 
   const performImport = async (data: any) => {
-    const result = await application!.importData(data);
+    const result = await application!.mutator.importData(data);
     if (!result) {
       return;
     } else if ('error' in result) {

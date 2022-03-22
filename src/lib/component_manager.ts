@@ -375,8 +375,11 @@ export async function associateComponentWithNote(
   component: SNComponent,
   note: SNNote
 ) {
-  return application.changeItem<ComponentMutator>(component.uuid, mutator => {
-    mutator.removeDisassociatedItemId(note.uuid);
-    mutator.associateWithItem(note.uuid);
-  });
+  return application.mutator.changeItem<ComponentMutator>(
+    component.uuid,
+    mutator => {
+      mutator.removeDisassociatedItemId(note.uuid);
+      mutator.associateWithItem(note.uuid);
+    }
+  );
 }

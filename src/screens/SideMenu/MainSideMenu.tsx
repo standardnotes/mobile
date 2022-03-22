@@ -155,7 +155,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     const unsubscribeStreamThemes = application?.streamItems(
       ContentType.Theme,
       () => {
-        const newItems = application
+        const newItems = application.items
           .getItems(ContentType.Theme)
           .filter(el => !el.errorDecrypting && !el.deleted);
         setThemes(newItems as SNTheme[]);
@@ -249,7 +249,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
   const onTagSelect = useCallback(
     async (tag: SNTag | SmartView) => {
       if (tag.conflictOf) {
-        application!.changeAndSaveItem(tag.uuid, mutator => {
+        application!.mutator.changeAndSaveItem(tag.uuid, mutator => {
           mutator.conflictOf = undefined;
         });
       }

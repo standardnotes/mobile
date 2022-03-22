@@ -430,7 +430,7 @@ export const useChangeNoteChecks = (
       await editor.insertTemplatedNote();
     }
 
-    if (!application?.findItem(note.uuid)) {
+    if (!application?.items.findItem(note.uuid)) {
       application?.alertService!.alert(
         "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
       );
@@ -455,7 +455,7 @@ export const useChangeNote = (
   const changeNote = useCallback(
     async (mutate: (mutator: NoteMutator) => void) => {
       if (await canChangeNote()) {
-        await application?.changeAndSaveItem(note!.uuid, mutator => {
+        await application?.mutator.changeAndSaveItem(note!.uuid, mutator => {
           const noteMutator = mutator as NoteMutator;
           mutate(noteMutator);
         });
@@ -479,9 +479,9 @@ export const useProtectOrUnprotectNote = (
   const protectOrUnprotectNote = useCallback(async () => {
     if (await canChangeNote()) {
       if (note!.protected) {
-        await application?.unprotectNote(note!);
+        await application?.mutator.unprotectNote(note!);
       } else {
-        application?.protectNote(note!);
+        application?.mutator.protectNote(note!);
       }
     }
   }, [application, note, canChangeNote]);

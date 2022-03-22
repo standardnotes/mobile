@@ -32,7 +32,7 @@ export const NoteHistory = (props: Props) => {
 
   // State
   const [note] = useState<SNNote>(
-    () => application?.findItem(props.route.params.noteUuid) as SNNote
+    () => application?.items.findItem(props.route.params.noteUuid) as SNNote
   );
   const [routes] = React.useState([
     { key: 'session', title: 'Session' },
