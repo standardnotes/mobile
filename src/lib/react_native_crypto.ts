@@ -1,5 +1,4 @@
 /* eslint-disable no-bitwise */
-import Aes from '@standardnotes/react-native-aes';
 import {
   Base64String,
   HexString,
@@ -9,7 +8,10 @@ import {
   timingSafeEqual,
   Utf8String,
 } from '@standardnotes/sncrypto-common';
+import { NativeModules } from 'react-native';
 import * as Sodium from 'react-native-sodium-jsi';
+
+const { Aes } = NativeModules;
 
 export class SNReactNativeCrypto implements SNPureCrypto {
   deinit(): void {}
