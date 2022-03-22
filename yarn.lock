@@ -1907,11 +1907,6 @@
     "@standardnotes/features" "^1.35.3"
     "@standardnotes/utils" "^1.4.2"
 
-"@standardnotes/react-native-aes@^1.4.3":
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/@standardnotes/react-native-aes/-/react-native-aes-1.4.3.tgz#e8e9aa7d3fce8622ab520002b2260bee03a23b8b"
-  integrity sha512-yY5tDIvvjweEMYdpd2cRGW9BqaUxb82n7Gr3iR1REYny7rrYPCCj+kS76D589mISYNa1TiTXwccvEd9zV1iYzg==
-
 "@standardnotes/react-native-textview@1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/react-native-textview/-/react-native-textview-1.0.2.tgz#8b22a58b9f5d3eb4fcd3e062f0db285147e85227"
