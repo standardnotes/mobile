@@ -62,6 +62,8 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Export Apple AppStore Connect API key
         run: echo "${{ secrets.APPSTORE_CONNECT_KEY }}" > ios/Authkey.p8
+      - name: Ruby Setup for Fastlane
+        uses: ruby/setup-ruby@v1
       - name: Setup fastlane
         uses: maierj/fastlane-action@v1.4.0
         env:

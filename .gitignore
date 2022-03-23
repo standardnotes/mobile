@@ -49,7 +49,7 @@ android-release.bundle
 android-release.bundle.map
 app-release.aab
 
-ios-release.bundle
+*.bundle
 ios-release.bundle.map
 
 # fastlane

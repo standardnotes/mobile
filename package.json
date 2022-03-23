@@ -16,7 +16,8 @@
     "lint:ts": "tsc --noEmit",
     "start": "react-native start",
     "test": "jest",
-    "postinstall": "patch-package && yarn run ncu"
+    "postinstall": "patch-package && yarn run ncu",
+    "android:bundle": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release/"
   },
   "resolutions": {
     "@types/react": "^17"
