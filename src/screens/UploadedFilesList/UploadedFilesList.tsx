@@ -13,8 +13,8 @@ import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import RNFS, {
   DocumentDirectoryPath,
+  DownloadDirectoryPath,
   exists,
-  ExternalDirectoryPath,
 } from 'react-native-fs';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
@@ -272,7 +272,7 @@ export const UploadedFilesList: FC<Props> = props => {
     let tmpInFileName = '';
 
     if (Platform.OS === 'android') {
-      directory = ExternalDirectoryPath;
+      directory = DownloadDirectoryPath;
 
       if (showShareScreen) {
         tmpInFileName = 'tmp-';
@@ -280,14 +280,6 @@ export const UploadedFilesList: FC<Props> = props => {
     }
     path = `${directory}/${tmpInFileName}${fileName}`;
 
-    if (Platform.OS === 'android') {
-      // On Android, the downloaded files are saved very deep (in “Android/com.standardnotes/files” folder).
-      // Change it to store in "Downloads" folder
-      path = path.replace(
-        /\/Android\/data\/com.standardnotes(\.dev)?\/files/i,
-        '/Download/'
-      );
-    }
     return path;
   };
 
