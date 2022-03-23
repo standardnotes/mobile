@@ -27,7 +27,7 @@ import { UploadedFilesList } from '@Screens/UploadedFilesList/UploadedFilesList'
 import { Challenge, DeinitSource, SNFile, SNNote } from '@standardnotes/snjs';
 import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
-import React, { useContext } from 'react';
+import React, { memo, useContext } from 'react';
 import { Platform } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ThemeContext } from 'styled-components';
@@ -76,6 +76,12 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
 
+  const MemoizedAppStackComponent = memo(
+    (props: ModalStackNavigationProp<'AppStack'>) => (
+      <AppStackComponent {...props} env={env} />
+    )
+  );
+
   return (
     <MainStack.Navigator
       screenOptions={{
@@ -92,7 +98,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
         options={{
           headerShown: false,
         }}
-        component={props => <AppStackComponent {...props} env={env} />}
+        component={MemoizedAppStackComponent}
       />
       <MainStack.Screen
         options={{
