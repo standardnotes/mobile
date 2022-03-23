@@ -10,9 +10,8 @@ export const FileIconContainer = styled.View`
   margin-right: 16px;
 `;
 export const FileDetailsContainer = styled.View`
-  margin-right: 16px;
-  width: 90%;
   flex-shrink: 1;
+  flex-grow: 1;
 `;
 export const FileName = styled.Text`
   font-size: 16px;

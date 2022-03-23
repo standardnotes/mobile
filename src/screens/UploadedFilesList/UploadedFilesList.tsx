@@ -9,8 +9,17 @@ import {
 } from '@Screens/UploadedFilesList/UploadedFileItemAction';
 import { ChallengeReason, ContentType, SNFile } from '@standardnotes/snjs';
 import { Buffer } from 'buffer';
-import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
+  FlatList,
+  ListRenderItem,
   PermissionsAndroid,
   Platform,
   Text,
@@ -26,11 +35,10 @@ import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { ThemeContext } from 'styled-components/native';
 import {
-  AttachedFilesList,
   ClearFilterTextIconContainer,
   FilterTextInput,
   FilterTextInputContainer,
-  ModalViewContainer,
+  UploadFilesListContainer,
   useUploadedFilesListStyles,
 } from './UploadedFilesList.styled';
 
@@ -93,17 +101,24 @@ export const UploadedFilesList: FC<Props> = props => {
     };
   }, [application, reloadAllFiles, reloadAttachedFiles]);
 
+  const filesList =
+    currentTab === Tabs.AttachedFiles ? attachedFiles : allFiles;
+
+  const filteredList = useMemo(() => {
+    if (!application) {
+      return [];
+    }
+
+    return searchString
+      ? filesList.filter(file =>
+          file.name.toLowerCase().includes(searchString.toLowerCase())
+        )
+      : filesList;
+  }, [application, filesList, searchString]);
+
   if (!application) {
     return null;
   }
-
-  const filesList =
-    currentTab === Tabs.AttachedFiles ? attachedFiles : allFiles;
-  const filteredList = searchString
-    ? filesList.filter(file =>
-        file.name.toLowerCase().includes(searchString.toLowerCase())
-      )
-    : filesList;
 
   const { AttachedFiles, AllFiles } = Tabs;
   const {
@@ -459,9 +474,20 @@ export const UploadedFilesList: FC<Props> = props => {
     setSearchString(textToSearch);
   };
 
+  const renderItem: ListRenderItem<SNFile> = ({ item }) => {
+    return (
+      <UploadedFileItem
+        key={item.uuid}
+        file={item}
+        isAttachedToNote={attachedFiles.includes(item)}
+        handleFileAction={handleFileAction}
+      />
+    );
+  };
+
   return (
     <View style={centeredView}>
-      <ModalViewContainer hasAttachedFiles={filesList.length > 0}>
+      <UploadFilesListContainer>
         <View style={header}>
           <View style={headerTabContainer}>
             <View
@@ -494,18 +520,12 @@ export const UploadedFilesList: FC<Props> = props => {
         </FilterTextInputContainer>
 
         {filteredList.length > 0 ? (
-          <AttachedFilesList>
-            {filteredList.map((file: SNFile) => {
-              return (
-                <UploadedFileItem
-                  key={file.uuid}
-                  file={file}
-                  isAttachedToNote={attachedFiles.includes(file)}
-                  handleFileAction={handleFileAction}
-                />
-              );
-            })}
-          </AttachedFilesList>
+          <FlatList
+            data={filteredList}
+            renderItem={renderItem}
+            style={styles.filesList}
+            keyExtractor={item => item.uuid}
+          />
         ) : (
           <View style={noAttachmentsIconContainer}>
             <SnIcon
@@ -534,7 +554,7 @@ export const UploadedFilesList: FC<Props> = props => {
                 onPress={showActionsMenu}
               />
             </Pressable>*/}
-      </ModalViewContainer>
+      </UploadFilesListContainer>
     </View>
   );
 };

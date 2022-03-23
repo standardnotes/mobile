@@ -4,17 +4,18 @@ import styled, { DefaultTheme } from 'styled-components/native';
 export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
   return StyleSheet.create({
     centeredView: {
-      flex: 1,
       justifyContent: 'flex-start',
       alignItems: 'center',
-      width: '100%',
+      flexShrink: 1,
       flexGrow: 1,
+    },
+    filesList: {
+      width: '100%',
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      width: '100%',
       borderBottomColor: theme.stylekitIron,
       borderBottomWidth: 1,
     },
@@ -34,7 +35,6 @@ export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
     noAttachmentsIconContainer: {
       alignItems: 'center',
       marginTop: 24,
-      width: '100%',
     },
     noAttachmentsIcon: {
       marginTop: 24,
@@ -54,12 +54,10 @@ export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
   });
 };
 
-export const ModalViewContainer = styled.View<{ hasAttachedFiles: boolean }>`
+export const UploadFilesListContainer = styled.View`
   padding-right: 16px;
   padding-left: 16px;
-  align-items: ${props => (props.hasAttachedFiles ? 'flex-start' : 'center')};
   width: 100%;
-}
 `;
 export const FilterTextInputContainer = styled.View`
   flex-direction: row;
@@ -85,4 +83,6 @@ export const ClearFilterTextIconContainer = styled.View`
 export const AttachedFilesList = styled.View`
   align-items: flex-start;
   flex-grow: 1;
+  background: lightyellow;
+  overflow-y: scroll;
 `;
