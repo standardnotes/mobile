@@ -50,6 +50,7 @@ export const UploadedFilesList: FC<Props> = props => {
   const [attachedFiles, setAttachedFiles] = useState<SNFile[]>([]);
   const [allFiles, setAllFiles] = useState<SNFile[]>([]);
   const [searchString, setSearchString] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const note = props.route.params.note;
 
@@ -214,7 +215,6 @@ export const UploadedFilesList: FC<Props> = props => {
       'Delete'
     );
     if (shouldDelete) {
-      // TODO: show some toast
       await application.mutator.deleteItem(file);
       /*const deletingToastId = addToast({
         type: ToastType.Loading,
@@ -246,7 +246,7 @@ export const UploadedFilesList: FC<Props> = props => {
             url: `file://${path}`,
             failOnCancel: false,
           });
-          // TODO: On Android this response always returns {success: false}, there is an open issue for that
+          // On Android this response always returns {success: false}, there is an open issue for that:
           //  https://github.com/react-native-share/react-native-share/issues/1059
           console.log('shareDialogResponse is', shareDialogResponse);
 
@@ -290,17 +290,22 @@ export const UploadedFilesList: FC<Props> = props => {
   };
 
   const downloadFile = async (file: SNFile, showShareScreen = false) => {
+    if (isDownloading) {
+      return;
+    }
+
     if (Platform.OS === 'android') {
       const grantedStatus = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
       );
       if (grantedStatus !== PermissionsAndroid.RESULTS.GRANTED) {
         await application.alertService.alert(
-          'Please provide access to Storage to download files'
+          'Storage permissions are required in order to download files. Please accept the permissions prompt and try again.'
         );
         return;
       }
     }
+    setIsDownloading(true);
 
     try {
       Toast.show({
@@ -329,6 +334,7 @@ export const UploadedFilesList: FC<Props> = props => {
         await shareFile(file, path);
         return;
       }
+
       Toast.show({
         type: 'success',
         text1: 'Success',
@@ -340,6 +346,8 @@ export const UploadedFilesList: FC<Props> = props => {
         text1: 'Error',
         text2: 'There was an error while downloading the file',
       });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
