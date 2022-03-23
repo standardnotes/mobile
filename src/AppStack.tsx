@@ -114,9 +114,9 @@ export const AppStackComponent = (
       setDimensions(window);
     };
 
-    Dimensions.addEventListener('change', updateDimensions);
+    const removeDimensionsChangeListener = Dimensions.addEventListener('change', updateDimensions);
 
-    return () => Dimensions.removeEventListener('change', updateDimensions);
+    return () => removeDimensionsChangeListener.remove();
   }, []);
 
   useEffect(() => {
