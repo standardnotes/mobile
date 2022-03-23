@@ -26,6 +26,7 @@ import {
   InteractionManager,
   Keyboard,
   KeyboardEventListener,
+  NativeEventSubscription,
   NativeModules,
   Platform,
 } from 'react-native';
@@ -110,6 +111,7 @@ export class ApplicationState extends ApplicationService {
   screenshotPrivacyEnabled?: boolean;
   passcodeTiming?: UnlockTiming;
   biometricsTiming?: UnlockTiming;
+  removeHandleReactNativeAppStateChangeListener: NativeEventSubscription;
   removeItemChangesListener?: () => void;
   removePreferencesLoadedListener?: () => void;
 
@@ -120,7 +122,8 @@ export class ApplicationState extends ApplicationService {
     this.handleApplicationEvents();
     this.handleItemsChanges();
 
-    AppState.addEventListener('change', this.handleReactNativeAppStateChange);
+    this.removeHandleReactNativeAppStateChangeListener =
+      AppState.addEventListener('change', this.handleReactNativeAppStateChange);
 
     this.keyboardDidShowListener = Keyboard.addListener(
       'keyboardWillShow',
@@ -134,10 +137,7 @@ export class ApplicationState extends ApplicationService {
 
   deinit() {
     this.appEventObersever();
-    AppState.removeEventListener(
-      'change',
-      this.handleReactNativeAppStateChange
-    );
+    this.removeHandleReactNativeAppStateChangeListener.remove();
     if (this.removeItemChangesListener) {
       this.removeItemChangesListener();
     }
