@@ -6,8 +6,12 @@ import {
 } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { NoteCellIconFlags } from '@Screens/Notes/NoteCellIconFlags';
-import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
-import { IconType } from '@standardnotes/snjs/dist/@types/types';
+import {
+  CollectionSort,
+  IconType,
+  isNullOrUndefined,
+  SNNote,
+} from '@standardnotes/snjs';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
