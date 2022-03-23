@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
 import styled, { DefaultTheme } from 'styled-components/native';
 
-// TODO: clean up all unneeded classes here
 export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
   return StyleSheet.create({
     centeredView: {
@@ -9,7 +8,6 @@ export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
       justifyContent: 'flex-start',
       alignItems: 'center',
       width: '100%',
-
       flexGrow: 1,
     },
     header: {
@@ -52,14 +50,6 @@ export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
     },
     buttonClose: {
       backgroundColor: '#2196F3',
-    },
-    uploadButtonTextStyle: {
-      backgroundColor: theme.stylekitBorderColor,
-      color: theme.stylekitInfoContrastColor,
-    },
-    modalText: {
-      marginBottom: 15,
-      textAlign: 'center',
     },
   });
 };
