@@ -18,6 +18,7 @@ import {
 import { Listed } from '@Screens/SideMenu/Listed';
 import { FeatureIdentifier } from '@standardnotes/features';
 import {
+  ApplicationEvent,
   ButtonType,
   ComponentArea,
   ComponentMutator,
@@ -26,6 +27,7 @@ import {
   NoteMutator,
   NoteViewController,
   PayloadSource,
+  PrefKey,
   SmartView,
   SNComponent,
   SNNote,
@@ -122,6 +124,28 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
   const [attachedFilesLength, setAttachedFilesLength] = useState(0);
+
+  const [shouldAddTagHierarchy, setShouldAddTagHierachy] = useState(() =>
+    application!.getPreference(PrefKey.NoteAddToParentFolders, true)
+  );
+
+  useEffect(() => {
+    if (!application) return;
+
+    const removeEventObserver = application.addSingleEventObserver(
+      ApplicationEvent.PreferencesChanged,
+      async () => {
+        setShouldAddTagHierachy(
+          application.getPreference(PrefKey.NoteAddToParentFolders, true)
+        );
+      }
+    );
+
+    return () => {
+      removeEventObserver();
+    };
+  }, [application]);
+
   const components = useEditorComponents();
 
   const [changeNote] = useChangeNote(note, editor);
@@ -139,7 +163,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     () => {
       changeNote(mutator => {
         mutator.trashed = true;
-      });
+      }, false);
       props.drawerRef?.closeDrawer();
       if (!application?.getAppState().isInTabletMode) {
         navigation.popToTop();
@@ -277,10 +301,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
       props.drawerRef?.closeDrawer();
       if (!selectedComponent) {
         if (!note?.prefersPlainEditor) {
-          await application?.mutator.changeItem(note!.uuid, mutator => {
-            const noteMutator = mutator as NoteMutator;
-            noteMutator.prefersPlainEditor = true;
-          });
+          await application?.mutator.changeItem(
+            note!.uuid,
+            mutator => {
+              const noteMutator = mutator as NoteMutator;
+              noteMutator.prefersPlainEditor = true;
+            },
+            false
+          );
         }
         if (
           activeEditorComponent?.isExplicitlyEnabledForItem(note!.uuid) ||
@@ -295,10 +323,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
         }
         const prefersPlain = note!.prefersPlainEditor;
         if (prefersPlain) {
-          await application?.mutator.changeItem(note!.uuid, mutator => {
-            const noteMutator = mutator as NoteMutator;
-            noteMutator.prefersPlainEditor = false;
-          });
+          await application?.mutator.changeItem(
+            note!.uuid,
+            mutator => {
+              const noteMutator = mutator as NoteMutator;
+              noteMutator.prefersPlainEditor = false;
+            },
+            false
+          );
         }
         await associateComponentWithNote(application, selectedComponent, note);
       }
@@ -460,7 +492,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const pinEvent = () =>
       changeNote(mutator => {
         mutator.pinned = !note.pinned;
-      });
+      }, false);
 
     const archiveOption = note.archived ? 'Unarchive' : 'Archive';
     const archiveEvent = () => {
@@ -472,7 +504,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
       changeNote(mutator => {
         mutator.archived = !note.archived;
-      });
+      }, false);
       leaveEditor();
     };
 
@@ -480,7 +512,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const lockEvent = () =>
       changeNote(mutator => {
         mutator.locked = !note.locked;
-      });
+      }, false);
 
     const protectOption = note.protected ? 'Unprotect' : 'Protect';
     const protectEvent = async () => await protectOrUnprotectNote();
@@ -564,7 +596,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           onSelect: () => {
             changeNote(mutator => {
               mutator.trashed = false;
-            });
+            }, false);
           },
         },
         {
@@ -614,7 +646,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   ]);
 
   const onTagSelect = useCallback(
-    async (tag: SNTag | SmartView) => {
+    async (tag: SNTag | SmartView, addTagHierachy: boolean) => {
       const isSelected =
         selectedTags.findIndex(selectedTag => selectedTag.uuid === tag.uuid) >
         -1;
@@ -625,7 +657,11 @@ export const NoteSideMenu = React.memo((props: Props) => {
             mutator.removeItemAsRelationship(note);
           });
         } else {
-          await application?.items.addTagToNote(note, tag as SNTag, true);
+          await application?.items.addTagToNote(
+            note,
+            tag as SNTag,
+            addTagHierachy
+          );
         }
       }
       reloadTags();
@@ -687,7 +723,9 @@ export const NoteSideMenu = React.memo((props: Props) => {
                 <TagSelectionList
                   hasBottomPadding={Platform.OS === 'android'}
                   contentType={ContentType.Tag}
-                  onTagSelect={item.onTagSelect}
+                  onTagSelect={tag =>
+                    item.onTagSelect(tag, shouldAddTagHierarchy)
+                  }
                   selectedTags={item.selectedTags}
                   emptyPlaceholder={
                     'Create a new tag using the tag button in the bottom right corner.'
