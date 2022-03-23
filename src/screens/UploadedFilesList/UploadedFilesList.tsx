@@ -10,7 +10,13 @@ import {
 import { ChallengeReason, ContentType, SNFile } from '@standardnotes/snjs';
 import { Buffer } from 'buffer';
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import {
+  PermissionsAndroid,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import RNFS, {
   DocumentDirectoryPath,
   DownloadDirectoryPath,
@@ -284,6 +290,18 @@ export const UploadedFilesList: FC<Props> = props => {
   };
 
   const downloadFile = async (file: SNFile, showShareScreen = false) => {
+    if (Platform.OS === 'android') {
+      const grantedStatus = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      );
+      if (grantedStatus !== PermissionsAndroid.RESULTS.GRANTED) {
+        await application.alertService.alert(
+          'Please provide access to Storage to download files'
+        );
+        return;
+      }
+    }
+
     try {
       Toast.show({
         type: 'info',
