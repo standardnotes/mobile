@@ -351,9 +351,9 @@ export const UploadedFilesList: FC<Props> = props => {
       }
       let result: SNFile | undefined;
       if (file.protected) {
-        result = await application.protections.unprotectFile(file);
+        result = await application.mutator.unprotectFile(file);
       } else {
-        result = await application.protections.protectFile(file);
+        result = await application.mutator.protectFile(file);
       }
       const isProtected = result ? result.protected : file.protected;
       return isProtected;
