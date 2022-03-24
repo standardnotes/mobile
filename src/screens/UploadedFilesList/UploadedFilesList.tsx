@@ -230,7 +230,7 @@ export const UploadedFilesList: FC<Props> = props => {
       'Delete'
     );
     if (shouldDelete) {
-      await application.mutator.deleteItem(file);
+      await application.files.deleteFile(file);
       /*const deletingToastId = addToast({
         type: ToastType.Loading,
         message: `Deleting file "${file.nameWithExt}"...`,
@@ -274,7 +274,7 @@ export const UploadedFilesList: FC<Props> = props => {
           if (shareDialogResponse.success) {
             Toast.show({
               type: 'success',
-              text1: 'Successfully shared file',
+              text1: 'Successfully exported file',
             });
           }
         } catch (error) {
@@ -325,7 +325,7 @@ export const UploadedFilesList: FC<Props> = props => {
     try {
       Toast.show({
         type: 'info',
-        text1: 'Preparing file...',
+        text1: 'Downloading file...',
         autoHide: false,
       });
 
