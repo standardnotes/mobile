@@ -138,13 +138,15 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({
                 </Text>
               </FileDateAndSizeContainer>
             </FileDetailsContainer>
-            <SnIcon
-              type={'lock-filled'}
-              width={12}
-              height={12}
-              fill={theme.stylekitPalSky}
-              styles={uploadedFileItemStyles.lockIcon}
-            />
+            {file.protected && (
+              <SnIcon
+                type={'lock-filled'}
+                width={12}
+                height={12}
+                fill={theme.stylekitPalSky}
+                styles={uploadedFileItemStyles.lockIcon}
+              />
+            )}
           </FileDetailsWithExtraIconsContainer>
         </FileDataContainer>
       </View>
