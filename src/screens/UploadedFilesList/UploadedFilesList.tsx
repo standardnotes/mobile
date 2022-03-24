@@ -332,13 +332,18 @@ export const UploadedFilesList: FC<Props> = props => {
 
   const attachFileToNote = async (file: SNFile) => {
     await application.items.associateFileWithNote(file, note);
+    Toast.show({
+      type: 'success',
+      text1: 'Successfully attached file to note',
+    });
   };
 
   const detachFileFromNote = async (file: SNFile) => {
-    if (!application) {
-      return;
-    }
     await application.items.disassociateFileWithNote(file, note);
+    Toast.show({
+      type: 'success',
+      text1: 'Successfully detached file from note',
+    });
   };
 
   const toggleFileProtection = async (file: SNFile) => {
