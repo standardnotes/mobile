@@ -1,5 +1,6 @@
 import { SearchSNItemsBar } from '@Components/SearchSNItemsBar';
 import { SnIcon } from '@Components/SnIcon';
+import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
@@ -41,6 +42,7 @@ export const UploadedFilesList: FC<Props> = props => {
   const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
   const styles = useUploadedFilesListStyles(theme);
+  const navigation = useNavigation();
 
   const [currentTab, setCurrentTab] = useState(Tabs.AttachedFiles);
   const [attachedFiles, setAttachedFiles] = useState<SNFile[]>([]);
@@ -108,6 +110,17 @@ export const UploadedFilesList: FC<Props> = props => {
         )
       : filesList;
   }, [application, filesList, searchString]);
+
+  useEffect(() => {
+    let screenTitle = 'Files';
+    if (searchString) {
+      const filesCount = filteredList.length;
+      screenTitle = `${filesCount} search result${filesCount !== 1 ? 's' : ''}`;
+    }
+    navigation.setOptions({
+      title: screenTitle,
+    });
+  }, [filteredList.length, navigation, searchString]);
 
   const scrollListToTop = useCallback(() => {
     if (filesListScrolled && filteredList.length > 0) {
