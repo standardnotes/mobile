@@ -1,4 +1,4 @@
-import { searchSNItemsBarStyles } from '@Components/SearchSNItemsBar.styled';
+import { searchBarStyles } from '@Components/SearchBar.styled';
 import { ThemeServiceContext } from '@Style/theme_service';
 import React, { FC, RefObject, useCallback, useContext } from 'react';
 import { Platform } from 'react-native';
@@ -16,7 +16,7 @@ type Props = {
   collapseSearchBarOnBlur?: boolean;
 };
 
-export const SearchSNItemsBar: FC<Props> = ({
+export const SearchBar: FC<Props> = ({
   onChangeText,
   onSearchCancel,
   iosSearchBarInputRef,
@@ -79,7 +79,7 @@ export const SearchSNItemsBar: FC<Props> = ({
           inputBorderRadius={4}
           tintColorSearch={theme.stylekitForegroundColor}
           inputStyle={[
-            searchSNItemsBarStyles.androidSearch,
+            searchBarStyles.androidSearch,
             {
               color: theme.stylekitForegroundColor,
               backgroundColor: theme.stylekitContrastBackgroundColor,

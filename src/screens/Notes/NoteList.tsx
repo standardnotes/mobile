@@ -1,5 +1,5 @@
 import { Chip } from '@Components/Chip';
-import { SearchSNItemsBar } from '@Components/SearchSNItemsBar';
+import { SearchBar } from '@Components/SearchBar';
 import { AppStateEventType, AppStateType } from '@Lib/application_state';
 import { useSignedIn } from '@Lib/snjs_helper_hooks';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -7,7 +7,6 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
 import { CollectionSort, SNNote } from '@standardnotes/snjs';
-import { ThemeServiceContext } from '@Style/theme_service';
 import React, {
   Dispatch,
   SetStateAction,
@@ -204,7 +203,7 @@ export const NoteList = (props: Props) => {
     <Container>
       <HeaderContainer>
         <SearchBarContainer>
-          <SearchSNItemsBar
+          <SearchBar
             onChangeText={onChangeSearchText}
             onSearchCancel={props.onSearchCancel}
             onSearchFocusCallback={onSearchFocus}

@@ -1,4 +1,4 @@
-import { SearchSNItemsBar } from '@Components/SearchSNItemsBar';
+import { SearchBar } from '@Components/SearchBar';
 import { SnIcon } from '@Components/SnIcon';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
@@ -500,7 +500,7 @@ export const UploadedFilesList: FC<Props> = props => {
           </View>
         </View>
         <View>
-          <SearchSNItemsBar
+          <SearchBar
             onChangeText={handleFilter}
             onSearchCancel={() => handleFilter('')}
             iosSearchBarInputRef={iosSearchBarInputRef}
