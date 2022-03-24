@@ -99,6 +99,7 @@ platform :android do
   end
 
   def deploy_android(variant, versionCode, track = 'internal')
+    sh("yarn run android:bundle")
     build_android(variant, versionCode)
     upload_to_play_store(
       track: track,
