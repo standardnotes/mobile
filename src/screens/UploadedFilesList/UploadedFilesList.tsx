@@ -487,8 +487,10 @@ export const UploadedFilesList: FC<Props> = props => {
           <FlatList
             data={filteredList}
             renderItem={renderItem}
-            style={styles.filesList}
             keyExtractor={item => item.uuid}
+            contentContainerStyle={{
+              paddingBottom: Platform.OS === 'ios' ? 100 : 120,
+            }}
           />
         ) : (
           <View style={noAttachmentsIconContainer}>

@@ -9,9 +9,6 @@ export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
       flexShrink: 1,
       flexGrow: 1,
     },
-    filesList: {
-      width: '100%',
-    },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
