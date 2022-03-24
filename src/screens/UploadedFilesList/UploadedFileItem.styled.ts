@@ -1,4 +1,12 @@
+import { SnIcon } from '@Components/SnIcon';
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
+
+export const uploadedFileItemStyles = StyleSheet.create({
+  lockIcon: {
+    marginLeft: 8,
+  },
+});
 
 export const FileDataContainer = styled.View`
   align-items: flex-start;
@@ -9,9 +17,20 @@ export const FileIconContainer = styled.View`
   margin-top: 2px;
   margin-right: 16px;
 `;
-export const FileDetailsContainer = styled.View`
+export const FileDetailsWithExtraIconsContainer = styled.View`
+  flex-direction: row;
   flex-shrink: 1;
   flex-grow: 1;
+  align-items: center;
+  border-bottom-color: ${({ theme }) => theme.stylekitIron};
+  border-bottom-width: 1px;
+`;
+export const LockIconStyled = styled(SnIcon)`
+  background-color: green;
+  display: none;
+`;
+export const FileDetailsContainer = styled.View`
+  flex-shrink: 1;
 `;
 export const FileName = styled.Text`
   font-size: 16px;
@@ -19,8 +38,6 @@ export const FileName = styled.Text`
   color: ${({ theme }) => theme.stylekitCodGray};
 `;
 export const FileDateAndSizeContainer = styled.View`
-  border-bottom-color: ${({ theme }) => theme.stylekitIron};
-  border-bottom-width: 1px;
   color: ${({ theme }) => theme.stylekitAbbey};
   font-size: 12px;
   padding-bottom: 12px;

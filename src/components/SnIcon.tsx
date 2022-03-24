@@ -14,6 +14,7 @@ import FilePdfIcon from '@standardnotes/stylekit/dist/icons/ic-file-pdf.svg';
 import FilePptIcon from '@standardnotes/stylekit/dist/icons/ic-file-ppt.svg';
 import FileXlsIcon from '@standardnotes/stylekit/dist/icons/ic-file-xls.svg';
 import FileZipIcon from '@standardnotes/stylekit/dist/icons/ic-file-zip.svg';
+import LockIconFilled from '@standardnotes/stylekit/dist/icons/ic-lock-filled.svg';
 import MarkdownIcon from '@standardnotes/stylekit/dist/icons/ic-markdown.svg';
 import NotesIcon from '@standardnotes/stylekit/dist/icons/ic-notes.svg';
 import OpenInIcon from '@standardnotes/stylekit/dist/icons/ic-open-in.svg';
@@ -61,6 +62,7 @@ const ICONS: Partial<TIcons> = {
   'file-xls': FileXlsIcon,
   'file-zip': FileZipIcon,
   'clear-circle-filled': ClearCircleFilledIcon,
+  'lock-filled': LockIconFilled,
 };
 
 type Props = {

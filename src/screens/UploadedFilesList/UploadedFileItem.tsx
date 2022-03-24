@@ -8,12 +8,15 @@ import { IconType, SNFile } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import React, { FC, useContext, useEffect, useState } from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { ThemeContext } from 'styled-components';
 import {
   FileDataContainer,
   FileDateAndSizeContainer,
   FileDetailsContainer,
+  FileDetailsWithExtraIconsContainer,
   FileIconContainer,
   FileName,
+  uploadedFileItemStyles,
 } from './UploadedFileItem.styled';
 import {
   UploadedFileItemAction,
@@ -44,6 +47,7 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({
 
   const [fileName, setFileName] = useState(file.name);
   const [isFileProtected, setIsFileProtected] = useState(file.protected);
+  const theme = useContext(ThemeContext);
 
   useEffect(() => {
     setFileName(file.name);
@@ -124,15 +128,24 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({
       <View>
         <FileDataContainer>
           <FileIconContainer>{iconForFileType}</FileIconContainer>
-          <FileDetailsContainer>
-            <FileName>{fileName}</FileName>
-            <FileDateAndSizeContainer>
-              <Text>
-                {file.created_at.toLocaleString()} ·{' '}
-                {formatSizeToReadableString(file.size)}
-              </Text>
-            </FileDateAndSizeContainer>
-          </FileDetailsContainer>
+          <FileDetailsWithExtraIconsContainer>
+            <FileDetailsContainer>
+              <FileName>{fileName}</FileName>
+              <FileDateAndSizeContainer>
+                <Text>
+                  {file.created_at.toLocaleString()} ·{' '}
+                  {formatSizeToReadableString(file.size)}
+                </Text>
+              </FileDateAndSizeContainer>
+            </FileDetailsContainer>
+            <SnIcon
+              type={'lock-filled'}
+              width={12}
+              height={12}
+              fill={theme.stylekitPalSky}
+              styles={uploadedFileItemStyles.lockIcon}
+            />
+          </FileDetailsWithExtraIconsContainer>
         </FileDataContainer>
       </View>
     </TouchableOpacity>
