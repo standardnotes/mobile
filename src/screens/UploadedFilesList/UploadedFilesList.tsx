@@ -1,3 +1,4 @@
+import { SearchSNItemsBar } from '@Components/SearchSNItemsBar';
 import { SnIcon } from '@Components/SnIcon';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
@@ -14,24 +15,17 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
-import {
-  FlatList,
-  ListRenderItem,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { FlatList, ListRenderItem, Platform, Text, View } from 'react-native';
 import RNFS, { exists } from 'react-native-fs';
+import IosSearchBar from 'react-native-search-bar';
+import AndroidSearchBar from 'react-native-search-box';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { ThemeContext } from 'styled-components/native';
 import {
-  ClearFilterTextIconContainer,
-  FilterTextInput,
-  FilterTextInputContainer,
   UploadFilesListContainer,
   useUploadedFilesListStyles,
 } from './UploadedFilesList.styled';
@@ -53,6 +47,11 @@ export const UploadedFilesList: FC<Props> = props => {
   const [allFiles, setAllFiles] = useState<SNFile[]>([]);
   const [searchString, setSearchString] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [filesListScrolled, setFilesListScrolled] = useState(false);
+
+  const iosSearchBarInputRef = useRef<IosSearchBar>(null);
+  const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
+  const filesListRef = useRef<FlatList>(null);
 
   const note = props.route.params.note;
 
@@ -109,6 +108,21 @@ export const UploadedFilesList: FC<Props> = props => {
         )
       : filesList;
   }, [application, filesList, searchString]);
+
+  const scrollListToTop = useCallback(() => {
+    if (filesListScrolled && filteredList.length > 0) {
+      filesListRef.current?.scrollToIndex({ animated: false, index: 0 });
+      setFilesListScrolled(false);
+    }
+  }, [filesListScrolled, filteredList.length]);
+
+  const handleFilter = useCallback(
+    (textToSearch: string) => {
+      setSearchString(textToSearch);
+      scrollListToTop();
+    },
+    [scrollListToTop]
+  );
 
   if (!application) {
     return null;
@@ -439,8 +453,11 @@ export const UploadedFilesList: FC<Props> = props => {
     return true;
   };
 
-  const handleFilter = (textToSearch: string) => {
-    setSearchString(textToSearch);
+  const onScroll = () => {
+    if (filesListScrolled) {
+      return;
+    }
+    setFilesListScrolled(true);
   };
 
   const renderItem: ListRenderItem<SNFile> = ({ item }) => {
@@ -469,33 +486,25 @@ export const UploadedFilesList: FC<Props> = props => {
             </View>
           </View>
         </View>
-        <FilterTextInputContainer>
-          <FilterTextInput
-            onChangeText={textToSearch => {
-              handleFilter(textToSearch);
-            }}
-            placeholder={'Search files...'}
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            value={searchString}
+        <View>
+          <SearchSNItemsBar
+            onChangeText={handleFilter}
+            onSearchCancel={() => handleFilter('')}
+            iosSearchBarInputRef={iosSearchBarInputRef}
+            androidSearchBarInputRef={androidSearchBarInputRef}
           />
-          {searchString.length > 0 && (
-            <ClearFilterTextIconContainer>
-              <TouchableOpacity onPress={() => setSearchString('')}>
-                <SnIcon type="clear-circle-filled" width={18} height={18} />
-              </TouchableOpacity>
-            </ClearFilterTextIconContainer>
-          )}
-        </FilterTextInputContainer>
+        </View>
 
         {filteredList.length > 0 ? (
           <FlatList
+            ref={filesListRef}
             data={filteredList}
             renderItem={renderItem}
             keyExtractor={item => item.uuid}
             contentContainerStyle={{
               paddingBottom: Platform.OS === 'ios' ? 100 : 120,
             }}
+            onScroll={onScroll}
           />
         ) : (
           <View style={noAttachmentsIconContainer}>
