@@ -36,9 +36,10 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({
   handleFileAction,
 }) => {
   const application = useContext(ApplicationContext);
-  const navigation = useNavigation<
-    AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
-  >();
+  const navigation =
+    useNavigation<
+      AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
+    >();
   const { showActionSheet } = useCustomActionSheet();
 
   const [fileName, setFileName] = useState(file.name);
@@ -107,7 +108,7 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({
       Platform.OS === 'ios'
         ? actions.filter(action => action.text !== 'Download')
         : [...actions];
-    showActionSheet('Choose action', osDependentActions);
+    showActionSheet(file.name, osDependentActions);
   };
 
   if (!application) {

@@ -8,7 +8,6 @@ import {
   UploadedFileItemActionType,
 } from '@Screens/UploadedFilesList/UploadedFileItemAction';
 import { ChallengeReason, ContentType, SNFile } from '@standardnotes/snjs';
-import { Buffer } from 'buffer';
 import React, {
   FC,
   useCallback,
@@ -20,17 +19,12 @@ import React, {
 import {
   FlatList,
   ListRenderItem,
-  PermissionsAndroid,
   Platform,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import RNFS, {
-  DocumentDirectoryPath,
-  DownloadDirectoryPath,
-  exists,
-} from 'react-native-fs';
+import RNFS, { exists } from 'react-native-fs';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { ThemeContext } from 'styled-components/native';
@@ -286,39 +280,16 @@ export const UploadedFilesList: FC<Props> = props => {
       });
   };
 
-  const getDestinationPath = (fileName: string, showShareScreen: boolean) => {
-    let path = '';
-
-    let directory = DocumentDirectoryPath;
-    let tmpInFileName = '';
-
-    if (Platform.OS === 'android') {
-      directory = DownloadDirectoryPath;
-
-      if (showShareScreen) {
-        tmpInFileName = 'tmp-';
-      }
-    }
-    path = `${directory}/${tmpInFileName}${fileName}`;
-
-    return path;
-  };
-
   const downloadFile = async (file: SNFile, showShareScreen = false) => {
     if (isDownloading) {
       return;
     }
+    const filesService = application.getFilesService();
+    const isGrantedStoragePermissionOnAndroid =
+      await filesService.hasStoragePermissionOnAndroid();
 
-    if (Platform.OS === 'android') {
-      const grantedStatus = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-      );
-      if (grantedStatus !== PermissionsAndroid.RESULTS.GRANTED) {
-        await application.alertService.alert(
-          'Storage permissions are required in order to download files. Please accept the permissions prompt and try again.'
-        );
-        return;
-      }
+    if (!isGrantedStoragePermissionOnAndroid) {
+      return;
     }
     setIsDownloading(true);
 
@@ -329,19 +300,12 @@ export const UploadedFilesList: FC<Props> = props => {
         autoHide: false,
       });
 
-      const path = getDestinationPath(file.name, showShareScreen);
+      const path = filesService.getDestinationPath(file.name, showShareScreen);
 
       // Overwrite any existing file with that name
       await deleteFileAtPath(path);
 
-      await application.files.downloadFile(
-        file,
-        async (decryptedBytes: Uint8Array) => {
-          const base64String = new Buffer(decryptedBytes).toString('base64');
-
-          await RNFS.appendFile(path, base64String, 'base64');
-        }
-      );
+      await filesService.downloadFileInChunks(file, path);
 
       Toast.hide();
 
