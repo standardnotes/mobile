@@ -1,13 +1,17 @@
 import { StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled, { DefaultTheme } from 'styled-components/native';
 
 export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
+  const insets = useSafeAreaInsets();
+
   return StyleSheet.create({
     centeredView: {
       justifyContent: 'flex-start',
       alignItems: 'center',
       flexShrink: 1,
       flexGrow: 1,
+      paddingBottom: insets.bottom,
     },
     header: {
       flexDirection: 'row',
@@ -55,31 +59,5 @@ export const UploadFilesListContainer = styled.View`
   padding-right: 16px;
   padding-left: 16px;
   width: 100%;
-`;
-export const FilterTextInputContainer = styled.View`
-  flex-direction: row;
-  padding: 12px 8px;
-  border-bottom-width: 1px;
-  border-style: solid;
-  border-color: ${({ theme }) => theme.stylekitIron};
-  position: relative;
-`;
-export const FilterTextInput = styled.TextInput`
-  border-width: 1px;
-  border-color: ${({ theme }) => theme.stylekitIron};
-  border-radius: 4px;
-  padding: 4px 8px;
-  flex-grow: 1;
-`;
-export const ClearFilterTextIconContainer = styled.View`
-  position: absolute;
-  top: 60%;
-  right: 16px;
-`;
-
-export const AttachedFilesList = styled.View`
-  align-items: flex-start;
-  flex-grow: 1;
-  background: lightyellow;
-  overflow-y: scroll;
+  height: 100%;
 `;

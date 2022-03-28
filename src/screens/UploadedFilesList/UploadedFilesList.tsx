@@ -9,6 +9,10 @@ import {
   UploadedFileItemAction,
   UploadedFileItemActionType,
 } from '@Screens/UploadedFilesList/UploadedFileItemAction';
+import {
+  UploadFilesListContainer,
+  useUploadedFilesListStyles,
+} from '@Screens/UploadedFilesList/UploadedFilesList.styled';
 import { ChallengeReason, ContentType, SNFile } from '@standardnotes/snjs';
 import React, {
   FC,
@@ -26,10 +30,6 @@ import AndroidSearchBar from 'react-native-search-box';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import { ThemeContext } from 'styled-components/native';
-import {
-  UploadFilesListContainer,
-  useUploadedFilesListStyles,
-} from './UploadedFilesList.styled';
 
 enum Tabs {
   AttachedFiles,
@@ -514,9 +514,6 @@ export const UploadedFilesList: FC<Props> = props => {
             data={filteredList}
             renderItem={renderItem}
             keyExtractor={item => item.uuid}
-            contentContainerStyle={{
-              paddingBottom: Platform.OS === 'ios' ? 100 : 120,
-            }}
             onScroll={onScroll}
           />
         ) : (
