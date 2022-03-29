@@ -402,7 +402,7 @@ export const useFiles = ({ note }: Props) => {
           },
         },
         {
-          text: 'Share',
+          text: Platform.OS === 'ios' ? 'Export' : 'Share',
           callback: () => {
             handleFileAction({
               type: UploadedFileItemActionType.ShareFile,
