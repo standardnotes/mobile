@@ -73,6 +73,7 @@ export const useFiles = ({ note }: Props) => {
         /*Toast.show({
           type: Info,
           text1: `Deleting file "${file.name}"...`,
+          onPress: Toast.hide,
         });
 
         await application.files.deleteFile(file);
@@ -80,6 +81,7 @@ export const useFiles = ({ note }: Props) => {
         Toast.show({
           type: Success,
           text1: `Deleted file "${file.name}"`,
+          onPress: Toast.hide,
         });*/
       }
     },
@@ -121,12 +123,14 @@ export const useFiles = ({ note }: Props) => {
               Toast.show({
                 type: Success,
                 text1: 'Successfully exported file',
+                onPress: Toast.hide,
               });
             }
           } catch (error) {
             Toast.show({
               type: Error,
               text1: 'There was an error while sharing the file',
+              onPress: Toast.hide,
             });
           }
         });
@@ -153,6 +157,7 @@ export const useFiles = ({ note }: Props) => {
           type: Info,
           text1: 'Downloading file...',
           autoHide: false,
+          onPress: Toast.hide,
         });
 
         const path = filesService.getDestinationPath(
@@ -176,12 +181,14 @@ export const useFiles = ({ note }: Props) => {
           type: Success,
           text1: 'Success',
           text2: 'Successfully downloaded file',
+          onPress: Toast.hide,
         });
       } catch (error) {
         Toast.show({
           type: Error,
           text1: 'Error',
           text2: 'There was an error while downloading the file',
+          onPress: Toast.hide,
         });
       } finally {
         setIsDownloading(false);
@@ -207,6 +214,7 @@ export const useFiles = ({ note }: Props) => {
       Toast.show({
         type: Success,
         text1: 'Successfully attached file to note',
+        onPress: Toast.hide,
       });
     },
     [Success, application, note]
@@ -221,6 +229,7 @@ export const useFiles = ({ note }: Props) => {
       Toast.show({
         type: Success,
         text1: 'Successfully detached file from note',
+        onPress: Toast.hide,
       });
     },
     [Success, application, note]
