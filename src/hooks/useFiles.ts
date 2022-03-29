@@ -1,3 +1,4 @@
+import { ToastType } from '@Lib/types';
 import { useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Screens/screens';
@@ -34,6 +35,8 @@ export const useFiles = ({ note }: Props) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isFileProtected, setIsFileProtected] = useState(false);
 
+  const { Success, Info, Error } = ToastType;
+
   const reloadAttachedFiles = useCallback(() => {
     if (!application || !note) {
       return [];
@@ -68,14 +71,14 @@ export const useFiles = ({ note }: Props) => {
       );
       if (shouldDelete) {
         /*Toast.show({
-          type: 'info',
+          type: Info,
           text1: `Deleting file "${file.name}"...`,
         });
 
         await application.files.deleteFile(file);
 
         Toast.show({
-          type: 'success',
+          type: Success,
           text1: `Deleted file "${file.name}"`,
         });*/
       }
@@ -116,19 +119,19 @@ export const useFiles = ({ note }: Props) => {
             }
             if (shareDialogResponse.success) {
               Toast.show({
-                type: 'success',
+                type: Success,
                 text1: 'Successfully exported file',
               });
             }
           } catch (error) {
             Toast.show({
-              type: 'error',
+              type: Error,
               text1: 'There was an error while sharing the file',
             });
           }
         });
     },
-    [application, deleteFileAtPath]
+    [Error, Success, application, deleteFileAtPath]
   );
 
   const downloadFile = useCallback(
@@ -147,7 +150,7 @@ export const useFiles = ({ note }: Props) => {
 
       try {
         Toast.show({
-          type: 'info',
+          type: Info,
           text1: 'Downloading file...',
           autoHide: false,
         });
@@ -170,13 +173,13 @@ export const useFiles = ({ note }: Props) => {
         }
 
         Toast.show({
-          type: 'success',
+          type: Success,
           text1: 'Success',
           text2: 'Successfully downloaded file',
         });
       } catch (error) {
         Toast.show({
-          type: 'error',
+          type: Error,
           text1: 'Error',
           text2: 'There was an error while downloading the file',
         });
@@ -184,7 +187,15 @@ export const useFiles = ({ note }: Props) => {
         setIsDownloading(false);
       }
     },
-    [application, deleteFileAtPath, isDownloading, shareFile]
+    [
+      Error,
+      Info,
+      Success,
+      application,
+      deleteFileAtPath,
+      isDownloading,
+      shareFile,
+    ]
   );
 
   const attachFileToNote = useCallback(
@@ -194,11 +205,11 @@ export const useFiles = ({ note }: Props) => {
       }
       await application.items.associateFileWithNote(file, note);
       Toast.show({
-        type: 'success',
+        type: Success,
         text1: 'Successfully attached file to note',
       });
     },
-    [application, note]
+    [Success, application, note]
   );
 
   const detachFileFromNote = useCallback(
@@ -208,11 +219,11 @@ export const useFiles = ({ note }: Props) => {
       }
       await application.items.disassociateFileWithNote(file, note);
       Toast.show({
-        type: 'success',
+        type: Success,
         text1: 'Successfully detached file from note',
       });
     },
-    [application, note]
+    [Success, application, note]
   );
 
   const toggleFileProtection = useCallback(
