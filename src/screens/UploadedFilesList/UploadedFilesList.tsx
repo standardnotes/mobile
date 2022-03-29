@@ -7,6 +7,8 @@ import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
 import { UploadedFileItem } from '@Screens/UploadedFilesList/UploadedFileItem';
 import {
+  HeaderTabItem,
+  TabText,
   UploadFilesListContainer,
   useUploadedFilesListStyles,
 } from '@Screens/UploadedFilesList/UploadedFilesList.styled';
@@ -100,8 +102,6 @@ export const UploadedFilesList: FC<Props> = props => {
     centeredView,
     header,
     headerTabContainer,
-    headerTab,
-    activeTab,
     noAttachmentsIcon,
     noAttachmentsIconContainer,
   } = styles;
@@ -129,14 +129,21 @@ export const UploadedFilesList: FC<Props> = props => {
       <UploadFilesListContainer>
         <View style={header}>
           <View style={headerTabContainer}>
-            <View
-              style={[headerTab, currentTab === AttachedFiles ? activeTab : {}]}
+            <HeaderTabItem
+              isActive={currentTab === AttachedFiles}
+              isLeftTab={true}
+              onTouchEnd={() => setCurrentTab(AttachedFiles)}
             >
-              <Text onPress={() => setCurrentTab(AttachedFiles)}>Attached</Text>
-            </View>
-            <View style={[headerTab, currentTab === AllFiles ? activeTab : {}]}>
-              <Text onPress={() => setCurrentTab(AllFiles)}>All files</Text>
-            </View>
+              <TabText isActive={currentTab === AttachedFiles}>
+                Attached
+              </TabText>
+            </HeaderTabItem>
+            <HeaderTabItem
+              isActive={currentTab === AllFiles}
+              onTouchEnd={() => setCurrentTab(AllFiles)}
+            >
+              <TabText isActive={currentTab === AllFiles}>All files</TabText>
+            </HeaderTabItem>
           </View>
         </View>
         <View>

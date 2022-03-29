@@ -696,7 +696,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
                 title={'Files'}
                 customCollapsedLabel={`${
                   attachedFilesLength ? `${attachedFilesLength}` : 'No'
-                } attached files`}
+                } attached file${attachedFilesLength === 1 ? '' : 's'}`}
                 collapsed={true}
               >
                 <Files note={note} />

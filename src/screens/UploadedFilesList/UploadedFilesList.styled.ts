@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import styled, { DefaultTheme } from 'styled-components/native';
+import styled from 'styled-components/native';
 
-export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
+export const useUploadedFilesListStyles = () => {
   const insets = useSafeAreaInsets();
 
   return StyleSheet.create({
@@ -17,21 +17,10 @@ export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      borderBottomColor: theme.stylekitIron,
-      borderBottomWidth: 1,
+      marginBottom: 4,
     },
     headerTabContainer: {
       flexDirection: 'row',
-    },
-    headerTab: {
-      justifyContent: 'center',
-      padding: 12,
-    },
-    activeTab: {
-      color: theme.stylekitInfoColor,
-      borderBottomColor: theme.stylekitInfoColor,
-      borderBottomWidth: 2,
-      backgroundColor: '#2b6fcf0f',
     },
     noAttachmentsIconContainer: {
       alignItems: 'center',
@@ -56,8 +45,31 @@ export const useUploadedFilesListStyles = (theme: DefaultTheme) => {
 };
 
 export const UploadFilesListContainer = styled.View`
+  margin-top: 12px;
   padding-right: 16px;
   padding-left: 16px;
   width: 100%;
   height: 100%;
+`;
+export const HeaderTabItem = styled.View<{
+  isActive: boolean;
+  isLeftTab?: boolean;
+}>`
+  align-items: center;
+  padding: 12px;
+  flex-grow: 1;
+  background-color: ${({ theme, isActive }) =>
+    isActive ? theme.stylekitInfoColor : theme.stylekitInfoContrastColor};
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.stylekitInfoColor};
+  border-top-right-radius: ${({ isLeftTab }) => (isLeftTab ? 0 : '8px')};
+  border-bottom-right-radius: ${({ isLeftTab }) => (isLeftTab ? 0 : '8px')};
+  border-top-left-radius: ${({ isLeftTab }) => (isLeftTab ? '8px' : 0)};
+  border-bottom-left-radius: ${({ isLeftTab }) => (isLeftTab ? '8px' : 0)};
+  margin-left: ${({ isLeftTab }) => (isLeftTab ? 0 : '-1px')};
+`;
+export const TabText = styled.Text<{ isActive: boolean }>`
+  font-weight: bold;
+  color: ${({ isActive, theme }) =>
+    isActive ? theme.stylekitInfoContrastColor : theme.stylekitInfoColor};
 `;
