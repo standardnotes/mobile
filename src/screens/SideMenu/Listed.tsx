@@ -186,7 +186,7 @@ export const Listed: FC<TProps> = ({ note }) => {
                       side: 'left',
                       type: SideMenuOptionIconDescriptionType.CustomComponent,
                       value: (
-                        <SnIcon type={'notes'} styles={styles.blogItemIcon} />
+                        <SnIcon type={'notes'} style={styles.blogItemIcon} />
                       ),
                     }}
                   />
@@ -218,7 +218,7 @@ export const Listed: FC<TProps> = ({ note }) => {
             iconDesc={{
               side: 'left',
               type: SideMenuOptionIconDescriptionType.CustomComponent,
-              value: <SnIcon type={'user-add'} styles={styles.blogItemIcon} />,
+              value: <SnIcon type={'user-add'} style={styles.blogItemIcon} />,
             }}
           />
           {isRequestingAccount && (
@@ -234,7 +234,7 @@ export const Listed: FC<TProps> = ({ note }) => {
             iconDesc={{
               side: 'left',
               type: SideMenuOptionIconDescriptionType.CustomComponent,
-              value: <SnIcon type={'open-in'} styles={styles.blogItemIcon} />,
+              value: <SnIcon type={'open-in'} style={styles.blogItemIcon} />,
             }}
           />
         </ListedItemRow>

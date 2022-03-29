@@ -225,7 +225,7 @@ export const NoteCell = ({
           <SnIcon
             type={icon}
             fill={getTintColorForEditor(theme, tint)}
-            styles={styles.editorIcon}
+            style={styles.editorIcon}
           />
         )}
         <NoteDataContainer distance={padding}>

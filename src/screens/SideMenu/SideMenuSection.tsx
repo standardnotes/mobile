@@ -31,6 +31,7 @@ export type SideMenuOption = {
 
 type Props = {
   title: string;
+  customCollapsedLabel?: string;
   collapsed?: boolean;
   options?: SideMenuOption[];
 };
@@ -41,9 +42,10 @@ export const SideMenuSection: React.FC<Props> = React.memo(props => {
     return props.options || [];
   }, [props.options]);
   const collapsedLabel =
-    options.length > 0
+    props.customCollapsedLabel ||
+    (options.length > 0
       ? 'Tap to expand ' + options.length + ' options'
-      : 'Tap to expand';
+      : 'Tap to expand');
   return (
     <Root>
       <Header collapsed={collapsed} onPress={() => setCollapsed(!collapsed)}>

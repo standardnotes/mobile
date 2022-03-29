@@ -68,12 +68,12 @@ const ICONS: Partial<TIcons> = {
 type Props = {
   type: IconType;
   fill?: string;
-  styles?: Record<string, unknown>;
+  style?: Record<string, unknown>;
   width?: number;
   height?: number;
 };
 
-export const SnIcon = ({ type, fill, width, height, styles = {} }: Props) => {
+export const SnIcon = ({ type, fill, width, height, style = {} }: Props) => {
   const theme = useContext(ThemeContext);
   const fillColor = fill || theme.stylekitPalSky;
 
@@ -101,10 +101,7 @@ export const SnIcon = ({ type, fill, width, height, styles = {} }: Props) => {
     <IconComponent
       fill={fillColor}
       {...customSizes}
-      style={{
-        ...iconStyles.icon,
-        ...styles,
-      }}
+      style={[iconStyles.icon, style]}
     />
   );
 };

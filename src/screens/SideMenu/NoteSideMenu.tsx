@@ -13,8 +13,8 @@ import {
   SCREEN_COMPOSE,
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_NOTE_HISTORY,
-  SCREEN_UPLOADED_FILES_LIST,
 } from '@Screens/screens';
+import { Files } from '@Screens/SideMenu/Files';
 import { Listed } from '@Screens/SideMenu/Listed';
 import { FeatureIdentifier } from '@standardnotes/features';
 import {
@@ -36,7 +36,6 @@ import {
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import {
   ICON_ARCHIVE,
-  ICON_ATTACH,
   ICON_BOOKMARK,
   ICON_FINGER_PRINT,
   ICON_HISTORY,
@@ -483,6 +482,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
     navigation.goBack();
   }, [props.drawerRef, navigation]);
 
+  const isEntitledToFiles =
+    application?.features.getFeatureStatus(FeatureIdentifier.Files) ===
+    FeatureStatus.Entitled;
+
   const noteOptions = useMemo(() => {
     if (!note) {
       return;
@@ -539,14 +542,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
     };
 
-    const openFilesScreen = () => {
-      navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note });
-    };
-
-    const isEntitledToFiles =
-      application?.features.getFeatureStatus(FeatureIdentifier.Files) ===
-      FeatureStatus.Entitled;
-
     const rawOptions = [
       { text: pinOption, onSelect: pinEvent, icon: ICON_BOOKMARK },
       { text: archiveOption, onSelect: archiveEvent, icon: ICON_ARCHIVE },
@@ -560,15 +555,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
       { text: 'Share', onSelect: shareNote, icon: ICON_SHARE },
     ];
 
-    if (isUnfinishedFeaturesEnabled(props.env) && isEntitledToFiles) {
-      rawOptions.push({
-        text: `Files${
-          attachedFilesLength > 0 ? ` (${attachedFilesLength})` : ''
-        }`,
-        onSelect: openFilesScreen,
-        icon: ICON_ATTACH,
-      });
-    }
     if (!note.trashed) {
       rawOptions.push({
         text: 'Move to Trash',
@@ -633,7 +619,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
     return options;
   }, [
     application,
-    attachedFilesLength,
     changeNote,
     deleteNote,
     editor?.isTemplateNote,
@@ -641,7 +626,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
     navigation,
     note,
     props.drawerRef,
-    props.env,
     protectOrUnprotectNote,
   ]);
 
@@ -675,6 +659,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   }
 
   enum MenuSections {
+    FilesSection = 'files-section',
     OptionsSection = 'options-section',
     EditorsSection = 'editors-section',
     ListedSection = 'listed-section',
@@ -693,9 +678,31 @@ export const NoteSideMenu = React.memo((props: Props) => {
           selectedTags,
         }))}
         renderItem={({ item }) => {
-          const { OptionsSection, EditorsSection, ListedSection, TagsSection } =
-            MenuSections;
+          const {
+            OptionsSection,
+            EditorsSection,
+            ListedSection,
+            TagsSection,
+            FilesSection,
+          } = MenuSections;
 
+          if (
+            item.key === FilesSection &&
+            isUnfinishedFeaturesEnabled(props.env) &&
+            isEntitledToFiles
+          ) {
+            return (
+              <SideMenuSection
+                title={'Files'}
+                customCollapsedLabel={`${
+                  attachedFilesLength ? `${attachedFilesLength}` : 'No'
+                } attached files`}
+                collapsed={true}
+              >
+                <Files note={note} />
+              </SideMenuSection>
+            );
+          }
           if (item.key === OptionsSection) {
             return (
               <SideMenuSection title="Options" options={item.noteOptions} />
