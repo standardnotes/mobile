@@ -14,6 +14,8 @@ type Props = {
   note: SNNote;
 };
 
+const MaximumVisibleFilesCount = 3;
+
 export const Files: FC<Props> = ({ note }) => {
   const application = useContext(ApplicationContext);
 
@@ -31,9 +33,11 @@ export const Files: FC<Props> = ({ note }) => {
     navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note });
   };
 
+  const isFilesListTruncated = attachedFiles.length > MaximumVisibleFilesCount;
+
   return (
     <View>
-      {attachedFiles.slice(0, 3).map(file => {
+      {attachedFiles.slice(0, MaximumVisibleFilesCount).map(file => {
         const iconType = application.iconsController.getIconForFileType(
           file.mimeType
         );
@@ -64,7 +68,12 @@ export const Files: FC<Props> = ({ note }) => {
           </View>
         );
       })}
-      <SideMenuCell text={'Show all files'} onSelect={openFilesScreen} />
+      <SideMenuCell
+        text={
+          isFilesListTruncated ? 'Show all attached files' : 'Show other files'
+        }
+        onSelect={openFilesScreen}
+      />
       <SideMenuCell
         text={'Upload new file'}
         onSelect={() => console.error('Not implemented')}
