@@ -3,7 +3,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { useFiles } from '@Root/hooks/useFiles';
 import { SCREEN_COMPOSE, SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
-import { SNIconStyled } from '@Screens/SideMenu/Files.styled';
+import { IconsContainer, SNIconStyled } from '@Screens/SideMenu/Files.styled';
 import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell';
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
 import { SNNote } from '@standardnotes/snjs';
@@ -47,7 +47,18 @@ export const Files: FC<Props> = ({ note }) => {
               iconDesc={{
                 side: 'right',
                 type: SideMenuOptionIconDescriptionType.CustomComponent,
-                value: <SNIconStyled type={iconType} width={16} height={16} />,
+                value: (
+                  <IconsContainer>
+                    {file.protected && (
+                      <SNIconStyled
+                        type={'lock-filled'}
+                        width={16}
+                        height={16}
+                      />
+                    )}
+                    <SNIconStyled type={iconType} width={16} height={16} />
+                  </IconsContainer>
+                ),
               }}
             />
           </View>
