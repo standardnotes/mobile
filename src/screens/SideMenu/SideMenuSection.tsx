@@ -1,4 +1,5 @@
 import React, { ReactElement, useMemo, useState } from 'react';
+import { StyleProp, ViewStyle } from 'react-native';
 import { SideMenuCell } from './SideMenuCell';
 import { CollapsedLabel, Header, Root, Title } from './SideMenuSection.styled';
 
@@ -27,6 +28,7 @@ export type SideMenuOption = {
   selected?: boolean;
   onSelect?: () => void | Promise<void>;
   onLongPress?: () => void;
+  style?: StyleProp<ViewStyle>;
 };
 
 type Props = {

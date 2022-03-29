@@ -3,12 +3,18 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { useFiles } from '@Root/hooks/useFiles';
 import { SCREEN_COMPOSE, SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
-import { IconsContainer, SNIconStyled } from '@Screens/SideMenu/Files.styled';
+import {
+  FileItemContainer,
+  FilesContainer,
+  IconsContainer,
+  SideMenuCellShowAllFiles,
+  SideMenuCellStyled,
+  SNIconStyled,
+} from '@Screens/SideMenu/Files.styled';
 import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell';
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
 import { SNNote } from '@standardnotes/snjs';
 import React, { FC, useContext } from 'react';
-import { View } from 'react-native';
 
 type Props = {
   note: SNNote;
@@ -36,15 +42,15 @@ export const Files: FC<Props> = ({ note }) => {
   const isFilesListTruncated = attachedFiles.length > MaximumVisibleFilesCount;
 
   return (
-    <View>
+    <FilesContainer>
       {attachedFiles.slice(0, MaximumVisibleFilesCount).map(file => {
         const iconType = application.iconsController.getIconForFileType(
           file.mimeType
         );
 
         return (
-          <View>
-            <SideMenuCell
+          <FileItemContainer>
+            <SideMenuCellStyled
               text={file.name}
               key={file.uuid}
               onSelect={() => showActionsMenu(file)}
@@ -65,10 +71,10 @@ export const Files: FC<Props> = ({ note }) => {
                 ),
               }}
             />
-          </View>
+          </FileItemContainer>
         );
       })}
-      <SideMenuCell
+      <SideMenuCellShowAllFiles
         text={
           isFilesListTruncated ? 'Show all attached files' : 'Show other files'
         }
@@ -78,6 +84,6 @@ export const Files: FC<Props> = ({ note }) => {
         text={'Upload new file'}
         onSelect={() => console.error('Not implemented')}
       />
-    </View>
+    </FilesContainer>
   );
 };

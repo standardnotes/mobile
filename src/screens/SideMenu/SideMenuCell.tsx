@@ -78,6 +78,7 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
       isSubtext={Boolean(props.subtext)}
       onPress={props.onSelect}
       onLongPress={props.onLongPress}
+      style={[props.style || {}]}
     >
       <CellContent iconSide={iconSide}>
         {iconSide === 'left' && (
