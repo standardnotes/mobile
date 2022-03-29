@@ -56,7 +56,7 @@ export const HeaderTabItem = styled.View<{
   isLeftTab?: boolean;
 }>`
   align-items: center;
-  padding: 12px;
+  padding: 8px;
   flex-grow: 1;
   background-color: ${({ theme, isActive }) =>
     isActive ? theme.stylekitInfoColor : theme.stylekitInfoContrastColor};
