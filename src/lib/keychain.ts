@@ -12,8 +12,8 @@ export default class Keychain {
       'sn',
       JSON.stringify(keys),
       options
-    ).then(function () {
-      console.log('Credentials saved successfully!');
+    ).then(function (result) {
+      console.log('Credentials saved successfully!', result);
     });
   }
 

@@ -1881,10 +1881,10 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/components/-/components-1.7.13.tgz#55c0bad3afd36788b45bf1e67950d84ee5358dd3"
   integrity sha512-Gy1PsibeTjcNNLUvHtfgPFNvEf+BdaYF9QA/RimEsPd9NWZL/kDJSVqj7J33gGoxpdv7l8Y/lMOMt6Az+FqKKw==
 
-"@standardnotes/domain-events@^2.25.6":
-  version "2.25.6"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.25.6.tgz#025f2377f7eada61e0d6f5e9c68d6a860f26dbd7"
-  integrity sha512-TAEzhtoyPdEep94jyb8PZxH2cmEY9gdEUsKnWLpQrxrUrXRZ7+fqc1M01PtX4f6/bEnkkonBaxrs8XIVoKKZzA==
+"@standardnotes/domain-events@^2.26.0":
+  version "2.26.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.26.0.tgz#878b3ced75508ae686cff5f70cf6635575aae889"
+  integrity sha512-sV5Zu2/2xXBGLh1rA7OOJZVKhf+UjSGfKgEQOFKHqQVFTKbWr/XxQX/dNLJsBh+N9NfmPVm5kxZ91m798ulV5g==
   dependencies:
     "@standardnotes/auth" "^3.18.0"
     "@standardnotes/features" "^1.35.6"
@@ -1896,11 +1896,6 @@
   dependencies:
     "@standardnotes/auth" "^3.18.0"
     "@standardnotes/common" "^1.17.0"
-
-"@standardnotes/filepicker@^1.10.3":
-  version "1.10.3"
-  resolved "https://registry.yarnpkg.com/@standardnotes/filepicker/-/filepicker-1.10.3.tgz#7384cf40e5ee6b685ea4773cd7857530f11f9d3a"
-  integrity sha512-95XYq3f758jiut9L4wmd4pC8UariaWUMuGtZB1NDPWm/qgO9ig117hrL7sMN7NU5hRqdt+f6O9xpO7zOoTblrQ==
 
 "@standardnotes/payloads@^1.4.20":
   version "1.4.20"
@@ -1957,15 +1952,15 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.7.3.tgz#1e62a14800393be44cdb376d1d72fbc064334fc1"
   integrity sha512-twwYeBL+COkNF9IUM5bWrLZ4gXjg41tRxBMR3r3JcbrkyYjcNqVHf9L+YdBcndjSV3/9xwWl2pYWK1RB3UR2Xg==
 
-"@standardnotes/snjs@2.92.3":
-  version "2.92.3"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.92.3.tgz#995fcb8eafcf44efe04680641f19f152c66d5299"
-  integrity sha512-oTG3rAy5zFFIu5++f47JP9b8Dm7MG2ImWF6JLed/BsOZt5R6kyAjkBqrpN8cE5bp28wfb8KfShFHrN9xcOvfdg==
+"@standardnotes/snjs@2.92.5":
+  version "2.92.5"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.92.5.tgz#d471728083830e170252cd59b48e35e887ad31df"
+  integrity sha512-+sttUkV2PjvMFH6/AMop6FsYdlfa23mRhg8jPr3jBK5JJ+rJvoX876jecAjHfYuQs8cLVoT+YeK7xFh0IyA6kw==
   dependencies:
     "@standardnotes/applications" "^1.2.6"
     "@standardnotes/auth" "^3.18.0"
     "@standardnotes/common" "^1.17.0"
-    "@standardnotes/domain-events" "^2.25.6"
+    "@standardnotes/domain-events" "^2.26.0"
     "@standardnotes/features" "^1.35.6"
     "@standardnotes/payloads" "^1.4.20"
     "@standardnotes/responses" "^1.4.1"
@@ -1974,15 +1969,16 @@
     "@standardnotes/sncrypto-common" "^1.7.3"
     "@standardnotes/utils" "^1.4.3"
 
-"@standardnotes/stylekit@5.18.0":
-  version "5.18.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/stylekit/-/stylekit-5.18.0.tgz#4b301a9f51d1785e8d7971d39beaf1f304f12522"
-  integrity sha512-fD3LTB6CNbEZv647ldWqlxrUvx/rJnj7zpTQPebOODbwomQ7KVWa9ss7lTobCAS7JiMeuGS7DpRu/UMnaLudMg==
+"@standardnotes/stylekit@5.19.0":
+  version "5.19.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/stylekit/-/stylekit-5.19.0.tgz#b5dfb54a3d17502a86231f9633ac1404298b3397"
+  integrity sha512-UO64ChrMYUSjj5xWiw3LMc5flUBSsI/Q5GqQZz22fS0JVcdxTDYKDUREk3uNlsMnwfS1+QZqLJrRsu1OYIPp5w==
   dependencies:
     "@nanostores/preact" "^0.1.3"
     "@reach/listbox" "^0.16.2"
     "@reach/menu-button" "^0.16.2"
     "@svgr/webpack" "^6.2.1"
+    focus-trap "^6.7.3"
     nanoid "^3.3.1"
     nanostores "^0.5.10"
     prop-types "^15.8.1"
@@ -4660,6 +4656,13 @@ flow-parser@^0.121.0:
   version "0.121.0"
   resolved "https://registry.yarnpkg.com/flow-parser/-/flow-parser-0.121.0.tgz#9f9898eaec91a9f7c323e9e992d81ab5c58e618f"
   integrity sha512-1gIBiWJNR0tKUNv8gZuk7l9rVX06OuLzY9AoGio7y/JT4V1IZErEMEq2TJS+PFcw/y0RshZ1J/27VfK1UQzYVg==
+
+focus-trap@^6.7.3:
+  version "6.7.3"
+  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-6.7.3.tgz#b5dc195b49c90001f08a63134471d1e6dd381ddd"
+  integrity sha512-8xCEKndV4KrseGhFKKKmczVA14yx1/hnmFICPOjcFjToxCJYj/NHH43tPc3YE/PLnLRNZoFug0EcWkGQde/miQ==
+  dependencies:
+    tabbable "^5.2.1"
 
 for-in@^1.0.2:
   version "1.0.2"
@@ -8223,11 +8226,6 @@ react-native-search-box@standardnotes/react-native-search-box#c0de5bab18cb418fef
   dependencies:
     prop-types "^15.5.10"
 
-react-native-share@^7.3.7:
-  version "7.3.7"
-  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-7.3.7.tgz#f5eed0bf657ec8c5c45e3fe7a88611d28cc8f734"
-  integrity sha512-WYXAqyNZeKKk3Kvsv4N3tJuLNw8k+HM+ymKnWFRomoSerD5syJqmBHgw1HwED8iV3zH11lXJw3rha9+H80XUHQ==
-
 react-native-sodium-jsi@1.1.7:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/react-native-sodium-jsi/-/react-native-sodium-jsi-1.1.7.tgz#b2f9e76fb1b3bc47cb862a99b321f49b2dc60868"
@@ -8265,11 +8263,6 @@ react-native-tab-view@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-3.1.1.tgz#1f8d7a835ab4f5b1b1407ec8dddc1053b53fa3c6"
   integrity sha512-M5pRN6utQfytKWoKlKVzg5NbkYu308qNoW1khGTtEOTs1k14p2dHJ/BWOJoJYHKbPVUyZldbG9MFT7gUl4YHnw==
-
-react-native-toast-message@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/react-native-toast-message/-/react-native-toast-message-2.1.2.tgz#c7fd78252d829e6a69e82320acd6fa878bb0e910"
-  integrity sha512-nLySPAhxovSisRoorpxQxUBchQJjypDit3SCaMmQMOZh3pUH0Q72XRUFingBCq19i849v+A082fdcfqGlkuiFg==
 
 react-native-url-polyfill@^1.3.0:
   version "1.3.0"
@@ -9378,6 +9371,11 @@ tabbable@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/tabbable/-/tabbable-4.0.0.tgz#5bff1d1135df1482cf0f0206434f15eadbeb9261"
   integrity sha512-H1XoH1URcBOa/rZZWxLxHCtOdVUEev+9vo5YdYhC9tCY4wnybX+VQrCYuy9ubkg69fCBxCONJOSLGfw0DWMffQ==
+
+tabbable@^5.2.1:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/tabbable/-/tabbable-5.2.1.tgz#e3fda7367ddbb172dcda9f871c0fdb36d1c4cd9c"
+  integrity sha512-40pEZ2mhjaZzK0BnI+QGNjJO8UYx9pP5v7BGe17SORTO0OEuuaAwQTkAp8whcZvqon44wKFOikD+Al11K3JICQ==
 
 tail@^2.0.0:
   version "2.2.4"
