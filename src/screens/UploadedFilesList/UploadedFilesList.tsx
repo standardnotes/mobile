@@ -25,7 +25,6 @@ import React, {
 import { FlatList, ListRenderItem, Text, View } from 'react-native';
 import IosSearchBar from 'react-native-search-bar';
 import AndroidSearchBar from 'react-native-search-box';
-import { ThemeContext } from 'styled-components/native';
 
 enum Tabs {
   AttachedFiles,
@@ -35,9 +34,8 @@ enum Tabs {
 type Props = ModalStackNavigationProp<typeof SCREEN_UPLOADED_FILES_LIST>;
 
 export const UploadedFilesList: FC<Props> = props => {
-  const theme = useContext(ThemeContext);
   const application = useContext(ApplicationContext);
-  const styles = useUploadedFilesListStyles(theme);
+  const styles = useUploadedFilesListStyles();
   const navigation = useNavigation();
 
   const [currentTab, setCurrentTab] = useState(Tabs.AttachedFiles);

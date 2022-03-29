@@ -114,7 +114,10 @@ export const AppStackComponent = (
       setDimensions(window);
     };
 
-    const removeDimensionsChangeListener = Dimensions.addEventListener('change', updateDimensions);
+    const removeDimensionsChangeListener = Dimensions.addEventListener(
+      'change',
+      updateDimensions
+    );
 
     return () => removeDimensionsChangeListener.remove();
   }, []);
