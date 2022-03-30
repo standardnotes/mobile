@@ -252,9 +252,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-
-    implementation project(':react-native-fs')
-
 }
 
 // Run this once to be able to run the application with BUCK
