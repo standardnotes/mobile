@@ -22,7 +22,6 @@ export type UploadedFileItemAction =
   | {
       type: UploadedFileItemActionType.ToggleFileProtection;
       payload: SNFile;
-      callback: (isProtected: boolean) => void;
     }
   | {
       type: UploadedFileItemActionType.RenameFile;

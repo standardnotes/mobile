@@ -33,7 +33,6 @@ export const useFiles = ({ note }: Props) => {
   const [attachedFiles, setAttachedFiles] = useState<SNFile[]>([]);
   const [allFiles, setAllFiles] = useState<SNFile[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isFileProtected, setIsFileProtected] = useState(false);
 
   const { Success, Info, Error } = ToastType;
 
@@ -325,8 +324,7 @@ export const useFiles = ({ note }: Props) => {
           await downloadFile(file);
           break;
         case UploadedFileItemActionType.ToggleFileProtection: {
-          const isProtected = await toggleFileProtection(file);
-          action.callback(isProtected);
+          await toggleFileProtection(file);
           break;
         }
         case UploadedFileItemActionType.RenameFile:
@@ -372,7 +370,6 @@ export const useFiles = ({ note }: Props) => {
         return;
       }
       const isAttachedToNote = attachedFiles.includes(file);
-      setIsFileProtected(file.protected);
 
       const actions = [
         {
@@ -390,14 +387,11 @@ export const useFiles = ({ note }: Props) => {
                 }),
         },
         {
-          text: `${isFileProtected ? 'Disable' : 'Enable'} password protection`,
+          text: `${file.protected ? 'Disable' : 'Enable'} password protection`,
           callback: () => {
             handleFileAction({
               type: UploadedFileItemActionType.ToggleFileProtection,
               payload: file,
-              callback: isProtected => {
-                setIsFileProtected(isProtected);
-              },
             });
           },
         },
@@ -434,13 +428,7 @@ export const useFiles = ({ note }: Props) => {
           : [...actions];
       showActionSheet(file.name, osDependentActions);
     },
-    [
-      attachedFiles,
-      handleFileAction,
-      isFileProtected,
-      navigation,
-      showActionSheet,
-    ]
+    [attachedFiles, handleFileAction, navigation, showActionSheet]
   );
 
   return {
