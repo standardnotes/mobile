@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 import styled from 'styled-components/native';
 
 export const SNIconStyled = styled(SnIcon)`
-  margin-left: 4px;
+  margin-left: 8px;
 `;
 export const FilesContainer = styled.View`
   margin-top: 10px;
