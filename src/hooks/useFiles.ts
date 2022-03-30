@@ -98,7 +98,7 @@ export const useFiles = ({ note }: Props) => {
           } catch (error) {
             Toast.show({
               type: Error,
-              text1: 'There was an error while sharing the file',
+              text1: 'An error occurred while trying to share this file',
               onPress: Toast.hide,
             });
           }
@@ -134,7 +134,6 @@ export const useFiles = ({ note }: Props) => {
           showShareScreen
         );
 
-        // Overwrite any existing file with that name
         await deleteFileAtPath(path);
 
         await filesService.downloadFileInChunks(file, path);
@@ -156,7 +155,7 @@ export const useFiles = ({ note }: Props) => {
         Toast.show({
           type: Error,
           text1: 'Error',
-          text2: 'There was an error while downloading the file',
+          text2: 'An error occurred while downloading the file',
           onPress: Toast.hide,
         });
       } finally {

@@ -171,7 +171,7 @@ export const UploadedFilesList: FC<Props> = props => {
             />
             <Text>
               {searchString
-                ? 'No result found'
+                ? 'No files found'
                 : 'No files attached to this note'}
             </Text>
           </View>
