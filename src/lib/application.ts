@@ -1,3 +1,4 @@
+import { FilesService } from '@Lib/files_service';
 import { SCREEN_AUTHENTICATE } from '@Screens/screens';
 import {
   Challenge,
@@ -34,6 +35,7 @@ type MobileServices = {
   installationService: InstallationService;
   prefsService: PreferencesManager;
   statusManager: StatusManager;
+  filesService: FilesService;
 };
 
 const IsDev = VersionInfo.bundleIdentifier?.includes('dev');
@@ -155,5 +157,9 @@ export class MobileApplication extends SNApplication {
 
   public getStatusManager() {
     return this.MobileServices.statusManager;
+  }
+
+  public getFilesService() {
+    return this.MobileServices.filesService;
   }
 }

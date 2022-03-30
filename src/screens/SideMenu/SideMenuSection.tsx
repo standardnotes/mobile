@@ -1,4 +1,5 @@
 import React, { ReactElement, useMemo, useState } from 'react';
+import { StyleProp, ViewStyle } from 'react-native';
 import { SideMenuCell } from './SideMenuCell';
 import { CollapsedLabel, Header, Root, Title } from './SideMenuSection.styled';
 
@@ -27,10 +28,12 @@ export type SideMenuOption = {
   selected?: boolean;
   onSelect?: () => void | Promise<void>;
   onLongPress?: () => void;
+  style?: StyleProp<ViewStyle>;
 };
 
 type Props = {
   title: string;
+  customCollapsedLabel?: string;
   collapsed?: boolean;
   options?: SideMenuOption[];
 };
@@ -41,9 +44,10 @@ export const SideMenuSection: React.FC<Props> = React.memo(props => {
     return props.options || [];
   }, [props.options]);
   const collapsedLabel =
-    options.length > 0
+    props.customCollapsedLabel ||
+    (options.length > 0
       ? 'Tap to expand ' + options.length + ' options'
-      : 'Tap to expand';
+      : 'Tap to expand');
   return (
     <Root>
       <Header collapsed={collapsed} onPress={() => setCollapsed(!collapsed)}>

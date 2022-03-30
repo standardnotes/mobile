@@ -4,7 +4,9 @@ import {
   useDeleteNoteWithPrivileges,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
+import { isUnfinishedFeaturesEnabled } from '@Lib/utils';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { TEnvironment } from '@Root/App';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import {
@@ -12,13 +14,16 @@ import {
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_NOTE_HISTORY,
 } from '@Screens/screens';
+import { Files } from '@Screens/SideMenu/Files';
 import { Listed } from '@Screens/SideMenu/Listed';
+import { FeatureIdentifier } from '@standardnotes/features';
 import {
   ApplicationEvent,
   ButtonType,
   ComponentArea,
   ComponentMutator,
   ContentType,
+  FeatureStatus,
   NoteMutator,
   NoteViewController,
   PayloadSource,
@@ -71,6 +76,7 @@ function sortAlphabetically(array: SNComponent[]): SNComponent[] {
 type Props = {
   drawerRef: DrawerLayout | null;
   drawerOpen: boolean;
+  env: TEnvironment;
 };
 
 function useEditorComponents(): SNComponent[] {
@@ -116,6 +122,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   );
   const [note, setNote] = useState<SNNote | undefined>(undefined);
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([]);
+  const [attachedFilesLength, setAttachedFilesLength] = useState(0);
 
   const [shouldAddTagHierarchy, setShouldAddTagHierachy] = useState(() =>
     application!.getPreference(PrefKey.NoteAddToParentFolders, true)
@@ -163,6 +170,29 @@ export const NoteSideMenu = React.memo((props: Props) => {
     },
     editor
   );
+
+  useEffect(() => {
+    if (!application || !note) {
+      setAttachedFilesLength(0);
+      return;
+    }
+    setAttachedFilesLength(application.items.getFilesForNote(note).length);
+  }, [application, note]);
+
+  useEffect(() => {
+    if (!application || !note) {
+      return;
+    }
+    const removeFilesObserver = application.streamItems(
+      ContentType.File,
+      () => {
+        setAttachedFilesLength(application.items.getFilesForNote(note).length);
+      }
+    );
+    return () => {
+      removeFilesObserver();
+    };
+  }, [application, note]);
 
   useEffect(() => {
     let mounted = true;
@@ -452,6 +482,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
     navigation.goBack();
   }, [props.drawerRef, navigation]);
 
+  const isEntitledToFiles =
+    application?.features.getFeatureStatus(FeatureIdentifier.Files) ===
+    FeatureStatus.Entitled;
+
   const noteOptions = useMemo(() => {
     if (!note) {
       return;
@@ -584,15 +618,15 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
     return options;
   }, [
-    note,
-    changeNote,
-    leaveEditor,
-    editor?.isTemplateNote,
-    props.drawerRef,
-    navigation,
     application,
-    protectOrUnprotectNote,
+    changeNote,
     deleteNote,
+    editor?.isTemplateNote,
+    leaveEditor,
+    navigation,
+    note,
+    props.drawerRef,
+    protectOrUnprotectNote,
   ]);
 
   const onTagSelect = useCallback(
@@ -625,6 +659,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   }
 
   enum MenuSections {
+    FilesSection = 'files-section',
     OptionsSection = 'options-section',
     EditorsSection = 'editors-section',
     ListedSection = 'listed-section',
@@ -643,9 +678,31 @@ export const NoteSideMenu = React.memo((props: Props) => {
           selectedTags,
         }))}
         renderItem={({ item }) => {
-          const { OptionsSection, EditorsSection, ListedSection, TagsSection } =
-            MenuSections;
+          const {
+            OptionsSection,
+            EditorsSection,
+            ListedSection,
+            TagsSection,
+            FilesSection,
+          } = MenuSections;
 
+          if (
+            item.key === FilesSection &&
+            isUnfinishedFeaturesEnabled(props.env) &&
+            isEntitledToFiles
+          ) {
+            return (
+              <SideMenuSection
+                title={'Files'}
+                customCollapsedLabel={`${
+                  attachedFilesLength ? `${attachedFilesLength}` : 'No'
+                } attached file${attachedFilesLength === 1 ? '' : 's'}`}
+                collapsed={true}
+              >
+                <Files note={note} />
+              </SideMenuSection>
+            );
+          }
           if (item.key === OptionsSection) {
             return (
               <SideMenuSection title="Options" options={item.noteOptions} />

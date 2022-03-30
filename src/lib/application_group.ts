@@ -1,3 +1,4 @@
+import { FilesService } from '@Lib/files_service';
 import { InternalEventBus } from '@standardnotes/services';
 import {
   ApplicationDescriptor,
@@ -42,6 +43,7 @@ export class ApplicationGroup extends SNApplicationGroup {
       internalEventBus
     );
     const statusManager = new StatusManager(application, internalEventBus);
+    const filesService = new FilesService(application, internalEventBus);
     application.setMobileServices({
       applicationState,
       reviewService,
@@ -49,6 +51,7 @@ export class ApplicationGroup extends SNApplicationGroup {
       prefsService,
       installationService,
       statusManager,
+      filesService,
     });
     return application;
   };

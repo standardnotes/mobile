@@ -38,7 +38,7 @@ import DrawerLayout, {
 } from 'react-native-gesture-handler/DrawerLayout';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ThemeContext } from 'styled-components';
-import { HeaderTitleParams } from './App';
+import { HeaderTitleParams, TEnvironment } from './App';
 import { ApplicationContext } from './ApplicationContext';
 import { ModalStackNavigationProp } from './ModalStack';
 
@@ -62,7 +62,7 @@ export type AppStackNavigationProp<T extends keyof AppStackNavigatorParamList> =
 const AppStack = createStackNavigator<AppStackNavigatorParamList>();
 
 export const AppStackComponent = (
-  props: ModalStackNavigationProp<'AppStack'>
+  props: ModalStackNavigationProp<'AppStack'> & { env: TEnvironment }
 ) => {
   // Context
   const application = useContext(ApplicationContext);
@@ -114,9 +114,12 @@ export const AppStackComponent = (
       setDimensions(window);
     };
 
-    Dimensions.addEventListener('change', updateDimensions);
+    const removeDimensionsChangeListener = Dimensions.addEventListener(
+      'change',
+      updateDimensions
+    );
 
-    return () => Dimensions.removeEventListener('change', updateDimensions);
+    return () => removeDimensionsChangeListener.remove();
   }, []);
 
   useEffect(() => {
@@ -176,6 +179,7 @@ export const AppStackComponent = (
             <NoteSideMenu
               drawerOpen={noteDrawerOpen}
               drawerRef={noteDrawerRef.current}
+              env={props.env}
             />
           )
         }

@@ -1,8 +1,20 @@
 import { iconStyles } from '@Components/Icon.styled';
 import { IconType } from '@standardnotes/snjs';
 import ArchiveIcon from '@standardnotes/stylekit/dist/icons/ic-archive.svg';
+import AttachmentFileIcon from '@standardnotes/stylekit/dist/icons/ic-attachment-file.svg';
 import AuthenticatorIcon from '@standardnotes/stylekit/dist/icons/ic-authenticator.svg';
+import ClearCircleFilledIcon from '@standardnotes/stylekit/dist/icons/ic-clear-circle-filled.svg';
 import CodeIcon from '@standardnotes/stylekit/dist/icons/ic-code.svg';
+import FileDocIcon from '@standardnotes/stylekit/dist/icons/ic-file-doc.svg';
+import FileImageIcon from '@standardnotes/stylekit/dist/icons/ic-file-image.svg';
+import FileMovIcon from '@standardnotes/stylekit/dist/icons/ic-file-mov.svg';
+import FileMusicIcon from '@standardnotes/stylekit/dist/icons/ic-file-music.svg';
+import FileOtherIcon from '@standardnotes/stylekit/dist/icons/ic-file-other.svg';
+import FilePdfIcon from '@standardnotes/stylekit/dist/icons/ic-file-pdf.svg';
+import FilePptIcon from '@standardnotes/stylekit/dist/icons/ic-file-ppt.svg';
+import FileXlsIcon from '@standardnotes/stylekit/dist/icons/ic-file-xls.svg';
+import FileZipIcon from '@standardnotes/stylekit/dist/icons/ic-file-zip.svg';
+import LockIconFilled from '@standardnotes/stylekit/dist/icons/ic-lock-filled.svg';
 import MarkdownIcon from '@standardnotes/stylekit/dist/icons/ic-markdown.svg';
 import NotesIcon from '@standardnotes/stylekit/dist/icons/ic-notes.svg';
 import OpenInIcon from '@standardnotes/stylekit/dist/icons/ic-open-in.svg';
@@ -14,10 +26,16 @@ import PlainTextIcon from '@standardnotes/stylekit/dist/icons/ic-text-paragraph.
 import RichTextIcon from '@standardnotes/stylekit/dist/icons/ic-text-rich.svg';
 import TrashFilledIcon from '@standardnotes/stylekit/dist/icons/ic-trash-filled.svg';
 import UserAddIcon from '@standardnotes/stylekit/dist/icons/ic-user-add.svg';
-import React, { useContext } from 'react';
+import FilesIllustration from '@standardnotes/stylekit/dist/icons/il-files.svg';
+import React, { FC, useContext } from 'react';
+import { SvgProps } from 'react-native-svg';
 import { ThemeContext } from 'styled-components';
 
-const ICONS = {
+type TIcons = {
+  [key in IconType]: FC<SvgProps>;
+};
+
+const ICONS: Partial<TIcons> = {
   'pencil-off': PencilOffIcon,
   'plain-text': PlainTextIcon,
   'rich-text': RichTextIcon,
@@ -32,31 +50,30 @@ const ICONS = {
   'user-add': UserAddIcon,
   'open-in': OpenInIcon,
   notes: NotesIcon,
+  'attachment-file': AttachmentFileIcon,
+  'files-illustration': FilesIllustration,
+  'file-doc': FileDocIcon,
+  'file-image': FileImageIcon,
+  'file-mov': FileMovIcon,
+  'file-music': FileMusicIcon,
+  'file-other': FileOtherIcon,
+  'file-pdf': FilePdfIcon,
+  'file-ppt': FilePptIcon,
+  'file-xls': FileXlsIcon,
+  'file-zip': FileZipIcon,
+  'clear-circle-filled': ClearCircleFilledIcon,
+  'lock-filled': LockIconFilled,
 };
-
-export type TEditorIcon = Extract<
-  IconType,
-  | 'pencil-off'
-  | 'plain-text'
-  | 'rich-text'
-  | 'code'
-  | 'markdown'
-  | 'spreadsheets'
-  | 'tasks'
-  | 'authenticator'
-  | 'trash-filled'
-  | 'pin-filled'
-  | 'archive'
->;
-export type TGeneralIcon = Extract<IconType, 'user-add' | 'open-in' | 'notes'>;
 
 type Props = {
-  type: TEditorIcon | TGeneralIcon;
+  type: IconType;
   fill?: string;
-  styles?: Record<string, unknown>;
+  style?: Record<string, unknown>;
+  width?: number;
+  height?: number;
 };
 
-export const SnIcon = ({ type, fill, styles = {} }: Props) => {
+export const SnIcon = ({ type, fill, width, height, style = {} }: Props) => {
   const theme = useContext(ThemeContext);
   const fillColor = fill || theme.stylekitPalSky;
 
@@ -66,13 +83,25 @@ export const SnIcon = ({ type, fill, styles = {} }: Props) => {
     return null;
   }
 
+  let customSizes = {};
+  if (width !== undefined) {
+    customSizes = {
+      ...customSizes,
+      width,
+    };
+  }
+  if (height !== undefined) {
+    customSizes = {
+      ...customSizes,
+      height,
+    };
+  }
+
   return (
     <IconComponent
       fill={fillColor}
-      style={{
-        ...iconStyles.icon,
-        ...styles,
-      }}
+      {...customSizes}
+      style={[iconStyles.icon, style]}
     />
   );
 };

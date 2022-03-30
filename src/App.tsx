@@ -8,6 +8,7 @@ import { MobileThemeVariables } from '@Style/Themes/styled-components';
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { ThemeProvider } from 'styled-components/native';
 import { ApplicationContext } from './ApplicationContext';
 import { MainStackComponent } from './ModalStack';
@@ -18,9 +19,11 @@ export type HeaderTitleParams = {
   subTitleColor?: string;
 };
 
+export type TEnvironment = 'prod' | 'dev';
+
 const AppComponent: React.FC<{
   application: MobileApplication;
-  env: 'prod' | 'dev';
+  env: TEnvironment;
 }> = ({ application, env }) => {
   const themeService = useRef<ThemeService>();
   const appReady = useRef(false);
@@ -114,6 +117,7 @@ const AppComponent: React.FC<{
           </ThemeProvider>
         </>
       )}
+      <Toast />
     </NavigationContainer>
   );
 };
@@ -125,7 +129,7 @@ const AppComponent: React.FC<{
 const AppGroupInstance = new ApplicationGroup();
 AppGroupInstance.initialize();
 
-export const App = (props: { env: 'prod' | 'dev' }) => {
+export const App = (props: { env: TEnvironment }) => {
   const applicationGroupRef = useRef(AppGroupInstance);
   const [application, setApplication] = useState<
     MobileApplication | undefined

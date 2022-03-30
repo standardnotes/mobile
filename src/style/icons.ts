@@ -17,3 +17,4 @@ export const ICON_USER = 'person-circle';
 export const ICON_FORWARD = 'arrow-forward';
 export const ICON_HISTORY = 'time';
 export const ELIPSIS = 'ellipsis-vertical';
+export const ICON_ATTACH = 'attach';

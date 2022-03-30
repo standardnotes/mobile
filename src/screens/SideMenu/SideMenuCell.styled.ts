@@ -34,6 +34,7 @@ export const TextContainer = styled.View<{
 }>`
   min-height: ${props => (props.isSubtext ? 38 : 24)}px;
   margin-left: 6px;
+  flex-shrink: 1;
   ${({ selected, theme }) =>
     selected &&
     css`

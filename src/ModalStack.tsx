@@ -7,26 +7,31 @@ import {
   StackNavigationProp,
 } from '@react-navigation/stack';
 import { Authenticate } from '@Screens/Authenticate/Authenticate';
+import { FileInputModal } from '@Screens/InputModal/FileInputModal';
 import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
 import { TagInputModal } from '@Screens/InputModal/TagInputModal';
 import { ManageSessions } from '@Screens/ManageSessions/ManageSessions';
 import {
   MODAL_BLOCKING_ALERT,
   SCREEN_AUTHENTICATE,
+  SCREEN_INPUT_MODAL_FILE_NAME,
   SCREEN_INPUT_MODAL_PASSCODE,
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_MANAGE_SESSIONS,
   SCREEN_SETTINGS,
+  SCREEN_UPLOADED_FILES_LIST,
 } from '@Screens/screens';
 import { Settings } from '@Screens/Settings/Settings';
-import { Challenge, DeinitSource } from '@standardnotes/snjs';
+import { UploadedFileItemAction } from '@Screens/UploadedFilesList/UploadedFileItemAction';
+import { UploadedFilesList } from '@Screens/UploadedFilesList/UploadedFilesList';
+import { Challenge, DeinitSource, SNFile, SNNote } from '@standardnotes/snjs';
 import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
-import React, { useContext } from 'react';
+import React, { memo, useContext } from 'react';
 import { Platform } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ThemeContext } from 'styled-components';
-import { HeaderTitleParams } from './App';
+import { HeaderTitleParams, TEnvironment } from './App';
 import { ApplicationContext } from './ApplicationContext';
 import { AppStackComponent } from './AppStack';
 import { HistoryStack } from './HistoryStack';
@@ -39,6 +44,13 @@ export type ModalStackNavigatorParamList = {
   [SCREEN_INPUT_MODAL_TAG]: HeaderTitleParams & {
     tagUuid?: string;
     noteUuid?: string;
+  };
+  [SCREEN_INPUT_MODAL_FILE_NAME]: HeaderTitleParams & {
+    file: SNFile;
+    handleFileAction: (action: UploadedFileItemAction) => Promise<boolean>;
+  };
+  [SCREEN_UPLOADED_FILES_LIST]: HeaderTitleParams & {
+    note: SNNote;
   };
   [SCREEN_INPUT_MODAL_PASSCODE]: undefined;
   [SCREEN_AUTHENTICATE]: {
@@ -60,9 +72,15 @@ export type ModalStackNavigationProp<
 
 const MainStack = createStackNavigator<ModalStackNavigatorParamList>();
 
-export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
+export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
   const application = useContext(ApplicationContext);
   const theme = useContext(ThemeContext);
+
+  const MemoizedAppStackComponent = memo(
+    (props: ModalStackNavigationProp<'AppStack'>) => (
+      <AppStackComponent {...props} env={env} />
+    )
+  );
 
   return (
     <MainStack.Navigator
@@ -80,7 +98,7 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
         options={{
           headerShown: false,
         }}
-        component={AppStackComponent}
+        component={MemoizedAppStackComponent}
       />
       <MainStack.Screen
         options={{
@@ -211,6 +229,37 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
         component={TagInputModal}
       />
       <MainStack.Screen
+        name={SCREEN_INPUT_MODAL_FILE_NAME}
+        options={({ route }) => ({
+          title: 'File',
+          gestureEnabled: false,
+          headerTitle: ({ children }) => {
+            return (
+              <HeaderTitleView
+                title={route.params?.title ?? (children || '')}
+              />
+            );
+          },
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Cancel' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : ThemeService.nameForIcon(ICON_CLOSE)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
+        })}
+        component={FileInputModal}
+      />
+
+      <MainStack.Screen
         name={SCREEN_AUTHENTICATE}
         options={({ route }) => ({
           title: 'Authenticate',
@@ -220,6 +269,28 @@ export const MainStackComponent = ({ env }: { env: 'prod' | 'dev' }) => {
           ),
         })}
         component={Authenticate}
+      />
+      <MainStack.Screen
+        name={SCREEN_UPLOADED_FILES_LIST}
+        options={() => ({
+          title: 'Files',
+          headerLeft: ({ disabled, onPress }) => (
+            <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
+              <Item
+                testID="headerButton"
+                disabled={disabled}
+                title={Platform.OS === 'ios' ? 'Close' : ''}
+                iconName={
+                  Platform.OS === 'ios'
+                    ? undefined
+                    : ThemeService.nameForIcon(ICON_CLOSE)
+                }
+                onPress={onPress}
+              />
+            </HeaderButtons>
+          ),
+        })}
+        component={UploadedFilesList}
       />
       <MainStack.Screen
         name={MODAL_BLOCKING_ALERT}

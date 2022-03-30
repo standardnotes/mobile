@@ -1,4 +1,4 @@
-import { SnIcon, TEditorIcon } from '@Components/SnIcon';
+import { SnIcon } from '@Components/SnIcon';
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
@@ -6,7 +6,12 @@ import {
 } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { NoteCellIconFlags } from '@Screens/Notes/NoteCellIconFlags';
-import { CollectionSort, isNullOrUndefined, SNNote } from '@standardnotes/snjs';
+import {
+  CollectionSort,
+  IconType,
+  isNullOrUndefined,
+  SNNote,
+} from '@standardnotes/snjs';
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
@@ -201,7 +206,7 @@ export const NoteCell = ({
   const editorForNote = application?.componentManager.editorForNote(note);
   const [icon, tint] = application?.iconsController.getIconAndTintForEditor(
     editorForNote?.identifier
-  ) as [TEditorIcon, number];
+  ) as [IconType, number];
 
   return (
     <TouchableContainer
@@ -220,7 +225,7 @@ export const NoteCell = ({
           <SnIcon
             type={icon}
             fill={getTintColorForEditor(theme, tint)}
-            styles={styles.editorIcon}
+            style={styles.editorIcon}
           />
         )}
         <NoteDataContainer distance={padding}>
