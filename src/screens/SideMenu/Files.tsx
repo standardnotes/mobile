@@ -11,7 +11,6 @@ import {
   SideMenuCellStyled,
   SNIconStyled,
 } from '@Screens/SideMenu/Files.styled';
-import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell';
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
 import { SNNote } from '@standardnotes/snjs';
 import React, { FC, useContext } from 'react';
@@ -79,10 +78,6 @@ export const Files: FC<Props> = ({ note }) => {
           isFilesListTruncated ? 'Show all attached files' : 'Show other files'
         }
         onSelect={openFilesScreen}
-      />
-      <SideMenuCell
-        text={'Upload new file'}
-        onSelect={() => console.error('Not implemented')}
       />
     </FilesContainer>
   );

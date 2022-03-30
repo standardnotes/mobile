@@ -58,35 +58,6 @@ export const useFiles = ({ note }: Props) => {
     );
   }, [application]);
 
-  const deleteFile = useCallback(
-    async (file: SNFile) => {
-      if (!application) {
-        return;
-      }
-      const shouldDelete = await application.alertService.confirm(
-        `Are you sure you want to permanently delete "${file.name}"?`,
-        'Delete file',
-        'Delete'
-      );
-      if (shouldDelete) {
-        /*Toast.show({
-          type: Info,
-          text1: `Deleting file "${file.name}"...`,
-          onPress: Toast.hide,
-        });
-
-        await application.files.deleteFile(file);
-
-        Toast.show({
-          type: Success,
-          text1: `Deleted file "${file.name}"`,
-          onPress: Toast.hide,
-        });*/
-      }
-    },
-    [application]
-  );
-
   const deleteFileAtPath = useCallback(async (path: string) => {
     try {
       if (await exists(path)) {
@@ -313,9 +284,6 @@ export const useFiles = ({ note }: Props) => {
         case UploadedFileItemActionType.DetachFileToNote:
           await detachFileFromNote(file);
           break;
-        case UploadedFileItemActionType.DeleteFile:
-          await deleteFile(file);
-          break;
         case UploadedFileItemActionType.ShareFile:
           await downloadFile(file, true);
           break;
@@ -338,7 +306,6 @@ export const useFiles = ({ note }: Props) => {
       application,
       attachFileToNote,
       authorizeProtectedActionForFile,
-      deleteFile,
       detachFileFromNote,
       downloadFile,
       renameFile,
