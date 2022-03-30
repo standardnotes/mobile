@@ -176,19 +176,6 @@ export const UploadedFilesList: FC<Props> = props => {
             </Text>
           </View>
         )}
-
-        {/*<Pressable
-              style={[button, buttonClose]}
-              onPress={() => setIsModalVisible(false)}
-            >
-              <Button
-                title={`${
-                  currentTab === AttachedFiles ? 'Attach' : 'Upload'
-                } files`}
-                color={theme.stylekitInfoContrastColor}
-                onPress={showActionsMenu}
-              />
-            </Pressable>*/}
       </UploadFilesListContainer>
     </View>
   );
