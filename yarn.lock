@@ -1855,62 +1855,62 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@standardnotes/applications@^1.2.6":
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/@standardnotes/applications/-/applications-1.2.6.tgz#e78dd45eb829765e5f6bf9ff99acdef88c1fd474"
-  integrity sha512-QozKdaItKZDsUhL2hZPLbjwTcjAExlFNuRZiug0zApfii2Z5jBkgoXB1p2Ma/o/gjdkS4CxHGFWALjth8mxN0w==
+"@standardnotes/applications@^1.2.7":
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@standardnotes/applications/-/applications-1.2.7.tgz#77dc5c1061e28d377614f44c5ad9b6e5970cfc8d"
+  integrity sha512-7bPb7jDIexLZ9R5ZjfWH+dmNdATzqOv7MyR1NMjnHaEhJQCsg9DM2mmKndbulgm8O8r+klC+NN2TMSFHcm6KDw==
   dependencies:
-    "@standardnotes/common" "^1.17.0"
+    "@standardnotes/common" "^1.18.0"
     "@standardnotes/sncrypto-common" "^1.7.3"
 
-"@standardnotes/auth@^3.18.0":
-  version "3.18.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.18.0.tgz#682301abe8b15d297cd3d140682e8c85bc849953"
-  integrity sha512-7X11Uy9DtmTRgplvk9TkUjVqCxlv2gsgigM9rxtGPZQ++cb/iypD34RfhDVQ87tPtVL8LOlqtkZ/iC8eItS/JQ==
+"@standardnotes/auth@^3.18.1":
+  version "3.18.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.18.1.tgz#05c6e86f17cb54bb3b1fdab458da0219fcf14b99"
+  integrity sha512-ppQ6NOGwXXe78lpomwDyk9FyW1DkyC1eOWytV4G67kCTBhEr8NNJ9Y+8efJLsPQgDU7Cn7CMZNZvKUkp8fe2dw==
   dependencies:
-    "@standardnotes/common" "^1.17.0"
+    "@standardnotes/common" "^1.18.0"
     jsonwebtoken "^8.5.1"
 
-"@standardnotes/common@^1.17.0":
-  version "1.17.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.17.0.tgz#4f862dae7599bc6541bc259f98f93cd399581175"
-  integrity sha512-aINO14A8pHFb6tOP6Jmv9inPrT0rWvQE7J8RAVtd5bP9Vh7Po5AmwUxTsSrZIb9wBGzkYFMs3m+vA1ZNMMfLvQ==
+"@standardnotes/common@^1.18.0":
+  version "1.18.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/common/-/common-1.18.0.tgz#59a92a322e0987c62bf076fabca466ef121e86d8"
+  integrity sha512-xL0+uEoQYhL6ZNI+Jc63smhQdQD9TsEoN+/nqLSfYs3WOoKNV1sZ/NYrQZL9SuVbgWVT238xxQeoA9FrfTfJaA==
 
 "@standardnotes/components@^1.7.13":
   version "1.7.13"
   resolved "https://registry.yarnpkg.com/@standardnotes/components/-/components-1.7.13.tgz#55c0bad3afd36788b45bf1e67950d84ee5358dd3"
   integrity sha512-Gy1PsibeTjcNNLUvHtfgPFNvEf+BdaYF9QA/RimEsPd9NWZL/kDJSVqj7J33gGoxpdv7l8Y/lMOMt6Az+FqKKw==
 
-"@standardnotes/domain-events@^2.26.2":
-  version "2.26.2"
-  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.26.2.tgz#4f39bdb5048ad64bd528e544c54512d4387a43dd"
-  integrity sha512-cnyr954d0DIUFLZafy2k359DhHqyq1b7ylZG4ZHYiqpiG30cfQyQ2r2HBWQiFHNVRvIYrFxnSl3k0cm+H3JoXQ==
+"@standardnotes/domain-events@^2.26.3":
+  version "2.26.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.26.3.tgz#58847bfd3a92e7c2d5647154e9f8fba1c7bf59e6"
+  integrity sha512-vkpTGUXON2NPnDkjzXYqREuLrs42EZDfELK6UKy5GqfMvpM0dDkZ7HuPTXOoH55dKbCBTMnRvQGUnbJiQ78RIg==
   dependencies:
-    "@standardnotes/auth" "^3.18.0"
-    "@standardnotes/features" "^1.35.6"
+    "@standardnotes/auth" "^3.18.1"
+    "@standardnotes/features" "^1.36.0"
 
-"@standardnotes/features@^1.35.6":
-  version "1.35.6"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.35.6.tgz#177b34cdb5dc71e13aba0a6b57e5d2ab0849d740"
-  integrity sha512-fiYZvlTpYyBcjnPSs1bN7pvIYWvQevZTEBTjNvOTo5ZqCtLoXu0p0hzU+17J2pYrjkh4vHZhYVxrRLXnyft3ZQ==
+"@standardnotes/features@^1.36.0":
+  version "1.36.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.36.0.tgz#ed1971f8a3264870f70482dcc4fccab6db3bb521"
+  integrity sha512-WwtqOQ+154bhS3PAVIsQn99EI79KOIFK6I+26R89WN+F+ZeciG6ojLZLtFFJseCypAdB9mc4koNDzkruIPwdVg==
   dependencies:
-    "@standardnotes/auth" "^3.18.0"
-    "@standardnotes/common" "^1.17.0"
+    "@standardnotes/auth" "^3.18.1"
+    "@standardnotes/common" "^1.18.0"
 
 "@standardnotes/filepicker@^1.10.3":
   version "1.10.3"
   resolved "https://registry.yarnpkg.com/@standardnotes/filepicker/-/filepicker-1.10.3.tgz#7384cf40e5ee6b685ea4773cd7857530f11f9d3a"
   integrity sha512-95XYq3f758jiut9L4wmd4pC8UariaWUMuGtZB1NDPWm/qgO9ig117hrL7sMN7NU5hRqdt+f6O9xpO7zOoTblrQ==
 
-"@standardnotes/payloads@^1.4.20":
-  version "1.4.20"
-  resolved "https://registry.yarnpkg.com/@standardnotes/payloads/-/payloads-1.4.20.tgz#d35544e144b556b5cc2b9cf1e3561462832964b2"
-  integrity sha512-Lj+D0scBjEkMWXdezXQs/6gm1wAh9KTosPfD912XHKhYoJfqHiDwwLFgHuB0fxrnvGNhiopM3+GtE/OeP5ZYOw==
+"@standardnotes/payloads@^1.4.21":
+  version "1.4.21"
+  resolved "https://registry.yarnpkg.com/@standardnotes/payloads/-/payloads-1.4.21.tgz#647b730526b89dea557fd906a6dfee8413bae450"
+  integrity sha512-SfgieswPyMpxJlGTyqXpafvxgbMuZ5NxL0QXyhby+jDm8yzKx9BgCVb6Pb28q+oEOK8nANIb2BgplQlkyjD07A==
   dependencies:
-    "@standardnotes/applications" "^1.2.6"
-    "@standardnotes/common" "^1.17.0"
-    "@standardnotes/features" "^1.35.6"
-    "@standardnotes/utils" "^1.4.3"
+    "@standardnotes/applications" "^1.2.7"
+    "@standardnotes/common" "^1.18.0"
+    "@standardnotes/features" "^1.36.0"
+    "@standardnotes/utils" "^1.4.4"
 
 "@standardnotes/react-native-aes@^1.4.3":
   version "1.4.3"
@@ -1927,25 +1927,25 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/react-native-utils/-/react-native-utils-1.0.1.tgz#acaf80ac9abc6d074d2f283dcd6ace88ba86df5e"
   integrity sha512-In9v6RfK+FRexfIYHs1WhFHMX8xYmtDlIw3dAkSU0IpmxRmV/Dobj4fENYVOBWjYfYKF8fgBFFpC+W+mv/zu/Q==
 
-"@standardnotes/responses@^1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/responses/-/responses-1.4.1.tgz#b03ecf5836d98ce0f9ce91f698411c7694126680"
-  integrity sha512-u7r46NIRh6M/a4UF1O+dbBn60D2/u1ENb2I3rXhMu+Ddrji9T3Kcrs1CzlH1ZwgnN32P3vT4Vjw1K5G0VZMBPw==
+"@standardnotes/responses@^1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/responses/-/responses-1.4.2.tgz#aa0469b634a98d4da32e4e4ec78de01576cd24f3"
+  integrity sha512-vHXcD0VC30T22UlzwEW9VD5H4yVgHqVzmyLlNC5LdK3THxN5M3hImetmbaoB5y68Q/RZBrHqF+NYAItwHAiAgw==
   dependencies:
-    "@standardnotes/auth" "^3.18.0"
-    "@standardnotes/common" "^1.17.0"
-    "@standardnotes/features" "^1.35.6"
-    "@standardnotes/payloads" "^1.4.20"
+    "@standardnotes/auth" "^3.18.1"
+    "@standardnotes/common" "^1.18.0"
+    "@standardnotes/features" "^1.36.0"
+    "@standardnotes/payloads" "^1.4.21"
 
-"@standardnotes/services@^1.6.12":
-  version "1.6.12"
-  resolved "https://registry.yarnpkg.com/@standardnotes/services/-/services-1.6.12.tgz#9a1800761a8e07b8cb7fe5938f86b282c5336f28"
-  integrity sha512-GNEirn+v3GuL6KvpKUDUv9jLzEacYmrrRJ4EzgauZD63hZA6L1nX0iHPLudDrxBB101p597BQXWzt94Rwk5Jfw==
+"@standardnotes/services@^1.6.13":
+  version "1.6.13"
+  resolved "https://registry.yarnpkg.com/@standardnotes/services/-/services-1.6.13.tgz#2918bd8bb3d2bd0242cd3fad440f699fd834b14b"
+  integrity sha512-ycwmNGr6dDFDWt8DH29CKcPYiDtlIp0ZQUuHPh8g0h8LZHJO+seX4TzkTfcHLuTIb1jbzh5WRbmUcknifkr/rg==
   dependencies:
-    "@standardnotes/applications" "^1.2.6"
-    "@standardnotes/common" "^1.17.0"
-    "@standardnotes/responses" "^1.4.1"
-    "@standardnotes/utils" "^1.4.3"
+    "@standardnotes/applications" "^1.2.7"
+    "@standardnotes/common" "^1.18.0"
+    "@standardnotes/responses" "^1.4.2"
+    "@standardnotes/utils" "^1.4.4"
 
 "@standardnotes/settings@^1.13.1":
   version "1.13.1"
@@ -1957,22 +1957,22 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.7.3.tgz#1e62a14800393be44cdb376d1d72fbc064334fc1"
   integrity sha512-twwYeBL+COkNF9IUM5bWrLZ4gXjg41tRxBMR3r3JcbrkyYjcNqVHf9L+YdBcndjSV3/9xwWl2pYWK1RB3UR2Xg==
 
-"@standardnotes/snjs@2.92.7":
-  version "2.92.7"
-  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.92.7.tgz#edd1c8cee52f3d9141e0586c1874a1b818c86a48"
-  integrity sha512-lx+wIen5bHTnFEnuwsNb8LnRNebNDbzVKWrOZuUS1he66yq8mvyoySiUfLhdj4hg2wRVKFccUzGgHKxKL5byXQ==
+"@standardnotes/snjs@2.92.9":
+  version "2.92.9"
+  resolved "https://registry.yarnpkg.com/@standardnotes/snjs/-/snjs-2.92.9.tgz#524a116e27a7da7bc09d6377302ce75444f3cc22"
+  integrity sha512-4qt4gueUVeIAuNd1DSepSVd5bDiHm2zBi/FU+mulsRO4DUqM37Pql3J2jVhc67HQBVOxJE90kIQ5NMSA14M9Xg==
   dependencies:
-    "@standardnotes/applications" "^1.2.6"
-    "@standardnotes/auth" "^3.18.0"
-    "@standardnotes/common" "^1.17.0"
-    "@standardnotes/domain-events" "^2.26.2"
-    "@standardnotes/features" "^1.35.6"
-    "@standardnotes/payloads" "^1.4.20"
-    "@standardnotes/responses" "^1.4.1"
-    "@standardnotes/services" "^1.6.12"
+    "@standardnotes/applications" "^1.2.7"
+    "@standardnotes/auth" "^3.18.1"
+    "@standardnotes/common" "^1.18.0"
+    "@standardnotes/domain-events" "^2.26.3"
+    "@standardnotes/features" "^1.36.0"
+    "@standardnotes/payloads" "^1.4.21"
+    "@standardnotes/responses" "^1.4.2"
+    "@standardnotes/services" "^1.6.13"
     "@standardnotes/settings" "^1.13.1"
     "@standardnotes/sncrypto-common" "^1.7.3"
-    "@standardnotes/utils" "^1.4.3"
+    "@standardnotes/utils" "^1.4.4"
 
 "@standardnotes/stylekit@5.20.0":
   version "5.20.0"
@@ -1988,12 +1988,12 @@
     nanostores "^0.5.10"
     prop-types "^15.8.1"
 
-"@standardnotes/utils@^1.4.3":
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/@standardnotes/utils/-/utils-1.4.3.tgz#6bae390a2d5ef6947340e6ec03cb4b0d0ac88d48"
-  integrity sha512-QO/bKmex/KFnKgKg1kIpaCTSO/QjYS80enHCwx4de1yZ1NN3xYjZpzjK/HB7RarXHCzFSxDuLTmf/68eswViBA==
+"@standardnotes/utils@^1.4.4":
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/@standardnotes/utils/-/utils-1.4.4.tgz#89f5f9cb6d6a65ce7d656ce8de12a9c4eb092bbd"
+  integrity sha512-JPzAF3QvN7MP6vYBjjkZBqC1e06GmijpqwvO59NQWUg62gAMJkOBb3BtBI7AVa+C3OkQRNvqf8JWb5xq7sFKTQ==
   dependencies:
-    "@standardnotes/common" "^1.17.0"
+    "@standardnotes/common" "^1.18.0"
     dompurify "^2.3.6"
     lodash "^4.17.21"
 
