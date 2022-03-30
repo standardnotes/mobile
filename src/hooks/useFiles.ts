@@ -104,13 +104,12 @@ export const useFiles = ({ note }: Props) => {
         .getAppState()
         .performActionWithoutStateChangeImpact(async () => {
           try {
+            // On Android this response always returns {success: false}, there is an open issue for that:
+            //  https://github.com/react-native-share/react-native-share/issues/1059
             const shareDialogResponse = await RNShare.open({
               url: `file://${path}`,
               failOnCancel: false,
             });
-            // On Android this response always returns {success: false}, there is an open issue for that:
-            //  https://github.com/react-native-share/react-native-share/issues/1059
-            console.log('shareDialogResponse is', shareDialogResponse);
 
             // On iOS the user can store files locally from "Share" screen, so we don't show "Download" option there.
             // For Android the user has a separate "Download" action for the file, therefore after the file is shared,
@@ -249,7 +248,7 @@ export const useFiles = ({ note }: Props) => {
         const isProtected = result ? result.protected : file.protected;
         return isProtected;
       } catch (error) {
-        console.log('An error occurred: ', error);
+        console.error('An error occurred: ', error);
         return file.protected;
       }
     },
