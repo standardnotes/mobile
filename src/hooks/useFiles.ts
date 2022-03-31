@@ -8,6 +8,7 @@ import {
   UploadedFileItemActionType,
 } from '@Screens/UploadedFilesList/UploadedFileItemAction';
 import {
+  ButtonType,
   ChallengeReason,
   ContentType,
   SNFile,
@@ -27,6 +28,16 @@ type Props = {
 type TDownloadFileAndReturnLocalPathParams = {
   file: SNFile;
   saveInTempLocation?: boolean;
+};
+
+export const isFileTypePreviewable = (fileType: string) => {
+  const isImage = fileType.startsWith('image/');
+  const isVideo = fileType.startsWith('video/');
+  const isAudio = fileType.startsWith('audio/');
+  const isPdf = fileType === 'application/pdf';
+  const isText = fileType === 'text/plain';
+
+  return isImage || isVideo || isAudio || isPdf || isText;
 };
 
 export const useFiles = ({ note }: Props) => {
@@ -270,23 +281,44 @@ export const useFiles = ({ note }: Props) => {
       if (!application) {
         return;
       }
+
+      let downloadedFilePath: string | undefined = '';
       try {
-        const downloadedFilePath = await downloadFileAndReturnLocalPath({
+        const isPreviewable = isFileTypePreviewable(file.mimeType);
+
+        if (!isPreviewable) {
+          const tryToPreview = await application.alertService.confirm(
+            'This file may not be previewable. Do you wish to try anyway?',
+            'Attempt to preview',
+            'Try to preview',
+            ButtonType.Info,
+            'Cancel'
+          );
+          if (!tryToPreview) {
+            return;
+          }
+        }
+
+        downloadedFilePath = await downloadFileAndReturnLocalPath({
           file,
           saveInTempLocation: true,
         });
+
         if (!downloadedFilePath) {
           return;
         }
         await FileViewer.open(downloadedFilePath, {
           onDismiss: async () => {
-            await cleanupTempFileOnAndroid(downloadedFilePath);
+            await cleanupTempFileOnAndroid(downloadedFilePath as string);
           },
         });
 
         return true;
       } catch (error) {
-        console.error('Error opening file', error);
+        await cleanupTempFileOnAndroid(downloadedFilePath as string);
+        await application.alertService.alert(
+          'An error occured while previewing the file'
+        );
 
         return false;
       }
