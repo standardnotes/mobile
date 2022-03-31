@@ -317,7 +317,7 @@ export const useFiles = ({ note }: Props) => {
       } catch (error) {
         await cleanupTempFileOnAndroid(downloadedFilePath as string);
         await application.alertService.alert(
-          'An error occured while previewing the file'
+          'An error occurred while previewing the file'
         );
 
         return false;

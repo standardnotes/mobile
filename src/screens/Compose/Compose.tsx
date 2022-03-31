@@ -494,7 +494,7 @@ export class Compose extends React.Component<{}, State> {
         text = 'The local component server has an error.';
         break;
       case ComponentLoadingError.Unknown:
-        text = 'An unknown error occured.';
+        text = 'An unknown error occurred.';
         break;
       default:
         break;
