@@ -2,22 +2,29 @@ import { ApplicationService, SNFile } from '@standardnotes/snjs';
 import { Buffer } from 'buffer';
 import { PermissionsAndroid, Platform } from 'react-native';
 import RNFS, {
+  CachesDirectoryPath,
   DocumentDirectoryPath,
   DownloadDirectoryPath,
-  TemporaryDirectoryPath,
 } from 'react-native-fs';
 
+type TGetFileDestinationPath = {
+  fileName: string;
+  saveInTempLocation?: boolean;
+};
+
 export class FilesService extends ApplicationService {
-  getDestinationPath(fileName: string, showShareScreen: boolean): string {
+  getDestinationPath({
+    fileName,
+    saveInTempLocation = false,
+  }: TGetFileDestinationPath): string {
     let directory = DocumentDirectoryPath;
-    let tmpInFileName = '';
 
     if (Platform.OS === 'android') {
-      directory = showShareScreen
-        ? TemporaryDirectoryPath
+      directory = saveInTempLocation
+        ? CachesDirectoryPath
         : DownloadDirectoryPath;
     }
-    return `${directory}/${tmpInFileName}${fileName}`;
+    return `${directory}/${fileName}`;
   }
 
   async hasStoragePermissionOnAndroid(): Promise<boolean> {

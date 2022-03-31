@@ -8,6 +8,7 @@ export enum UploadedFileItemActionType {
   DownloadFile,
   RenameFile,
   ToggleFileProtection,
+  PreviewFile,
 }
 
 export type UploadedFileItemAction =

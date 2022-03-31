@@ -48,7 +48,7 @@ export const Files: FC<Props> = ({ note }) => {
         );
 
         return (
-          <FileItemContainer>
+          <FileItemContainer key={file.uuid}>
             <SideMenuCellStyled
               text={file.name}
               key={file.uuid}
