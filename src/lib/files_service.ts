@@ -4,6 +4,7 @@ import { PermissionsAndroid, Platform } from 'react-native';
 import RNFS, {
   DocumentDirectoryPath,
   DownloadDirectoryPath,
+  TemporaryDirectoryPath,
 } from 'react-native-fs';
 
 export class FilesService extends ApplicationService {
@@ -12,11 +13,9 @@ export class FilesService extends ApplicationService {
     let tmpInFileName = '';
 
     if (Platform.OS === 'android') {
-      directory = DownloadDirectoryPath;
-
-      if (showShareScreen) {
-        tmpInFileName = 'tmp-';
-      }
+      directory = showShareScreen
+        ? TemporaryDirectoryPath
+        : DownloadDirectoryPath;
     }
     return `${directory}/${tmpInFileName}${fileName}`;
   }
