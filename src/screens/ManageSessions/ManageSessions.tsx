@@ -33,7 +33,7 @@ const useSessions = (): [
     const response = await application?.getSessions();
 
     if (!response) {
-      setErrorMessage('An unknown error occured while loading sessions.');
+      setErrorMessage('An unknown error occurred while loading sessions.');
       return;
     }
 
@@ -41,7 +41,7 @@ const useSessions = (): [
       if (response.error?.message) {
         setErrorMessage(response.error.message);
       } else {
-        setErrorMessage('An unknown error occured while loading sessions.');
+        setErrorMessage('An unknown error occurred while loading sessions.');
       }
     } else {
       const newSessions = response.data as RemoteSession[];
@@ -66,7 +66,9 @@ const useSessions = (): [
       if (response.error?.message) {
         setErrorMessage(response.error?.message);
       } else {
-        setErrorMessage('An unknown error occured while revoking the session.');
+        setErrorMessage(
+          'An unknown error occurred while revoking the session.'
+        );
       }
     } else {
       setSessions(sessions.filter(session => session.uuid !== uuid));

@@ -8,6 +8,7 @@ import {
   UploadedFileItemActionType,
 } from '@Screens/UploadedFilesList/UploadedFileItemAction';
 import {
+  ButtonType,
   ChallengeReason,
   ContentType,
   SNFile,
@@ -16,12 +17,27 @@ import {
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import FileViewer from 'react-native-file-viewer';
 import RNFS, { exists } from 'react-native-fs';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
 
 type Props = {
   note: SNNote;
+};
+type TDownloadFileAndReturnLocalPathParams = {
+  file: SNFile;
+  saveInTempLocation?: boolean;
+};
+
+export const isFileTypePreviewable = (fileType: string) => {
+  const isImage = fileType.startsWith('image/');
+  const isVideo = fileType.startsWith('video/');
+  const isAudio = fileType.startsWith('audio/');
+  const isPdf = fileType === 'application/pdf';
+  const isText = fileType === 'text/plain';
+
+  return isImage || isVideo || isAudio || isPdf || isText;
 };
 
 export const useFiles = ({ note }: Props) => {
@@ -66,49 +82,11 @@ export const useFiles = ({ note }: Props) => {
     } catch (err) {}
   }, []);
 
-  const shareFile = useCallback(
-    (file: SNFile, path: string) => {
-      if (!application) {
-        return;
-      }
-      application
-        .getAppState()
-        .performActionWithoutStateChangeImpact(async () => {
-          try {
-            // On Android this response always returns {success: false}, there is an open issue for that:
-            //  https://github.com/react-native-share/react-native-share/issues/1059
-            const shareDialogResponse = await RNShare.open({
-              url: `file://${path}`,
-              failOnCancel: false,
-            });
-
-            // On iOS the user can store files locally from "Share" screen, so we don't show "Download" option there.
-            // For Android the user has a separate "Download" action for the file, therefore after the file is shared,
-            // it's not needed anymore and we remove it from the storage.
-            if (Platform.OS === 'android') {
-              await deleteFileAtPath(path);
-            }
-            if (shareDialogResponse.success) {
-              Toast.show({
-                type: Success,
-                text1: 'Successfully exported file',
-                onPress: Toast.hide,
-              });
-            }
-          } catch (error) {
-            Toast.show({
-              type: Error,
-              text1: 'An error occurred while trying to share this file',
-              onPress: Toast.hide,
-            });
-          }
-        });
-    },
-    [Error, Success, application, deleteFileAtPath]
-  );
-
-  const downloadFile = useCallback(
-    async (file: SNFile, showShareScreen = false) => {
+  const downloadFileAndReturnLocalPath = useCallback(
+    async ({
+      file,
+      saveInTempLocation = false,
+    }: TDownloadFileAndReturnLocalPathParams): Promise<string | undefined> => {
       if (isDownloading || !application) {
         return;
       }
@@ -129,21 +107,13 @@ export const useFiles = ({ note }: Props) => {
           onPress: Toast.hide,
         });
 
-        const path = filesService.getDestinationPath(
-          file.name,
-          showShareScreen
-        );
+        const path = filesService.getDestinationPath({
+          fileName: file.name,
+          saveInTempLocation,
+        });
 
         await deleteFileAtPath(path);
-
         await filesService.downloadFileInChunks(file, path);
-
-        Toast.hide();
-
-        if (showShareScreen) {
-          await shareFile(file, path);
-          return;
-        }
 
         Toast.show({
           type: Success,
@@ -151,6 +121,8 @@ export const useFiles = ({ note }: Props) => {
           text2: 'Successfully downloaded file',
           onPress: Toast.hide,
         });
+
+        return path;
       } catch (error) {
         Toast.show({
           type: Error,
@@ -162,14 +134,68 @@ export const useFiles = ({ note }: Props) => {
         setIsDownloading(false);
       }
     },
+    [Error, Info, Success, application, deleteFileAtPath, isDownloading]
+  );
+
+  const cleanupTempFileOnAndroid = useCallback(
+    async (downloadedFilePath: string) => {
+      if (Platform.OS === 'android') {
+        await deleteFileAtPath(downloadedFilePath);
+      }
+    },
+    [deleteFileAtPath]
+  );
+
+  const shareFile = useCallback(
+    async (file: SNFile) => {
+      if (!application) {
+        return;
+      }
+      const downloadedFilePath = await downloadFileAndReturnLocalPath({
+        file,
+        saveInTempLocation: true,
+      });
+      if (!downloadedFilePath) {
+        return;
+      }
+      application
+        .getAppState()
+        .performActionWithoutStateChangeImpact(async () => {
+          try {
+            // On Android this response always returns {success: false}, there is an open issue for that:
+            //  https://github.com/react-native-share/react-native-share/issues/1059
+            const shareDialogResponse = await RNShare.open({
+              url: `file://${downloadedFilePath}`,
+              failOnCancel: false,
+            });
+
+            // On iOS the user can store files locally from "Share" screen, so we don't show "Download" option there.
+            // For Android the user has a separate "Download" action for the file, therefore after the file is shared,
+            // it's not needed anymore and we remove it from the storage.
+            await cleanupTempFileOnAndroid(downloadedFilePath);
+
+            if (shareDialogResponse.success) {
+              Toast.show({
+                type: Success,
+                text1: 'Successfully exported file',
+                onPress: Toast.hide,
+              });
+            }
+          } catch (error) {
+            Toast.show({
+              type: Error,
+              text1: 'An error occurred while trying to share this file',
+              onPress: Toast.hide,
+            });
+          }
+        });
+    },
     [
       Error,
-      Info,
       Success,
       application,
-      deleteFileAtPath,
-      isDownloading,
-      shareFile,
+      cleanupTempFileOnAndroid,
+      downloadFileAndReturnLocalPath,
     ]
   );
 
@@ -250,6 +276,55 @@ export const useFiles = ({ note }: Props) => {
     [application]
   );
 
+  const previewFile = useCallback(
+    async (file: SNFile) => {
+      if (!application) {
+        return;
+      }
+
+      let downloadedFilePath: string | undefined = '';
+      try {
+        const isPreviewable = isFileTypePreviewable(file.mimeType);
+
+        if (!isPreviewable) {
+          const tryToPreview = await application.alertService.confirm(
+            'This file may not be previewable. Do you wish to try anyway?',
+            '',
+            'Try to preview',
+            ButtonType.Info,
+            'Cancel'
+          );
+          if (!tryToPreview) {
+            return;
+          }
+        }
+
+        downloadedFilePath = await downloadFileAndReturnLocalPath({
+          file,
+          saveInTempLocation: true,
+        });
+
+        if (!downloadedFilePath) {
+          return;
+        }
+        await FileViewer.open(downloadedFilePath, {
+          onDismiss: async () => {
+            await cleanupTempFileOnAndroid(downloadedFilePath as string);
+          },
+        });
+
+        return true;
+      } catch (error) {
+        await cleanupTempFileOnAndroid(downloadedFilePath as string);
+        await application.alertService.alert(
+          'An error occurred while previewing the file.'
+        );
+
+        return false;
+      }
+    },
+    [application, cleanupTempFileOnAndroid, downloadFileAndReturnLocalPath]
+  );
   const handleFileAction = useCallback(
     async (action: UploadedFileItemAction) => {
       if (!application) {
@@ -284,10 +359,10 @@ export const useFiles = ({ note }: Props) => {
           await detachFileFromNote(file);
           break;
         case UploadedFileItemActionType.ShareFile:
-          await downloadFile(file, true);
+          await shareFile(file);
           break;
         case UploadedFileItemActionType.DownloadFile:
-          await downloadFile(file);
+          await downloadFileAndReturnLocalPath({ file });
           break;
         case UploadedFileItemActionType.ToggleFileProtection: {
           await toggleFileProtection(file);
@@ -295,6 +370,11 @@ export const useFiles = ({ note }: Props) => {
         }
         case UploadedFileItemActionType.RenameFile:
           await renameFile(file, action.payload.name);
+          break;
+        case UploadedFileItemActionType.PreviewFile:
+          await previewFile(file);
+          break;
+        default:
           break;
       }
 
@@ -306,8 +386,10 @@ export const useFiles = ({ note }: Props) => {
       attachFileToNote,
       authorizeProtectedActionForFile,
       detachFileFromNote,
-      downloadFile,
+      downloadFileAndReturnLocalPath,
+      previewFile,
       renameFile,
+      shareFile,
       toggleFileProtection,
     ]
   );
@@ -356,6 +438,15 @@ export const useFiles = ({ note }: Props) => {
           callback: () => {
             handleFileAction({
               type: UploadedFileItemActionType.ToggleFileProtection,
+              payload: file,
+            });
+          },
+        },
+        {
+          text: 'Preview',
+          callback: () => {
+            handleFileAction({
+              type: UploadedFileItemActionType.PreviewFile,
               payload: file,
             });
           },
