@@ -289,7 +289,7 @@ export const useFiles = ({ note }: Props) => {
         if (!isPreviewable) {
           const tryToPreview = await application.alertService.confirm(
             'This file may not be previewable. Do you wish to try anyway?',
-            'Attempt to preview',
+            '',
             'Try to preview',
             ButtonType.Info,
             'Cancel'
