@@ -4,6 +4,7 @@ import {
   GetFeatures,
 } from '@standardnotes/features';
 import {
+  ComponentContent,
   ComponentMutator,
   EncryptionService,
   isRightVersionGreaterThanLeft,
@@ -330,7 +331,11 @@ export class ComponentManager extends SNComponentManager {
 
   /** @override */
   urlForComponent(component: SNComponent) {
-    if (component.isTheme() && component.safeContent.isSystemTheme) {
+    if (
+      component.isTheme() &&
+      (component.safeContent as ComponentContent & { isSystemTheme: boolean })
+        .isSystemTheme
+    ) {
       const theme = component as MobileTheme;
       const cssData = objectToCss(theme.mobileContent.variables);
       const encoded = Base64.encodeURI(cssData);
