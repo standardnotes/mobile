@@ -277,7 +277,7 @@ PODS:
     - glog
   - react-native-aes (1.4.3):
     - React-Core
-  - react-native-document-picker (8.0.0):
+  - react-native-document-picker (8.1.0):
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
     - React-Core
@@ -705,7 +705,7 @@ SPEC CHECKSUMS:
   React-jsinspector: f4775ea9118cbe1f72b834f0f842baa7a99508d8
   React-logger: a1f028f6d8639a3f364ef80419e5e862e1115250
   react-native-aes: 420f829e2c4ff32e3deb2aa056094a6a29fcf992
-  react-native-document-picker: 429972f7ece4463aa5bcdd789622b3a674a3c5d1
+  react-native-document-picker: 5663fe4bcdb646200683a41790464d2793307ac8
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-mail: 5fe7239a5b5c1e858d425501c03d1ab977434122
   react-native-pager-view: b1914469643f40042e65d78cbf3d3dfebd6fb0d9

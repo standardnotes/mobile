@@ -11,7 +11,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_PASSCODE, SCREEN_SETTINGS } from '@Screens/screens';
-import { StorageEncryptionPolicies } from '@standardnotes/snjs';
+import { StorageEncryptionPolicy } from '@standardnotes/snjs';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { Title } from './SecuritySection.styled';
@@ -97,18 +97,18 @@ export const SecuritySection = (props: Props) => {
       return;
     }
 
-    if (encryptionPolicy === StorageEncryptionPolicies.Default) {
+    if (encryptionPolicy === StorageEncryptionPolicy.Default) {
       setEncryptionPolictChangeInProgress(true);
-      setEncryptionPolicy(StorageEncryptionPolicies.Disabled);
+      setEncryptionPolicy(StorageEncryptionPolicy.Disabled);
       await application?.setStorageEncryptionPolicy(
-        StorageEncryptionPolicies.Disabled
+        StorageEncryptionPolicy.Disabled
       );
       setEncryptionPolictChangeInProgress(false);
-    } else if (encryptionPolicy === StorageEncryptionPolicies.Disabled) {
+    } else if (encryptionPolicy === StorageEncryptionPolicy.Disabled) {
       setEncryptionPolictChangeInProgress(true);
-      setEncryptionPolicy(StorageEncryptionPolicies.Default);
+      setEncryptionPolicy(StorageEncryptionPolicy.Default);
       await application?.setStorageEncryptionPolicy(
-        StorageEncryptionPolicies.Default
+        StorageEncryptionPolicy.Default
       );
       setEncryptionPolictChangeInProgress(false);
     }
@@ -116,7 +116,7 @@ export const SecuritySection = (props: Props) => {
 
   // State
   const storageEncryptionTitle = props.encryptionAvailable
-    ? encryptionPolicy === StorageEncryptionPolicies.Default
+    ? encryptionPolicy === StorageEncryptionPolicy.Default
       ? 'Disable Storage Encryption'
       : 'Enable Storage Encryption'
     : 'Storage Encryption';
@@ -126,7 +126,7 @@ export const SecuritySection = (props: Props) => {
 
   if (props.encryptionAvailable) {
     storageSubText +=
-      encryptionPolicy === StorageEncryptionPolicies.Default
+      encryptionPolicy === StorageEncryptionPolicy.Default
         ? ' Disable to improve app start-up speed.'
         : ' May decrease app start-up speed.';
   } else {
