@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-community/async-storage';
+import { RawPayload } from '@standardnotes/payloads';
 import { AbstractDevice, ApplicationIdentifier } from '@standardnotes/snjs';
 import { Alert, Linking, Platform } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
@@ -100,7 +101,7 @@ export class MobileDeviceInterface extends AbstractDevice {
   }
 
   private async getDatabaseKeyValues(keys: string[]) {
-    const results: unknown[] = [];
+    const results: (RawPayload | unknown)[] = [];
     if (Platform.OS === 'android') {
       const failedItemIds: string[] = [];
       for (const key of keys) {
@@ -108,7 +109,7 @@ export class MobileDeviceInterface extends AbstractDevice {
           const item = await AsyncStorage.getItem(key);
           if (item) {
             try {
-              results.push(JSON.parse(item));
+              results.push(JSON.parse(item) as RawPayload);
             } catch (e) {
               results.push(item);
             }
@@ -169,9 +170,9 @@ export class MobileDeviceInterface extends AbstractDevice {
 
   async getAllRawDatabasePayloads(
     identifier: ApplicationIdentifier
-  ): Promise<unknown[]> {
+  ): Promise<RawPayload[]> {
     const keys = await this.getAllDatabaseKeys(identifier);
-    return this.getDatabaseKeyValues(keys);
+    return this.getDatabaseKeyValues(keys) as Promise<RawPayload[]>;
   }
   saveRawDatabasePayload(
     payload: any,

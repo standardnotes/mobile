@@ -7,7 +7,7 @@ import {
   NoteMutator,
   NoteViewController,
   SNNote,
-  StorageEncryptionPolicies,
+  StorageEncryptionPolicy,
 } from '@standardnotes/snjs';
 import React, { useCallback, useEffect } from 'react';
 import { LockStateType } from './application_state';
@@ -168,7 +168,7 @@ export const useSyncStatus = () => {
     const encryption =
       application!.isEncryptionAvailable() &&
       application!.getStorageEncryptionPolicy() ===
-        StorageEncryptionPolicies.Default;
+        StorageEncryptionPolicy.Default;
 
     if (
       stats.localDataCurrent === 0 ||
@@ -190,7 +190,7 @@ export const useSyncStatus = () => {
     const isEncryptionAvailable =
       application!.isEncryptionAvailable() &&
       application!.getStorageEncryptionPolicy() ===
-        StorageEncryptionPolicies.Default;
+        StorageEncryptionPolicy.Default;
     if (mounted) {
       setDecrypting(!completedInitialSync && isEncryptionAvailable);
       updateLocalDataStatus();

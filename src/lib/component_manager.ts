@@ -4,7 +4,9 @@ import {
   GetFeatures,
 } from '@standardnotes/features';
 import {
+  ComponentContent,
   ComponentMutator,
+  EncryptionService,
   isRightVersionGreaterThanLeft,
   PermissionDialog,
   SNAlertService,
@@ -13,7 +15,6 @@ import {
   SNComponentManager,
   SNLog,
   SNNote,
-  SNProtocolService,
 } from '@standardnotes/snjs';
 import { objectToCss } from '@Style/css_parser';
 import { MobileTheme } from '@Style/theme_service';
@@ -41,10 +42,10 @@ export class ComponentManager extends SNComponentManager {
 
   private staticServer!: StaticServer;
   private staticServerUrl!: string;
-  private protocolService!: SNProtocolService;
+  private protocolService!: EncryptionService;
   private thirdPartyIndexPaths: Record<string, string> = {};
 
-  public async initialize(protocolService: SNProtocolService) {
+  public async initialize(protocolService: EncryptionService) {
     this.loggingEnabled = false;
     this.protocolService = protocolService;
     await this.createServer();
@@ -330,7 +331,11 @@ export class ComponentManager extends SNComponentManager {
 
   /** @override */
   urlForComponent(component: SNComponent) {
-    if (component.isTheme() && component.safeContent.isSystemTheme) {
+    if (
+      component.isTheme() &&
+      (component.safeContent as ComponentContent & { isSystemTheme: boolean })
+        .isSystemTheme
+    ) {
       const theme = component as MobileTheme;
       const cssData = objectToCss(theme.mobileContent.variables);
       const encoded = Base64.encodeURI(cssData);

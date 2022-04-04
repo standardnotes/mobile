@@ -2,10 +2,12 @@ import { MobileApplication } from '@Lib/application';
 import { RawPayload } from '@standardnotes/payloads';
 import {
   ApplicationEvent,
+  ComponentContent,
   ContentType,
   CopyPayload,
   CreateMaxPayloadFromAnyObject,
   FillItemContent,
+  PayloadInterface,
   removeFromArray,
   SNTheme,
   StorageValueModes,
@@ -63,7 +65,7 @@ export class MobileTheme extends SNTheme {
           variables: variables || ({} as MobileThemeVariables),
           isSystemTheme: false,
           isInitial: false,
-        } as MobileThemeContent),
+        } as unknown as ComponentContent),
       })
     );
   }
@@ -194,7 +196,7 @@ export class ThemeService {
           ),
           isSystemTheme: true,
           isInitial: Boolean(option.isInitial),
-        } as MobileThemeContent),
+        } as unknown as ComponentContent),
       });
       const theme = new MobileTheme(payload);
       this.addTheme(theme);
@@ -371,7 +373,7 @@ export class ThemeService {
           ...theme.mobileContent,
           variables,
           luminosity,
-        } as MobileThemeContent,
+        } as unknown as ComponentContent,
       })
     );
   }
@@ -509,8 +511,8 @@ export class ThemeService {
               border_color: finalVariables.stylekitInfoColor,
             },
           },
-        } as MobileThemeContent,
-      })
+        },
+      } as unknown as ComponentContent)
     );
     this.addTheme(mobileTheme);
     this.activateTheme(theme.uuid);
@@ -529,7 +531,9 @@ export class ThemeService {
         StorageValueModes.Nonwrapped
       )) || [];
     const themes = (rawValue as RawPayload[]).map((rawPayload: RawPayload) => {
-      const payload = CreateMaxPayloadFromAnyObject(rawPayload);
+      const payload = CreateMaxPayloadFromAnyObject(
+        rawPayload
+      ) as PayloadInterface<ComponentContent>;
       return new MobileTheme(payload);
     });
     for (const theme of themes) {

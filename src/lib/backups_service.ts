@@ -1,7 +1,6 @@
 import {
   ApplicationService,
   ButtonType,
-  EncryptionIntent,
   Platform,
 } from '@standardnotes/snjs';
 import { Base64 } from 'js-base64';
@@ -22,12 +21,9 @@ export class BackupsService extends ApplicationService {
    */
 
   async export(encrypted: boolean) {
-    const data = await this.application!.createBackupFile(
-      encrypted
-        ? EncryptionIntent.FileEncrypted
-        : EncryptionIntent.FileDecrypted,
-      true
-    );
+    const data = encrypted
+      ? await this.application.createEncryptedBackupFile(true)
+      : await this.application.createDecryptedBackupFile();
     const prettyPrint = 2;
     const stringifiedData = JSON.stringify(data, null, prettyPrint);
 

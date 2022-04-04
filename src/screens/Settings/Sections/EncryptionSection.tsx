@@ -2,7 +2,7 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { useIsLocked } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { ContentType, StorageEncryptionPolicies } from '@standardnotes/snjs';
+import { ContentType, StorageEncryptionPolicy } from '@standardnotes/snjs';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   BaseView,
@@ -50,7 +50,7 @@ export const EncryptionSection = (props: Props) => {
       encryptionStatus += '. '; // to connect sentence
       encryptionStatus +=
         application?.getStorageEncryptionPolicy() ===
-        StorageEncryptionPolicies.Default
+        StorageEncryptionPolicy.Default
           ? 'To enable encryption, sign in, register, or enable storage encryption.'
           : 'Sign in, register, or add a local passcode to enable encryption.';
     }
