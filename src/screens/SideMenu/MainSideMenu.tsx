@@ -209,7 +209,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
             text: mapTheme.name,
             key: mapTheme.uuid,
             iconDesc: iconDescriptorForTheme(mapTheme),
-            dimmed: mapTheme.getNotAvailOnMobile(),
+            dimmed: !!mapTheme.getNotAvailOnMobile(),
             onSelect: () => onThemeSelect(mapTheme),
             onLongPress: () =>
               onThemeLongPress(mapTheme?.uuid, mapTheme?.name, mapTheme),
