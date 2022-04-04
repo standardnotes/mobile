@@ -5,6 +5,7 @@ import {
 } from '@standardnotes/features';
 import {
   ComponentMutator,
+  EncryptionService,
   isRightVersionGreaterThanLeft,
   PermissionDialog,
   SNAlertService,
@@ -13,7 +14,6 @@ import {
   SNComponentManager,
   SNLog,
   SNNote,
-  SNProtocolService,
 } from '@standardnotes/snjs';
 import { objectToCss } from '@Style/css_parser';
 import { MobileTheme } from '@Style/theme_service';
@@ -41,10 +41,10 @@ export class ComponentManager extends SNComponentManager {
 
   private staticServer!: StaticServer;
   private staticServerUrl!: string;
-  private protocolService!: SNProtocolService;
+  private protocolService!: EncryptionService;
   private thirdPartyIndexPaths: Record<string, string> = {};
 
-  public async initialize(protocolService: SNProtocolService) {
+  public async initialize(protocolService: EncryptionService) {
     this.loggingEnabled = false;
     this.protocolService = protocolService;
     await this.createServer();
