@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { useFiles } from '@Root/hooks/useFiles';
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
 import { SCREEN_COMPOSE, SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
 import {
   FileItemContainer,
@@ -13,7 +13,7 @@ import {
 } from '@Screens/SideMenu/Files.styled';
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
 import { SNNote } from '@standardnotes/snjs';
-import React, { FC, useContext } from 'react';
+import React, { FC } from 'react';
 
 type Props = {
   note: SNNote;
@@ -22,17 +22,13 @@ type Props = {
 const MaximumVisibleFilesCount = 3;
 
 export const Files: FC<Props> = ({ note }) => {
-  const application = useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
 
   const navigation =
     useNavigation<
       AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
     >();
   const { showActionsMenu, attachedFiles } = useFiles({ note });
-
-  if (!application) {
-    return null;
-  }
 
   const openFilesScreen = () => {
     navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note });

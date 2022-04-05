@@ -145,15 +145,16 @@ export const App = (props: { env: TEnvironment }) => {
     return removeAppChangeObserver;
   }, [applicationGroupRef.current.primaryApplication]);
 
+  if (!application) {
+    return null;
+  }
   return (
     <ApplicationContext.Provider value={application}>
-      {application && (
-        <AppComponent
-          env={props.env}
-          key={application.Uuid}
-          application={application}
-        />
-      )}
+      <AppComponent
+        env={props.env}
+        key={application.Uuid}
+        application={application}
+      />
     </ApplicationContext.Provider>
   );
 };

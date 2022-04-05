@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
 import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
 import {
@@ -11,13 +11,7 @@ import {
   SNTag,
 } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, ListRenderItem } from 'react-native';
 import { SideMenuCell } from './SideMenuCell';
 import { EmptyPlaceholder } from './TagSelectionList.styled';
@@ -39,7 +33,7 @@ export const TagSelectionList = React.memo(
     hasBottomPadding,
   }: Props) => {
     // Context
-    const application = useContext(ApplicationContext);
+    const application = useSafeApplicationContext();
     const navigation =
       useNavigation<
         AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
@@ -124,7 +118,7 @@ export const TagSelectionList = React.memo(
     };
 
     const isRootTag = (tag: SNTag | SmartView): boolean =>
-      tag instanceof SmartView || !application?.items.getTagParent(tag.uuid);
+      tag instanceof SmartView || !application.items.getTagParent(tag.uuid);
 
     const showFolders = contentType === ContentType.Tag;
     const renderedTags = showFolders
@@ -132,10 +126,6 @@ export const TagSelectionList = React.memo(
       : tags;
 
     const renderItem: ListRenderItem<SNTag | SmartView> = ({ item }) => {
-      if (!application) {
-        return null;
-      }
-
       let title = item.deleted ? 'Deleting...' : item.title;
       if (item.errorDecrypting) {
         title = 'Unable to Decrypt';

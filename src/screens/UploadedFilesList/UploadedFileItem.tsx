@@ -1,7 +1,7 @@
 import { SnIcon } from '@Components/SnIcon';
-import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { useFiles } from '@Root/hooks/useFiles';
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
 import { SCREEN_COMPOSE } from '@Screens/screens';
 import { formatSizeToReadableString } from '@standardnotes/filepicker';
 import { SNFile, SNNote } from '@standardnotes/snjs';
@@ -29,7 +29,7 @@ export type TAppStackNavigationProp = AppStackNavigationProp<
 >['navigation'];
 
 export const UploadedFileItem: FC<UploadedFileItemProps> = ({ file, note }) => {
-  const application = useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
   const theme = useContext(ThemeContext);
 
   const { showActionsMenu } = useFiles({ note });
@@ -39,10 +39,6 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({ file, note }) => {
   useEffect(() => {
     setFileName(file.name);
   }, [file.name]);
-
-  if (!application) {
-    return null;
-  }
 
   const iconType = application.iconsController.getIconForFileType(
     file.mimeType

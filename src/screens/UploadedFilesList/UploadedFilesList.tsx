@@ -1,7 +1,6 @@
 import { SearchBar } from '@Components/SearchBar';
 import { SnIcon } from '@Components/SnIcon';
 import { useNavigation } from '@react-navigation/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
 import { useFiles } from '@Root/hooks/useFiles';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
@@ -16,7 +15,6 @@ import { SNFile } from '@standardnotes/snjs';
 import React, {
   FC,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -34,7 +32,6 @@ enum Tabs {
 type Props = ModalStackNavigationProp<typeof SCREEN_UPLOADED_FILES_LIST>;
 
 export const UploadedFilesList: FC<Props> = props => {
-  const application = useContext(ApplicationContext);
   const styles = useUploadedFilesListStyles();
   const navigation = useNavigation();
 
@@ -54,16 +51,12 @@ export const UploadedFilesList: FC<Props> = props => {
     currentTab === Tabs.AttachedFiles ? attachedFiles : allFiles;
 
   const filteredList = useMemo(() => {
-    if (!application) {
-      return [];
-    }
-
     return searchString
       ? filesList.filter(file =>
           file.name.toLowerCase().includes(searchString.toLowerCase())
         )
       : filesList;
-  }, [application, filesList, searchString]);
+  }, [filesList, searchString]);
 
   useEffect(() => {
     let screenTitle = 'Files';
@@ -90,10 +83,6 @@ export const UploadedFilesList: FC<Props> = props => {
     },
     [scrollListToTop]
   );
-
-  if (!application) {
-    return null;
-  }
 
   const { AttachedFiles, AllFiles } = Tabs;
   const {

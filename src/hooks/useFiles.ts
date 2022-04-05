@@ -1,6 +1,6 @@
 import { ToastType } from '@Lib/types';
 import { useNavigation } from '@react-navigation/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
 import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Screens/screens';
 import { TAppStackNavigationProp } from '@Screens/UploadedFilesList/UploadedFileItem';
 import {
@@ -15,7 +15,7 @@ import {
   SNNote,
 } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import RNFS, { exists } from 'react-native-fs';
@@ -41,7 +41,7 @@ export const isFileTypePreviewable = (fileType: string) => {
 };
 
 export const useFiles = ({ note }: Props) => {
-  const application = useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
 
   const { showActionSheet } = useCustomActionSheet();
   const navigation = useNavigation<TAppStackNavigationProp>();
@@ -53,9 +53,6 @@ export const useFiles = ({ note }: Props) => {
   const { Success, Info, Error } = ToastType;
 
   const reloadAttachedFiles = useCallback(() => {
-    if (!application || !note) {
-      return [];
-    }
     setAttachedFiles(
       application.items
         .getFilesForNote(note)
@@ -64,9 +61,6 @@ export const useFiles = ({ note }: Props) => {
   }, [application, note]);
 
   const reloadAllFiles = useCallback(() => {
-    if (!application) {
-      return [];
-    }
     setAllFiles(
       application.items
         .getItems(ContentType.File)
@@ -87,7 +81,7 @@ export const useFiles = ({ note }: Props) => {
       file,
       saveInTempLocation = false,
     }: TDownloadFileAndReturnLocalPathParams): Promise<string | undefined> => {
-      if (isDownloading || !application) {
+      if (isDownloading) {
         return;
       }
       const filesService = application.getFilesService();
@@ -148,9 +142,6 @@ export const useFiles = ({ note }: Props) => {
 
   const shareFile = useCallback(
     async (file: SNFile) => {
-      if (!application) {
-        return;
-      }
       const downloadedFilePath = await downloadFileAndReturnLocalPath({
         file,
         saveInTempLocation: true,
@@ -201,9 +192,6 @@ export const useFiles = ({ note }: Props) => {
 
   const attachFileToNote = useCallback(
     async (file: SNFile) => {
-      if (!application || !note) {
-        return;
-      }
       await application.items.associateFileWithNote(file, note);
       Toast.show({
         type: Success,
@@ -216,9 +204,6 @@ export const useFiles = ({ note }: Props) => {
 
   const detachFileFromNote = useCallback(
     async (file: SNFile) => {
-      if (!application || !note) {
-        return;
-      }
       await application.items.disassociateFileWithNote(file, note);
       Toast.show({
         type: Success,
@@ -232,9 +217,6 @@ export const useFiles = ({ note }: Props) => {
   const toggleFileProtection = useCallback(
     async (file: SNFile) => {
       try {
-        if (!application) {
-          return file.protected;
-        }
         let result: SNFile | undefined;
         if (file.protected) {
           result = await application.mutator.unprotectFile(file);
@@ -253,9 +235,6 @@ export const useFiles = ({ note }: Props) => {
 
   const authorizeProtectedActionForFile = useCallback(
     async (file: SNFile, challengeReason: ChallengeReason) => {
-      if (!application) {
-        return false;
-      }
       const authorizedFiles =
         await application.protections.authorizeProtectedActionForFiles(
           [file],
@@ -268,9 +247,6 @@ export const useFiles = ({ note }: Props) => {
 
   const renameFile = useCallback(
     async (file: SNFile, fileName: string) => {
-      if (!application) {
-        return;
-      }
       await application.items.renameFile(file, fileName);
     },
     [application]
@@ -278,10 +254,6 @@ export const useFiles = ({ note }: Props) => {
 
   const previewFile = useCallback(
     async (file: SNFile) => {
-      if (!application) {
-        return;
-      }
-
       let downloadedFilePath: string | undefined = '';
       try {
         const isPreviewable = isFileTypePreviewable(file.mimeType);
@@ -327,10 +299,6 @@ export const useFiles = ({ note }: Props) => {
   );
   const handleFileAction = useCallback(
     async (action: UploadedFileItemAction) => {
-      if (!application) {
-        return false;
-      }
-
       const file =
         action.type !== UploadedFileItemActionType.RenameFile
           ? action.payload
@@ -395,9 +363,6 @@ export const useFiles = ({ note }: Props) => {
   );
 
   useEffect(() => {
-    if (!application) {
-      return;
-    }
     const unregisterFileStream = application.streamItems(
       ContentType.File,
       () => {

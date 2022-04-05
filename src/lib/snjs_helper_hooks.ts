@@ -1,4 +1,5 @@
 import { ApplicationContext } from '@Root/ApplicationContext';
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
 import { SCREEN_NOTES } from '@Screens/screens';
 import {
   ApplicationEvent,
@@ -17,7 +18,7 @@ export const useSignedIn = (
   signedOutCallback?: () => void
 ) => {
   // Context
-  const application = React.useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
 
   const [isLocked] = useIsLocked();
 
@@ -28,24 +29,22 @@ export const useSignedIn = (
     let mounted = true;
     const getSignedIn = async () => {
       if (mounted && !isLocked) {
-        setSignedIn(!application?.noAccount());
+        setSignedIn(!application.noAccount());
       }
     };
     getSignedIn();
-    const removeSignedInObserver = application?.addEventObserver(
-      async event => {
-        if (event === ApplicationEvent.Launched) {
-          getSignedIn();
-        }
-        if (event === ApplicationEvent.SignedIn) {
-          setSignedIn(true);
-          signedInCallback && signedInCallback();
-        } else if (event === ApplicationEvent.SignedOut) {
-          setSignedIn(false);
-          signedOutCallback && signedOutCallback();
-        }
+    const removeSignedInObserver = application.addEventObserver(async event => {
+      if (event === ApplicationEvent.Launched) {
+        getSignedIn();
       }
-    );
+      if (event === ApplicationEvent.SignedIn) {
+        setSignedIn(true);
+        signedInCallback && signedInCallback();
+      } else if (event === ApplicationEvent.SignedOut) {
+        setSignedIn(false);
+        signedOutCallback && signedOutCallback();
+      }
+    });
 
     return () => {
       mounted = false;
@@ -58,7 +57,7 @@ export const useSignedIn = (
 
 export const useOutOfSync = () => {
   // Context
-  const application = React.useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
 
   // State
   const [outOfSync, setOutOfSync] = React.useState<boolean>(false);
@@ -66,7 +65,7 @@ export const useOutOfSync = () => {
   React.useEffect(() => {
     let isMounted = true;
     const getOutOfSync = async () => {
-      const outOfSyncInitial = await application?.sync.isOutOfSync();
+      const outOfSyncInitial = await application.sync.isOutOfSync();
       if (isMounted) {
         setOutOfSync(Boolean(outOfSyncInitial));
       }
@@ -78,15 +77,13 @@ export const useOutOfSync = () => {
   }, [application]);
 
   React.useEffect(() => {
-    const removeSignedInObserver = application?.addEventObserver(
-      async event => {
-        if (event === ApplicationEvent.EnteredOutOfSync) {
-          setOutOfSync(true);
-        } else if (event === ApplicationEvent.ExitedOutOfSync) {
-          setOutOfSync(false);
-        }
+    const removeSignedInObserver = application.addEventObserver(async event => {
+      if (event === ApplicationEvent.EnteredOutOfSync) {
+        setOutOfSync(true);
+      } else if (event === ApplicationEvent.ExitedOutOfSync) {
+        setOutOfSync(false);
       }
-    );
+    });
 
     return removeSignedInObserver;
   }, [application]);
@@ -412,7 +409,7 @@ export const useChangeNoteChecks = (
   editor: NoteViewController | undefined = undefined
 ) => {
   // Context
-  const application = React.useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
 
   const canChangeNote = useCallback(async () => {
     if (!note) {
@@ -420,7 +417,7 @@ export const useChangeNoteChecks = (
     }
 
     if (note.deleted) {
-      application?.alertService?.alert(
+      application.alertService?.alert(
         'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
       );
       return false;
@@ -430,8 +427,8 @@ export const useChangeNoteChecks = (
       await editor.insertTemplatedNote();
     }
 
-    if (!application?.items.findItem(note.uuid)) {
-      application?.alertService!.alert(
+    if (!application.items.findItem(note.uuid)) {
+      application.alertService!.alert(
         "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
       );
       return false;
