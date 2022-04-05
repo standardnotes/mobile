@@ -1,7 +1,7 @@
 import { ButtonCell } from '@Components/ButtonCell';
 import { SectionedTableCell } from '@Components/SectionedTableCell';
 import { TableSection } from '@Components/TableSection';
-import { ApplicationContext } from '@Root/ApplicationContext';
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
 import { ModalStackNavigationProp } from '@Root/ModalStack';
 import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Screens/screens';
 import { UploadedFileItemActionType } from '@Screens/UploadedFilesList/UploadedFileItemAction';
@@ -15,16 +15,13 @@ type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_FILE_NAME>;
 export const FileInputModal: FC<Props> = props => {
   const { file, handleFileAction } = props.route.params;
   const themeService = useContext(ThemeServiceContext);
-  const application = useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
 
   const fileNameInputRef = useRef<TextInput>(null);
 
   const [fileName, setFileName] = useState(file.name);
 
   const onSubmit = async () => {
-    if (!application) {
-      return;
-    }
     const trimmedFileName = fileName.trim();
     if (trimmedFileName === '') {
       setFileName(file.name);

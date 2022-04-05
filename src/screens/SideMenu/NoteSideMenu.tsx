@@ -7,8 +7,8 @@ import {
 import { isUnfinishedFeaturesEnabled } from '@Lib/utils';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { TEnvironment } from '@Root/App';
-import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
 import {
   SCREEN_COMPOSE,
   SCREEN_INPUT_MODAL_TAG,
@@ -80,12 +80,9 @@ type Props = {
 };
 
 function useEditorComponents(): SNComponent[] {
-  const application = useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
   const [components, setComponents] = useState<SNComponent[]>([]);
   useEffect(() => {
-    if (!application) {
-      return;
-    }
     const removeComponentsObserver = application.streamItems(
       ContentType.Component,
       () => {
@@ -108,7 +105,7 @@ function useEditorComponents(): SNComponent[] {
 export const NoteSideMenu = React.memo((props: Props) => {
   // Context
   const theme = useContext(ThemeContext);
-  const application = useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
   const navigation =
     useNavigation<
       AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
@@ -129,8 +126,6 @@ export const NoteSideMenu = React.memo((props: Props) => {
   );
 
   useEffect(() => {
-    if (!application) return;
-
     const removeEventObserver = application.addSingleEventObserver(
       ApplicationEvent.PreferencesChanged,
       async () => {
@@ -155,7 +150,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     async () => {
       await application?.mutator.deleteItem(note!);
       props.drawerRef?.closeDrawer();
-      if (!application?.getAppState().isInTabletMode) {
+      if (!application.getAppState().isInTabletMode) {
         navigation.popToTop();
       }
     },
@@ -164,7 +159,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         mutator.trashed = true;
       }, false);
       props.drawerRef?.closeDrawer();
-      if (!application?.getAppState().isInTabletMode) {
+      if (!application.getAppState().isInTabletMode) {
         navigation.popToTop();
       }
     },
@@ -172,7 +167,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   );
 
   useEffect(() => {
-    if (!application || !note) {
+    if (!note) {
       setAttachedFilesLength(0);
       return;
     }
@@ -180,7 +175,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   }, [application, note]);
 
   useEffect(() => {
-    if (!application || !note) {
+    if (!note) {
       return;
     }
     const removeFilesObserver = application.streamItems(
@@ -282,7 +277,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   const onEditorPress = useCallback(
     async (selectedComponent?: SNComponent) => {
-      if (!note || !application) {
+      if (!note) {
         return;
       }
       if (note?.locked) {
@@ -413,7 +408,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   );
 
   const editors = useMemo(() => {
-    if (!note || !application) {
+    if (!note) {
       return [];
     }
     const componentEditor = application.componentManager.editorForNote(note);
@@ -606,7 +601,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             if (confirmed) {
               await application?.mutator.emptyTrash();
               props.drawerRef?.closeDrawer();
-              if (!application?.getAppState().isInTabletMode) {
+              if (!application.getAppState().isInTabletMode) {
                 navigation.popToTop();
               }
               application?.sync.sync();

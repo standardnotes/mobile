@@ -1,5 +1,5 @@
 import { SnIcon } from '@Components/SnIcon';
-import { ApplicationContext } from '@Root/ApplicationContext';
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
 import {
   CantLoadActionsText,
   CreateBlogContainer,
@@ -15,7 +15,7 @@ import {
   SNNote,
 } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 
 type TProps = {
@@ -27,7 +27,7 @@ type TListedAccountItem =
   | Pick<ListedAccountInfo, 'display_name'>;
 
 export const Listed: FC<TProps> = ({ note }) => {
-  const application = useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isActionInProgress, setIsActionInProgress] = useState(false);
@@ -44,9 +44,6 @@ export const Listed: FC<TProps> = ({ note }) => {
 
   const getListedAccountsDetails = useCallback(
     async (accounts: ListedAccount[]) => {
-      if (!application) {
-        return;
-      }
       const listedAccountsArray: TListedAccountItem[] = [];
 
       for (const listedAccountItem of accounts) {
@@ -67,9 +64,6 @@ export const Listed: FC<TProps> = ({ note }) => {
   );
 
   const reloadListedAccounts = useCallback(async () => {
-    if (!application) {
-      return [];
-    }
     setIsLoading(true);
     const accounts = await application.getListedAccounts();
     setListedAccounts(accounts);
@@ -79,7 +73,7 @@ export const Listed: FC<TProps> = ({ note }) => {
   }, [application, getListedAccountsDetails]);
 
   const registerNewAccount = useCallback(() => {
-    if (!application || isRequestingAccount) {
+    if (isRequestingAccount) {
       return;
     }
 
@@ -125,9 +119,6 @@ export const Listed: FC<TProps> = ({ note }) => {
   };
 
   const showActionsMenu = (item: TListedAccountItem, index: number) => {
-    if (!application) {
-      return;
-    }
     if (!doesListedItemHaveActions(item)) {
       application.alertService.alert('Unable to load actions.');
       return;
@@ -163,9 +154,6 @@ export const Listed: FC<TProps> = ({ note }) => {
     );
   };
 
-  if (!application) {
-    return null;
-  }
   return (
     <View>
       {isLoading && <ActivityIndicator style={styles.loadingIndicator} />}
