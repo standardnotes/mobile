@@ -12,17 +12,24 @@ import {
   useUploadedFilesListStyles,
 } from '@Screens/UploadedFilesList/UploadedFilesList.styled';
 import { SNFile } from '@standardnotes/snjs';
+import { useCustomActionSheet } from '@Style/custom_action_sheet';
+import { ICON_ATTACH } from '@Style/icons';
+import { ThemeService } from '@Style/theme_service';
 import React, {
   FC,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
 import { FlatList, ListRenderItem, Text, View } from 'react-native';
+import FAB from 'react-native-fab';
 import IosSearchBar from 'react-native-search-bar';
 import AndroidSearchBar from 'react-native-search-box';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { ThemeContext } from 'styled-components';
 
 enum Tabs {
   AttachedFiles,
@@ -32,8 +39,11 @@ enum Tabs {
 type Props = ModalStackNavigationProp<typeof SCREEN_UPLOADED_FILES_LIST>;
 
 export const UploadedFilesList: FC<Props> = props => {
+  const theme = useContext(ThemeContext);
+
   const styles = useUploadedFilesListStyles();
   const navigation = useNavigation();
+  const { showActionSheet } = useCustomActionSheet();
 
   const [currentTab, setCurrentTab] = useState(Tabs.AttachedFiles);
   const [searchString, setSearchString] = useState('');
@@ -45,7 +55,9 @@ export const UploadedFilesList: FC<Props> = props => {
 
   const note = props.route.params.note;
 
-  const { attachedFiles, allFiles } = useFiles({ note });
+  const { attachedFiles, allFiles, uploadFiles, attachFileToNote } = useFiles({
+    note,
+  });
 
   const filesList =
     currentTab === Tabs.AttachedFiles ? attachedFiles : allFiles;
@@ -98,6 +110,31 @@ export const UploadedFilesList: FC<Props> = props => {
       return;
     }
     setFilesListScrolled(true);
+  };
+
+  const handlePressAttach = () => {
+    const options = [
+      {
+        text: 'Attach from files',
+        callback: async () => {
+          const uploadedFiles = await uploadFiles();
+          console.log('returned');
+          if (!uploadedFiles) {
+            return;
+          }
+          if (currentTab === AttachedFiles) {
+            uploadedFiles.forEach(file => attachFileToNote(file, false));
+          }
+        },
+      },
+      {
+        text: 'Attach from Camera or Photo Library',
+        callback: () => {
+          console.error('Not implemented');
+        },
+      },
+    ];
+    showActionSheet('Choose action', options);
   };
 
   const renderItem: ListRenderItem<SNFile> = ({ item }) => {
@@ -165,6 +202,16 @@ export const UploadedFilesList: FC<Props> = props => {
             </Text>
           </View>
         )}
+        <FAB
+          buttonColor={theme.stylekitInfoColor}
+          iconTextColor={theme.stylekitInfoContrastColor}
+          onClickAction={handlePressAttach}
+          visible={true}
+          size={30}
+          iconTextComponent={
+            <Icon name={ThemeService.nameForIcon(ICON_ATTACH)} />
+          }
+        />
       </UploadFilesListContainer>
     </View>
   );

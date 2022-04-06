@@ -7,6 +7,7 @@ import {
   UploadedFileItemAction,
   UploadedFileItemActionType,
 } from '@Screens/UploadedFilesList/UploadedFileItemAction';
+import { ClientDisplayableError } from '@standardnotes/responses';
 import {
   ButtonType,
   ChallengeReason,
@@ -15,10 +16,15 @@ import {
   SNNote,
 } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
+import { Base64 } from 'js-base64';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import DocumentPicker, {
+  isInProgress,
+  pickMultiple,
+} from 'react-native-document-picker';
 import FileViewer from 'react-native-file-viewer';
-import RNFS, { exists } from 'react-native-fs';
+import RNFS, { exists, read } from 'react-native-fs';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
 
@@ -191,13 +197,16 @@ export const useFiles = ({ note }: Props) => {
   );
 
   const attachFileToNote = useCallback(
-    async (file: SNFile) => {
+    async (file: SNFile, showToastAfterAction = true) => {
       await application.items.associateFileWithNote(file, note);
-      Toast.show({
-        type: Success,
-        text1: 'Successfully attached file to note',
-        onPress: Toast.hide,
-      });
+
+      if (showToastAfterAction) {
+        Toast.show({
+          type: Success,
+          text1: 'Successfully attached file to note',
+          onPress: Toast.hide,
+        });
+      }
     },
     [Success, application, note]
   );
@@ -297,6 +306,96 @@ export const useFiles = ({ note }: Props) => {
     },
     [application, cleanupTempFileOnAndroid, downloadFileAndReturnLocalPath]
   );
+
+  const handleError = async (err: unknown) => {
+    if (DocumentPicker.isCancel(err)) {
+      // User canceled the picker, exit any dialogs or menus and move on
+    } else if (isInProgress(err)) {
+      Toast.show({
+        type: Info,
+        text2: 'Multiple pickers were opened, only the last will be considered',
+      });
+    } else {
+      Toast.show({
+        type: Error,
+        text1: 'Error',
+        text2: 'An error occurred while uploading file(s)',
+      });
+    }
+  };
+
+  const uploadFiles = async () => {
+    try {
+      const selectedFiles = await pickMultiple();
+      if (selectedFiles.length === 0) {
+        return;
+      }
+      const uploadedFiles: SNFile[] = [];
+
+      for (const fileResult of selectedFiles) {
+        if (!fileResult.uri || !fileResult.size) {
+          return;
+        }
+        const uri =
+          Platform.OS === 'ios' ? decodeURI(fileResult.uri) : fileResult.uri;
+
+        const size = fileResult.size;
+
+        Toast.show({
+          type: Info,
+          text1: `Uploading file "${fileResult.name}"...`,
+          autoHide: false,
+        });
+
+        const operation = await application.files.beginNewFileUpload();
+        if (operation instanceof ClientDisplayableError) {
+          Toast.show({
+            type: Error,
+            text1: operation.text,
+          });
+          return;
+        }
+
+        const onChunk = async (
+          chunk: Uint8Array,
+          index: number,
+          isLast: boolean
+        ) => {
+          await application.files.pushBytesForUpload(
+            operation,
+            chunk,
+            index,
+            isLast
+          );
+        };
+
+        const data = await read(uri, size, 0, 'base64');
+        const bytes = Base64.toUint8Array(data);
+        await onChunk(bytes, 1, true);
+
+        const fileObj = await application.files.finishUpload(operation, {
+          name: fileResult.name,
+          mimeType: fileResult.type as string,
+        });
+
+        if (fileObj instanceof ClientDisplayableError) {
+          Toast.show({
+            type: Error,
+            text1: fileObj.text,
+          });
+          return;
+        }
+        uploadedFiles.push(fileObj);
+        Toast.show({ text1: `Uploaded file ${fileObj.name}` });
+      }
+      Toast.show({ text1: 'Successfully uploaded' });
+
+      return uploadedFiles;
+    } catch (e) {
+      handleError(e);
+    }
+  };
+
   const handleFileAction = useCallback(
     async (action: UploadedFileItemAction) => {
       const file =
@@ -456,5 +555,7 @@ export const useFiles = ({ note }: Props) => {
     showActionsMenu,
     attachedFiles,
     allFiles,
+    uploadFiles,
+    attachFileToNote,
   };
 };
