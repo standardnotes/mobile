@@ -23,7 +23,6 @@ import DocumentPicker, {
   isInProgress,
   pickMultiple,
 } from 'react-native-document-picker';
-import { DocumentPickerResponse } from 'react-native-document-picker/src';
 import FileViewer from 'react-native-file-viewer';
 import RNFS, { exists, read } from 'react-native-fs';
 import RNShare from 'react-native-share';
@@ -351,9 +350,9 @@ export const useFiles = ({ note }: Props) => {
       }
       const uploadedFiles: SNFile[] = [];
 
-      for (const fileResult of selectedFiles as DocumentPickerResponse[]) {
+      for (const fileResult of selectedFiles) {
         if (!fileResult.uri || !fileResult.size) {
-          return;
+          continue;
         }
         const uri =
           Platform.OS === 'ios' ? decodeURI(fileResult.uri) : fileResult.uri;
@@ -362,7 +361,7 @@ export const useFiles = ({ note }: Props) => {
 
         Toast.show({
           type: Info,
-          text1: `Uploading file "${fileResult.name}"...`,
+          text1: `Uploading "${fileResult.name}"...`,
           autoHide: false,
         });
 
@@ -405,7 +404,7 @@ export const useFiles = ({ note }: Props) => {
           return;
         }
         uploadedFiles.push(fileObj);
-        Toast.show({ text1: `Uploaded file ${fileObj.name}` });
+        Toast.show({ text1: `Successfully uploaded ${fileObj.name}` });
       }
       Toast.show({ text1: 'Successfully uploaded' });
 
