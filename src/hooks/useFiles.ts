@@ -23,6 +23,7 @@ import DocumentPicker, {
   isInProgress,
   pickMultiple,
 } from 'react-native-document-picker';
+import { DocumentPickerResponse } from 'react-native-document-picker/src';
 import FileViewer from 'react-native-file-viewer';
 import RNFS, { exists, read } from 'react-native-fs';
 import RNShare from 'react-native-share';
@@ -307,32 +308,50 @@ export const useFiles = ({ note }: Props) => {
     [application, cleanupTempFileOnAndroid, downloadFileAndReturnLocalPath]
   );
 
-  const handleError = async (err: unknown) => {
-    if (DocumentPicker.isCancel(err)) {
+  const handlePickFilesError = async (error: unknown) => {
+    if (DocumentPicker.isCancel(error)) {
       // User canceled the picker, exit any dialogs or menus and move on
-    } else if (isInProgress(err)) {
+    } else if (isInProgress(error)) {
       Toast.show({
         type: Info,
-        text2: 'Multiple pickers were opened, only the last will be considered',
+        text2:
+          'Multiple pickers were opened, only the last will be considered.',
       });
     } else {
       Toast.show({
         type: Error,
-        text1: 'Error',
-        text2: 'An error occurred while uploading file(s)',
+        text1: 'An error occurred while attempting to select files.',
       });
+    }
+  };
+
+  const handUploadError = async () => {
+    Toast.show({
+      type: Error,
+      text1: 'Error',
+      text2: 'An error occurred while uploading file(s).',
+    });
+  };
+
+  const pickFiles = async () => {
+    try {
+      const selectedFiles = await pickMultiple();
+
+      return selectedFiles;
+    } catch (error) {
+      handlePickFilesError(error);
     }
   };
 
   const uploadFiles = async () => {
     try {
-      const selectedFiles = await pickMultiple();
-      if (selectedFiles.length === 0) {
+      const selectedFiles = await pickFiles();
+      if (!selectedFiles || selectedFiles.length === 0) {
         return;
       }
       const uploadedFiles: SNFile[] = [];
 
-      for (const fileResult of selectedFiles) {
+      for (const fileResult of selectedFiles as DocumentPickerResponse[]) {
         if (!fileResult.uri || !fileResult.size) {
           return;
         }
@@ -391,8 +410,8 @@ export const useFiles = ({ note }: Props) => {
       Toast.show({ text1: 'Successfully uploaded' });
 
       return uploadedFiles;
-    } catch (e) {
-      handleError(e);
+    } catch (error) {
+      handUploadError();
     }
   };
 

@@ -118,7 +118,6 @@ export const UploadedFilesList: FC<Props> = props => {
         text: 'Attach from files',
         callback: async () => {
           const uploadedFiles = await uploadFiles();
-          console.log('returned');
           if (!uploadedFiles) {
             return;
           }
