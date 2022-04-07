@@ -16,7 +16,6 @@ import {
   SNNote,
 } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import { Base64 } from 'js-base64';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import DocumentPicker, {
@@ -24,7 +23,7 @@ import DocumentPicker, {
   pickMultiple,
 } from 'react-native-document-picker';
 import FileViewer from 'react-native-file-viewer';
-import RNFS, { exists, read } from 'react-native-fs';
+import RNFS, { exists } from 'react-native-fs';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
 
@@ -58,6 +57,8 @@ export const useFiles = ({ note }: Props) => {
 
   const { Success, Info, Error } = ToastType;
 
+  const filesService = application.getFilesService();
+
   const reloadAttachedFiles = useCallback(() => {
     setAttachedFiles(
       application.items
@@ -90,7 +91,6 @@ export const useFiles = ({ note }: Props) => {
       if (isDownloading) {
         return;
       }
-      const filesService = application.getFilesService();
       const isGrantedStoragePermissionOnAndroid =
         await filesService.hasStoragePermissionOnAndroid();
 
@@ -134,7 +134,7 @@ export const useFiles = ({ note }: Props) => {
         setIsDownloading(false);
       }
     },
-    [Error, Info, Success, application, deleteFileAtPath, isDownloading]
+    [Error, Info, Success, deleteFileAtPath, filesService, isDownloading]
   );
 
   const cleanupTempFileOnAndroid = useCallback(
@@ -349,19 +349,14 @@ export const useFiles = ({ note }: Props) => {
         return;
       }
       const uploadedFiles: SNFile[] = [];
-
-      for (const fileResult of selectedFiles) {
-        if (!fileResult.uri || !fileResult.size) {
+      for (const file of selectedFiles) {
+        if (!file.uri || !file.size) {
           continue;
         }
-        const uri =
-          Platform.OS === 'ios' ? decodeURI(fileResult.uri) : fileResult.uri;
-
-        const size = fileResult.size;
 
         Toast.show({
           type: Info,
-          text1: `Uploading "${fileResult.name}"...`,
+          text1: `Uploading "${file.name}"...`,
           autoHide: false,
         });
 
@@ -387,14 +382,11 @@ export const useFiles = ({ note }: Props) => {
           );
         };
 
-        const data = await read(uri, size, 0, 'base64');
-        const bytes = Base64.toUint8Array(data);
-        await onChunk(bytes, 1, true);
-
-        const fileObj = await application.files.finishUpload(operation, {
-          name: fileResult.name,
-          mimeType: fileResult.type as string,
-        });
+        const fileResult = await filesService.readFile(file, onChunk);
+        const fileObj = await application.files.finishUpload(
+          operation,
+          fileResult
+        );
 
         if (fileObj instanceof ClientDisplayableError) {
           Toast.show({
@@ -404,9 +396,12 @@ export const useFiles = ({ note }: Props) => {
           return;
         }
         uploadedFiles.push(fileObj);
+
         Toast.show({ text1: `Successfully uploaded ${fileObj.name}` });
       }
-      Toast.show({ text1: 'Successfully uploaded' });
+      if (selectedFiles.length > 1) {
+        Toast.show({ text1: 'Successfully uploaded' });
+      }
 
       return uploadedFiles;
     } catch (error) {
