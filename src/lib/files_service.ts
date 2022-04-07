@@ -22,15 +22,6 @@ type TGetFileDestinationPath = {
 
 export class FilesService extends ApplicationService {
   private fileChunkSizeForReading = 2_000_000;
-  private minimumChunkSizeForUploading = 5_000_000;
-
-  getFileChunkSize(): number {
-    return this.fileChunkSizeForReading;
-  }
-
-  getMinimumChunkSize(): number {
-    return this.minimumChunkSizeForUploading;
-  }
 
   getDestinationPath({
     fileName,
@@ -79,9 +70,14 @@ export class FilesService extends ApplicationService {
   ): Promise<FileSelectionResponse> {
     const fileUri = Platform.OS === 'ios' ? decodeURI(file.uri) : file.uri;
 
-    let fileContentsInString = '';
     let positionShift = 0;
     let filePortion = '';
+
+    const chunker = new ByteChunker(
+      this.application.files.minimumChunkSize(),
+      onChunk
+    );
+    let isFinalChunk = false;
 
     do {
       filePortion = await read(
@@ -90,20 +86,13 @@ export class FilesService extends ApplicationService {
         positionShift,
         'base64'
       );
-      fileContentsInString += filePortion;
+      const bytes = Base64.toUint8Array(filePortion);
+      isFinalChunk = bytes.length < this.fileChunkSizeForReading;
+
+      await chunker.addBytes(bytes, isFinalChunk);
+
       positionShift += this.fileChunkSizeForReading;
-    } while (filePortion.length > 0);
-
-    const bytes = Base64.toUint8Array(fileContentsInString);
-
-    const chunker = new ByteChunker(this.minimumChunkSizeForUploading, onChunk);
-
-    for (let i = 0; i < bytes.length; i += this.fileChunkSizeForReading) {
-      const chunkMax = i + this.fileChunkSizeForReading;
-      const chunk = bytes.slice(i, chunkMax);
-      const isFinalChunk = chunkMax >= bytes.length;
-      await chunker.addBytes(chunk, isFinalChunk);
-    }
+    } while (!isFinalChunk);
 
     return {
       name: file.name,
