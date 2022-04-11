@@ -48,7 +48,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   const onItemPress = useCallback(
     async (item: RevisionListEntry) => {
       const remoteRevision =
-        await application?.historyManager!.fetchRemoteRevision(note.uuid, item);
+        await application?.historyManager!.fetchRemoteRevision(note, item);
       if (remoteRevision) {
         onPress(
           item.uuid,
@@ -63,7 +63,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
         return;
       }
     },
-    [application?.alertService, application?.historyManager, note.uuid, onPress]
+    [application?.alertService, application?.historyManager, note, onPress]
   );
 
   const renderItem: ListRenderItem<RevisionListEntry> | null | undefined = ({

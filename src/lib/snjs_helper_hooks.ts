@@ -416,13 +416,6 @@ export const useChangeNoteChecks = (
       return false;
     }
 
-    if (note.deleted) {
-      application.alertService?.alert(
-        'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
-      );
-      return false;
-    }
-
     if (editor && editor.isTemplateNote) {
       await editor.insertTemplatedNote();
     }
@@ -455,7 +448,7 @@ export const useChangeNote = (
     ) => {
       if (await canChangeNote()) {
         await application?.mutator.changeAndSaveItem(
-          note!.uuid,
+          note!,
           mutator => {
             const noteMutator = mutator as NoteMutator;
             mutate(noteMutator);

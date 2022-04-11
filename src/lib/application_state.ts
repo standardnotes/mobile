@@ -18,6 +18,7 @@ import {
   StorageKey,
   StorageValueModes,
   SystemViewId,
+  Uuid,
 } from '@standardnotes/snjs';
 import {
   AppState,
@@ -312,7 +313,7 @@ export class ApplicationState extends ApplicationService {
 
     if (note && note.conflictOf) {
       InteractionManager.runAfterInteractions(() => {
-        this.application?.mutator.changeAndSaveItem(note.uuid, mutator => {
+        this.application?.mutator.changeAndSaveItem(note, mutator => {
           mutator.conflictOf = undefined;
         });
       });
@@ -342,9 +343,9 @@ export class ApplicationState extends ApplicationService {
     this.application.editorGroup.closeAllNoteViews();
   }
 
-  editorForNote(note: SNNote) {
+  editorForNote(uuid: Uuid) {
     for (const editor of this.getEditors()) {
-      if (editor.note?.uuid === note.uuid) {
+      if (editor.note?.uuid === uuid) {
         return editor;
       }
     }
@@ -371,42 +372,53 @@ export class ApplicationState extends ApplicationService {
    * Reacts to @SNNote and @SNTag Changes
    */
   private handleItemsChanges() {
-    this.removeItemChangesListener = this.application!.streamItems(
+    this.removeItemChangesListener = this.application.streamItems<
+      SNNote | SNTag
+    >(
       [ContentType.Note, ContentType.Tag],
-      async (items, source) => {
-        /** Close any editors for deleted/trashed/archived notes */
-        if (source === PayloadSource.PreSyncSave) {
-          const notes = items.filter(
+      async ({ changed, inserted, removed, source }) => {
+        if (
+          source === PayloadSource.PreSyncSave ||
+          source === PayloadSource.RemoteRetrieved
+        ) {
+          const removedNotes = removed.filter(
+            i => i.content_type === ContentType.Note
+          );
+          for (const removedNote of removedNotes) {
+            const editor = this.editorForNote(removedNote.uuid);
+            if (editor) {
+              this.closeEditor(editor);
+            }
+          }
+
+          const notes = [...changed, ...inserted].filter(
             candidate => candidate.content_type === ContentType.Note
-          ) as SNNote[];
+          );
+
+          const isBrowswingTrashedNotes =
+            this.selectedTag instanceof SmartView &&
+            this.selectedTag.uuid === SystemViewId.TrashedNotes;
+
+          const isBrowsingArchivedNotes =
+            this.selectedTag instanceof SmartView &&
+            this.selectedTag.uuid === SystemViewId.ArchivedNotes;
+
           for (const note of notes) {
-            const editor = this.editorForNote(note);
+            const editor = this.editorForNote(note.uuid);
             if (!editor) {
               continue;
             }
-            if (note.deleted) {
+
+            if (note.trashed && !isBrowswingTrashedNotes) {
               this.closeEditor(editor);
-            } else if (
-              note.trashed &&
-              !(
-                this.selectedTag instanceof SmartView &&
-                this.selectedTag.uuid === SystemViewId.TrashedNotes
-              )
-            ) {
-              this.closeEditor(editor);
-            } else if (
-              note.archived &&
-              !(
-                this.selectedTag instanceof SmartView &&
-                this.selectedTag.uuid === SystemViewId.ArchivedNotes
-              )
-            ) {
+            } else if (note.archived && !isBrowsingArchivedNotes) {
               this.closeEditor(editor);
             }
           }
         }
+
         if (this.selectedTag) {
-          const matchingTag = items.find(
+          const matchingTag = [...changed, ...inserted].find(
             candidate => candidate.uuid === this.selectedTag!.uuid
           );
           if (matchingTag) {
@@ -469,11 +481,9 @@ export class ApplicationState extends ApplicationService {
    * @returns tags that are referencing note
    */
   public getNoteTags(note: SNNote) {
-    return this.application.items
-      .itemsReferencingItem(note.uuid)
-      .filter(ref => {
-        return ref.content_type === ContentType.Tag;
-      }) as SNTag[];
+    return this.application.items.itemsReferencingItem(note).filter(ref => {
+      return ref.content_type === ContentType.Tag;
+    }) as SNTag[];
   }
 
   /**
@@ -483,7 +493,7 @@ export class ApplicationState extends ApplicationService {
     if (tag instanceof SmartView) {
       return this.application.items.notesMatchingSmartView(tag);
     } else {
-      return this.application.items.referencesForItem(tag.uuid).filter(ref => {
+      return this.application.items.referencesForItem(tag).filter(ref => {
         return ref.content_type === ContentType.Note;
       }) as SNNote[];
     }

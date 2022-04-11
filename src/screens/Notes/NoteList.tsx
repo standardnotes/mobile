@@ -6,7 +6,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ApplicationContext } from '@Root/ApplicationContext';
 import { AppStackNavigationProp } from '@Root/AppStack';
 import { SCREEN_NOTES } from '@Screens/screens';
-import { CollectionSort, SNNote } from '@standardnotes/snjs';
+import { CollectionSortProperty, SNNote } from '@standardnotes/snjs';
 import React, {
   Dispatch,
   SetStateAction,
@@ -49,7 +49,7 @@ type Props = {
   }[];
   onPressItem: (noteUuid: SNNote['uuid']) => void;
   selectedNoteId: string | undefined;
-  sortType: CollectionSort;
+  sortType: CollectionSortProperty;
   hideDates: boolean;
   hidePreviews: boolean;
   hideEditorIcon: boolean;

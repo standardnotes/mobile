@@ -40,16 +40,15 @@ export const NoteHistoryPreview = ({
 
   const restore = useCallback(
     async (asCopy: boolean) => {
-      const originalNote = application?.items.findItem(
-        originalNoteUuid
-      ) as SNNote;
+      const originalNote =
+        application!.items.findSureItem<SNNote>(originalNoteUuid);
 
       const run = async () => {
         if (asCopy) {
           await application?.mutator.duplicateItem(originalNote!, {
-            ...revision.payload.safeContent,
-            title: revision.payload.safeContent.title
-              ? revision.payload.safeContent.title + ' (copy)'
+            ...revision.payload.content,
+            title: revision.payload.content.title
+              ? revision.payload.content.title + ' (copy)'
               : undefined,
           });
 
@@ -57,9 +56,9 @@ export const NoteHistoryPreview = ({
           navigation.navigate(SCREEN_NOTES);
         } else {
           await application?.mutator.changeAndSaveItem(
-            originalNoteUuid,
+            originalNote,
             mutator => {
-              mutator.unsafe_setCustomContent(revision.payload.safeContent);
+              mutator.unsafe_setCustomContent(revision.payload.content);
             },
             true,
             PayloadSource.RemoteActionRetrieved
@@ -94,7 +93,7 @@ export const NoteHistoryPreview = ({
         run();
       }
     },
-    [application, navigation, originalNoteUuid, revision.payload.safeContent]
+    [application, navigation, originalNoteUuid, revision.payload.content]
   );
 
   const onPress = useCallback(() => {
@@ -131,13 +130,13 @@ export const NoteHistoryPreview = ({
     <Container>
       <TitleContainer>
         <Title testID="notePreviewTitleField">
-          {revision.payload.safeContent?.title}
+          {revision.payload.content.title}
         </Title>
       </TitleContainer>
 
       <TextContainer>
         <StyledTextView testID="notePreviewText">
-          {revision.payload.safeContent?.text}
+          {revision.payload.content.text}
         </StyledTextView>
       </TextContainer>
     </Container>

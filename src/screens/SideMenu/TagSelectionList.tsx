@@ -7,6 +7,7 @@ import {
   ButtonType,
   CollectionSort,
   ContentType,
+  FindItem,
   SmartView,
   SNTag,
 } from '@standardnotes/snjs';
@@ -58,19 +59,14 @@ export const TagSelectionList = React.memo(
 
     const streamTags = useCallback(
       () =>
-        application!.streamItems(contentType, items => {
+        application.streamItems(contentType, ({ removed }) => {
           reloadTags();
+
           if (application?.getAppState().selectedTag) {
-            /** If the selected tag has been deleted, revert to All view. */
-            const matchingTag = items.find(tag => {
-              return tag.uuid === application?.getAppState().selectedTag?.uuid;
-            }) as SNTag;
-            if (matchingTag) {
-              if (matchingTag.deleted) {
-                application
-                  .getAppState()
-                  .setSelectedTag(application!.items.getSmartViews()[0], true);
-              }
+            if (FindItem(removed, application.getAppState().selectedTag.uuid)) {
+              application
+                .getAppState()
+                .setSelectedTag(application.items.getSmartViews()[0], true);
             }
           }
         }),
@@ -118,7 +114,7 @@ export const TagSelectionList = React.memo(
     };
 
     const isRootTag = (tag: SNTag | SmartView): boolean =>
-      tag instanceof SmartView || !application.items.getTagParent(tag.uuid);
+      tag instanceof SmartView || !application.items.getTagParent(tag);
 
     const showFolders = contentType === ContentType.Tag;
     const renderedTags = showFolders
@@ -126,16 +122,13 @@ export const TagSelectionList = React.memo(
       : tags;
 
     const renderItem: ListRenderItem<SNTag | SmartView> = ({ item }) => {
-      let title = item.deleted ? 'Deleting...' : item.title;
-      if (item.errorDecrypting) {
-        title = 'Unable to Decrypt';
-      }
+      let title = item.title;
 
       let children: SNTag[] = [];
 
       if (showFolders && item instanceof SNTag) {
         const rawChildren = application.items
-          .getTagChildren(item.uuid)
+          .getTagChildren(item)
           .map(tag => tag.uuid);
         children = (tags as SNTag[]).filter((tag: SNTag) =>
           rawChildren.includes(tag.uuid)

@@ -126,10 +126,11 @@ export class Compose extends React.Component<{}, State> {
 
     this.removeStreamComponents = this.context?.streamItems(
       ContentType.Component,
-      async (_items, source) => {
-        if (isPayloadSourceInternalChange(source!)) {
+      async ({ source }) => {
+        if (isPayloadSourceInternalChange(source)) {
           return;
         }
+
         if (!this.note) {
           return;
         }
@@ -214,7 +215,7 @@ export class Compose extends React.Component<{}, State> {
    * on a deleted note.
    */
   get noteLocked() {
-    if (!this.note || this.note.deleted) {
+    if (!this.note) {
       return false;
     }
     return this.note.locked;
@@ -278,14 +279,11 @@ export class Compose extends React.Component<{}, State> {
     if (!note) {
       return;
     }
-    return this.context?.mutator.changeItem(
-      component.uuid,
-      (m: ItemMutator) => {
-        const mutator = m as ComponentMutator;
-        mutator.removeDisassociatedItemId(note.uuid);
-        mutator.associateWithItem(note.uuid);
-      }
-    );
+    return this.context?.mutator.changeItem(component, (m: ItemMutator) => {
+      const mutator = m as ComponentMutator;
+      mutator.removeDisassociatedItemId(note.uuid);
+      mutator.associateWithItem(note.uuid);
+    });
   }
 
   reloadComponentEditorState = async () => {
@@ -368,23 +366,20 @@ export class Compose extends React.Component<{}, State> {
     if (!note) {
       return;
     }
-    if (note?.deleted) {
-      this.context!.alertService!.alert(
-        'Attempting to save this note has failed. The note has previously been deleted.'
-      );
-      return;
-    }
+
     if (editor?.isTemplateNote) {
       await editor?.insertTemplatedNote();
     }
+
     if (!this.context?.items.findItem(note!.uuid)) {
       this.context?.alertService!.alert(
         'Attempting to save this note has failed. The note cannot be found.'
       );
       return;
     }
+
     await this.context!.mutator.changeItem(
-      note!.uuid,
+      note,
       mutator => {
         const noteMutator = mutator as NoteMutator;
         noteMutator.title = title!;
