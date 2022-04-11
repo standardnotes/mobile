@@ -55,7 +55,13 @@ export const UploadedFilesList: FC<Props> = props => {
 
   const note = props.route.params.note;
 
-  const { attachedFiles, allFiles, uploadFiles, attachFileToNote } = useFiles({
+  const {
+    attachedFiles,
+    allFiles,
+    uploadFiles,
+    uploadFileFromCameraOrImageGallery,
+    attachFileToNote,
+  } = useFiles({
     note,
   });
 
@@ -127,9 +133,23 @@ export const UploadedFilesList: FC<Props> = props => {
         },
       },
       {
-        text: 'Attach from Camera or Photo Library',
-        callback: () => {
-          console.error('Not implemented');
+        text: 'Attach from Photo Library',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery(true);
+          if (!uploadedFile) {
+            return;
+          }
+          attachFileToNote(uploadedFile, false);
+        },
+      },
+      {
+        text: 'Attach from Camera',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery();
+          if (!uploadedFile) {
+            return;
+          }
+          attachFileToNote(uploadedFile, false);
         },
       },
     ];

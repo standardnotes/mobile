@@ -14,6 +14,7 @@ import RNFS, {
   DownloadDirectoryPath,
   read,
 } from 'react-native-fs';
+import { Asset } from 'react-native-image-picker';
 
 type TGetFileDestinationPath = {
   fileName: string;
@@ -64,11 +65,20 @@ export class FilesService extends ApplicationService {
     );
   }
 
+  getFileName(file: DocumentPickerResponse | Asset) {
+    if ('name' in file) {
+      return file.name;
+    }
+    return file.fileName as string;
+  }
+
   async readFile(
-    file: DocumentPickerResponse,
+    file: DocumentPickerResponse | Asset,
     onChunk: OnChunkCallback
   ): Promise<FileSelectionResponse> {
-    const fileUri = Platform.OS === 'ios' ? decodeURI(file.uri) : file.uri;
+    const fileUri = (
+      Platform.OS === 'ios' ? decodeURI(file.uri!) : file.uri
+    ) as string;
 
     let positionShift = 0;
     let filePortion = '';
@@ -94,8 +104,10 @@ export class FilesService extends ApplicationService {
       positionShift += this.fileChunkSizeForReading;
     } while (!isFinalChunk);
 
+    const fileName = this.getFileName(file);
+
     return {
-      name: file.name,
+      name: fileName,
       mimeType: file.type || '',
     };
   }

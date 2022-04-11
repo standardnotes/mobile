@@ -98,6 +98,8 @@
 	<string>Not used by application; required in configuration because API exists in build dependencies.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo library is optionally used to select files to upload or QR code images from your photo library.</string>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>Microphone is optionally used to capture videos.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

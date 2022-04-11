@@ -281,6 +281,8 @@ PODS:
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
     - React-Core
+  - react-native-image-picker (4.7.3):
+    - React-Core
   - react-native-mail (4.1.0):
     - React-Core
   - react-native-pager-view (5.4.15):
@@ -488,6 +490,7 @@ DEPENDENCIES:
   - "react-native-aes (from `../node_modules/@standardnotes/react-native-aes`)"
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
+  - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-mail (from `../node_modules/react-native-mail`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -591,6 +594,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-document-picker"
   react-native-fingerprint-scanner:
     :path: "../node_modules/react-native-fingerprint-scanner"
+  react-native-image-picker:
+    :path: "../node_modules/react-native-image-picker"
   react-native-mail:
     :path: "../node_modules/react-native-mail"
   react-native-pager-view:
@@ -707,6 +712,7 @@ SPEC CHECKSUMS:
   react-native-aes: 420f829e2c4ff32e3deb2aa056094a6a29fcf992
   react-native-document-picker: 5663fe4bcdb646200683a41790464d2793307ac8
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
+  react-native-image-picker: 4e6008ad8c2321622affa2c85432a5ebd02d480c
   react-native-mail: 5fe7239a5b5c1e858d425501c03d1ab977434122
   react-native-pager-view: b1914469643f40042e65d78cbf3d3dfebd6fb0d9
   react-native-safe-area-context: da2d11bd7df9bf7779e9bdc85081c141cfa544f4

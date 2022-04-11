@@ -19,11 +19,17 @@ import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import DocumentPicker, {
+  DocumentPickerResponse,
   isInProgress,
   pickMultiple,
 } from 'react-native-document-picker';
 import FileViewer from 'react-native-file-viewer';
 import RNFS, { exists } from 'react-native-fs';
+import {
+  Asset,
+  launchCamera,
+  launchImageLibrary,
+} from 'react-native-image-picker';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
 
@@ -324,7 +330,7 @@ export const useFiles = ({ note }: Props) => {
     }
   };
 
-  const handUploadError = async () => {
+  const handleUploadError = async () => {
     Toast.show({
       type: Error,
       text1: 'Error',
@@ -342,7 +348,57 @@ export const useFiles = ({ note }: Props) => {
     }
   };
 
-  const uploadFiles = async () => {
+  const uploadSingleFile = async (file: DocumentPickerResponse | Asset) => {
+    try {
+      const fileName = filesService.getFileName(file);
+      Toast.show({
+        type: Info,
+        text1: `Uploading "${fileName}"...`,
+        autoHide: false,
+      });
+
+      const operation = await application.files.beginNewFileUpload();
+
+      if (operation instanceof ClientDisplayableError) {
+        Toast.show({
+          type: Error,
+          text1: operation.text,
+        });
+        return;
+      }
+
+      const onChunk = async (
+        chunk: Uint8Array,
+        index: number,
+        isLast: boolean
+      ) => {
+        await application.files.pushBytesForUpload(
+          operation,
+          chunk,
+          index,
+          isLast
+        );
+      };
+
+      const fileResult = await filesService.readFile(file, onChunk);
+      const fileObj = await application.files.finishUpload(
+        operation,
+        fileResult
+      );
+      if (fileObj instanceof ClientDisplayableError) {
+        Toast.show({
+          type: Error,
+          text1: fileObj.text,
+        });
+        return;
+      }
+      return fileObj;
+    } catch (error) {
+      handleUploadError();
+    }
+  };
+
+  const uploadFiles = async (): Promise<SNFile[] | undefined> => {
     try {
       const selectedFiles = await pickFiles();
       if (!selectedFiles || selectedFiles.length === 0) {
@@ -353,51 +409,18 @@ export const useFiles = ({ note }: Props) => {
         if (!file.uri || !file.size) {
           continue;
         }
-
-        Toast.show({
-          type: Info,
-          text1: `Uploading "${file.name}"...`,
-          autoHide: false,
-        });
-
-        const operation = await application.files.beginNewFileUpload();
-        if (operation instanceof ClientDisplayableError) {
+        const fileObject = await uploadSingleFile(file);
+        if (!fileObject) {
           Toast.show({
             type: Error,
-            text1: operation.text,
+            text1: 'Error',
+            text2: `An error occurred while uploading ${file.name}.`,
           });
-          return;
+          continue;
         }
+        uploadedFiles.push(fileObject);
 
-        const onChunk = async (
-          chunk: Uint8Array,
-          index: number,
-          isLast: boolean
-        ) => {
-          await application.files.pushBytesForUpload(
-            operation,
-            chunk,
-            index,
-            isLast
-          );
-        };
-
-        const fileResult = await filesService.readFile(file, onChunk);
-        const fileObj = await application.files.finishUpload(
-          operation,
-          fileResult
-        );
-
-        if (fileObj instanceof ClientDisplayableError) {
-          Toast.show({
-            type: Error,
-            text1: fileObj.text,
-          });
-          return;
-        }
-        uploadedFiles.push(fileObj);
-
-        Toast.show({ text1: `Successfully uploaded ${fileObj.name}` });
+        Toast.show({ text1: `Successfully uploaded ${fileObject.name}` });
       }
       if (selectedFiles.length > 1) {
         Toast.show({ text1: 'Successfully uploaded' });
@@ -405,7 +428,39 @@ export const useFiles = ({ note }: Props) => {
 
       return uploadedFiles;
     } catch (error) {
-      handUploadError();
+      handleUploadError();
+    }
+  };
+
+  const uploadFileFromCameraOrImageGallery = async (
+    uploadFromGallery = false
+  ): Promise<SNFile | undefined> => {
+    try {
+      const result = uploadFromGallery
+        ? await launchImageLibrary({ mediaType: 'mixed' })
+        : await launchCamera({ mediaType: 'photo' });
+
+      if (result.didCancel || !result.assets) {
+        return;
+      }
+      const file = result.assets[0];
+      const fileObject = await uploadSingleFile(file);
+      if (!file.uri || !file.fileSize) {
+        return;
+      }
+      if (!fileObject) {
+        Toast.show({
+          type: Error,
+          text1: 'Error',
+          text2: `An error occurred while uploading ${file.fileName}.`,
+        });
+        return;
+      }
+      Toast.show({ text1: `Successfully uploaded ${fileObject.name}` });
+
+      return fileObject;
+    } catch (error) {
+      handleUploadError();
     }
   };
 
@@ -569,6 +624,7 @@ export const useFiles = ({ note }: Props) => {
     attachedFiles,
     allFiles,
     uploadFiles,
+    uploadFileFromCameraOrImageGallery,
     attachFileToNote,
   };
 };
