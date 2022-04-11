@@ -8,6 +8,7 @@ import { ApplicationContext } from '@Root/ApplicationContext';
 import { NoteCellIconFlags } from '@Screens/Notes/NoteCellIconFlags';
 import {
   CollectionSort,
+  CollectionSortProperty,
   IconType,
   isNullOrUndefined,
   SNNote,
@@ -22,7 +23,6 @@ import { Text, View } from 'react-native';
 import { ThemeContext } from 'styled-components';
 import {
   Container,
-  DeletedText,
   DetailsText,
   FlexContainer,
   NoteContentsContainer,
@@ -41,7 +41,7 @@ type Props = {
   hideDates: boolean;
   hidePreviews: boolean;
   hideEditorIcon: boolean;
-  sortType: CollectionSort;
+  sortType: CollectionSortProperty;
 };
 
 export const NoteCell = ({
@@ -101,10 +101,6 @@ export const NoteCell = ({
   };
 
   const onLongPress = () => {
-    if (note.errorDecrypting) {
-      return;
-    }
-
     if (note.protected) {
       showActionSheet(
         note.title,
@@ -201,7 +197,7 @@ export const NoteCell = ({
   const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
   const hasPlainPreview =
     !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
-  const showDetails = !note.errorDecrypting && (!hideDates || note.protected);
+  const showDetails = !hideDates || note.protected;
 
   const editorForNote = application?.componentManager.editorForNote(note);
   const [icon, tint] = application?.iconsController.getIconAndTintForEditor(
@@ -229,15 +225,7 @@ export const NoteCell = ({
           />
         )}
         <NoteDataContainer distance={padding}>
-          {note.deleted && <DeletedText>Deleting...</DeletedText>}
-
           <NoteCellFlags note={note} highlight={highlight} />
-
-          {note.errorDecrypting && !note.waitingForKey && (
-            <NoteText selected={highlight} numberOfLines={2}>
-              {'Please sign in to restore your decryption keys and notes.'}
-            </NoteText>
-          )}
 
           <FlexContainer>
             <NoteContentsContainer>

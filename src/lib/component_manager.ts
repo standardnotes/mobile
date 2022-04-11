@@ -4,7 +4,6 @@ import {
   GetFeatures,
 } from '@standardnotes/features';
 import {
-  ComponentContent,
   ComponentMutator,
   EncryptionService,
   isRightVersionGreaterThanLeft,
@@ -17,11 +16,12 @@ import {
   SNNote,
 } from '@standardnotes/snjs';
 import { objectToCss } from '@Style/css_parser';
-import { MobileTheme } from '@Style/theme_service';
+import { MobileTheme } from '@Style/MobileTheme';
 import { Base64 } from 'js-base64';
 import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import StaticServer from 'react-native-static-server';
 import { unzip } from 'react-native-zip-archive';
+import { MobileThemeContent } from './../style/MobileTheme';
 
 export enum ComponentLoadingError {
   FailedDownload = 'FailedDownload',
@@ -333,8 +333,7 @@ export class ComponentManager extends SNComponentManager {
   urlForComponent(component: SNComponent) {
     if (
       component.isTheme() &&
-      (component.safeContent as ComponentContent & { isSystemTheme: boolean })
-        .isSystemTheme
+      (component.content as MobileThemeContent).isSystemTheme
     ) {
       const theme = component as MobileTheme;
       const cssData = objectToCss(theme.mobileContent.variables);
@@ -381,7 +380,7 @@ export async function associateComponentWithNote(
   note: SNNote
 ) {
   return application.mutator.changeItem<ComponentMutator>(
-    component.uuid,
+    component,
     mutator => {
       mutator.removeDisassociatedItemId(note.uuid);
       mutator.associateWithItem(note.uuid);

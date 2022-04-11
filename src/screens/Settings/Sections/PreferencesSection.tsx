@@ -3,7 +3,7 @@ import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { PrefKey } from '@Lib/preferences_manager';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { CollectionSort } from '@standardnotes/snjs';
+import { CollectionSort, CollectionSortProperty } from '@standardnotes/snjs';
 import React, { useContext, useMemo, useState } from 'react';
 
 export const PreferencesSection = () => {
@@ -11,7 +11,7 @@ export const PreferencesSection = () => {
   const application = useContext(ApplicationContext);
 
   // State
-  const [sortBy, setSortBy] = useState<CollectionSort>(() =>
+  const [sortBy, setSortBy] = useState<CollectionSortProperty>(() =>
     application!
       .getLocalPreferences()
       .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
@@ -48,7 +48,7 @@ export const PreferencesSection = () => {
     setSortReverse(value => !value);
   };
 
-  const changeSortOption = (key: CollectionSort) => {
+  const changeSortOption = (key: CollectionSortProperty) => {
     application
       ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.SortNotesBy, key);

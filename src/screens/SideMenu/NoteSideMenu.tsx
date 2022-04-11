@@ -265,7 +265,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const disassociateComponentWithCurrentNote = useCallback(
     async (component: SNComponent) => {
       if (note) {
-        return application?.mutator.changeItem(component.uuid, m => {
+        return application?.mutator.changeItem(component, m => {
           const mutator = m as ComponentMutator;
           mutator.removeAssociatedItemId(note.uuid);
           mutator.disassociateWithItem(note.uuid);
@@ -296,7 +296,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       if (!selectedComponent) {
         if (!note?.prefersPlainEditor) {
           await application?.mutator.changeItem(
-            note!.uuid,
+            note!,
             mutator => {
               const noteMutator = mutator as NoteMutator;
               noteMutator.prefersPlainEditor = true;
@@ -318,7 +318,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         const prefersPlain = note!.prefersPlainEditor;
         if (prefersPlain) {
           await application?.mutator.changeItem(
-            note!.uuid,
+            note!,
             mutator => {
               const noteMutator = mutator as NoteMutator;
               noteMutator.prefersPlainEditor = false;
@@ -366,14 +366,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
       const setAsDefault = () => {
         if (currentDefault) {
-          application!.mutator.changeItem(currentDefault.uuid, m => {
+          application!.mutator.changeItem(currentDefault, m => {
             const mutator = m as ComponentMutator;
             mutator.isMobileDefault = false;
           });
         }
 
         if (component) {
-          application!.mutator.changeAndSaveItem(component.uuid, m => {
+          application!.mutator.changeAndSaveItem(component, m => {
             const mutator = m as ComponentMutator;
             mutator.isMobileDefault = true;
           });
@@ -381,7 +381,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       };
 
       const removeAsDefault = () => {
-        application!.mutator.changeItem(currentDefault.uuid, m => {
+        application!.mutator.changeItem(currentDefault, m => {
           const mutator = m as ComponentMutator;
           mutator.isMobileDefault = false;
         });
@@ -632,7 +632,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
       if (note) {
         if (isSelected) {
-          await application?.mutator.changeItem(tag.uuid, mutator => {
+          await application?.mutator.changeItem(tag, mutator => {
             mutator.removeItemAsRelationship(note);
           });
         } else {

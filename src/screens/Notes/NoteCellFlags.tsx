@@ -39,30 +39,9 @@ export const NoteCellFlags = ({
 
   let flags: NoteFlag[] = [];
 
-  if (note.errorDecrypting) {
-    if (note.waitingForKey) {
-      flags.push({
-        text: 'Waiting For Keys',
-        color: theme.stylekitWarningColor,
-      });
-    } else {
-      flags.push({
-        text: 'Missing Keys',
-        color: theme.stylekitDangerColor,
-      });
-    }
-  }
-
   if (note.conflictOf) {
     flags.push({
       text: 'Conflicted Copy',
-      color: theme.stylekitDangerColor,
-    });
-  }
-
-  if (note.deleted) {
-    flags.push({
-      text: 'Deletion Pending Sync',
       color: theme.stylekitDangerColor,
     });
   }

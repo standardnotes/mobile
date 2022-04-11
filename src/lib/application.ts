@@ -104,7 +104,6 @@ export class MobileApplication extends SNApplication {
     }
     this.MobileServices = {} as MobileServices;
     this.editorGroup.deinit();
-    this.iconsController.deinit();
     super.deinit(source);
   }
 

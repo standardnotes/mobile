@@ -1,7 +1,7 @@
 import { isNullOrUndefined } from '@standardnotes/snjs';
 import { Platform, ScaledSize } from 'react-native';
 import { DefaultTheme } from 'styled-components/native';
-import { MobileTheme } from './theme_service';
+import { MobileTheme } from './MobileTheme';
 /* eslint-disable no-bitwise */
 export const LIGHT_MODE_KEY = 'light';
 export const DARK_MODE_KEY = 'dark';
