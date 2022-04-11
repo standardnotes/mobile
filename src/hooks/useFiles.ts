@@ -320,7 +320,7 @@ export const useFiles = ({ note }: Props) => {
       Toast.show({
         type: Info,
         text2:
-          'Multiple pickers were opened, only the last will be considered.',
+          'Multiple pickers were opened; only the last one will be considered.',
       });
     } else {
       Toast.show({
