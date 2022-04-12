@@ -29,6 +29,7 @@ import {
   Asset,
   launchCamera,
   launchImageLibrary,
+  MediaType,
 } from 'react-native-image-picker';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
@@ -39,6 +40,11 @@ type Props = {
 type TDownloadFileAndReturnLocalPathParams = {
   file: SNFile;
   saveInTempLocation?: boolean;
+};
+
+type TUploadFileFromCameraOrImageGalleryParams = {
+  uploadFromGallery?: boolean;
+  mediaType?: MediaType;
 };
 
 export const isFileTypePreviewable = (fileType: string) => {
@@ -432,13 +438,16 @@ export const useFiles = ({ note }: Props) => {
     }
   };
 
-  const uploadFileFromCameraOrImageGallery = async (
-    uploadFromGallery = false
-  ): Promise<SNFile | undefined> => {
+  const uploadFileFromCameraOrImageGallery = async ({
+    uploadFromGallery = false,
+    mediaType = 'photo',
+  }: TUploadFileFromCameraOrImageGalleryParams): Promise<
+    SNFile | undefined
+  > => {
     try {
       const result = uploadFromGallery
         ? await launchImageLibrary({ mediaType: 'mixed' })
-        : await launchCamera({ mediaType: 'photo' });
+        : await launchCamera({ mediaType });
 
       if (result.didCancel || !result.assets) {
         return;

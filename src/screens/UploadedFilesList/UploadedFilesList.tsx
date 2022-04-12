@@ -12,7 +12,10 @@ import {
   useUploadedFilesListStyles,
 } from '@Screens/UploadedFilesList/UploadedFilesList.styled';
 import { SNFile } from '@standardnotes/snjs';
-import { useCustomActionSheet } from '@Style/custom_action_sheet';
+import {
+  CustomActionSheetOption,
+  useCustomActionSheet,
+} from '@Style/custom_action_sheet';
 import { ICON_ATTACH } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
 import React, {
@@ -24,7 +27,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { FlatList, ListRenderItem, Text, View } from 'react-native';
+import { FlatList, ListRenderItem, Platform, Text, View } from 'react-native';
 import FAB from 'react-native-fab';
 import IosSearchBar from 'react-native-search-bar';
 import AndroidSearchBar from 'react-native-search-box';
@@ -118,10 +121,41 @@ export const UploadedFilesList: FC<Props> = props => {
     setFilesListScrolled(true);
   };
 
-  const handlePressAttach = () => {
+  const handleAttachFromCamera = () => {
     const options = [
       {
+        text: 'Photo',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery({
+            mediaType: 'photo',
+          });
+          if (!uploadedFile) {
+            return;
+          }
+          attachFileToNote(uploadedFile, false);
+        },
+      },
+      {
+        text: 'Video',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery({
+            mediaType: 'video',
+          });
+          if (!uploadedFile) {
+            return;
+          }
+          attachFileToNote(uploadedFile, false);
+        },
+      },
+    ];
+    showActionSheet('Choose media type', options);
+  };
+
+  const handlePressAttach = () => {
+    const options: CustomActionSheetOption[] = [
+      {
         text: 'Attach from files',
+        key: 'files',
         callback: async () => {
           const uploadedFiles = await uploadFiles();
           if (!uploadedFiles) {
@@ -134,8 +168,11 @@ export const UploadedFilesList: FC<Props> = props => {
       },
       {
         text: 'Attach from Photo Library',
+        key: 'library',
         callback: async () => {
-          const uploadedFile = await uploadFileFromCameraOrImageGallery(true);
+          const uploadedFile = await uploadFileFromCameraOrImageGallery({
+            uploadFromGallery: true,
+          });
           if (!uploadedFile) {
             return;
           }
@@ -144,16 +181,17 @@ export const UploadedFilesList: FC<Props> = props => {
       },
       {
         text: 'Attach from Camera',
+        key: 'camera',
         callback: async () => {
-          const uploadedFile = await uploadFileFromCameraOrImageGallery();
-          if (!uploadedFile) {
-            return;
-          }
-          attachFileToNote(uploadedFile, false);
+          handleAttachFromCamera();
         },
       },
     ];
-    showActionSheet('Choose action', options);
+    const osSpecificOptions =
+      Platform.OS === 'android'
+        ? options.filter(option => option.key !== 'library')
+        : options;
+    showActionSheet('Choose action', osSpecificOptions);
   };
 
   const renderItem: ListRenderItem<SNFile> = ({ item }) => {
