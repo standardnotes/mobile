@@ -7,10 +7,10 @@ import {
   UploadedFileItemAction,
   UploadedFileItemActionType,
 } from '@Screens/UploadedFilesList/UploadedFileItemAction';
-import { ClientDisplayableError } from '@standardnotes/responses';
 import {
   ButtonType,
   ChallengeReason,
+  ClientDisplayableError,
   ContentType,
   SNFile,
   SNNote,
