@@ -30,17 +30,6 @@ export const useUploadedFilesListStyles = () => {
       marginTop: 24,
       marginBottom: 24,
     },
-    button: {
-      borderRadius: 20,
-      padding: 10,
-      elevation: 2,
-    },
-    buttonOpen: {
-      backgroundColor: '#F194FF',
-    },
-    buttonClose: {
-      backgroundColor: '#2196F3',
-    },
   });
 };
 

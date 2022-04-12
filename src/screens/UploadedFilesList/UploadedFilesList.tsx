@@ -148,7 +148,7 @@ export const UploadedFilesList: FC<Props> = props => {
         },
       },
     ];
-    showActionSheet('Choose media type', options);
+    showActionSheet('Choose file type', options);
   };
 
   const handlePressAttach = () => {
