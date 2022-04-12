@@ -11,6 +11,7 @@ import {
 } from '@Screens/screens';
 import {
   CollectionSort,
+  CollectionSortProperty,
   ContentType,
   NotesDisplayCriteria,
   SmartView,
@@ -61,7 +62,7 @@ export const Notes = React.memo(
     const [signedIn] = useSignedIn();
 
     // State
-    const [sortBy, setSortBy] = useState<CollectionSort>(() =>
+    const [sortBy, setSortBy] = useState<CollectionSortProperty>(() =>
       application
         .getLocalPreferences()
         .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
@@ -126,9 +127,7 @@ export const Notes = React.memo(
         } else if (selectedTag) {
           title = selectedTag.title;
           if (selectedTag instanceof SNTag && selectedTag.parentId) {
-            const parents = application.items.getTagParentChain(
-              selectedTag.uuid
-            );
+            const parents = application.items.getTagParentChain(selectedTag);
             const hierarchy = parents.map(tag => tag.title).join(' ⫽ ');
             subTitle = hierarchy.length > 0 ? `in ${hierarchy}` : undefined;
           }
@@ -169,19 +168,8 @@ export const Notes = React.memo(
 
     const onNoteSelect = useCallback(
       async (noteUuid: SNNote['uuid']) => {
-        const note = application.items.findItem(noteUuid) as SNNote;
+        const note = application.items.findItem<SNNote>(noteUuid);
         if (note) {
-          if (note.errorDecrypting) {
-            if (note.waitingForKey) {
-              return application.presentKeyRecoveryWizard();
-            } else {
-              return application.alertService.alert(
-                'Standard Notes was unable to decrypt this item. Please sign out of your account and back in to attempt to resolve this issue.',
-                'Unable to Decrypt'
-              );
-            }
-          }
-
           if (note.protected && !application.hasProtectionSources()) {
             return navigation.navigate(SCREEN_VIEW_PROTECTED_NOTE, {
               onPressView: () => openNote(noteUuid, true),
@@ -234,7 +222,7 @@ export const Notes = React.memo(
       (
         searchFilter?: string,
         sortOptions?: {
-          sortBy?: CollectionSort;
+          sortBy?: CollectionSortProperty;
           sortReverse: boolean;
         },
         includeProtected?: boolean,
@@ -259,7 +247,7 @@ export const Notes = React.memo(
         }
 
         const criteria = NotesDisplayCriteria.Create({
-          sortProperty: sortOptions?.sortBy ?? (sortBy! as CollectionSort),
+          sortProperty: sortOptions?.sortBy ?? sortBy,
           sortDirection:
             sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
           tags: tag instanceof SNTag ? [tag] : [],
@@ -377,8 +365,7 @@ export const Notes = React.memo(
     ]);
 
     const getFirstSelectableNote = useCallback(
-      (newNotes: SNNote[]) =>
-        newNotes.find(note => !note.protected && !note.errorDecrypting),
+      (newNotes: SNNote[]) => newNotes.find(note => !note.protected),
       []
     );
 
@@ -419,9 +406,7 @@ export const Notes = React.memo(
           reloadNotesDisplayOptions();
         }
 
-        const newNotes = application.items.getDisplayableItems(
-          ContentType.Note
-        ) as SNNote[];
+        const newNotes = application.items.getDisplayableNotes();
         let renderedNotes: SNNote[] = newNotes;
 
         setNotes(renderedNotes);
@@ -438,13 +423,13 @@ export const Notes = React.memo(
             const activeNote = application
               .getAppState()
               .getActiveNoteController()?.note;
+
             if (activeNote) {
-              const discarded = activeNote.deleted || activeNote.trashed;
               const isTrashView =
                 application.getAppState().selectedTag instanceof SmartView &&
                 application.getAppState().selectedTag.uuid ===
                   SystemViewId.TrashedNotes;
-              if (discarded && !isTrashView) {
+              if (activeNote.trashed && !isTrashView) {
                 selectNextOrCreateNew(renderedNotes);
               }
             } else {

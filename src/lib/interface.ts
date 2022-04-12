@@ -1,6 +1,9 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import { RawPayload } from '@standardnotes/payloads';
-import { AbstractDevice, ApplicationIdentifier } from '@standardnotes/snjs';
+import {
+  AbstractDevice,
+  ApplicationIdentifier,
+  TransferPayload,
+} from '@standardnotes/snjs';
 import { Alert, Linking, Platform } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Keychain from './keychain';
@@ -101,7 +104,8 @@ export class MobileDeviceInterface extends AbstractDevice {
   }
 
   private async getDatabaseKeyValues(keys: string[]) {
-    const results: (RawPayload | unknown)[] = [];
+    const results: (TransferPayload | unknown)[] = [];
+
     if (Platform.OS === 'android') {
       const failedItemIds: string[] = [];
       for (const key of keys) {
@@ -109,7 +113,7 @@ export class MobileDeviceInterface extends AbstractDevice {
           const item = await AsyncStorage.getItem(key);
           if (item) {
             try {
-              results.push(JSON.parse(item) as RawPayload);
+              results.push(JSON.parse(item) as TransferPayload);
             } catch (e) {
               results.push(item);
             }
@@ -168,18 +172,20 @@ export class MobileDeviceInterface extends AbstractDevice {
     return Promise.resolve({ isNewDatabase: false });
   }
 
-  async getAllRawDatabasePayloads(
+  async getAllRawDatabasePayloads<T extends TransferPayload = TransferPayload>(
     identifier: ApplicationIdentifier
-  ): Promise<RawPayload[]> {
+  ): Promise<T[]> {
     const keys = await this.getAllDatabaseKeys(identifier);
-    return this.getDatabaseKeyValues(keys) as Promise<RawPayload[]>;
+    return this.getDatabaseKeyValues(keys) as Promise<T[]>;
   }
+
   saveRawDatabasePayload(
     payload: any,
     identifier: ApplicationIdentifier
   ): Promise<void> {
     return this.saveRawDatabasePayloads([payload], identifier);
   }
+
   async saveRawDatabasePayloads(
     payloads: any[],
     identifier: ApplicationIdentifier

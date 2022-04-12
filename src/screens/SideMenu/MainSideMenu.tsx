@@ -8,11 +8,8 @@ import {
   useCustomActionSheet,
 } from '@Style/custom_action_sheet';
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
-import {
-  MobileTheme,
-  ThemeService,
-  ThemeServiceContext,
-} from '@Style/theme_service';
+import { MobileTheme } from '@Style/MobileTheme';
+import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
 import React, {
   Fragment,
   useCallback,
@@ -155,9 +152,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     const unsubscribeStreamThemes = application?.streamItems(
       ContentType.Theme,
       () => {
-        const newItems = application.items
-          .getItems(ContentType.Theme)
-          .filter(el => !el.errorDecrypting && !el.deleted);
+        const newItems = application.items.getItems(ContentType.Theme);
         setThemes(newItems as SNTheme[]);
       }
     );
@@ -249,7 +244,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
   const onTagSelect = useCallback(
     async (tag: SNTag | SmartView) => {
       if (tag.conflictOf) {
-        application!.mutator.changeAndSaveItem(tag.uuid, mutator => {
+        application!.mutator.changeAndSaveItem(tag, mutator => {
           mutator.conflictOf = undefined;
         });
       }

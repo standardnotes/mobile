@@ -9,6 +9,7 @@ import {
 import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell';
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
 import {
+  Action,
   ButtonType,
   ListedAccount,
   ListedAccountInfo,
@@ -123,16 +124,17 @@ export const Listed: FC<TProps> = ({ note }) => {
       application.alertService.alert('Unable to load actions.');
       return;
     }
+
     showActionSheet(
       item.display_name,
       item.actions.map(action => ({
-        text: action.label,
+        text: (action as Action).label,
         callback: async () => {
           setIsActionInProgress(true);
           setAuthorUrlWithInProgressAction(item.author_url);
 
           const response = await application.actionsManager.runAction(
-            action,
+            action as Action,
             note
           );
 

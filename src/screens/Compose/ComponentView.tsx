@@ -218,7 +218,7 @@ export const ComponentView = ({
     if (didLoadRootUrl.current === true || !SupportsShouldLoadRequestHandler) {
       log('Setting component viewer webview');
       timeoutRef.current = setTimeout(() => {
-        componentViewer?.setWindow(webViewRef.current);
+        componentViewer?.setWindow(webViewRef.current as unknown as Window);
       }, 1);
       /**
        * The parent will remove their loading screen on load end. We want to

@@ -51,7 +51,7 @@ export const TagInputModal = (props: Props) => {
       const tag = application?.items.findItem(
         props.route.params.tagUuid
       ) as SNTag;
-      await application?.mutator.changeItem(tag.uuid, mutator => {
+      await application?.mutator.changeItem(tag, mutator => {
         const tagMutator = mutator as TagMutator;
         tagMutator.title = text;
         if (props.route.params.noteUuid) {
@@ -64,7 +64,7 @@ export const TagInputModal = (props: Props) => {
     } else {
       const tag = await application!.mutator.findOrCreateTag(text);
       if (props.route.params.noteUuid) {
-        await application?.mutator.changeItem(tag.uuid, mutator => {
+        await application?.mutator.changeItem(tag, mutator => {
           const tagMutator = mutator as TagMutator;
           const note = application.items.findItem(props.route.params.noteUuid!);
           if (note) {

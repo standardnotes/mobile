@@ -1,13 +1,11 @@
 import { MobileApplication } from '@Lib/application';
-import { RawPayload } from '@standardnotes/payloads';
 import {
   ApplicationEvent,
   ComponentContent,
   ContentType,
-  CopyPayload,
-  CreateMaxPayloadFromAnyObject,
+  DecryptedPayload,
+  DecryptedTransferPayload,
   FillItemContent,
-  PayloadInterface,
   removeFromArray,
   SNTheme,
   StorageValueModes,
@@ -30,6 +28,7 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native';
+import { MobileTheme } from './MobileTheme';
 import THEME_DARK_JSON from './Themes/blue-dark.json';
 import THEME_BLUE_JSON from './Themes/blue.json';
 import THEME_RED_JSON from './Themes/red.json';
@@ -42,34 +41,6 @@ const CACHED_THEMES_KEY = 'cachedThemesKey';
 type ThemeChangeObserver = () => Promise<void> | void;
 
 type ThemeVariables = Record<string, string>;
-
-type MobileThemeContent = {
-  variables: MobileThemeVariables;
-  isSystemTheme: boolean;
-  isInitial: boolean;
-  luminosity: number;
-  isSwapIn?: boolean;
-};
-
-export class MobileTheme extends SNTheme {
-  get mobileContent() {
-    return this.safeContent as any as MobileThemeContent;
-  }
-
-  static BuildTheme(variables?: MobileThemeVariables) {
-    return new MobileTheme(
-      CreateMaxPayloadFromAnyObject({
-        uuid: `${Math.random()}`,
-        content_type: ContentType.Theme,
-        content: FillItemContent({
-          variables: variables || ({} as MobileThemeVariables),
-          isSystemTheme: false,
-          isInitial: false,
-        } as unknown as ComponentContent),
-      })
-    );
-  }
-}
 
 enum SystemThemeTint {
   Blue = 'Blue',
@@ -178,7 +149,7 @@ export class ThemeService {
       variables.statusBar =
         Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
 
-      const payload = CreateMaxPayloadFromAnyObject({
+      const payload = new DecryptedPayload<ComponentContent>({
         uuid: option.uuid,
         content_type: ContentType.Theme,
         content: FillItemContent({
@@ -198,7 +169,9 @@ export class ThemeService {
           isInitial: Boolean(option.isInitial),
         } as unknown as ComponentContent),
       });
+
       const theme = new MobileTheme(payload);
+
       this.addTheme(theme);
     }
   }
@@ -368,7 +341,7 @@ export class ThemeService {
       theme.mobileContent.luminosity ||
       getColorLuminosity(variables.stylekitContrastBackgroundColor);
     return new MobileTheme(
-      CopyPayload(theme.payload, {
+      theme.payload.copy({
         content: {
           ...theme.mobileContent,
           variables,
@@ -494,9 +467,9 @@ export class ThemeService {
       ...ThemeService.constants,
     };
     const mobileTheme = new MobileTheme(
-      CreateMaxPayloadFromAnyObject(theme.payload, {
+      theme.payload.copy({
         content: {
-          ...theme.payload.safeContent,
+          ...theme.payload.content,
           variables: finalVariables,
           luminosity: getColorLuminosity(
             finalVariables.stylekitContrastBackgroundColor
@@ -504,15 +477,15 @@ export class ThemeService {
           isSystemTheme: false,
           isInitial: false,
           package_info: {
-            ...theme.payload.safeContent.package_info,
+            ...theme.payload.content.package_info,
             dock_icon: {
               type: 'circle',
               background_color: finalVariables.stylekitInfoColor,
               border_color: finalVariables.stylekitInfoColor,
             },
           },
-        },
-      } as unknown as ComponentContent)
+        } as unknown as ComponentContent,
+      })
     );
     this.addTheme(mobileTheme);
     this.activateTheme(theme.uuid);
@@ -530,12 +503,15 @@ export class ThemeService {
         CACHED_THEMES_KEY,
         StorageValueModes.Nonwrapped
       )) || [];
-    const themes = (rawValue as RawPayload[]).map((rawPayload: RawPayload) => {
-      const payload = CreateMaxPayloadFromAnyObject(
-        rawPayload
-      ) as PayloadInterface<ComponentContent>;
+
+    const themes = (
+      rawValue as DecryptedTransferPayload<ComponentContent>[]
+    ).map(rawPayload => {
+      const payload = new DecryptedPayload<ComponentContent>(rawPayload);
+
       return new MobileTheme(payload);
     });
+
     for (const theme of themes) {
       this.addTheme(theme);
     }
