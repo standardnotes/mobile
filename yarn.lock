@@ -1898,10 +1898,10 @@
     "@standardnotes/auth" "^3.18.5"
     "@standardnotes/common" "^1.19.3"
 
-"@standardnotes/filepicker@^1.10.5":
-  version "1.10.5"
-  resolved "https://registry.yarnpkg.com/@standardnotes/filepicker/-/filepicker-1.10.5.tgz#28c7cc68cb3337940a52e19b1dea76af343f2852"
-  integrity sha512-Tl9mCW/qAzupOtQAYlbPHgZU16ljtRGV0awOHT7+uulPYoyKJJ4cqlKRzFaaONTAN6GpICEeSqidcB/lb5e5uQ==
+"@standardnotes/filepicker@^1.10.6":
+  version "1.10.6"
+  resolved "https://registry.yarnpkg.com/@standardnotes/filepicker/-/filepicker-1.10.6.tgz#73fcf1f455b88fbede4bbdff53ea657fefed1249"
+  integrity sha512-cYQ/0ccYpwsH/sZMLUC6v2TlKUlBvqJFSroM70LANlIIWWQe9aoPNqrR2kPGlbuzz9FkBcadsHgpshfFR8o/nA==
 
 "@standardnotes/models@^1.2.2":
   version "1.2.2"

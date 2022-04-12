@@ -1,8 +1,8 @@
 import {
+  ByteChunker,
   FileSelectionResponse,
   OnChunkCallback,
 } from '@standardnotes/filepicker';
-import { ByteChunker } from '@standardnotes/filepicker/dist/byte_chunker';
 import { ApplicationService, SNFile } from '@standardnotes/snjs';
 import { Buffer } from 'buffer';
 import { Base64 } from 'js-base64';
