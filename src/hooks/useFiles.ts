@@ -334,16 +334,25 @@ export const useFiles = ({ note }: Props) => {
       if (shouldDelete) {
         Toast.show({
           type: Info,
-          text2: `Deleting file "${file.name}"...`,
+          text2: `Deleting "${file.name}"...`,
         });
-        await application.files.deleteFile(file);
+        const response = await application.files.deleteFile(file);
+
+        if (response instanceof ClientDisplayableError) {
+          Toast.show({
+            type: Error,
+            text1: response.text,
+          });
+          return;
+        }
+
         Toast.show({
           type: Success,
-          text2: `Deleted file "${file.name}"`,
+          text2: `Successfully deleted "${file.name}"`,
         });
       }
     },
-    [Info, Success, application.alertService, application.files]
+    [Error, Info, Success, application.alertService, application.files]
   );
 
   const handlePickFilesError = async (error: unknown) => {
