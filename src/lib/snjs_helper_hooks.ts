@@ -347,7 +347,7 @@ export const useDeleteNoteWithPrivileges = (
 
 export const useProtectionSessionExpiry = () => {
   // Context
-  const application = React.useContext(ApplicationContext);
+  const application = useSafeApplicationContext();
 
   const getProtectionsDisabledUntil = React.useCallback(() => {
     const protectionExpiry = application?.getProtectionSessionExpiryDate();
@@ -391,7 +391,12 @@ export const useProtectionSessionExpiry = () => {
   useEffect(() => {
     const removeProtectionLengthSubscriber = application?.addEventObserver(
       async event => {
-        if (event === ApplicationEvent.UnprotectedSessionBegan) {
+        if (
+          [
+            ApplicationEvent.UnprotectedSessionBegan,
+            ApplicationEvent.UnprotectedSessionExpired,
+          ].includes(event)
+        ) {
           setProtectionsDisabledUntil(getProtectionsDisabledUntil());
         }
       }

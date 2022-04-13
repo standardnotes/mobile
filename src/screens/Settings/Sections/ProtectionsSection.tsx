@@ -2,8 +2,8 @@ import { ButtonCell } from '@Components/ButtonCell';
 import { SectionHeader } from '@Components/SectionHeader';
 import { TableSection } from '@Components/TableSection';
 import { useProtectionSessionExpiry } from '@Lib/snjs_helper_hooks';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import React, { useContext } from 'react';
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
+import React from 'react';
 import {
   BaseView,
   StyledSectionedTableCell,
@@ -19,8 +19,7 @@ type Props = {
 
 export const ProtectionsSection = (props: Props) => {
   // Context
-  const application = useContext(ApplicationContext);
-
+  const application = useSafeApplicationContext();
   // State
   const [protectionsDisabledUntil] = useProtectionSessionExpiry();
 
