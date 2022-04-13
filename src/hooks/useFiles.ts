@@ -15,7 +15,10 @@ import {
   SNFile,
   SNNote,
 } from '@standardnotes/snjs';
-import { useCustomActionSheet } from '@Style/custom_action_sheet';
+import {
+  CustomActionSheetOption,
+  useCustomActionSheet,
+} from '@Style/custom_action_sheet';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import DocumentPicker, {
@@ -319,6 +322,39 @@ export const useFiles = ({ note }: Props) => {
     [application, cleanupTempFileOnAndroid, downloadFileAndReturnLocalPath]
   );
 
+  const deleteFile = useCallback(
+    async (file: SNFile) => {
+      const shouldDelete = await application.alertService.confirm(
+        `Are you sure you want to permanently delete "${file.name}"?`,
+        undefined,
+        'Confirm',
+        ButtonType.Danger,
+        'Cancel'
+      );
+      if (shouldDelete) {
+        Toast.show({
+          type: Info,
+          text2: `Deleting "${file.name}"...`,
+        });
+        const response = await application.files.deleteFile(file);
+
+        if (response instanceof ClientDisplayableError) {
+          Toast.show({
+            type: Error,
+            text1: response.text,
+          });
+          return;
+        }
+
+        Toast.show({
+          type: Success,
+          text2: `Successfully deleted "${file.name}"`,
+        });
+      }
+    },
+    [Error, Info, Success, application.alertService, application.files]
+  );
+
   const handlePickFilesError = async (error: unknown) => {
     if (DocumentPicker.isCancel(error)) {
       // User canceled the picker, exit any dialogs or menus and move on
@@ -518,6 +554,9 @@ export const useFiles = ({ note }: Props) => {
         case UploadedFileItemActionType.PreviewFile:
           await previewFile(file);
           break;
+        case UploadedFileItemActionType.DeleteFile:
+          await deleteFile(file);
+          break;
         default:
           break;
       }
@@ -526,9 +565,10 @@ export const useFiles = ({ note }: Props) => {
       return true;
     },
     [
-      application,
+      application.sync,
       attachFileToNote,
       authorizeProtectedActionForFile,
+      deleteFile,
       detachFileFromNote,
       downloadFileAndReturnLocalPath,
       previewFile,
@@ -559,7 +599,7 @@ export const useFiles = ({ note }: Props) => {
       }
       const isAttachedToNote = attachedFiles.includes(file);
 
-      const actions = [
+      const actions: CustomActionSheetOption[] = [
         {
           text: isAttachedToNote ? 'Detach from note' : 'Attach to note',
           callback: isAttachedToNote
@@ -617,6 +657,16 @@ export const useFiles = ({ note }: Props) => {
               file,
               handleFileAction,
             }),
+        },
+        {
+          text: 'Delete permanently',
+          callback: () => {
+            handleFileAction({
+              type: UploadedFileItemActionType.DeleteFile,
+              payload: file,
+            });
+          },
+          destructive: true,
         },
       ];
       const osDependentActions =
