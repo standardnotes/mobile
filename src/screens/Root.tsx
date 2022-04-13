@@ -5,7 +5,7 @@ import {
 } from '@Lib/application_state';
 import { useHasEditor, useIsLocked } from '@Lib/snjs_helper_hooks';
 import { ApplicationContext } from '@Root/ApplicationContext';
-import { UuidString } from '@standardnotes/snjs/dist/@types';
+import { UuidString } from '@standardnotes/snjs';
 import { ThemeService } from '@Style/theme_service';
 import { hexToRGBA } from '@Style/utils';
 import React, { useContext, useEffect, useMemo, useState } from 'react';

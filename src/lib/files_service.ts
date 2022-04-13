@@ -1,11 +1,20 @@
+import {
+  ByteChunker,
+  FileSelectionResponse,
+  OnChunkCallback,
+} from '@standardnotes/filepicker';
 import { ApplicationService, SNFile } from '@standardnotes/snjs';
 import { Buffer } from 'buffer';
+import { Base64 } from 'js-base64';
 import { PermissionsAndroid, Platform } from 'react-native';
+import { DocumentPickerResponse } from 'react-native-document-picker';
 import RNFS, {
   CachesDirectoryPath,
   DocumentDirectoryPath,
   DownloadDirectoryPath,
+  read,
 } from 'react-native-fs';
+import { Asset } from 'react-native-image-picker';
 
 type TGetFileDestinationPath = {
   fileName: string;
@@ -13,6 +22,8 @@ type TGetFileDestinationPath = {
 };
 
 export class FilesService extends ApplicationService {
+  private fileChunkSizeForReading = 2_000_000;
+
   getDestinationPath({
     fileName,
     saveInTempLocation = false,
@@ -52,5 +63,52 @@ export class FilesService extends ApplicationService {
         await RNFS.appendFile(path, base64String, 'base64');
       }
     );
+  }
+
+  getFileName(file: DocumentPickerResponse | Asset) {
+    if ('name' in file) {
+      return file.name;
+    }
+    return file.fileName as string;
+  }
+
+  async readFile(
+    file: DocumentPickerResponse | Asset,
+    onChunk: OnChunkCallback
+  ): Promise<FileSelectionResponse> {
+    const fileUri = (
+      Platform.OS === 'ios' ? decodeURI(file.uri!) : file.uri
+    ) as string;
+
+    let positionShift = 0;
+    let filePortion = '';
+
+    const chunker = new ByteChunker(
+      this.application.files.minimumChunkSize(),
+      onChunk
+    );
+    let isFinalChunk = false;
+
+    do {
+      filePortion = await read(
+        fileUri,
+        this.fileChunkSizeForReading,
+        positionShift,
+        'base64'
+      );
+      const bytes = Base64.toUint8Array(filePortion);
+      isFinalChunk = bytes.length < this.fileChunkSizeForReading;
+
+      await chunker.addBytes(bytes, isFinalChunk);
+
+      positionShift += this.fileChunkSizeForReading;
+    } while (!isFinalChunk);
+
+    const fileName = this.getFileName(file);
+
+    return {
+      name: fileName,
+      mimeType: file.type || '',
+    };
   }
 }

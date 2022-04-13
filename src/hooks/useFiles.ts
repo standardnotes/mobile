@@ -10,15 +10,30 @@ import {
 import {
   ButtonType,
   ChallengeReason,
+  ClientDisplayableError,
   ContentType,
   SNFile,
   SNNote,
 } from '@standardnotes/snjs';
-import { useCustomActionSheet } from '@Style/custom_action_sheet';
+import {
+  CustomActionSheetOption,
+  useCustomActionSheet,
+} from '@Style/custom_action_sheet';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import DocumentPicker, {
+  DocumentPickerResponse,
+  isInProgress,
+  pickMultiple,
+} from 'react-native-document-picker';
 import FileViewer from 'react-native-file-viewer';
 import RNFS, { exists } from 'react-native-fs';
+import {
+  Asset,
+  launchCamera,
+  launchImageLibrary,
+  MediaType,
+} from 'react-native-image-picker';
 import RNShare from 'react-native-share';
 import Toast from 'react-native-toast-message';
 
@@ -28,6 +43,11 @@ type Props = {
 type TDownloadFileAndReturnLocalPathParams = {
   file: SNFile;
   saveInTempLocation?: boolean;
+};
+
+type TUploadFileFromCameraOrImageGalleryParams = {
+  uploadFromGallery?: boolean;
+  mediaType?: MediaType;
 };
 
 export const isFileTypePreviewable = (fileType: string) => {
@@ -51,6 +71,8 @@ export const useFiles = ({ note }: Props) => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const { Success, Info, Error } = ToastType;
+
+  const filesService = application.getFilesService();
 
   const reloadAttachedFiles = useCallback(() => {
     setAttachedFiles(
@@ -84,7 +106,6 @@ export const useFiles = ({ note }: Props) => {
       if (isDownloading) {
         return;
       }
-      const filesService = application.getFilesService();
       const isGrantedStoragePermissionOnAndroid =
         await filesService.hasStoragePermissionOnAndroid();
 
@@ -128,7 +149,7 @@ export const useFiles = ({ note }: Props) => {
         setIsDownloading(false);
       }
     },
-    [Error, Info, Success, application, deleteFileAtPath, isDownloading]
+    [Error, Info, Success, deleteFileAtPath, filesService, isDownloading]
   );
 
   const cleanupTempFileOnAndroid = useCallback(
@@ -191,13 +212,16 @@ export const useFiles = ({ note }: Props) => {
   );
 
   const attachFileToNote = useCallback(
-    async (file: SNFile) => {
+    async (file: SNFile, showToastAfterAction = true) => {
       await application.items.associateFileWithNote(file, note);
-      Toast.show({
-        type: Success,
-        text1: 'Successfully attached file to note',
-        onPress: Toast.hide,
-      });
+
+      if (showToastAfterAction) {
+        Toast.show({
+          type: Success,
+          text1: 'Successfully attached file to note',
+          onPress: Toast.hide,
+        });
+      }
     },
     [Success, application, note]
   );
@@ -297,6 +321,194 @@ export const useFiles = ({ note }: Props) => {
     },
     [application, cleanupTempFileOnAndroid, downloadFileAndReturnLocalPath]
   );
+
+  const deleteFile = useCallback(
+    async (file: SNFile) => {
+      const shouldDelete = await application.alertService.confirm(
+        `Are you sure you want to permanently delete "${file.name}"?`,
+        undefined,
+        'Confirm',
+        ButtonType.Danger,
+        'Cancel'
+      );
+      if (shouldDelete) {
+        Toast.show({
+          type: Info,
+          text2: `Deleting "${file.name}"...`,
+        });
+        const response = await application.files.deleteFile(file);
+
+        if (response instanceof ClientDisplayableError) {
+          Toast.show({
+            type: Error,
+            text1: response.text,
+          });
+          return;
+        }
+
+        Toast.show({
+          type: Success,
+          text2: `Successfully deleted "${file.name}"`,
+        });
+      }
+    },
+    [Error, Info, Success, application.alertService, application.files]
+  );
+
+  const handlePickFilesError = async (error: unknown) => {
+    if (DocumentPicker.isCancel(error)) {
+      // User canceled the picker, exit any dialogs or menus and move on
+    } else if (isInProgress(error)) {
+      Toast.show({
+        type: Info,
+        text2:
+          'Multiple pickers were opened; only the last one will be considered.',
+      });
+    } else {
+      Toast.show({
+        type: Error,
+        text1: 'An error occurred while attempting to select files.',
+      });
+    }
+  };
+
+  const handleUploadError = async () => {
+    Toast.show({
+      type: Error,
+      text1: 'Error',
+      text2: 'An error occurred while uploading file(s).',
+    });
+  };
+
+  const pickFiles = async () => {
+    try {
+      const selectedFiles = await pickMultiple();
+
+      return selectedFiles;
+    } catch (error) {
+      handlePickFilesError(error);
+    }
+  };
+
+  const uploadSingleFile = async (file: DocumentPickerResponse | Asset) => {
+    try {
+      const fileName = filesService.getFileName(file);
+      Toast.show({
+        type: Info,
+        text1: `Uploading "${fileName}"...`,
+        autoHide: false,
+      });
+
+      const operation = await application.files.beginNewFileUpload();
+
+      if (operation instanceof ClientDisplayableError) {
+        Toast.show({
+          type: Error,
+          text1: operation.text,
+        });
+        return;
+      }
+
+      const onChunk = async (
+        chunk: Uint8Array,
+        index: number,
+        isLast: boolean
+      ) => {
+        await application.files.pushBytesForUpload(
+          operation,
+          chunk,
+          index,
+          isLast
+        );
+      };
+
+      const fileResult = await filesService.readFile(file, onChunk);
+      const fileObj = await application.files.finishUpload(
+        operation,
+        fileResult
+      );
+      if (fileObj instanceof ClientDisplayableError) {
+        Toast.show({
+          type: Error,
+          text1: fileObj.text,
+        });
+        return;
+      }
+      return fileObj;
+    } catch (error) {
+      handleUploadError();
+    }
+  };
+
+  const uploadFiles = async (): Promise<SNFile[] | undefined> => {
+    try {
+      const selectedFiles = await pickFiles();
+      if (!selectedFiles || selectedFiles.length === 0) {
+        return;
+      }
+      const uploadedFiles: SNFile[] = [];
+      for (const file of selectedFiles) {
+        if (!file.uri || !file.size) {
+          continue;
+        }
+        const fileObject = await uploadSingleFile(file);
+        if (!fileObject) {
+          Toast.show({
+            type: Error,
+            text1: 'Error',
+            text2: `An error occurred while uploading ${file.name}.`,
+          });
+          continue;
+        }
+        uploadedFiles.push(fileObject);
+
+        Toast.show({ text1: `Successfully uploaded ${fileObject.name}` });
+      }
+      if (selectedFiles.length > 1) {
+        Toast.show({ text1: 'Successfully uploaded' });
+      }
+
+      return uploadedFiles;
+    } catch (error) {
+      handleUploadError();
+    }
+  };
+
+  const uploadFileFromCameraOrImageGallery = async ({
+    uploadFromGallery = false,
+    mediaType = 'photo',
+  }: TUploadFileFromCameraOrImageGalleryParams): Promise<
+    SNFile | undefined
+  > => {
+    try {
+      const result = uploadFromGallery
+        ? await launchImageLibrary({ mediaType: 'mixed' })
+        : await launchCamera({ mediaType });
+
+      if (result.didCancel || !result.assets) {
+        return;
+      }
+      const file = result.assets[0];
+      const fileObject = await uploadSingleFile(file);
+      if (!file.uri || !file.fileSize) {
+        return;
+      }
+      if (!fileObject) {
+        Toast.show({
+          type: Error,
+          text1: 'Error',
+          text2: `An error occurred while uploading ${file.fileName}.`,
+        });
+        return;
+      }
+      Toast.show({ text1: `Successfully uploaded ${fileObject.name}` });
+
+      return fileObject;
+    } catch (error) {
+      handleUploadError();
+    }
+  };
+
   const handleFileAction = useCallback(
     async (action: UploadedFileItemAction) => {
       const file =
@@ -342,6 +554,9 @@ export const useFiles = ({ note }: Props) => {
         case UploadedFileItemActionType.PreviewFile:
           await previewFile(file);
           break;
+        case UploadedFileItemActionType.DeleteFile:
+          await deleteFile(file);
+          break;
         default:
           break;
       }
@@ -350,9 +565,10 @@ export const useFiles = ({ note }: Props) => {
       return true;
     },
     [
-      application,
+      application.sync,
       attachFileToNote,
       authorizeProtectedActionForFile,
+      deleteFile,
       detachFileFromNote,
       downloadFileAndReturnLocalPath,
       previewFile,
@@ -383,7 +599,7 @@ export const useFiles = ({ note }: Props) => {
       }
       const isAttachedToNote = attachedFiles.includes(file);
 
-      const actions = [
+      const actions: CustomActionSheetOption[] = [
         {
           text: isAttachedToNote ? 'Detach from note' : 'Attach to note',
           callback: isAttachedToNote
@@ -442,6 +658,16 @@ export const useFiles = ({ note }: Props) => {
               handleFileAction,
             }),
         },
+        {
+          text: 'Delete permanently',
+          callback: () => {
+            handleFileAction({
+              type: UploadedFileItemActionType.DeleteFile,
+              payload: file,
+            });
+          },
+          destructive: true,
+        },
       ];
       const osDependentActions =
         Platform.OS === 'ios'
@@ -456,5 +682,8 @@ export const useFiles = ({ note }: Props) => {
     showActionsMenu,
     attachedFiles,
     allFiles,
+    uploadFiles,
+    uploadFileFromCameraOrImageGallery,
+    attachFileToNote,
   };
 };
