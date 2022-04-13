@@ -22,7 +22,7 @@ type TGetFileDestinationPath = {
 };
 
 export class FilesService extends ApplicationService {
-  private fileChunkSizeForReading = 2_000_000;
+  private fileChunkSizeForReading = 2000000;
 
   getDestinationPath({
     fileName,
