@@ -37,6 +37,9 @@ export function isSameDay(dateA: Date, dateB: Date) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function isUnfinishedFeaturesEnabled(env: TEnvironment): boolean {
-  return env === 'dev' || __DEV__;
+  // TODO: restore the commented part, remove eslint-ignore-comment
+  // return env === 'dev' || __DEV__;
+  return true;
 }
