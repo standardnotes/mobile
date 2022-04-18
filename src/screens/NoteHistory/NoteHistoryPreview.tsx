@@ -97,16 +97,19 @@ export const NoteHistoryPreview = ({
   );
 
   const onPress = useCallback(() => {
-    showActionSheet(title!, [
-      {
-        text: 'Restore',
-        callback: () => restore(false),
-      },
-      {
-        text: 'Restore as copy',
-        callback: async () => restore(true),
-      },
-    ]);
+    showActionSheet({
+      title: title!,
+      options: [
+        {
+          text: 'Restore',
+          callback: () => restore(false),
+        },
+        {
+          text: 'Restore as copy',
+          callback: async () => restore(true),
+        },
+      ],
+    });
   }, [showActionSheet, title, restore]);
 
   useLayoutEffect(() => {
