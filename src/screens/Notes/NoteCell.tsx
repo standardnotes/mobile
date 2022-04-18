@@ -102,16 +102,15 @@ export const NoteCell = ({
 
   const onLongPress = () => {
     if (note.protected) {
-      showActionSheet(
-        note.title,
-        [
+      showActionSheet({
+        title: note.title,
+        options: [
           {
             text: 'Note Protected',
           },
         ],
-        undefined,
-        elementRef.current ?? undefined
-      );
+        anchor: elementRef.current ?? undefined,
+      });
     } else {
       let options: CustomActionSheetOption[] = [];
 
@@ -184,12 +183,11 @@ export const NoteCell = ({
           },
         ]);
       }
-      showActionSheet(
-        note.title,
+      showActionSheet({
+        title: note.title,
         options,
-        undefined,
-        elementRef.current ?? undefined
-      );
+        anchor: elementRef.current ?? undefined,
+      });
     }
   };
 

@@ -387,22 +387,25 @@ export const NoteSideMenu = React.memo((props: Props) => {
         });
       };
 
-      showActionSheet(component?.name ?? 'Plain editor', [
-        {
-          text: action,
-          callback: () => {
-            if (!component) {
-              setAsDefault();
-            } else {
-              if (isDefault) {
-                removeAsDefault();
-              } else {
+      showActionSheet({
+        title: component?.name ?? 'Plain editor',
+        options: [
+          {
+            text: action,
+            callback: () => {
+              if (!component) {
                 setAsDefault();
+              } else {
+                if (isDefault) {
+                  removeAsDefault();
+                } else {
+                  setAsDefault();
+                }
               }
-            }
+            },
           },
-        },
-      ]);
+        ]
+      })
     },
     [application, showActionSheet]
   );
