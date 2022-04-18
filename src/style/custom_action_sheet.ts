@@ -1,4 +1,7 @@
-import { useActionSheet } from '@expo/react-native-action-sheet';
+import {
+  ActionSheetOptions,
+  useActionSheet,
+} from '@expo/react-native-action-sheet';
 import React, { useContext } from 'react';
 import { findNodeHandle } from 'react-native';
 import { ThemeContext } from 'styled-components';
@@ -17,22 +20,31 @@ export type CustomActionSheetOption =
       destructive?: boolean;
     };
 
+type TShowActionSheetParams = {
+  title: string;
+  options: CustomActionSheetOption[];
+  onCancel?: () => void;
+  anchor?: React.Component<any, any>;
+  styles?: Partial<ActionSheetOptions>;
+};
+
 export const createActionSheetOptions = () => {};
 
 export const useCustomActionSheet = () => {
   const { showActionSheetWithOptions } = useActionSheet();
   const theme = useContext(ThemeContext);
 
-  const showActionSheet = (
-    title: string,
-    options: CustomActionSheetOption[],
-    onCancel?: () => void,
-    anchor?: React.Component<any, any>
-  ) => {
+  const showActionSheet = ({
+    title,
+    options,
+    onCancel = () => {},
+    anchor,
+    styles = {},
+  }: TShowActionSheetParams) => {
     const cancelOption: CustomActionSheetOption[] = [
       {
         text: 'Cancel',
-        callback: onCancel || (() => {}),
+        callback: onCancel,
         key: 'CancelItem',
         destructive: false,
       },
@@ -49,12 +61,15 @@ export const useCustomActionSheet = () => {
         title,
         containerStyle: {
           backgroundColor: theme.stylekitBorderColor,
+          ...styles?.containerStyle,
         },
         textStyle: {
           color: theme.stylekitForegroundColor,
+          ...styles.textStyle,
         },
         titleTextStyle: {
           color: theme.stylekitForegroundColor,
+          ...styles.titleTextStyle,
         },
         anchor: anchor ? findNodeHandle(anchor) ?? undefined : undefined,
       },

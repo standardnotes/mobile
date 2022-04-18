@@ -102,13 +102,16 @@ export const ManageSessions: React.FC = () => {
   ] = useSessions();
 
   const onItemPress = (item: RemoteSession) => {
-    showActionSheet(item.device_info, [
-      {
-        text: 'Revoke',
-        destructive: true,
-        callback: () => showRevokeSessionAlert(item),
-      },
-    ]);
+    showActionSheet({
+      title: item.device_info,
+      options: [
+        {
+          text: 'Revoke',
+          destructive: true,
+          callback: () => showRevokeSessionAlert(item),
+        },
+      ],
+    });
   };
 
   const showRevokeSessionAlert = useCallback(

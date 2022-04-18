@@ -148,7 +148,10 @@ export const UploadedFilesList: FC<Props> = props => {
         },
       },
     ];
-    showActionSheet('Choose file type', options);
+    showActionSheet({
+      title: 'Choose file type',
+      options,
+    });
   };
 
   const handlePressAttach = () => {
@@ -191,7 +194,10 @@ export const UploadedFilesList: FC<Props> = props => {
       Platform.OS === 'android'
         ? options.filter(option => option.key !== 'library')
         : options;
-    showActionSheet('Choose action', osSpecificOptions);
+    showActionSheet({
+      title: 'Choose action',
+      options: osSpecificOptions,
+    });
   };
 
   const renderItem: ListRenderItem<SNFile> = ({ item }) => {

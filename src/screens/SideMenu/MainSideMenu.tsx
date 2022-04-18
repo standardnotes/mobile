@@ -143,7 +143,10 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
           },
         });
       }
-      showActionSheet(name, options);
+      showActionSheet({
+        title: name,
+        options,
+      });
     },
     [application?.alertService, showActionSheet, themeService]
   );

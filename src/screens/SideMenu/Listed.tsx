@@ -125,9 +125,9 @@ export const Listed: FC<TProps> = ({ note }) => {
       return;
     }
 
-    showActionSheet(
-      item.display_name,
-      item.actions.map(action => ({
+    showActionSheet({
+      title: item.display_name,
+      options: item.actions.map(action => ({
         text: (action as Action).label,
         callback: async () => {
           setIsActionInProgress(true);
@@ -152,8 +152,8 @@ export const Listed: FC<TProps> = ({ note }) => {
           setIsActionInProgress(false);
           setAuthorUrlWithInProgressAction(null);
         },
-      }))
-    );
+      })),
+    });
   };
 
   return (

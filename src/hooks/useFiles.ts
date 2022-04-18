@@ -673,7 +673,15 @@ export const useFiles = ({ note }: Props) => {
         Platform.OS === 'ios'
           ? actions.filter(action => action.text !== 'Download')
           : [...actions];
-      showActionSheet(file.name, osDependentActions);
+      showActionSheet({
+        title: file.name,
+        options: osDependentActions,
+        styles: {
+          titleTextStyle: {
+            fontWeight: 'bold',
+          },
+        },
+      });
     },
     [attachedFiles, handleFileAction, navigation, showActionSheet]
   );

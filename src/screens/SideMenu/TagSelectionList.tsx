@@ -89,28 +89,33 @@ export const TagSelectionList = React.memo(
     }, [application, contentType, streamTags]);
 
     const onTagLongPress = (tag: SNTag | SmartView) => {
-      showActionSheet(tag.title, [
-        {
-          text: 'Rename',
-          callback: () =>
-            navigation.navigate(SCREEN_INPUT_MODAL_TAG, { tagUuid: tag.uuid }),
-        },
-        {
-          text: 'Delete',
-          destructive: true,
-          callback: async () => {
-            const confirmed = await application?.alertService.confirm(
-              'Are you sure you want to delete this tag? Deleting a tag will not delete its notes.',
-              undefined,
-              'Delete',
-              ButtonType.Danger
-            );
-            if (confirmed) {
-              await application!.mutator.deleteItem(tag);
-            }
+      showActionSheet({
+        title: tag.title,
+        options: [
+          {
+            text: 'Rename',
+            callback: () =>
+              navigation.navigate(SCREEN_INPUT_MODAL_TAG, {
+                tagUuid: tag.uuid,
+              }),
           },
-        },
-      ]);
+          {
+            text: 'Delete',
+            destructive: true,
+            callback: async () => {
+              const confirmed = await application?.alertService.confirm(
+                'Are you sure you want to delete this tag? Deleting a tag will not delete its notes.',
+                undefined,
+                'Delete',
+                ButtonType.Danger
+              );
+              if (confirmed) {
+                await application!.mutator.deleteItem(tag);
+              }
+            },
+          },
+        ],
+      });
     };
 
     const isRootTag = (tag: SNTag | SmartView): boolean =>
