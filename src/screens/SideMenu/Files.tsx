@@ -10,6 +10,7 @@ import {
   SideMenuCellShowAllFiles,
   SideMenuCellStyled,
   SNIconStyled,
+  styles,
 } from '@Screens/SideMenu/Files.styled';
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
 import { SNNote } from '@standardnotes/snjs';
@@ -65,6 +66,7 @@ export const Files: FC<Props> = ({ note }) => {
                   </IconsContainer>
                 ),
               }}
+              cellContentStyle={styles.cellContentStyle}
             />
           </FileItemContainer>
         );
@@ -74,6 +76,7 @@ export const Files: FC<Props> = ({ note }) => {
           isFilesListTruncated ? 'Show all attached files' : 'Show other files'
         }
         onSelect={openFilesScreen}
+        cellContentStyle={styles.cellContentStyle}
       />
     </FilesContainer>
   );

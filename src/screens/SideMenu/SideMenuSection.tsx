@@ -29,6 +29,7 @@ export type SideMenuOption = {
   onSelect?: () => void | Promise<void>;
   onLongPress?: () => void;
   style?: StyleProp<ViewStyle>;
+  cellContentStyle?: StyleProp<ViewStyle>;
 };
 
 type Props = {
