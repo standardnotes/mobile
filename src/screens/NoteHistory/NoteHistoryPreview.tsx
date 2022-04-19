@@ -6,7 +6,7 @@ import {
   SCREEN_NOTES,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens';
-import { ButtonType, PayloadSource, SNNote } from '@standardnotes/snjs';
+import { ButtonType, PayloadEmitSource, SNNote } from '@standardnotes/snjs';
 import { useCustomActionSheet } from '@Style/custom_action_sheet';
 import { ELIPSIS } from '@Style/icons';
 import { ThemeService } from '@Style/theme_service';
@@ -58,10 +58,10 @@ export const NoteHistoryPreview = ({
           await application?.mutator.changeAndSaveItem(
             originalNote,
             mutator => {
-              mutator.unsafe_setCustomContent(revision.payload.content);
+              mutator.setCustomContent(revision.payload.content);
             },
             true,
-            PayloadSource.RemoteActionRetrieved
+            PayloadEmitSource.RemoteRetrieved
           );
           if (application?.getAppState().isTabletDevice) {
             // @ts-expect-error

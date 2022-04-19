@@ -26,7 +26,7 @@ import {
   FeatureStatus,
   NoteMutator,
   NoteViewController,
-  PayloadSource,
+  PayloadEmitSource,
   PrefKey,
   SmartView,
   SNComponent,
@@ -232,7 +232,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const removeObserver = editor?.addNoteInnerValueChangeObserver(
       (newNote, source) => {
         if (mounted && props.drawerOpen) {
-          if (source !== PayloadSource.ComponentRetrieved) {
+          if (source !== PayloadEmitSource.ComponentRetrieved) {
             setNote(newNote);
           }
         }
@@ -404,8 +404,8 @@ export const NoteSideMenu = React.memo((props: Props) => {
               }
             },
           },
-        ]
-      })
+        ],
+      });
     },
     [application, showActionSheet]
   );

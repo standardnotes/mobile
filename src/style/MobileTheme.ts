@@ -25,6 +25,8 @@ export class MobileTheme extends SNTheme {
   }
 
   static BuildTheme(variables?: MobileThemeVariables) {
+    const currentDate = new Date();
+
     return new MobileTheme(
       new DecryptedPayload({
         uuid: `${Math.random()}`,
@@ -34,6 +36,10 @@ export class MobileTheme extends SNTheme {
           isSystemTheme: false,
           isInitial: false,
         }),
+        created_at: currentDate,
+        created_at_timestamp: currentDate.getTime(),
+        updated_at: currentDate,
+        updated_at_timestamp: currentDate.getTime(),
       })
     );
   }
