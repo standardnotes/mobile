@@ -13,7 +13,7 @@ import {
   isPayloadSourceRetrieved,
   ItemMutator,
   NoteMutator,
-  PayloadSource,
+  PayloadEmitSource,
   SNComponent,
 } from '@standardnotes/snjs';
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons';
@@ -100,7 +100,7 @@ export class Compose extends React.Component<{}, State> {
         }
 
         const isTemplateNoteInsertedToBeInteractableWithEditor =
-          source === PayloadSource.Constructor && note.dirty;
+          source === PayloadEmitSource.LocalInserted && note.dirty;
         if (isTemplateNoteInsertedToBeInteractableWithEditor) {
           return;
         }

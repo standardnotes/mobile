@@ -149,6 +149,7 @@ export class ThemeService {
       variables.statusBar =
         Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT;
 
+      const currentDate = new Date();
       const payload = new DecryptedPayload<ComponentContent>({
         uuid: option.uuid,
         content_type: ContentType.Theme,
@@ -168,6 +169,10 @@ export class ThemeService {
           isSystemTheme: true,
           isInitial: Boolean(option.isInitial),
         } as unknown as ComponentContent),
+        created_at: currentDate,
+        created_at_timestamp: currentDate.getTime(),
+        updated_at: currentDate,
+        updated_at_timestamp: currentDate.getTime(),
       });
 
       const theme = new MobileTheme(payload);

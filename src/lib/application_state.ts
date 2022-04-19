@@ -9,7 +9,7 @@ import {
   ContentType,
   isNullOrUndefined,
   NoteViewController,
-  PayloadSource,
+  PayloadEmitSource,
   removeFromArray,
   SmartView,
   SNNote,
@@ -378,8 +378,8 @@ export class ApplicationState extends ApplicationService {
       [ContentType.Note, ContentType.Tag],
       async ({ changed, inserted, removed, source }) => {
         if (
-          source === PayloadSource.PreSyncSave ||
-          source === PayloadSource.RemoteRetrieved
+          source === PayloadEmitSource.PreSyncSave ||
+          source === PayloadEmitSource.RemoteRetrieved
         ) {
           const removedNotes = removed.filter(
             i => i.content_type === ContentType.Note
