@@ -4,6 +4,7 @@ import {
   useDeleteNoteWithPrivileges,
   useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks';
+import { isUnfinishedFeaturesEnabled } from '@Lib/utils';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { TEnvironment } from '@Root/App';
 import { AppStackNavigationProp } from '@Root/AppStack';
@@ -683,7 +684,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
             FilesSection,
           } = MenuSections;
 
-          if (item.key === FilesSection && isEntitledToFiles) {
+          if (
+            item.key === FilesSection &&
+            (isEntitledToFiles || isUnfinishedFeaturesEnabled(props.env))
+          ) {
             return (
               <SideMenuSection
                 title={'Files'}
