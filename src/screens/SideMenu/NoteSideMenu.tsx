@@ -26,7 +26,7 @@ import {
   FeatureStatus,
   NoteMutator,
   NoteViewController,
-  PayloadSource,
+  PayloadEmitSource,
   PrefKey,
   SmartView,
   SNComponent,
@@ -232,7 +232,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const removeObserver = editor?.addNoteInnerValueChangeObserver(
       (newNote, source) => {
         if (mounted && props.drawerOpen) {
-          if (source !== PayloadSource.ComponentRetrieved) {
+          if (source !== PayloadEmitSource.ComponentRetrieved) {
             setNote(newNote);
           }
         }
@@ -405,8 +405,8 @@ export const NoteSideMenu = React.memo((props: Props) => {
               }
             },
           },
-        ]
-      })
+        ],
+      });
     },
     [application, showActionSheet]
   );
@@ -482,7 +482,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   }, [props.drawerRef, navigation]);
 
   const isEntitledToFiles =
-    application?.features.getFeatureStatus(FeatureIdentifier.Files) ===
+    application?.features.getFeatureStatus(FeatureIdentifier.FilesBeta) ===
     FeatureStatus.Entitled;
 
   const noteOptions = useMemo(() => {
@@ -687,8 +687,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
           if (
             item.key === FilesSection &&
-            isUnfinishedFeaturesEnabled(props.env) &&
-            isEntitledToFiles
+            (isEntitledToFiles || isUnfinishedFeaturesEnabled(props.env))
           ) {
             return (
               <SideMenuSection
