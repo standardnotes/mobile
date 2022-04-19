@@ -481,7 +481,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   }, [props.drawerRef, navigation]);
 
   const isEntitledToFiles =
-    application?.features.getFeatureStatus(FeatureIdentifier.Files) ===
+    application?.features.getFeatureStatus(FeatureIdentifier.FilesBeta) ===
     FeatureStatus.Entitled;
 
   const noteOptions = useMemo(() => {
@@ -686,8 +686,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
           if (
             item.key === FilesSection &&
-            isUnfinishedFeaturesEnabled(props.env) &&
-            isEntitledToFiles
+            (isEntitledToFiles || isUnfinishedFeaturesEnabled(props.env))
           ) {
             return (
               <SideMenuSection
