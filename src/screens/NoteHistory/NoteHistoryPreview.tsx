@@ -1,47 +1,47 @@
-import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { HistoryStackNavigationProp } from '@Root/HistoryStack';
+import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { HistoryStackNavigationProp } from '@Root/HistoryStack'
 import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
-  SCREEN_NOTE_HISTORY_PREVIEW,
-} from '@Screens/screens';
-import { ButtonType, PayloadEmitSource, SNNote } from '@standardnotes/snjs';
-import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import { ELIPSIS } from '@Style/icons';
-import { ThemeService } from '@Style/theme_service';
-import React, { useCallback, useContext, useLayoutEffect } from 'react';
-import { LogBox } from 'react-native';
-import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+  SCREEN_NOTE_HISTORY_PREVIEW
+} from '@Screens/screens'
+import { ButtonType, PayloadEmitSource, SNNote } from '@standardnotes/snjs'
+import { useCustomActionSheet } from '@Style/custom_action_sheet'
+import { ELIPSIS } from '@Style/icons'
+import { ThemeService } from '@Style/theme_service'
+import React, { useCallback, useContext, useLayoutEffect } from 'react'
+import { LogBox } from 'react-native'
+import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 import {
   Container,
   StyledTextView,
   TextContainer,
   Title,
-  TitleContainer,
-} from './NoteHistoryPreview.styled';
+  TitleContainer
+} from './NoteHistoryPreview.styled'
 
 LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state',
-]);
+  'Non-serializable values were found in the navigation state'
+])
 
-type Props = HistoryStackNavigationProp<typeof SCREEN_NOTE_HISTORY_PREVIEW>;
+type Props = HistoryStackNavigationProp<typeof SCREEN_NOTE_HISTORY_PREVIEW>
 export const NoteHistoryPreview = ({
   navigation,
   route: {
-    params: { revision, title, originalNoteUuid },
-  },
+    params: { revision, title, originalNoteUuid }
+  }
 }: Props) => {
   // Context
-  const application = useContext(ApplicationContext);
-  const { showActionSheet } = useCustomActionSheet();
+  const application = useContext(ApplicationContext)
+  const { showActionSheet } = useCustomActionSheet()
 
   // State
 
   const restore = useCallback(
     async (asCopy: boolean) => {
       const originalNote =
-        application!.items.findSureItem<SNNote>(originalNoteUuid);
+        application!.items.findSureItem<SNNote>(originalNoteUuid)
 
       const run = async () => {
         if (asCopy) {
@@ -49,52 +49,52 @@ export const NoteHistoryPreview = ({
             ...revision.payload.content,
             title: revision.payload.content.title
               ? revision.payload.content.title + ' (copy)'
-              : undefined,
-          });
+              : undefined
+          })
 
           // @ts-expect-error
-          navigation.navigate(SCREEN_NOTES);
+          navigation.navigate(SCREEN_NOTES)
         } else {
           await application?.mutator.changeAndSaveItem(
             originalNote,
             mutator => {
-              mutator.setCustomContent(revision.payload.content);
+              mutator.setCustomContent(revision.payload.content)
             },
             true,
             PayloadEmitSource.RemoteRetrieved
-          );
+          )
           if (application?.getAppState().isTabletDevice) {
             // @ts-expect-error
-            navigation.navigate(SCREEN_NOTES);
+            navigation.navigate(SCREEN_NOTES)
           } else {
             // @ts-expect-error
-            navigation.navigate(SCREEN_COMPOSE);
+            navigation.navigate(SCREEN_COMPOSE)
           }
         }
-      };
+      }
 
       if (!asCopy) {
         if (originalNote.locked) {
           application?.alertService.alert(
             "This note has editing disabled. If you'd like to restore it to a previous revision, enable editing and try again."
-          );
-          return;
+          )
+          return
         }
         const confirmed = await application?.alertService?.confirm(
           "Are you sure you want to replace the current note's contents with what you see in this preview?",
           'Restore note',
           'Restore',
           ButtonType.Info
-        );
+        )
         if (confirmed) {
-          run();
+          run()
         }
       } else {
-        run();
+        run()
       }
     },
     [application, navigation, originalNoteUuid, revision.payload.content]
-  );
+  )
 
   const onPress = useCallback(() => {
     showActionSheet({
@@ -102,15 +102,15 @@ export const NoteHistoryPreview = ({
       options: [
         {
           text: 'Restore',
-          callback: () => restore(false),
+          callback: () => restore(false)
         },
         {
           text: 'Restore as copy',
-          callback: async () => restore(true),
-        },
-      ],
-    });
-  }, [showActionSheet, title, restore]);
+          callback: async () => restore(true)
+        }
+      ]
+    })
+  }, [showActionSheet, title, restore])
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -125,9 +125,9 @@ export const NoteHistoryPreview = ({
             onPress={onPress}
           />
         </HeaderButtons>
-      ),
-    });
-  }, [navigation, onPress]);
+      )
+    })
+  }, [navigation, onPress])
 
   return (
     <Container>
@@ -143,5 +143,5 @@ export const NoteHistoryPreview = ({
         </StyledTextView>
       </TextContainer>
     </Container>
-  );
-};
+  )
+}

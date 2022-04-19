@@ -1,1 +1,1 @@
-declare module '@standardnotes/stylekit';
+declare module '@standardnotes/stylekit'

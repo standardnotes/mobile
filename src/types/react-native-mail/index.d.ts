@@ -1,1 +1,1 @@
-declare module 'react-native-mail';
+declare module 'react-native-mail'

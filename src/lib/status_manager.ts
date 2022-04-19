@@ -1,37 +1,37 @@
-import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens';
-import { ApplicationService, removeFromArray } from '@standardnotes/snjs';
+import { SCREEN_COMPOSE, SCREEN_NOTES } from '@Screens/screens'
+import { ApplicationService, removeFromArray } from '@standardnotes/snjs'
 
 export type ScreenStatus = {
-  status: string;
-  color?: string;
-};
+  status: string
+  color?: string
+}
 type StatusState = {
-  [SCREEN_NOTES]: ScreenStatus;
-  [SCREEN_COMPOSE]: ScreenStatus;
-};
-type HeaderStatusObserverCallback = (status: StatusState) => void;
+  [SCREEN_NOTES]: ScreenStatus
+  [SCREEN_COMPOSE]: ScreenStatus
+}
+type HeaderStatusObserverCallback = (status: StatusState) => void
 
 export class StatusManager extends ApplicationService {
   private messages: StatusState = {
     [SCREEN_NOTES]: {
-      status: '',
+      status: ''
     },
     [SCREEN_COMPOSE]: {
-      status: '',
-    },
-  };
-  private observers: HeaderStatusObserverCallback[] = [];
+      status: ''
+    }
+  }
+  private observers: HeaderStatusObserverCallback[] = []
 
   override deinit() {
-    this.observers = [];
+    this.observers = []
     this.messages = {
       [SCREEN_NOTES]: {
-        status: '',
+        status: ''
       },
       [SCREEN_COMPOSE]: {
-        status: '',
-      },
-    };
+        status: ''
+      }
+    }
   }
 
   /**
@@ -39,10 +39,10 @@ export class StatusManager extends ApplicationService {
    * @returns function that unregisters this observer
    */
   public addHeaderStatusObserver(callback: HeaderStatusObserverCallback) {
-    this.observers.push(callback);
+    this.observers.push(callback)
     return () => {
-      removeFromArray(this.observers, callback);
-    };
+      removeFromArray(this.observers, callback)
+    }
   }
 
   setMessage(
@@ -52,26 +52,26 @@ export class StatusManager extends ApplicationService {
   ) {
     this.messages[screen] = {
       status: message,
-      color,
-    };
-    this.notifyObservers();
+      color
+    }
+    this.notifyObservers()
   }
 
   hasMessage(screen: typeof SCREEN_COMPOSE | typeof SCREEN_NOTES) {
-    const message = this.getMessage(screen);
+    const message = this.getMessage(screen)
     if (!message || message.status.length === 0) {
-      return false;
+      return false
     }
-    return true;
+    return true
   }
 
   getMessage(screen: typeof SCREEN_COMPOSE | typeof SCREEN_NOTES) {
-    return this.messages[screen];
+    return this.messages[screen]
   }
 
   private notifyObservers() {
     for (const observer of this.observers) {
-      observer(this.messages);
+      observer(this.messages)
     }
   }
 }

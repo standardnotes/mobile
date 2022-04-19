@@ -1,129 +1,129 @@
-import { AppStateType } from '@Lib/application_state';
-import { useNavigation } from '@react-navigation/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { SCREEN_SETTINGS } from '@Screens/screens';
-import { ContentType, SmartView, SNTag, SNTheme } from '@standardnotes/snjs';
+import { AppStateType } from '@Lib/application_state'
+import { useNavigation } from '@react-navigation/native'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { SCREEN_SETTINGS } from '@Screens/screens'
+import { ContentType, SmartView, SNTag, SNTheme } from '@standardnotes/snjs'
 import {
   CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Style/custom_action_sheet';
-import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons';
-import { MobileTheme } from '@Style/MobileTheme';
-import { ThemeService, ThemeServiceContext } from '@Style/theme_service';
+  useCustomActionSheet
+} from '@Style/custom_action_sheet'
+import { ICON_BRUSH, ICON_SETTINGS } from '@Style/icons'
+import { MobileTheme } from '@Style/MobileTheme'
+import { ThemeService, ThemeServiceContext } from '@Style/theme_service'
 import React, {
   Fragment,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useState,
-} from 'react';
-import { Platform } from 'react-native';
-import FAB from 'react-native-fab';
-import { FlatList } from 'react-native-gesture-handler';
-import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { ThemeContext } from 'styled-components';
+  useState
+} from 'react'
+import { Platform } from 'react-native'
+import FAB from 'react-native-fab'
+import { FlatList } from 'react-native-gesture-handler'
+import DrawerLayout from 'react-native-gesture-handler/DrawerLayout'
+import Icon from 'react-native-vector-icons/Ionicons'
+import { ThemeContext } from 'styled-components'
 import {
   FirstSafeAreaView,
   MainSafeAreaView,
-  useStyles,
-} from './MainSideMenu.styled';
-import { SideMenuHero } from './SideMenuHero';
+  useStyles
+} from './MainSideMenu.styled'
+import { SideMenuHero } from './SideMenuHero'
 import {
   SideMenuOption,
   SideMenuOptionIconDescriptionType,
-  SideMenuSection,
-} from './SideMenuSection';
-import { TagSelectionList } from './TagSelectionList';
+  SideMenuSection
+} from './SideMenuSection'
+import { TagSelectionList } from './TagSelectionList'
 
 type Props = {
-  drawerRef: DrawerLayout | null;
-};
+  drawerRef: DrawerLayout | null
+}
 
 export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
   // Context
-  const theme = useContext(ThemeContext);
-  const themeService = useContext(ThemeServiceContext);
-  const application = useContext(ApplicationContext);
-  const navigation = useNavigation();
-  const { showActionSheet } = useCustomActionSheet();
+  const theme = useContext(ThemeContext)
+  const themeService = useContext(ThemeServiceContext)
+  const application = useContext(ApplicationContext)
+  const navigation = useNavigation()
+  const { showActionSheet } = useCustomActionSheet()
   // State
   const [selectedTag, setSelectedTag] = useState(() =>
     application!.getAppState().getSelectedTag()
-  );
-  const [themes, setThemes] = useState<SNTheme[]>([]);
-  const styles = useStyles(theme);
+  )
+  const [themes, setThemes] = useState<SNTheme[]>([])
+  const styles = useStyles(theme)
 
   useEffect(() => {
     const removeTagChangeObserver = application!
       .getAppState()
       .addStateChangeObserver(state => {
         if (state === AppStateType.TagChanged) {
-          setSelectedTag(application!.getAppState().getSelectedTag());
+          setSelectedTag(application!.getAppState().getSelectedTag())
         }
-      });
-    return removeTagChangeObserver;
-  });
+      })
+    return removeTagChangeObserver
+  })
 
   const onSystemThemeSelect = useCallback(
     async (selectedTheme: MobileTheme) => {
-      themeService?.activateSystemTheme(selectedTheme.uuid);
+      themeService?.activateSystemTheme(selectedTheme.uuid)
     },
     [themeService]
-  );
+  )
 
   const onThemeSelect = useCallback(
     async (selectedTheme: SNTheme) => {
-      themeService?.activateExternalTheme(selectedTheme);
+      themeService?.activateExternalTheme(selectedTheme)
     },
     [themeService]
-  );
+  )
 
   const onThemeLongPress = useCallback(
     async (themeId: string, name: string, snTheme?: SNTheme) => {
-      const options: CustomActionSheetOption[] = [];
+      const options: CustomActionSheetOption[] = []
       /**
        * If this theme is a mobile theme, allow it to be set as the preferred
        * option for light/dark mode.
        */
       if ((snTheme && !snTheme.getNotAvailOnMobile()) || !snTheme) {
-        const activeLightTheme = await themeService?.getThemeForMode('light');
+        const activeLightTheme = await themeService?.getThemeForMode('light')
         const lightThemeAction =
-          activeLightTheme === themeId ? 'Current' : 'Set as';
+          activeLightTheme === themeId ? 'Current' : 'Set as'
         const lightName = ThemeService.doesDeviceSupportDarkMode()
           ? 'Light'
-          : 'Active';
-        const text = `${lightThemeAction} ${lightName} Theme`;
+          : 'Active'
+        const text = `${lightThemeAction} ${lightName} Theme`
         options.push({
           text,
           callback: () => {
             if (snTheme) {
-              themeService?.assignExternalThemeForMode(snTheme, 'light');
+              themeService?.assignExternalThemeForMode(snTheme, 'light')
             } else {
-              themeService?.assignThemeForMode(themeId, 'light');
+              themeService?.assignThemeForMode(themeId, 'light')
             }
-          },
-        });
+          }
+        })
       }
       /**
        * Only display a dark mode option if this device supports dark mode.
        */
       if (ThemeService.doesDeviceSupportDarkMode()) {
-        const activeDarkTheme = await themeService?.getThemeForMode('dark');
+        const activeDarkTheme = await themeService?.getThemeForMode('dark')
         const darkThemeAction =
-          activeDarkTheme === themeId ? 'Current' : 'Set as';
-        const text = `${darkThemeAction} Dark Theme`;
+          activeDarkTheme === themeId ? 'Current' : 'Set as'
+        const text = `${darkThemeAction} Dark Theme`
         options.push({
           text,
           callback: () => {
             if (snTheme) {
-              themeService?.assignExternalThemeForMode(snTheme, 'dark');
+              themeService?.assignExternalThemeForMode(snTheme, 'dark')
             } else {
-              themeService?.assignThemeForMode(themeId, 'dark');
+              themeService?.assignThemeForMode(themeId, 'dark')
             }
-          },
-        });
+          }
+        })
       }
       /**
        * System themes cannot be redownloaded.
@@ -136,56 +136,56 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
               'Themes are cached when downloaded. To retrieve the latest version, press Redownload.',
               'Redownload Theme',
               'Redownload'
-            );
+            )
             if (confirmed) {
-              themeService?.downloadThemeAndReload(snTheme);
+              themeService?.downloadThemeAndReload(snTheme)
             }
-          },
-        });
+          }
+        })
       }
       showActionSheet({
         title: name,
-        options,
-      });
+        options
+      })
     },
     [application?.alertService, showActionSheet, themeService]
-  );
+  )
 
   useEffect(() => {
     const unsubscribeStreamThemes = application?.streamItems(
       ContentType.Theme,
       () => {
-        const newItems = application.items.getItems(ContentType.Theme);
-        setThemes(newItems as SNTheme[]);
+        const newItems = application.items.getItems(ContentType.Theme)
+        setThemes(newItems as SNTheme[])
       }
-    );
+    )
 
-    return unsubscribeStreamThemes;
-  }, [application]);
+    return unsubscribeStreamThemes
+  }, [application])
 
   const iconDescriptorForTheme = (currentTheme: SNTheme | MobileTheme) => {
     const desc = {
       type: SideMenuOptionIconDescriptionType.Circle,
-      side: 'right' as 'right',
-    };
+      side: 'right' as 'right'
+    }
 
     const dockIcon =
-      currentTheme.package_info && currentTheme.package_info.dock_icon;
+      currentTheme.package_info && currentTheme.package_info.dock_icon
 
     if (dockIcon && dockIcon.type === 'circle') {
       Object.assign(desc, {
         backgroundColor: dockIcon.background_color,
-        borderColor: dockIcon.border_color,
-      });
+        borderColor: dockIcon.border_color
+      })
     } else {
       Object.assign(desc, {
         backgroundColor: theme.stylekitInfoColor,
-        borderColor: theme.stylekitInfoColor,
-      });
+        borderColor: theme.stylekitInfoColor
+      })
     }
 
-    return desc;
-  };
+    return desc
+  }
 
   const themeOptions = useMemo(() => {
     const options: SideMenuOption[] = themeService!
@@ -198,7 +198,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
         onSelect: () => onSystemThemeSelect(systemTheme),
         onLongPress: () =>
           onThemeLongPress(systemTheme?.uuid, systemTheme?.name),
-        selected: themeService!.activeThemeId === systemTheme?.uuid,
+        selected: themeService!.activeThemeId === systemTheme?.uuid
       }))
       .concat(
         themes
@@ -211,9 +211,9 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
             onSelect: () => onThemeSelect(mapTheme),
             onLongPress: () =>
               onThemeLongPress(mapTheme?.uuid, mapTheme?.name, mapTheme),
-            selected: themeService!.activeThemeId === mapTheme.uuid,
+            selected: themeService!.activeThemeId === mapTheme.uuid
           }))
-      );
+      )
 
     if (options.length === themeService!.systemThemes().length) {
       options.push({
@@ -223,17 +223,17 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
           type: SideMenuOptionIconDescriptionType.Icon,
           name: ThemeService.nameForIcon(ICON_BRUSH),
           side: 'right',
-          size: 17,
+          size: 17
         },
         onSelect: () => {
           application?.deviceInterface?.openUrl(
             'https://standardnotes.com/plans'
-          );
-        },
-      });
+          )
+        }
+      })
     }
 
-    return options;
+    return options
     // We want to also track activeThemeId
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -241,26 +241,26 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     themeService?.activeThemeId,
     themes,
     onSystemThemeSelect,
-    onThemeSelect,
-  ]);
+    onThemeSelect
+  ])
 
   const onTagSelect = useCallback(
     async (tag: SNTag | SmartView) => {
       if (tag.conflictOf) {
         application!.mutator.changeAndSaveItem(tag, mutator => {
-          mutator.conflictOf = undefined;
-        });
+          mutator.conflictOf = undefined
+        })
       }
-      application?.getAppState().setSelectedTag(tag, true);
-      drawerRef?.closeDrawer();
+      application?.getAppState().setSelectedTag(tag, true)
+      drawerRef?.closeDrawer()
     },
     [application, drawerRef]
-  );
+  )
 
   const openSettings = () => {
-    drawerRef?.closeDrawer();
-    navigation?.navigate(SCREEN_SETTINGS as never);
-  };
+    drawerRef?.closeDrawer()
+    navigation?.navigate(SCREEN_SETTINGS as never)
+  }
 
   const outOfSyncPressed = async () => {
     const confirmed = await application!.alertService!.confirm(
@@ -273,16 +273,16 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
       'Potentially Out of Sync',
       'Open Settings',
       undefined
-    );
+    )
     if (confirmed) {
-      openSettings();
+      openSettings()
     }
-  };
+  }
 
   const selectedTags: SNTag[] | SmartView[] = useMemo(
     () => (selectedTag ? ([selectedTag] as SNTag[] | SmartView[]) : []),
     [selectedTag]
-  );
+  )
 
   return (
     <Fragment>
@@ -300,7 +300,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
               key,
               themeOptions,
               onTagSelect,
-              selectedTags,
+              selectedTags
             })
           )}
           renderItem={({ item, index }) => {
@@ -330,7 +330,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
                   selectedTags={item.selectedTags}
                 />
               </SideMenuSection>
-            ) : null;
+            ) : null
           }}
         />
         <FAB
@@ -345,5 +345,5 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
         />
       </MainSafeAreaView>
     </Fragment>
-  );
-});
+  )
+})

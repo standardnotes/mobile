@@ -1,79 +1,77 @@
-import { SectionHeader } from '@Components/SectionHeader';
-import { TableSection } from '@Components/TableSection';
-import { useIsLocked } from '@Lib/snjs_helper_hooks';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { ContentType, StorageEncryptionPolicy } from '@standardnotes/snjs';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { SectionHeader } from '@Components/SectionHeader'
+import { TableSection } from '@Components/TableSection'
+import { useIsLocked } from '@Lib/snjs_helper_hooks'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { ContentType, StorageEncryptionPolicy } from '@standardnotes/snjs'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import {
   BaseView,
   StyledSectionedTableCell,
   Subtitle,
-  Title,
-} from './EncryptionSection.styled';
+  Title
+} from './EncryptionSection.styled'
 
 type Props = {
-  title: string;
-  encryptionAvailable: boolean;
-};
+  title: string
+  encryptionAvailable: boolean
+}
 
 export const EncryptionSection = (props: Props) => {
   // Context
-  const application = useContext(ApplicationContext);
-  const [isLocked] = useIsLocked();
+  const application = useContext(ApplicationContext)
+  const [isLocked] = useIsLocked()
 
   // State
-  const [protocolDisplayName, setProtocolDisplayName] = useState('');
+  const [protocolDisplayName, setProtocolDisplayName] = useState('')
 
   useEffect(() => {
-    let mounted = true;
+    let mounted = true
     const getProtocolDisplayName = async () => {
       const displayName =
-        (await application?.getProtocolEncryptionDisplayName()) ?? '';
+        (await application?.getProtocolEncryptionDisplayName()) ?? ''
       if (mounted) {
-        setProtocolDisplayName(displayName);
+        setProtocolDisplayName(displayName)
       }
-    };
-    getProtocolDisplayName();
+    }
+    getProtocolDisplayName()
     return () => {
-      mounted = false;
-    };
-  }, [application, props.encryptionAvailable]);
+      mounted = false
+    }
+  }, [application, props.encryptionAvailable])
 
   const textData = useMemo(() => {
-    const encryptionType = protocolDisplayName;
-    let encryptionStatus = props.encryptionAvailable
-      ? 'Enabled'
-      : 'Not Enabled';
+    const encryptionType = protocolDisplayName
+    let encryptionStatus = props.encryptionAvailable ? 'Enabled' : 'Not Enabled'
     if (props.encryptionAvailable) {
-      encryptionStatus += ` | ${encryptionType}`;
+      encryptionStatus += ` | ${encryptionType}`
     } else {
-      encryptionStatus += '. '; // to connect sentence
+      encryptionStatus += '. ' // to connect sentence
       encryptionStatus +=
         application?.getStorageEncryptionPolicy() ===
         StorageEncryptionPolicy.Default
           ? 'To enable encryption, sign in, register, or enable storage encryption.'
-          : 'Sign in, register, or add a local passcode to enable encryption.';
+          : 'Sign in, register, or add a local passcode to enable encryption.'
     }
-    let sourceString;
+    let sourceString
     if (isLocked) {
-      return { title: '', text: '' };
+      return { title: '', text: '' }
     } else {
-      sourceString = application?.hasAccount() ? 'Account Keys' : 'Passcode';
+      sourceString = application?.hasAccount() ? 'Account Keys' : 'Passcode'
     }
 
     const items = application!.items.getItems([
       ContentType.Note,
-      ContentType.Tag,
-    ]);
+      ContentType.Tag
+    ])
     const itemsStatus =
-      items.length + '/' + items.length + ' notes and tags encrypted';
+      items.length + '/' + items.length + ' notes and tags encrypted'
 
     return {
       encryptionStatus,
       sourceString,
-      itemsStatus,
-    };
-  }, [application, props.encryptionAvailable, isLocked, protocolDisplayName]);
+      itemsStatus
+    }
+  }, [application, props.encryptionAvailable, isLocked, protocolDisplayName])
 
   return (
     <TableSection>
@@ -104,5 +102,5 @@ export const EncryptionSection = (props: Props) => {
         </StyledSectionedTableCell>
       )}
     </TableSection>
-  );
-};
+  )
+}

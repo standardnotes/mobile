@@ -1,4 +1,4 @@
-import { SNFile } from '@standardnotes/snjs';
+import { SNFile } from '@standardnotes/snjs'
 
 export enum UploadedFileItemActionType {
   AttachFileToNote,
@@ -8,7 +8,7 @@ export enum UploadedFileItemActionType {
   DownloadFile,
   RenameFile,
   ToggleFileProtection,
-  PreviewFile,
+  PreviewFile
 }
 
 export type UploadedFileItemAction =
@@ -17,17 +17,17 @@ export type UploadedFileItemAction =
         UploadedFileItemActionType,
         | UploadedFileItemActionType.RenameFile
         | UploadedFileItemActionType.ToggleFileProtection
-      >;
-      payload: SNFile;
+      >
+      payload: SNFile
     }
   | {
-      type: UploadedFileItemActionType.ToggleFileProtection;
-      payload: SNFile;
+      type: UploadedFileItemActionType.ToggleFileProtection
+      payload: SNFile
     }
   | {
-      type: UploadedFileItemActionType.RenameFile;
+      type: UploadedFileItemActionType.RenameFile
       payload: {
-        file: SNFile;
-        name: string;
-      };
-    };
+        file: SNFile
+        name: string
+      }
+    }

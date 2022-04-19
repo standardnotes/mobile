@@ -1,39 +1,39 @@
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { HistoryEntry, NoteHistoryEntry, SNNote } from '@standardnotes/snjs';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { FlatList, ListRenderItem } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { NoteHistoryCell } from './NoteHistoryCell';
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { HistoryEntry, NoteHistoryEntry, SNNote } from '@standardnotes/snjs'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { FlatList, ListRenderItem } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { NoteHistoryCell } from './NoteHistoryCell'
 
 type Props = {
-  note: SNNote;
-  onPress: (uuid: string, revision: NoteHistoryEntry, title: string) => void;
-};
+  note: SNNote
+  onPress: (uuid: string, revision: NoteHistoryEntry, title: string) => void
+}
 export const SessionHistory: React.FC<Props> = ({ note, onPress }) => {
   // Context
-  const application = useContext(ApplicationContext);
-  const insets = useSafeAreaInsets();
+  const application = useContext(ApplicationContext)
+  const insets = useSafeAreaInsets()
 
   // State
-  const [sessionHistory, setSessionHistory] = useState<HistoryEntry[]>();
+  const [sessionHistory, setSessionHistory] = useState<HistoryEntry[]>()
 
   useEffect(() => {
     if (note) {
       setSessionHistory(
         application?.historyManager?.sessionHistoryForItem(note)
-      );
+      )
     }
-  }, [application?.historyManager, note]);
+  }, [application?.historyManager, note])
 
   const onItemPress = useCallback(
     (item: NoteHistoryEntry) => {
-      onPress(item.payload.uuid, item, item.previewTitle());
+      onPress(item.payload.uuid, item, item.previewTitle())
     },
     [onPress]
-  );
+  )
 
   const RenderItem: ListRenderItem<NoteHistoryEntry> | null | undefined = ({
-    item,
+    item
   }) => {
     return (
       <NoteHistoryCell
@@ -41,8 +41,8 @@ export const SessionHistory: React.FC<Props> = ({ note, onPress }) => {
         title={item.previewTitle()}
         subTitle={item.previewSubTitle()}
       />
-    );
-  };
+    )
+  }
 
   return (
     <FlatList<NoteHistoryEntry>
@@ -54,5 +54,5 @@ export const SessionHistory: React.FC<Props> = ({ note, onPress }) => {
       data={sessionHistory as NoteHistoryEntry[]}
       renderItem={RenderItem}
     />
-  );
-};
+  )
+}

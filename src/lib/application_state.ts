@@ -1,4 +1,4 @@
-import { InternalEventBus } from '@standardnotes/services';
+import { InternalEventBus } from '@standardnotes/services'
 import {
   ApplicationEvent,
   ApplicationService,
@@ -18,8 +18,8 @@ import {
   StorageKey,
   StorageValueModes,
   SystemViewId,
-  Uuid,
-} from '@standardnotes/snjs';
+  Uuid
+} from '@standardnotes/snjs'
 import {
   AppState,
   AppStateStatus,
@@ -29,17 +29,17 @@ import {
   KeyboardEventListener,
   NativeEventSubscription,
   NativeModules,
-  Platform,
-} from 'react-native';
-import FlagSecure from 'react-native-flag-secure-android';
-import { hide, show } from 'react-native-privacy-snapshot';
-import VersionInfo from 'react-native-version-info';
-import { MobileApplication } from './application';
-import { associateComponentWithNote } from './component_manager';
-import { PrefKey } from './preferences_manager';
+  Platform
+} from 'react-native'
+import FlagSecure from 'react-native-flag-secure-android'
+import { hide, show } from 'react-native-privacy-snapshot'
+import VersionInfo from 'react-native-version-info'
+import { MobileApplication } from './application'
+import { associateComponentWithNote } from './component_manager'
+import { PrefKey } from './preferences_manager'
 
-const pjson = require('../../package.json');
-const { PlatformConstants } = NativeModules;
+const pjson = require('../../package.json')
+const { PlatformConstants } = NativeModules
 
 export enum AppStateType {
   LosingFocus = 1,
@@ -48,148 +48,148 @@ export enum AppStateType {
   ResumingFromBackground = 4,
   TagChanged = 5,
   EditorClosed = 6,
-  PreferencesChanged = 7,
+  PreferencesChanged = 7
 }
 
 export enum LockStateType {
   Locked = 1,
-  Unlocked = 2,
+  Unlocked = 2
 }
 
 export enum AppStateEventType {
   KeyboardChangeEvent = 1,
   TabletModeChange = 2,
-  DrawerOpen = 3,
+  DrawerOpen = 3
 }
 
 export type TabletModeChangeData = {
-  new_isInTabletMode: boolean;
-  old_isInTabletMode: boolean;
-};
+  new_isInTabletMode: boolean
+  old_isInTabletMode: boolean
+}
 
 export enum UnlockTiming {
   Immediately = 'immediately',
-  OnQuit = 'on-quit',
+  OnQuit = 'on-quit'
 }
 
 export enum PasscodeKeyboardType {
   Default = 'default',
-  Numeric = 'numeric',
+  Numeric = 'numeric'
 }
 
 export enum MobileStorageKey {
-  PasscodeKeyboardTypeKey = 'passcodeKeyboardType',
+  PasscodeKeyboardTypeKey = 'passcodeKeyboardType'
 }
 
 type EventObserverCallback = (
   event: AppStateEventType,
   data?: TabletModeChangeData
-) => void | Promise<void>;
+) => void | Promise<void>
 type ObserverCallback = (
   event: AppStateType,
   data?: any
-) => void | Promise<void>;
-type LockStateObserverCallback = (event: LockStateType) => void | Promise<void>;
+) => void | Promise<void>
+type LockStateObserverCallback = (event: LockStateType) => void | Promise<void>
 
 export class ApplicationState extends ApplicationService {
-  override application: MobileApplication;
-  observers: ObserverCallback[] = [];
-  private stateObservers: EventObserverCallback[] = [];
-  private lockStateObservers: LockStateObserverCallback[] = [];
-  locked = true;
-  keyboardDidShowListener?: EmitterSubscription;
-  keyboardDidHideListener?: EmitterSubscription;
-  keyboardHeight?: number;
-  appEventObersever: any;
-  selectedTagRestored = false;
-  selectedTag: SNTag | SmartView = this.application.items.getSmartViews()[0];
-  userPreferences?: SNUserPrefs;
-  tabletMode: boolean = false;
-  ignoreStateChanges: boolean = false;
-  mostRecentState?: AppStateType;
-  authenticationInProgress: boolean = false;
-  multiEditorEnabled = false;
-  screenshotPrivacyEnabled?: boolean;
-  passcodeTiming?: UnlockTiming;
-  biometricsTiming?: UnlockTiming;
-  removeHandleReactNativeAppStateChangeListener: NativeEventSubscription;
-  removeItemChangesListener?: () => void;
-  removePreferencesLoadedListener?: () => void;
+  override application: MobileApplication
+  observers: ObserverCallback[] = []
+  private stateObservers: EventObserverCallback[] = []
+  private lockStateObservers: LockStateObserverCallback[] = []
+  locked = true
+  keyboardDidShowListener?: EmitterSubscription
+  keyboardDidHideListener?: EmitterSubscription
+  keyboardHeight?: number
+  appEventObersever: any
+  selectedTagRestored = false
+  selectedTag: SNTag | SmartView = this.application.items.getSmartViews()[0]
+  userPreferences?: SNUserPrefs
+  tabletMode: boolean = false
+  ignoreStateChanges: boolean = false
+  mostRecentState?: AppStateType
+  authenticationInProgress: boolean = false
+  multiEditorEnabled = false
+  screenshotPrivacyEnabled?: boolean
+  passcodeTiming?: UnlockTiming
+  biometricsTiming?: UnlockTiming
+  removeHandleReactNativeAppStateChangeListener: NativeEventSubscription
+  removeItemChangesListener?: () => void
+  removePreferencesLoadedListener?: () => void
 
   constructor(application: MobileApplication) {
-    super(application, new InternalEventBus());
-    this.application = application;
-    this.setTabletModeEnabled(this.isTabletDevice);
-    this.handleApplicationEvents();
-    this.handleItemsChanges();
+    super(application, new InternalEventBus())
+    this.application = application
+    this.setTabletModeEnabled(this.isTabletDevice)
+    this.handleApplicationEvents()
+    this.handleItemsChanges()
 
     this.removeHandleReactNativeAppStateChangeListener =
-      AppState.addEventListener('change', this.handleReactNativeAppStateChange);
+      AppState.addEventListener('change', this.handleReactNativeAppStateChange)
 
     this.keyboardDidShowListener = Keyboard.addListener(
       'keyboardWillShow',
       this.keyboardDidShow
-    );
+    )
     this.keyboardDidHideListener = Keyboard.addListener(
       'keyboardWillHide',
       this.keyboardDidHide
-    );
+    )
   }
 
   override deinit() {
-    this.appEventObersever();
-    this.removeHandleReactNativeAppStateChangeListener.remove();
+    this.appEventObersever()
+    this.removeHandleReactNativeAppStateChangeListener.remove()
     if (this.removeItemChangesListener) {
-      this.removeItemChangesListener();
+      this.removeItemChangesListener()
     }
     if (this.removePreferencesLoadedListener) {
-      this.removePreferencesLoadedListener();
+      this.removePreferencesLoadedListener()
     }
-    this.appEventObersever = undefined;
-    this.observers.length = 0;
-    this.keyboardDidShowListener = undefined;
-    this.keyboardDidHideListener = undefined;
+    this.appEventObersever = undefined
+    this.observers.length = 0
+    this.keyboardDidShowListener = undefined
+    this.keyboardDidHideListener = undefined
   }
 
   restoreSelectedTag() {
     if (this.selectedTagRestored) {
-      return;
+      return
     }
     const savedTagUuid: string | undefined = this.prefService.getValue(
       PrefKey.SelectedTagUuid,
       undefined
-    );
+    )
 
     if (isNullOrUndefined(savedTagUuid)) {
-      this.selectedTagRestored = true;
-      return;
+      this.selectedTagRestored = true
+      return
     }
 
     const savedTag =
       (this.application.items.findItem(savedTagUuid) as SNTag) ||
       this.application.items
         .getSmartViews()
-        .find(tag => tag.uuid === savedTagUuid);
+        .find(tag => tag.uuid === savedTagUuid)
     if (savedTag) {
-      this.setSelectedTag(savedTag, false);
-      this.selectedTagRestored = true;
+      this.setSelectedTag(savedTag, false)
+      this.selectedTagRestored = true
     }
   }
 
   override async onAppStart() {
     this.removePreferencesLoadedListener =
       this.prefService.addPreferencesLoadedObserver(() => {
-        this.notifyOfStateChange(AppStateType.PreferencesChanged);
-      });
+        this.notifyOfStateChange(AppStateType.PreferencesChanged)
+      })
 
-    await this.loadUnlockTiming();
+    await this.loadUnlockTiming()
   }
 
   override async onAppLaunch() {
-    MobileApplication.setPreviouslyLaunched();
+    MobileApplication.setPreviouslyLaunched()
     this.screenshotPrivacyEnabled =
-      (await this.getScreenshotPrivacyEnabled()) ?? true;
-    this.setAndroidScreenshotPrivacy(this.screenshotPrivacyEnabled);
+      (await this.getScreenshotPrivacyEnabled()) ?? true
+    this.setAndroidScreenshotPrivacy(this.screenshotPrivacyEnabled)
   }
 
   /**
@@ -197,10 +197,10 @@ export class ApplicationState extends ApplicationService {
    * @returns function that unregisters this observer
    */
   public addStateChangeObserver(callback: ObserverCallback) {
-    this.observers.push(callback);
+    this.observers.push(callback)
     return () => {
-      removeFromArray(this.observers, callback);
-    };
+      removeFromArray(this.observers, callback)
+    }
   }
 
   /**
@@ -208,10 +208,10 @@ export class ApplicationState extends ApplicationService {
    * @returns function that unregisters this observer
    */
   public addLockStateChangeObserver(callback: LockStateObserverCallback) {
-    this.lockStateObservers.push(callback);
+    this.lockStateObservers.push(callback)
     return () => {
-      removeFromArray(this.lockStateObservers, callback);
-    };
+      removeFromArray(this.lockStateObservers, callback)
+    }
   }
 
   /**
@@ -219,10 +219,10 @@ export class ApplicationState extends ApplicationService {
    * @returns function that unregisters this observer
    */
   public addStateEventObserver(callback: EventObserverCallback) {
-    this.stateObservers.push(callback);
+    this.stateObservers.push(callback)
     return () => {
-      removeFromArray(this.stateObservers, callback);
-    };
+      removeFromArray(this.stateObservers, callback)
+    }
   }
 
   /**
@@ -230,14 +230,14 @@ export class ApplicationState extends ApplicationService {
    */
   private notifyOfStateChange(state: AppStateType, data?: any) {
     if (this.ignoreStateChanges) {
-      return;
+      return
     }
 
     // Set most recent state before notifying observers, in case they need to query this value.
-    this.mostRecentState = state;
+    this.mostRecentState = state
 
     for (const observer of this.observers) {
-      observer(state, data);
+      observer(state, data)
     }
   }
 
@@ -249,7 +249,7 @@ export class ApplicationState extends ApplicationService {
     data?: TabletModeChangeData
   ) {
     for (const observer of this.stateObservers) {
-      observer(event, data);
+      observer(event, data)
     }
   }
 
@@ -258,18 +258,18 @@ export class ApplicationState extends ApplicationService {
    */
   private notifyLockStateObservers(event: LockStateType) {
     for (const observer of this.lockStateObservers) {
-      observer(event);
+      observer(event)
     }
   }
 
   private async loadUnlockTiming() {
-    this.passcodeTiming = await this.getPasscodeTiming();
-    this.biometricsTiming = await this.getBiometricsTiming();
+    this.passcodeTiming = await this.getPasscodeTiming()
+    this.biometricsTiming = await this.getBiometricsTiming()
   }
 
   public async setAndroidScreenshotPrivacy(enable: boolean) {
     if (Platform.OS === 'android') {
-      enable ? FlagSecure.activate() : FlagSecure.deactivate();
+      enable ? FlagSecure.activate() : FlagSecure.deactivate()
     }
   }
 
@@ -282,90 +282,90 @@ export class ApplicationState extends ApplicationService {
       ? this.selectedTag instanceof SmartView
         ? undefined
         : this.selectedTag.uuid
-      : undefined;
+      : undefined
 
-    this.application.editorGroup.closeActiveNoteView();
+    this.application.editorGroup.closeActiveNoteView()
 
     await this.application.editorGroup.createNoteView(
       undefined,
       title,
       selectedTagUuid
-    );
+    )
 
-    const defaultEditor = this.application.componentManager.getDefaultEditor();
+    const defaultEditor = this.application.componentManager.getDefaultEditor()
     if (defaultEditor) {
       await associateComponentWithNote(
         this.application,
         defaultEditor,
         this.getActiveNoteController().note!
-      );
+      )
     }
   }
 
   async openEditor(noteUuid: string) {
-    const note = this.application.items.findItem(noteUuid) as SNNote;
-    const activeEditor = this.getActiveNoteController();
+    const note = this.application.items.findItem(noteUuid) as SNNote
+    const activeEditor = this.getActiveNoteController()
     if (activeEditor) {
-      this.application.editorGroup.closeActiveNoteView();
+      this.application.editorGroup.closeActiveNoteView()
     }
 
-    await this.application.editorGroup.createNoteView(noteUuid);
+    await this.application.editorGroup.createNoteView(noteUuid)
 
     if (note && note.conflictOf) {
       InteractionManager.runAfterInteractions(() => {
         this.application?.mutator.changeAndSaveItem(note, mutator => {
-          mutator.conflictOf = undefined;
-        });
-      });
+          mutator.conflictOf = undefined
+        })
+      })
     }
   }
 
   getActiveNoteController() {
-    return this.application.editorGroup.noteControllers[0];
+    return this.application.editorGroup.noteControllers[0]
   }
 
   getEditors() {
-    return this.application.editorGroup.noteControllers;
+    return this.application.editorGroup.noteControllers
   }
 
   closeEditor(editor: NoteViewController) {
-    this.notifyOfStateChange(AppStateType.EditorClosed);
-    this.application.editorGroup.closeNoteView(editor);
+    this.notifyOfStateChange(AppStateType.EditorClosed)
+    this.application.editorGroup.closeNoteView(editor)
   }
 
   closeActiveEditor() {
-    this.notifyOfStateChange(AppStateType.EditorClosed);
-    this.application.editorGroup.closeActiveNoteView();
+    this.notifyOfStateChange(AppStateType.EditorClosed)
+    this.application.editorGroup.closeActiveNoteView()
   }
 
   closeAllEditors() {
-    this.notifyOfStateChange(AppStateType.EditorClosed);
-    this.application.editorGroup.closeAllNoteViews();
+    this.notifyOfStateChange(AppStateType.EditorClosed)
+    this.application.editorGroup.closeAllNoteViews()
   }
 
   editorForNote(uuid: Uuid): NoteViewController | void {
     for (const editor of this.getEditors()) {
       if (editor.note?.uuid === uuid) {
-        return editor;
+        return editor
       }
     }
   }
 
   private keyboardDidShow: KeyboardEventListener = e => {
-    this.keyboardHeight = e.endCoordinates.height;
-    this.notifyEventObservers(AppStateEventType.KeyboardChangeEvent);
-  };
+    this.keyboardHeight = e.endCoordinates.height
+    this.notifyEventObservers(AppStateEventType.KeyboardChangeEvent)
+  }
 
   private keyboardDidHide: KeyboardEventListener = () => {
-    this.keyboardHeight = 0;
-    this.notifyEventObservers(AppStateEventType.KeyboardChangeEvent);
-  };
+    this.keyboardHeight = 0
+    this.notifyEventObservers(AppStateEventType.KeyboardChangeEvent)
+  }
 
   /**
    * @returns Returns keybord height
    */
   getKeyboardHeight() {
-    return this.keyboardHeight;
+    return this.keyboardHeight
   }
 
   /**
@@ -383,36 +383,36 @@ export class ApplicationState extends ApplicationService {
         ) {
           const removedNotes = removed.filter(
             i => i.content_type === ContentType.Note
-          );
+          )
           for (const removedNote of removedNotes) {
-            const editor = this.editorForNote(removedNote.uuid);
+            const editor = this.editorForNote(removedNote.uuid)
             if (editor) {
-              this.closeEditor(editor);
+              this.closeEditor(editor)
             }
           }
 
           const notes = [...changed, ...inserted].filter(
             candidate => candidate.content_type === ContentType.Note
-          );
+          )
 
           const isBrowswingTrashedNotes =
             this.selectedTag instanceof SmartView &&
-            this.selectedTag.uuid === SystemViewId.TrashedNotes;
+            this.selectedTag.uuid === SystemViewId.TrashedNotes
 
           const isBrowsingArchivedNotes =
             this.selectedTag instanceof SmartView &&
-            this.selectedTag.uuid === SystemViewId.ArchivedNotes;
+            this.selectedTag.uuid === SystemViewId.ArchivedNotes
 
           for (const note of notes) {
-            const editor = this.editorForNote(note.uuid);
+            const editor = this.editorForNote(note.uuid)
             if (!editor) {
-              continue;
+              continue
             }
 
             if (note.trashed && !isBrowswingTrashedNotes) {
-              this.closeEditor(editor);
+              this.closeEditor(editor)
             } else if (note.archived && !isBrowsingArchivedNotes) {
-              this.closeEditor(editor);
+              this.closeEditor(editor)
             }
           }
         }
@@ -420,13 +420,13 @@ export class ApplicationState extends ApplicationService {
         if (this.selectedTag) {
           const matchingTag = [...changed, ...inserted].find(
             candidate => candidate.uuid === this.selectedTag!.uuid
-          );
+          )
           if (matchingTag) {
-            this.selectedTag = matchingTag as SNTag;
+            this.selectedTag = matchingTag as SNTag
           }
         }
       }
-    );
+    )
   }
 
   /**
@@ -438,21 +438,21 @@ export class ApplicationState extends ApplicationService {
         switch (eventName) {
           case ApplicationEvent.LocalDataIncrementalLoad:
           case ApplicationEvent.LocalDataLoaded: {
-            this.restoreSelectedTag();
-            break;
+            this.restoreSelectedTag()
+            break
           }
           case ApplicationEvent.Started: {
-            this.locked = true;
-            break;
+            this.locked = true
+            break
           }
           case ApplicationEvent.Launched: {
-            this.locked = false;
-            this.notifyLockStateObservers(LockStateType.Unlocked);
-            break;
+            this.locked = false
+            this.notifyLockStateObservers(LockStateType.Unlocked)
+            break
           }
         }
       }
-    );
+    )
   }
 
   /**
@@ -460,21 +460,21 @@ export class ApplicationState extends ApplicationService {
    */
   public setSelectedTag(tag: SNTag | SmartView, saveSelection: boolean = true) {
     if (this.selectedTag.uuid === tag.uuid) {
-      return;
+      return
     }
-    const previousTag = this.selectedTag;
-    this.selectedTag = tag;
+    const previousTag = this.selectedTag
+    this.selectedTag = tag
 
     if (saveSelection) {
       this.application
         .getLocalPreferences()
-        .setUserPrefValue(PrefKey.SelectedTagUuid, tag.uuid);
+        .setUserPrefValue(PrefKey.SelectedTagUuid, tag.uuid)
     }
 
     this.notifyOfStateChange(AppStateType.TagChanged, {
       tag,
-      previousTag,
-    });
+      previousTag
+    })
   }
 
   /**
@@ -482,8 +482,8 @@ export class ApplicationState extends ApplicationService {
    */
   public getNoteTags(note: SNNote) {
     return this.application.items.itemsReferencingItem(note).filter(ref => {
-      return ref.content_type === ContentType.Tag;
-    }) as SNTag[];
+      return ref.content_type === ContentType.Tag
+    }) as SNTag[]
   }
 
   /**
@@ -491,38 +491,38 @@ export class ApplicationState extends ApplicationService {
    */
   public getTagNotes(tag: SNTag | SmartView) {
     if (tag instanceof SmartView) {
-      return this.application.items.notesMatchingSmartView(tag);
+      return this.application.items.notesMatchingSmartView(tag)
     } else {
       return this.application.items.referencesForItem(tag).filter(ref => {
-        return ref.content_type === ContentType.Note;
-      }) as SNNote[];
+        return ref.content_type === ContentType.Note
+      }) as SNNote[]
     }
   }
 
   public getSelectedTag() {
-    return this.selectedTag;
+    return this.selectedTag
   }
 
   static get version() {
-    return `${pjson['user-version']} (${VersionInfo.buildVersion})`;
+    return `${pjson['user-version']} (${VersionInfo.buildVersion})`
   }
 
   get isTabletDevice() {
-    const deviceType = PlatformConstants.interfaceIdiom;
-    return deviceType === 'pad';
+    const deviceType = PlatformConstants.interfaceIdiom
+    return deviceType === 'pad'
   }
 
   get isInTabletMode() {
-    return this.tabletMode;
+    return this.tabletMode
   }
 
   setTabletModeEnabled(enabledTabletMode: boolean) {
     if (enabledTabletMode !== this.tabletMode) {
-      this.tabletMode = enabledTabletMode;
+      this.tabletMode = enabledTabletMode
       this.notifyEventObservers(AppStateEventType.TabletModeChange, {
         new_isInTabletMode: enabledTabletMode,
-        old_isInTabletMode: !enabledTabletMode,
-      });
+        old_isInTabletMode: !enabledTabletMode
+      })
     }
   }
 
@@ -531,14 +531,14 @@ export class ApplicationState extends ApplicationService {
       {
         title: 'Immediately',
         key: UnlockTiming.Immediately,
-        selected: this.passcodeTiming === UnlockTiming.Immediately,
+        selected: this.passcodeTiming === UnlockTiming.Immediately
       },
       {
         title: 'On Quit',
         key: UnlockTiming.OnQuit,
-        selected: this.passcodeTiming === UnlockTiming.OnQuit,
-      },
-    ];
+        selected: this.passcodeTiming === UnlockTiming.OnQuit
+      }
+    ]
   }
 
   getBiometricsTimingOptions() {
@@ -546,23 +546,23 @@ export class ApplicationState extends ApplicationService {
       {
         title: 'Immediately',
         key: UnlockTiming.Immediately,
-        selected: this.biometricsTiming === UnlockTiming.Immediately,
+        selected: this.biometricsTiming === UnlockTiming.Immediately
       },
       {
         title: 'On Quit',
         key: UnlockTiming.OnQuit,
-        selected: this.biometricsTiming === UnlockTiming.OnQuit,
-      },
-    ];
+        selected: this.biometricsTiming === UnlockTiming.OnQuit
+      }
+    ]
   }
 
   private async checkAndLockApplication() {
-    const isLocked = await this.application.isLocked();
+    const isLocked = await this.application.isLocked()
     if (!isLocked) {
-      const hasBiometrics = await this.application.hasBiometrics();
-      const hasPasscode = this.application.hasPasscode();
+      const hasBiometrics = await this.application.hasBiometrics()
+      const hasPasscode = this.application.hasPasscode()
       if (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately) {
-        await this.application.lock();
+        await this.application.lock()
       } else if (
         hasBiometrics &&
         this.biometricsTiming === UnlockTiming.Immediately &&
@@ -572,17 +572,17 @@ export class ApplicationState extends ApplicationService {
           [new ChallengePrompt(ChallengeValidation.Biometric)],
           ChallengeReason.ApplicationUnlock,
           false
-        );
-        this.application.promptForCustomChallenge(challenge);
+        )
+        this.application.promptForCustomChallenge(challenge)
 
-        this.locked = true;
-        this.notifyLockStateObservers(LockStateType.Locked);
+        this.locked = true
+        this.notifyLockStateObservers(LockStateType.Locked)
         this.application.addChallengeObserver(challenge, {
           onComplete: () => {
-            this.locked = false;
-            this.notifyLockStateObservers(LockStateType.Unlocked);
-          },
-        });
+            this.locked = false
+            this.notifyLockStateObservers(LockStateType.Unlocked)
+          }
+        })
       }
     }
   }
@@ -594,46 +594,46 @@ export class ApplicationState extends ApplicationService {
     nextAppState: AppStateStatus
   ) => {
     if (this.ignoreStateChanges) {
-      return;
+      return
     }
 
     // if the most recent state is not 'background' ('inactive'), then we're going
     // from inactive to active, which doesn't really happen unless you, say, swipe
     // notification center in iOS down then back up. We don't want to lock on this state change.
-    const isResuming = nextAppState === 'active';
+    const isResuming = nextAppState === 'active'
     const isResumingFromBackground =
-      isResuming && this.mostRecentState === AppStateType.EnteringBackground;
-    const isEnteringBackground = nextAppState === 'background';
-    const isLosingFocus = nextAppState === 'inactive';
+      isResuming && this.mostRecentState === AppStateType.EnteringBackground
+    const isEnteringBackground = nextAppState === 'background'
+    const isLosingFocus = nextAppState === 'inactive'
 
     if (isEnteringBackground) {
-      this.notifyOfStateChange(AppStateType.EnteringBackground);
-      return this.checkAndLockApplication();
+      this.notifyOfStateChange(AppStateType.EnteringBackground)
+      return this.checkAndLockApplication()
     }
 
     if (isResumingFromBackground || isResuming) {
       if (this.screenshotPrivacyEnabled) {
-        hide();
+        hide()
       }
 
       if (isResumingFromBackground) {
-        this.notifyOfStateChange(AppStateType.ResumingFromBackground);
+        this.notifyOfStateChange(AppStateType.ResumingFromBackground)
       }
 
       // Notify of GainingFocus even if resuming from background
-      this.notifyOfStateChange(AppStateType.GainingFocus);
-      return;
+      this.notifyOfStateChange(AppStateType.GainingFocus)
+      return
     }
 
     if (isLosingFocus) {
       if (this.screenshotPrivacyEnabled) {
-        show();
+        show()
       }
 
-      this.notifyOfStateChange(AppStateType.LosingFocus);
-      return this.checkAndLockApplication();
+      this.notifyOfStateChange(AppStateType.LosingFocus)
+      return this.checkAndLockApplication()
     }
-  };
+  }
 
   /**
    * Visibility change events are like active, inactive, background,
@@ -645,30 +645,30 @@ export class ApplicationState extends ApplicationService {
         AppStateType.LosingFocus,
         AppStateType.EnteringBackground,
         AppStateType.GainingFocus,
-        AppStateType.ResumingFromBackground,
+        AppStateType.ResumingFromBackground
       ] as Array<AppStateType>
-    ).includes(state);
+    ).includes(state)
   }
 
   private async getScreenshotPrivacyEnabled(): Promise<boolean | undefined> {
     return this.application.getValue(
       StorageKey.MobileScreenshotPrivacyEnabled,
       StorageValueModes.Default
-    ) as Promise<boolean | undefined>;
+    ) as Promise<boolean | undefined>
   }
 
   private async getPasscodeTiming(): Promise<UnlockTiming | undefined> {
     return this.application.getValue(
       StorageKey.MobilePasscodeTiming,
       StorageValueModes.Nonwrapped
-    ) as Promise<UnlockTiming | undefined>;
+    ) as Promise<UnlockTiming | undefined>
   }
 
   private async getBiometricsTiming(): Promise<UnlockTiming | undefined> {
     return this.application.getValue(
       StorageKey.MobileBiometricsTiming,
       StorageValueModes.Nonwrapped
-    ) as Promise<UnlockTiming | undefined>;
+    ) as Promise<UnlockTiming | undefined>
   }
 
   public async setScreenshotPrivacyEnabled(enabled: boolean) {
@@ -676,9 +676,9 @@ export class ApplicationState extends ApplicationService {
       StorageKey.MobileScreenshotPrivacyEnabled,
       enabled,
       StorageValueModes.Default
-    );
-    this.screenshotPrivacyEnabled = enabled;
-    this.setAndroidScreenshotPrivacy(enabled);
+    )
+    this.screenshotPrivacyEnabled = enabled
+    this.setAndroidScreenshotPrivacy(enabled)
   }
 
   public async setPasscodeTiming(timing: UnlockTiming) {
@@ -686,8 +686,8 @@ export class ApplicationState extends ApplicationService {
       StorageKey.MobilePasscodeTiming,
       timing,
       StorageValueModes.Nonwrapped
-    );
-    this.passcodeTiming = timing;
+    )
+    this.passcodeTiming = timing
   }
 
   public async setBiometricsTiming(timing: UnlockTiming) {
@@ -695,15 +695,15 @@ export class ApplicationState extends ApplicationService {
       StorageKey.MobileBiometricsTiming,
       timing,
       StorageValueModes.Nonwrapped
-    );
-    this.biometricsTiming = timing;
+    )
+    this.biometricsTiming = timing
   }
 
   public async getPasscodeKeyboardType(): Promise<PasscodeKeyboardType> {
     return this.application.getValue(
       MobileStorageKey.PasscodeKeyboardTypeKey,
       StorageValueModes.Nonwrapped
-    ) as Promise<PasscodeKeyboardType>;
+    ) as Promise<PasscodeKeyboardType>
   }
 
   public async setPasscodeKeyboardType(type: PasscodeKeyboardType) {
@@ -711,11 +711,11 @@ export class ApplicationState extends ApplicationService {
       MobileStorageKey.PasscodeKeyboardTypeKey,
       type,
       StorageValueModes.Nonwrapped
-    );
+    )
   }
 
   public onDrawerOpen() {
-    this.notifyEventObservers(AppStateEventType.DrawerOpen);
+    this.notifyEventObservers(AppStateEventType.DrawerOpen)
   }
 
   /*
@@ -726,28 +726,28 @@ export class ApplicationState extends ApplicationService {
     block: () => void | Promise<void>,
     notAwaited?: boolean
   ) {
-    this.ignoreStateChanges = true;
+    this.ignoreStateChanges = true
     if (notAwaited) {
-      block();
+      block()
     } else {
-      await block();
+      await block()
     }
     setTimeout(() => {
-      this.ignoreStateChanges = false;
-    }, 350);
+      this.ignoreStateChanges = false
+    }, 350)
   }
 
   getMostRecentState() {
-    return this.mostRecentState;
+    return this.mostRecentState
   }
 
   private get prefService() {
-    return this.application.getLocalPreferences();
+    return this.application.getLocalPreferences()
   }
 
   public getEnvironment() {
-    const bundleId = VersionInfo.bundleIdentifier;
-    console.log(bundleId && bundleId.includes('dev'));
-    return bundleId && bundleId.includes('dev') ? 'dev' : 'prod';
+    const bundleId = VersionInfo.bundleIdentifier
+    console.log(bundleId && bundleId.includes('dev'))
+    return bundleId && bundleId.includes('dev') ? 'dev' : 'prod'
   }
 }

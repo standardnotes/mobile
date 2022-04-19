@@ -1,88 +1,88 @@
-import { ButtonCell } from '@Components/ButtonCell';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
-import { TableSection } from '@Components/TableSection';
-import { useFocusEffect } from '@react-navigation/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { ModalStackNavigationProp } from '@Root/ModalStack';
-import { SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
-import { SNTag, TagMutator } from '@standardnotes/snjs';
-import { ThemeServiceContext } from '@Style/theme_service';
+import { ButtonCell } from '@Components/ButtonCell'
+import { SectionedTableCell } from '@Components/SectionedTableCell'
+import { TableSection } from '@Components/TableSection'
+import { useFocusEffect } from '@react-navigation/native'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { ModalStackNavigationProp } from '@Root/ModalStack'
+import { SCREEN_INPUT_MODAL_TAG } from '@Screens/screens'
+import { SNTag, TagMutator } from '@standardnotes/snjs'
+import { ThemeServiceContext } from '@Style/theme_service'
 import React, {
   useCallback,
   useContext,
   useEffect,
   useRef,
-  useState,
-} from 'react';
-import { TextInput } from 'react-native';
-import { Container, Input } from './InputModal.styled';
+  useState
+} from 'react'
+import { TextInput } from 'react-native'
+import { Container, Input } from './InputModal.styled'
 
-type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_TAG>;
+type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_TAG>
 export const TagInputModal = (props: Props) => {
   // Context
-  const application = useContext(ApplicationContext);
-  const themeService = useContext(ThemeServiceContext);
+  const application = useContext(ApplicationContext)
+  const themeService = useContext(ThemeServiceContext)
 
   // State
-  const [text, setText] = useState('');
+  const [text, setText] = useState('')
 
   // Refs
-  const textRef = useRef<TextInput>(null);
+  const textRef = useRef<TextInput>(null)
 
   useEffect(() => {
     if (props.route.params.tagUuid) {
       const tag = application?.items.findItem(
         props.route.params.tagUuid
-      ) as SNTag;
-      setText(tag.title);
+      ) as SNTag
+      setText(tag.title)
     }
-  }, [application, props.route.params.tagUuid]);
+  }, [application, props.route.params.tagUuid])
 
   useFocusEffect(
     useCallback(() => {
       setTimeout(() => {
-        textRef.current?.focus();
-      }, 1);
+        textRef.current?.focus()
+      }, 1)
     }, [])
-  );
+  )
 
   const onSubmit = useCallback(async () => {
     if (props.route.params.tagUuid) {
       const tag = application?.items.findItem(
         props.route.params.tagUuid
-      ) as SNTag;
+      ) as SNTag
       await application?.mutator.changeItem(tag, mutator => {
-        const tagMutator = mutator as TagMutator;
-        tagMutator.title = text;
+        const tagMutator = mutator as TagMutator
+        tagMutator.title = text
         if (props.route.params.noteUuid) {
-          const note = application.items.findItem(props.route.params.noteUuid);
+          const note = application.items.findItem(props.route.params.noteUuid)
           if (note) {
-            tagMutator.addItemAsRelationship(note);
+            tagMutator.addItemAsRelationship(note)
           }
         }
-      });
+      })
     } else {
-      const tag = await application!.mutator.findOrCreateTag(text);
+      const tag = await application!.mutator.findOrCreateTag(text)
       if (props.route.params.noteUuid) {
         await application?.mutator.changeItem(tag, mutator => {
-          const tagMutator = mutator as TagMutator;
-          const note = application.items.findItem(props.route.params.noteUuid!);
+          const tagMutator = mutator as TagMutator
+          const note = application.items.findItem(props.route.params.noteUuid!)
           if (note) {
-            tagMutator.addItemAsRelationship(note);
+            tagMutator.addItemAsRelationship(note)
           }
-        });
+        })
       }
     }
 
-    application?.sync.sync();
-    props.navigation.goBack();
+    application?.sync.sync()
+    props.navigation.goBack()
   }, [
     application,
     props.navigation,
     props.route.params.noteUuid,
     props.route.params.tagUuid,
-    text,
-  ]);
+    text
+  ])
 
   return (
     <Container>
@@ -112,5 +112,5 @@ export const TagInputModal = (props: Props) => {
         />
       </TableSection>
     </Container>
-  );
-};
+  )
+}

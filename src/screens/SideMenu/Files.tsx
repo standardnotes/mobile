@@ -1,8 +1,8 @@
-import { useNavigation } from '@react-navigation/native';
-import { AppStackNavigationProp } from '@Root/AppStack';
-import { useFiles } from '@Root/hooks/useFiles';
-import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
-import { SCREEN_COMPOSE, SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
+import { useNavigation } from '@react-navigation/native'
+import { AppStackNavigationProp } from '@Root/AppStack'
+import { useFiles } from '@Root/hooks/useFiles'
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext'
+import { SCREEN_COMPOSE, SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens'
 import {
   FileItemContainer,
   FilesContainer,
@@ -10,39 +10,37 @@ import {
   SideMenuCellShowAllFiles,
   SideMenuCellStyled,
   SNIconStyled,
-  styles,
-} from '@Screens/SideMenu/Files.styled';
-import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
-import { SNNote } from '@standardnotes/snjs';
-import React, { FC } from 'react';
+  styles
+} from '@Screens/SideMenu/Files.styled'
+import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection'
+import { SNNote } from '@standardnotes/snjs'
+import React, { FC } from 'react'
 
 type Props = {
-  note: SNNote;
-};
+  note: SNNote
+}
 
-const MaximumVisibleFilesCount = 3;
+const MaximumVisibleFilesCount = 3
 
 export const Files: FC<Props> = ({ note }) => {
-  const application = useSafeApplicationContext();
+  const application = useSafeApplicationContext()
 
   const navigation =
-    useNavigation<
-      AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
-    >();
-  const { showActionsMenu, attachedFiles } = useFiles({ note });
+    useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
+  const { showActionsMenu, attachedFiles } = useFiles({ note })
 
   const openFilesScreen = () => {
-    navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note });
-  };
+    navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note })
+  }
 
-  const isFilesListTruncated = attachedFiles.length > MaximumVisibleFilesCount;
+  const isFilesListTruncated = attachedFiles.length > MaximumVisibleFilesCount
 
   return (
     <FilesContainer>
       {attachedFiles.slice(0, MaximumVisibleFilesCount).map(file => {
         const iconType = application.iconsController.getIconForFileType(
           file.mimeType
-        );
+        )
 
         return (
           <FileItemContainer key={file.uuid}>
@@ -64,12 +62,12 @@ export const Files: FC<Props> = ({ note }) => {
                     )}
                     <SNIconStyled type={iconType} width={16} height={16} />
                   </IconsContainer>
-                ),
+                )
               }}
               cellContentStyle={styles.cellContentStyle}
             />
           </FileItemContainer>
-        );
+        )
       })}
       <SideMenuCellShowAllFiles
         text={
@@ -79,5 +77,5 @@ export const Files: FC<Props> = ({ note }) => {
         cellContentStyle={styles.cellContentStyle}
       />
     </FilesContainer>
-  );
-};
+  )
+}

@@ -1,12 +1,12 @@
-import styled, { css } from 'styled-components/native';
+import styled, { css } from 'styled-components/native'
 
 export type Props = {
-  first?: boolean;
-  last?: boolean;
-  textInputCell?: any;
-  height?: number;
-  extraStyles?: any;
-};
+  first?: boolean
+  last?: boolean
+  textInputCell?: any
+  height?: number
+  extraStyles?: any
+}
 
 export const SectionedTableCell = styled.View<Props>`
   border-bottom-color: ${props => props.theme.stylekitBorderColor};
@@ -31,7 +31,7 @@ export const SectionedTableCell = styled.View<Props>`
     css`
       height: ${height}px;
     `};
-`;
+`
 
 export const SectionedTableCellTouchableHighlight = styled.TouchableHighlight<Props>`
   border-bottom-color: ${props => props.theme.stylekitBorderColor};
@@ -56,4 +56,4 @@ export const SectionedTableCellTouchableHighlight = styled.TouchableHighlight<Pr
     css`
       height: ${height}px;
     `};
-`;
+`

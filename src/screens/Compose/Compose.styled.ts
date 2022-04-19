@@ -1,15 +1,15 @@
-import SNTextView from '@standardnotes/react-native-textview';
-import React, { ComponentProps } from 'react';
-import { Platform } from 'react-native';
-import styled, { css } from 'styled-components/native';
+import SNTextView from '@standardnotes/react-native-textview'
+import React, { ComponentProps } from 'react'
+import { Platform } from 'react-native'
+import styled, { css } from 'styled-components/native'
 
-const PADDING = 14;
-const NOTE_TITLE_HEIGHT = 50;
+const PADDING = 14
+const NOTE_TITLE_HEIGHT = 50
 
 export const Container = styled.View`
   flex: 1;
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
-`;
+`
 export const LockedContainer = styled.View`
   justify-content: flex-start;
   flex-direction: row;
@@ -19,14 +19,14 @@ export const LockedContainer = styled.View`
   background-color: ${({ theme }) => theme.stylekitNeutralColor};
   border-bottom-color: ${({ theme }) => theme.stylekitBorderColor};
   border-bottom-width: 1px;
-`;
+`
 export const LockedText = styled.Text`
   font-weight: bold;
   font-size: 12px;
   color: ${({ theme }) => theme.stylekitBackgroundColor};
   padding-left: 10px;
   padding-right: 100px;
-`;
+`
 export const WebViewReloadButton = styled.TouchableOpacity`
   position: absolute;
   right: ${PADDING}px;
@@ -35,12 +35,12 @@ export const WebViewReloadButton = styled.TouchableOpacity`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-`;
+`
 export const WebViewReloadButtonText = styled.Text`
   color: ${({ theme }) => theme.stylekitBackgroundColor};
   font-size: 12px;
   font-weight: bold;
-`;
+`
 export const NoteTitleInput = styled.TextInput`
   font-weight: ${Platform.OS === 'ios' ? 600 : 'bold'};
   font-size: ${Platform.OS === 'ios' ? 17 : 18}px;
@@ -52,7 +52,7 @@ export const NoteTitleInput = styled.TextInput`
   padding-top: ${Platform.OS === 'ios' ? 5 : 12}px;
   padding-left: ${PADDING}px;
   padding-right: ${PADDING}px;
-`;
+`
 export const LoadingWebViewContainer = styled.View<{ locked?: boolean }>`
   position: absolute;
   height: 100%;
@@ -65,23 +65,23 @@ export const LoadingWebViewContainer = styled.View<{ locked?: boolean }>`
   align-items: center;
   justify-content: center;
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
-`;
+`
 export const LoadingText = styled.Text`
   padding-left: 0px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
   opacity: 0.7;
   margin-top: 5px;
-`;
+`
 export const ContentContainer = styled.View`
   flex-grow: 1;
-`;
+`
 export const TextContainer = styled.View`
   flex: 1;
-`;
+`
 export const StyledKeyboardAvoidngView = styled.KeyboardAvoidingView`
   flex: 1;
   ${({ theme }) => theme.stylekitBackgroundColor};
-`;
+`
 
 const StyledTextViewComponent = styled(SNTextView)<{ errorState: boolean }>`
   padding-top: 10px;
@@ -101,7 +101,7 @@ const StyledTextViewComponent = styled(SNTextView)<{ errorState: boolean }>`
   `}
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   /* ${Platform.OS === 'ios' && 'padding-bottom: 10px'}; */
-`;
+`
 
 export const StyledTextView = React.memo(
   StyledTextViewComponent,
@@ -120,8 +120,8 @@ export const StyledTextView = React.memo(
       newProps.testID !== prevProps.testID ||
       newProps.multiline !== prevProps.multiline
     ) {
-      return false;
+      return false
     }
-    return true;
+    return true
   }
-);
+)

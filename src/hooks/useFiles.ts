@@ -1,175 +1,175 @@
-import { ToastType } from '@Lib/types';
-import { useNavigation } from '@react-navigation/native';
-import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
-import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Screens/screens';
-import { TAppStackNavigationProp } from '@Screens/UploadedFilesList/UploadedFileItem';
+import { ToastType } from '@Lib/types'
+import { useNavigation } from '@react-navigation/native'
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext'
+import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Screens/screens'
+import { TAppStackNavigationProp } from '@Screens/UploadedFilesList/UploadedFileItem'
 import {
   UploadedFileItemAction,
-  UploadedFileItemActionType,
-} from '@Screens/UploadedFilesList/UploadedFileItemAction';
+  UploadedFileItemActionType
+} from '@Screens/UploadedFilesList/UploadedFileItemAction'
 import {
   ButtonType,
   ChallengeReason,
   ClientDisplayableError,
   ContentType,
   SNFile,
-  SNNote,
-} from '@standardnotes/snjs';
+  SNNote
+} from '@standardnotes/snjs'
 import {
   CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Style/custom_action_sheet';
-import { useCallback, useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+  useCustomActionSheet
+} from '@Style/custom_action_sheet'
+import { useCallback, useEffect, useState } from 'react'
+import { Platform } from 'react-native'
 import DocumentPicker, {
   DocumentPickerResponse,
   isInProgress,
-  pickMultiple,
-} from 'react-native-document-picker';
-import FileViewer from 'react-native-file-viewer';
-import RNFS, { exists } from 'react-native-fs';
+  pickMultiple
+} from 'react-native-document-picker'
+import FileViewer from 'react-native-file-viewer'
+import RNFS, { exists } from 'react-native-fs'
 import {
   Asset,
   launchCamera,
   launchImageLibrary,
-  MediaType,
-} from 'react-native-image-picker';
-import RNShare from 'react-native-share';
-import Toast from 'react-native-toast-message';
+  MediaType
+} from 'react-native-image-picker'
+import RNShare from 'react-native-share'
+import Toast from 'react-native-toast-message'
 
 type Props = {
-  note: SNNote;
-};
+  note: SNNote
+}
 type TDownloadFileAndReturnLocalPathParams = {
-  file: SNFile;
-  saveInTempLocation?: boolean;
-};
+  file: SNFile
+  saveInTempLocation?: boolean
+}
 
 type TUploadFileFromCameraOrImageGalleryParams = {
-  uploadFromGallery?: boolean;
-  mediaType?: MediaType;
-};
+  uploadFromGallery?: boolean
+  mediaType?: MediaType
+}
 
 export const isFileTypePreviewable = (fileType: string) => {
-  const isImage = fileType.startsWith('image/');
-  const isVideo = fileType.startsWith('video/');
-  const isAudio = fileType.startsWith('audio/');
-  const isPdf = fileType === 'application/pdf';
-  const isText = fileType === 'text/plain';
+  const isImage = fileType.startsWith('image/')
+  const isVideo = fileType.startsWith('video/')
+  const isAudio = fileType.startsWith('audio/')
+  const isPdf = fileType === 'application/pdf'
+  const isText = fileType === 'text/plain'
 
-  return isImage || isVideo || isAudio || isPdf || isText;
-};
+  return isImage || isVideo || isAudio || isPdf || isText
+}
 
 export const useFiles = ({ note }: Props) => {
-  const application = useSafeApplicationContext();
+  const application = useSafeApplicationContext()
 
-  const { showActionSheet } = useCustomActionSheet();
-  const navigation = useNavigation<TAppStackNavigationProp>();
+  const { showActionSheet } = useCustomActionSheet()
+  const navigation = useNavigation<TAppStackNavigationProp>()
 
-  const [attachedFiles, setAttachedFiles] = useState<SNFile[]>([]);
-  const [allFiles, setAllFiles] = useState<SNFile[]>([]);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<SNFile[]>([])
+  const [allFiles, setAllFiles] = useState<SNFile[]>([])
+  const [isDownloading, setIsDownloading] = useState(false)
 
-  const { Success, Info, Error } = ToastType;
+  const { Success, Info, Error } = ToastType
 
-  const filesService = application.getFilesService();
+  const filesService = application.getFilesService()
 
   const reloadAttachedFiles = useCallback(() => {
     setAttachedFiles(
       application.items
         .getFilesForNote(note)
         .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
-    );
-  }, [application, note]);
+    )
+  }, [application, note])
 
   const reloadAllFiles = useCallback(() => {
     setAllFiles(
       application.items
         .getItems(ContentType.File)
         .sort((a, b) => (a.created_at < b.created_at ? 1 : -1)) as SNFile[]
-    );
-  }, [application]);
+    )
+  }, [application])
 
   const deleteFileAtPath = useCallback(async (path: string) => {
     try {
       if (await exists(path)) {
-        await RNFS.unlink(path);
+        await RNFS.unlink(path)
       }
     } catch (err) {}
-  }, []);
+  }, [])
 
   const downloadFileAndReturnLocalPath = useCallback(
     async ({
       file,
-      saveInTempLocation = false,
+      saveInTempLocation = false
     }: TDownloadFileAndReturnLocalPathParams): Promise<string | undefined> => {
       if (isDownloading) {
-        return;
+        return
       }
       const isGrantedStoragePermissionOnAndroid =
-        await filesService.hasStoragePermissionOnAndroid();
+        await filesService.hasStoragePermissionOnAndroid()
 
       if (!isGrantedStoragePermissionOnAndroid) {
-        return;
+        return
       }
-      setIsDownloading(true);
+      setIsDownloading(true)
 
       try {
         Toast.show({
           type: Info,
           text1: 'Downloading file...',
           autoHide: false,
-          onPress: Toast.hide,
-        });
+          onPress: Toast.hide
+        })
 
         const path = filesService.getDestinationPath({
           fileName: file.name,
-          saveInTempLocation,
-        });
+          saveInTempLocation
+        })
 
-        await deleteFileAtPath(path);
-        await filesService.downloadFileInChunks(file, path);
+        await deleteFileAtPath(path)
+        await filesService.downloadFileInChunks(file, path)
 
         Toast.show({
           type: Success,
           text1: 'Success',
           text2: 'Successfully downloaded file',
-          onPress: Toast.hide,
-        });
+          onPress: Toast.hide
+        })
 
-        return path;
+        return path
       } catch (error) {
         Toast.show({
           type: Error,
           text1: 'Error',
           text2: 'An error occurred while downloading the file',
-          onPress: Toast.hide,
-        });
-        return;
+          onPress: Toast.hide
+        })
+        return
       } finally {
-        setIsDownloading(false);
+        setIsDownloading(false)
       }
     },
     [Error, Info, Success, deleteFileAtPath, filesService, isDownloading]
-  );
+  )
 
   const cleanupTempFileOnAndroid = useCallback(
     async (downloadedFilePath: string) => {
       if (Platform.OS === 'android') {
-        await deleteFileAtPath(downloadedFilePath);
+        await deleteFileAtPath(downloadedFilePath)
       }
     },
     [deleteFileAtPath]
-  );
+  )
 
   const shareFile = useCallback(
     async (file: SNFile) => {
       const downloadedFilePath = await downloadFileAndReturnLocalPath({
         file,
-        saveInTempLocation: true,
-      });
+        saveInTempLocation: true
+      })
       if (!downloadedFilePath) {
-        return;
+        return
       }
       application
         .getAppState()
@@ -179,84 +179,84 @@ export const useFiles = ({ note }: Props) => {
             //  https://github.com/react-native-share/react-native-share/issues/1059
             const shareDialogResponse = await RNShare.open({
               url: `file://${downloadedFilePath}`,
-              failOnCancel: false,
-            });
+              failOnCancel: false
+            })
 
             // On iOS the user can store files locally from "Share" screen, so we don't show "Download" option there.
             // For Android the user has a separate "Download" action for the file, therefore after the file is shared,
             // it's not needed anymore and we remove it from the storage.
-            await cleanupTempFileOnAndroid(downloadedFilePath);
+            await cleanupTempFileOnAndroid(downloadedFilePath)
 
             if (shareDialogResponse.success) {
               Toast.show({
                 type: Success,
                 text1: 'Successfully exported file',
-                onPress: Toast.hide,
-              });
+                onPress: Toast.hide
+              })
             }
           } catch (error) {
             Toast.show({
               type: Error,
               text1: 'An error occurred while trying to share this file',
-              onPress: Toast.hide,
-            });
+              onPress: Toast.hide
+            })
           }
-        });
+        })
     },
     [
       Error,
       Success,
       application,
       cleanupTempFileOnAndroid,
-      downloadFileAndReturnLocalPath,
+      downloadFileAndReturnLocalPath
     ]
-  );
+  )
 
   const attachFileToNote = useCallback(
     async (file: SNFile, showToastAfterAction = true) => {
-      await application.items.associateFileWithNote(file, note);
+      await application.items.associateFileWithNote(file, note)
 
       if (showToastAfterAction) {
         Toast.show({
           type: Success,
           text1: 'Successfully attached file to note',
-          onPress: Toast.hide,
-        });
+          onPress: Toast.hide
+        })
       }
     },
     [Success, application, note]
-  );
+  )
 
   const detachFileFromNote = useCallback(
     async (file: SNFile) => {
-      await application.items.disassociateFileWithNote(file, note);
+      await application.items.disassociateFileWithNote(file, note)
       Toast.show({
         type: Success,
         text1: 'Successfully detached file from note',
-        onPress: Toast.hide,
-      });
+        onPress: Toast.hide
+      })
     },
     [Success, application, note]
-  );
+  )
 
   const toggleFileProtection = useCallback(
     async (file: SNFile) => {
       try {
-        let result: SNFile | undefined;
+        let result: SNFile | undefined
         if (file.protected) {
-          result = await application.mutator.unprotectFile(file);
+          result = await application.mutator.unprotectFile(file)
         } else {
-          result = await application.mutator.protectFile(file);
+          result = await application.mutator.protectFile(file)
         }
-        const isProtected = result ? result.protected : file.protected;
-        return isProtected;
+        const isProtected = result ? result.protected : file.protected
+        return isProtected
       } catch (error) {
-        console.error('An error occurred: ', error);
-        return file.protected;
+        console.error('An error occurred: ', error)
+        return file.protected
       }
     },
     [application]
-  );
+  )
 
   const authorizeProtectedActionForFile = useCallback(
     async (file: SNFile, challengeReason: ChallengeReason) => {
@@ -264,24 +264,24 @@ export const useFiles = ({ note }: Props) => {
         await application.protections.authorizeProtectedActionForFiles(
           [file],
           challengeReason
-        );
-      return authorizedFiles.length > 0 && authorizedFiles.includes(file);
+        )
+      return authorizedFiles.length > 0 && authorizedFiles.includes(file)
     },
     [application]
-  );
+  )
 
   const renameFile = useCallback(
     async (file: SNFile, fileName: string) => {
-      await application.items.renameFile(file, fileName);
+      await application.items.renameFile(file, fileName)
     },
     [application]
-  );
+  )
 
   const previewFile = useCallback(
     async (file: SNFile) => {
-      let downloadedFilePath: string | undefined = '';
+      let downloadedFilePath: string | undefined = ''
       try {
-        const isPreviewable = isFileTypePreviewable(file.mimeType);
+        const isPreviewable = isFileTypePreviewable(file.mimeType)
 
         if (!isPreviewable) {
           const tryToPreview = await application.alertService.confirm(
@@ -290,38 +290,38 @@ export const useFiles = ({ note }: Props) => {
             'Try to preview',
             ButtonType.Info,
             'Cancel'
-          );
+          )
           if (!tryToPreview) {
-            return;
+            return
           }
         }
 
         downloadedFilePath = await downloadFileAndReturnLocalPath({
           file,
-          saveInTempLocation: true,
-        });
+          saveInTempLocation: true
+        })
 
         if (!downloadedFilePath) {
-          return;
+          return
         }
         await FileViewer.open(downloadedFilePath, {
           onDismiss: async () => {
-            await cleanupTempFileOnAndroid(downloadedFilePath as string);
-          },
-        });
+            await cleanupTempFileOnAndroid(downloadedFilePath as string)
+          }
+        })
 
-        return true;
+        return true
       } catch (error) {
-        await cleanupTempFileOnAndroid(downloadedFilePath as string);
+        await cleanupTempFileOnAndroid(downloadedFilePath as string)
         await application.alertService.alert(
           'An error occurred while previewing the file.'
-        );
+        )
 
-        return false;
+        return false
       }
     },
     [application, cleanupTempFileOnAndroid, downloadFileAndReturnLocalPath]
-  );
+  )
 
   const deleteFile = useCallback(
     async (file: SNFile) => {
@@ -331,30 +331,30 @@ export const useFiles = ({ note }: Props) => {
         'Confirm',
         ButtonType.Danger,
         'Cancel'
-      );
+      )
       if (shouldDelete) {
         Toast.show({
           type: Info,
-          text2: `Deleting "${file.name}"...`,
-        });
-        const response = await application.files.deleteFile(file);
+          text2: `Deleting "${file.name}"...`
+        })
+        const response = await application.files.deleteFile(file)
 
         if (response instanceof ClientDisplayableError) {
           Toast.show({
             type: Error,
-            text1: response.text,
-          });
-          return;
+            text1: response.text
+          })
+          return
         }
 
         Toast.show({
           type: Success,
-          text2: `Successfully deleted "${file.name}"`,
-        });
+          text2: `Successfully deleted "${file.name}"`
+        })
       }
     },
     [Error, Info, Success, application.alertService, application.files]
-  );
+  )
 
   const handlePickFilesError = async (error: unknown) => {
     if (DocumentPicker.isCancel(error)) {
@@ -363,53 +363,53 @@ export const useFiles = ({ note }: Props) => {
       Toast.show({
         type: Info,
         text2:
-          'Multiple pickers were opened; only the last one will be considered.',
-      });
+          'Multiple pickers were opened; only the last one will be considered.'
+      })
     } else {
       Toast.show({
         type: Error,
-        text1: 'An error occurred while attempting to select files.',
-      });
+        text1: 'An error occurred while attempting to select files.'
+      })
     }
-  };
+  }
 
   const handleUploadError = async () => {
     Toast.show({
       type: Error,
       text1: 'Error',
-      text2: 'An error occurred while uploading file(s).',
-    });
-  };
+      text2: 'An error occurred while uploading file(s).'
+    })
+  }
 
   const pickFiles = async (): Promise<DocumentPickerResponse[] | void> => {
     try {
-      const selectedFiles = await pickMultiple();
+      const selectedFiles = await pickMultiple()
 
-      return selectedFiles;
+      return selectedFiles
     } catch (error) {
-      handlePickFilesError(error);
+      handlePickFilesError(error)
     }
-  };
+  }
 
   const uploadSingleFile = async (
     file: DocumentPickerResponse | Asset
   ): Promise<SNFile | void> => {
     try {
-      const fileName = filesService.getFileName(file);
+      const fileName = filesService.getFileName(file)
       Toast.show({
         type: Info,
         text1: `Uploading "${fileName}"...`,
-        autoHide: false,
-      });
+        autoHide: false
+      })
 
-      const operation = await application.files.beginNewFileUpload();
+      const operation = await application.files.beginNewFileUpload()
 
       if (operation instanceof ClientDisplayableError) {
         Toast.show({
           type: Error,
-          text1: operation.text,
-        });
-        return;
+          text1: operation.text
+        })
+        return
       }
 
       const onChunk = async (
@@ -422,103 +422,101 @@ export const useFiles = ({ note }: Props) => {
           chunk,
           index,
           isLast
-        );
-      };
+        )
+      }
 
-      const fileResult = await filesService.readFile(file, onChunk);
+      const fileResult = await filesService.readFile(file, onChunk)
       const fileObj = await application.files.finishUpload(
         operation,
         fileResult
-      );
+      )
       if (fileObj instanceof ClientDisplayableError) {
         Toast.show({
           type: Error,
-          text1: fileObj.text,
-        });
-        return;
+          text1: fileObj.text
+        })
+        return
       }
-      return fileObj;
+      return fileObj
     } catch (error) {
-      handleUploadError();
+      handleUploadError()
     }
-  };
+  }
 
   const uploadFiles = async (): Promise<SNFile[] | void> => {
     try {
-      const selectedFiles = await pickFiles();
+      const selectedFiles = await pickFiles()
       if (!selectedFiles || selectedFiles.length === 0) {
-        return;
+        return
       }
-      const uploadedFiles: SNFile[] = [];
+      const uploadedFiles: SNFile[] = []
       for (const file of selectedFiles) {
         if (!file.uri || !file.size) {
-          continue;
+          continue
         }
-        const fileObject = await uploadSingleFile(file);
+        const fileObject = await uploadSingleFile(file)
         if (!fileObject) {
           Toast.show({
             type: Error,
             text1: 'Error',
-            text2: `An error occurred while uploading ${file.name}.`,
-          });
-          continue;
+            text2: `An error occurred while uploading ${file.name}.`
+          })
+          continue
         }
-        uploadedFiles.push(fileObject);
+        uploadedFiles.push(fileObject)
 
-        Toast.show({ text1: `Successfully uploaded ${fileObject.name}` });
+        Toast.show({ text1: `Successfully uploaded ${fileObject.name}` })
       }
       if (selectedFiles.length > 1) {
-        Toast.show({ text1: 'Successfully uploaded' });
+        Toast.show({ text1: 'Successfully uploaded' })
       }
 
-      return uploadedFiles;
+      return uploadedFiles
     } catch (error) {
-      handleUploadError();
+      handleUploadError()
     }
-  };
+  }
 
   const uploadFileFromCameraOrImageGallery = async ({
     uploadFromGallery = false,
-    mediaType = 'photo',
-  }: TUploadFileFromCameraOrImageGalleryParams): Promise<
-    SNFile | void
-  > => {
+    mediaType = 'photo'
+  }: TUploadFileFromCameraOrImageGalleryParams): Promise<SNFile | void> => {
     try {
       const result = uploadFromGallery
         ? await launchImageLibrary({ mediaType: 'mixed' })
-        : await launchCamera({ mediaType });
+        : await launchCamera({ mediaType })
 
       if (result.didCancel || !result.assets) {
-        return;
+        return
       }
-      const file = result.assets[0];
-      const fileObject = await uploadSingleFile(file);
+      const file = result.assets[0]
+      const fileObject = await uploadSingleFile(file)
       if (!file.uri || !file.fileSize) {
-        return;
+        return
       }
       if (!fileObject) {
         Toast.show({
           type: Error,
           text1: 'Error',
-          text2: `An error occurred while uploading ${file.fileName}.`,
-        });
-        return;
+          text2: `An error occurred while uploading ${file.fileName}.`
+        })
+        return
       }
-      Toast.show({ text1: `Successfully uploaded ${fileObject.name}` });
+      Toast.show({ text1: `Successfully uploaded ${fileObject.name}` })
 
-      return fileObject;
+      return fileObject
     } catch (error) {
-      handleUploadError();
+      handleUploadError()
     }
-  };
+  }
 
   const handleFileAction = useCallback(
     async (action: UploadedFileItemAction) => {
       const file =
         action.type !== UploadedFileItemActionType.RenameFile
           ? action.payload
-          : action.payload.file;
-      let isAuthorizedForAction = true;
+          : action.payload.file
+      let isAuthorizedForAction = true
 
       if (
         file.protected &&
@@ -527,45 +525,45 @@ export const useFiles = ({ note }: Props) => {
         isAuthorizedForAction = await authorizeProtectedActionForFile(
           file,
           ChallengeReason.AccessProtectedFile
-        );
+        )
       }
 
       if (!isAuthorizedForAction) {
-        return false;
+        return false
       }
 
       switch (action.type) {
         case UploadedFileItemActionType.AttachFileToNote:
-          await attachFileToNote(file);
-          break;
+          await attachFileToNote(file)
+          break
         case UploadedFileItemActionType.DetachFileToNote:
-          await detachFileFromNote(file);
-          break;
+          await detachFileFromNote(file)
+          break
         case UploadedFileItemActionType.ShareFile:
-          await shareFile(file);
-          break;
+          await shareFile(file)
+          break
         case UploadedFileItemActionType.DownloadFile:
-          await downloadFileAndReturnLocalPath({ file });
-          break;
+          await downloadFileAndReturnLocalPath({ file })
+          break
         case UploadedFileItemActionType.ToggleFileProtection: {
-          await toggleFileProtection(file);
-          break;
+          await toggleFileProtection(file)
+          break
         }
         case UploadedFileItemActionType.RenameFile:
-          await renameFile(file, action.payload.name);
-          break;
+          await renameFile(file, action.payload.name)
+          break
         case UploadedFileItemActionType.PreviewFile:
-          await previewFile(file);
-          break;
+          await previewFile(file)
+          break
         case UploadedFileItemActionType.DeleteFile:
-          await deleteFile(file);
-          break;
+          await deleteFile(file)
+          break
         default:
-          break;
+          break
       }
 
-      application.sync.sync();
-      return true;
+      application.sync.sync()
+      return true
     },
     [
       application.sync,
@@ -577,30 +575,30 @@ export const useFiles = ({ note }: Props) => {
       previewFile,
       renameFile,
       shareFile,
-      toggleFileProtection,
+      toggleFileProtection
     ]
-  );
+  )
 
   useEffect(() => {
     const unregisterFileStream = application.streamItems(
       ContentType.File,
       () => {
-        reloadAttachedFiles();
-        reloadAllFiles();
+        reloadAttachedFiles()
+        reloadAllFiles()
       }
-    );
+    )
 
     return () => {
-      unregisterFileStream();
-    };
-  }, [application, reloadAllFiles, reloadAttachedFiles]);
+      unregisterFileStream()
+    }
+  }, [application, reloadAllFiles, reloadAttachedFiles])
 
   const showActionsMenu = useCallback(
     (file: SNFile | undefined) => {
       if (!file) {
-        return;
+        return
       }
-      const isAttachedToNote = attachedFiles.includes(file);
+      const isAttachedToNote = attachedFiles.includes(file)
 
       const actions: CustomActionSheetOption[] = [
         {
@@ -609,85 +607,85 @@ export const useFiles = ({ note }: Props) => {
             ? () =>
                 handleFileAction({
                   type: UploadedFileItemActionType.DetachFileToNote,
-                  payload: file,
+                  payload: file
                 })
             : () =>
                 handleFileAction({
                   type: UploadedFileItemActionType.AttachFileToNote,
-                  payload: file,
-                }),
+                  payload: file
+                })
         },
         {
           text: `${file.protected ? 'Disable' : 'Enable'} password protection`,
           callback: () => {
             handleFileAction({
               type: UploadedFileItemActionType.ToggleFileProtection,
-              payload: file,
-            });
-          },
+              payload: file
+            })
+          }
         },
         {
           text: 'Preview',
           callback: () => {
             handleFileAction({
               type: UploadedFileItemActionType.PreviewFile,
-              payload: file,
-            });
-          },
+              payload: file
+            })
+          }
         },
         {
           text: Platform.OS === 'ios' ? 'Export' : 'Share',
           callback: () => {
             handleFileAction({
               type: UploadedFileItemActionType.ShareFile,
-              payload: file,
-            });
-          },
+              payload: file
+            })
+          }
         },
         {
           text: 'Download',
           callback: () => {
             handleFileAction({
               type: UploadedFileItemActionType.DownloadFile,
-              payload: file,
-            });
-          },
+              payload: file
+            })
+          }
         },
         {
           text: 'Rename',
           callback: () =>
             navigation.navigate(SCREEN_INPUT_MODAL_FILE_NAME, {
               file,
-              handleFileAction,
-            }),
+              handleFileAction
+            })
         },
         {
           text: 'Delete permanently',
           callback: () => {
             handleFileAction({
               type: UploadedFileItemActionType.DeleteFile,
-              payload: file,
-            });
+              payload: file
+            })
           },
-          destructive: true,
-        },
-      ];
+          destructive: true
+        }
+      ]
       const osDependentActions =
         Platform.OS === 'ios'
           ? actions.filter(action => action.text !== 'Download')
-          : [...actions];
+          : [...actions]
       showActionSheet({
         title: file.name,
         options: osDependentActions,
         styles: {
           titleTextStyle: {
-            fontWeight: 'bold',
-          },
-        },
-      });
+            fontWeight: 'bold'
+          }
+        }
+      })
     },
     [attachedFiles, handleFileAction, navigation, showActionSheet]
-  );
+  )
 
   return {
     showActionsMenu,
@@ -695,6 +693,6 @@ export const useFiles = ({ note }: Props) => {
     allFiles,
     uploadFiles,
     uploadFileFromCameraOrImageGallery,
-    attachFileToNote,
-  };
-};
+    attachFileToNote
+  }
+}

@@ -1,48 +1,48 @@
-import { ButtonCell } from '@Components/ButtonCell';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
-import { TableSection } from '@Components/TableSection';
-import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
-import { ModalStackNavigationProp } from '@Root/ModalStack';
-import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Screens/screens';
-import { UploadedFileItemActionType } from '@Screens/UploadedFilesList/UploadedFileItemAction';
-import { ThemeServiceContext } from '@Style/theme_service';
-import React, { FC, useContext, useEffect, useRef, useState } from 'react';
-import { TextInput } from 'react-native';
-import { Container, Input } from './InputModal.styled';
+import { ButtonCell } from '@Components/ButtonCell'
+import { SectionedTableCell } from '@Components/SectionedTableCell'
+import { TableSection } from '@Components/TableSection'
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext'
+import { ModalStackNavigationProp } from '@Root/ModalStack'
+import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Screens/screens'
+import { UploadedFileItemActionType } from '@Screens/UploadedFilesList/UploadedFileItemAction'
+import { ThemeServiceContext } from '@Style/theme_service'
+import React, { FC, useContext, useEffect, useRef, useState } from 'react'
+import { TextInput } from 'react-native'
+import { Container, Input } from './InputModal.styled'
 
-type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_FILE_NAME>;
+type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_FILE_NAME>
 
 export const FileInputModal: FC<Props> = props => {
-  const { file, handleFileAction } = props.route.params;
-  const themeService = useContext(ThemeServiceContext);
-  const application = useSafeApplicationContext();
+  const { file, handleFileAction } = props.route.params
+  const themeService = useContext(ThemeServiceContext)
+  const application = useSafeApplicationContext()
 
-  const fileNameInputRef = useRef<TextInput>(null);
+  const fileNameInputRef = useRef<TextInput>(null)
 
-  const [fileName, setFileName] = useState(file.name);
+  const [fileName, setFileName] = useState(file.name)
 
   const onSubmit = async () => {
-    const trimmedFileName = fileName.trim();
+    const trimmedFileName = fileName.trim()
     if (trimmedFileName === '') {
-      setFileName(file.name);
-      await application?.alertService.alert('File name cannot be empty');
-      fileNameInputRef.current?.focus();
-      return;
+      setFileName(file.name)
+      await application?.alertService.alert('File name cannot be empty')
+      fileNameInputRef.current?.focus()
+      return
     }
     await handleFileAction({
       type: UploadedFileItemActionType.RenameFile,
       payload: {
         file,
-        name: trimmedFileName,
-      },
-    });
-    application.sync.sync();
-    props.navigation.goBack();
-  };
+        name: trimmedFileName
+      }
+    })
+    application.sync.sync()
+    props.navigation.goBack()
+  }
 
   useEffect(() => {
-    fileNameInputRef.current?.focus();
-  }, []);
+    fileNameInputRef.current?.focus()
+  }, [])
 
   return (
     <Container>
@@ -70,5 +70,5 @@ export const FileInputModal: FC<Props> = props => {
         />
       </TableSection>
     </Container>
-  );
-};
+  )
+}

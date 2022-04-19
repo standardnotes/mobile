@@ -1,33 +1,33 @@
-import { Button } from '@Components/Button';
-import { useFocusEffect } from '@react-navigation/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { AppStackNavigationProp } from '@Root/AppStack';
-import { SCREEN_SETTINGS, SCREEN_VIEW_PROTECTED_NOTE } from '@Screens/screens';
-import React, { useCallback, useContext } from 'react';
-import { Container, Text, Title } from './ViewProtectedNote.styled';
+import { Button } from '@Components/Button'
+import { useFocusEffect } from '@react-navigation/native'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { AppStackNavigationProp } from '@Root/AppStack'
+import { SCREEN_SETTINGS, SCREEN_VIEW_PROTECTED_NOTE } from '@Screens/screens'
+import React, { useCallback, useContext } from 'react'
+import { Container, Text, Title } from './ViewProtectedNote.styled'
 
-type Props = AppStackNavigationProp<typeof SCREEN_VIEW_PROTECTED_NOTE>;
+type Props = AppStackNavigationProp<typeof SCREEN_VIEW_PROTECTED_NOTE>
 
 export const ViewProtectedNote = ({
   route: {
-    params: { onPressView },
+    params: { onPressView }
   },
-  navigation,
+  navigation
 }: Props) => {
-  const application = useContext(ApplicationContext);
+  const application = useContext(ApplicationContext)
 
   const onPressGoToSettings = () => {
-    navigation.navigate(SCREEN_SETTINGS);
-  };
+    navigation.navigate(SCREEN_SETTINGS)
+  }
 
   const checkProtectionSources = useCallback(() => {
-    const hasProtectionSources = application?.hasProtectionSources();
+    const hasProtectionSources = application?.hasProtectionSources()
     if (hasProtectionSources) {
-      onPressView();
+      onPressView()
     }
-  }, [application, onPressView]);
+  }, [application, onPressView])
 
-  useFocusEffect(checkProtectionSources);
+  useFocusEffect(checkProtectionSources)
 
   return (
     <Container>
@@ -44,5 +44,5 @@ export const ViewProtectedNote = ({
       />
       <Button label="View" fullWidth={true} last={true} onPress={onPressView} />
     </Container>
-  );
-};
+  )
+}

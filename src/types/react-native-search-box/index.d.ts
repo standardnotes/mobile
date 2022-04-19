@@ -1,1 +1,1 @@
-declare module 'react-native-seach-box';
+declare module 'react-native-seach-box'

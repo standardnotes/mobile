@@ -1,7 +1,7 @@
-import { Circle } from '@Components/Circle';
-import React, { useContext } from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { ThemeContext } from 'styled-components';
+import { Circle } from '@Components/Circle'
+import React, { useContext } from 'react'
+import Icon from 'react-native-vector-icons/Ionicons'
+import { ThemeContext } from 'styled-components'
 import {
   CellContent,
   IconAscii,
@@ -14,16 +14,16 @@ import {
   SubTextContainer,
   Text,
   TextContainer,
-  Touchable,
-} from './SideMenuCell.styled';
+  Touchable
+} from './SideMenuCell.styled'
 import {
   SideMenuOption,
-  SideMenuOptionIconDescriptionType,
-} from './SideMenuSection';
+  SideMenuOptionIconDescriptionType
+} from './SideMenuSection'
 
 const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
   if (!desc) {
-    return null;
+    return null
   }
 
   if (desc.type === SideMenuOptionIconDescriptionType.Icon && desc.name) {
@@ -31,10 +31,10 @@ const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
       <IconGraphicContainer>
         <Icon name={desc.name} size={desc.size || 20} color={color} />
       </IconGraphicContainer>
-    );
+    )
   }
   if (desc.type === SideMenuOptionIconDescriptionType.Ascii) {
-    return <IconAscii>{desc.value}</IconAscii>;
+    return <IconAscii>{desc.value}</IconAscii>
   }
   if (desc.type === SideMenuOptionIconDescriptionType.Circle) {
     return (
@@ -44,35 +44,35 @@ const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
           borderColor={desc.borderColor}
         />
       </IconCircleContainer>
-    );
+    )
   }
   if (desc.type === SideMenuOptionIconDescriptionType.CustomComponent) {
-    return desc.value;
+    return desc.value
   }
-  return <RegularText>*</RegularText>;
-};
+  return <RegularText>*</RegularText>
+}
 
 export const SideMenuCell: React.FC<SideMenuOption> = props => {
-  const theme = useContext(ThemeContext);
+  const theme = useContext(ThemeContext)
   const colorForTextClass = (textClass: SideMenuOption['textClass']) => {
     if (!textClass) {
-      return undefined;
+      return undefined
     }
 
     return {
       info: theme.stylekitInfoColor,
       danger: theme.stylekitDangerColor,
-      warning: theme.stylekitWarningColor,
-    }[textClass];
-  };
+      warning: theme.stylekitWarningColor
+    }[textClass]
+  }
 
-  const hasIcon = props.iconDesc;
+  const hasIcon = props.iconDesc
   const iconSide =
     hasIcon && props.iconDesc?.side
       ? props.iconDesc.side
       : hasIcon
       ? 'left'
-      : null;
+      : null
   return (
     <Touchable
       isSubtext={Boolean(props.subtext)}
@@ -110,5 +110,5 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
         )}
       </CellContent>
     </Touchable>
-  );
-};
+  )
+}

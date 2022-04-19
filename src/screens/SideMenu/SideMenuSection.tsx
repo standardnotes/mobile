@@ -1,54 +1,54 @@
-import React, { ReactElement, useMemo, useState } from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
-import { SideMenuCell } from './SideMenuCell';
-import { CollapsedLabel, Header, Root, Title } from './SideMenuSection.styled';
+import React, { ReactElement, useMemo, useState } from 'react'
+import { StyleProp, ViewStyle } from 'react-native'
+import { SideMenuCell } from './SideMenuCell'
+import { CollapsedLabel, Header, Root, Title } from './SideMenuSection.styled'
 
 export enum SideMenuOptionIconDescriptionType {
   Icon = 'icon',
   Ascii = 'ascii',
   Circle = 'circle',
-  CustomComponent = 'custom-component',
+  CustomComponent = 'custom-component'
 }
 
 export type SideMenuOption = {
-  text: string;
-  subtext?: string;
-  textClass?: 'info' | 'danger' | 'warning';
-  key?: string;
+  text: string
+  subtext?: string
+  textClass?: 'info' | 'danger' | 'warning'
+  key?: string
   iconDesc?: {
-    type: SideMenuOptionIconDescriptionType;
-    side?: 'left' | 'right';
-    name?: string;
-    value?: string | ReactElement;
-    backgroundColor?: string;
-    borderColor?: string;
-    size?: number;
-  };
-  dimmed?: boolean;
-  selected?: boolean;
-  onSelect?: () => void | Promise<void>;
-  onLongPress?: () => void;
-  style?: StyleProp<ViewStyle>;
-  cellContentStyle?: StyleProp<ViewStyle>;
-};
+    type: SideMenuOptionIconDescriptionType
+    side?: 'left' | 'right'
+    name?: string
+    value?: string | ReactElement
+    backgroundColor?: string
+    borderColor?: string
+    size?: number
+  }
+  dimmed?: boolean
+  selected?: boolean
+  onSelect?: () => void | Promise<void>
+  onLongPress?: () => void
+  style?: StyleProp<ViewStyle>
+  cellContentStyle?: StyleProp<ViewStyle>
+}
 
 type Props = {
-  title: string;
-  customCollapsedLabel?: string;
-  collapsed?: boolean;
-  options?: SideMenuOption[];
-};
+  title: string
+  customCollapsedLabel?: string
+  collapsed?: boolean
+  options?: SideMenuOption[]
+}
 
 export const SideMenuSection: React.FC<Props> = React.memo(props => {
-  const [collapsed, setCollapsed] = useState(Boolean(props.collapsed));
+  const [collapsed, setCollapsed] = useState(Boolean(props.collapsed))
   const options = useMemo(() => {
-    return props.options || [];
-  }, [props.options]);
+    return props.options || []
+  }, [props.options])
   const collapsedLabel =
     props.customCollapsedLabel ||
     (options.length > 0
       ? 'Tap to expand ' + options.length + ' options'
-      : 'Tap to expand');
+      : 'Tap to expand')
   return (
     <Root>
       <Header collapsed={collapsed} onPress={() => setCollapsed(!collapsed)}>
@@ -73,11 +73,11 @@ export const SideMenuSection: React.FC<Props> = React.memo(props => {
                 onSelect={option.onSelect}
                 onLongPress={option.onLongPress}
               />
-            );
+            )
           })}
           {props.children}
         </>
       )}
     </Root>
-  );
-});
+  )
+})

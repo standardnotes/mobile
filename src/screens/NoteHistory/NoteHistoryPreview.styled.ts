@@ -1,13 +1,13 @@
-import { Platform } from 'react-native';
-import styled, { css } from 'styled-components/native';
+import { Platform } from 'react-native'
+import styled, { css } from 'styled-components/native'
 
-const PADDING = 14;
-const NOTE_TITLE_HEIGHT = 50;
+const PADDING = 14
+const NOTE_TITLE_HEIGHT = 50
 
 export const Container = styled.View`
   flex: 1;
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
-`;
+`
 
 export const StyledTextView = styled.Text`
   padding-top: 10px;
@@ -23,9 +23,9 @@ export const StyledTextView = styled.Text`
   `}
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
   /* ${Platform.OS === 'ios' && 'padding-bottom: 10px'}; */
-`;
+`
 
-export const TextContainer = styled.ScrollView``;
+export const TextContainer = styled.ScrollView``
 
 export const TitleContainer = styled.View`
   border-bottom-color: ${({ theme }) => theme.stylekitBorderColor};
@@ -36,10 +36,10 @@ export const TitleContainer = styled.View`
   padding-top: ${Platform.OS === 'ios' ? 5 : 12}px;
   padding-left: ${PADDING}px;
   padding-right: ${PADDING}px;
-`;
+`
 
 export const Title = styled.Text`
   font-weight: 600;
   font-size: 16px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
-`;
+`

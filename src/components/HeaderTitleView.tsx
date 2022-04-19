@@ -1,12 +1,12 @@
-import React from 'react';
-import { Platform } from 'react-native';
-import styled from 'styled-components/native';
+import React from 'react'
+import { Platform } from 'react-native'
+import styled from 'styled-components/native'
 
 type Props = {
-  subtitleColor?: string;
-  title: string;
-  subtitle?: string;
-};
+  subtitleColor?: string
+  title: string
+  subtitle?: string
+}
 
 const Container = styled.View`
   /* background-color: ${props =>
@@ -15,22 +15,22 @@ const Container = styled.View`
   justify-content: center;
 
   ${Platform.OS === 'android' && 'align-items: flex-start; min-width: 100px;'}
-`;
+`
 const Title = styled.Text`
   color: ${props => props.theme.stylekitForegroundColor};
   font-weight: bold;
   font-size: 18px;
   text-align: center;
-`;
+`
 const SubTitle = styled.Text.attrs(() => ({
   adjustsFontSizeToFit: true,
-  numberOfLines: 1,
+  numberOfLines: 1
 }))<{ color?: string }>`
   color: ${props => props.color ?? props.theme.stylekitForegroundColor};
   opacity: ${props => (props.color ? 1 : 0.6)};
   font-size: ${Platform.OS === 'android' ? 13 : 12}px;
   ${Platform.OS === 'ios' && 'text-align: center'}
-`;
+`
 
 export const HeaderTitleView: React.FC<Props> = props => (
   <Container>
@@ -39,4 +39,4 @@ export const HeaderTitleView: React.FC<Props> = props => (
       <SubTitle color={props.subtitleColor}>{props.subtitle}</SubTitle>
     ) : undefined}
   </Container>
-);
+)

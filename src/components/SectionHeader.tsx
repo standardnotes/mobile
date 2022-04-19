@@ -1,16 +1,16 @@
-import React from 'react';
-import { Platform } from 'react-native';
-import styled from 'styled-components/native';
+import React from 'react'
+import { Platform } from 'react-native'
+import styled from 'styled-components/native'
 
 type Props = {
-  title?: string;
-  subtitle?: string;
-  buttonText?: string;
-  buttonAction?: () => void;
-  buttonStyles?: any;
-  tinted?: boolean;
-  backgroundColor?: string;
-};
+  title?: string
+  subtitle?: string
+  buttonText?: string
+  buttonAction?: () => void
+  buttonStyles?: any
+  tinted?: boolean
+  backgroundColor?: string
+}
 
 const Container = styled.View<Pick<Props, 'backgroundColor'>>`
   /* flex: 1; */
@@ -22,8 +22,8 @@ const Container = styled.View<Pick<Props, 'backgroundColor'>>`
   padding-top: 10px;
   background-color: ${props =>
     props.backgroundColor ?? props.theme.stylekitBackgroundColor};
-`;
-const TitleContainer = styled.View``;
+`
+const TitleContainer = styled.View``
 const Title = styled.Text<Pick<Props, 'tinted'>>`
   background-color: ${props => props.theme.stylekitBackgroundColor};
   font-size: ${props =>
@@ -33,30 +33,30 @@ const Title = styled.Text<Pick<Props, 'tinted'>>`
   padding-left: ${props => props.theme.paddingLeft}px;
   color: ${props => {
     if (props.tinted) {
-      return props.theme.stylekitInfoColor;
+      return props.theme.stylekitInfoColor
     }
 
     return Platform.OS === 'android'
       ? props.theme.stylekitInfoColor
-      : props.theme.stylekitNeutralColor;
+      : props.theme.stylekitNeutralColor
   }};
   font-weight: ${Platform.OS === 'android' ? 'bold' : 'normal'};
-`;
+`
 const SubTitle = styled.Text`
   background-color: ${props => props.theme.stylekitBackgroundColor};
   font-size: ${props => props.theme.mainTextFontSize - 5}px;
   margin-top: 4px;
   padding-left: ${props => props.theme.paddingLeft}px;
   color: ${props => props.theme.stylekitNeutralColor};
-`;
+`
 const ButtonContainer = styled.TouchableOpacity`
   flex: 1;
   align-items: flex-end;
   justify-content: center;
-`;
+`
 const Button = styled.Text`
   color: ${props => props.theme.stylekitInfoColor};
-`;
+`
 
 export const SectionHeader: React.FC<Props> = props => (
   <Container>
@@ -65,7 +65,7 @@ export const SectionHeader: React.FC<Props> = props => (
         <Title>
           {Platform.select({
             ios: props.title.toUpperCase(),
-            android: props.title,
+            android: props.title
           })}
         </Title>
       )}
@@ -77,4 +77,4 @@ export const SectionHeader: React.FC<Props> = props => (
       </ButtonContainer>
     )}
   </Container>
-);
+)

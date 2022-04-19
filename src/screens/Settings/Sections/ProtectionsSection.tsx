@@ -1,38 +1,38 @@
-import { ButtonCell } from '@Components/ButtonCell';
-import { SectionHeader } from '@Components/SectionHeader';
-import { TableSection } from '@Components/TableSection';
-import { useProtectionSessionExpiry } from '@Lib/snjs_helper_hooks';
-import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
-import React from 'react';
+import { ButtonCell } from '@Components/ButtonCell'
+import { SectionHeader } from '@Components/SectionHeader'
+import { TableSection } from '@Components/TableSection'
+import { useProtectionSessionExpiry } from '@Lib/snjs_helper_hooks'
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext'
+import React from 'react'
 import {
   BaseView,
   StyledSectionedTableCell,
   SubText,
   Subtitle,
-  Title,
-} from './ProtectionsSection.styled';
+  Title
+} from './ProtectionsSection.styled'
 
 type Props = {
-  title: string;
-  protectionsAvailable?: Boolean;
-};
+  title: string
+  protectionsAvailable?: Boolean
+}
 
 export const ProtectionsSection = (props: Props) => {
   // Context
-  const application = useSafeApplicationContext();
+  const application = useSafeApplicationContext()
   // State
-  const [protectionsDisabledUntil] = useProtectionSessionExpiry();
+  const [protectionsDisabledUntil] = useProtectionSessionExpiry()
 
   const protectionsEnabledSubtitle = protectionsDisabledUntil
     ? `Disabled until ${protectionsDisabledUntil}`
-    : 'Enabled';
+    : 'Enabled'
 
   const protectionsEnabledSubtext =
-    'Actions like viewing protected notes, exporting decrypted backups, or revoking an active session, require additional authentication like entering your account password or application passcode.';
+    'Actions like viewing protected notes, exporting decrypted backups, or revoking an active session, require additional authentication like entering your account password or application passcode.'
 
   const enableProtections = () => {
-    application?.clearProtectionSession();
-  };
+    application?.clearProtectionSession()
+  }
 
   return (
     <TableSection>
@@ -56,5 +56,5 @@ export const ProtectionsSection = (props: Props) => {
       )}
       <SubText>{protectionsEnabledSubtext}</SubText>
     </TableSection>
-  );
-};
+  )
+}

@@ -1,8 +1,8 @@
-import { useNavigation } from '@react-navigation/native';
-import { SCREEN_SETTINGS } from '@Screens/screens';
-import { ICON_FORWARD, ICON_USER } from '@Style/icons';
-import { ThemeService } from '@Style/theme_service';
-import React from 'react';
+import { useNavigation } from '@react-navigation/native'
+import { SCREEN_SETTINGS } from '@Screens/screens'
+import { ICON_FORWARD, ICON_USER } from '@Style/icons'
+import { ThemeService } from '@Style/theme_service'
+import React from 'react'
 import {
   BoldText,
   CenterContainer,
@@ -11,17 +11,17 @@ import {
   SubText,
   TextContainer,
   Touchable,
-  UserIcon,
-} from './OfflineBanner.styled';
+  UserIcon
+} from './OfflineBanner.styled'
 
-const NOT_BACKED_UP_TEXT = 'Data not backed up';
-const SIGN_IN_TEXT = 'Sign in or register to backup your notes';
+const NOT_BACKED_UP_TEXT = 'Data not backed up'
+const SIGN_IN_TEXT = 'Sign in or register to backup your notes'
 
 export const OfflineBanner: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation()
   const onPress = () => {
-    navigation.navigate(SCREEN_SETTINGS as never);
-  };
+    navigation.navigate(SCREEN_SETTINGS as never)
+  }
 
   return (
     <Touchable onPress={onPress}>
@@ -38,5 +38,5 @@ export const OfflineBanner: React.FC = () => {
         </CenterContainer>
       </Container>
     </Touchable>
-  );
-};
+  )
+}

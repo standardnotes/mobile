@@ -1,27 +1,27 @@
-import React from 'react';
-import { Platform } from 'react-native';
-import styled, { css } from 'styled-components/native';
+import React from 'react'
+import { Platform } from 'react-native'
+import styled, { css } from 'styled-components/native'
 import {
   Props as TableCellProps,
-  SectionedTableCellTouchableHighlight,
-} from './SectionedTableCell';
+  SectionedTableCellTouchableHighlight
+} from './SectionedTableCell'
 
 type Props = {
-  testID?: string;
-  maxHeight?: number;
-  leftAligned?: boolean;
-  bold?: boolean;
-  disabled?: boolean;
-  important?: boolean;
-  onPress: () => void;
-  first?: boolean;
-  last?: boolean;
-  title?: string;
-};
+  testID?: string
+  maxHeight?: number
+  leftAligned?: boolean
+  bold?: boolean
+  disabled?: boolean
+  important?: boolean
+  onPress: () => void
+  first?: boolean
+  last?: boolean
+  title?: string
+}
 
-type ContainerProps = Pick<Props, 'maxHeight'> & TableCellProps;
+type ContainerProps = Pick<Props, 'maxHeight'> & TableCellProps
 const Container = styled(SectionedTableCellTouchableHighlight).attrs(props => ({
-  underlayColor: props.theme.stylekitBorderColor,
+  underlayColor: props.theme.stylekitBorderColor
 }))<ContainerProps>`
   padding-top: ${12}px;
   justify-content: center;
@@ -30,13 +30,13 @@ const Container = styled(SectionedTableCellTouchableHighlight).attrs(props => ({
     css`
       max-height: 50px;
     `};
-`;
-const ButtonContainer = styled.View``;
+`
+const ButtonContainer = styled.View``
 
 type ButtonLabelProps = Pick<
   Props,
   'leftAligned' | 'bold' | 'disabled' | 'important'
->;
+>
 const ButtonLabel = styled.Text<ButtonLabelProps>`
   text-align: ${props => (props.leftAligned ? 'left' : 'center')};
   text-align-vertical: center;
@@ -44,13 +44,13 @@ const ButtonLabel = styled.Text<ButtonLabelProps>`
     let color =
       Platform.OS === 'android'
         ? props.theme.stylekitForegroundColor
-        : props.theme.stylekitInfoColor;
+        : props.theme.stylekitInfoColor
     if (props.disabled) {
-      color = 'gray';
+      color = 'gray'
     } else if (props.important) {
-      color = props.theme.stylekitDangerColor;
+      color = props.theme.stylekitDangerColor
     }
-    return color;
+    return color
   }};
   font-size: ${props => props.theme.mainTextFontSize}px;
   ${({ bold }) =>
@@ -63,7 +63,7 @@ const ButtonLabel = styled.Text<ButtonLabelProps>`
     css`
       opacity: 0.6;
     `}
-`;
+`
 
 export const ButtonCell: React.FC<Props> = props => (
   <Container
@@ -86,4 +86,4 @@ export const ButtonCell: React.FC<Props> = props => (
       {props.children && props.children}
     </ButtonContainer>
   </Container>
-);
+)

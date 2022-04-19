@@ -1,61 +1,61 @@
-import { ButtonCell } from '@Components/ButtonCell';
-import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
-import { SectionHeader } from '@Components/SectionHeader';
-import { TableSection } from '@Components/TableSection';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { ThemeServiceContext } from '@Style/theme_service';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Keyboard } from 'react-native';
+import { ButtonCell } from '@Components/ButtonCell'
+import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell'
+import { SectionedTableCell } from '@Components/SectionedTableCell'
+import { SectionHeader } from '@Components/SectionHeader'
+import { TableSection } from '@Components/TableSection'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { ThemeServiceContext } from '@Style/theme_service'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { Keyboard } from 'react-native'
 import {
   RegistrationDescription,
   RegistrationInput,
-  RegularView,
-} from './AuthSection.styled';
+  RegularView
+} from './AuthSection.styled'
 
-const DEFAULT_SIGN_IN_TEXT = 'Sign In';
-const DEFAULT_REGISTER_TEXT = 'Register';
-const SIGNIN_IN = 'Generating Keys...';
+const DEFAULT_SIGN_IN_TEXT = 'Sign In'
+const DEFAULT_REGISTER_TEXT = 'Register'
+const SIGNIN_IN = 'Generating Keys...'
 
 type Props = {
-  title: string;
-  signedIn: boolean;
-};
+  title: string
+  signedIn: boolean
+}
 
 export const AuthSection = (props: Props) => {
   // Context
-  const application = useContext(ApplicationContext);
-  const themeService = useContext(ThemeServiceContext);
+  const application = useContext(ApplicationContext)
+  const themeService = useContext(ThemeServiceContext)
 
   // State
-  const [registering, setRegistering] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
-  const [strictSignIn, setStrictSignIn] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [server, setServer] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
-  const [confirmRegistration, setConfirmRegistration] = useState(false);
+  const [registering, setRegistering] = useState(false)
+  const [signingIn, setSigningIn] = useState(false)
+  const [strictSignIn, setStrictSignIn] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [server, setServer] = useState('')
+  const [passwordConfirmation, setPasswordConfirmation] = useState('')
+  const [confirmRegistration, setConfirmRegistration] = useState(false)
 
   // set initial server
   useEffect(() => {
     const getServer = async () => {
-      const host = await application?.getHost();
-      setServer(host!);
-    };
-    getServer();
-  }, [application]);
+      const host = await application?.getHost()
+      setServer(host!)
+    }
+    getServer()
+  }, [application])
 
   const updateServer = useCallback(
     async (host: string) => {
-      setServer(host);
-      await application?.setCustomHost(host);
+      setServer(host)
+      await application?.setCustomHost(host)
     },
     [application]
-  );
+  )
   if (props.signedIn) {
-    return null;
+    return null
   }
 
   const validate = () => {
@@ -64,8 +64,8 @@ export const AuthSection = (props: Props) => {
         'Please enter a valid email address.',
         'Missing Email',
         'OK'
-      );
-      return false;
+      )
+      return false
     }
 
     if (!password) {
@@ -73,20 +73,20 @@ export const AuthSection = (props: Props) => {
         'Please enter your password.',
         'Missing Password',
         'OK'
-      );
-      return false;
+      )
+      return false
     }
 
-    return true;
-  };
+    return true
+  }
 
   const signIn = async () => {
-    setSigningIn(true);
+    setSigningIn(true)
     if (!validate()) {
-      setSigningIn(false);
-      return;
+      setSigningIn(false)
+      return
     }
-    Keyboard.dismiss();
+    Keyboard.dismiss()
     const result = await application!.signIn(
       email,
       password,
@@ -94,50 +94,50 @@ export const AuthSection = (props: Props) => {
       undefined,
       true,
       false
-    );
+    )
 
     if (result?.error) {
       if (result?.error.message) {
-        application?.alertService?.alert(result?.error.message);
+        application?.alertService?.alert(result?.error.message)
       }
-      setSigningIn(false);
-      return;
+      setSigningIn(false)
+      return
     }
 
-    setSigningIn(false);
-    setPassword('');
-    setPasswordConfirmation('');
-  };
+    setSigningIn(false)
+    setPassword('')
+    setPasswordConfirmation('')
+  }
 
   const onRegisterPress = () => {
     if (!validate()) {
-      return;
+      return
     }
-    setConfirmRegistration(true);
-  };
+    setConfirmRegistration(true)
+  }
 
   const register = async () => {
-    setRegistering(true);
+    setRegistering(true)
     if (password !== passwordConfirmation) {
       application?.alertService?.alert(
         'The passwords you entered do not match. Please try again.',
         "Passwords Don't Match",
         'OK'
-      );
+      )
     } else {
-      Keyboard.dismiss();
+      Keyboard.dismiss()
       const result = await application!.register(
         email,
         password,
         undefined,
         true
-      );
+      )
       if (result?.error) {
-        application?.alertService?.alert(result.error.message);
+        application?.alertService?.alert(result.error.message)
       }
     }
-    setRegistering(false);
-  };
+    setRegistering(false)
+  }
 
   const _renderRegistrationConfirm = () => {
     return (
@@ -173,17 +173,17 @@ export const AuthSection = (props: Props) => {
         <ButtonCell
           title="Cancel"
           onPress={() => {
-            setConfirmRegistration(false);
-            setPasswordConfirmation('');
-            setPassword('');
+            setConfirmRegistration(false)
+            setPasswordConfirmation('')
+            setPassword('')
           }}
         />
       </TableSection>
-    );
-  };
+    )
+  }
 
   const _renderDefaultContent = () => {
-    const keyboardApperance = themeService?.keyboardColorForActiveTheme();
+    const keyboardApperance = themeService?.keyboardColorForActiveTheme()
 
     return (
       <TableSection>
@@ -238,7 +238,7 @@ export const AuthSection = (props: Props) => {
                 onPress={() => setStrictSignIn(!strictSignIn)}
                 text={'Use strict sign in'}
                 selected={() => {
-                  return strictSignIn;
+                  return strictSignIn
                 }}
               />
             </RegularView>
@@ -269,8 +269,8 @@ export const AuthSection = (props: Props) => {
           />
         )}
       </TableSection>
-    );
-  };
+    )
+  }
 
   return (
     <RegularView>
@@ -278,5 +278,5 @@ export const AuthSection = (props: Props) => {
 
       {!confirmRegistration && _renderDefaultContent()}
     </RegularView>
-  );
-};
+  )
+}

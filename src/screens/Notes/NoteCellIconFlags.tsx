@@ -1,53 +1,53 @@
-import { SnIcon } from '@Components/SnIcon';
-import { IconType, SNNote } from '@standardnotes/snjs';
-import React, { useContext } from 'react';
-import { ThemeContext } from 'styled-components';
-import styled from 'styled-components/native';
+import { SnIcon } from '@Components/SnIcon'
+import { IconType, SNNote } from '@standardnotes/snjs'
+import React, { useContext } from 'react'
+import { ThemeContext } from 'styled-components'
+import styled from 'styled-components/native'
 
 const FlagIconsContainer = styled.View`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   margin-top: 2px;
-`;
+`
 type Props = {
-  note: SNNote;
-};
+  note: SNNote
+}
 
 type TFlagIcon = {
-  icon: IconType;
-  fillColor?: string;
-};
+  icon: IconType
+  fillColor?: string
+}
 
 export const NoteCellIconFlags = ({ note }: Props) => {
-  const theme = useContext(ThemeContext);
-  const { stylekitCorn, stylekitDangerColor, stylekitInfoColor } = theme;
+  const theme = useContext(ThemeContext)
+  const { stylekitCorn, stylekitDangerColor, stylekitInfoColor } = theme
 
-  const flagIcons = [] as TFlagIcon[];
+  const flagIcons = [] as TFlagIcon[]
 
   if (note.archived) {
     flagIcons.push({
       icon: 'archive',
-      fillColor: stylekitCorn,
-    });
+      fillColor: stylekitCorn
+    })
   }
   if (note.locked) {
     flagIcons.push({
       icon: 'pencil-off',
-      fillColor: stylekitInfoColor,
-    });
+      fillColor: stylekitInfoColor
+    })
   }
   if (note.trashed) {
     flagIcons.push({
       icon: 'trash-filled',
-      fillColor: stylekitDangerColor,
-    });
+      fillColor: stylekitDangerColor
+    })
   }
   if (note.pinned) {
     flagIcons.push({
       icon: 'pin-filled',
-      fillColor: stylekitInfoColor,
-    });
+      fillColor: stylekitInfoColor
+    })
   }
   return flagIcons.length ? (
     <FlagIconsContainer>
@@ -55,5 +55,5 @@ export const NoteCellIconFlags = ({ note }: Props) => {
         <SnIcon key={index} type={flagIcon.icon} fill={flagIcon.fillColor} />
       ))}
     </FlagIconsContainer>
-  ) : null;
-};
+  ) : null
+}

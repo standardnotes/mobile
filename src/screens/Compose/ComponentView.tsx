@@ -1,25 +1,25 @@
-import { ComponentLoadingError } from '@Lib/component_manager';
-import { PrefKey } from '@Lib/preferences_manager';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { AppStackNavigationProp } from '@Root/AppStack';
-import { SCREEN_NOTES } from '@Screens/screens';
-import { ButtonType, ComponentViewer } from '@standardnotes/snjs';
-import { ThemeServiceContext } from '@Style/theme_service';
+import { ComponentLoadingError } from '@Lib/component_manager'
+import { PrefKey } from '@Lib/preferences_manager'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { AppStackNavigationProp } from '@Root/AppStack'
+import { SCREEN_NOTES } from '@Screens/screens'
+import { ButtonType, ComponentViewer } from '@standardnotes/snjs'
+import { ThemeServiceContext } from '@Style/theme_service'
 import React, {
   useCallback,
   useContext,
   useEffect,
   useRef,
-  useState,
-} from 'react';
-import { Platform } from 'react-native';
-import { WebView } from 'react-native-webview';
+  useState
+} from 'react'
+import { Platform } from 'react-native'
+import { WebView } from 'react-native-webview'
 import {
   OnShouldStartLoadWithRequest,
   WebViewErrorEvent,
-  WebViewMessageEvent,
-} from 'react-native-webview/lib/WebViewTypes';
+  WebViewMessageEvent
+} from 'react-native-webview/lib/WebViewTypes'
 import {
   DeprecatedContainer,
   DeprecatedIcon,
@@ -28,28 +28,28 @@ import {
   LockedContainer,
   LockedText,
   StyledIcon,
-  StyledWebview,
-} from './ComponentView.styled';
+  StyledWebview
+} from './ComponentView.styled'
 
 type Props = {
-  componentViewer: ComponentViewer;
-  onLoadEnd: () => void;
-  onLoadStart: () => void;
-  onLoadError: (error: ComponentLoadingError, desc?: string) => void;
-  onDownloadEditorStart: () => void;
-  onDownloadEditorEnd: () => void;
-};
+  componentViewer: ComponentViewer
+  onLoadEnd: () => void
+  onLoadStart: () => void
+  onLoadError: (error: ComponentLoadingError, desc?: string) => void
+  onDownloadEditorStart: () => void
+  onDownloadEditorEnd: () => void
+}
 
 const log = (message?: any, ...optionalParams: any[]) => {
-  const LOGGING_ENABLED = false;
+  const LOGGING_ENABLED = false
   if (LOGGING_ENABLED) {
-    console.log(message, optionalParams, '\n\n');
-    console.log('\n\n');
+    console.log(message, optionalParams, '\n\n')
+    console.log('\n\n')
   }
-};
+}
 
 /** On Android, webview.onShouldStartLoadWithRequest is not called by react-native-webview*/
-const SupportsShouldLoadRequestHandler = Platform.OS === 'ios';
+const SupportsShouldLoadRequestHandler = Platform.OS === 'ios'
 
 export const ComponentView = ({
   onLoadEnd,
@@ -57,75 +57,74 @@ export const ComponentView = ({
   onLoadStart,
   onDownloadEditorStart,
   onDownloadEditorEnd,
-  componentViewer,
+  componentViewer
 }: Props) => {
   // Context
-  const application = useContext(ApplicationContext);
-  const themeService = useContext(ThemeServiceContext);
+  const application = useContext(ApplicationContext)
+  const themeService = useContext(ThemeServiceContext)
 
   // State
-  const [showWebView, setShowWebView] = useState<boolean>(true);
-  const [requiresLocalEditor, setRequiresLocalEditor] =
-    useState<boolean>(false);
-  const [localEditorReady, setLocalEditorReady] = useState<boolean>(false);
+  const [showWebView, setShowWebView] = useState<boolean>(true)
+  const [requiresLocalEditor, setRequiresLocalEditor] = useState<boolean>(false)
+  const [localEditorReady, setLocalEditorReady] = useState<boolean>(false)
 
   // Ref
-  const didLoadRootUrl = useRef<boolean>(false);
-  const webViewRef = useRef<WebView>(null);
+  const didLoadRootUrl = useRef<boolean>(false)
+  const webViewRef = useRef<WebView>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
-  );
+  )
 
   const navigation =
-    useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>();
+    useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
 
   useEffect(() => {
     const removeBlurScreenListener = navigation.addListener('blur', () => {
-      setShowWebView(false);
-    });
+      setShowWebView(false)
+    })
 
-    return removeBlurScreenListener;
-  }, [navigation]);
+    return removeBlurScreenListener
+  }, [navigation])
 
   useFocusEffect(() => {
-    setShowWebView(true);
-  });
+    setShowWebView(true)
+  })
 
   useEffect(() => {
     const warnIfUnsupportedEditors = async () => {
-      let platformVersionRequirements;
+      let platformVersionRequirements
 
       switch (Platform.OS) {
         case 'ios':
           if (parseInt(Platform.Version.toString(), 10) < 11) {
             // WKWebView has issues on iOS < 11
-            platformVersionRequirements = 'iOS 11 or greater';
+            platformVersionRequirements = 'iOS 11 or greater'
           }
-          break;
+          break
         case 'android':
           if (Platform.Version <= 23) {
             /**
              * postMessage doesn't work on Android <= 6 (API version 23)
              * https://github.com/facebook/react-native/issues/11594
              */
-            platformVersionRequirements = 'Android 7.0 or greater';
+            platformVersionRequirements = 'Android 7.0 or greater'
           }
-          break;
+          break
       }
 
       if (!platformVersionRequirements) {
-        return;
+        return
       }
 
       const doNotShowAgainUnsupportedEditors = application
         ?.getLocalPreferences()
-        .getValue(PrefKey.DoNotShowAgainUnsupportedEditors, false);
+        .getValue(PrefKey.DoNotShowAgainUnsupportedEditors, false)
 
       if (!doNotShowAgainUnsupportedEditors) {
         const alertText =
           `Web editors require ${platformVersionRequirements}. ` +
           'Your version does not support web editors. ' +
-          'Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.';
+          'Changes you make may not be properly saved. Please switch to the Plain Editor for the best experience.'
 
         const confirmed = await application?.alertService?.confirm(
           alertText,
@@ -133,73 +132,73 @@ export const ComponentView = ({
           "Don't show again",
           ButtonType.Info,
           'OK'
-        );
+        )
 
         if (confirmed) {
           application
             ?.getLocalPreferences()
-            .setUserPrefValue(PrefKey.DoNotShowAgainUnsupportedEditors, true);
+            .setUserPrefValue(PrefKey.DoNotShowAgainUnsupportedEditors, true)
         }
       }
-    };
+    }
 
-    warnIfUnsupportedEditors();
-  }, [application]);
+    warnIfUnsupportedEditors()
+  }, [application])
 
   const onLoadErrorHandler = useCallback(
     (error?: WebViewErrorEvent) => {
-      log('On load error', error);
+      log('On load error', error)
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+        clearTimeout(timeoutRef.current)
       }
 
       onLoadError(
         ComponentLoadingError.Unknown,
         error?.nativeEvent?.description
-      );
+      )
     },
     [onLoadError, timeoutRef]
-  );
+  )
 
   useEffect(() => {
-    const componentManager = application!.mobileComponentManager;
-    const component = componentViewer.component;
-    const isDownloadable = componentManager.isComponentDownloadable(component);
-    setRequiresLocalEditor(isDownloadable);
+    const componentManager = application!.mobileComponentManager
+    const component = componentViewer.component
+    const isDownloadable = componentManager.isComponentDownloadable(component)
+    setRequiresLocalEditor(isDownloadable)
 
     if (isDownloadable) {
       const asyncFunc = async () => {
         if (await componentManager.doesComponentNeedDownload(component)) {
-          onDownloadEditorStart();
+          onDownloadEditorStart()
           const error = await componentManager.downloadComponentOffline(
             component
-          );
-          log('Download component error', error);
-          onDownloadEditorEnd();
+          )
+          log('Download component error', error)
+          onDownloadEditorEnd()
           if (error) {
-            onLoadError(error);
+            onLoadError(error)
           }
         }
-        setLocalEditorReady(true);
-      };
-      asyncFunc();
+        setLocalEditorReady(true)
+      }
+      asyncFunc()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const onMessage = (event: WebViewMessageEvent) => {
-    let data;
+    let data
     try {
-      data = JSON.parse(event.nativeEvent.data);
+      data = JSON.parse(event.nativeEvent.data)
     } catch (e) {
-      log('Message is not valid JSON, returning');
-      return;
+      log('Message is not valid JSON, returning')
+      return
     }
-    componentViewer?.handleMessage(data);
-  };
+    componentViewer?.handleMessage(data)
+  }
 
   const onFrameLoad = useCallback(() => {
-    log('Iframe did load', webViewRef.current?.props.source);
+    log('Iframe did load', webViewRef.current?.props.source)
 
     /**
      * We have no way of knowing if the webview load is successful or not. We
@@ -212,38 +211,38 @@ export const ComponentView = ({
      * double java.lang.double.doublevalue() on a null object reference"
      */
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current)
     }
 
     if (didLoadRootUrl.current === true || !SupportsShouldLoadRequestHandler) {
-      log('Setting component viewer webview');
+      log('Setting component viewer webview')
       timeoutRef.current = setTimeout(() => {
-        componentViewer?.setWindow(webViewRef.current as unknown as Window);
-      }, 1);
+        componentViewer?.setWindow(webViewRef.current as unknown as Window)
+      }, 1)
       /**
        * The parent will remove their loading screen on load end. We want to
        * delay this to avoid flicker that may result if using a dark theme.
        * This delay will allow editor to load its theme.
        */
-      const isDarkTheme = themeService?.isLikelyUsingDarkColorTheme();
-      const delayToAvoidFlicker = isDarkTheme ? 50 : 0;
+      const isDarkTheme = themeService?.isLikelyUsingDarkColorTheme()
+      const delayToAvoidFlicker = isDarkTheme ? 50 : 0
       setTimeout(() => {
-        onLoadEnd();
-      }, delayToAvoidFlicker);
+        onLoadEnd()
+      }, delayToAvoidFlicker)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const onLoadStartHandler = () => {
-    onLoadStart();
-  };
+    onLoadStart()
+  }
 
   const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest =
     request => {
-      log('Setting last iframe URL to', request.url);
+      log('Setting last iframe URL to', request.url)
       /** The first request can typically be 'about:blank', which we want to ignore */
       if (!didLoadRootUrl.current) {
-        didLoadRootUrl.current = request.url === componentViewer.url!;
+        didLoadRootUrl.current = request.url === componentViewer.url!
       }
       /**
        * We want to handle link clicks within an editor by opening the browser
@@ -262,11 +261,11 @@ export const ComponentView = ({
         (Platform.OS === 'ios' && request.navigationType === 'click') ||
         (Platform.OS === 'android' && request.url !== componentViewer.url!)
       ) {
-        application!.deviceInterface!.openUrl(request.url);
-        return false;
+        application!.deviceInterface!.openUrl(request.url)
+        return false
       }
-      return true;
-    };
+      return true
+    }
 
   const defaultInjectedJavaScript = () => {
     return `(function() {
@@ -278,12 +277,12 @@ export const ComponentView = ({
       meta.setAttribute('name', 'viewport');
       document.getElementsByTagName('head')[0].appendChild(meta);
       return true;
-    })()`;
-  };
+    })()`
+  }
 
-  const deprecationMessage = componentViewer.component.deprecationMessage;
+  const deprecationMessage = componentViewer.component.deprecationMessage
 
-  const renderWebview = !requiresLocalEditor || localEditorReady;
+  const renderWebview = !requiresLocalEditor || localEditorReady
 
   return (
     <FlexContainer>
@@ -334,5 +333,5 @@ export const ComponentView = ({
         />
       )}
     </FlexContainer>
-  );
-};
+  )
+}

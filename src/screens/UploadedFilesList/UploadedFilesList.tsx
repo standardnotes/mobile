@@ -1,23 +1,23 @@
-import { SearchBar } from '@Components/SearchBar';
-import { SnIcon } from '@Components/SnIcon';
-import { useNavigation } from '@react-navigation/native';
-import { useFiles } from '@Root/hooks/useFiles';
-import { ModalStackNavigationProp } from '@Root/ModalStack';
-import { SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens';
-import { UploadedFileItem } from '@Screens/UploadedFilesList/UploadedFileItem';
+import { SearchBar } from '@Components/SearchBar'
+import { SnIcon } from '@Components/SnIcon'
+import { useNavigation } from '@react-navigation/native'
+import { useFiles } from '@Root/hooks/useFiles'
+import { ModalStackNavigationProp } from '@Root/ModalStack'
+import { SCREEN_UPLOADED_FILES_LIST } from '@Screens/screens'
+import { UploadedFileItem } from '@Screens/UploadedFilesList/UploadedFileItem'
 import {
   HeaderTabItem,
   TabText,
   UploadFilesListContainer,
-  useUploadedFilesListStyles,
-} from '@Screens/UploadedFilesList/UploadedFilesList.styled';
-import { SNFile } from '@standardnotes/snjs';
+  useUploadedFilesListStyles
+} from '@Screens/UploadedFilesList/UploadedFilesList.styled'
+import { SNFile } from '@standardnotes/snjs'
 import {
   CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Style/custom_action_sheet';
-import { ICON_ATTACH } from '@Style/icons';
-import { ThemeService } from '@Style/theme_service';
+  useCustomActionSheet
+} from '@Style/custom_action_sheet'
+import { ICON_ATTACH } from '@Style/icons'
+import { ThemeService } from '@Style/theme_service'
 import React, {
   FC,
   useCallback,
@@ -25,101 +25,100 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
-} from 'react';
-import { FlatList, ListRenderItem, Platform, Text, View } from 'react-native';
-import FAB from 'react-native-fab';
-import IosSearchBar from 'react-native-search-bar';
-import AndroidSearchBar from 'react-native-search-box';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { ThemeContext } from 'styled-components';
+  useState
+} from 'react'
+import { FlatList, ListRenderItem, Platform, Text, View } from 'react-native'
+import FAB from 'react-native-fab'
+import IosSearchBar from 'react-native-search-bar'
+import AndroidSearchBar from 'react-native-search-box'
+import Icon from 'react-native-vector-icons/Ionicons'
+import { ThemeContext } from 'styled-components'
 
 enum Tabs {
   AttachedFiles,
-  AllFiles,
+  AllFiles
 }
 
-type Props = ModalStackNavigationProp<typeof SCREEN_UPLOADED_FILES_LIST>;
+type Props = ModalStackNavigationProp<typeof SCREEN_UPLOADED_FILES_LIST>
 
 export const UploadedFilesList: FC<Props> = props => {
-  const theme = useContext(ThemeContext);
+  const theme = useContext(ThemeContext)
 
-  const styles = useUploadedFilesListStyles();
-  const navigation = useNavigation();
-  const { showActionSheet } = useCustomActionSheet();
+  const styles = useUploadedFilesListStyles()
+  const navigation = useNavigation()
+  const { showActionSheet } = useCustomActionSheet()
 
-  const [currentTab, setCurrentTab] = useState(Tabs.AttachedFiles);
-  const [searchString, setSearchString] = useState('');
-  const [filesListScrolled, setFilesListScrolled] = useState(false);
+  const [currentTab, setCurrentTab] = useState(Tabs.AttachedFiles)
+  const [searchString, setSearchString] = useState('')
+  const [filesListScrolled, setFilesListScrolled] = useState(false)
 
-  const iosSearchBarInputRef = useRef<IosSearchBar>(null);
-  const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
-  const filesListRef = useRef<FlatList>(null);
+  const iosSearchBarInputRef = useRef<IosSearchBar>(null)
+  const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null)
+  const filesListRef = useRef<FlatList>(null)
 
-  const note = props.route.params.note;
+  const note = props.route.params.note
 
   const {
     attachedFiles,
     allFiles,
     uploadFiles,
     uploadFileFromCameraOrImageGallery,
-    attachFileToNote,
+    attachFileToNote
   } = useFiles({
-    note,
-  });
+    note
+  })
 
-  const filesList =
-    currentTab === Tabs.AttachedFiles ? attachedFiles : allFiles;
+  const filesList = currentTab === Tabs.AttachedFiles ? attachedFiles : allFiles
 
   const filteredList = useMemo(() => {
     return searchString
       ? filesList.filter(file =>
           file.name.toLowerCase().includes(searchString.toLowerCase())
         )
-      : filesList;
-  }, [filesList, searchString]);
+      : filesList
+  }, [filesList, searchString])
 
   useEffect(() => {
-    let screenTitle = 'Files';
+    let screenTitle = 'Files'
     if (searchString) {
-      const filesCount = filteredList.length;
-      screenTitle = `${filesCount} search result${filesCount !== 1 ? 's' : ''}`;
+      const filesCount = filteredList.length
+      screenTitle = `${filesCount} search result${filesCount !== 1 ? 's' : ''}`
     }
     navigation.setOptions({
-      title: screenTitle,
-    });
-  }, [filteredList.length, navigation, searchString]);
+      title: screenTitle
+    })
+  }, [filteredList.length, navigation, searchString])
 
   const scrollListToTop = useCallback(() => {
     if (filesListScrolled && filteredList.length > 0) {
-      filesListRef.current?.scrollToIndex({ animated: false, index: 0 });
-      setFilesListScrolled(false);
+      filesListRef.current?.scrollToIndex({ animated: false, index: 0 })
+      setFilesListScrolled(false)
     }
-  }, [filesListScrolled, filteredList.length]);
+  }, [filesListScrolled, filteredList.length])
 
   const handleFilter = useCallback(
     (textToSearch: string) => {
-      setSearchString(textToSearch);
-      scrollListToTop();
+      setSearchString(textToSearch)
+      scrollListToTop()
     },
     [scrollListToTop]
-  );
+  )
 
-  const { AttachedFiles, AllFiles } = Tabs;
+  const { AttachedFiles, AllFiles } = Tabs
   const {
     centeredView,
     header,
     headerTabContainer,
     noAttachmentsIcon,
-    noAttachmentsIconContainer,
-  } = styles;
+    noAttachmentsIconContainer
+  } = styles
 
   const onScroll = () => {
     if (filesListScrolled) {
-      return;
+      return
     }
-    setFilesListScrolled(true);
-  };
+    setFilesListScrolled(true)
+  }
 
   const handleAttachFromCamera = () => {
     const options = [
@@ -127,32 +126,32 @@ export const UploadedFilesList: FC<Props> = props => {
         text: 'Photo',
         callback: async () => {
           const uploadedFile = await uploadFileFromCameraOrImageGallery({
-            mediaType: 'photo',
-          });
+            mediaType: 'photo'
+          })
           if (!uploadedFile) {
-            return;
+            return
           }
-          attachFileToNote(uploadedFile, false);
-        },
+          attachFileToNote(uploadedFile, false)
+        }
       },
       {
         text: 'Video',
         callback: async () => {
           const uploadedFile = await uploadFileFromCameraOrImageGallery({
-            mediaType: 'video',
-          });
+            mediaType: 'video'
+          })
           if (!uploadedFile) {
-            return;
+            return
           }
-          attachFileToNote(uploadedFile, false);
-        },
-      },
-    ];
+          attachFileToNote(uploadedFile, false)
+        }
+      }
+    ]
     showActionSheet({
       title: 'Choose file type',
-      options,
-    });
-  };
+      options
+    })
+  }
 
   const handlePressAttach = () => {
     const options: CustomActionSheetOption[] = [
@@ -160,45 +159,45 @@ export const UploadedFilesList: FC<Props> = props => {
         text: 'Attach from files',
         key: 'files',
         callback: async () => {
-          const uploadedFiles = await uploadFiles();
+          const uploadedFiles = await uploadFiles()
           if (!uploadedFiles) {
-            return;
+            return
           }
           if (currentTab === AttachedFiles) {
-            uploadedFiles.forEach(file => attachFileToNote(file, false));
+            uploadedFiles.forEach(file => attachFileToNote(file, false))
           }
-        },
+        }
       },
       {
         text: 'Attach from Photo Library',
         key: 'library',
         callback: async () => {
           const uploadedFile = await uploadFileFromCameraOrImageGallery({
-            uploadFromGallery: true,
-          });
+            uploadFromGallery: true
+          })
           if (!uploadedFile) {
-            return;
+            return
           }
-          attachFileToNote(uploadedFile, false);
-        },
+          attachFileToNote(uploadedFile, false)
+        }
       },
       {
         text: 'Attach from Camera',
         key: 'camera',
         callback: async () => {
-          handleAttachFromCamera();
-        },
-      },
-    ];
+          handleAttachFromCamera()
+        }
+      }
+    ]
     const osSpecificOptions =
       Platform.OS === 'android'
         ? options.filter(option => option.key !== 'library')
-        : options;
+        : options
     showActionSheet({
       title: 'Choose action',
-      options: osSpecificOptions,
-    });
-  };
+      options: osSpecificOptions
+    })
+  }
 
   const renderItem: ListRenderItem<SNFile> = ({ item }) => {
     return (
@@ -208,8 +207,8 @@ export const UploadedFilesList: FC<Props> = props => {
         note={note}
         isAttachedToNote={attachedFiles.includes(item)}
       />
-    );
-  };
+    )
+  }
 
   return (
     <View style={centeredView}>
@@ -277,5 +276,5 @@ export const UploadedFilesList: FC<Props> = props => {
         />
       </UploadFilesListContainer>
     </View>
-  );
-};
+  )
+}

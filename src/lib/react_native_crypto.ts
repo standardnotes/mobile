@@ -6,21 +6,21 @@ import {
   SodiumConstant,
   StreamDecryptorResult,
   timingSafeEqual,
-  Utf8String,
-} from '@standardnotes/sncrypto-common';
-import { NativeModules } from 'react-native';
-import * as Sodium from 'react-native-sodium-jsi';
+  Utf8String
+} from '@standardnotes/sncrypto-common'
+import { NativeModules } from 'react-native'
+import * as Sodium from 'react-native-sodium-jsi'
 
-const { Aes } = NativeModules;
+const { Aes } = NativeModules
 
 export class SNReactNativeCrypto implements SNPureCrypto {
   deinit(): void {}
   public timingSafeEqual(a: string, b: string) {
-    return timingSafeEqual(a, b);
+    return timingSafeEqual(a, b)
   }
 
   async initialize(): Promise<void> {
-    return;
+    return
   }
 
   pbkdf2(
@@ -29,13 +29,13 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     iterations: number,
     length: number
   ): Promise<string | null> {
-    return Aes.pbkdf2(password, salt, iterations, length);
+    return Aes.pbkdf2(password, salt, iterations, length)
   }
 
   public generateRandomKey(bits: number): string {
-    const bytes = bits / 8;
-    const result = Sodium.randombytes_buf(bytes);
-    return result;
+    const bytes = bits / 8
+    const result = Sodium.randombytes_buf(bytes)
+    return result
   }
 
   aes256CbcEncrypt(
@@ -43,7 +43,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     iv: HexString,
     key: HexString
   ): Promise<Base64String> {
-    return Aes.encrypt(plaintext, key, iv);
+    return Aes.encrypt(plaintext, key, iv)
   }
 
   async aes256CbcDecrypt(
@@ -52,9 +52,9 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     key: HexString
   ): Promise<Utf8String | null> {
     try {
-      return Aes.decrypt(ciphertext, key, iv);
+      return Aes.decrypt(ciphertext, key, iv)
     } catch (e) {
-      return null;
+      return null
     }
   }
 
@@ -63,18 +63,18 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     key: HexString
   ): Promise<HexString | null> {
     try {
-      return Aes.hmac256(message, key);
+      return Aes.hmac256(message, key)
     } catch (e) {
-      return null;
+      return null
     }
   }
 
   public async sha256(text: string): Promise<string> {
-    return Aes.sha256(text);
+    return Aes.sha256(text)
   }
 
   public unsafeSha1(text: string): Promise<string> {
-    return Aes.sha1(text);
+    return Aes.sha1(text)
   }
 
   public argon2(
@@ -91,7 +91,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
       iterations,
       bytes,
       Sodium.constants.crypto_pwhash_ALG_DEFAULT
-    );
+    )
   }
 
   xchacha20Encrypt(
@@ -105,7 +105,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
       nonce,
       key,
       assocData
-    );
+    )
   }
 
   public xchacha20Decrypt(
@@ -120,10 +120,10 @@ export class SNReactNativeCrypto implements SNPureCrypto {
         nonce,
         key,
         assocData
-      );
-      return result;
+      )
+      return result
     } catch (e) {
-      return null;
+      return null
     }
   }
 
@@ -131,8 +131,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     key: HexString
   ): Sodium.MobileStreamEncryptor {
     const encryptor =
-      Sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
-    return encryptor;
+      Sodium.crypto_secretstream_xchacha20poly1305_init_push(key)
+    return encryptor
   }
 
   public xchacha20StreamEncryptorPush(
@@ -146,8 +146,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
       plainBuffer.buffer,
       assocData,
       tag
-    );
-    return new Uint8Array(encryptedBuffer);
+    )
+    return new Uint8Array(encryptedBuffer)
   }
 
   public xchacha20StreamInitDecryptor(
@@ -157,8 +157,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     const decryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_pull(
       header,
       key
-    );
-    return decryptor;
+    )
+    return decryptor
   }
 
   public xchacha20StreamDecryptorPush(
@@ -170,67 +170,67 @@ export class SNReactNativeCrypto implements SNPureCrypto {
       encryptedBuffer.length <
       SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
     ) {
-      throw new Error('Invalid ciphertext size');
+      throw new Error('Invalid ciphertext size')
     }
 
     const result = Sodium.crypto_secretstream_xchacha20poly1305_pull(
       decryptor,
       encryptedBuffer.buffer,
       assocData
-    );
+    )
 
     if (!result) {
-      return false;
+      return false
     }
 
     return {
       message: new Uint8Array(result.message),
-      tag: result.tag,
-    };
+      tag: result.tag
+    }
   }
 
   public generateUUID() {
-    const randomBuf = Sodium.randombytes_buf(16);
-    const tempBuf = new Uint8Array(randomBuf.length / 2);
+    const randomBuf = Sodium.randombytes_buf(16)
+    const tempBuf = new Uint8Array(randomBuf.length / 2)
 
     for (let i = 0; i < randomBuf.length; i += 2) {
-      tempBuf[i / 2] = parseInt(randomBuf.substring(i, i + 2), 16);
+      tempBuf[i / 2] = parseInt(randomBuf.substring(i, i + 2), 16)
     }
 
-    const buf = new Uint32Array(tempBuf.buffer);
-    let idx = -1;
+    const buf = new Uint32Array(tempBuf.buffer)
+    let idx = -1
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
       /[xy]/g,
       function (c) {
-        idx++;
-        const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15;
-        const v = c === 'x' ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
+        idx++
+        const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15
+        const v = c === 'x' ? r : (r & 0x3) | 0x8
+        return v.toString(16)
       }
-    );
+    )
   }
 
   public base64Encode(text: Utf8String): string {
-    return Sodium.to_base64(text);
+    return Sodium.to_base64(text)
   }
 
   public base64Decode(base64String: Base64String): string {
-    return Sodium.from_base64(base64String);
+    return Sodium.from_base64(base64String)
   }
 
   public hmac1(): Promise<HexString | null> {
-    throw new Error('hmac1 is not implemented on mobile');
+    throw new Error('hmac1 is not implemented on mobile')
   }
 
   public generateOtpSecret(): Promise<string> {
-    throw new Error('generateOtpSecret is not implemented on mobile');
+    throw new Error('generateOtpSecret is not implemented on mobile')
   }
 
   public hotpToken(): Promise<string> {
-    throw new Error('hotpToken is not implemented on mobile');
+    throw new Error('hotpToken is not implemented on mobile')
   }
 
   public totpToken(): Promise<string> {
-    throw new Error('totpToken is not implemented on mobile');
+    throw new Error('totpToken is not implemented on mobile')
   }
 }

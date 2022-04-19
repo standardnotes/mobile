@@ -1,86 +1,86 @@
-import { SnIcon } from '@Components/SnIcon';
-import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
+import { SnIcon } from '@Components/SnIcon'
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext'
 import {
   CantLoadActionsText,
   CreateBlogContainer,
   ListedItemRow,
-  styles,
-} from '@Screens/SideMenu/Listed.styled';
-import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell';
-import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
+  styles
+} from '@Screens/SideMenu/Listed.styled'
+import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell'
+import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection'
 import {
   Action,
   ButtonType,
   ListedAccount,
   ListedAccountInfo,
-  SNNote,
-} from '@standardnotes/snjs';
-import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import React, { FC, useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+  SNNote
+} from '@standardnotes/snjs'
+import { useCustomActionSheet } from '@Style/custom_action_sheet'
+import React, { FC, useCallback, useEffect, useState } from 'react'
+import { ActivityIndicator, FlatList, View } from 'react-native'
 
 type TProps = {
-  note: SNNote;
-};
+  note: SNNote
+}
 
 type TListedAccountItem =
   | ListedAccountInfo
-  | Pick<ListedAccountInfo, 'display_name'>;
+  | Pick<ListedAccountInfo, 'display_name'>
 
 export const Listed: FC<TProps> = ({ note }) => {
-  const application = useSafeApplicationContext();
+  const application = useSafeApplicationContext()
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isActionInProgress, setIsActionInProgress] = useState(false);
-  const [isRequestingAccount, setIsRequestingAccount] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
+  const [isActionInProgress, setIsActionInProgress] = useState(false)
+  const [isRequestingAccount, setIsRequestingAccount] = useState(false)
 
-  const [listedAccounts, setListedAccounts] = useState<ListedAccount[]>([]);
+  const [listedAccounts, setListedAccounts] = useState<ListedAccount[]>([])
   const [listedAccountDetails, setListedAccountDetails] = useState<
     TListedAccountItem[]
-  >([]);
+  >([])
   const [authorUrlWithInProgressAction, setAuthorUrlWithInProgressAction] =
-    useState<string | null>(null);
+    useState<string | null>(null)
 
-  const { showActionSheet } = useCustomActionSheet();
+  const { showActionSheet } = useCustomActionSheet()
 
   const getListedAccountsDetails = useCallback(
     async (accounts: ListedAccount[]) => {
-      const listedAccountsArray: TListedAccountItem[] = [];
+      const listedAccountsArray: TListedAccountItem[] = []
 
       for (const listedAccountItem of accounts) {
         const listedItemInfo = await application.getListedAccountInfo(
           listedAccountItem,
           note?.uuid
-        );
+        )
 
         listedAccountsArray.push(
           listedItemInfo
             ? listedItemInfo
             : { display_name: listedAccountItem.authorId }
-        );
+        )
       }
-      return listedAccountsArray;
+      return listedAccountsArray
     },
     [application, note?.uuid]
-  );
+  )
 
   const reloadListedAccounts = useCallback(async () => {
-    setIsLoading(true);
-    const accounts = await application.getListedAccounts();
-    setListedAccounts(accounts);
+    setIsLoading(true)
+    const accounts = await application.getListedAccounts()
+    setListedAccounts(accounts)
 
-    setListedAccountDetails((await getListedAccountsDetails(accounts)) || []);
-    setIsLoading(false);
-  }, [application, getListedAccountsDetails]);
+    setListedAccountDetails((await getListedAccountsDetails(accounts)) || [])
+    setIsLoading(false)
+  }, [application, getListedAccountsDetails])
 
   const registerNewAccount = useCallback(() => {
     if (isRequestingAccount) {
-      return;
+      return
     }
 
     const requestAccount = async () => {
-      setIsRequestingAccount(true);
-      const account = await application.requestNewListedAccount();
+      setIsRequestingAccount(true)
+      const account = await application.requestNewListedAccount()
       if (account) {
         const openSettings = await application.alertService.confirm(
           'Your new Listed blog has been successfully created!' +
@@ -90,39 +90,39 @@ export const Listed: FC<TProps> = ({ note }) => {
           'Open Settings',
           ButtonType.Info,
           'Later'
-        );
-        reloadListedAccounts();
+        )
+        reloadListedAccounts()
 
         if (openSettings) {
-          const info = await application.getListedAccountInfo(account);
+          const info = await application.getListedAccountInfo(account)
           if (info) {
-            application.deviceInterface.openUrl(info?.settings_url);
+            application.deviceInterface.openUrl(info?.settings_url)
           }
         }
       }
-      setIsRequestingAccount(false);
-    };
+      setIsRequestingAccount(false)
+    }
 
-    requestAccount();
-  }, [application, isRequestingAccount, reloadListedAccounts]);
+    requestAccount()
+  }, [application, isRequestingAccount, reloadListedAccounts])
 
   useEffect(() => {
     const loadListedData = async () => {
-      await reloadListedAccounts();
-    };
-    loadListedData();
-  }, [reloadListedAccounts]);
+      await reloadListedAccounts()
+    }
+    loadListedData()
+  }, [reloadListedAccounts])
 
   const doesListedItemHaveActions = (
     item: TListedAccountItem
   ): item is ListedAccountInfo => {
-    return (item as ListedAccountInfo).author_url !== undefined;
-  };
+    return (item as ListedAccountInfo).author_url !== undefined
+  }
 
   const showActionsMenu = (item: TListedAccountItem, index: number) => {
     if (!doesListedItemHaveActions(item)) {
-      application.alertService.alert('Unable to load actions.');
-      return;
+      application.alertService.alert('Unable to load actions.')
+      return
     }
 
     showActionSheet({
@@ -130,31 +130,31 @@ export const Listed: FC<TProps> = ({ note }) => {
       options: item.actions.map(action => ({
         text: (action as Action).label,
         callback: async () => {
-          setIsActionInProgress(true);
-          setAuthorUrlWithInProgressAction(item.author_url);
+          setIsActionInProgress(true)
+          setAuthorUrlWithInProgressAction(item.author_url)
 
           const response = await application.actionsManager.runAction(
             action as Action,
             note
-          );
+          )
 
           if (!response || response.error) {
-            setIsActionInProgress(false);
-            setAuthorUrlWithInProgressAction(null);
-            return;
+            setIsActionInProgress(false)
+            setAuthorUrlWithInProgressAction(null)
+            return
           }
           const listedDetails = (await getListedAccountsDetails(
             listedAccounts
-          )) as TListedAccountItem[];
-          setListedAccountDetails(listedDetails);
+          )) as TListedAccountItem[]
+          setListedAccountDetails(listedDetails)
 
-          showActionsMenu(listedDetails[index], index);
-          setIsActionInProgress(false);
-          setAuthorUrlWithInProgressAction(null);
-        },
-      })),
-    });
-  };
+          showActionsMenu(listedDetails[index], index)
+          setIsActionInProgress(false)
+          setAuthorUrlWithInProgressAction(null)
+        }
+      }))
+    })
+  }
 
   return (
     <View>
@@ -164,7 +164,7 @@ export const Listed: FC<TProps> = ({ note }) => {
           data={listedAccountDetails}
           renderItem={({ item, index }) => {
             if (!item) {
-              return null;
+              return null
             }
             return (
               <View>
@@ -177,7 +177,7 @@ export const Listed: FC<TProps> = ({ note }) => {
                       type: SideMenuOptionIconDescriptionType.CustomComponent,
                       value: (
                         <SnIcon type={'notes'} style={styles.blogItemIcon} />
-                      ),
+                      )
                     }}
                   />
                   {isActionInProgress &&
@@ -194,7 +194,7 @@ export const Listed: FC<TProps> = ({ note }) => {
                   </CantLoadActionsText>
                 )}
               </View>
-            );
+            )
           }}
         />
       )}
@@ -208,7 +208,7 @@ export const Listed: FC<TProps> = ({ note }) => {
             iconDesc={{
               side: 'left',
               type: SideMenuOptionIconDescriptionType.CustomComponent,
-              value: <SnIcon type={'user-add'} style={styles.blogItemIcon} />,
+              value: <SnIcon type={'user-add'} style={styles.blogItemIcon} />
             }}
           />
           {isRequestingAccount && (
@@ -224,11 +224,11 @@ export const Listed: FC<TProps> = ({ note }) => {
             iconDesc={{
               side: 'left',
               type: SideMenuOptionIconDescriptionType.CustomComponent,
-              value: <SnIcon type={'open-in'} style={styles.blogItemIcon} />,
+              value: <SnIcon type={'open-in'} style={styles.blogItemIcon} />
             }}
           />
         </ListedItemRow>
       </CreateBlogContainer>
     </View>
-  );
-};
+  )
+}

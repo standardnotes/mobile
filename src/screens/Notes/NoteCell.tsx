@@ -1,26 +1,26 @@
-import { SnIcon } from '@Components/SnIcon';
+import { SnIcon } from '@Components/SnIcon'
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
-  useProtectOrUnprotectNote,
-} from '@Lib/snjs_helper_hooks';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { NoteCellIconFlags } from '@Screens/Notes/NoteCellIconFlags';
+  useProtectOrUnprotectNote
+} from '@Lib/snjs_helper_hooks'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { NoteCellIconFlags } from '@Screens/Notes/NoteCellIconFlags'
 import {
   CollectionSort,
   CollectionSortProperty,
   IconType,
   isNullOrUndefined,
-  SNNote,
-} from '@standardnotes/snjs';
+  SNNote
+} from '@standardnotes/snjs'
 import {
   CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Style/custom_action_sheet';
-import { getTintColorForEditor } from '@Style/utils';
-import React, { useContext, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
-import { ThemeContext } from 'styled-components';
+  useCustomActionSheet
+} from '@Style/custom_action_sheet'
+import { getTintColorForEditor } from '@Style/utils'
+import React, { useContext, useRef, useState } from 'react'
+import { Text, View } from 'react-native'
+import { ThemeContext } from 'styled-components'
 import {
   Container,
   DetailsText,
@@ -30,19 +30,19 @@ import {
   NoteText,
   styles,
   TitleText,
-  TouchableContainer,
-} from './NoteCell.styled';
-import { NoteCellFlags } from './NoteCellFlags';
+  TouchableContainer
+} from './NoteCell.styled'
+import { NoteCellFlags } from './NoteCellFlags'
 
 type Props = {
-  note: SNNote;
-  highlighted?: boolean;
-  onPressItem: (noteUuid: SNNote['uuid']) => void;
-  hideDates: boolean;
-  hidePreviews: boolean;
-  hideEditorIcon: boolean;
-  sortType: CollectionSortProperty;
-};
+  note: SNNote
+  highlighted?: boolean
+  onPressItem: (noteUuid: SNNote['uuid']) => void
+  hideDates: boolean
+  hidePreviews: boolean
+  hideEditorIcon: boolean
+  sortType: CollectionSortProperty
+}
 
 export const NoteCell = ({
   note,
@@ -51,54 +51,54 @@ export const NoteCell = ({
   sortType,
   hideDates,
   hidePreviews,
-  hideEditorIcon,
+  hideEditorIcon
 }: Props) => {
   // Context
-  const application = useContext(ApplicationContext);
-  const theme = useContext(ThemeContext);
+  const application = useContext(ApplicationContext)
+  const theme = useContext(ThemeContext)
 
-  const [changeNote] = useChangeNote(note);
-  const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note);
+  const [changeNote] = useChangeNote(note)
+  const [protectOrUnprotectNote] = useProtectOrUnprotectNote(note)
 
   // State
-  const [selected, setSelected] = useState(false);
+  const [selected, setSelected] = useState(false)
 
   // Ref
-  const selectionTimeout = useRef<ReturnType<typeof setTimeout>>();
-  const elementRef = useRef<View>(null);
+  const selectionTimeout = useRef<ReturnType<typeof setTimeout>>()
+  const elementRef = useRef<View>(null)
 
-  const { showActionSheet } = useCustomActionSheet();
+  const { showActionSheet } = useCustomActionSheet()
 
   const [deleteNote] = useDeleteNoteWithPrivileges(
     note,
     async () => {
-      await application?.mutator.deleteItem(note);
+      await application?.mutator.deleteItem(note)
     },
     () => {
       changeNote(mutator => {
-        mutator.trashed = true;
-      }, false);
+        mutator.trashed = true
+      }, false)
     },
     undefined
-  );
+  )
 
-  const highlight = Boolean(selected || highlighted);
+  const highlight = Boolean(selected || highlighted)
 
   const _onPress = () => {
-    setSelected(true);
+    setSelected(true)
     selectionTimeout.current = setTimeout(() => {
-      setSelected(false);
-      onPressItem(note.uuid);
-    }, 25);
-  };
+      setSelected(false)
+      onPressItem(note.uuid)
+    }, 25)
+  }
 
   const _onPressIn = () => {
-    setSelected(true);
-  };
+    setSelected(true)
+  }
 
   const _onPressOut = () => {
-    setSelected(false);
-  };
+    setSelected(false)
+  }
 
   const onLongPress = () => {
     if (note.protected) {
@@ -106,22 +106,22 @@ export const NoteCell = ({
         title: note.title,
         options: [
           {
-            text: 'Note Protected',
-          },
+            text: 'Note Protected'
+          }
         ],
-        anchor: elementRef.current ?? undefined,
-      });
+        anchor: elementRef.current ?? undefined
+      })
     } else {
-      let options: CustomActionSheetOption[] = [];
+      let options: CustomActionSheetOption[] = []
 
       options.push({
         text: note.pinned ? 'Unpin' : 'Pin',
         key: 'pin',
         callback: () =>
           changeNote(mutator => {
-            mutator.pinned = !note.pinned;
-          }, false),
-      });
+            mutator.pinned = !note.pinned
+          }, false)
+      })
 
       options.push({
         text: note.archived ? 'Unarchive' : 'Archive',
@@ -132,38 +132,38 @@ export const NoteCell = ({
               `This note has editing disabled. If you'd like to ${
                 note.archived ? 'unarchive' : 'archive'
               } it, enable editing on it, and try again.`
-            );
-            return;
+            )
+            return
           }
 
           changeNote(mutator => {
-            mutator.archived = !note.archived;
-          }, false);
-        },
-      });
+            mutator.archived = !note.archived
+          }, false)
+        }
+      })
 
       options.push({
         text: note.locked ? 'Enable editing' : 'Prevent editing',
         key: 'lock',
         callback: () =>
           changeNote(mutator => {
-            mutator.locked = !note.locked;
-          }, false),
-      });
+            mutator.locked = !note.locked
+          }, false)
+      })
 
       options.push({
         text: note.protected ? 'Unprotect' : 'Protect',
         key: 'protect',
-        callback: async () => await protectOrUnprotectNote(),
-      });
+        callback: async () => await protectOrUnprotectNote()
+      })
 
       if (!note.trashed) {
         options.push({
           text: 'Move to Trash',
           key: 'trash',
           destructive: true,
-          callback: async () => deleteNote(false),
-        });
+          callback: async () => deleteNote(false)
+        })
       } else {
         options = options.concat([
           {
@@ -171,36 +171,36 @@ export const NoteCell = ({
             key: 'restore-note',
             callback: () => {
               changeNote(mutator => {
-                mutator.trashed = false;
-              }, false);
-            },
+                mutator.trashed = false
+              }, false)
+            }
           },
           {
             text: 'Delete permanently',
             key: 'delete-forever',
             destructive: true,
-            callback: async () => deleteNote(true),
-          },
-        ]);
+            callback: async () => deleteNote(true)
+          }
+        ])
       }
       showActionSheet({
         title: note.title,
         options,
-        anchor: elementRef.current ?? undefined,
-      });
+        anchor: elementRef.current ?? undefined
+      })
     }
-  };
+  }
 
-  const padding = 14;
-  const showPreview = !hidePreviews && !note.protected && !note.hidePreview;
+  const padding = 14
+  const showPreview = !hidePreviews && !note.protected && !note.hidePreview
   const hasPlainPreview =
-    !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0;
-  const showDetails = !hideDates || note.protected;
+    !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0
+  const showDetails = !hideDates || note.protected
 
-  const editorForNote = application?.componentManager.editorForNote(note);
+  const editorForNote = application?.componentManager.editorForNote(note)
   const [icon, tint] = application?.iconsController.getIconAndTintForEditor(
     editorForNote?.identifier
-  ) as [IconType, number];
+  ) as [IconType, number]
 
   return (
     <TouchableContainer
@@ -267,5 +267,5 @@ export const NoteCell = ({
         </NoteDataContainer>
       </Container>
     </TouchableContainer>
-  );
-};
+  )
+}

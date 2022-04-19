@@ -1,77 +1,77 @@
-import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell';
-import { SectionHeader } from '@Components/SectionHeader';
-import { TableSection } from '@Components/TableSection';
-import { PrefKey } from '@Lib/preferences_manager';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { CollectionSort, CollectionSortProperty } from '@standardnotes/snjs';
-import React, { useContext, useMemo, useState } from 'react';
+import { SectionedAccessoryTableCell } from '@Components/SectionedAccessoryTableCell'
+import { SectionHeader } from '@Components/SectionHeader'
+import { TableSection } from '@Components/TableSection'
+import { PrefKey } from '@Lib/preferences_manager'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { CollectionSort, CollectionSortProperty } from '@standardnotes/snjs'
+import React, { useContext, useMemo, useState } from 'react'
 
 export const PreferencesSection = () => {
   // Context
-  const application = useContext(ApplicationContext);
+  const application = useContext(ApplicationContext)
 
   // State
   const [sortBy, setSortBy] = useState<CollectionSortProperty>(() =>
     application!
       .getLocalPreferences()
       .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
-  );
+  )
   const [sortReverse, setSortReverse] = useState<boolean>(() =>
     application!.getLocalPreferences().getValue(PrefKey.SortNotesReverse, false)
-  );
+  )
   const [hideDates, setHideDates] = useState<boolean>(() =>
     application!.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
-  );
+  )
   const [hideEditorIcon, setHideEditorIcon] = useState<boolean>(() =>
     application!
       .getLocalPreferences()
       .getValue(PrefKey.NotesHideEditorIcon, false)
-  );
+  )
   const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
     application!
       .getLocalPreferences()
       .getValue(PrefKey.NotesHideNotePreview, false)
-  );
+  )
 
   const sortOptions = useMemo(() => {
     return [
       { key: CollectionSort.CreatedAt, label: 'Date Added' },
       { key: CollectionSort.UpdatedAt, label: 'Date Modified' },
-      { key: CollectionSort.Title, label: 'Title' },
-    ];
-  }, []);
+      { key: CollectionSort.Title, label: 'Title' }
+    ]
+  }, [])
 
   const toggleReverseSort = () => {
     application
       ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.SortNotesReverse, !sortReverse);
-    setSortReverse(value => !value);
-  };
+      .setUserPrefValue(PrefKey.SortNotesReverse, !sortReverse)
+    setSortReverse(value => !value)
+  }
 
   const changeSortOption = (key: CollectionSortProperty) => {
     application
       ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.SortNotesBy, key);
-    setSortBy(key);
-  };
+      .setUserPrefValue(PrefKey.SortNotesBy, key)
+    setSortBy(key)
+  }
   const toggleNotesPreviewHidden = () => {
     application
       ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.NotesHideNotePreview, !hidePreviews);
-    setHidePreviews(value => !value);
-  };
+      .setUserPrefValue(PrefKey.NotesHideNotePreview, !hidePreviews)
+    setHidePreviews(value => !value)
+  }
   const toggleNotesDateHidden = () => {
     application
       ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.NotesHideDate, !hideDates);
-    setHideDates(value => !value);
-  };
+      .setUserPrefValue(PrefKey.NotesHideDate, !hideDates)
+    setHideDates(value => !value)
+  }
   const toggleNotesEditorIconHidden = () => {
     application
       ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.NotesHideEditorIcon, !hideEditorIcon);
-    setHideEditorIcon(value => !value);
-  };
+      .setUserPrefValue(PrefKey.NotesHideEditorIcon, !hideEditorIcon)
+    setHideEditorIcon(value => !value)
+  }
 
   return (
     <>
@@ -87,7 +87,7 @@ export const PreferencesSection = () => {
           return (
             <SectionedAccessoryTableCell
               onPress={() => {
-                changeSortOption(option.key);
+                changeSortOption(option.key)
               }}
               text={option.label}
               key={option.key}
@@ -95,7 +95,7 @@ export const PreferencesSection = () => {
               last={i === sortOptions.length - 1}
               selected={() => option.key === sortBy}
             />
-          );
+          )
         })}
       </TableSection>
 
@@ -123,5 +123,5 @@ export const PreferencesSection = () => {
         />
       </TableSection>
     </>
-  );
-};
+  )
+}

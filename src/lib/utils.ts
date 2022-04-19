@@ -1,18 +1,18 @@
-import { TEnvironment } from '@Root/App';
+import { TEnvironment } from '@Root/App'
 
 export function isNullOrUndefined(value: unknown) {
-  return value === null || value === undefined;
+  return value === null || value === undefined
 }
 
 /**
  * Returns a string with non-alphanumeric characters stripped out
  */
 export function stripNonAlphanumeric(str: string) {
-  return str.replace(/\W/g, '');
+  return str.replace(/\W/g, '')
 }
 
 export function isMatchCaseInsensitive(a: string, b: string) {
-  return a.toLowerCase() === b.toLowerCase();
+  return a.toLowerCase() === b.toLowerCase()
 }
 
 /**
@@ -20,10 +20,10 @@ export function isMatchCaseInsensitive(a: string, b: string) {
  */
 export function dateFromJsonString(str: string) {
   if (str) {
-    return new Date(JSON.parse(str));
+    return new Date(JSON.parse(str))
   }
 
-  return str;
+  return str
 }
 
 /**
@@ -34,9 +34,9 @@ export function isSameDay(dateA: Date, dateB: Date) {
     dateA.getFullYear() === dateB.getFullYear() &&
     dateA.getMonth() === dateB.getMonth() &&
     dateA.getDate() === dateB.getDate()
-  );
+  )
 }
 
 export function isUnfinishedFeaturesEnabled(env: TEnvironment): boolean {
-  return env === 'dev' || __DEV__;
+  return env === 'dev' || __DEV__
 }

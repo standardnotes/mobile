@@ -1,20 +1,20 @@
-import { MODAL_BLOCKING_ALERT } from '@Screens/screens';
+import { MODAL_BLOCKING_ALERT } from '@Screens/screens'
 import {
   ButtonType,
   DismissBlockingDialog,
-  SNAlertService,
-} from '@standardnotes/snjs';
-import { Alert, AlertButton } from 'react-native';
-import { goBack, navigate } from './navigation_service';
+  SNAlertService
+} from '@standardnotes/snjs'
+import { Alert, AlertButton } from 'react-native'
+import { goBack, navigate } from './navigation_service'
 
 export class AlertService implements SNAlertService {
   blockingDialog(
     text: string,
     title?: string
   ): DismissBlockingDialog | Promise<DismissBlockingDialog> {
-    navigate(MODAL_BLOCKING_ALERT, { text, title });
+    navigate(MODAL_BLOCKING_ALERT, { text, title })
 
-    return goBack;
+    return goBack
   }
   alert(text: string, title: string, closeButtonText?: string) {
     return new Promise<void>(resolve => {
@@ -23,14 +23,14 @@ export class AlertService implements SNAlertService {
         {
           text: closeButtonText,
           onPress: async () => {
-            resolve();
-          },
-        },
-      ];
+            resolve()
+          }
+        }
+      ]
       Alert.alert(title, text, buttons, {
-        cancelable: true,
-      });
-    });
+        cancelable: true
+      })
+    })
   }
 
   confirm(
@@ -47,24 +47,24 @@ export class AlertService implements SNAlertService {
           text: cancelButtonText,
           style: 'cancel',
           onPress: async () => {
-            resolve(false);
-          },
+            resolve(false)
+          }
         },
         {
           text: confirmButtonText,
           style:
             confirmButtonType === ButtonType.Danger ? 'destructive' : 'default',
           onPress: async () => {
-            resolve(true);
-          },
-        },
-      ];
+            resolve(true)
+          }
+        }
+      ]
       Alert.alert(title, text, buttons, {
         cancelable: true,
         onDismiss: async () => {
-          reject();
-        },
-      });
-    });
+          reject()
+        }
+      })
+    })
   }
 }

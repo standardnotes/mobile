@@ -1,17 +1,17 @@
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled';
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled'
 import {
   ButtonType,
   RemoteSession,
   SessionStrings,
-  UuidString,
-} from '@standardnotes/snjs';
-import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { FlatList, ListRenderItem, RefreshControl } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ThemeContext } from 'styled-components';
-import { SessionCell } from './SessionCell';
+  UuidString
+} from '@standardnotes/snjs'
+import { useCustomActionSheet } from '@Style/custom_action_sheet'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { FlatList, ListRenderItem, RefreshControl } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ThemeContext } from 'styled-components'
+import { SessionCell } from './SessionCell'
 
 const useSessions = (): [
   RemoteSession[],
@@ -22,56 +22,54 @@ const useSessions = (): [
   string
 ] => {
   // Context
-  const application = useContext(ApplicationContext);
+  const application = useContext(ApplicationContext)
 
   // State
-  const [sessions, setSessions] = useState<RemoteSession[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [sessions, setSessions] = useState<RemoteSession[]>([])
+  const [refreshing, setRefreshing] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const getSessions = useCallback(async () => {
-    const response = await application?.getSessions();
+    const response = await application?.getSessions()
 
     if (!response) {
-      setErrorMessage('An unknown error occurred while loading sessions.');
-      return;
+      setErrorMessage('An unknown error occurred while loading sessions.')
+      return
     }
 
     if ('error' in response || !response.data) {
       if (response.error?.message) {
-        setErrorMessage(response.error.message);
+        setErrorMessage(response.error.message)
       } else {
-        setErrorMessage('An unknown error occurred while loading sessions.');
+        setErrorMessage('An unknown error occurred while loading sessions.')
       }
     } else {
-      const newSessions = response.data as RemoteSession[];
-      setSessions(newSessions);
-      setErrorMessage('');
+      const newSessions = response.data as RemoteSession[]
+      setSessions(newSessions)
+      setErrorMessage('')
     }
-  }, [application]);
+  }, [application])
 
   const refreshSessions = useCallback(async () => {
-    setRefreshing(true);
-    await getSessions();
-    setRefreshing(false);
-  }, [getSessions]);
+    setRefreshing(true)
+    await getSessions()
+    setRefreshing(false)
+  }, [getSessions])
 
   useEffect(() => {
-    refreshSessions();
-  }, [application, refreshSessions]);
+    refreshSessions()
+  }, [application, refreshSessions])
 
   async function revokeSession(uuid: UuidString) {
-    const response = await application?.revokeSession(uuid);
+    const response = await application?.revokeSession(uuid)
     if (response && 'error' in response) {
       if (response.error?.message) {
-        setErrorMessage(response.error?.message);
+        setErrorMessage(response.error?.message)
       } else {
-        setErrorMessage(
-          'An unknown error occurred while revoking the session.'
-        );
+        setErrorMessage('An unknown error occurred while revoking the session.')
       }
     } else {
-      setSessions(sessions.filter(session => session.uuid !== uuid));
+      setSessions(sessions.filter(session => session.uuid !== uuid))
     }
   }
 
@@ -81,16 +79,16 @@ const useSessions = (): [
     refreshSessions,
     refreshing,
     revokeSession,
-    errorMessage,
-  ];
-};
+    errorMessage
+  ]
+}
 
 export const ManageSessions: React.FC = () => {
   // Context
-  const application = useContext(ApplicationContext);
-  const { showActionSheet } = useCustomActionSheet();
-  const theme = useContext(ThemeContext);
-  const insets = useSafeAreaInsets();
+  const application = useContext(ApplicationContext)
+  const { showActionSheet } = useCustomActionSheet()
+  const theme = useContext(ThemeContext)
+  const insets = useSafeAreaInsets()
 
   const [
     sessions,
@@ -98,8 +96,8 @@ export const ManageSessions: React.FC = () => {
     refreshSessions,
     refreshing,
     revokeSession,
-    errorMessage,
-  ] = useSessions();
+    errorMessage
+  ] = useSessions()
 
   const onItemPress = (item: RemoteSession) => {
     showActionSheet({
@@ -108,11 +106,11 @@ export const ManageSessions: React.FC = () => {
         {
           text: 'Revoke',
           destructive: true,
-          callback: () => showRevokeSessionAlert(item),
-        },
-      ],
-    });
-  };
+          callback: () => showRevokeSessionAlert(item)
+        }
+      ]
+    })
+  }
 
   const showRevokeSessionAlert = useCallback(
     async (item: RemoteSession) => {
@@ -122,21 +120,21 @@ export const ManageSessions: React.FC = () => {
         SessionStrings.RevokeConfirmButton,
         ButtonType.Danger,
         SessionStrings.RevokeCancelButton
-      );
+      )
       if (confirmed) {
         try {
-          await revokeSession(item.uuid);
-          getSessions();
+          await revokeSession(item.uuid)
+          getSessions()
         } catch (e) {
-          application?.alertService.alert('Action failed. Please try again.');
+          application?.alertService.alert('Action failed. Please try again.')
         }
       }
     },
     [application?.alertService, getSessions, revokeSession]
-  );
+  )
 
   const RenderItem: ListRenderItem<RemoteSession> | null | undefined = ({
-    item,
+    item
   }) => {
     return (
       <SessionCell
@@ -146,15 +144,15 @@ export const ManageSessions: React.FC = () => {
         currentSession={item.current}
         disabled={item.current}
       />
-    );
-  };
+    )
+  }
 
   if (errorMessage) {
     return (
       <LoadingContainer>
         <LoadingText>{errorMessage}</LoadingText>
       </LoadingContainer>
-    );
+    )
   }
 
   return (
@@ -173,5 +171,5 @@ export const ManageSessions: React.FC = () => {
       }
       renderItem={RenderItem}
     />
-  );
-};
+  )
+}

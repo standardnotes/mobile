@@ -1,12 +1,12 @@
-import { Chip } from '@Components/Chip';
-import { SearchBar } from '@Components/SearchBar';
-import { AppStateEventType, AppStateType } from '@Lib/application_state';
-import { useSignedIn } from '@Lib/snjs_helper_hooks';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { AppStackNavigationProp } from '@Root/AppStack';
-import { SCREEN_NOTES } from '@Screens/screens';
-import { CollectionSortProperty, SNNote } from '@standardnotes/snjs';
+import { Chip } from '@Components/Chip'
+import { SearchBar } from '@Components/SearchBar'
+import { AppStateEventType, AppStateType } from '@Lib/application_state'
+import { useSignedIn } from '@Lib/snjs_helper_hooks'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { AppStackNavigationProp } from '@Root/AppStack'
+import { SCREEN_NOTES } from '@Screens/screens'
+import { CollectionSortProperty, SNNote } from '@standardnotes/snjs'
 import React, {
   Dispatch,
   SetStateAction,
@@ -14,19 +14,19 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState,
-} from 'react';
+  useState
+} from 'react'
 import {
   Animated,
   FlatList,
   ListRenderItem,
-  RefreshControl,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import IosSearchBar from 'react-native-search-bar';
-import AndroidSearchBar from 'react-native-search-box';
-import { ThemeContext } from 'styled-components';
-import { NoteCell } from './NoteCell';
+  RefreshControl
+} from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import IosSearchBar from 'react-native-search-bar'
+import AndroidSearchBar from 'react-native-search-box'
+import { ThemeContext } from 'styled-components'
+import { NoteCell } from './NoteCell'
 import {
   Container,
   HeaderContainer,
@@ -34,149 +34,149 @@ import {
   LoadingText,
   SearchBarContainer,
   SearchOptionsContainer,
-  styles,
-} from './NoteList.styled';
-import { OfflineBanner } from './OfflineBanner';
+  styles
+} from './NoteList.styled'
+import { OfflineBanner } from './OfflineBanner'
 
 type Props = {
-  onSearchChange: (text: string) => void;
-  onSearchCancel: () => void;
-  searchText: string;
+  onSearchChange: (text: string) => void
+  onSearchCancel: () => void
+  searchText: string
   searchOptions: {
-    selected: boolean;
-    onPress: () => void;
-    label: string;
-  }[];
-  onPressItem: (noteUuid: SNNote['uuid']) => void;
-  selectedNoteId: string | undefined;
-  sortType: CollectionSortProperty;
-  hideDates: boolean;
-  hidePreviews: boolean;
-  hideEditorIcon: boolean;
-  decrypting: boolean;
-  loading: boolean;
-  hasRefreshControl: boolean;
-  notes: SNNote[];
-  refreshing: boolean;
-  onRefresh: () => void;
-  shouldFocusSearch: boolean;
-  setShouldFocusSearch: Dispatch<SetStateAction<boolean>>;
-};
+    selected: boolean
+    onPress: () => void
+    label: string
+  }[]
+  onPressItem: (noteUuid: SNNote['uuid']) => void
+  selectedNoteId: string | undefined
+  sortType: CollectionSortProperty
+  hideDates: boolean
+  hidePreviews: boolean
+  hideEditorIcon: boolean
+  decrypting: boolean
+  loading: boolean
+  hasRefreshControl: boolean
+  notes: SNNote[]
+  refreshing: boolean
+  onRefresh: () => void
+  shouldFocusSearch: boolean
+  setShouldFocusSearch: Dispatch<SetStateAction<boolean>>
+}
 
 export const NoteList = (props: Props) => {
   // Context
-  const [signedIn] = useSignedIn();
-  const application = useContext(ApplicationContext);
-  const theme = useContext(ThemeContext);
-  const insets = useSafeAreaInsets();
+  const [signedIn] = useSignedIn()
+  const application = useContext(ApplicationContext)
+  const theme = useContext(ThemeContext)
+  const insets = useSafeAreaInsets()
 
-  const [collapseSearchBarOnBlur, setCollapseSearchBarOnBlur] = useState(true);
-  const [noteListScrolled, setNoteListScrolled] = useState(false);
+  const [collapseSearchBarOnBlur, setCollapseSearchBarOnBlur] = useState(true)
+  const [noteListScrolled, setNoteListScrolled] = useState(false)
 
   // Ref
-  const opacityAnimationValue = useRef(new Animated.Value(0)).current;
-  const marginTopAnimationValue = useRef(new Animated.Value(-40)).current;
-  const iosSearchBarInputRef = useRef<IosSearchBar>(null);
-  const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null);
-  const noteListRef = useRef<FlatList>(null);
+  const opacityAnimationValue = useRef(new Animated.Value(0)).current
+  const marginTopAnimationValue = useRef(new Animated.Value(-40)).current
+  const iosSearchBarInputRef = useRef<IosSearchBar>(null)
+  const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null)
+  const noteListRef = useRef<FlatList>(null)
 
   const navigation =
-    useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>();
+    useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
 
   const dismissKeyboard = () => {
-    iosSearchBarInputRef.current?.blur();
-  };
+    iosSearchBarInputRef.current?.blur()
+  }
 
   useEffect(() => {
     const removeBlurScreenListener = navigation.addListener('blur', () => {
-      setCollapseSearchBarOnBlur(false);
-    });
+      setCollapseSearchBarOnBlur(false)
+    })
 
-    return removeBlurScreenListener;
-  });
+    return removeBlurScreenListener
+  })
 
   useEffect(() => {
     const unsubscribeStateEventObserver = application
       ?.getAppState()
       .addStateEventObserver(state => {
         if (state === AppStateEventType.DrawerOpen) {
-          dismissKeyboard();
+          dismissKeyboard()
         }
-      });
+      })
 
-    return unsubscribeStateEventObserver;
-  }, [application]);
+    return unsubscribeStateEventObserver
+  }, [application])
 
   const scrollListToTop = useCallback(() => {
     if (noteListScrolled && props.notes && props.notes.length > 0) {
-      noteListRef.current?.scrollToIndex({ animated: false, index: 0 });
-      setNoteListScrolled(false);
+      noteListRef.current?.scrollToIndex({ animated: false, index: 0 })
+      setNoteListScrolled(false)
     }
-  }, [noteListScrolled, props.notes]);
+  }, [noteListScrolled, props.notes])
 
   useEffect(() => {
     const unsubscribeTagChangedEventObserver = application
       ?.getAppState()
       .addStateChangeObserver(event => {
         if (event === AppStateType.TagChanged) {
-          scrollListToTop();
+          scrollListToTop()
         }
-      });
+      })
 
-    return unsubscribeTagChangedEventObserver;
-  }, [application, scrollListToTop]);
+    return unsubscribeTagChangedEventObserver
+  }, [application, scrollListToTop])
 
-  const { shouldFocusSearch, searchText } = props;
+  const { shouldFocusSearch, searchText } = props
 
   const focusSearch = useCallback(() => {
-    setCollapseSearchBarOnBlur(true);
+    setCollapseSearchBarOnBlur(true)
 
     if (shouldFocusSearch) {
-      iosSearchBarInputRef.current?.focus();
-      androidSearchBarInputRef.current?.focus(searchText);
+      iosSearchBarInputRef.current?.focus()
+      androidSearchBarInputRef.current?.focus(searchText)
     }
-  }, [shouldFocusSearch, searchText]);
+  }, [shouldFocusSearch, searchText])
 
-  useFocusEffect(focusSearch);
+  useFocusEffect(focusSearch)
 
   useFocusEffect(
     useCallback(() => {
-      return dismissKeyboard;
+      return dismissKeyboard
     }, [])
-  );
+  )
 
   const onChangeSearchText = (text: string) => {
-    props.onSearchChange(text);
-    scrollListToTop();
-  };
+    props.onSearchChange(text)
+    scrollListToTop()
+  }
 
   const toggleSearchOptions = (showOptions: boolean) => {
     Animated.parallel([
       Animated.timing(opacityAnimationValue, {
         toValue: showOptions ? 1 : 0,
         duration: 200,
-        useNativeDriver: false,
+        useNativeDriver: false
       }),
       Animated.timing(marginTopAnimationValue, {
         toValue: showOptions ? 0 : -40,
         duration: 200,
-        useNativeDriver: false,
-      }),
-    ]).start();
-  };
+        useNativeDriver: false
+      })
+    ]).start()
+  }
 
   const onSearchFocus = () => {
-    toggleSearchOptions(true);
-    props.setShouldFocusSearch(false);
-  };
+    toggleSearchOptions(true)
+    props.setShouldFocusSearch(false)
+  }
 
   const onSearchBlur = () => {
-    toggleSearchOptions(false);
-  };
+    toggleSearchOptions(false)
+  }
 
   const onScroll = () => {
-    setNoteListScrolled(true);
-  };
+    setNoteListScrolled(true)
+  }
 
   const renderItem: ListRenderItem<SNNote> | null | undefined = ({ item }) => {
     return (
@@ -189,15 +189,15 @@ export const NoteList = (props: Props) => {
         hideEditorIcon={props.hideEditorIcon}
         highlighted={item.uuid === props.selectedNoteId}
       />
-    );
-  };
-  let placeholderText = '';
+    )
+  }
+  let placeholderText = ''
   if (props.decrypting) {
-    placeholderText = 'Decrypting notes...';
+    placeholderText = 'Decrypting notes...'
   } else if (props.loading) {
-    placeholderText = 'Loading notes...';
+    placeholderText = 'Loading notes...'
   } else if (props.notes.length === 0) {
-    placeholderText = 'No notes.';
+    placeholderText = 'No notes.'
   }
   return (
     <Container>
@@ -220,7 +220,7 @@ export const NoteList = (props: Props) => {
           keyboardShouldPersistTaps={'always'}
           style={{
             opacity: opacityAnimationValue,
-            marginTop: marginTopAnimationValue,
+            marginTop: marginTopAnimationValue
           }}
         >
           {props.searchOptions.map(({ selected, onPress, label }, index) => (
@@ -240,7 +240,7 @@ export const NoteList = (props: Props) => {
         keyExtractor={item => item.uuid}
         contentContainerStyle={[
           { paddingBottom: insets.bottom },
-          props.notes.length > 0 ? {} : { height: '100%' },
+          props.notes.length > 0 ? {} : { height: '100%' }
         ]}
         initialNumToRender={6}
         windowSize={6}
@@ -272,5 +272,5 @@ export const NoteList = (props: Props) => {
         onScroll={onScroll}
       />
     </Container>
-  );
-};
+  )
+}

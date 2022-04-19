@@ -1,9 +1,9 @@
-import { StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import styled from 'styled-components/native';
+import { StyleSheet } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import styled from 'styled-components/native'
 
 export const useUploadedFilesListStyles = () => {
-  const insets = useSafeAreaInsets();
+  const insets = useSafeAreaInsets()
 
   return StyleSheet.create({
     centeredView: {
@@ -11,27 +11,27 @@ export const useUploadedFilesListStyles = () => {
       alignItems: 'center',
       flexShrink: 1,
       flexGrow: 1,
-      paddingBottom: insets.bottom,
+      paddingBottom: insets.bottom
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: 4,
+      marginBottom: 4
     },
     headerTabContainer: {
-      flexDirection: 'row',
+      flexDirection: 'row'
     },
     noAttachmentsIconContainer: {
       alignItems: 'center',
-      marginTop: 24,
+      marginTop: 24
     },
     noAttachmentsIcon: {
       marginTop: 24,
-      marginBottom: 24,
-    },
-  });
-};
+      marginBottom: 24
+    }
+  })
+}
 
 export const UploadFilesListContainer = styled.View`
   margin-top: 12px;
@@ -39,10 +39,10 @@ export const UploadFilesListContainer = styled.View`
   padding-left: 16px;
   width: 100%;
   height: 100%;
-`;
+`
 export const HeaderTabItem = styled.View<{
-  isActive: boolean;
-  isLeftTab?: boolean;
+  isActive: boolean
+  isLeftTab?: boolean
 }>`
   align-items: center;
   padding: 8px;
@@ -56,9 +56,9 @@ export const HeaderTabItem = styled.View<{
   border-top-left-radius: ${({ isLeftTab }) => (isLeftTab ? '8px' : 0)};
   border-bottom-left-radius: ${({ isLeftTab }) => (isLeftTab ? '8px' : 0)};
   margin-left: ${({ isLeftTab }) => (isLeftTab ? 0 : '-1px')};
-`;
+`
 export const TabText = styled.Text<{ isActive: boolean }>`
   font-weight: bold;
   color: ${({ isActive, theme }) =>
     isActive ? theme.stylekitInfoContrastColor : theme.stylekitInfoColor};
-`;
+`

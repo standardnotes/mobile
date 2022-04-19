@@ -1,85 +1,85 @@
-import { ButtonCell } from '@Components/ButtonCell';
+import { ButtonCell } from '@Components/ButtonCell'
 import {
   Option,
-  SectionedOptionsTableCell,
-} from '@Components/SectionedOptionsTableCell';
-import { SectionedTableCell } from '@Components/SectionedTableCell';
-import { TableSection } from '@Components/TableSection';
-import { PasscodeKeyboardType, UnlockTiming } from '@Lib/application_state';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { ModalStackNavigationProp } from '@Root/ModalStack';
-import { SCREEN_INPUT_MODAL_PASSCODE } from '@Screens/screens';
-import { ThemeServiceContext } from '@Style/theme_service';
-import React, { useContext, useMemo, useRef, useState } from 'react';
-import { Keyboard, KeyboardType, Platform, TextInput } from 'react-native';
-import { Container, Input } from './InputModal.styled';
+  SectionedOptionsTableCell
+} from '@Components/SectionedOptionsTableCell'
+import { SectionedTableCell } from '@Components/SectionedTableCell'
+import { TableSection } from '@Components/TableSection'
+import { PasscodeKeyboardType, UnlockTiming } from '@Lib/application_state'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { ModalStackNavigationProp } from '@Root/ModalStack'
+import { SCREEN_INPUT_MODAL_PASSCODE } from '@Screens/screens'
+import { ThemeServiceContext } from '@Style/theme_service'
+import React, { useContext, useMemo, useRef, useState } from 'react'
+import { Keyboard, KeyboardType, Platform, TextInput } from 'react-native'
+import { Container, Input } from './InputModal.styled'
 
-type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_PASSCODE>;
+type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_PASSCODE>
 export const PasscodeInputModal = (props: Props) => {
   // Context
-  const application = useContext(ApplicationContext);
-  const themeService = useContext(ThemeServiceContext);
+  const application = useContext(ApplicationContext)
+  const themeService = useContext(ThemeServiceContext)
 
   // State
-  const [settingPassocode, setSettingPassocode] = useState(false);
-  const [text, setText] = useState('');
-  const [confirmText, setConfirmText] = useState('');
-  const [keyboardType, setKeyboardType] = useState<KeyboardType>('default');
+  const [settingPassocode, setSettingPassocode] = useState(false)
+  const [text, setText] = useState('')
+  const [confirmText, setConfirmText] = useState('')
+  const [keyboardType, setKeyboardType] = useState<KeyboardType>('default')
 
   // Refs
-  const textRef = useRef<TextInput>(null);
-  const confirmTextRef = useRef<TextInput>(null);
+  const textRef = useRef<TextInput>(null)
+  const confirmTextRef = useRef<TextInput>(null)
 
   const onTextSubmit = () => {
     if (!confirmText) {
-      confirmTextRef.current?.focus();
+      confirmTextRef.current?.focus()
     } else {
-      Keyboard.dismiss();
+      Keyboard.dismiss()
     }
-  };
+  }
 
   const onSubmit = async () => {
     if (settingPassocode) {
-      return;
+      return
     }
-    setSettingPassocode(true);
+    setSettingPassocode(true)
     if (text !== confirmText) {
       application?.alertService?.alert(
         'The two values you entered do not match. Please try again.',
         'Invalid Confirmation',
         'OK'
-      );
-      setSettingPassocode(false);
+      )
+      setSettingPassocode(false)
     } else {
-      await application?.addPasscode(text);
+      await application?.addPasscode(text)
       await application
         ?.getAppState()
-        .setPasscodeKeyboardType(keyboardType as PasscodeKeyboardType);
-      await application?.getAppState().setPasscodeTiming(UnlockTiming.OnQuit);
-      setSettingPassocode(false);
-      props.navigation.goBack();
+        .setPasscodeKeyboardType(keyboardType as PasscodeKeyboardType)
+      await application?.getAppState().setPasscodeTiming(UnlockTiming.OnQuit)
+      setSettingPassocode(false)
+      props.navigation.goBack()
     }
-  };
+  }
 
   const keyboardOptions: Option[] = useMemo(
     () => [
       {
         title: 'General',
         key: 'default' as PasscodeKeyboardType,
-        selected: keyboardType === 'default',
+        selected: keyboardType === 'default'
       },
       {
         title: 'Numeric',
         key: 'numeric' as PasscodeKeyboardType,
-        selected: keyboardType === 'numeric',
-      },
+        selected: keyboardType === 'numeric'
+      }
     ],
     [keyboardType]
-  );
+  )
 
   const onKeyboardTypeSelect = (option: Option) => {
-    setKeyboardType(option.key as KeyboardType);
-  };
+    setKeyboardType(option.key as KeyboardType)
+  }
 
   return (
     <Container>
@@ -135,5 +135,5 @@ export const PasscodeInputModal = (props: Props) => {
         />
       </TableSection>
     </Container>
-  );
-};
+  )
+}

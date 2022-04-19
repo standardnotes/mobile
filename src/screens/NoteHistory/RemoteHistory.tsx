@@ -1,81 +1,81 @@
-import { ApplicationContext } from '@Root/ApplicationContext';
-import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled';
+import { ApplicationContext } from '@Root/ApplicationContext'
+import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled'
 import {
   NoteHistoryEntry,
   RevisionListEntry,
-  SNNote,
-} from '@standardnotes/snjs';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { FlatList, ListRenderItem } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { NoteHistoryCell } from './NoteHistoryCell';
+  SNNote
+} from '@standardnotes/snjs'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { FlatList, ListRenderItem } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { NoteHistoryCell } from './NoteHistoryCell'
 
 type Props = {
-  note: SNNote;
-  onPress: (uuid: string, revision: NoteHistoryEntry, title: string) => void;
-};
+  note: SNNote
+  onPress: (uuid: string, revision: NoteHistoryEntry, title: string) => void
+}
 export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   // Context
-  const application = useContext(ApplicationContext);
-  const insets = useSafeAreaInsets();
+  const application = useContext(ApplicationContext)
+  const insets = useSafeAreaInsets()
 
   // State
   const [remoteHistoryList, setRemoteHistoryList] =
-    useState<RevisionListEntry[]>();
-  const [fetchingRemoteHistory, setFetchingRemoteHistory] = useState(false);
+    useState<RevisionListEntry[]>()
+  const [fetchingRemoteHistory, setFetchingRemoteHistory] = useState(false)
 
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
 
     const fetchRemoteHistoryList = async () => {
       if (note) {
-        setFetchingRemoteHistory(true);
+        setFetchingRemoteHistory(true)
         const newRemoteHistory =
-          await application?.historyManager?.remoteHistoryForItem(note);
+          await application?.historyManager?.remoteHistoryForItem(note)
         if (isMounted) {
-          setFetchingRemoteHistory(false);
-          setRemoteHistoryList(newRemoteHistory);
+          setFetchingRemoteHistory(false)
+          setRemoteHistoryList(newRemoteHistory)
         }
       }
-    };
-    fetchRemoteHistoryList();
+    }
+    fetchRemoteHistoryList()
 
     return () => {
-      isMounted = false;
-    };
-  }, [application?.historyManager, note]);
+      isMounted = false
+    }
+  }, [application?.historyManager, note])
 
   const onItemPress = useCallback(
     async (item: RevisionListEntry) => {
       const remoteRevision =
-        await application?.historyManager!.fetchRemoteRevision(note, item);
+        await application?.historyManager!.fetchRemoteRevision(note, item)
       if (remoteRevision) {
         onPress(
           item.uuid,
           remoteRevision as NoteHistoryEntry,
           new Date(item.updated_at).toLocaleString()
-        );
+        )
       } else {
         application?.alertService!.alert(
           'The remote revision could not be loaded. Please try again later.',
           'Error'
-        );
-        return;
+        )
+        return
       }
     },
     [application?.alertService, application?.historyManager, note, onPress]
-  );
+  )
 
   const renderItem: ListRenderItem<RevisionListEntry> | null | undefined = ({
-    item,
+    item
   }) => {
     return (
       <NoteHistoryCell
         onPress={() => onItemPress(item)}
         title={new Date(item.updated_at).toLocaleString()}
       />
-    );
-  };
+    )
+  }
 
   if (
     fetchingRemoteHistory ||
@@ -84,12 +84,12 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   ) {
     const placeholderText = fetchingRemoteHistory
       ? 'Loading entries...'
-      : 'No entries.';
+      : 'No entries.'
     return (
       <LoadingContainer>
         <LoadingText>{placeholderText}</LoadingText>
       </LoadingContainer>
-    );
+    )
   }
 
   return (
@@ -102,5 +102,5 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
       data={remoteHistoryList}
       renderItem={renderItem}
     />
-  );
-};
+  )
+}

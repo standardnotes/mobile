@@ -1,20 +1,20 @@
-import { searchBarStyles } from '@Components/SearchBar.styled';
-import { ThemeServiceContext } from '@Style/theme_service';
-import React, { FC, RefObject, useCallback, useContext } from 'react';
-import { Platform } from 'react-native';
-import IosSearchBar from 'react-native-search-bar';
-import AndroidSearchBar from 'react-native-search-box';
-import { ThemeContext } from 'styled-components/native';
+import { searchBarStyles } from '@Components/SearchBar.styled'
+import { ThemeServiceContext } from '@Style/theme_service'
+import React, { FC, RefObject, useCallback, useContext } from 'react'
+import { Platform } from 'react-native'
+import IosSearchBar from 'react-native-search-bar'
+import AndroidSearchBar from 'react-native-search-box'
+import { ThemeContext } from 'styled-components/native'
 
 type Props = {
-  onChangeText: (text: string) => void;
-  onSearchCancel: () => void;
-  iosSearchBarInputRef: RefObject<IosSearchBar>;
-  androidSearchBarInputRef: RefObject<typeof AndroidSearchBar>;
-  onSearchFocusCallback?: () => void;
-  onSearchBlurCallback?: () => void;
-  collapseSearchBarOnBlur?: boolean;
-};
+  onChangeText: (text: string) => void
+  onSearchCancel: () => void
+  iosSearchBarInputRef: RefObject<IosSearchBar>
+  androidSearchBarInputRef: RefObject<typeof AndroidSearchBar>
+  onSearchFocusCallback?: () => void
+  onSearchBlurCallback?: () => void
+  collapseSearchBarOnBlur?: boolean
+}
 
 export const SearchBar: FC<Props> = ({
   onChangeText,
@@ -23,18 +23,18 @@ export const SearchBar: FC<Props> = ({
   androidSearchBarInputRef,
   onSearchFocusCallback,
   onSearchBlurCallback,
-  collapseSearchBarOnBlur = true,
+  collapseSearchBarOnBlur = true
 }) => {
-  const theme = useContext(ThemeContext);
-  const themeService = useContext(ThemeServiceContext);
+  const theme = useContext(ThemeContext)
+  const themeService = useContext(ThemeServiceContext)
 
   const onSearchFocus = useCallback(() => {
-    onSearchFocusCallback?.();
-  }, [onSearchFocusCallback]);
+    onSearchFocusCallback?.()
+  }, [onSearchFocusCallback])
 
   const onSearchBlur = useCallback(() => {
-    onSearchBlurCallback?.();
-  }, [onSearchBlurCallback]);
+    onSearchBlurCallback?.()
+  }, [onSearchBlurCallback])
 
   return (
     <>
@@ -49,11 +49,11 @@ export const SearchBar: FC<Props> = ({
           textFieldBackgroundColor={theme.stylekitContrastBackgroundColor}
           onChangeText={onChangeText}
           onSearchButtonPress={() => {
-            iosSearchBarInputRef.current?.blur();
+            iosSearchBarInputRef.current?.blur()
           }}
           onCancelButtonPress={() => {
-            iosSearchBarInputRef.current?.blur();
-            onSearchCancel();
+            iosSearchBarInputRef.current?.blur()
+            onSearchCancel()
           }}
           onFocus={onSearchFocus}
           onBlur={onSearchBlur}
@@ -64,8 +64,8 @@ export const SearchBar: FC<Props> = ({
           ref={androidSearchBarInputRef}
           onChangeText={onChangeText}
           onCancel={() => {
-            onSearchBlur();
-            onSearchCancel();
+            onSearchBlur()
+            onSearchCancel()
           }}
           onDelete={onSearchCancel}
           onFocus={onSearchFocus}
@@ -82,13 +82,13 @@ export const SearchBar: FC<Props> = ({
             searchBarStyles.androidSearch,
             {
               color: theme.stylekitForegroundColor,
-              backgroundColor: theme.stylekitContrastBackgroundColor,
-            },
+              backgroundColor: theme.stylekitContrastBackgroundColor
+            }
           ]}
           placeholderExpandedMargin={25}
           searchIconCollapsedMargin={30}
         />
       )}
     </>
-  );
-};
+  )
+}

@@ -1,16 +1,16 @@
-import { BlockingModal } from '@Components/BlockingModal';
-import { HeaderTitleView } from '@Components/HeaderTitleView';
-import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton';
-import { RouteProp } from '@react-navigation/native';
+import { BlockingModal } from '@Components/BlockingModal'
+import { HeaderTitleView } from '@Components/HeaderTitleView'
+import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton'
+import { RouteProp } from '@react-navigation/native'
 import {
   createStackNavigator,
-  StackNavigationProp,
-} from '@react-navigation/stack';
-import { Authenticate } from '@Screens/Authenticate/Authenticate';
-import { FileInputModal } from '@Screens/InputModal/FileInputModal';
-import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal';
-import { TagInputModal } from '@Screens/InputModal/TagInputModal';
-import { ManageSessions } from '@Screens/ManageSessions/ManageSessions';
+  StackNavigationProp
+} from '@react-navigation/stack'
+import { Authenticate } from '@Screens/Authenticate/Authenticate'
+import { FileInputModal } from '@Screens/InputModal/FileInputModal'
+import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal'
+import { TagInputModal } from '@Screens/InputModal/TagInputModal'
+import { ManageSessions } from '@Screens/ManageSessions/ManageSessions'
 import {
   MODAL_BLOCKING_ALERT,
   SCREEN_AUTHENTICATE,
@@ -19,68 +19,68 @@ import {
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_MANAGE_SESSIONS,
   SCREEN_SETTINGS,
-  SCREEN_UPLOADED_FILES_LIST,
-} from '@Screens/screens';
-import { Settings } from '@Screens/Settings/Settings';
-import { UploadedFileItemAction } from '@Screens/UploadedFilesList/UploadedFileItemAction';
-import { UploadedFilesList } from '@Screens/UploadedFilesList/UploadedFilesList';
-import { Challenge, DeinitSource, SNFile, SNNote } from '@standardnotes/snjs';
-import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons';
-import { ThemeService } from '@Style/theme_service';
-import React, { memo, useContext } from 'react';
-import { Platform } from 'react-native';
-import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ThemeContext } from 'styled-components';
-import { HeaderTitleParams, TEnvironment } from './App';
-import { ApplicationContext } from './ApplicationContext';
-import { AppStackComponent } from './AppStack';
-import { HistoryStack } from './HistoryStack';
+  SCREEN_UPLOADED_FILES_LIST
+} from '@Screens/screens'
+import { Settings } from '@Screens/Settings/Settings'
+import { UploadedFileItemAction } from '@Screens/UploadedFilesList/UploadedFileItemAction'
+import { UploadedFilesList } from '@Screens/UploadedFilesList/UploadedFilesList'
+import { Challenge, DeinitSource, SNFile, SNNote } from '@standardnotes/snjs'
+import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons'
+import { ThemeService } from '@Style/theme_service'
+import React, { memo, useContext } from 'react'
+import { Platform } from 'react-native'
+import { HeaderButtons, Item } from 'react-navigation-header-buttons'
+import { ThemeContext } from 'styled-components'
+import { HeaderTitleParams, TEnvironment } from './App'
+import { ApplicationContext } from './ApplicationContext'
+import { AppStackComponent } from './AppStack'
+import { HistoryStack } from './HistoryStack'
 
 export type ModalStackNavigatorParamList = {
-  AppStack: undefined;
-  HistoryStack: undefined;
-  [SCREEN_SETTINGS]: undefined;
-  [SCREEN_MANAGE_SESSIONS]: undefined;
+  AppStack: undefined
+  HistoryStack: undefined
+  [SCREEN_SETTINGS]: undefined
+  [SCREEN_MANAGE_SESSIONS]: undefined
   [SCREEN_INPUT_MODAL_TAG]: HeaderTitleParams & {
-    tagUuid?: string;
-    noteUuid?: string;
-  };
+    tagUuid?: string
+    noteUuid?: string
+  }
   [SCREEN_INPUT_MODAL_FILE_NAME]: HeaderTitleParams & {
-    file: SNFile;
-    handleFileAction: (action: UploadedFileItemAction) => Promise<boolean>;
-  };
+    file: SNFile
+    handleFileAction: (action: UploadedFileItemAction) => Promise<boolean>
+  }
   [SCREEN_UPLOADED_FILES_LIST]: HeaderTitleParams & {
-    note: SNNote;
-  };
-  [SCREEN_INPUT_MODAL_PASSCODE]: undefined;
+    note: SNNote
+  }
+  [SCREEN_INPUT_MODAL_PASSCODE]: undefined
   [SCREEN_AUTHENTICATE]: {
-    challenge: Challenge;
-    title?: string;
-  };
+    challenge: Challenge
+    title?: string
+  }
   [MODAL_BLOCKING_ALERT]: {
-    title?: string;
-    text: string;
-  };
-};
+    title?: string
+    text: string
+  }
+}
 
 export type ModalStackNavigationProp<
   T extends keyof ModalStackNavigatorParamList
 > = {
-  navigation: StackNavigationProp<ModalStackNavigatorParamList, T>;
-  route: RouteProp<ModalStackNavigatorParamList, T>;
-};
+  navigation: StackNavigationProp<ModalStackNavigatorParamList, T>
+  route: RouteProp<ModalStackNavigatorParamList, T>
+}
 
-const MainStack = createStackNavigator<ModalStackNavigatorParamList>();
+const MainStack = createStackNavigator<ModalStackNavigatorParamList>()
 
 export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
-  const application = useContext(ApplicationContext);
-  const theme = useContext(ThemeContext);
+  const application = useContext(ApplicationContext)
+  const theme = useContext(ThemeContext)
 
   const MemoizedAppStackComponent = memo(
     (props: ModalStackNavigationProp<'AppStack'>) => (
       <AppStackComponent {...props} env={env} />
     )
-  );
+  )
 
   return (
     <MainStack.Navigator
@@ -88,21 +88,21 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
         gestureEnabled: false,
         presentation: 'modal',
         headerStyle: {
-          backgroundColor: theme.stylekitContrastBackgroundColor,
-        },
+          backgroundColor: theme.stylekitContrastBackgroundColor
+        }
       }}
       initialRouteName="AppStack"
     >
       <MainStack.Screen
         name={'AppStack'}
         options={{
-          headerShown: false,
+          headerShown: false
         }}
         component={MemoizedAppStackComponent}
       />
       <MainStack.Screen
         options={{
-          headerShown: false,
+          headerShown: false
         }}
         name="HistoryStack"
         component={HistoryStack}
@@ -112,7 +112,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
         options={() => ({
           title: 'Settings',
           headerTitle: ({ children }) => {
-            return <HeaderTitleView title={children || ''} />;
+            return <HeaderTitleView title={children || ''} />
           },
           headerLeft: ({ disabled, onPress }) => (
             <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
@@ -136,15 +136,15 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                   testID="headerButton"
                   title={'Destroy Data'}
                   onPress={async () => {
-                    await application?.deviceInterface?.removeAllRawStorageValues();
+                    await application?.deviceInterface?.removeAllRawStorageValues()
                     await application?.deviceInterface?.removeAllRawDatabasePayloads(
                       application?.identifier
-                    );
-                    application?.deinit(DeinitSource.SignOut);
+                    )
+                    application?.deinit(DeinitSource.SignOut)
                   }}
                 />
               </HeaderButtons>
-            ),
+            )
         })}
         component={Settings}
       />
@@ -153,7 +153,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
         options={() => ({
           title: 'Active Sessions',
           headerTitle: ({ children }) => {
-            return <HeaderTitleView title={children || ''} />;
+            return <HeaderTitleView title={children || ''} />
           },
           headerLeft: ({ disabled, onPress }) => (
             <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
@@ -169,7 +169,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          ),
+          )
         })}
         component={ManageSessions}
       />
@@ -178,7 +178,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
         options={{
           title: 'Setup Passcode',
           headerTitle: ({ children }) => {
-            return <HeaderTitleView title={children || ''} />;
+            return <HeaderTitleView title={children || ''} />
           },
           headerLeft: ({ disabled, onPress }) => (
             <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
@@ -194,7 +194,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          ),
+          )
         }}
         component={PasscodeInputModal}
       />
@@ -208,7 +208,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
               <HeaderTitleView
                 title={route.params?.title ?? (children || '')}
               />
-            );
+            )
           },
           headerLeft: ({ disabled, onPress }) => (
             <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
@@ -224,7 +224,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          ),
+          )
         })}
         component={TagInputModal}
       />
@@ -238,7 +238,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
               <HeaderTitleView
                 title={route.params?.title ?? (children || '')}
               />
-            );
+            )
           },
           headerLeft: ({ disabled, onPress }) => (
             <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
@@ -254,7 +254,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          ),
+          )
         })}
         component={FileInputModal}
       />
@@ -266,7 +266,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
           headerLeft: () => undefined,
           headerTitle: ({ children }) => (
             <HeaderTitleView title={route.params?.title ?? (children || '')} />
-          ),
+          )
         })}
         component={Authenticate}
       />
@@ -288,7 +288,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          ),
+          )
         })}
         component={UploadedFilesList}
       />
@@ -302,20 +302,20 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
             cardStyle: {
               opacity: progress.interpolate({
                 inputRange: [0, 0.5, 0.9, 1],
-                outputRange: [0, 0.25, 0.7, 1],
-              }),
+                outputRange: [0, 0.25, 0.7, 1]
+              })
             },
             overlayStyle: {
               opacity: progress.interpolate({
                 inputRange: [0, 1],
                 outputRange: [0, 0.5],
-                extrapolate: 'clamp',
-              }),
-            },
-          }),
+                extrapolate: 'clamp'
+              })
+            }
+          })
         })}
         component={BlockingModal}
       />
     </MainStack.Navigator>
-  );
-};
+  )
+}

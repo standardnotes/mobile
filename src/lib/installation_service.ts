@@ -1,19 +1,19 @@
-import SNReactNative from '@standardnotes/react-native-utils';
+import SNReactNative from '@standardnotes/react-native-utils'
 import {
   ApplicationService,
   ButtonType,
   isNullOrUndefined,
-  StorageValueModes,
-} from '@standardnotes/snjs';
+  StorageValueModes
+} from '@standardnotes/snjs'
 
-const FIRST_RUN_KEY = 'first_run';
+const FIRST_RUN_KEY = 'first_run'
 
 export class InstallationService extends ApplicationService {
   override async onAppStart() {
     if (await this.needsWipe()) {
-      await this.wipeData();
+      await this.wipeData()
     } else {
-      this.markApplicationAsRan();
+      this.markApplicationAsRan()
     }
   }
 
@@ -22,7 +22,7 @@ export class InstallationService extends ApplicationService {
       FIRST_RUN_KEY,
       false,
       StorageValueModes.Nonwrapped
-    );
+    )
   }
 
   async needsWipe() {
@@ -30,19 +30,19 @@ export class InstallationService extends ApplicationService {
     // AsyncStorage failures, we want to confirm with the user before deleting anything.
 
     const hasNormalKeys =
-      this.application?.hasAccount() || this.application?.hasPasscode();
+      this.application?.hasAccount() || this.application?.hasPasscode()
     const keychainKey =
-      await this.application?.deviceInterface?.getRawKeychainValue();
+      await this.application?.deviceInterface?.getRawKeychainValue()
     const hasKeychainValue = !(
       isNullOrUndefined(keychainKey) ||
       (typeof keychainKey === 'object' && Object.keys(keychainKey).length === 0)
-    );
+    )
 
     let firstRunKey = await this.application?.getValue(
       FIRST_RUN_KEY,
       StorageValueModes.Nonwrapped
-    );
-    let firstRunKeyMissing = isNullOrUndefined(firstRunKey);
+    )
+    let firstRunKeyMissing = isNullOrUndefined(firstRunKey)
     /*
      * Because of migration failure first run key might not be in non wrapped storage
      */
@@ -50,10 +50,10 @@ export class InstallationService extends ApplicationService {
       const fallbackFirstRunValue =
         await this.application?.deviceInterface?.getRawStorageValue(
           FIRST_RUN_KEY
-        );
-      firstRunKeyMissing = isNullOrUndefined(fallbackFirstRunValue);
+        )
+      firstRunKeyMissing = isNullOrUndefined(fallbackFirstRunValue)
     }
-    return !hasNormalKeys && hasKeychainValue && firstRunKeyMissing;
+    return !hasNormalKeys && hasKeychainValue && firstRunKeyMissing
   }
 
   async wipeData() {
@@ -68,16 +68,16 @@ export class InstallationService extends ApplicationService {
       'Delete Local Data',
       ButtonType.Danger,
       'Quit App'
-    );
+    )
 
     if (confirmed) {
-      await this.application?.deviceInterface?.removeAllRawStorageValues();
+      await this.application?.deviceInterface?.removeAllRawStorageValues()
       await this.application?.deviceInterface?.removeAllRawDatabasePayloads(
         this.application?.identifier
-      );
-      await this.application?.deviceInterface?.clearRawKeychainValue();
+      )
+      await this.application?.deviceInterface?.clearRawKeychainValue()
     } else {
-      SNReactNative.exitApp();
+      SNReactNative.exitApp()
     }
   }
 }

@@ -1,11 +1,11 @@
-import { ButtonCell } from '@Components/ButtonCell';
-import { SectionHeader } from '@Components/SectionHeader';
-import { TableSection } from '@Components/TableSection';
-import { ApplicationState } from '@Lib/application_state';
-import { ApplicationContext } from '@Root/ApplicationContext';
-import React, { useContext } from 'react';
-import { Platform, Share } from 'react-native';
-import { ContentContainer, Label } from './CompanySection.styled';
+import { ButtonCell } from '@Components/ButtonCell'
+import { SectionHeader } from '@Components/SectionHeader'
+import { TableSection } from '@Components/TableSection'
+import { ApplicationState } from '@Lib/application_state'
+import { ApplicationContext } from '@Root/ApplicationContext'
+import React, { useContext } from 'react'
+import { Platform, Share } from 'react-native'
+import { ContentContainer, Label } from './CompanySection.styled'
 
 const URLS = {
   feedback: `mailto:help@standardnotes.com?subject=${
@@ -16,48 +16,48 @@ const URLS = {
   help: 'https://standardnotes.com/help',
   rate: Platform.select({
     ios: 'https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8',
-    android: 'market://details?id=com.standardnotes',
-  }) as string,
-};
+    android: 'market://details?id=com.standardnotes'
+  }) as string
+}
 
 type Props = {
-  title: string;
-};
+  title: string
+}
 
 export const CompanySection = (props: Props) => {
-  const application = useContext(ApplicationContext);
-  const storeName = Platform.OS === 'android' ? 'Play Store' : 'App Store';
+  const application = useContext(ApplicationContext)
+  const storeName = Platform.OS === 'android' ? 'Play Store' : 'App Store'
 
   const openUrl = (action: keyof typeof URLS) => {
-    application?.deviceInterface!.openUrl(URLS[action]);
-  };
+    application?.deviceInterface!.openUrl(URLS[action])
+  }
 
   const shareEncryption = () => {
-    const title = 'The Unexpected Benefits of Encrypted Writing';
-    let message = Platform.OS === 'ios' ? title : '';
-    const url = 'https://standardnotes.com/why-encrypted';
+    const title = 'The Unexpected Benefits of Encrypted Writing'
+    let message = Platform.OS === 'ios' ? title : ''
+    const url = 'https://standardnotes.com/why-encrypted'
     // Android ignores url. iOS ignores title.
     if (Platform.OS === 'android') {
-      message += '\n\nhttps://standardnotes.com/why-encrypted';
+      message += '\n\nhttps://standardnotes.com/why-encrypted'
     }
     application?.getAppState().performActionWithoutStateChangeImpact(() => {
-      Share.share({ title: title, message: message, url: url });
-    });
-  };
+      Share.share({ title: title, message: message, url: url })
+    })
+  }
 
   const shareWithFriend = () => {
-    const title = 'Standard Notes';
+    const title = 'Standard Notes'
     let message =
-      'Check out Standard Notes, a free, open-source, and completely encrypted notes app.';
-    const url = 'https://standardnotes.com';
+      'Check out Standard Notes, a free, open-source, and completely encrypted notes app.'
+    const url = 'https://standardnotes.com'
     // Android ignores url. iOS ignores title.
     if (Platform.OS === 'android') {
-      message += '\n\nhttps://standardnotes.com';
+      message += '\n\nhttps://standardnotes.com'
     }
     application?.getAppState().performActionWithoutStateChangeImpact(() => {
-      Share.share({ title: title, message: message, url: url });
-    });
-  };
+      Share.share({ title: title, message: message, url: url })
+    })
+  }
 
   return (
     <TableSection>
@@ -124,5 +124,5 @@ export const CompanySection = (props: Props) => {
         </ContentContainer>
       </ButtonCell>
     </TableSection>
-  );
-};
+  )
+}

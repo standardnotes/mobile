@@ -1,32 +1,32 @@
-import { Platform, StyleSheet } from 'react-native';
-import styled, { css } from 'styled-components/native';
+import { Platform, StyleSheet } from 'react-native'
+import styled, { css } from 'styled-components/native'
 
 // no support for generic types in Flatlist
 export const styles = StyleSheet.create({
   list: {
-    height: '100%',
+    height: '100%'
   },
   inputStyle: {
-    height: 30,
+    height: 30
   },
   androidSearch: {
-    height: 30,
-  },
-});
+    height: 30
+  }
+})
 
 export const Container = styled.View`
   background-color: ${props => props.theme.stylekitBackgroundColor};
   flex: 1;
-`;
+`
 
 export const LoadingContainer = styled.View`
   flex: 1;
   align-items: center;
   justify-content: center;
-`;
+`
 
 interface LoadingTextProps {
-  textAlign?: 'left' | 'center' | 'right' | 'justify';
+  textAlign?: 'left' | 'center' | 'right' | 'justify'
 }
 
 export const LoadingText = styled.Text<LoadingTextProps>`
@@ -34,18 +34,18 @@ export const LoadingText = styled.Text<LoadingTextProps>`
   opacity: 0.5;
   color: ${props => props.theme.stylekitForegroundColor};
   text-align: ${props => props.textAlign ?? 'left'};
-`;
+`
 
 export const HeaderContainer = styled.View`
-  padding-top: 3px
+  padding-top: 3px;
   padding-left: 5px;
   padding-right: 5px;
-`;
+`
 
 export const SearchBarContainer = styled.View`
   background-color: ${props => props.theme.stylekitBackgroundColor};
   z-index: 2;
-`;
+`
 
 export const SearchOptionsContainer = styled.ScrollView`
   display: flex;
@@ -57,4 +57,4 @@ export const SearchOptionsContainer = styled.ScrollView`
     css`
       padding-top: 4px;
     `}
-`;
+`

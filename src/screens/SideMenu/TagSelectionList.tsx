@@ -1,29 +1,29 @@
-import { useNavigation } from '@react-navigation/native';
-import { AppStackNavigationProp } from '@Root/AppStack';
-import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext';
-import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Screens/screens';
-import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection';
+import { useNavigation } from '@react-navigation/native'
+import { AppStackNavigationProp } from '@Root/AppStack'
+import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext'
+import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Screens/screens'
+import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection'
 import {
   ButtonType,
   CollectionSort,
   ContentType,
   FindItem,
   SmartView,
-  SNTag,
-} from '@standardnotes/snjs';
-import { useCustomActionSheet } from '@Style/custom_action_sheet';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, ListRenderItem } from 'react-native';
-import { SideMenuCell } from './SideMenuCell';
-import { EmptyPlaceholder } from './TagSelectionList.styled';
+  SNTag
+} from '@standardnotes/snjs'
+import { useCustomActionSheet } from '@Style/custom_action_sheet'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { FlatList, ListRenderItem } from 'react-native'
+import { SideMenuCell } from './SideMenuCell'
+import { EmptyPlaceholder } from './TagSelectionList.styled'
 
 type Props = {
-  contentType: ContentType.Tag | ContentType.SmartView;
-  onTagSelect: (tag: SNTag | SmartView) => void;
-  selectedTags: SNTag[] | SmartView[];
-  emptyPlaceholder?: string;
-  hasBottomPadding?: boolean;
-};
+  contentType: ContentType.Tag | ContentType.SmartView
+  onTagSelect: (tag: SNTag | SmartView) => void
+  selectedTags: SNTag[] | SmartView[]
+  emptyPlaceholder?: string
+  hasBottomPadding?: boolean
+}
 
 export const TagSelectionList = React.memo(
   ({
@@ -31,47 +31,47 @@ export const TagSelectionList = React.memo(
     onTagSelect,
     selectedTags,
     emptyPlaceholder,
-    hasBottomPadding,
+    hasBottomPadding
   }: Props) => {
     // Context
-    const application = useSafeApplicationContext();
+    const application = useSafeApplicationContext()
     const navigation =
       useNavigation<
         AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
-      >();
-    const { showActionSheet } = useCustomActionSheet();
+      >()
+    const { showActionSheet } = useCustomActionSheet()
 
     // State
     const [tags, setTags] = useState<SNTag[] | SmartView[]>(() =>
       contentType === ContentType.SmartView
         ? application!.items.getSmartViews()
         : []
-    );
-    const displayOptionsSet = useRef<boolean>(false);
+    )
+    const displayOptionsSet = useRef<boolean>(false)
 
     const reloadTags = useCallback(() => {
       if (contentType === ContentType.SmartView) {
-        setTags(application!.items.getSmartViews());
+        setTags(application!.items.getSmartViews())
       } else {
-        setTags(application!.items.getDisplayableItems(contentType) as SNTag[]);
+        setTags(application!.items.getDisplayableItems(contentType) as SNTag[])
       }
-    }, [application, contentType]);
+    }, [application, contentType])
 
     const streamTags = useCallback(
       () =>
         application.streamItems(contentType, ({ removed }) => {
-          reloadTags();
+          reloadTags()
 
           if (application?.getAppState().selectedTag) {
             if (FindItem(removed, application.getAppState().selectedTag.uuid)) {
               application
                 .getAppState()
-                .setSelectedTag(application.items.getSmartViews()[0], true);
+                .setSelectedTag(application.items.getSmartViews()[0], true)
             }
           }
         }),
       [application, contentType, reloadTags]
-    );
+    )
 
     useEffect(() => {
       if (!displayOptionsSet.current) {
@@ -79,14 +79,14 @@ export const TagSelectionList = React.memo(
           contentType,
           CollectionSort.Title,
           'dsc'
-        );
-        displayOptionsSet.current = true;
+        )
+        displayOptionsSet.current = true
       }
 
-      const removeStreamTags = streamTags();
+      const removeStreamTags = streamTags()
 
-      return removeStreamTags;
-    }, [application, contentType, streamTags]);
+      return removeStreamTags
+    }, [application, contentType, streamTags])
 
     const onTagLongPress = (tag: SNTag | SmartView) => {
       showActionSheet({
@@ -96,8 +96,8 @@ export const TagSelectionList = React.memo(
             text: 'Rename',
             callback: () =>
               navigation.navigate(SCREEN_INPUT_MODAL_TAG, {
-                tagUuid: tag.uuid,
-              }),
+                tagUuid: tag.uuid
+              })
           },
           {
             text: 'Delete',
@@ -108,41 +108,41 @@ export const TagSelectionList = React.memo(
                 undefined,
                 'Delete',
                 ButtonType.Danger
-              );
+              )
               if (confirmed) {
-                await application!.mutator.deleteItem(tag);
+                await application!.mutator.deleteItem(tag)
               }
-            },
-          },
-        ],
-      });
-    };
+            }
+          }
+        ]
+      })
+    }
 
     const isRootTag = (tag: SNTag | SmartView): boolean =>
-      tag instanceof SmartView || !application.items.getTagParent(tag);
+      tag instanceof SmartView || !application.items.getTagParent(tag)
 
-    const showFolders = contentType === ContentType.Tag;
+    const showFolders = contentType === ContentType.Tag
     const renderedTags = showFolders
       ? (tags as SNTag[]).filter(isRootTag)
-      : tags;
+      : tags
 
     const renderItem: ListRenderItem<SNTag | SmartView> = ({ item }) => {
-      let title = item.title;
+      let title = item.title
 
-      let children: SNTag[] = [];
+      let children: SNTag[] = []
 
       if (showFolders && item instanceof SNTag) {
         const rawChildren = application.items
           .getTagChildren(item)
-          .map(tag => tag.uuid);
+          .map(tag => tag.uuid)
         children = (tags as SNTag[]).filter((tag: SNTag) =>
           rawChildren.includes(tag.uuid)
-        );
+        )
       }
 
       const isSelected = selectedTags.some(
         (selectedTag: SNTag | SmartView) => selectedTag.uuid === item.uuid
-      );
+      )
 
       return (
         <>
@@ -153,7 +153,7 @@ export const TagSelectionList = React.memo(
             iconDesc={{
               side: 'left',
               type: SideMenuOptionIconDescriptionType.Ascii,
-              value: '#',
+              value: '#'
             }}
             key={item.uuid}
             selected={isSelected}
@@ -162,7 +162,7 @@ export const TagSelectionList = React.memo(
             <FlatList
               // eslint-disable-next-line react-native/no-inline-styles
               style={{
-                paddingLeft: 25,
+                paddingLeft: 25
               }}
               initialNumToRender={10}
               windowSize={10}
@@ -173,8 +173,8 @@ export const TagSelectionList = React.memo(
             />
           )}
         </>
-      );
-    };
+      )
+    }
 
     return (
       <>
@@ -192,6 +192,6 @@ export const TagSelectionList = React.memo(
           <EmptyPlaceholder>{emptyPlaceholder}</EmptyPlaceholder>
         )}
       </>
-    );
+    )
   }
-);
+)
