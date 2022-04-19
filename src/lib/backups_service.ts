@@ -22,7 +22,7 @@ export class BackupsService extends ApplicationService {
 
   async export(encrypted: boolean) {
     const data = encrypted
-      ? await this.application.createEncryptedBackupFile(true)
+      ? await this.application.createEncryptedBackupFile()
       : await this.application.createDecryptedBackupFile();
     const prettyPrint = 2;
     const stringifiedData = JSON.stringify(data, null, prettyPrint);
