@@ -20,7 +20,7 @@ export class BackupsService extends ApplicationService {
     the path the file was saved to.
    */
 
-  async export(encrypted: boolean) {
+  async export(encrypted: boolean): Promise<boolean | void> {
     const data = encrypted
       ? await this.application.createEncryptedBackupFile(true)
       : await this.application.createDecryptedBackupFile();

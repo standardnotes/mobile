@@ -1,5 +1,5 @@
 const faker = require('faker');
-import Detox, { by, device, element, expect, waitFor } from 'detox';
+import { by, device, element, expect, waitFor } from 'detox';
 
 export const expectToBeVisible = async (
   testedElement: Detox.IndexableNativeElement

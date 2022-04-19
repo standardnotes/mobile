@@ -66,6 +66,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       const user = application?.getUser();
       return user?.email;
     }
+    return;
   }, [application, signedIn]);
 
   const exportOptions = useMemo(() => {

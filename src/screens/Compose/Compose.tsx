@@ -57,8 +57,8 @@ const EditingIsDisabledText =
   'This note has editing disabled. Please enable editing on this note to make changes.';
 
 export class Compose extends React.Component<{}, State> {
-  static contextType = ApplicationContext;
-  context: React.ContextType<typeof ApplicationContext>;
+  static override contextType = ApplicationContext;
+  override context: React.ContextType<typeof ApplicationContext>;
   editorViewRef: React.RefObject<SNTextView> = createRef();
   saveTimeout: ReturnType<typeof setTimeout> | undefined;
   alreadySaved: boolean = false;
@@ -89,7 +89,7 @@ export class Compose extends React.Component<{}, State> {
     };
   }
 
-  componentDidMount() {
+  override componentDidMount() {
     this.removeNoteInnerValueObserver =
       this.editor?.addNoteInnerValueChangeObserver((note, source) => {
         if (isPayloadSourceRetrieved(source!)) {
@@ -179,7 +179,7 @@ export class Compose extends React.Component<{}, State> {
     }
   }
 
-  componentWillUnmount() {
+  override componentWillUnmount() {
     this.dismissKeyboard();
     this.removeNoteInnerValueObserver && this.removeNoteInnerValueObserver();
     this.removeAppEventObserver && this.removeAppEventObserver();
@@ -502,7 +502,7 @@ export class Compose extends React.Component<{}, State> {
     return text;
   }
 
-  render() {
+  override render() {
     const shouldDisplayEditor =
       this.state.componentViewer &&
       Boolean(this.note) &&

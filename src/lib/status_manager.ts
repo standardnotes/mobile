@@ -22,7 +22,7 @@ export class StatusManager extends ApplicationService {
   };
   private observers: HeaderStatusObserverCallback[] = [];
 
-  deinit() {
+  override deinit() {
     this.observers = [];
     this.messages = {
       [SCREEN_NOTES]: {

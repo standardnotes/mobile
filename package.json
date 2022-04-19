@@ -83,6 +83,7 @@
     "@babel/preset-typescript": "^7.16.7",
     "@babel/runtime": "^7.17.8",
     "@react-native-community/eslint-config": "^3.0.1",
+    "@standardnotes/config": "^2.4.0",
     "@types/detox": "^18.1.0",
     "@types/faker": "^6.6.9",
     "@types/jest": "^27.4.1",

@@ -19,7 +19,7 @@ export class ApplicationGroup extends SNApplicationGroup {
     super(new MobileDeviceInterface());
   }
 
-  async initialize(_callback?: any) {
+  override async initialize(_callback?: any): Promise<void> {
     await super.initialize({
       applicationCreator: this.createApplication,
     });

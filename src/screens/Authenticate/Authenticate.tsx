@@ -340,6 +340,7 @@ export const Authenticate = ({
         return id;
       }
     }
+    return;
   }, [challengeValueStates]);
 
   const beginAuthenticatingForNextChallengeReason = useCallback(

@@ -48,7 +48,7 @@ export class MobileDeviceInterface extends AbstractDevice {
     super(setTimeout, setInterval);
   }
 
-  deinit() {
+  override deinit() {
     super.deinit();
   }
 
@@ -281,6 +281,7 @@ export class MobileDeviceInterface extends AbstractDevice {
       .then(supported => {
         if (!supported) {
           showAlert();
+          return;
         } else {
           return Linking.openURL(url);
         }

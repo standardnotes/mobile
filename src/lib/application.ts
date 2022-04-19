@@ -92,8 +92,7 @@ export class MobileApplication extends SNApplication {
     return this.startedDeinit;
   }
 
-  /** @override */
-  deinit(source: DeinitSource) {
+  override deinit(source: DeinitSource): void {
     this.startedDeinit = true;
     for (const key of Object.keys(this.MobileServices)) {
       const service = (this.MobileServices as any)[key];
@@ -107,8 +106,7 @@ export class MobileApplication extends SNApplication {
     super.deinit(source);
   }
 
-  /** @override */
-  getLaunchChallenge() {
+  override getLaunchChallenge() {
     const challenge = super.getLaunchChallenge();
 
     if (!challenge) {

@@ -41,7 +41,7 @@ export const NoteHistory = (props: Props) => {
   const [index, setIndex] = useState(0);
 
   const openPreview = (
-    uuid: string,
+    _uuid: string,
     revision: NoteHistoryEntry,
     title: string
   ) => {

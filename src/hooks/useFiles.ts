@@ -145,6 +145,7 @@ export const useFiles = ({ note }: Props) => {
           text2: 'An error occurred while downloading the file',
           onPress: Toast.hide,
         });
+        return;
       } finally {
         setIsDownloading(false);
       }
@@ -380,7 +381,7 @@ export const useFiles = ({ note }: Props) => {
     });
   };
 
-  const pickFiles = async () => {
+  const pickFiles = async (): Promise<DocumentPickerResponse[] | void> => {
     try {
       const selectedFiles = await pickMultiple();
 
@@ -390,7 +391,9 @@ export const useFiles = ({ note }: Props) => {
     }
   };
 
-  const uploadSingleFile = async (file: DocumentPickerResponse | Asset) => {
+  const uploadSingleFile = async (
+    file: DocumentPickerResponse | Asset
+  ): Promise<SNFile | void> => {
     try {
       const fileName = filesService.getFileName(file);
       Toast.show({
@@ -440,7 +443,7 @@ export const useFiles = ({ note }: Props) => {
     }
   };
 
-  const uploadFiles = async (): Promise<SNFile[] | undefined> => {
+  const uploadFiles = async (): Promise<SNFile[] | void> => {
     try {
       const selectedFiles = await pickFiles();
       if (!selectedFiles || selectedFiles.length === 0) {
@@ -478,7 +481,7 @@ export const useFiles = ({ note }: Props) => {
     uploadFromGallery = false,
     mediaType = 'photo',
   }: TUploadFileFromCameraOrImageGalleryParams): Promise<
-    SNFile | undefined
+    SNFile | void
   > => {
     try {
       const result = uploadFromGallery

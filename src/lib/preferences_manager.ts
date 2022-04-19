@@ -27,12 +27,12 @@ export class PreferencesManager extends ApplicationService {
   observers: PreferencesObserver[] = [];
 
   /** @override */
-  async onAppLaunch() {
+  override async onAppLaunch() {
     super.onAppLaunch();
     this.loadPreferences();
   }
 
-  deinit() {
+  override deinit() {
     this.observers = [];
   }
 

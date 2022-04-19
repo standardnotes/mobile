@@ -9,7 +9,7 @@ import {
 const FIRST_RUN_KEY = 'first_run';
 
 export class InstallationService extends ApplicationService {
-  async onAppStart() {
+  override async onAppStart() {
     if (await this.needsWipe()) {
       await this.wipeData();
     } else {

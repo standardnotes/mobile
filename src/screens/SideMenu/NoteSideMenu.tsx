@@ -271,6 +271,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           mutator.disassociateWithItem(note.uuid);
         });
       }
+      return;
     },
     [application, note]
   );

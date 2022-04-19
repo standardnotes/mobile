@@ -4,7 +4,7 @@ import * as StoreReview from 'react-native-store-review';
 const RUN_COUNTS_BEFORE_REVIEW = [18, 45, 105];
 
 export class ReviewService extends ApplicationService {
-  async onAppLaunch() {
+  override async onAppLaunch() {
     if (
       this.application?.platform === Platform.Android ||
       !StoreReview.isAvailable

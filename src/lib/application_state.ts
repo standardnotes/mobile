@@ -92,7 +92,7 @@ type ObserverCallback = (
 type LockStateObserverCallback = (event: LockStateType) => void | Promise<void>;
 
 export class ApplicationState extends ApplicationService {
-  application: MobileApplication;
+  override application: MobileApplication;
   observers: ObserverCallback[] = [];
   private stateObservers: EventObserverCallback[] = [];
   private lockStateObservers: LockStateObserverCallback[] = [];
@@ -136,7 +136,7 @@ export class ApplicationState extends ApplicationService {
     );
   }
 
-  deinit() {
+  override deinit() {
     this.appEventObersever();
     this.removeHandleReactNativeAppStateChangeListener.remove();
     if (this.removeItemChangesListener) {
@@ -176,7 +176,7 @@ export class ApplicationState extends ApplicationService {
     }
   }
 
-  async onAppStart() {
+  override async onAppStart() {
     this.removePreferencesLoadedListener =
       this.prefService.addPreferencesLoadedObserver(() => {
         this.notifyOfStateChange(AppStateType.PreferencesChanged);
@@ -185,7 +185,7 @@ export class ApplicationState extends ApplicationService {
     await this.loadUnlockTiming();
   }
 
-  async onAppLaunch() {
+  override async onAppLaunch() {
     MobileApplication.setPreviouslyLaunched();
     this.screenshotPrivacyEnabled =
       (await this.getScreenshotPrivacyEnabled()) ?? true;
@@ -343,7 +343,7 @@ export class ApplicationState extends ApplicationService {
     this.application.editorGroup.closeAllNoteViews();
   }
 
-  editorForNote(uuid: Uuid) {
+  editorForNote(uuid: Uuid): NoteViewController | void {
     for (const editor of this.getEditors()) {
       if (editor.note?.uuid === uuid) {
         return editor;

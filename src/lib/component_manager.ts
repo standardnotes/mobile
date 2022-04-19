@@ -72,7 +72,7 @@ export class ComponentManager extends SNComponentManager {
     }
   }
 
-  deinit() {
+  override deinit() {
     super.deinit();
     this.staticServer!.stop();
   }
@@ -270,6 +270,7 @@ export class ComponentManager extends SNComponentManager {
       );
     }
     await RNFS.unlink(tmpLocation);
+    return;
   }
 
   private pathForComponent(identifier: FeatureIdentifier) {
@@ -308,7 +309,7 @@ export class ComponentManager extends SNComponentManager {
     return packageJson;
   }
 
-  async presentPermissionsDialog(dialog: PermissionDialog) {
+  override async presentPermissionsDialog(dialog: PermissionDialog) {
     const text = `${dialog.component.name} would like to interact with your ${dialog.permissionsString}`;
     const approved = await (this.alertService! as SNAlertService).confirm(
       text,
@@ -329,8 +330,7 @@ export class ComponentManager extends SNComponentManager {
     }
   }
 
-  /** @override */
-  urlForComponent(component: SNComponent) {
+  override urlForComponent(component: SNComponent) {
     if (
       component.isTheme() &&
       (component.content as MobileThemeContent).isSystemTheme
@@ -364,8 +364,7 @@ export class ComponentManager extends SNComponentManager {
     this.postActiveThemesToAllViewers();
   }
 
-  /** @override */
-  getActiveThemes() {
+  override getActiveThemes() {
     if (this.mobileActiveTheme) {
       return [this.mobileActiveTheme];
     } else {
