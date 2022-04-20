@@ -1,10 +1,6 @@
 import { MobileTheme } from '@Root/Style/MobileTheme'
 import FeatureChecksums from '@standardnotes/components/dist/checksums.json'
-import {
-  FeatureDescription,
-  FeatureIdentifier,
-  GetFeatures,
-} from '@standardnotes/features'
+import { FeatureDescription, FeatureIdentifier, GetFeatures } from '@standardnotes/features'
 import {
   ComponentMutator,
   EncryptionService,
@@ -84,8 +80,7 @@ export class ComponentManager extends SNComponentManager {
   public isComponentDownloadable(component: SNComponent): boolean {
     const identifier = component.identifier
     const nativeFeature = this.nativeFeatureForIdentifier(identifier)
-    const downloadUrl =
-      nativeFeature?.download_url || component.package_info?.download_url
+    const downloadUrl = nativeFeature?.download_url || component.package_info?.download_url
     return !!downloadUrl
   }
 
@@ -97,13 +92,10 @@ export class ComponentManager extends SNComponentManager {
     }
   }
 
-  public async doesComponentNeedDownload(
-    component: SNComponent
-  ): Promise<boolean> {
+  public async doesComponentNeedDownload(component: SNComponent): Promise<boolean> {
     const identifier = component.identifier
     const nativeFeature = this.nativeFeatureForIdentifier(identifier)
-    const downloadUrl =
-      nativeFeature?.download_url || component.package_info?.download_url
+    const downloadUrl = nativeFeature?.download_url || component.package_info?.download_url
 
     if (!downloadUrl) {
       throw Error('Attempting to download component with no download url')
@@ -111,15 +103,13 @@ export class ComponentManager extends SNComponentManager {
 
     const version = nativeFeature?.version || component.package_info?.version
 
-    const existingPackageJson =
-      await this.getDownloadedComponentPackageJsonFile(identifier)
+    const existingPackageJson = await this.getDownloadedComponentPackageJsonFile(identifier)
     const existingVersion = existingPackageJson?.version
     this.log('Existing package version', existingVersion)
     this.log('Latest package version', version)
 
     const shouldDownload =
-      !existingPackageJson ||
-      isRightVersionGreaterThanLeft(existingVersion, version!)
+      !existingPackageJson || isRightVersionGreaterThanLeft(existingVersion, version!)
 
     return shouldDownload
   }
@@ -129,8 +119,7 @@ export class ComponentManager extends SNComponentManager {
   ): Promise<ComponentLoadingError | undefined> {
     const identifier = component.identifier
     const nativeFeature = this.nativeFeatureForIdentifier(identifier)
-    const downloadUrl =
-      nativeFeature?.download_url || component.package_info?.download_url
+    const downloadUrl = nativeFeature?.download_url || component.package_info?.download_url
 
     if (!downloadUrl) {
       throw Error('Attempting to download component with no download url')
@@ -150,9 +139,7 @@ export class ComponentManager extends SNComponentManager {
 
     const componentPath = this.pathForComponent(identifier)
     if (!(await RNFS.exists(componentPath))) {
-      this.log(
-        `No component exists at path ${componentPath}, not using offline component`
-      )
+      this.log(`No component exists at path ${componentPath}, not using offline component`)
       return ComponentLoadingError.DoesntExist
     }
 
@@ -160,40 +147,26 @@ export class ComponentManager extends SNComponentManager {
   }
 
   public nativeFeatureForIdentifier(identifier: FeatureIdentifier) {
-    return GetFeatures().find(
-      (feature: FeatureDescription) => feature.identifier === identifier
-    )
+    return GetFeatures().find((feature: FeatureDescription) => feature.identifier === identifier)
   }
 
   public isComponentThirdParty(identifier: FeatureIdentifier): boolean {
     return !this.nativeFeatureForIdentifier(identifier)
   }
 
-  public async preloadThirdPartyIndexPathFromDisk(
-    identifier: FeatureIdentifier
-  ) {
-    const packageJson = await this.getDownloadedComponentPackageJsonFile(
-      identifier
-    )
-    this.thirdPartyIndexPaths[identifier] =
-      packageJson?.sn?.main || 'index.html'
+  public async preloadThirdPartyIndexPathFromDisk(identifier: FeatureIdentifier) {
+    const packageJson = await this.getDownloadedComponentPackageJsonFile(identifier)
+    this.thirdPartyIndexPaths[identifier] = packageJson?.sn?.main || 'index.html'
   }
 
-  private async passesChecksumValidation(
-    filePath: string,
-    featureIdentifier: FeatureIdentifier
-  ) {
+  private async passesChecksumValidation(filePath: string, featureIdentifier: FeatureIdentifier) {
     this.log('Performing checksum verification on', filePath)
     const zipContents = await RNFS.readFile(filePath, 'base64')
     const checksum = await this.protocolService.crypto.sha256(zipContents)
 
-    const desiredChecksum = (FeatureChecksums as TFeatureChecksums)[
-      featureIdentifier
-    ]?.base64
+    const desiredChecksum = (FeatureChecksums as TFeatureChecksums)[featureIdentifier]?.base64
     if (!desiredChecksum) {
-      this.log(
-        `Checksum is missing for ${featureIdentifier}; aborting installation`
-      )
+      this.log(`Checksum is missing for ${featureIdentifier}; aborting installation`)
       return false
     }
     if (checksum !== desiredChecksum) {
@@ -202,9 +175,7 @@ export class ComponentManager extends SNComponentManager {
       )
       return false
     }
-    this.log(
-      `Checksum ${checksum} matches ${desiredChecksum} for ${featureIdentifier}`
-    )
+    this.log(`Checksum ${checksum} matches ${desiredChecksum} for ${featureIdentifier}`)
 
     return true
   }
@@ -241,13 +212,9 @@ export class ComponentManager extends SNComponentManager {
 
     this.log('Finished download to tmp location', tmpLocation)
 
-    const requireChecksumVerification =
-      !!this.nativeFeatureForIdentifier(identifier)
+    const requireChecksumVerification = !!this.nativeFeatureForIdentifier(identifier)
     if (requireChecksumVerification) {
-      const passes = await this.passesChecksumValidation(
-        tmpLocation,
-        identifier
-      )
+      const passes = await this.passesChecksumValidation(tmpLocation, identifier)
       if (!passes) {
         return ComponentLoadingError.ChecksumMismatch
       }
@@ -260,20 +227,15 @@ export class ComponentManager extends SNComponentManager {
     this.log('Unzipped component to', componentPath)
 
     const directoryContents = await RNFS.readDir(componentPath)
-    const isNestedArchive =
-      directoryContents.length === 1 && directoryContents[0].isDirectory()
+    const isNestedArchive = directoryContents.length === 1 && directoryContents[0].isDirectory()
     if (isNestedArchive) {
-      this.log(
-        'Component download includes base level dir that is not its identifier, fixing...'
-      )
+      this.log('Component download includes base level dir that is not its identifier, fixing...')
       const nestedDir = directoryContents[0]
       const tmpMovePath = `${BASE_DOCUMENTS_PATH}/${identifier}`
       await RNFS.moveFile(nestedDir.path, tmpMovePath)
       await RNFS.unlink(componentPath)
       await RNFS.moveFile(tmpMovePath, componentPath)
-      this.log(
-        `Moved directory from ${directoryContents[0].path} to ${componentPath}`
-      )
+      this.log(`Moved directory from ${directoryContents[0].path} to ${componentPath}`)
     }
     await RNFS.unlink(tmpLocation)
     return
@@ -337,10 +299,7 @@ export class ComponentManager extends SNComponentManager {
   }
 
   override urlForComponent(component: SNComponent) {
-    if (
-      component.isTheme() &&
-      (component.content as MobileThemeContent).isSystemTheme
-    ) {
+    if (component.isTheme() && (component.content as MobileThemeContent).isSystemTheme) {
       const theme = component as MobileTheme
       const cssData = objectToCss(theme.mobileContent.variables)
       const encoded = Base64.encodeURI(cssData)
@@ -384,11 +343,8 @@ export async function associateComponentWithNote(
   component: SNComponent,
   note: SNNote
 ) {
-  return application.mutator.changeItem<ComponentMutator>(
-    component,
-    mutator => {
-      mutator.removeDisassociatedItemId(note.uuid)
-      mutator.associateWithItem(note.uuid)
-    }
-  )
+  return application.mutator.changeItem<ComponentMutator>(component, mutator => {
+    mutator.removeDisassociatedItemId(note.uuid)
+    mutator.associateWithItem(note.uuid)
+  })
 }

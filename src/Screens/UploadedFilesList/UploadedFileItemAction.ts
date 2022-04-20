@@ -15,8 +15,7 @@ export type UploadedFileItemAction =
   | {
       type: Exclude<
         UploadedFileItemActionType,
-        | UploadedFileItemActionType.RenameFile
-        | UploadedFileItemActionType.ToggleFileProtection
+        UploadedFileItemActionType.RenameFile | UploadedFileItemActionType.ToggleFileProtection
       >
       payload: SNFile
     }

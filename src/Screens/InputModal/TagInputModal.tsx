@@ -7,13 +7,7 @@ import { ModalStackNavigationProp } from '@Root/ModalStack'
 import { SCREEN_INPUT_MODAL_TAG } from '@Root/Screens/screens'
 import { SNTag, TagMutator } from '@standardnotes/snjs'
 import { ThemeServiceContext } from '@Style/ThemeService'
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { TextInput } from 'react-native'
 import { Container, Input } from './InputModal.styled'
 
@@ -31,9 +25,7 @@ export const TagInputModal = (props: Props) => {
 
   useEffect(() => {
     if (props.route.params.tagUuid) {
-      const tag = application?.items.findItem(
-        props.route.params.tagUuid
-      ) as SNTag
+      const tag = application?.items.findItem(props.route.params.tagUuid) as SNTag
       setText(tag.title)
     }
   }, [application, props.route.params.tagUuid])
@@ -48,9 +40,7 @@ export const TagInputModal = (props: Props) => {
 
   const onSubmit = useCallback(async () => {
     if (props.route.params.tagUuid) {
-      const tag = application?.items.findItem(
-        props.route.params.tagUuid
-      ) as SNTag
+      const tag = application?.items.findItem(props.route.params.tagUuid) as SNTag
       await application?.mutator.changeItem(tag, mutator => {
         const tagMutator = mutator as TagMutator
         tagMutator.title = text
@@ -76,13 +66,7 @@ export const TagInputModal = (props: Props) => {
 
     void application?.sync.sync()
     props.navigation.goBack()
-  }, [
-    application,
-    props.navigation,
-    props.route.params.noteUuid,
-    props.route.params.tagUuid,
-    text,
-  ])
+  }, [application, props.navigation, props.route.params.noteUuid, props.route.params.tagUuid, text])
 
   return (
     <Container>
@@ -90,9 +74,7 @@ export const TagInputModal = (props: Props) => {
         <SectionedTableCell textInputCell first={true}>
           <Input
             ref={textRef as any}
-            placeholder={
-              props.route.params.tagUuid ? 'Tag name' : 'New tag name'
-            }
+            placeholder={props.route.params.tagUuid ? 'Tag name' : 'New tag name'}
             onChangeText={setText}
             value={text}
             autoCorrect={false}

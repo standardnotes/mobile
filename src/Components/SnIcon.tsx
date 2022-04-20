@@ -97,11 +97,5 @@ export const SnIcon = ({ type, fill, width, height, style = {} }: Props) => {
     }
   }
 
-  return (
-    <IconComponent
-      fill={fillColor}
-      {...customSizes}
-      style={[iconStyles.icon, style]}
-    />
-  )
+  return <IconComponent fill={fillColor} {...customSizes} style={[iconStyles.icon, style]} />
 }

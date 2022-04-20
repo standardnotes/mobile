@@ -12,21 +12,10 @@ import {
   useUploadedFilesListStyles,
 } from '@Root/Screens/UploadedFilesList/UploadedFilesList.styled'
 import { SNFile } from '@standardnotes/snjs'
-import {
-  CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Style/CustomActionSheet'
+import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
 import { ICON_ATTACH } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
-import React, {
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import React, { FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, ListRenderItem, Platform, Text, View } from 'react-native'
 import FAB from 'react-native-fab'
 import IosSearchBar from 'react-native-search-bar'
@@ -72,9 +61,7 @@ export const UploadedFilesList: FC<Props> = props => {
 
   const filteredList = useMemo(() => {
     return searchString
-      ? filesList.filter(file =>
-          file.name.toLowerCase().includes(searchString.toLowerCase())
-        )
+      ? filesList.filter(file => file.name.toLowerCase().includes(searchString.toLowerCase()))
       : filesList
   }, [filesList, searchString])
 
@@ -190,9 +177,7 @@ export const UploadedFilesList: FC<Props> = props => {
       },
     ]
     const osSpecificOptions =
-      Platform.OS === 'android'
-        ? options.filter(option => option.key !== 'library')
-        : options
+      Platform.OS === 'android' ? options.filter(option => option.key !== 'library') : options
     showActionSheet({
       title: 'Choose action',
       options: osSpecificOptions,
@@ -220,9 +205,7 @@ export const UploadedFilesList: FC<Props> = props => {
               isLeftTab={true}
               onTouchEnd={() => setCurrentTab(AttachedFiles)}
             >
-              <TabText isActive={currentTab === AttachedFiles}>
-                Attached
-              </TabText>
+              <TabText isActive={currentTab === AttachedFiles}>Attached</TabText>
             </HeaderTabItem>
             <HeaderTabItem
               isActive={currentTab === AllFiles}
@@ -251,17 +234,8 @@ export const UploadedFilesList: FC<Props> = props => {
           />
         ) : (
           <View style={noAttachmentsIconContainer}>
-            <SnIcon
-              type={'files-illustration'}
-              style={noAttachmentsIcon}
-              width={72}
-              height={72}
-            />
-            <Text>
-              {searchString
-                ? 'No files found'
-                : 'No files attached to this note'}
-            </Text>
+            <SnIcon type={'files-illustration'} style={noAttachmentsIcon} width={72} height={72} />
+            <Text>{searchString ? 'No files found' : 'No files attached to this note'}</Text>
           </View>
         )}
         <FAB
@@ -270,9 +244,7 @@ export const UploadedFilesList: FC<Props> = props => {
           onClickAction={handlePressAttach}
           visible={true}
           size={30}
-          iconTextComponent={
-            <Icon name={ThemeService.nameForIcon(ICON_ATTACH)} />
-          }
+          iconTextComponent={<Icon name={ThemeService.nameForIcon(ICON_ATTACH)} />}
         />
       </UploadFilesListContainer>
     </View>

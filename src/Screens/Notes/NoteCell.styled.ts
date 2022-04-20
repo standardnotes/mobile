@@ -14,8 +14,7 @@ export const Container = styled.View<{ selected: boolean; distance: number }>`
   }};
 `
 export const NoteDataContainer = styled.View<{ distance: number }>`
-  border-bottom-color: ${({ theme }) =>
-    hexToRGBA(theme.stylekitBorderColor, 0.75)};
+  border-bottom-color: ${({ theme }) => hexToRGBA(theme.stylekitBorderColor, 0.75)};
   border-bottom-width: 1px;
   padding-bottom: ${props => props.distance}px;
   flex-grow: 1;
@@ -29,9 +28,7 @@ export const DeletedText = styled.Text`
 export const NoteText = styled.Text<{ selected: boolean }>`
   font-size: 15px;
   color: ${({ theme, selected }) => {
-    return selected
-      ? theme.stylekitInfoContrastColor
-      : theme.stylekitForegroundColor
+    return selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor
   }};
   opacity: 0.8;
   line-height: 19px;
@@ -40,9 +37,7 @@ export const TitleText = styled.Text<{ selected: boolean }>`
   font-weight: bold;
   font-size: 16px;
   color: ${({ theme, selected }) => {
-    return selected
-      ? theme.stylekitInfoContrastColor
-      : theme.stylekitForegroundColor
+    return selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor
   }};
   flex-grow: 1;
   flex-shrink: 1;
@@ -57,9 +52,7 @@ export const TagText = styled.Text<{ selected: boolean }>`
   margin-right: 2px;
   font-size: 12px;
   color: ${({ theme, selected }) => {
-    return selected
-      ? theme.stylekitInfoContrastColor
-      : theme.stylekitForegroundColor
+    return selected ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor
   }};
   opacity: ${props => (props.selected ? 0.8 : 0.5)};
 `

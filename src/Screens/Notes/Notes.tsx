@@ -4,11 +4,7 @@ import { useSignedIn, useSyncStatus } from '@Lib/SnjsHelperHooks'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
-import {
-  SCREEN_COMPOSE,
-  SCREEN_NOTES,
-  SCREEN_VIEW_PROTECTED_NOTE,
-} from '@Root/Screens/screens'
+import { SCREEN_COMPOSE, SCREEN_NOTES, SCREEN_VIEW_PROTECTED_NOTE } from '@Root/Screens/screens'
 import {
   CollectionSort,
   CollectionSortProperty,
@@ -21,13 +17,7 @@ import {
 } from '@standardnotes/snjs'
 import { ICON_ADD } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import FAB from 'react-native-fab'
 import { ThemeContext } from 'styled-components'
 import { NoteList } from './NoteList'
@@ -50,8 +40,7 @@ export const Notes = React.memo(
     // Context
     const application = useSafeApplicationContext()
     const theme = useContext(ThemeContext)
-    const navigation =
-      useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
+    const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
 
     /**
      * Update sync status
@@ -61,52 +50,35 @@ export const Notes = React.memo(
 
     // State
     const [sortBy, setSortBy] = useState<CollectionSortProperty>(() =>
-      application
-        .getLocalPreferences()
-        .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
+      application.getLocalPreferences().getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
     )
     const [sortReverse, setSortReverse] = useState<boolean>(() =>
-      application
-        .getLocalPreferences()
-        .getValue(PrefKey.SortNotesReverse, false)
+      application.getLocalPreferences().getValue(PrefKey.SortNotesReverse, false)
     )
     const [hideDates, setHideDates] = useState<boolean>(() =>
       application.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
     )
     const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
-      application
-        .getLocalPreferences()
-        .getValue(PrefKey.NotesHideNotePreview, false)
+      application.getLocalPreferences().getValue(PrefKey.NotesHideNotePreview, false)
     )
     const [hideEditorIcon, setHideEditorIcon] = useState<boolean>(() =>
-      application
-        .getLocalPreferences()
-        .getValue(PrefKey.NotesHideEditorIcon, false)
+      application.getLocalPreferences().getValue(PrefKey.NotesHideEditorIcon, false)
     )
     const [notes, setNotes] = useState<SNNote[]>([])
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>()
     const [searchText, setSearchText] = useState('')
     const [searchOptions, setSearchOptions] = useState<SearchOptions>([])
-    const [includeProtectedNoteText, setIncludeProtectedNoteText] =
-      useState<boolean>(
-        () =>
-          !(
-            application.hasProtectionSources() &&
-            !application.hasUnprotectedAccessSession()
-          )
-      )
-    const [includeArchivedNotes, setIncludeArchivedNotes] =
-      useState<boolean>(false)
-    const [includeTrashedNotes, setIncludeTrashedNotes] =
-      useState<boolean>(false)
-    const [includeProtectedStarted, setIncludeProtectedStarted] =
-      useState<boolean>(false)
+    const [includeProtectedNoteText, setIncludeProtectedNoteText] = useState<boolean>(
+      () => !(application.hasProtectionSources() && !application.hasUnprotectedAccessSession())
+    )
+    const [includeArchivedNotes, setIncludeArchivedNotes] = useState<boolean>(false)
+    const [includeTrashedNotes, setIncludeTrashedNotes] = useState<boolean>(false)
+    const [includeProtectedStarted, setIncludeProtectedStarted] = useState<boolean>(false)
     const [shouldFocusSearch, setShouldFocusSearch] = useState<boolean>(false)
 
     const haveDisplayOptions = useRef(false)
     const protectionsEnabled = useRef(
-      application.hasProtectionSources() &&
-        !application.hasUnprotectedAccessSession()
+      application.hasProtectionSources() && !application.hasUnprotectedAccessSession()
     )
 
     const reloadTitle = useCallback(
@@ -119,9 +91,7 @@ export const Notes = React.memo(
         if (newNotes && (newFilter ?? searchText).length > 0) {
           const resultCount = newNotes.length
           title =
-            resultCount === 1
-              ? `${resultCount} search result`
-              : `${resultCount} search results`
+            resultCount === 1 ? `${resultCount} search result` : `${resultCount} search results`
         } else if (selectedTag) {
           title = selectedTag.title
           if (selectedTag instanceof SNTag && selectedTag.parentId) {
@@ -194,14 +164,13 @@ export const Notes = React.memo(
 
     useEffect(() => {
       let mounted = true
-      const removeEditorObserver =
-        application.editorGroup.addActiveControllerChangeObserver(
-          activeEditor => {
-            if (mounted) {
-              setSelectedNoteId(activeEditor?.note?.uuid)
-            }
+      const removeEditorObserver = application.editorGroup.addActiveControllerChangeObserver(
+        activeEditor => {
+          if (mounted) {
+            setSelectedNoteId(activeEditor?.note?.uuid)
           }
-        )
+        }
+      )
 
       return () => {
         mounted = false
@@ -232,8 +201,7 @@ export const Notes = React.memo(
           searchText || searchFilter
             ? {
                 query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
-                includeProtectedNoteText:
-                  includeProtected ?? includeProtectedNoteText,
+                includeProtectedNoteText: includeProtected ?? includeProtectedNoteText,
               }
             : undefined
 
@@ -246,15 +214,12 @@ export const Notes = React.memo(
 
         const criteria = NotesDisplayCriteria.Create({
           sortProperty: sortOptions?.sortBy ?? sortBy,
-          sortDirection:
-            sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
+          sortDirection: sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
           tags: tag instanceof SNTag ? [tag] : [],
           views: tag instanceof SmartView ? [tag] : [],
           searchQuery: searchQuery,
-          includeArchived:
-            applyFilters && (includeArchived ?? includeArchivedNotes),
-          includeTrashed:
-            applyFilters && (includeTrashed ?? includeTrashedNotes),
+          includeArchived: applyFilters && (includeArchived ?? includeArchivedNotes),
+          includeTrashed: applyFilters && (includeTrashed ?? includeTrashedNotes),
         })
         application.items.setNotesDisplayCriteria(criteria)
       },
@@ -288,31 +253,19 @@ export const Notes = React.memo(
 
     const toggleIncludeArchived = useCallback(() => {
       const includeArchived = !includeArchivedNotes
-      reloadNotesDisplayOptions(
-        undefined,
-        undefined,
-        undefined,
-        includeArchived
-      )
+      reloadNotesDisplayOptions(undefined, undefined, undefined, includeArchived)
       setIncludeArchivedNotes(includeArchived)
     }, [includeArchivedNotes, reloadNotesDisplayOptions])
 
     const toggleIncludeTrashed = useCallback(() => {
       const includeTrashed = !includeTrashedNotes
-      reloadNotesDisplayOptions(
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        includeTrashed
-      )
+      reloadNotesDisplayOptions(undefined, undefined, undefined, undefined, includeTrashed)
       setIncludeTrashedNotes(includeTrashed)
     }, [includeTrashedNotes, reloadNotesDisplayOptions])
 
     const reloadSearchOptions = useCallback(() => {
       const protections =
-        application.hasProtectionSources() &&
-        !application.hasUnprotectedAccessSession()
+        application.hasProtectionSources() && !application.hasUnprotectedAccessSession()
 
       if (protections !== protectionsEnabled.current) {
         protectionsEnabled.current = !!protections
@@ -329,11 +282,9 @@ export const Notes = React.memo(
       ]
 
       const isArchiveView =
-        selectedTag instanceof SmartView &&
-        selectedTag.uuid === SystemViewId.ArchivedNotes
+        selectedTag instanceof SmartView && selectedTag.uuid === SystemViewId.ArchivedNotes
       const isTrashView =
-        selectedTag instanceof SmartView &&
-        selectedTag.uuid === SystemViewId.TrashedNotes
+        selectedTag instanceof SmartView && selectedTag.uuid === SystemViewId.TrashedNotes
       if (!isArchiveView && !isTrashView) {
         setSearchOptions([
           ...options,
@@ -417,15 +368,12 @@ export const Notes = React.memo(
               application.getAppState().closeActiveEditor()
             }
           } else {
-            const activeNote = application
-              .getAppState()
-              .getActiveNoteController()?.note
+            const activeNote = application.getAppState().getActiveNoteController()?.note
 
             if (activeNote) {
               const isTrashView =
                 application.getAppState().selectedTag instanceof SmartView &&
-                application.getAppState().selectedTag.uuid ===
-                  SystemViewId.TrashedNotes
+                application.getAppState().selectedTag.uuid === SystemViewId.TrashedNotes
               if (activeNote.trashed && !isTrashView) {
                 selectNextOrCreateNew(renderedNotes)
               }
@@ -455,23 +403,17 @@ export const Notes = React.memo(
     }, [application, notes.length, openCompose, reloadNotes])
 
     const streamNotesAndTags = useCallback(() => {
-      const removeStreamNotes = application.streamItems(
-        [ContentType.Note],
-        async () => {
-          /** If a note changes, it will be queried against the existing filter;
-           * we dont need to reload display options */
-          reloadNotes(true)
-        }
-      )
+      const removeStreamNotes = application.streamItems([ContentType.Note], async () => {
+        /** If a note changes, it will be queried against the existing filter;
+         * we dont need to reload display options */
+        reloadNotes(true)
+      })
 
-      const removeStreamTags = application.streamItems(
-        [ContentType.Tag],
-        async () => {
-          /** A tag could have changed its relationships, so we need to reload the filter */
-          reloadNotesDisplayOptions()
-          reloadNotes()
-        }
-      )
+      const removeStreamTags = application.streamItems([ContentType.Tag], async () => {
+        /** A tag could have changed its relationships, so we need to reload the filter */
+        reloadNotesDisplayOptions()
+        reloadNotes()
+      })
 
       return () => {
         removeStreamNotes()
@@ -491,9 +433,7 @@ export const Notes = React.memo(
       const newHidePreview = application
         .getLocalPreferences()
         .getValue(PrefKey.NotesHideNotePreview, false)
-      const newHideDate = application
-        .getLocalPreferences()
-        .getValue(PrefKey.NotesHideDate, false)
+      const newHideDate = application.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
       const newHideEditorIcon = application
         .getLocalPreferences()
         .getValue(PrefKey.NotesHideEditorIcon, false)
@@ -597,11 +537,7 @@ export const Notes = React.memo(
           hidePreviews={hidePreviews}
           hideDates={hideDates}
           hideEditorIcon={hideEditorIcon}
-          selectedNoteId={
-            application.getAppState().isInTabletMode
-              ? selectedNoteId
-              : undefined
-          }
+          selectedNoteId={application.getAppState().isInTabletMode ? selectedNoteId : undefined}
           searchOptions={searchOptions}
           shouldFocusSearch={shouldFocusSearch}
           setShouldFocusSearch={setShouldFocusSearch}
@@ -609,21 +545,14 @@ export const Notes = React.memo(
         <FAB
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore style prop does not exist in types
-          style={
-            application.getAppState().isInTabletMode
-              ? { bottom: keyboardHeight }
-              : undefined
-          }
+          style={application.getAppState().isInTabletMode ? { bottom: keyboardHeight } : undefined}
           buttonColor={theme.stylekitInfoColor}
           iconTextColor={theme.stylekitInfoContrastColor}
           onClickAction={onNoteCreate}
           visible={true}
           size={30}
           iconTextComponent={
-            <StyledIcon
-              testID="newNoteButton"
-              name={ThemeService.nameForIcon(ICON_ADD)}
-            />
+            <StyledIcon testID="newNoteButton" name={ThemeService.nameForIcon(ICON_ADD)} />
           }
         />
       </>

@@ -28,9 +28,7 @@ const AppComponent: React.FC<{
   const themeService = useRef<ThemeService>()
   const appReady = useRef(false)
   const navigationReady = useRef(false)
-  const [activeTheme, setActiveTheme] = useState<
-    MobileThemeVariables | undefined
-  >()
+  const [activeTheme, setActiveTheme] = useState<MobileThemeVariables | undefined>()
 
   const setThemeServiceRef = useCallback((node: ThemeService | undefined) => {
     if (node) {
@@ -131,17 +129,13 @@ void AppGroupInstance.initialize()
 
 export const App = (props: { env: TEnvironment }) => {
   const applicationGroupRef = useRef(AppGroupInstance)
-  const [application, setApplication] = useState<
-    MobileApplication | undefined
-  >()
+  const [application, setApplication] = useState<MobileApplication | undefined>()
 
   useEffect(() => {
-    const removeAppChangeObserver =
-      applicationGroupRef.current.addApplicationChangeObserver(() => {
-        const mobileApplication = applicationGroupRef.current
-          .primaryApplication as MobileApplication
-        setApplication(mobileApplication)
-      })
+    const removeAppChangeObserver = applicationGroupRef.current.addApplicationChangeObserver(() => {
+      const mobileApplication = applicationGroupRef.current.primaryApplication as MobileApplication
+      setApplication(mobileApplication)
+    })
     return removeAppChangeObserver
   }, [applicationGroupRef.current.primaryApplication])
 
@@ -150,11 +144,7 @@ export const App = (props: { env: TEnvironment }) => {
   }
   return (
     <ApplicationContext.Provider value={application}>
-      <AppComponent
-        env={props.env}
-        key={application.Uuid}
-        application={application}
-      />
+      <AppComponent env={props.env} key={application.Uuid} application={application} />
     </ApplicationContext.Provider>
   )
 }

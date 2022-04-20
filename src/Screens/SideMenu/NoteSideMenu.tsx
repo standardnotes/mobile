@@ -9,11 +9,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { TEnvironment } from '@Root/App'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
-import {
-  SCREEN_COMPOSE,
-  SCREEN_INPUT_MODAL_TAG,
-  SCREEN_NOTE_HISTORY,
-} from '@Root/Screens/screens'
+import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG, SCREEN_NOTE_HISTORY } from '@Root/Screens/screens'
 import { Files } from '@Root/Screens/SideMenu/Files'
 import { Listed } from '@Root/Screens/SideMenu/Listed'
 import { FeatureIdentifier } from '@standardnotes/features'
@@ -46,13 +42,7 @@ import {
   ICON_TRASH,
 } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { Platform, Share } from 'react-native'
 import FAB from 'react-native-fab'
 import { FlatList } from 'react-native-gesture-handler'
@@ -83,15 +73,12 @@ function useEditorComponents(): SNComponent[] {
   const application = useSafeApplicationContext()
   const [components, setComponents] = useState<SNComponent[]>([])
   useEffect(() => {
-    const removeComponentsObserver = application.streamItems(
-      ContentType.Component,
-      () => {
-        const displayComponents = sortAlphabetically(
-          application.componentManager.componentsForArea(ComponentArea.Editor)
-        )
-        setComponents(displayComponents)
-      }
-    )
+    const removeComponentsObserver = application.streamItems(ContentType.Component, () => {
+      const displayComponents = sortAlphabetically(
+        application.componentManager.componentsForArea(ComponentArea.Editor)
+      )
+      setComponents(displayComponents)
+    })
     return () => {
       if (application) {
         removeComponentsObserver()
@@ -106,15 +93,12 @@ export const NoteSideMenu = React.memo((props: Props) => {
   // Context
   const theme = useContext(ThemeContext)
   const application = useSafeApplicationContext()
-  const navigation =
-    useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
+  const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
   const { showActionSheet } = useCustomActionSheet()
   const styles = useStyles(theme)
 
   // State
-  const [editor, setEditor] = useState<NoteViewController | undefined>(
-    undefined
-  )
+  const [editor, setEditor] = useState<NoteViewController | undefined>(undefined)
   const [note, setNote] = useState<SNNote | undefined>(undefined)
   const [selectedTags, setSelectedTags] = useState<SNTag[]>([])
   const [attachedFilesLength, setAttachedFilesLength] = useState(0)
@@ -127,9 +111,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const removeEventObserver = application.addSingleEventObserver(
       ApplicationEvent.PreferencesChanged,
       async () => {
-        setShouldAddTagHierachy(
-          application.getPreference(PrefKey.NoteAddToParentFolders, true)
-        )
+        setShouldAddTagHierachy(application.getPreference(PrefKey.NoteAddToParentFolders, true))
       }
     )
 
@@ -176,12 +158,9 @@ export const NoteSideMenu = React.memo((props: Props) => {
     if (!note) {
       return
     }
-    const removeFilesObserver = application.streamItems(
-      ContentType.File,
-      () => {
-        setAttachedFilesLength(application.items.getFilesForNote(note).length)
-      }
-    )
+    const removeFilesObserver = application.streamItems(ContentType.File, () => {
+      setAttachedFilesLength(application.items.getFilesForNote(note).length)
+    })
     return () => {
       removeFilesObserver()
     }
@@ -202,15 +181,13 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   useEffect(() => {
     let mounted = true
-    const removeEditorObserver =
-      application?.editorGroup.addActiveControllerChangeObserver(() => {
-        if (mounted) {
-          const activeController =
-            application?.editorGroup.activeNoteViewController
-          setNote(activeController?.note)
-          setEditor(activeController)
-        }
-      })
+    const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(() => {
+      if (mounted) {
+        const activeController = application?.editorGroup.activeNoteViewController
+        setNote(activeController?.note)
+        setEditor(activeController)
+      }
+    })
 
     return () => {
       mounted = false
@@ -227,15 +204,13 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   useEffect(() => {
     let mounted = true
-    const removeObserver = editor?.addNoteInnerValueChangeObserver(
-      (newNote, source) => {
-        if (mounted && props.drawerOpen) {
-          if (source !== PayloadEmitSource.ComponentRetrieved) {
-            setNote(newNote)
-          }
+    const removeObserver = editor?.addNoteInnerValueChangeObserver((newNote, source) => {
+      if (mounted && props.drawerOpen) {
+        if (source !== PayloadEmitSource.ComponentRetrieved) {
+          setNote(newNote)
         }
       }
-    )
+    })
     return () => {
       if (removeObserver) {
         removeObserver()
@@ -288,9 +263,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       if (editor?.isTemplateNote) {
         await editor?.insertTemplatedNote()
       }
-      const activeEditorComponent = application.componentManager!.editorForNote(
-        note!
-      )
+      const activeEditorComponent = application.componentManager!.editorForNote(note!)
       props.drawerRef?.closeDrawer()
       if (!selectedComponent) {
         if (!note?.prefersPlainEditor) {
@@ -330,13 +303,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       /** Dirtying can happen above */
       void application?.sync.sync()
     },
-    [
-      application,
-      disassociateComponentWithCurrentNote,
-      editor,
-      note,
-      props.drawerRef,
-    ]
+    [application, disassociateComponentWithCurrentNote, editor, note, props.drawerRef]
   )
 
   const onEdtiorLongPress = useCallback(
@@ -355,9 +322,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         isDefault = component.isMobileDefault
       }
 
-      let action = isDefault
-        ? 'Remove as Mobile Default'
-        : 'Set as Mobile Default'
+      let action = isDefault ? 'Remove as Mobile Default' : 'Set as Mobile Default'
       if (!component && !currentDefault) {
         // Long pressing on plain editor while it is default, no actions available
         action = 'Is Mobile Default'
@@ -452,9 +417,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           size: 17,
         },
         onSelect: () => {
-          application?.deviceInterface?.openUrl(
-            'https://standardnotes.com/plans'
-          )
+          application?.deviceInterface?.openUrl('https://standardnotes.com/plans')
         },
       })
     }
@@ -480,8 +443,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   }, [props.drawerRef, navigation])
 
   const isEntitledToFiles =
-    application?.features.getFeatureStatus(FeatureIdentifier.FilesBeta) ===
-    FeatureStatus.Entitled
+    application?.features.getFeatureStatus(FeatureIdentifier.FilesBeta) === FeatureStatus.Entitled
 
   const noteOptions = useMemo(() => {
     if (!note) {
@@ -531,14 +493,12 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
     const shareNote = () => {
       if (note) {
-        void application
-          ?.getAppState()
-          .performActionWithoutStateChangeImpact(() => {
-            void Share.share({
-              title: note.title,
-              message: note.text,
-            })
+        void application?.getAppState().performActionWithoutStateChangeImpact(() => {
+          void Share.share({
+            title: note.title,
+            message: note.text,
           })
+        })
       }
     }
 
@@ -631,9 +591,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   const onTagSelect = useCallback(
     async (tag: SNTag | SmartView, addTagHierachy: boolean) => {
-      const isSelected =
-        selectedTags.findIndex(selectedTag => selectedTag.uuid === tag.uuid) >
-        -1
+      const isSelected = selectedTags.findIndex(selectedTag => selectedTag.uuid === tag.uuid) > -1
 
       if (note) {
         if (isSelected) {
@@ -641,11 +599,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             mutator.removeItemAsRelationship(note)
           })
         } else {
-          await application?.items.addTagToNote(
-            note,
-            tag as SNTag,
-            addTagHierachy
-          )
+          await application?.items.addTagToNote(note, tag as SNTag, addTagHierachy)
         }
       }
       reloadTags()
@@ -678,13 +632,8 @@ export const NoteSideMenu = React.memo((props: Props) => {
           selectedTags,
         }))}
         renderItem={({ item }) => {
-          const {
-            OptionsSection,
-            EditorsSection,
-            ListedSection,
-            TagsSection,
-            FilesSection,
-          } = MenuSections
+          const { OptionsSection, EditorsSection, ListedSection, TagsSection, FilesSection } =
+            MenuSections
 
           if (
             item.key === FilesSection &&
@@ -703,17 +652,11 @@ export const NoteSideMenu = React.memo((props: Props) => {
             )
           }
           if (item.key === OptionsSection) {
-            return (
-              <SideMenuSection title="Options" options={item.noteOptions} />
-            )
+            return <SideMenuSection title="Options" options={item.noteOptions} />
           }
           if (item.key === EditorsSection) {
             return (
-              <SideMenuSection
-                title="Editors"
-                options={item.editorComponents}
-                collapsed={true}
-              />
+              <SideMenuSection title="Editors" options={item.editorComponents} collapsed={true} />
             )
           }
           if (item.key === ListedSection) {
@@ -729,9 +672,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
                 <TagSelectionList
                   hasBottomPadding={Platform.OS === 'android'}
                   contentType={ContentType.Tag}
-                  onTagSelect={tag =>
-                    item.onTagSelect(tag, shouldAddTagHierarchy)
-                  }
+                  onTagSelect={tag => item.onTagSelect(tag, shouldAddTagHierarchy)}
                   selectedTags={item.selectedTags}
                   emptyPlaceholder={
                     'Create a new tag using the tag button in the bottom right corner.'
@@ -747,14 +688,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
       <FAB
         buttonColor={theme.stylekitInfoColor}
         iconTextColor={theme.stylekitInfoContrastColor}
-        onClickAction={() =>
-          navigation.navigate(SCREEN_INPUT_MODAL_TAG, { noteUuid: note.uuid })
-        }
+        onClickAction={() => navigation.navigate(SCREEN_INPUT_MODAL_TAG, { noteUuid: note.uuid })}
         visible={true}
         size={30}
-        iconTextComponent={
-          <Icon name={ThemeService.nameForIcon(ICON_PRICE_TAG)} />
-        }
+        iconTextComponent={<Icon name={ThemeService.nameForIcon(ICON_PRICE_TAG)} />}
       />
     </SafeAreaContainer>
   )

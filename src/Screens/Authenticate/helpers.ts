@@ -1,8 +1,4 @@
-import {
-  ChallengePrompt,
-  ChallengeValidation,
-  ChallengeValue,
-} from '@standardnotes/snjs'
+import { ChallengePrompt, ChallengeValidation, ChallengeValue } from '@standardnotes/snjs'
 
 export const isInActiveState = (state: AuthenticationValueStateType) =>
   state !== AuthenticationValueStateType.WaitingInput &&
@@ -66,9 +62,7 @@ export const authenticationReducer = (
 }
 
 export const findIndexInObject = (
-  map:
-    | ChallengeValueState['challengeValues']
-    | ChallengeValueState['challengeValueStates'],
+  map: ChallengeValueState['challengeValues'] | ChallengeValueState['challengeValueStates'],
   id: string
 ) => {
   return Object.keys(map).indexOf(id)

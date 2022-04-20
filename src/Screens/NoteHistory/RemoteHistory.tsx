@@ -1,13 +1,6 @@
 import { ApplicationContext } from '@Root/ApplicationContext'
-import {
-  LoadingContainer,
-  LoadingText,
-} from '@Root/Screens/Notes/NoteList.styled'
-import {
-  NoteHistoryEntry,
-  RevisionListEntry,
-  SNNote,
-} from '@standardnotes/snjs'
+import { LoadingContainer, LoadingText } from '@Root/Screens/Notes/NoteList.styled'
+import { NoteHistoryEntry, RevisionListEntry, SNNote } from '@standardnotes/snjs'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -23,8 +16,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   const insets = useSafeAreaInsets()
 
   // State
-  const [remoteHistoryList, setRemoteHistoryList] =
-    useState<RevisionListEntry[]>()
+  const [remoteHistoryList, setRemoteHistoryList] = useState<RevisionListEntry[]>()
   const [fetchingRemoteHistory, setFetchingRemoteHistory] = useState(false)
 
   useEffect(() => {
@@ -33,8 +25,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
     const fetchRemoteHistoryList = async () => {
       if (note) {
         setFetchingRemoteHistory(true)
-        const newRemoteHistory =
-          await application?.historyManager?.remoteHistoryForItem(note)
+        const newRemoteHistory = await application?.historyManager?.remoteHistoryForItem(note)
         if (isMounted) {
           setFetchingRemoteHistory(false)
           setRemoteHistoryList(newRemoteHistory)
@@ -50,8 +41,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
 
   const onItemPress = useCallback(
     async (item: RevisionListEntry) => {
-      const remoteRevision =
-        await application?.historyManager!.fetchRemoteRevision(note, item)
+      const remoteRevision = await application?.historyManager!.fetchRemoteRevision(note, item)
       if (remoteRevision) {
         onPress(
           item.uuid,
@@ -69,9 +59,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
     [application?.alertService, application?.historyManager, note, onPress]
   )
 
-  const renderItem: ListRenderItem<RevisionListEntry> | null | undefined = ({
-    item,
-  }) => {
+  const renderItem: ListRenderItem<RevisionListEntry> | null | undefined = ({ item }) => {
     return (
       <NoteHistoryCell
         onPress={() => onItemPress(item)}
@@ -85,9 +73,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
     !remoteHistoryList ||
     (remoteHistoryList && remoteHistoryList.length === 0)
   ) {
-    const placeholderText = fetchingRemoteHistory
-      ? 'Loading entries...'
-      : 'No entries.'
+    const placeholderText = fetchingRemoteHistory ? 'Loading entries...' : 'No entries.'
     return (
       <LoadingContainer>
         <LoadingText>{placeholderText}</LoadingText>

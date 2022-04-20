@@ -31,10 +31,7 @@ export class BackupsService extends ApplicationService {
       } else {
         const result = await this.showAndroidEmailOrSaveOption()
         if (result === 'email') {
-          return this.exportViaEmailAndroid(
-            Base64.encode(stringifiedData),
-            filename
-          )
+          return this.exportViaEmailAndroid(Base64.encode(stringifiedData), filename)
         } else if (result === 'save') {
           await this.exportAndroid(filename, stringifiedData)
         } else {
@@ -93,9 +90,7 @@ export class BackupsService extends ApplicationService {
       void this.showFileSavePromptAndroid(filepath)
     } catch (err) {
       console.error('Error exporting backup', err)
-      void this.application.alertService.alert(
-        'There was an issue exporting your backup.'
-      )
+      void this.application.alertService.alert('There was an issue exporting your backup.')
     }
   }
 

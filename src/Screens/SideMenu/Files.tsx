@@ -2,10 +2,7 @@ import { useNavigation } from '@react-navigation/native'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { useFiles } from '@Root/Hooks/useFiles'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
-import {
-  SCREEN_COMPOSE,
-  SCREEN_UPLOADED_FILES_LIST,
-} from '@Root/Screens/screens'
+import { SCREEN_COMPOSE, SCREEN_UPLOADED_FILES_LIST } from '@Root/Screens/screens'
 import {
   FileItemContainer,
   FilesContainer,
@@ -28,8 +25,7 @@ const MaximumVisibleFilesCount = 3
 export const Files: FC<Props> = ({ note }) => {
   const application = useSafeApplicationContext()
 
-  const navigation =
-    useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
+  const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
   const { showActionsMenu, attachedFiles } = useFiles({ note })
 
   const openFilesScreen = () => {
@@ -41,9 +37,7 @@ export const Files: FC<Props> = ({ note }) => {
   return (
     <FilesContainer>
       {attachedFiles.slice(0, MaximumVisibleFilesCount).map(file => {
-        const iconType = application.iconsController.getIconForFileType(
-          file.mimeType
-        )
+        const iconType = application.iconsController.getIconForFileType(file.mimeType)
 
         return (
           <FileItemContainer key={file.uuid}>
@@ -56,13 +50,7 @@ export const Files: FC<Props> = ({ note }) => {
                 type: SideMenuOptionIconDescriptionType.CustomComponent,
                 value: (
                   <IconsContainer>
-                    {file.protected && (
-                      <SNIconStyled
-                        type={'lock-filled'}
-                        width={16}
-                        height={16}
-                      />
-                    )}
+                    {file.protected && <SNIconStyled type={'lock-filled'} width={16} height={16} />}
                     <SNIconStyled type={iconType} width={16} height={16} />
                   </IconsContainer>
                 ),
@@ -73,9 +61,7 @@ export const Files: FC<Props> = ({ note }) => {
         )
       })}
       <SideMenuCellShowAllFiles
-        text={
-          isFilesListTruncated ? 'Show all attached files' : 'Show other files'
-        }
+        text={isFilesListTruncated ? 'Show all attached files' : 'Show other files'}
         onSelect={openFilesScreen}
         cellContentStyle={styles.cellContentStyle}
       />

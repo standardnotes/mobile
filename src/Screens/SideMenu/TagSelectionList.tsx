@@ -26,26 +26,15 @@ type Props = {
 }
 
 export const TagSelectionList = React.memo(
-  ({
-    contentType,
-    onTagSelect,
-    selectedTags,
-    emptyPlaceholder,
-    hasBottomPadding,
-  }: Props) => {
+  ({ contentType, onTagSelect, selectedTags, emptyPlaceholder, hasBottomPadding }: Props) => {
     // Context
     const application = useSafeApplicationContext()
-    const navigation =
-      useNavigation<
-        AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
-      >()
+    const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
     const { showActionSheet } = useCustomActionSheet()
 
     // State
     const [tags, setTags] = useState<SNTag[] | SmartView[]>(() => {
-      return contentType === ContentType.SmartView
-        ? application!.items.getSmartViews()
-        : []
+      return contentType === ContentType.SmartView ? application!.items.getSmartViews() : []
     })
     const displayOptionsSet = useRef<boolean>(false)
 
@@ -64,9 +53,7 @@ export const TagSelectionList = React.memo(
 
           if (application?.getAppState().selectedTag) {
             if (FindItem(removed, application.getAppState().selectedTag.uuid)) {
-              application
-                .getAppState()
-                .setSelectedTag(application.items.getSmartViews()[0], true)
+              application.getAppState().setSelectedTag(application.items.getSmartViews()[0], true)
             }
           }
         }),
@@ -75,11 +62,7 @@ export const TagSelectionList = React.memo(
 
     useEffect(() => {
       if (!displayOptionsSet.current) {
-        application!.items.setDisplayOptions(
-          contentType,
-          CollectionSort.Title,
-          'dsc'
-        )
+        application!.items.setDisplayOptions(contentType, CollectionSort.Title, 'dsc')
         displayOptionsSet.current = true
       }
 
@@ -122,9 +105,7 @@ export const TagSelectionList = React.memo(
       tag instanceof SmartView || !application.items.getTagParent(tag)
 
     const showFolders = contentType === ContentType.Tag
-    const renderedTags = showFolders
-      ? (tags as SNTag[]).filter(isRootTag)
-      : tags
+    const renderedTags = showFolders ? (tags as SNTag[]).filter(isRootTag) : tags
 
     const renderItem: ListRenderItem<SNTag | SmartView> = ({ item }) => {
       const title = item.title
@@ -132,12 +113,8 @@ export const TagSelectionList = React.memo(
       let children: SNTag[] = []
 
       if (showFolders && item instanceof SNTag) {
-        const rawChildren = application.items
-          .getTagChildren(item)
-          .map(tag => tag.uuid)
-        children = (tags as SNTag[]).filter((tag: SNTag) =>
-          rawChildren.includes(tag.uuid)
-        )
+        const rawChildren = application.items.getTagChildren(item).map(tag => tag.uuid)
+        children = (tags as SNTag[]).filter((tag: SNTag) => rawChildren.includes(tag.uuid))
       }
 
       const isSelected = selectedTags.some(
@@ -188,9 +165,7 @@ export const TagSelectionList = React.memo(
           keyExtractor={item => item.uuid}
           renderItem={renderItem}
         />
-        {tags.length === 0 && (
-          <EmptyPlaceholder>{emptyPlaceholder}</EmptyPlaceholder>
-        )}
+        {tags.length === 0 && <EmptyPlaceholder>{emptyPlaceholder}</EmptyPlaceholder>}
       </>
     )
   }

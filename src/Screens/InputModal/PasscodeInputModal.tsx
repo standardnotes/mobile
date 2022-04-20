@@ -1,10 +1,7 @@
 import { PasscodeKeyboardType, UnlockTiming } from '@Lib/ApplicationState'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { ButtonCell } from '@Root/Components/ButtonCell'
-import {
-  Option,
-  SectionedOptionsTableCell,
-} from '@Root/Components/SectionedOptionsTableCell'
+import { Option, SectionedOptionsTableCell } from '@Root/Components/SectionedOptionsTableCell'
 import { SectionedTableCell } from '@Root/Components/SectionedTableCell'
 import { TableSection } from '@Root/Components/TableSection'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
@@ -52,9 +49,7 @@ export const PasscodeInputModal = (props: Props) => {
       setSettingPassocode(false)
     } else {
       await application?.addPasscode(text)
-      await application
-        ?.getAppState()
-        .setPasscodeKeyboardType(keyboardType as PasscodeKeyboardType)
+      await application?.getAppState().setPasscodeKeyboardType(keyboardType as PasscodeKeyboardType)
       await application?.getAppState().setPasscodeTiming(UnlockTiming.OnQuit)
       setSettingPassocode(false)
       props.navigation.goBack()

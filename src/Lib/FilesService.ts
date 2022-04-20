@@ -1,8 +1,4 @@
-import {
-  ByteChunker,
-  FileSelectionResponse,
-  OnChunkCallback,
-} from '@standardnotes/filepicker'
+import { ByteChunker, FileSelectionResponse, OnChunkCallback } from '@standardnotes/filepicker'
 import { ApplicationService, SNFile } from '@standardnotes/snjs'
 import { Buffer } from 'buffer'
 import { Base64 } from 'js-base64'
@@ -24,16 +20,11 @@ type TGetFileDestinationPath = {
 export class FilesService extends ApplicationService {
   private fileChunkSizeForReading = 2000000
 
-  getDestinationPath({
-    fileName,
-    saveInTempLocation = false,
-  }: TGetFileDestinationPath): string {
+  getDestinationPath({ fileName, saveInTempLocation = false }: TGetFileDestinationPath): string {
     let directory = DocumentDirectoryPath
 
     if (Platform.OS === 'android') {
-      directory = saveInTempLocation
-        ? CachesDirectoryPath
-        : DownloadDirectoryPath
+      directory = saveInTempLocation ? CachesDirectoryPath : DownloadDirectoryPath
     }
     return `${directory}/${fileName}`
   }
@@ -55,14 +46,11 @@ export class FilesService extends ApplicationService {
   }
 
   async downloadFileInChunks(file: SNFile, path: string): Promise<void> {
-    await this.application.files.downloadFile(
-      file,
-      async (decryptedBytes: Uint8Array) => {
-        const base64String = new Buffer(decryptedBytes).toString('base64')
+    await this.application.files.downloadFile(file, async (decryptedBytes: Uint8Array) => {
+      const base64String = new Buffer(decryptedBytes).toString('base64')
 
-        await RNFS.appendFile(path, base64String, 'base64')
-      }
-    )
+      await RNFS.appendFile(path, base64String, 'base64')
+    })
   }
 
   getFileName(file: DocumentPickerResponse | Asset) {
@@ -76,26 +64,16 @@ export class FilesService extends ApplicationService {
     file: DocumentPickerResponse | Asset,
     onChunk: OnChunkCallback
   ): Promise<FileSelectionResponse> {
-    const fileUri = (
-      Platform.OS === 'ios' ? decodeURI(file.uri!) : file.uri
-    ) as string
+    const fileUri = (Platform.OS === 'ios' ? decodeURI(file.uri!) : file.uri) as string
 
     let positionShift = 0
     let filePortion = ''
 
-    const chunker = new ByteChunker(
-      this.application.files.minimumChunkSize(),
-      onChunk
-    )
+    const chunker = new ByteChunker(this.application.files.minimumChunkSize(), onChunk)
     let isFinalChunk = false
 
     do {
-      filePortion = await read(
-        fileUri,
-        this.fileChunkSizeForReading,
-        positionShift,
-        'base64'
-      )
+      filePortion = await read(fileUri, this.fileChunkSizeForReading, positionShift, 'base64')
       const bytes = Base64.toUint8Array(filePortion)
       isFinalChunk = bytes.length < this.fileChunkSizeForReading
 

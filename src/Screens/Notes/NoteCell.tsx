@@ -13,10 +13,7 @@ import {
   isNullOrUndefined,
   SNNote,
 } from '@standardnotes/snjs'
-import {
-  CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Style/CustomActionSheet'
+import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
 import { getTintColorForEditor } from '@Style/Utils'
 import React, { useContext, useRef, useState } from 'react'
 import { Text, View } from 'react-native'
@@ -193,8 +190,7 @@ export const NoteCell = ({
 
   const padding = 14
   const showPreview = !hidePreviews && !note.protected && !note.hidePreview
-  const hasPlainPreview =
-    !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0
+  const hasPlainPreview = !isNullOrUndefined(note.preview_plain) && note.preview_plain.length > 0
   const showDetails = !hideDates || note.protected
 
   const editorForNote = application?.componentManager.editorForNote(note)
@@ -210,17 +206,9 @@ export const NoteCell = ({
       onLongPress={onLongPress}
       delayPressIn={150}
     >
-      <Container
-        ref={elementRef as any}
-        selected={highlight}
-        distance={padding}
-      >
+      <Container ref={elementRef as any} selected={highlight} distance={padding}>
         {!hideEditorIcon && (
-          <SnIcon
-            type={icon}
-            fill={getTintColorForEditor(theme, tint)}
-            style={styles.editorIcon}
-          />
+          <SnIcon type={icon} fill={getTintColorForEditor(theme, tint)} style={styles.editorIcon} />
         )}
         <NoteDataContainer distance={padding}>
           <NoteCellFlags note={note} highlight={highlight} />

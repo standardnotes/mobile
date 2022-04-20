@@ -2,10 +2,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { Button } from '@Root/Components/Button'
-import {
-  SCREEN_SETTINGS,
-  SCREEN_VIEW_PROTECTED_NOTE,
-} from '@Root/Screens/screens'
+import { SCREEN_SETTINGS, SCREEN_VIEW_PROTECTED_NOTE } from '@Root/Screens/screens'
 import React, { useCallback, useContext } from 'react'
 import { Container, Text, Title } from './ViewProtectedNote.styled'
 
@@ -36,8 +33,8 @@ export const ViewProtectedNote = ({
     <Container>
       <Title>This note is protected</Title>
       <Text>
-        Add a passcode or biometrics lock, or create an account, to require
-        authentication to view this note.
+        Add a passcode or biometrics lock, or create an account, to require authentication to view
+        this note.
       </Text>
       <Button
         label="Go to Settings"

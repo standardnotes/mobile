@@ -16,10 +16,7 @@ import {
   TextContainer,
   Touchable,
 } from './SideMenuCell.styled'
-import {
-  SideMenuOption,
-  SideMenuOptionIconDescriptionType,
-} from './SideMenuSection'
+import { SideMenuOption, SideMenuOptionIconDescriptionType } from './SideMenuSection'
 
 const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
   if (!desc) {
@@ -39,10 +36,7 @@ const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
   if (desc.type === SideMenuOptionIconDescriptionType.Circle) {
     return (
       <IconCircleContainer>
-        <Circle
-          backgroundColor={desc.backgroundColor}
-          borderColor={desc.borderColor}
-        />
+        <Circle backgroundColor={desc.backgroundColor} borderColor={desc.borderColor} />
       </IconCircleContainer>
     )
   }
@@ -67,12 +61,7 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
   }
 
   const hasIcon = props.iconDesc
-  const iconSide =
-    hasIcon && props.iconDesc?.side
-      ? props.iconDesc.side
-      : hasIcon
-      ? 'left'
-      : null
+  const iconSide = hasIcon && props.iconDesc?.side ? props.iconDesc.side : hasIcon ? 'left' : null
   return (
     <Touchable
       isSubtext={Boolean(props.subtext)}
@@ -87,18 +76,13 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
           </IconContainerLeft>
         )}
 
-        <TextContainer
-          selected={props.selected}
-          isSubtext={Boolean(props.subtext)}
-        >
+        <TextContainer selected={props.selected} isSubtext={Boolean(props.subtext)}>
           {props.subtext && (
             <SubTextContainer>
               <SubText>{props.subtext}</SubText>
             </SubTextContainer>
           )}
-          <Text textColor={colorForTextClass(props.textClass)}>
-            {props.text}
-          </Text>
+          <Text textColor={colorForTextClass(props.textClass)}>{props.text}</Text>
         </TextContainer>
 
         {props.children}

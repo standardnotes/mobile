@@ -25,18 +25,13 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   // Context
   const application = useContext(ApplicationContext)
   const [signedIn] = useSignedIn()
-  const navigation =
-    useNavigation<
-      ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
-    >()
+  const navigation = useNavigation<ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']>()
 
   // State
   const [importing, setImporting] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [lastExportDate, setLastExportDate] = useState<Date | undefined>(() =>
-    application
-      ?.getLocalPreferences()
-      .getValue(PrefKey.LastExportDate, undefined)
+    application?.getLocalPreferences().getValue(PrefKey.LastExportDate, undefined)
   )
 
   const lastExportData = useMemo(() => {
@@ -100,9 +95,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       if (result) {
         const exportDate = new Date()
         setLastExportDate(exportDate)
-        void application
-          ?.getLocalPreferences()
-          .setUserPrefValue(PrefKey.LastExportDate, exportDate)
+        void application?.getLocalPreferences().setUserPrefValue(PrefKey.LastExportDate, exportDate)
       }
       setExporting(false)
     },
@@ -131,9 +124,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
           'there was an error decrypting them. Make sure the password is correct and try again.'
       )
     } else {
-      void application!.alertService!.alert(
-        'Your data has been successfully imported.'
-      )
+      void application!.alertService!.alert('Your data has been successfully imported.')
     }
   }
 
@@ -144,20 +135,15 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       })
       const selectedFile = selectedFiles[0]
       const selectedFileURI =
-        Platform.OS === 'ios'
-          ? decodeURIComponent(selectedFile.uri)
-          : selectedFile.uri
+        Platform.OS === 'ios' ? decodeURIComponent(selectedFile.uri) : selectedFile.uri
       const data = await readImportFile(selectedFileURI)
       if (!data) {
         return
       }
       setImporting(true)
       if (data.version || data.auth_params || data.keyParams) {
-        const version =
-          data.version || data.keyParams?.version || data.auth_params?.version
-        if (
-          application!.protocolService.supportedVersions().includes(version)
-        ) {
+        const version = data.version || data.keyParams?.version || data.auth_params?.version
+        if (application!.protocolService.supportedVersions().includes(version)) {
           await performImport(data)
         } else {
           void application!.alertService.alert(

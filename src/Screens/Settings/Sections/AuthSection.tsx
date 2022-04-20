@@ -7,11 +7,7 @@ import { TableSection } from '@Root/Components/TableSection'
 import { ThemeServiceContext } from '@Style/ThemeService'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Keyboard } from 'react-native'
-import {
-  RegistrationDescription,
-  RegistrationInput,
-  RegularView,
-} from './AuthSection.styled'
+import { RegistrationDescription, RegistrationInput, RegularView } from './AuthSection.styled'
 
 const DEFAULT_SIGN_IN_TEXT = 'Sign In'
 const DEFAULT_REGISTER_TEXT = 'Register'
@@ -69,11 +65,7 @@ export const AuthSection = (props: Props) => {
     }
 
     if (!password) {
-      void application?.alertService?.alert(
-        'Please enter your password.',
-        'Missing Password',
-        'OK'
-      )
+      void application?.alertService?.alert('Please enter your password.', 'Missing Password', 'OK')
       return false
     }
 
@@ -87,14 +79,7 @@ export const AuthSection = (props: Props) => {
       return
     }
     Keyboard.dismiss()
-    const result = await application!.signIn(
-      email,
-      password,
-      strictSignIn,
-      undefined,
-      true,
-      false
-    )
+    const result = await application!.signIn(email, password, strictSignIn, undefined, true, false)
 
     if (result?.error) {
       if (result?.error.message) {
@@ -126,12 +111,7 @@ export const AuthSection = (props: Props) => {
       )
     } else {
       Keyboard.dismiss()
-      const result = await application!.register(
-        email,
-        password,
-        undefined,
-        true
-      )
+      const result = await application!.register(email, password, undefined, true)
       if (result?.error) {
         void application?.alertService?.alert(result.error.message)
       }
@@ -145,9 +125,8 @@ export const AuthSection = (props: Props) => {
         <SectionHeader title={'Confirm Password'} />
 
         <RegistrationDescription>
-          Due to the nature of our encryption, Standard Notes cannot offer
-          password reset functionality. If you forget your password, you will
-          permanently lose access to your data.
+          Due to the nature of our encryption, Standard Notes cannot offer password reset
+          functionality. If you forget your password, you will permanently lose access to your data.
         </RegistrationDescription>
 
         <SectionedTableCell first textInputCell>

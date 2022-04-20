@@ -41,18 +41,12 @@ export const ProtectionsSection = (props: Props) => {
         <BaseView>
           <Title>Status</Title>
           <Subtitle>
-            {props.protectionsAvailable
-              ? protectionsEnabledSubtitle
-              : 'Disabled'}
+            {props.protectionsAvailable ? protectionsEnabledSubtitle : 'Disabled'}
           </Subtitle>
         </BaseView>
       </StyledSectionedTableCell>
       {props.protectionsAvailable && protectionsDisabledUntil && (
-        <ButtonCell
-          leftAligned
-          title={'Enable Protections'}
-          onPress={enableProtections}
-        />
+        <ButtonCell leftAligned title={'Enable Protections'} onPress={enableProtections} />
       )}
       <SubText>{protectionsEnabledSubtext}</SubText>
     </TableSection>

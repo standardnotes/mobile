@@ -1,21 +1,12 @@
 import SegmentedControl from '@react-native-community/segmented-control'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { HistoryStackNavigationProp } from '@Root/HistoryStack'
-import {
-  SCREEN_NOTE_HISTORY,
-  SCREEN_NOTE_HISTORY_PREVIEW,
-} from '@Root/Screens/screens'
+import { SCREEN_NOTE_HISTORY, SCREEN_NOTE_HISTORY_PREVIEW } from '@Root/Screens/screens'
 import { NoteHistoryEntry, SNNote } from '@standardnotes/snjs'
 import { ThemeServiceContext } from '@Style/ThemeService'
 import React, { useContext, useState } from 'react'
 import { Dimensions, Platform } from 'react-native'
-import {
-  NavigationState,
-  Route,
-  SceneRendererProps,
-  TabBar,
-  TabView,
-} from 'react-native-tab-view'
+import { NavigationState, Route, SceneRendererProps, TabBar, TabView } from 'react-native-tab-view'
 import { ThemeContext } from 'styled-components'
 import { IosTabBarContainer } from './NoteHistory.styled'
 import { RemoteHistory } from './RemoteHistory'
@@ -40,11 +31,7 @@ export const NoteHistory = (props: Props) => {
   ])
   const [index, setIndex] = useState(0)
 
-  const openPreview = (
-    _uuid: string,
-    revision: NoteHistoryEntry,
-    title: string
-  ) => {
+  const openPreview = (_uuid: string, revision: NoteHistoryEntry, title: string) => {
     props.navigation.navigate(SCREEN_NOTE_HISTORY_PREVIEW, {
       title,
       revision,
@@ -52,11 +39,7 @@ export const NoteHistory = (props: Props) => {
     })
   }
 
-  const renderScene = ({
-    route,
-  }: {
-    route: { key: string; title: string }
-  }) => {
+  const renderScene = ({ route }: { route: { key: string; title: string } }) => {
     switch (route.key) {
       case 'session':
         return <SessionHistory onPress={openPreview} note={note} />
@@ -72,8 +55,7 @@ export const NoteHistory = (props: Props) => {
       navigationState: NavigationState<Route>
     }
   ) => {
-    return Platform.OS === 'ios' &&
-      parseInt(Platform.Version as string, 10) >= 13 ? (
+    return Platform.OS === 'ios' && parseInt(Platform.Version as string, 10) >= 13 ? (
       <IosTabBarContainer>
         <SegmentedControl
           backgroundColor={theme.stylekitContrastBackgroundColor}

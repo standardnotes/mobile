@@ -12,9 +12,7 @@ export const PreferencesSection = () => {
 
   // State
   const [sortBy, setSortBy] = useState<CollectionSortProperty>(() =>
-    application!
-      .getLocalPreferences()
-      .getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
+    application!.getLocalPreferences().getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
   )
   const [sortReverse, setSortReverse] = useState<boolean>(() =>
     application!.getLocalPreferences().getValue(PrefKey.SortNotesReverse, false)
@@ -23,14 +21,10 @@ export const PreferencesSection = () => {
     application!.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
   )
   const [hideEditorIcon, setHideEditorIcon] = useState<boolean>(() =>
-    application!
-      .getLocalPreferences()
-      .getValue(PrefKey.NotesHideEditorIcon, false)
+    application!.getLocalPreferences().getValue(PrefKey.NotesHideEditorIcon, false)
   )
   const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
-    application!
-      .getLocalPreferences()
-      .getValue(PrefKey.NotesHideNotePreview, false)
+    application!.getLocalPreferences().getValue(PrefKey.NotesHideNotePreview, false)
   )
 
   const sortOptions = useMemo(() => {
@@ -42,16 +36,12 @@ export const PreferencesSection = () => {
   }, [])
 
   const toggleReverseSort = () => {
-    void application
-      ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.SortNotesReverse, !sortReverse)
+    void application?.getLocalPreferences().setUserPrefValue(PrefKey.SortNotesReverse, !sortReverse)
     setSortReverse(value => !value)
   }
 
   const changeSortOption = (key: CollectionSortProperty) => {
-    void application
-      ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.SortNotesBy, key)
+    void application?.getLocalPreferences().setUserPrefValue(PrefKey.SortNotesBy, key)
     setSortBy(key)
   }
   const toggleNotesPreviewHidden = () => {
@@ -61,9 +51,7 @@ export const PreferencesSection = () => {
     setHidePreviews(value => !value)
   }
   const toggleNotesDateHidden = () => {
-    void application
-      ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.NotesHideDate, !hideDates)
+    void application?.getLocalPreferences().setUserPrefValue(PrefKey.NotesHideDate, !hideDates)
     setHideDates(value => !value)
   }
   const toggleNotesEditorIconHidden = () => {
@@ -78,9 +66,7 @@ export const PreferencesSection = () => {
       <TableSection>
         <SectionHeader
           title={'Sort Notes By'}
-          buttonText={
-            sortReverse ? 'Disable Reverse Sort' : 'Enable Reverse Sort'
-          }
+          buttonText={sortReverse ? 'Disable Reverse Sort' : 'Enable Reverse Sort'}
           buttonAction={toggleReverseSort}
         />
         {sortOptions.map((option, i) => {

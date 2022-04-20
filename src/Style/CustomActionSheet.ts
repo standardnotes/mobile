@@ -1,7 +1,4 @@
-import {
-  ActionSheetOptions,
-  useActionSheet,
-} from '@expo/react-native-action-sheet'
+import { ActionSheetOptions, useActionSheet } from '@expo/react-native-action-sheet'
 import React, { useContext } from 'react'
 import { findNodeHandle } from 'react-native'
 import { ThemeContext } from 'styled-components'

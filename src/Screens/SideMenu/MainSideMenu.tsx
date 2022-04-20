@@ -4,31 +4,17 @@ import { ApplicationContext } from '@Root/ApplicationContext'
 import { SCREEN_SETTINGS } from '@Root/Screens/screens'
 import { MobileTheme } from '@Root/Style/MobileTheme'
 import { ContentType, SmartView, SNTag, SNTheme } from '@standardnotes/snjs'
-import {
-  CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Style/CustomActionSheet'
+import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
 import { ICON_BRUSH, ICON_SETTINGS } from '@Style/Icons'
 import { ThemeService, ThemeServiceContext } from '@Style/ThemeService'
-import React, {
-  Fragment,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { Platform } from 'react-native'
 import FAB from 'react-native-fab'
 import { FlatList } from 'react-native-gesture-handler'
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { ThemeContext } from 'styled-components'
-import {
-  FirstSafeAreaView,
-  MainSafeAreaView,
-  useStyles,
-} from './MainSideMenu.styled'
+import { FirstSafeAreaView, MainSafeAreaView, useStyles } from './MainSideMenu.styled'
 import { SideMenuHero } from './SideMenuHero'
 import {
   SideMenuOption,
@@ -49,20 +35,16 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
   const navigation = useNavigation()
   const { showActionSheet } = useCustomActionSheet()
   // State
-  const [selectedTag, setSelectedTag] = useState(() =>
-    application!.getAppState().getSelectedTag()
-  )
+  const [selectedTag, setSelectedTag] = useState(() => application!.getAppState().getSelectedTag())
   const [themes, setThemes] = useState<SNTheme[]>([])
   const styles = useStyles(theme)
 
   useEffect(() => {
-    const removeTagChangeObserver = application!
-      .getAppState()
-      .addStateChangeObserver(state => {
-        if (state === AppStateType.TagChanged) {
-          setSelectedTag(application!.getAppState().getSelectedTag())
-        }
-      })
+    const removeTagChangeObserver = application!.getAppState().addStateChangeObserver(state => {
+      if (state === AppStateType.TagChanged) {
+        setSelectedTag(application!.getAppState().getSelectedTag())
+      }
+    })
     return removeTagChangeObserver
   })
 
@@ -89,11 +71,8 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
        */
       if ((snTheme && !snTheme.getNotAvailOnMobile()) || !snTheme) {
         const activeLightTheme = await themeService?.getThemeForMode('light')
-        const lightThemeAction =
-          activeLightTheme === themeId ? 'Current' : 'Set as'
-        const lightName = ThemeService.doesDeviceSupportDarkMode()
-          ? 'Light'
-          : 'Active'
+        const lightThemeAction = activeLightTheme === themeId ? 'Current' : 'Set as'
+        const lightName = ThemeService.doesDeviceSupportDarkMode() ? 'Light' : 'Active'
         const text = `${lightThemeAction} ${lightName} Theme`
         options.push({
           text,
@@ -111,8 +90,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
        */
       if (ThemeService.doesDeviceSupportDarkMode()) {
         const activeDarkTheme = await themeService?.getThemeForMode('dark')
-        const darkThemeAction =
-          activeDarkTheme === themeId ? 'Current' : 'Set as'
+        const darkThemeAction = activeDarkTheme === themeId ? 'Current' : 'Set as'
         const text = `${darkThemeAction} Dark Theme`
         options.push({
           text,
@@ -152,13 +130,10 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
   )
 
   useEffect(() => {
-    const unsubscribeStreamThemes = application?.streamItems(
-      ContentType.Theme,
-      () => {
-        const newItems = application.items.getItems(ContentType.Theme)
-        setThemes(newItems as SNTheme[])
-      }
-    )
+    const unsubscribeStreamThemes = application?.streamItems(ContentType.Theme, () => {
+      const newItems = application.items.getItems(ContentType.Theme)
+      setThemes(newItems as SNTheme[])
+    })
 
     return unsubscribeStreamThemes
   }, [application])
@@ -169,8 +144,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
       side: 'right' as const,
     }
 
-    const dockIcon =
-      currentTheme.package_info && currentTheme.package_info.dock_icon
+    const dockIcon = currentTheme.package_info && currentTheme.package_info.dock_icon
 
     if (dockIcon && dockIcon.type === 'circle') {
       Object.assign(desc, {
@@ -196,8 +170,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
         iconDesc: iconDescriptorForTheme(systemTheme),
         dimmed: false,
         onSelect: () => onSystemThemeSelect(systemTheme),
-        onLongPress: () =>
-          onThemeLongPress(systemTheme?.uuid, systemTheme?.name),
+        onLongPress: () => onThemeLongPress(systemTheme?.uuid, systemTheme?.name),
         selected: themeService!.activeThemeId === systemTheme?.uuid,
       }))
       .concat(
@@ -209,8 +182,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
             iconDesc: iconDescriptorForTheme(mapTheme),
             dimmed: !!mapTheme.getNotAvailOnMobile(),
             onSelect: () => onThemeSelect(mapTheme),
-            onLongPress: () =>
-              onThemeLongPress(mapTheme?.uuid, mapTheme?.name, mapTheme),
+            onLongPress: () => onThemeLongPress(mapTheme?.uuid, mapTheme?.name, mapTheme),
             selected: themeService!.activeThemeId === mapTheme.uuid,
           }))
       )
@@ -226,9 +198,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
           size: 17,
         },
         onSelect: () => {
-          application?.deviceInterface?.openUrl(
-            'https://standardnotes.com/plans'
-          )
+          application?.deviceInterface?.openUrl('https://standardnotes.com/plans')
         },
       })
     }
@@ -236,13 +206,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     return options
     // We want to also track activeThemeId
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    themeService,
-    themeService?.activeThemeId,
-    themes,
-    onSystemThemeSelect,
-    onThemeSelect,
-  ])
+  }, [themeService, themeService?.activeThemeId, themes, onSystemThemeSelect, onThemeSelect])
 
   const onTagSelect = useCallback(
     async (tag: SNTag | SmartView) => {
@@ -295,21 +259,15 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
         />
         <FlatList
           style={styles.sections}
-          data={['themes-section', 'views-section', 'tags-section'].map(
-            key => ({
-              key,
-              themeOptions,
-              onTagSelect,
-              selectedTags,
-            })
-          )}
+          data={['themes-section', 'views-section', 'tags-section'].map(key => ({
+            key,
+            themeOptions,
+            onTagSelect,
+            selectedTags,
+          }))}
           renderItem={({ item, index }) => {
             return index === 0 ? (
-              <SideMenuSection
-                title="Themes"
-                options={item.themeOptions}
-                collapsed={true}
-              />
+              <SideMenuSection title="Themes" options={item.themeOptions} collapsed={true} />
             ) : index === 1 ? (
               <SideMenuSection title="Views">
                 <TagSelectionList
@@ -322,9 +280,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
               <SideMenuSection title="Tags">
                 <TagSelectionList
                   hasBottomPadding={Platform.OS === 'android'}
-                  emptyPlaceholder={
-                    'No tags. Create one from the note composer.'
-                  }
+                  emptyPlaceholder={'No tags. Create one from the note composer.'}
                   contentType={ContentType.Tag}
                   onTagSelect={item.onTagSelect}
                   selectedTags={item.selectedTags}
@@ -339,9 +295,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
           onClickAction={openSettings}
           visible={true}
           size={29}
-          iconTextComponent={
-            <Icon name={ThemeService.nameForIcon(ICON_SETTINGS)} />
-          }
+          iconTextComponent={<Icon name={ThemeService.nameForIcon(ICON_SETTINGS)} />}
         />
       </MainSafeAreaView>
     </Fragment>

@@ -1,10 +1,7 @@
 import React from 'react'
 import { Platform } from 'react-native'
 import styled, { css } from 'styled-components/native'
-import {
-  Props as TableCellProps,
-  SectionedTableCellTouchableHighlight,
-} from './SectionedTableCell'
+import { Props as TableCellProps, SectionedTableCellTouchableHighlight } from './SectionedTableCell'
 
 type Props = {
   testID?: string
@@ -33,10 +30,7 @@ const Container = styled(SectionedTableCellTouchableHighlight).attrs(props => ({
 `
 const ButtonContainer = styled.View``
 
-type ButtonLabelProps = Pick<
-  Props,
-  'leftAligned' | 'bold' | 'disabled' | 'important'
->
+type ButtonLabelProps = Pick<Props, 'leftAligned' | 'bold' | 'disabled' | 'important'>
 const ButtonLabel = styled.Text<ButtonLabelProps>`
   text-align: ${props => (props.leftAligned ? 'left' : 'center')};
   text-align-vertical: center;

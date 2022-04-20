@@ -1,8 +1,4 @@
-import {
-  AppStateEventType,
-  AppStateType,
-  TabletModeChangeData,
-} from '@Lib/ApplicationState'
+import { AppStateEventType, AppStateType, TabletModeChangeData } from '@Lib/ApplicationState'
 import { useHasEditor, useIsLocked } from '@Lib/SnjsHelperHooks'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { UuidString } from '@standardnotes/snjs'
@@ -35,54 +31,42 @@ export const Root = () => {
   const [hasEditor] = useHasEditor()
   const [noteListCollapsed, setNoteListCollapsed] = useState<boolean>(false)
   const [activeNoteId, setActiveNoteId] = useState<UuidString | undefined>()
-  const [shouldSplitLayout, setShouldSplitLayout] = useState<
-    boolean | undefined
-  >(false)
-  const [keyboardHeight, setKeyboardHeight] = useState<number | undefined>(
-    undefined
-  )
+  const [shouldSplitLayout, setShouldSplitLayout] = useState<boolean | undefined>(false)
+  const [keyboardHeight, setKeyboardHeight] = useState<number | undefined>(undefined)
 
   /**
    * Register observers
    */
   useEffect(() => {
-    const removeStateObserver = application
-      ?.getAppState()
-      .addStateChangeObserver(state => {
-        if (state === AppStateType.GainingFocus) {
-          void application.sync.sync()
-        }
-      })
+    const removeStateObserver = application?.getAppState().addStateChangeObserver(state => {
+      if (state === AppStateType.GainingFocus) {
+        void application.sync.sync()
+      }
+    })
     const removeApplicationStateEventHandler = application
       ?.getAppState()
-      .addStateEventObserver(
-        (event: AppStateEventType, data: TabletModeChangeData | undefined) => {
-          if (event === AppStateEventType.TabletModeChange) {
-            const eventData = data as TabletModeChangeData
-            if (eventData.new_isInTabletMode && !eventData.old_isInTabletMode) {
-              setShouldSplitLayout(true)
-            } else if (
-              !eventData.new_isInTabletMode &&
-              eventData.old_isInTabletMode
-            ) {
-              setShouldSplitLayout(false)
-            }
-          }
-          if (event === AppStateEventType.KeyboardChangeEvent) {
-            // need to refresh the height of the keyboard when it opens so that we can change the position
-            // of the sidebar collapse icon
-            if (application?.getAppState().isInTabletMode) {
-              setKeyboardHeight(application?.getAppState().getKeyboardHeight())
-            }
+      .addStateEventObserver((event: AppStateEventType, data: TabletModeChangeData | undefined) => {
+        if (event === AppStateEventType.TabletModeChange) {
+          const eventData = data as TabletModeChangeData
+          if (eventData.new_isInTabletMode && !eventData.old_isInTabletMode) {
+            setShouldSplitLayout(true)
+          } else if (!eventData.new_isInTabletMode && eventData.old_isInTabletMode) {
+            setShouldSplitLayout(false)
           }
         }
-      )
-    const removeNoteObserver =
-      application?.editorGroup.addActiveControllerChangeObserver(
-        activeController => {
-          setActiveNoteId(activeController?.note.uuid)
+        if (event === AppStateEventType.KeyboardChangeEvent) {
+          // need to refresh the height of the keyboard when it opens so that we can change the position
+          // of the sidebar collapse icon
+          if (application?.getAppState().isInTabletMode) {
+            setKeyboardHeight(application?.getAppState().getKeyboardHeight())
+          }
         }
-      )
+      })
+    const removeNoteObserver = application?.editorGroup.addActiveControllerChangeObserver(
+      activeController => {
+        setActiveNoteId(activeController?.note.uuid)
+      }
+    )
     return () => {
       if (removeApplicationStateEventHandler) {
         removeApplicationStateEventHandler()
@@ -99,11 +83,7 @@ export const Root = () => {
   const collapseIconName = useMemo(() => {
     const collapseIconPrefix = ThemeService.platformIconPrefix()
 
-    return (
-      collapseIconPrefix +
-      '-' +
-      iconNames[collapseIconPrefix][noteListCollapsed ? 0 : 1]
-    )
+    return collapseIconPrefix + '-' + iconNames[collapseIconPrefix][noteListCollapsed ? 0 : 1]
   }, [noteListCollapsed])
 
   const onLayout = (e: LayoutChangeEvent) => {
@@ -133,9 +113,7 @@ export const Root = () => {
   }
 
   const collapseIconBottomPosition =
-    (keyboardHeight ?? 0) > (height ?? 0) / 2
-      ? (keyboardHeight ?? 0) + 40
-      : '50%'
+    (keyboardHeight ?? 0) > (height ?? 0) / 2 ? (keyboardHeight ?? 0) + 40 : '50%'
 
   if (isLocked) {
     return null
@@ -143,22 +121,13 @@ export const Root = () => {
 
   return (
     <Container testID="rootView" onLayout={onLayout}>
-      <NotesContainer
-        notesListCollapsed={noteListCollapsed}
-        shouldSplitLayout={shouldSplitLayout}
-      >
-        <Notes
-          keyboardHeight={keyboardHeight}
-          shouldSplitLayout={shouldSplitLayout}
-        />
+      <NotesContainer notesListCollapsed={noteListCollapsed} shouldSplitLayout={shouldSplitLayout}>
+        <Notes keyboardHeight={keyboardHeight} shouldSplitLayout={shouldSplitLayout} />
       </NotesContainer>
       {activeNoteId && hasEditor && shouldSplitLayout && (
         <ComposeContainer>
           <Compose key={activeNoteId} />
-          <ExpandTouchable
-            style={{ bottom: collapseIconBottomPosition }}
-            onPress={toggleNoteList}
-          >
+          <ExpandTouchable style={{ bottom: collapseIconBottomPosition }} onPress={toggleNoteList}>
             <Icon
               name={collapseIconName}
               size={24}

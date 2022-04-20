@@ -1,14 +1,6 @@
 import { ApplicationContext } from '@Root/ApplicationContext'
-import {
-  LoadingContainer,
-  LoadingText,
-} from '@Root/Screens/Notes/NoteList.styled'
-import {
-  ButtonType,
-  RemoteSession,
-  SessionStrings,
-  UuidString,
-} from '@standardnotes/snjs'
+import { LoadingContainer, LoadingText } from '@Root/Screens/Notes/NoteList.styled'
+import { ButtonType, RemoteSession, SessionStrings, UuidString } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/CustomActionSheet'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { FlatList, ListRenderItem, RefreshControl } from 'react-native'
@@ -76,14 +68,7 @@ const useSessions = (): [
     }
   }
 
-  return [
-    sessions,
-    getSessions,
-    refreshSessions,
-    refreshing,
-    revokeSession,
-    errorMessage,
-  ]
+  return [sessions, getSessions, refreshSessions, refreshing, revokeSession, errorMessage]
 }
 
 export const ManageSessions: React.FC = () => {
@@ -93,14 +78,8 @@ export const ManageSessions: React.FC = () => {
   const theme = useContext(ThemeContext)
   const insets = useSafeAreaInsets()
 
-  const [
-    sessions,
-    getSessions,
-    refreshSessions,
-    refreshing,
-    revokeSession,
-    errorMessage,
-  ] = useSessions()
+  const [sessions, getSessions, refreshSessions, refreshing, revokeSession, errorMessage] =
+    useSessions()
 
   const onItemPress = (item: RemoteSession) => {
     showActionSheet({
@@ -129,18 +108,14 @@ export const ManageSessions: React.FC = () => {
           await revokeSession(item.uuid)
           getSessions()
         } catch (e) {
-          void application?.alertService.alert(
-            'Action failed. Please try again.'
-          )
+          void application?.alertService.alert('Action failed. Please try again.')
         }
       }
     },
     [application?.alertService, getSessions, revokeSession]
   )
 
-  const RenderItem: ListRenderItem<RemoteSession> | null | undefined = ({
-    item,
-  }) => {
+  const RenderItem: ListRenderItem<RemoteSession> | null | undefined = ({ item }) => {
     return (
       <SessionCell
         onPress={() => onItemPress(item)}

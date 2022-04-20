@@ -84,10 +84,7 @@ type EventObserverCallback = (
   event: AppStateEventType,
   data?: TabletModeChangeData
 ) => void | Promise<void>
-type ObserverCallback = (
-  event: AppStateType,
-  data?: any
-) => void | Promise<void>
+type ObserverCallback = (event: AppStateType, data?: any) => void | Promise<void>
 type LockStateObserverCallback = (event: LockStateType) => void | Promise<void>
 
 export class ApplicationState extends ApplicationService {
@@ -122,17 +119,13 @@ export class ApplicationState extends ApplicationService {
     this.handleApplicationEvents()
     this.handleItemsChanges()
 
-    this.removeHandleReactNativeAppStateChangeListener =
-      AppState.addEventListener('change', this.handleReactNativeAppStateChange)
+    this.removeHandleReactNativeAppStateChangeListener = AppState.addEventListener(
+      'change',
+      this.handleReactNativeAppStateChange
+    )
 
-    this.keyboardDidShowListener = Keyboard.addListener(
-      'keyboardWillShow',
-      this.keyboardDidShow
-    )
-    this.keyboardDidHideListener = Keyboard.addListener(
-      'keyboardWillHide',
-      this.keyboardDidHide
-    )
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardDidShow)
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardDidHide)
   }
 
   override deinit() {
@@ -166,9 +159,7 @@ export class ApplicationState extends ApplicationService {
 
     const savedTag =
       (this.application.items.findItem(savedTagUuid) as SNTag) ||
-      this.application.items
-        .getSmartViews()
-        .find(tag => tag.uuid === savedTagUuid)
+      this.application.items.getSmartViews().find(tag => tag.uuid === savedTagUuid)
     if (savedTag) {
       this.setSelectedTag(savedTag, false)
       this.selectedTagRestored = true
@@ -176,18 +167,16 @@ export class ApplicationState extends ApplicationService {
   }
 
   override async onAppStart() {
-    this.removePreferencesLoadedListener =
-      this.prefService.addPreferencesLoadedObserver(() => {
-        this.notifyOfStateChange(AppStateType.PreferencesChanged)
-      })
+    this.removePreferencesLoadedListener = this.prefService.addPreferencesLoadedObserver(() => {
+      this.notifyOfStateChange(AppStateType.PreferencesChanged)
+    })
 
     await this.loadUnlockTiming()
   }
 
   override async onAppLaunch() {
     MobileApplication.setPreviouslyLaunched()
-    this.screenshotPrivacyEnabled =
-      (await this.getScreenshotPrivacyEnabled()) ?? true
+    this.screenshotPrivacyEnabled = (await this.getScreenshotPrivacyEnabled()) ?? true
     void this.setAndroidScreenshotPrivacy(this.screenshotPrivacyEnabled)
   }
 
@@ -243,10 +232,7 @@ export class ApplicationState extends ApplicationService {
   /**
    * Notify observers of ApplicationState Events
    */
-  private notifyEventObservers(
-    event: AppStateEventType,
-    data?: TabletModeChangeData
-  ) {
+  private notifyEventObservers(event: AppStateEventType, data?: TabletModeChangeData) {
     for (const observer of this.stateObservers) {
       void observer(event, data)
     }
@@ -285,11 +271,7 @@ export class ApplicationState extends ApplicationService {
 
     this.application.editorGroup.closeActiveNoteView()
 
-    await this.application.editorGroup.createNoteView(
-      undefined,
-      title,
-      selectedTagUuid
-    )
+    await this.application.editorGroup.createNoteView(undefined, title, selectedTagUuid)
 
     const defaultEditor = this.application.componentManager.getDefaultEditor()
     if (defaultEditor) {
@@ -371,18 +353,14 @@ export class ApplicationState extends ApplicationService {
    * Reacts to @SNNote and @SNTag Changes
    */
   private handleItemsChanges() {
-    this.removeItemChangesListener = this.application.streamItems<
-      SNNote | SNTag
-    >(
+    this.removeItemChangesListener = this.application.streamItems<SNNote | SNTag>(
       [ContentType.Note, ContentType.Tag],
       async ({ changed, inserted, removed, source }) => {
         if (
           source === PayloadEmitSource.PreSyncSave ||
           source === PayloadEmitSource.RemoteRetrieved
         ) {
-          const removedNotes = removed.filter(
-            i => i.content_type === ContentType.Note
-          )
+          const removedNotes = removed.filter(i => i.content_type === ContentType.Note)
           for (const removedNote of removedNotes) {
             const editor = this.editorForNote(removedNote.uuid)
             if (editor) {
@@ -432,26 +410,24 @@ export class ApplicationState extends ApplicationService {
    * Registers for MobileApplication events
    */
   private handleApplicationEvents() {
-    this.appEventObersever = this.application.addEventObserver(
-      async eventName => {
-        switch (eventName) {
-          case ApplicationEvent.LocalDataIncrementalLoad:
-          case ApplicationEvent.LocalDataLoaded: {
-            this.restoreSelectedTag()
-            break
-          }
-          case ApplicationEvent.Started: {
-            this.locked = true
-            break
-          }
-          case ApplicationEvent.Launched: {
-            this.locked = false
-            this.notifyLockStateObservers(LockStateType.Unlocked)
-            break
-          }
+    this.appEventObersever = this.application.addEventObserver(async eventName => {
+      switch (eventName) {
+        case ApplicationEvent.LocalDataIncrementalLoad:
+        case ApplicationEvent.LocalDataLoaded: {
+          this.restoreSelectedTag()
+          break
+        }
+        case ApplicationEvent.Started: {
+          this.locked = true
+          break
+        }
+        case ApplicationEvent.Launched: {
+          this.locked = false
+          this.notifyLockStateObservers(LockStateType.Unlocked)
+          break
         }
       }
-    )
+    })
   }
 
   /**
@@ -589,9 +565,7 @@ export class ApplicationState extends ApplicationService {
   /**
    * handles App State change from React Native
    */
-  private handleReactNativeAppStateChange = async (
-    nextAppState: AppStateStatus
-  ) => {
+  private handleReactNativeAppStateChange = async (nextAppState: AppStateStatus) => {
     if (this.ignoreStateChanges) {
       return
     }

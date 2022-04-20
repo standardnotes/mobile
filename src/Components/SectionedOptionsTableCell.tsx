@@ -65,9 +65,7 @@ const ButtonTouchable = styled.TouchableHighlight.attrs(props => ({
 
 const ButtonTitle = styled.Text<{ selected: boolean }>`
   color: ${props => {
-    return props.selected
-      ? props.theme.stylekitInfoColor
-      : props.theme.stylekitNeutralColor
+    return props.selected ? props.theme.stylekitInfoColor : props.theme.stylekitNeutralColor
   }};
   font-size: 16px;
   text-align: center;
@@ -80,10 +78,7 @@ export const SectionedOptionsTableCell: React.FC<Props> = props => (
     <OptionsContainer>
       {props.options.map(option => {
         return (
-          <ButtonTouchable
-            key={option.title}
-            onPress={() => props.onPress(option)}
-          >
+          <ButtonTouchable key={option.title} onPress={() => props.onPress(option)}>
             <ButtonTitle selected={option.selected}>{option.title}</ButtonTitle>
           </ButtonTouchable>
         )

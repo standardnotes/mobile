@@ -8,13 +8,7 @@ import {
 } from '@Root/Screens/SideMenu/Listed.styled'
 import { SideMenuCell } from '@Root/Screens/SideMenu/SideMenuCell'
 import { SideMenuOptionIconDescriptionType } from '@Root/Screens/SideMenu/SideMenuSection'
-import {
-  Action,
-  ButtonType,
-  ListedAccount,
-  ListedAccountInfo,
-  SNNote,
-} from '@standardnotes/snjs'
+import { Action, ButtonType, ListedAccount, ListedAccountInfo, SNNote } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/CustomActionSheet'
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, FlatList, View } from 'react-native'
@@ -23,9 +17,7 @@ type TProps = {
   note: SNNote
 }
 
-type TListedAccountItem =
-  | ListedAccountInfo
-  | Pick<ListedAccountInfo, 'display_name'>
+type TListedAccountItem = ListedAccountInfo | Pick<ListedAccountInfo, 'display_name'>
 
 export const Listed: FC<TProps> = ({ note }) => {
   const application = useSafeApplicationContext()
@@ -35,11 +27,10 @@ export const Listed: FC<TProps> = ({ note }) => {
   const [isRequestingAccount, setIsRequestingAccount] = useState(false)
 
   const [listedAccounts, setListedAccounts] = useState<ListedAccount[]>([])
-  const [listedAccountDetails, setListedAccountDetails] = useState<
-    TListedAccountItem[]
-  >([])
-  const [authorUrlWithInProgressAction, setAuthorUrlWithInProgressAction] =
-    useState<string | null>(null)
+  const [listedAccountDetails, setListedAccountDetails] = useState<TListedAccountItem[]>([])
+  const [authorUrlWithInProgressAction, setAuthorUrlWithInProgressAction] = useState<string | null>(
+    null
+  )
 
   const { showActionSheet } = useCustomActionSheet()
 
@@ -48,15 +39,10 @@ export const Listed: FC<TProps> = ({ note }) => {
       const listedAccountsArray: TListedAccountItem[] = []
 
       for (const listedAccountItem of accounts) {
-        const listedItemInfo = await application.getListedAccountInfo(
-          listedAccountItem,
-          note?.uuid
-        )
+        const listedItemInfo = await application.getListedAccountInfo(listedAccountItem, note?.uuid)
 
         listedAccountsArray.push(
-          listedItemInfo
-            ? listedItemInfo
-            : { display_name: listedAccountItem.authorId }
+          listedItemInfo ? listedItemInfo : { display_name: listedAccountItem.authorId }
         )
       }
       return listedAccountsArray
@@ -113,9 +99,7 @@ export const Listed: FC<TProps> = ({ note }) => {
     void loadListedData()
   }, [reloadListedAccounts])
 
-  const doesListedItemHaveActions = (
-    item: TListedAccountItem
-  ): item is ListedAccountInfo => {
+  const doesListedItemHaveActions = (item: TListedAccountItem): item is ListedAccountInfo => {
     return (item as ListedAccountInfo).author_url !== undefined
   }
 
@@ -133,10 +117,7 @@ export const Listed: FC<TProps> = ({ note }) => {
           setIsActionInProgress(true)
           setAuthorUrlWithInProgressAction(item.author_url)
 
-          const response = await application.actionsManager.runAction(
-            action as Action,
-            note
-          )
+          const response = await application.actionsManager.runAction(action as Action, note)
 
           if (!response || response.error) {
             setIsActionInProgress(false)
@@ -175,23 +156,16 @@ export const Listed: FC<TProps> = ({ note }) => {
                     iconDesc={{
                       side: 'left',
                       type: SideMenuOptionIconDescriptionType.CustomComponent,
-                      value: (
-                        <SnIcon type={'notes'} style={styles.blogItemIcon} />
-                      ),
+                      value: <SnIcon type={'notes'} style={styles.blogItemIcon} />,
                     }}
                   />
                   {isActionInProgress &&
-                    (item as ListedAccountInfo).author_url ===
-                      authorUrlWithInProgressAction && (
-                      <ActivityIndicator
-                        style={styles.blogActionInProgressIndicator}
-                      />
+                    (item as ListedAccountInfo).author_url === authorUrlWithInProgressAction && (
+                      <ActivityIndicator style={styles.blogActionInProgressIndicator} />
                     )}
                 </ListedItemRow>
                 {!isLoading && !doesListedItemHaveActions(item) && (
-                  <CantLoadActionsText>
-                    Unable to load actions
-                  </CantLoadActionsText>
+                  <CantLoadActionsText>Unable to load actions</CantLoadActionsText>
                 )}
               </View>
             )
@@ -201,9 +175,7 @@ export const Listed: FC<TProps> = ({ note }) => {
       <CreateBlogContainer>
         <ListedItemRow>
           <SideMenuCell
-            text={
-              isRequestingAccount ? 'Creating account...' : 'Create New Author'
-            }
+            text={isRequestingAccount ? 'Creating account...' : 'Create New Author'}
             onSelect={registerNewAccount}
             iconDesc={{
               side: 'left',
@@ -218,9 +190,7 @@ export const Listed: FC<TProps> = ({ note }) => {
         <ListedItemRow>
           <SideMenuCell
             text={'Learn more'}
-            onSelect={() =>
-              application.deviceInterface.openUrl('https://listed.to')
-            }
+            onSelect={() => application.deviceInterface.openUrl('https://listed.to')}
             iconDesc={{
               side: 'left',
               type: SideMenuOptionIconDescriptionType.CustomComponent,

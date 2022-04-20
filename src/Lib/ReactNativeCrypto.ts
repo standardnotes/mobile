@@ -39,11 +39,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     return result
   }
 
-  aes256CbcEncrypt(
-    plaintext: Utf8String,
-    iv: HexString,
-    key: HexString
-  ): Promise<Base64String> {
+  aes256CbcEncrypt(plaintext: Utf8String, iv: HexString, key: HexString): Promise<Base64String> {
     return Aes.encrypt(plaintext, key, iv)
   }
 
@@ -59,10 +55,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     }
   }
 
-  async hmac256(
-    message: Utf8String,
-    key: HexString
-  ): Promise<HexString | null> {
+  async hmac256(message: Utf8String, key: HexString): Promise<HexString | null> {
     try {
       return Aes.hmac256(message, key)
     } catch (e) {
@@ -101,12 +94,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     key: HexString,
     assocData: Utf8String
   ): Base64String {
-    return Sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-      plaintext,
-      nonce,
-      key,
-      assocData
-    )
+    return Sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(plaintext, nonce, key, assocData)
   }
 
   public xchacha20Decrypt(
@@ -128,11 +116,8 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     }
   }
 
-  public xchacha20StreamInitEncryptor(
-    key: HexString
-  ): Sodium.MobileStreamEncryptor {
-    const encryptor =
-      Sodium.crypto_secretstream_xchacha20poly1305_init_push(key)
+  public xchacha20StreamInitEncryptor(key: HexString): Sodium.MobileStreamEncryptor {
+    const encryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_push(key)
     return encryptor
   }
 
@@ -155,10 +140,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     header: Base64String,
     key: HexString
   ): Sodium.MobileStreamDecryptor {
-    const decryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_pull(
-      header,
-      key
-    )
+    const decryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_pull(header, key)
     return decryptor
   }
 
@@ -167,10 +149,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     encryptedBuffer: Uint8Array,
     assocData: Utf8String
   ): StreamDecryptorResult | false {
-    if (
-      encryptedBuffer.length <
-      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
-    ) {
+    if (encryptedBuffer.length < SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES) {
       throw new Error('Invalid ciphertext size')
     }
 
@@ -200,15 +179,12 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
     const buf = new Uint32Array(tempBuf.buffer)
     let idx = -1
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-      /[xy]/g,
-      function (c) {
-        idx++
-        const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15
-        const v = c === 'x' ? r : (r & 0x3) | 0x8
-        return v.toString(16)
-      }
-    )
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      idx++
+      const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
+      return v.toString(16)
+    })
   }
 
   public base64Encode(text: Utf8String): string {

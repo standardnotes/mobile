@@ -4,12 +4,7 @@ import { SectionHeader } from '@Root/Components/SectionHeader'
 import { TableSection } from '@Root/Components/TableSection'
 import { ContentType, StorageEncryptionPolicy } from '@standardnotes/snjs'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
-import {
-  BaseView,
-  StyledSectionedTableCell,
-  Subtitle,
-  Title,
-} from './EncryptionSection.styled'
+import { BaseView, StyledSectionedTableCell, Subtitle, Title } from './EncryptionSection.styled'
 
 type Props = {
   title: string
@@ -27,8 +22,7 @@ export const EncryptionSection = (props: Props) => {
   useEffect(() => {
     let mounted = true
     const getProtocolDisplayName = async () => {
-      const displayName =
-        (await application?.getProtocolEncryptionDisplayName()) ?? ''
+      const displayName = (await application?.getProtocolEncryptionDisplayName()) ?? ''
       if (mounted) {
         setProtocolDisplayName(displayName)
       }
@@ -47,8 +41,7 @@ export const EncryptionSection = (props: Props) => {
     } else {
       encryptionStatus += '. ' // to connect sentence
       encryptionStatus +=
-        application?.getStorageEncryptionPolicy() ===
-        StorageEncryptionPolicy.Default
+        application?.getStorageEncryptionPolicy() === StorageEncryptionPolicy.Default
           ? 'To enable encryption, sign in, register, or enable storage encryption.'
           : 'Sign in, register, or add a local passcode to enable encryption.'
     }
@@ -59,12 +52,8 @@ export const EncryptionSection = (props: Props) => {
       sourceString = application?.hasAccount() ? 'Account Keys' : 'Passcode'
     }
 
-    const items = application!.items.getItems([
-      ContentType.Note,
-      ContentType.Tag,
-    ])
-    const itemsStatus =
-      items.length + '/' + items.length + ' notes and tags encrypted'
+    const items = application!.items.getItems([ContentType.Note, ContentType.Tag])
+    const itemsStatus = items.length + '/' + items.length + ' notes and tags encrypted'
 
     return {
       encryptionStatus,

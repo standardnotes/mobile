@@ -12,10 +12,8 @@ export const Container = styled.View`
 export const StyledTextView = styled.Text`
   padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
-  padding-left: ${({ theme }) =>
-    theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
-  padding-right: ${({ theme }) =>
-    theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
+  padding-left: ${({ theme }) => theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
+  padding-right: ${({ theme }) => theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   /* padding-bottom: 10px; */
   ${Platform.OS === 'ios' &&
   css`

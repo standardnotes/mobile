@@ -1,8 +1,5 @@
 import { RouteProp } from '@react-navigation/native'
-import {
-  createStackNavigator,
-  StackNavigationProp,
-} from '@react-navigation/stack'
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack'
 import { BlockingModal } from '@Root/Components/BlockingModal'
 import { HeaderTitleView } from '@Root/Components/HeaderTitleView'
 import { IoniconsHeaderButton } from '@Root/Components/IoniconsHeaderButton'
@@ -63,9 +60,7 @@ export type ModalStackNavigatorParamList = {
   }
 }
 
-export type ModalStackNavigationProp<
-  T extends keyof ModalStackNavigatorParamList
-> = {
+export type ModalStackNavigationProp<T extends keyof ModalStackNavigatorParamList> = {
   navigation: StackNavigationProp<ModalStackNavigatorParamList, T>
   route: RouteProp<ModalStackNavigatorParamList, T>
 }
@@ -76,11 +71,9 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
   const application = useContext(ApplicationContext)
   const theme = useContext(ThemeContext)
 
-  const MemoizedAppStackComponent = memo(
-    (props: ModalStackNavigationProp<'AppStack'>) => (
-      <AppStackComponent {...props} env={env} />
-    )
-  )
+  const MemoizedAppStackComponent = memo((props: ModalStackNavigationProp<'AppStack'>) => (
+    <AppStackComponent {...props} env={env} />
+  ))
 
   return (
     <MainStack.Navigator
@@ -121,9 +114,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Done' : ''}
                 iconName={
-                  Platform.OS === 'ios'
-                    ? undefined
-                    : ThemeService.nameForIcon(ICON_CHECKMARK)
+                  Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CHECKMARK)
                 }
                 onPress={onPress}
               />
@@ -162,9 +153,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Done' : ''}
                 iconName={
-                  Platform.OS === 'ios'
-                    ? undefined
-                    : ThemeService.nameForIcon(ICON_CHECKMARK)
+                  Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CHECKMARK)
                 }
                 onPress={onPress}
               />
@@ -186,11 +175,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 testID="headerButton"
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Cancel' : ''}
-                iconName={
-                  Platform.OS === 'ios'
-                    ? undefined
-                    : ThemeService.nameForIcon(ICON_CLOSE)
-                }
+                iconName={Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CLOSE)}
                 onPress={onPress}
               />
             </HeaderButtons>
@@ -204,11 +189,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
           title: 'Tag',
           gestureEnabled: false,
           headerTitle: ({ children }) => {
-            return (
-              <HeaderTitleView
-                title={route.params?.title ?? (children || '')}
-              />
-            )
+            return <HeaderTitleView title={route.params?.title ?? (children || '')} />
           },
           headerLeft: ({ disabled, onPress }) => (
             <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
@@ -216,11 +197,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 testID="headerButton"
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Cancel' : ''}
-                iconName={
-                  Platform.OS === 'ios'
-                    ? undefined
-                    : ThemeService.nameForIcon(ICON_CLOSE)
-                }
+                iconName={Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CLOSE)}
                 onPress={onPress}
               />
             </HeaderButtons>
@@ -234,11 +211,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
           title: 'File',
           gestureEnabled: false,
           headerTitle: ({ children }) => {
-            return (
-              <HeaderTitleView
-                title={route.params?.title ?? (children || '')}
-              />
-            )
+            return <HeaderTitleView title={route.params?.title ?? (children || '')} />
           },
           headerLeft: ({ disabled, onPress }) => (
             <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
@@ -246,11 +219,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 testID="headerButton"
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Cancel' : ''}
-                iconName={
-                  Platform.OS === 'ios'
-                    ? undefined
-                    : ThemeService.nameForIcon(ICON_CLOSE)
-                }
+                iconName={Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CLOSE)}
                 onPress={onPress}
               />
             </HeaderButtons>
@@ -280,11 +249,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 testID="headerButton"
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Close' : ''}
-                iconName={
-                  Platform.OS === 'ios'
-                    ? undefined
-                    : ThemeService.nameForIcon(ICON_CLOSE)
-                }
+                iconName={Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CLOSE)}
                 onPress={onPress}
               />
             </HeaderButtons>

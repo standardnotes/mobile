@@ -1,11 +1,7 @@
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { IoniconsHeaderButton } from '@Root/Components/IoniconsHeaderButton'
 import { HistoryStackNavigationProp } from '@Root/HistoryStack'
-import {
-  SCREEN_COMPOSE,
-  SCREEN_NOTES,
-  SCREEN_NOTE_HISTORY_PREVIEW,
-} from '@Root/Screens/screens'
+import { SCREEN_COMPOSE, SCREEN_NOTES, SCREEN_NOTE_HISTORY_PREVIEW } from '@Root/Screens/screens'
 import { ButtonType, PayloadEmitSource, SNNote } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/CustomActionSheet'
 import { ELIPSIS } from '@Style/Icons'
@@ -21,9 +17,7 @@ import {
   TitleContainer,
 } from './NoteHistoryPreview.styled'
 
-LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state',
-])
+LogBox.ignoreLogs(['Non-serializable values were found in the navigation state'])
 
 type Props = HistoryStackNavigationProp<typeof SCREEN_NOTE_HISTORY_PREVIEW>
 export const NoteHistoryPreview = ({
@@ -40,8 +34,7 @@ export const NoteHistoryPreview = ({
 
   const restore = useCallback(
     async (asCopy: boolean) => {
-      const originalNote =
-        application!.items.findSureItem<SNNote>(originalNoteUuid)
+      const originalNote = application!.items.findSureItem<SNNote>(originalNoteUuid)
 
       const run = async () => {
         if (asCopy) {
@@ -135,15 +128,11 @@ export const NoteHistoryPreview = ({
   return (
     <Container>
       <TitleContainer>
-        <Title testID="notePreviewTitleField">
-          {revision.payload.content.title}
-        </Title>
+        <Title testID="notePreviewTitleField">{revision.payload.content.title}</Title>
       </TitleContainer>
 
       <TextContainer>
-        <StyledTextView testID="notePreviewText">
-          {revision.payload.content.text}
-        </StyledTextView>
+        <StyledTextView testID="notePreviewText">{revision.payload.content.text}</StyledTextView>
       </TextContainer>
     </Container>
   )

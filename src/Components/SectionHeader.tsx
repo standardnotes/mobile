@@ -20,8 +20,7 @@ const Container = styled.View<Pick<Props, 'backgroundColor'>>`
   padding-right: ${props => props.theme.paddingLeft}px;
   padding-bottom: 10px;
   padding-top: 10px;
-  background-color: ${props =>
-    props.backgroundColor ?? props.theme.stylekitBackgroundColor};
+  background-color: ${props => props.backgroundColor ?? props.theme.stylekitBackgroundColor};
 `
 const TitleContainer = styled.View``
 const Title = styled.Text<Pick<Props, 'tinted'>>`

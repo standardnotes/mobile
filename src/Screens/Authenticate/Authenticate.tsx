@@ -27,14 +27,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import {
-  Alert,
-  BackHandler,
-  Keyboard,
-  Platform,
-  ScrollView,
-  TextInput,
-} from 'react-native'
+import { Alert, BackHandler, Keyboard, Platform, ScrollView, TextInput } from 'react-native'
 import FingerprintScanner from 'react-native-fingerprint-scanner'
 import { hide } from 'react-native-privacy-snapshot'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
@@ -83,9 +76,7 @@ export const Authenticate = ({
   const theme = useContext(ThemeContext)
 
   // State
-  const [supportsBiometrics, setSupportsBiometrics] = useState<
-    boolean | undefined
-  >(undefined)
+  const [supportsBiometrics, setSupportsBiometrics] = useState<boolean | undefined>(undefined)
   const [passcodeKeyboardType, setPasscodeKeyboardType] = useState<
     PasscodeKeyboardType | undefined
   >(PasscodeKeyboardType.Default)
@@ -133,11 +124,7 @@ export const Authenticate = ({
               testID="headerButton"
               disabled={disabled || pending}
               title={Platform.OS === 'ios' ? 'Cancel' : ''}
-              iconName={
-                Platform.OS === 'ios'
-                  ? undefined
-                  : ThemeService.nameForIcon(ICON_CLOSE)
-              }
+              iconName={Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CLOSE)}
               onPress={() => {
                 if (!pending) {
                   application?.cancelChallenge(challenge)
@@ -154,10 +141,7 @@ export const Authenticate = ({
     async (challengeValue: ChallengeValue) => {
       if (singleValidation) {
         setPending(true)
-        return application?.submitValuesForChallenge(
-          challenge,
-          Object.values(challengeValues)
-        )
+        return application?.submitValuesForChallenge(challenge, Object.values(challengeValues))
       } else {
         const state = challengeValueStates[challengeValue.prompt.id]
 
@@ -168,18 +152,10 @@ export const Authenticate = ({
         ) {
           return
         }
-        return application?.submitValuesForChallenge(challenge, [
-          challengeValue,
-        ])
+        return application?.submitValuesForChallenge(challenge, [challengeValue])
       }
     },
-    [
-      challengeValueStates,
-      singleValidation,
-      challengeValues,
-      application,
-      challenge,
-    ]
+    [challengeValueStates, singleValidation, challengeValues, application, challenge]
   )
 
   const onValueLocked = useCallback((challengeValue: ChallengeValue) => {
@@ -200,9 +176,7 @@ export const Authenticate = ({
 
   const checkForBiometrics = useCallback(
     async () =>
-      (
-        application?.deviceInterface as MobileDeviceInterface
-      ).getDeviceBiometricsAvailability(),
+      (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(),
     [application]
   )
 
@@ -243,96 +217,77 @@ export const Authenticate = ({
       }
 
       if (Platform.OS === 'android') {
-        await application
-          ?.getAppState()
-          .performActionWithoutStateChangeImpact(async () => {
-            isAuthenticating.current = true
-            FingerprintScanner.authenticate({
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore ts type does not exist for deviceCredentialAllowed
-              deviceCredentialAllowed: true,
-              description: 'Biometrics are required to access your notes.',
-            })
-              .then(() => {
-                FingerprintScanner.release()
-                const newChallengeValue = { ...challengeValue, value: true }
+        await application?.getAppState().performActionWithoutStateChangeImpact(async () => {
+          isAuthenticating.current = true
+          FingerprintScanner.authenticate({
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore ts type does not exist for deviceCredentialAllowed
+            deviceCredentialAllowed: true,
+            description: 'Biometrics are required to access your notes.',
+          })
+            .then(() => {
+              FingerprintScanner.release()
+              const newChallengeValue = { ...challengeValue, value: true }
 
-                onValueChange(newChallengeValue)
-                return validateChallengeValue(newChallengeValue)
-              })
-              .catch(error => {
-                FingerprintScanner.release()
-                if (error.name === 'DeviceLocked') {
-                  onValueLocked(challengeValue)
-                  Alert.alert(
-                    'Unsuccessful',
-                    'Authentication failed. Wait 30 seconds to try again.'
-                  )
-                } else {
-                  dispatch({
-                    type: 'setState',
-                    id: challengeValue.prompt.id.toString(),
-                    state: AuthenticationValueStateType.Fail,
-                  })
-                  Alert.alert(
-                    'Unsuccessful',
-                    'Authentication failed. Tap to try again.'
-                  )
-                }
-              })
-              .finally(() => {
-                isAuthenticating.current = false
-              })
-          }, true)
-      } else {
-        // iOS
-        await application
-          ?.getAppState()
-          .performActionWithoutStateChangeImpact(async () => {
-            isAuthenticating.current = true
-            FingerprintScanner.authenticate({
-              fallbackEnabled: true,
-              description: 'This is required to access your notes.',
+              onValueChange(newChallengeValue)
+              return validateChallengeValue(newChallengeValue)
             })
-              .then(() => {
-                FingerprintScanner.release()
-
-                const newChallengeValue = { ...challengeValue, value: true }
-                onValueChange(newChallengeValue)
-                return validateChallengeValue(newChallengeValue)
-              })
-              .catch(error_1 => {
-                onValueChange({ ...challengeValue, value: false })
-                FingerprintScanner.release()
-                if (error_1.name !== 'SystemCancel') {
-                  if (error_1.name !== 'UserCancel') {
-                    Alert.alert('Unsuccessful')
-                  } else {
-                    Alert.alert(
-                      'Unsuccessful',
-                      'Authentication failed. Tap to try again.'
-                    )
-                  }
-                }
+            .catch(error => {
+              FingerprintScanner.release()
+              if (error.name === 'DeviceLocked') {
+                onValueLocked(challengeValue)
+                Alert.alert('Unsuccessful', 'Authentication failed. Wait 30 seconds to try again.')
+              } else {
                 dispatch({
                   type: 'setState',
                   id: challengeValue.prompt.id.toString(),
                   state: AuthenticationValueStateType.Fail,
                 })
+                Alert.alert('Unsuccessful', 'Authentication failed. Tap to try again.')
+              }
+            })
+            .finally(() => {
+              isAuthenticating.current = false
+            })
+        }, true)
+      } else {
+        // iOS
+        await application?.getAppState().performActionWithoutStateChangeImpact(async () => {
+          isAuthenticating.current = true
+          FingerprintScanner.authenticate({
+            fallbackEnabled: true,
+            description: 'This is required to access your notes.',
+          })
+            .then(() => {
+              FingerprintScanner.release()
+
+              const newChallengeValue = { ...challengeValue, value: true }
+              onValueChange(newChallengeValue)
+              return validateChallengeValue(newChallengeValue)
+            })
+            .catch(error_1 => {
+              onValueChange({ ...challengeValue, value: false })
+              FingerprintScanner.release()
+              if (error_1.name !== 'SystemCancel') {
+                if (error_1.name !== 'UserCancel') {
+                  Alert.alert('Unsuccessful')
+                } else {
+                  Alert.alert('Unsuccessful', 'Authentication failed. Tap to try again.')
+                }
+              }
+              dispatch({
+                type: 'setState',
+                id: challengeValue.prompt.id.toString(),
+                state: AuthenticationValueStateType.Fail,
               })
-              .finally(() => {
-                isAuthenticating.current = false
-              })
-          }, true)
+            })
+            .finally(() => {
+              isAuthenticating.current = false
+            })
+        }, true)
       }
     },
-    [
-      application,
-      checkForBiometrics,
-      onValueLocked,
-      supportsBiometrics,
-      validateChallengeValue,
-    ]
+    [application, checkForBiometrics, onValueLocked, supportsBiometrics, validateChallengeValue]
   )
 
   const firstNotSuccessful = useMemo(() => {
@@ -372,10 +327,8 @@ export const Authenticate = ({
        * wait until the app gains focus.
        */
       const isLosingFocusOrInBackground =
-        application?.getAppState().getMostRecentState() ===
-          AppStateType.LosingFocus ||
-        application?.getAppState().getMostRecentState() ===
-          AppStateType.EnteringBackground
+        application?.getAppState().getMostRecentState() === AppStateType.LosingFocus ||
+        application?.getAppState().getMostRecentState() === AppStateType.EnteringBackground
 
       if (
         challengeValue.prompt.validation === ChallengeValidation.Biometric &&
@@ -384,10 +337,7 @@ export const Authenticate = ({
         /** Begin authentication right away, we're not waiting for any input */
         void authenticateBiometrics(challengeValue)
       } else {
-        const index = findIndexInObject(
-          challengeValues,
-          challengeValue.prompt.id.toString()
-        )
+        const index = findIndexInObject(challengeValues, challengeValue.prompt.id.toString())
         switch (index) {
           case 0:
             firstInputRef.current?.focus()
@@ -508,8 +458,7 @@ export const Authenticate = ({
     if (
       challenge.prompts &&
       challenge.prompts.length > 0 &&
-      challenge.prompts[0].validation !==
-        ChallengeValidation.ProtectionSessionDuration
+      challenge.prompts[0].validation !== ChallengeValidation.ProtectionSessionDuration
     ) {
       beginAuthenticatingForNextChallengeReason()
     }
@@ -522,8 +471,7 @@ export const Authenticate = ({
     const biometricChallengeValue = Object.values(challengeValues).find(
       value => value.prompt.validation === ChallengeValidation.Biometric
     )
-    const state =
-      challengeValueStates[biometricChallengeValue?.prompt.id as number]
+    const state = challengeValueStates[biometricChallengeValue?.prompt.id as number]
     if (
       state === AuthenticationValueStateType.Locked ||
       state === AuthenticationValueStateType.Success
@@ -555,8 +503,7 @@ export const Authenticate = ({
 
       BackHandler.addEventListener('hardwareBackPress', onBackPress)
 
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress)
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress)
     }, [])
   )
 
@@ -597,23 +544,15 @@ export const Authenticate = ({
     [challengeValues]
   )
 
-  const renderAuthenticationSource = (
-    challengeValue: ChallengeValue,
-    index: number
-  ) => {
+  const renderAuthenticationSource = (challengeValue: ChallengeValue, index: number) => {
     const last = index === Object.keys(challengeValues).length - 1
     const state = challengeValueStates[challengeValue.prompt.id]
     const active = isInActiveState(state)
-    const isBiometric =
-      challengeValue.prompt.validation === ChallengeValidation.Biometric
+    const isBiometric = challengeValue.prompt.validation === ChallengeValidation.Biometric
     const isProtectionSessionDuration =
-      challengeValue.prompt.validation ===
-      ChallengeValidation.ProtectionSessionDuration
+      challengeValue.prompt.validation === ChallengeValidation.ProtectionSessionDuration
     const isInput = !isBiometric && !isProtectionSessionDuration
-    const stateLabel = getLabelForStateAndType(
-      challengeValue.prompt.validation,
-      state
-    )
+    const stateLabel = getLabelForStateAndType(challengeValue.prompt.validation, state)
 
     const stateTitle = getChallengePromptTitle(challengeValue.prompt, state)
 
@@ -631,15 +570,14 @@ export const Authenticate = ({
             subtitle={isInput ? stateLabel : undefined}
             tinted={active}
             buttonText={
-              challengeValue.prompt.validation ===
-                ChallengeValidation.LocalPasscode && showSwitchKeyboard
+              challengeValue.prompt.validation === ChallengeValidation.LocalPasscode &&
+              showSwitchKeyboard
                 ? 'Change Keyboard'
                 : undefined
             }
             buttonAction={switchKeyboard}
             buttonStyles={
-              challengeValue.prompt.validation ===
-              ChallengeValidation.LocalPasscode
+              challengeValue.prompt.validation === ChallengeValidation.LocalPasscode
                 ? {
                     color: theme.stylekitNeutralColor,
                     fontSize: theme.mainTextFontSize - 5,
@@ -653,12 +591,9 @@ export const Authenticate = ({
                 <Input
                   key={Platform.OS === 'android' ? keyboardType : undefined}
                   ref={
-                    Array.of(
-                      firstInputRef,
-                      secondInputRef,
-                      thirdInputRef,
-                      fourthInputRef
-                    )[index] as any
+                    Array.of(firstInputRef, secondInputRef, thirdInputRef, fourthInputRef)[
+                      index
+                    ] as any
                   }
                   placeholder={challengeValue.prompt.placeholder}
                   onChangeText={text => {
@@ -742,11 +677,7 @@ export const Authenticate = ({
     const stateKeys = Object.keys(challengeValueStates)
     submitButtonTitle = 'Submit'
     /** Check the next values; if one of them is not successful, show 'Next' */
-    for (
-      let i = stateKeys.indexOf(firstNotSuccessful) + 1;
-      i < stateKeys.length;
-      i++
-    ) {
+    for (let i = stateKeys.indexOf(firstNotSuccessful) + 1; i < stateKeys.length; i++) {
       const nextValueState = challengeValueStates[stateKeys[i]]
       if (nextValueState !== AuthenticationValueStateType.Success) {
         submitButtonTitle = 'Next'
@@ -767,9 +698,7 @@ export const Authenticate = ({
                 <StyledSectionedTableCell>
                   <BaseView>
                     {challenge.heading && <Title>{challenge.heading}</Title>}
-                    {challenge.subheading && (
-                      <Subtitle>{challenge.subheading}</Subtitle>
-                    )}
+                    {challenge.subheading && <Subtitle>{challenge.subheading}</Subtitle>}
                   </BaseView>
                 </StyledSectionedTableCell>
               </StyledTableSection>
@@ -779,9 +708,7 @@ export const Authenticate = ({
             )}
             <ButtonCell
               maxHeight={45}
-              disabled={
-                singleValidation ? !readyToSubmit || pending : isPending
-              }
+              disabled={singleValidation ? !readyToSubmit || pending : isPending}
               title={submitButtonTitle}
               bold={true}
               onPress={onSubmitPress}

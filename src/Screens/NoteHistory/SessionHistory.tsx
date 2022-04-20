@@ -19,9 +19,7 @@ export const SessionHistory: React.FC<Props> = ({ note, onPress }) => {
 
   useEffect(() => {
     if (note) {
-      setSessionHistory(
-        application?.historyManager?.sessionHistoryForItem(note)
-      )
+      setSessionHistory(application?.historyManager?.sessionHistoryForItem(note))
     }
   }, [application?.historyManager, note])
 
@@ -32,9 +30,7 @@ export const SessionHistory: React.FC<Props> = ({ note, onPress }) => {
     [onPress]
   )
 
-  const RenderItem: ListRenderItem<NoteHistoryEntry> | null | undefined = ({
-    item,
-  }) => {
+  const RenderItem: ListRenderItem<NoteHistoryEntry> | null | undefined = ({ item }) => {
     return (
       <NoteHistoryCell
         onPress={() => onItemPress(item)}

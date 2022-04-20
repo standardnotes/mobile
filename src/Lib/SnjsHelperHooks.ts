@@ -13,10 +13,7 @@ import {
 import React, { useCallback, useEffect } from 'react'
 import { LockStateType } from './ApplicationState'
 
-export const useSignedIn = (
-  signedInCallback?: () => void,
-  signedOutCallback?: () => void
-) => {
+export const useSignedIn = (signedInCallback?: () => void, signedOutCallback?: () => void) => {
   // Context
   const application = useSafeApplicationContext()
 
@@ -102,18 +99,16 @@ export const useIsLocked = () => {
 
   useEffect(() => {
     let isMounted = true
-    const removeSignedInObserver = application
-      ?.getAppState()
-      .addLockStateChangeObserver(event => {
-        if (isMounted) {
-          if (event === LockStateType.Locked) {
-            setIsLocked(true)
-          }
-          if (event === LockStateType.Unlocked) {
-            setIsLocked(false)
-          }
+    const removeSignedInObserver = application?.getAppState().addLockStateChangeObserver(event => {
+      if (isMounted) {
+        if (event === LockStateType.Locked) {
+          setIsLocked(true)
         }
-      })
+        if (event === LockStateType.Unlocked) {
+          setIsLocked(false)
+        }
+      }
+    })
 
     return () => {
       isMounted = false
@@ -132,10 +127,11 @@ export const useHasEditor = () => {
   const [hasEditor, setHasEditor] = React.useState<boolean>(false)
 
   useEffect(() => {
-    const removeEditorObserver =
-      application?.editorGroup.addActiveControllerChangeObserver(newEditor => {
+    const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(
+      newEditor => {
         setHasEditor(Boolean(newEditor))
-      })
+      }
+    )
     return removeEditorObserver
   }, [application])
 
@@ -164,21 +160,14 @@ export const useSyncStatus = () => {
     const stats = syncStatus.getStats()
     const encryption =
       application!.isEncryptionAvailable() &&
-      application!.getStorageEncryptionPolicy() ===
-        StorageEncryptionPolicy.Default
+      application!.getStorageEncryptionPolicy() === StorageEncryptionPolicy.Default
 
-    if (
-      stats.localDataCurrent === 0 ||
-      stats.localDataTotal === 0 ||
-      stats.localDataDone
-    ) {
+    if (stats.localDataCurrent === 0 || stats.localDataTotal === 0 || stats.localDataDone) {
       setStatus()
       return
     }
     const notesString = `${stats.localDataCurrent}/${stats.localDataTotal} items…`
-    const loadingStatus = encryption
-      ? `Decrypting ${notesString}`
-      : `Loading ${notesString}`
+    const loadingStatus = encryption ? `Decrypting ${notesString}` : `Loading ${notesString}`
     setStatus(loadingStatus)
   }, [application, setStatus])
 
@@ -186,8 +175,7 @@ export const useSyncStatus = () => {
     let mounted = true
     const isEncryptionAvailable =
       application!.isEncryptionAvailable() &&
-      application!.getStorageEncryptionPolicy() ===
-        StorageEncryptionPolicy.Default
+      application!.getStorageEncryptionPolicy() === StorageEncryptionPolicy.Default
     if (mounted) {
       setDecrypting(!completedInitialSync && isEncryptionAvailable)
       updateLocalDataStatus()
@@ -208,9 +196,7 @@ export const useSyncStatus = () => {
       const text = `Downloading ${stats.downloadCount} items. Keep app open.`
       setStatus(text)
     } else if (stats.uploadTotalCount > 20) {
-      setStatus(
-        `Syncing ${stats.uploadCompletionCount}/${stats.uploadTotalCount} items...`
-      )
+      setStatus(`Syncing ${stats.uploadCompletionCount}/${stats.uploadTotalCount} items...`)
     } else if (syncStatus.syncInProgress && !completedInitialSync) {
       setStatus('Syncing…')
     } else {
@@ -219,49 +205,41 @@ export const useSyncStatus = () => {
   }, [application, completedInitialSync, setStatus])
 
   useEffect(() => {
-    const unsubscribeAppEvents = application?.addEventObserver(
-      async eventName => {
-        if (eventName === ApplicationEvent.LocalDataIncrementalLoad) {
-          updateLocalDataStatus()
-        } else if (
-          eventName === ApplicationEvent.SyncStatusChanged ||
-          eventName === ApplicationEvent.FailedSync
-        ) {
-          updateSyncStatus()
-        } else if (eventName === ApplicationEvent.LocalDataLoaded) {
-          setDecrypting(false)
-          setLoading(false)
-          updateLocalDataStatus()
-        } else if (eventName === ApplicationEvent.CompletedFullSync) {
-          if (completedInitialSync) {
-            setRefreshing(false)
-          } else {
-            setCompletedInitialSync(true)
-          }
-          setLoading(false)
-          updateSyncStatus()
-        } else if (eventName === ApplicationEvent.LocalDatabaseReadError) {
-          void application!.alertService!.alert(
-            'Unable to load local storage. Please restart the app and try again.'
-          )
-        } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
-          void application!.alertService!.alert(
-            'Unable to write to local storage. Please restart the app and try again.'
-          )
-        } else if (eventName === ApplicationEvent.SignedIn) {
-          setLoading(true)
+    const unsubscribeAppEvents = application?.addEventObserver(async eventName => {
+      if (eventName === ApplicationEvent.LocalDataIncrementalLoad) {
+        updateLocalDataStatus()
+      } else if (
+        eventName === ApplicationEvent.SyncStatusChanged ||
+        eventName === ApplicationEvent.FailedSync
+      ) {
+        updateSyncStatus()
+      } else if (eventName === ApplicationEvent.LocalDataLoaded) {
+        setDecrypting(false)
+        setLoading(false)
+        updateLocalDataStatus()
+      } else if (eventName === ApplicationEvent.CompletedFullSync) {
+        if (completedInitialSync) {
+          setRefreshing(false)
+        } else {
+          setCompletedInitialSync(true)
         }
+        setLoading(false)
+        updateSyncStatus()
+      } else if (eventName === ApplicationEvent.LocalDatabaseReadError) {
+        void application!.alertService!.alert(
+          'Unable to load local storage. Please restart the app and try again.'
+        )
+      } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
+        void application!.alertService!.alert(
+          'Unable to write to local storage. Please restart the app and try again.'
+        )
+      } else if (eventName === ApplicationEvent.SignedIn) {
+        setLoading(true)
       }
-    )
+    })
 
     return unsubscribeAppEvents
-  }, [
-    application,
-    completedInitialSync,
-    setStatus,
-    updateLocalDataStatus,
-    updateSyncStatus,
-  ])
+  }, [application, completedInitialSync, setStatus, updateLocalDataStatus, updateSyncStatus])
 
   const startRefreshing = () => {
     setRefreshing(true)
@@ -318,12 +296,7 @@ export const useDeleteNoteWithPrivileges = (
     if (confirmed) {
       onDeleteCallback()
     }
-  }, [
-    application?.alertService,
-    editor?.isTemplateNote,
-    note,
-    onDeleteCallback,
-  ])
+  }, [application?.alertService, editor?.isTemplateNote, note, onDeleteCallback])
 
   const deleteNote = useCallback(
     async (permanently: boolean) => {
@@ -385,22 +358,21 @@ export const useProtectionSessionExpiry = () => {
   }, [application])
 
   // State
-  const [protectionsDisabledUntil, setProtectionsDisabledUntil] =
-    React.useState(getProtectionsDisabledUntil())
+  const [protectionsDisabledUntil, setProtectionsDisabledUntil] = React.useState(
+    getProtectionsDisabledUntil()
+  )
 
   useEffect(() => {
-    const removeProtectionLengthSubscriber = application?.addEventObserver(
-      async event => {
-        if (
-          [
-            ApplicationEvent.UnprotectedSessionBegan,
-            ApplicationEvent.UnprotectedSessionExpired,
-          ].includes(event)
-        ) {
-          setProtectionsDisabledUntil(getProtectionsDisabledUntil())
-        }
+    const removeProtectionLengthSubscriber = application?.addEventObserver(async event => {
+      if (
+        [
+          ApplicationEvent.UnprotectedSessionBegan,
+          ApplicationEvent.UnprotectedSessionExpired,
+        ].includes(event)
+      ) {
+        setProtectionsDisabledUntil(getProtectionsDisabledUntil())
       }
-    )
+    })
     return () => {
       removeProtectionLengthSubscriber && removeProtectionLengthSubscriber()
     }
@@ -447,10 +419,7 @@ export const useChangeNote = (
   const [canChangeNote] = useChangeNoteChecks(note, editor)
 
   const changeNote = useCallback(
-    async (
-      mutate: (mutator: NoteMutator) => void,
-      updateTimestamps: boolean
-    ) => {
+    async (mutate: (mutator: NoteMutator) => void, updateTimestamps: boolean) => {
       if (await canChangeNote()) {
         await application?.mutator.changeAndSaveItem(
           note!,

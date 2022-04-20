@@ -34,17 +34,13 @@ export const SideMenuHero: React.FC<Props> = props => {
 
   useEffect(() => {
     const observedContentTypes = [ContentType.Note, ContentType.Tag]
-    const removeStreamItems = application?.streamItems(
-      observedContentTypes,
-      _items => {
-        const notesAndTagsCount =
-          application?.items.getItems(observedContentTypes).length ?? 0
+    const removeStreamItems = application?.streamItems(observedContentTypes, _items => {
+      const notesAndTagsCount = application?.items.getItems(observedContentTypes).length ?? 0
 
-        if (notesAndTagsCount !== itemsCount) {
-          setItemsCount(notesAndTagsCount)
-        }
+      if (notesAndTagsCount !== itemsCount) {
+        setItemsCount(notesAndTagsCount)
       }
-    )
+    })
 
     return removeStreamItems
   }, [application, itemsCount])
@@ -61,8 +57,7 @@ export const SideMenuHero: React.FC<Props> = props => {
     } else if (!isLocked) {
       const user = application?.getUser()
       const email = user?.email
-      const itemsStatus =
-        itemsCount + '/' + itemsCount + ' notes and tags encrypted'
+      const itemsStatus = itemsCount + '/' + itemsCount + ' notes and tags encrypted'
       return {
         title: email,
         text: itemsStatus,

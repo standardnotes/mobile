@@ -28,12 +28,10 @@ const PrimaryButtonContainer = styled.TouchableOpacity.attrs({
     `};
 `
 
-const SecondaryButtonContainer = styled.TouchableHighlight.attrs(
-  ({ theme }) => ({
-    activeOpacity: 0.84,
-    underlayColor: theme.stylekitBorderColor,
-  })
-)<{
+const SecondaryButtonContainer = styled.TouchableHighlight.attrs(({ theme }) => ({
+  activeOpacity: 0.84,
+  underlayColor: theme.stylekitBorderColor,
+}))<{
   fullWidth?: boolean
   last?: boolean
 }>`
@@ -55,37 +53,21 @@ const ButtonLabel = styled.Text<{ primary?: boolean }>`
   text-align-vertical: center;
   font-weight: bold;
   color: ${({ theme, primary }) => {
-    return primary
-      ? theme.stylekitInfoContrastColor
-      : theme.stylekitForegroundColor
+    return primary ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor
   }};
   font-size: ${props => props.theme.mainTextFontSize}px;
 `
 
-export const Button: React.FC<Props> = ({
-  onPress,
-  label,
-  primary,
-  fullWidth,
-  last,
-}: Props) => {
+export const Button: React.FC<Props> = ({ onPress, label, primary, fullWidth, last }: Props) => {
   if (primary) {
     return (
-      <PrimaryButtonContainer
-        onPress={onPress}
-        fullWidth={fullWidth}
-        last={last}
-      >
+      <PrimaryButtonContainer onPress={onPress} fullWidth={fullWidth} last={last}>
         <ButtonLabel primary={primary}>{label}</ButtonLabel>
       </PrimaryButtonContainer>
     )
   } else {
     return (
-      <SecondaryButtonContainer
-        onPress={onPress}
-        fullWidth={fullWidth}
-        last={last}
-      >
+      <SecondaryButtonContainer onPress={onPress} fullWidth={fullWidth} last={last}>
         <ButtonLabel primary={primary}>{label}</ButtonLabel>
       </SecondaryButtonContainer>
     )

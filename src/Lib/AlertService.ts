@@ -1,9 +1,5 @@
 import { MODAL_BLOCKING_ALERT } from '@Root/Screens/screens'
-import {
-  ButtonType,
-  DismissBlockingDialog,
-  SNAlertService,
-} from '@standardnotes/snjs'
+import { ButtonType, DismissBlockingDialog, SNAlertService } from '@standardnotes/snjs'
 import { Alert, AlertButton } from 'react-native'
 import { goBack, navigate } from './NavigationService'
 
@@ -52,8 +48,7 @@ export class AlertService implements SNAlertService {
         },
         {
           text: confirmButtonText,
-          style:
-            confirmButtonType === ButtonType.Danger ? 'destructive' : 'default',
+          style: confirmButtonType === ButtonType.Danger ? 'destructive' : 'default',
           onPress: async () => {
             resolve(true)
           },

@@ -19,9 +19,7 @@ export const Settings = (props: Props) => {
   const application = useContext(ApplicationContext)
 
   // State
-  const [hasPasscode, setHasPasscode] = useState(() =>
-    Boolean(application?.hasPasscode())
-  )
+  const [hasPasscode, setHasPasscode] = useState(() => Boolean(application?.hasPasscode()))
   const [protectionsAvailable, setProtectionsAvailable] = useState(
     application?.hasProtectionSources()
   )
@@ -34,15 +32,13 @@ export const Settings = (props: Props) => {
   }, [application])
 
   useEffect(() => {
-    const removeApplicationEventSubscriber = application?.addEventObserver(
-      async event => {
-        if (event === ApplicationEvent.KeyStatusChanged) {
-          setHasPasscode(Boolean(application?.hasPasscode()))
-          updateProtectionsAvailable()
-          setEncryptionAvailable(() => application?.isEncryptionAvailable())
-        }
+    const removeApplicationEventSubscriber = application?.addEventObserver(async event => {
+      if (event === ApplicationEvent.KeyStatusChanged) {
+        setHasPasscode(Boolean(application?.hasPasscode()))
+        updateProtectionsAvailable()
+        setEncryptionAvailable(() => application?.isEncryptionAvailable())
       }
-    )
+    })
     return () => {
       removeApplicationEventSubscriber && removeApplicationEventSubscriber()
     }
@@ -55,15 +51,9 @@ export const Settings = (props: Props) => {
   const [signedIn] = useSignedIn(goBack)
 
   return (
-    <Container
-      keyboardShouldPersistTaps={'always'}
-      keyboardDismissMode={'interactive'}
-    >
+    <Container keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
       <AuthSection title="Account" signedIn={signedIn} />
-      <OptionsSection
-        encryptionAvailable={!!encryptionAvailable}
-        title="Options"
-      />
+      <OptionsSection encryptionAvailable={!!encryptionAvailable} title="Options" />
       <PreferencesSection />
       <SecuritySection
         encryptionAvailable={!!encryptionAvailable}
@@ -71,14 +61,8 @@ export const Settings = (props: Props) => {
         updateProtectionsAvailable={updateProtectionsAvailable}
         title="Security"
       />
-      <ProtectionsSection
-        title="Protections"
-        protectionsAvailable={protectionsAvailable}
-      />
-      <EncryptionSection
-        encryptionAvailable={!!encryptionAvailable}
-        title={'Encryption Status'}
-      />
+      <ProtectionsSection title="Protections" protectionsAvailable={protectionsAvailable} />
+      <EncryptionSection encryptionAvailable={!!encryptionAvailable} title={'Encryption Status'} />
       <CompanySection title="Standard Notes" />
     </Container>
   )

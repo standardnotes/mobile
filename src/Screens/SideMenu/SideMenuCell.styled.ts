@@ -50,8 +50,7 @@ const BaseText = styled.Text`
     `}
 `
 export const Text = styled(BaseText)<{ textColor?: string }>`
-  color: ${({ theme, textColor }) =>
-    textColor ?? theme.stylekitContrastForegroundColor};
+  color: ${({ theme, textColor }) => textColor ?? theme.stylekitContrastForegroundColor};
   font-weight: bold;
   font-size: 15px;
   padding-bottom: 0px;

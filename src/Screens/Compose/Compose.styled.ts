@@ -57,8 +57,7 @@ export const LoadingWebViewContainer = styled.View<{ locked?: boolean }>`
   position: absolute;
   height: 100%;
   width: 100%;
-  top: ${({ locked }) =>
-    (locked ? NOTE_TITLE_HEIGHT + 26 : NOTE_TITLE_HEIGHT)}px;
+  top: ${({ locked }) => (locked ? NOTE_TITLE_HEIGHT + 26 : NOTE_TITLE_HEIGHT)}px;
   bottom: 0px;
   z-index: 300;
   display: flex;
@@ -86,10 +85,8 @@ export const StyledKeyboardAvoidngView = styled.KeyboardAvoidingView`
 const StyledTextViewComponent = styled(SNTextView)<{ errorState: boolean }>`
   padding-top: 10px;
   color: ${({ theme }) => theme.stylekitForegroundColor};
-  padding-left: ${({ theme }) =>
-    theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
-  padding-right: ${({ theme }) =>
-    theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
+  padding-left: ${({ theme }) => theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
+  padding-right: ${({ theme }) => theme.paddingLeft - (Platform.OS === 'ios' ? 5 : 0)}px;
   padding-bottom: ${({ errorState }) => (errorState ? 36 : 10)}px;
   ${Platform.OS === 'ios' &&
   css`
@@ -105,10 +102,7 @@ const StyledTextViewComponent = styled(SNTextView)<{ errorState: boolean }>`
 
 export const StyledTextView = React.memo(
   StyledTextViewComponent,
-  (
-    newProps: ComponentProps<typeof SNTextView>,
-    prevProps: ComponentProps<typeof SNTextView>
-  ) => {
+  (newProps: ComponentProps<typeof SNTextView>, prevProps: ComponentProps<typeof SNTextView>) => {
     if (
       newProps.value !== prevProps.value ||
       newProps.selectionColor !== prevProps.selectionColor ||

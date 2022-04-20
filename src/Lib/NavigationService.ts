@@ -5,9 +5,7 @@ import * as React from 'react'
 
 export const navigationRef =
   React.createRef<
-    NavigationContainerRef<
-      AppStackNavigatorParamList & ModalStackNavigatorParamList
-    >
+    NavigationContainerRef<AppStackNavigatorParamList & ModalStackNavigatorParamList>
   >()
 
 export function navigate(

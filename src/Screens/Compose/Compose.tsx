@@ -90,8 +90,8 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
   }
 
   override componentDidMount() {
-    this.removeNoteInnerValueObserver =
-      this.editor?.addNoteInnerValueChangeObserver((note, source) => {
+    this.removeNoteInnerValueObserver = this.editor?.addNoteInnerValueChangeObserver(
+      (note, source) => {
         if (isPayloadSourceRetrieved(source!)) {
           this.setState({
             title: note.title,
@@ -107,10 +107,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
 
         if (note.lastSyncBegan || note.dirty) {
           if (note.lastSyncEnd) {
-            if (
-              note.dirty ||
-              note.lastSyncBegan!.getTime() > note.lastSyncEnd.getTime()
-            ) {
+            if (note.dirty || note.lastSyncBegan!.getTime() > note.lastSyncEnd.getTime()) {
               this.showSavingStatus()
             } else if (
               this.context?.getStatusManager().hasMessage(SCREEN_COMPOSE) &&
@@ -122,7 +119,8 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
             this.showSavingStatus()
           }
         }
-      })
+      }
+    )
 
     this.removeStreamComponents = this.context?.streamItems(
       ContentType.Component,
@@ -139,38 +137,34 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
       }
     )
 
-    this.removeAppEventObserver = this.context?.addEventObserver(
-      async eventName => {
-        if (eventName === ApplicationEvent.CompletedFullSync) {
-          /** if we're still dirty, don't change status, a sync is likely upcoming. */
-          if (!this.note?.dirty && this.state.saveError) {
-            this.showAllChangesSavedStatus()
-          }
-        } else if (eventName === ApplicationEvent.FailedSync) {
-          /**
-           * Only show error status in editor if the note is dirty.
-           * Otherwise, it means the originating sync came from somewhere else
-           * and we don't want to display an error here.
-           */
-          if (this.note?.dirty) {
-            this.showErrorStatus('Sync Unavailable (changes saved offline)')
-          }
-        } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
-          this.showErrorStatus('Offline Saving Issue (changes not saved)')
+    this.removeAppEventObserver = this.context?.addEventObserver(async eventName => {
+      if (eventName === ApplicationEvent.CompletedFullSync) {
+        /** if we're still dirty, don't change status, a sync is likely upcoming. */
+        if (!this.note?.dirty && this.state.saveError) {
+          this.showAllChangesSavedStatus()
         }
+      } else if (eventName === ApplicationEvent.FailedSync) {
+        /**
+         * Only show error status in editor if the note is dirty.
+         * Otherwise, it means the originating sync came from somewhere else
+         * and we don't want to display an error here.
+         */
+        if (this.note?.dirty) {
+          this.showErrorStatus('Sync Unavailable (changes saved offline)')
+        }
+      } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
+        this.showErrorStatus('Offline Saving Issue (changes not saved)')
       }
-    )
+    })
 
-    this.removeStateEventObserver = this.context
-      ?.getAppState()
-      .addStateEventObserver(state => {
-        if (state === AppStateEventType.DrawerOpen) {
-          this.dismissKeyboard()
-          /**
-           * Saves latest note state before any change might happen in the drawer
-           */
-        }
-      })
+    this.removeStateEventObserver = this.context?.getAppState().addStateEventObserver(state => {
+      if (state === AppStateEventType.DrawerOpen) {
+        this.dismissKeyboard()
+        /**
+         * Saves latest note state before any change might happen in the drawer
+         */
+      }
+    })
 
     if (this.editor?.isTemplateNote && Platform.OS === 'ios') {
       setTimeout(() => {
@@ -227,14 +221,10 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
     }
     if (wait) {
       this.statusTimeout = setTimeout(() => {
-        this.context
-          ?.getStatusManager()
-          ?.setMessage(SCREEN_COMPOSE, status, color)
+        this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, status, color)
       }, MINIMUM_STATUS_DURATION)
     } else {
-      this.context
-        ?.getStatusManager()
-        ?.setMessage(SCREEN_COMPOSE, status, color)
+      this.context?.getStatusManager()?.setMessage(SCREEN_COMPOSE, status, color)
     }
   }
 
@@ -306,18 +296,12 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
         this.componentManager.destroyComponentViewer(this.state.componentViewer)
         this.setState({ componentViewer: undefined })
       }
-    } else if (
-      associatedEditor.uuid !== this.state.componentViewer?.component.uuid
-    ) {
+    } else if (associatedEditor.uuid !== this.state.componentViewer?.component.uuid) {
       if (this.state.componentViewer) {
         this.componentManager.destroyComponentViewer(this.state.componentViewer)
       }
-      if (
-        this.componentManager.isComponentThirdParty(associatedEditor.identifier)
-      ) {
-        await this.componentManager.preloadThirdPartyIndexPathFromDisk(
-          associatedEditor.identifier
-        )
+      if (this.componentManager.isComponentThirdParty(associatedEditor.identifier)) {
+        await this.componentManager.preloadThirdPartyIndexPathFromDisk(associatedEditor.identifier)
       }
       this.loadComponentViewer(associatedEditor)
     }
@@ -325,10 +309,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
 
   loadComponentViewer(component: SNComponent) {
     this.setState({
-      componentViewer: this.componentManager.createComponentViewer(
-        component,
-        this.note?.uuid
-      ),
+      componentViewer: this.componentManager.createComponentViewer(component, this.note?.uuid),
     })
   }
 
@@ -396,9 +377,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
       clearTimeout(this.saveTimeout)
     }
     const noDebounce = bypassDebouncer || this.context?.noAccount()
-    const syncDebouceMs = noDebounce
-      ? SAVE_TIMEOUT_NO_DEBOUNCE
-      : SAVE_TIMEOUT_DEBOUNCE
+    const syncDebouceMs = noDebounce ? SAVE_TIMEOUT_NO_DEBOUNCE : SAVE_TIMEOUT_DEBOUNCE
     this.saveTimeout = setTimeout(() => {
       void this.context?.sync.sync()
       if (closeAfterSync) {
@@ -528,8 +507,8 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
                     color={theme.stylekitBackgroundColor}
                   />
                   <LockedText>
-                    Unable to load {this.state.componentViewer?.component.name}{' '}
-                    — {this.getErrorText()}
+                    Unable to load {this.state.componentViewer?.component.name} —{' '}
+                    {this.getErrorText()}
                   </LockedText>
                   <WebViewReloadButton
                     onPress={() => {
@@ -587,10 +566,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
                             ref={this.editorViewRef}
                             autoFocus={false}
                             value={this.state.text}
-                            selectionColor={lighten(
-                              theme.stylekitInfoColor,
-                              0.35
-                            )}
+                            selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
                             handlesColor={theme.stylekitInfoColor}
                             onChangeText={this.onContentChange}
                             errorState={false}

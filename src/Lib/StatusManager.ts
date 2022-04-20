@@ -45,11 +45,7 @@ export class StatusManager extends ApplicationService {
     }
   }
 
-  setMessage(
-    screen: typeof SCREEN_COMPOSE | typeof SCREEN_NOTES,
-    message: string,
-    color?: string
-  ) {
+  setMessage(screen: typeof SCREEN_COMPOSE | typeof SCREEN_NOTES, message: string, color?: string) {
     this.messages[screen] = {
       status: message,
       color,

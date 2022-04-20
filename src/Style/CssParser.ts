@@ -54,10 +54,7 @@ export default class CSSParser {
     return object
   }
 
-  static resolveVariablesThatReferenceOtherVariables(
-    object: Record<string, any>,
-    round = 0
-  ) {
+  static resolveVariablesThatReferenceOtherVariables(object: Record<string, any>, round = 0) {
     for (const key of Object.keys(object)) {
       const value = object[key]
       const stripValue = 'var('
@@ -66,10 +63,7 @@ export default class CSSParser {
         const to = value.indexOf(')')
         let varName = value.slice(from, to)
         if (varName.startsWith(PREFIX_STANDARD_NOTES)) {
-          varName = varName.slice(
-            PREFIX_STANDARD_NOTES_BURN.length,
-            varName.length
-          )
+          varName = varName.slice(PREFIX_STANDARD_NOTES_BURN.length, varName.length)
         } else {
           // Not all vars start with --sn-stylekit. e.g --background-color
           varName = varName.slice(PREFIX_GENERIC.length, varName.length)

@@ -1,18 +1,10 @@
 import AsyncStorage from '@react-native-community/async-storage'
-import {
-  AbstractDevice,
-  ApplicationIdentifier,
-  TransferPayload,
-} from '@standardnotes/snjs'
+import { AbstractDevice, ApplicationIdentifier, TransferPayload } from '@standardnotes/snjs'
 import { Alert, Linking, Platform } from 'react-native'
 import FingerprintScanner from 'react-native-fingerprint-scanner'
 import Keychain from './Keychain'
 
-export type BiometricsType =
-  | 'Fingerprint'
-  | 'Face ID'
-  | 'Biometrics'
-  | 'Touch ID'
+export type BiometricsType = 'Fingerprint' | 'Face ID' | 'Biometrics' | 'Touch ID'
 
 /**
  * This identifier was the database name used in Standard Notes web/desktop.
@@ -179,17 +171,11 @@ export class MobileDeviceInterface extends AbstractDevice {
     return this.getDatabaseKeyValues(keys) as Promise<T[]>
   }
 
-  saveRawDatabasePayload(
-    payload: any,
-    identifier: ApplicationIdentifier
-  ): Promise<void> {
+  saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void> {
     return this.saveRawDatabasePayloads([payload], identifier)
   }
 
-  async saveRawDatabasePayloads(
-    payloads: any[],
-    identifier: ApplicationIdentifier
-  ): Promise<void> {
+  async saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void> {
     if (payloads.length === 0) {
       return
     }
@@ -202,15 +188,10 @@ export class MobileDeviceInterface extends AbstractDevice {
       })
     )
   }
-  removeRawDatabasePayloadWithId(
-    id: string,
-    identifier: ApplicationIdentifier
-  ): Promise<void> {
+  removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void> {
     return this.removeRawStorageValue(this.keyForPayloadId(id, identifier))
   }
-  async removeAllRawDatabasePayloads(
-    identifier: ApplicationIdentifier
-  ): Promise<void> {
+  async removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void> {
     const keys = await this.getAllDatabaseKeys(identifier)
     return AsyncStorage.multiRemove(keys)
   }
@@ -226,10 +207,7 @@ export class MobileDeviceInterface extends AbstractDevice {
     return (keychain as any)[identifier]
   }
 
-  async setNamespacedKeychainValue(
-    value: any,
-    identifier: ApplicationIdentifier
-  ) {
+  async setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier) {
     if (isLegacyIdentifier(identifier)) {
       return Keychain.setKeys(value)
     }

@@ -1,9 +1,6 @@
 import React, { useContext } from 'react'
 import Icon from 'react-native-vector-icons/Ionicons'
-import {
-  HeaderButton,
-  HeaderButtonProps,
-} from 'react-navigation-header-buttons'
+import { HeaderButton, HeaderButtonProps } from 'react-navigation-header-buttons'
 import { ThemeContext } from 'styled-components'
 
 export const IoniconsHeaderButton = (passMeFurther: HeaderButtonProps) => {

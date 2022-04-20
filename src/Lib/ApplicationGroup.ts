@@ -1,9 +1,5 @@
 import { InternalEventBus } from '@standardnotes/services'
-import {
-  ApplicationDescriptor,
-  DeviceInterface,
-  SNApplicationGroup,
-} from '@standardnotes/snjs'
+import { ApplicationDescriptor, DeviceInterface, SNApplicationGroup } from '@standardnotes/snjs'
 import { MobileApplication } from './Application'
 import { ApplicationState } from './ApplicationState'
 import { BackupsService } from './BackupsService'
@@ -38,10 +34,7 @@ export class ApplicationGroup extends SNApplicationGroup {
     const reviewService = new ReviewService(application, internalEventBus)
     const backupsService = new BackupsService(application, internalEventBus)
     const prefsService = new PreferencesManager(application, internalEventBus)
-    const installationService = new InstallationService(
-      application,
-      internalEventBus
-    )
+    const installationService = new InstallationService(application, internalEventBus)
     const statusManager = new StatusManager(application, internalEventBus)
     const filesService = new FilesService(application, internalEventBus)
     application.setMobileServices({

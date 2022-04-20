@@ -24,9 +24,7 @@ export type UploadedFileItemProps = {
   isAttachedToNote: boolean
 }
 
-export type TAppStackNavigationProp = AppStackNavigationProp<
-  typeof SCREEN_COMPOSE
->['navigation']
+export type TAppStackNavigationProp = AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']
 
 export const UploadedFileItem: FC<UploadedFileItemProps> = ({ file, note }) => {
   const application = useSafeApplicationContext()
@@ -54,8 +52,7 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({ file, note }) => {
               <FileName>{fileName}</FileName>
               <FileDateAndSizeContainer>
                 <Text>
-                  {file.created_at.toLocaleString()} ·{' '}
-                  {formatSizeToReadableString(file.size)}
+                  {file.created_at.toLocaleString()} · {formatSizeToReadableString(file.size)}
                 </Text>
               </FileDateAndSizeContainer>
             </FileDetailsContainer>

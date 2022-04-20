@@ -16,12 +16,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import {
-  Animated,
-  FlatList,
-  ListRenderItem,
-  RefreshControl,
-} from 'react-native'
+import { Animated, FlatList, ListRenderItem, RefreshControl } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import IosSearchBar from 'react-native-search-bar'
 import AndroidSearchBar from 'react-native-search-box'
@@ -80,8 +75,7 @@ export const NoteList = (props: Props) => {
   const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null)
   const noteListRef = useRef<FlatList>(null)
 
-  const navigation =
-    useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
+  const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
 
   const dismissKeyboard = () => {
     iosSearchBarInputRef.current?.blur()

@@ -15,10 +15,7 @@ import {
   SNFile,
   SNNote,
 } from '@standardnotes/snjs'
-import {
-  CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Style/CustomActionSheet'
+import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
 import { useCallback, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import DocumentPicker, {
@@ -28,12 +25,7 @@ import DocumentPicker, {
 } from 'react-native-document-picker'
 import FileViewer from 'react-native-file-viewer'
 import RNFS, { exists } from 'react-native-fs'
-import {
-  Asset,
-  launchCamera,
-  launchImageLibrary,
-  MediaType,
-} from 'react-native-image-picker'
+import { Asset, launchCamera, launchImageLibrary, MediaType } from 'react-native-image-picker'
 import RNShare from 'react-native-share'
 import Toast from 'react-native-toast-message'
 
@@ -76,9 +68,7 @@ export const useFiles = ({ note }: Props) => {
 
   const reloadAttachedFiles = useCallback(() => {
     setAttachedFiles(
-      application.items
-        .getFilesForNote(note)
-        .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+      application.items.getFilesForNote(note).sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
     )
   }, [application, note])
 
@@ -108,8 +98,7 @@ export const useFiles = ({ note }: Props) => {
       if (isDownloading) {
         return
       }
-      const isGrantedStoragePermissionOnAndroid =
-        await filesService.hasStoragePermissionOnAndroid()
+      const isGrantedStoragePermissionOnAndroid = await filesService.hasStoragePermissionOnAndroid()
 
       if (!isGrantedStoragePermissionOnAndroid) {
         return
@@ -173,45 +162,37 @@ export const useFiles = ({ note }: Props) => {
       if (!downloadedFilePath) {
         return
       }
-      await application
-        .getAppState()
-        .performActionWithoutStateChangeImpact(async () => {
-          try {
-            // On Android this response always returns {success: false}, there is an open issue for that:
-            //  https://github.com/react-native-share/react-native-share/issues/1059
-            const shareDialogResponse = await RNShare.open({
-              url: `file://${downloadedFilePath}`,
-              failOnCancel: false,
-            })
+      await application.getAppState().performActionWithoutStateChangeImpact(async () => {
+        try {
+          // On Android this response always returns {success: false}, there is an open issue for that:
+          //  https://github.com/react-native-share/react-native-share/issues/1059
+          const shareDialogResponse = await RNShare.open({
+            url: `file://${downloadedFilePath}`,
+            failOnCancel: false,
+          })
 
-            // On iOS the user can store files locally from "Share" screen, so we don't show "Download" option there.
-            // For Android the user has a separate "Download" action for the file, therefore after the file is shared,
-            // it's not needed anymore and we remove it from the storage.
-            await cleanupTempFileOnAndroid(downloadedFilePath)
+          // On iOS the user can store files locally from "Share" screen, so we don't show "Download" option there.
+          // For Android the user has a separate "Download" action for the file, therefore after the file is shared,
+          // it's not needed anymore and we remove it from the storage.
+          await cleanupTempFileOnAndroid(downloadedFilePath)
 
-            if (shareDialogResponse.success) {
-              Toast.show({
-                type: Success,
-                text1: 'Successfully exported file',
-                onPress: Toast.hide,
-              })
-            }
-          } catch (error) {
+          if (shareDialogResponse.success) {
             Toast.show({
-              type: Error,
-              text1: 'An error occurred while trying to share this file',
+              type: Success,
+              text1: 'Successfully exported file',
               onPress: Toast.hide,
             })
           }
-        })
+        } catch (error) {
+          Toast.show({
+            type: Error,
+            text1: 'An error occurred while trying to share this file',
+            onPress: Toast.hide,
+          })
+        }
+      })
     },
-    [
-      Error,
-      Success,
-      application,
-      cleanupTempFileOnAndroid,
-      downloadFileAndReturnLocalPath,
-    ]
+    [Error, Success, application, cleanupTempFileOnAndroid, downloadFileAndReturnLocalPath]
   )
 
   const attachFileToNote = useCallback(
@@ -262,11 +243,10 @@ export const useFiles = ({ note }: Props) => {
 
   const authorizeProtectedActionForFile = useCallback(
     async (file: SNFile, challengeReason: ChallengeReason) => {
-      const authorizedFiles =
-        await application.protections.authorizeProtectedActionForFiles(
-          [file],
-          challengeReason
-        )
+      const authorizedFiles = await application.protections.authorizeProtectedActionForFiles(
+        [file],
+        challengeReason
+      )
       return authorizedFiles.length > 0 && authorizedFiles.includes(file)
     },
     [application]
@@ -315,9 +295,7 @@ export const useFiles = ({ note }: Props) => {
         return true
       } catch (error) {
         await cleanupTempFileOnAndroid(downloadedFilePath as string)
-        await application.alertService.alert(
-          'An error occurred while previewing the file.'
-        )
+        await application.alertService.alert('An error occurred while previewing the file.')
 
         return false
       }
@@ -364,8 +342,7 @@ export const useFiles = ({ note }: Props) => {
     } else if (isInProgress(error)) {
       Toast.show({
         type: Info,
-        text2:
-          'Multiple pickers were opened; only the last one will be considered.',
+        text2: 'Multiple pickers were opened; only the last one will be considered.',
       })
     } else {
       Toast.show({
@@ -393,9 +370,7 @@ export const useFiles = ({ note }: Props) => {
     }
   }
 
-  const uploadSingleFile = async (
-    file: DocumentPickerResponse | Asset
-  ): Promise<SNFile | void> => {
+  const uploadSingleFile = async (file: DocumentPickerResponse | Asset): Promise<SNFile | void> => {
     try {
       const fileName = filesService.getFileName(file)
       Toast.show({
@@ -414,24 +389,12 @@ export const useFiles = ({ note }: Props) => {
         return
       }
 
-      const onChunk = async (
-        chunk: Uint8Array,
-        index: number,
-        isLast: boolean
-      ) => {
-        await application.files.pushBytesForUpload(
-          operation,
-          chunk,
-          index,
-          isLast
-        )
+      const onChunk = async (chunk: Uint8Array, index: number, isLast: boolean) => {
+        await application.files.pushBytesForUpload(operation, chunk, index, isLast)
       }
 
       const fileResult = await filesService.readFile(file, onChunk)
-      const fileObj = await application.files.finishUpload(
-        operation,
-        fileResult
-      )
+      const fileObj = await application.files.finishUpload(operation, fileResult)
       if (fileObj instanceof ClientDisplayableError) {
         Toast.show({
           type: Error,
@@ -515,15 +478,10 @@ export const useFiles = ({ note }: Props) => {
   const handleFileAction = useCallback(
     async (action: UploadedFileItemAction) => {
       const file =
-        action.type !== UploadedFileItemActionType.RenameFile
-          ? action.payload
-          : action.payload.file
+        action.type !== UploadedFileItemActionType.RenameFile ? action.payload : action.payload.file
       let isAuthorizedForAction = true
 
-      if (
-        file.protected &&
-        action.type !== UploadedFileItemActionType.ToggleFileProtection
-      ) {
+      if (file.protected && action.type !== UploadedFileItemActionType.ToggleFileProtection) {
         isAuthorizedForAction = await authorizeProtectedActionForFile(
           file,
           ChallengeReason.AccessProtectedFile
@@ -582,13 +540,10 @@ export const useFiles = ({ note }: Props) => {
   )
 
   useEffect(() => {
-    const unregisterFileStream = application.streamItems(
-      ContentType.File,
-      () => {
-        reloadAttachedFiles()
-        reloadAllFiles()
-      }
-    )
+    const unregisterFileStream = application.streamItems(ContentType.File, () => {
+      reloadAttachedFiles()
+      reloadAllFiles()
+    })
 
     return () => {
       unregisterFileStream()
@@ -676,9 +631,7 @@ export const useFiles = ({ note }: Props) => {
         },
       ]
       const osDependentActions =
-        Platform.OS === 'ios'
-          ? actions.filter(action => action.text !== 'Download')
-          : [...actions]
+        Platform.OS === 'ios' ? actions.filter(action => action.text !== 'Download') : [...actions]
       showActionSheet({
         title: file.name,
         options: osDependentActions,

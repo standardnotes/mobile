@@ -22,11 +22,9 @@ type Props = {
   last?: boolean
 }
 
-const TouchableContainer = styled(SectionedTableCellTouchableHighlight).attrs(
-  props => ({
-    underlayColor: props.theme.stylekitBorderColor,
-  })
-)`
+const TouchableContainer = styled(SectionedTableCellTouchableHighlight).attrs(props => ({
+  underlayColor: props.theme.stylekitBorderColor,
+}))`
   flex-direction: column;
   padding-top: 0px;
   padding-bottom: 0px;
@@ -45,10 +43,7 @@ const IconContainer = styled.View`
   width: 30px;
   max-width: 30px;
 `
-type LabelProps = Pick<
-  Props,
-  'bold' | 'tinted' | 'dimmed' | 'selected' | 'color'
->
+type LabelProps = Pick<Props, 'bold' | 'tinted' | 'dimmed' | 'selected' | 'color'>
 const Label = styled.Text<LabelProps>`
   min-width: 80%;
   color: ${props => {
@@ -92,8 +87,7 @@ export const SectionedAccessoryTableCell: React.FC<Props> = props => {
     }
   }
 
-  const checkmarkName =
-    Platform.OS === 'android' ? 'md-checkbox' : 'ios-checkmark-circle'
+  const checkmarkName = Platform.OS === 'android' ? 'md-checkbox' : 'ios-checkmark-circle'
   const iconName = props.iconName
     ? props.iconName
     : props.selected && props.selected()
@@ -102,9 +96,7 @@ export const SectionedAccessoryTableCell: React.FC<Props> = props => {
 
   const left = props.leftAlignIcon
   let iconSize = left ? 25 : 30
-  let color = left
-    ? themeContext.stylekitForegroundColor
-    : themeContext.stylekitInfoColor
+  let color = left ? themeContext.stylekitForegroundColor : themeContext.stylekitInfoColor
 
   if (Platform.OS === 'android') {
     iconSize -= 5

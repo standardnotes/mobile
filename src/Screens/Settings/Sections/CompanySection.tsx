@@ -40,11 +40,9 @@ export const CompanySection = (props: Props) => {
     if (Platform.OS === 'android') {
       message += '\n\nhttps://standardnotes.com/why-encrypted'
     }
-    void application
-      ?.getAppState()
-      .performActionWithoutStateChangeImpact(() => {
-        void Share.share({ title: title, message: message, url: url })
-      })
+    void application?.getAppState().performActionWithoutStateChangeImpact(() => {
+      void Share.share({ title: title, message: message, url: url })
+    })
   }
 
   const shareWithFriend = () => {
@@ -56,48 +54,29 @@ export const CompanySection = (props: Props) => {
     if (Platform.OS === 'android') {
       message += '\n\nhttps://standardnotes.com'
     }
-    void application
-      ?.getAppState()
-      .performActionWithoutStateChangeImpact(() => {
-        void Share.share({ title: title, message: message, url: url })
-      })
+    void application?.getAppState().performActionWithoutStateChangeImpact(() => {
+      void Share.share({ title: title, message: message, url: url })
+    })
   }
 
   return (
     <TableSection>
       <SectionHeader title={props.title} />
 
-      <ButtonCell
-        first
-        leftAligned={true}
-        title="Help"
-        onPress={() => openUrl('help')}
-      >
+      <ButtonCell first leftAligned={true} title="Help" onPress={() => openUrl('help')}>
         <Label>https://standardnotes.com/help</Label>
       </ButtonCell>
-      <ButtonCell
-        leftAligned={true}
-        title="Contact Support"
-        onPress={() => openUrl('feedback')}
-      >
+      <ButtonCell leftAligned={true} title="Contact Support" onPress={() => openUrl('feedback')}>
         <ContentContainer>
           <Label>help@standardnotes.com</Label>
         </ContentContainer>
       </ButtonCell>
 
-      <ButtonCell
-        leftAligned={true}
-        title="Spread Encryption"
-        onPress={shareEncryption}
-      >
+      <ButtonCell leftAligned={true} title="Spread Encryption" onPress={shareEncryption}>
         <Label>Share the unexpected benefits of encrypted writing.</Label>
       </ButtonCell>
 
-      <ButtonCell
-        leftAligned={true}
-        title="Tell a Friend"
-        onPress={shareWithFriend}
-      >
+      <ButtonCell leftAligned={true} title="Tell a Friend" onPress={shareWithFriend}>
         <Label>Share Standard Notes with a friend.</Label>
       </ButtonCell>
 
@@ -117,11 +96,7 @@ export const CompanySection = (props: Props) => {
         <Label>https://standardnotes.com/privacy</Label>
       </ButtonCell>
 
-      <ButtonCell
-        leftAligned={true}
-        title="Rate Standard Notes"
-        onPress={() => openUrl('rate')}
-      >
+      <ButtonCell leftAligned={true} title="Rate Standard Notes" onPress={() => openUrl('rate')}>
         <ContentContainer>
           <Label>Version {ApplicationState.version}</Label>
           <Label>Help support us with a review on the {storeName}.</Label>

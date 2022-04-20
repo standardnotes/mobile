@@ -1,16 +1,10 @@
 import { RouteProp } from '@react-navigation/native'
-import {
-  createStackNavigator,
-  StackNavigationProp,
-} from '@react-navigation/stack'
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack'
 import { HeaderTitleView } from '@Root/Components/HeaderTitleView'
 import { IoniconsHeaderButton } from '@Root/Components/IoniconsHeaderButton'
 import { NoteHistory } from '@Root/Screens/NoteHistory/NoteHistory'
 import { NoteHistoryPreview } from '@Root/Screens/NoteHistory/NoteHistoryPreview'
-import {
-  SCREEN_NOTE_HISTORY,
-  SCREEN_NOTE_HISTORY_PREVIEW,
-} from '@Root/Screens/screens'
+import { SCREEN_NOTE_HISTORY, SCREEN_NOTE_HISTORY_PREVIEW } from '@Root/Screens/screens'
 import { NoteHistoryEntry } from '@standardnotes/snjs'
 import { ICON_CHECKMARK } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
@@ -30,9 +24,7 @@ type HistoryStackNavigatorParamList = {
   }
 }
 
-export type HistoryStackNavigationProp<
-  T extends keyof HistoryStackNavigatorParamList
-> = {
+export type HistoryStackNavigationProp<T extends keyof HistoryStackNavigatorParamList> = {
   navigation: StackNavigationProp<HistoryStackNavigatorParamList, T>
   route: RouteProp<HistoryStackNavigatorParamList, T>
 }
@@ -63,9 +55,7 @@ export const HistoryStack = () => {
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Done' : ''}
                 iconName={
-                  Platform.OS === 'ios'
-                    ? undefined
-                    : ThemeService.nameForIcon(ICON_CHECKMARK)
+                  Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CHECKMARK)
                 }
                 onPress={onPress}
               />

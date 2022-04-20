@@ -30,13 +30,7 @@ const FlagLabel = styled.Text<{ selected: boolean }>`
   font-weight: bold;
 `
 
-export const NoteCellFlags = ({
-  note,
-  highlight,
-}: {
-  note: SNNote
-  highlight: boolean
-}) => {
+export const NoteCellFlags = ({ note, highlight }: { note: SNNote; highlight: boolean }) => {
   const theme = useContext(ThemeContext)
 
   const flags: NoteFlag[] = []
@@ -51,11 +45,7 @@ export const NoteCellFlags = ({
   return flags.length > 0 ? (
     <FlagsContainer>
       {flags.map(flag => (
-        <FlagContainer
-          key={flag.text.concat(flag.color)}
-          color={flag.color}
-          selected={highlight}
-        >
+        <FlagContainer key={flag.text.concat(flag.color)} color={flag.color} selected={highlight}>
           <FlagLabel selected={highlight}>{flag.text}</FlagLabel>
         </FlagContainer>
       ))}

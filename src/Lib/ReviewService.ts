@@ -5,10 +5,7 @@ const RUN_COUNTS_BEFORE_REVIEW = [18, 45, 105]
 
 export class ReviewService extends ApplicationService {
   override async onAppLaunch() {
-    if (
-      this.application?.platform === Platform.Android ||
-      !StoreReview.isAvailable
-    ) {
+    if (this.application?.platform === Platform.Android || !StoreReview.isAvailable) {
       return
     }
     const runCount = await this.getRunCount()

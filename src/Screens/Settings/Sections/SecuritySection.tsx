@@ -3,17 +3,11 @@ import { MobileDeviceInterface } from '@Lib/Interface'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { ButtonCell } from '@Root/Components/ButtonCell'
-import {
-  Option,
-  SectionedOptionsTableCell,
-} from '@Root/Components/SectionedOptionsTableCell'
+import { Option, SectionedOptionsTableCell } from '@Root/Components/SectionedOptionsTableCell'
 import { SectionHeader } from '@Root/Components/SectionHeader'
 import { TableSection } from '@Root/Components/TableSection'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
-import {
-  SCREEN_INPUT_MODAL_PASSCODE,
-  SCREEN_SETTINGS,
-} from '@Root/Screens/screens'
+import { SCREEN_INPUT_MODAL_PASSCODE, SCREEN_SETTINGS } from '@Root/Screens/screens'
 import { StorageEncryptionPolicy } from '@standardnotes/snjs'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
@@ -27,10 +21,7 @@ type Props = {
 }
 
 export const SecuritySection = (props: Props) => {
-  const navigation =
-    useNavigation<
-      ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']
-    >()
+  const navigation = useNavigation<ModalStackNavigationProp<typeof SCREEN_SETTINGS>['navigation']>()
   // Context
   const application = useContext(ApplicationContext)
 
@@ -38,13 +29,8 @@ export const SecuritySection = (props: Props) => {
   const [encryptionPolicy, setEncryptionPolicy] = useState(() =>
     application?.getStorageEncryptionPolicy()
   )
-  const [
-    encryptionPolictChangeInProgress,
-    setEncryptionPolictChangeInProgress,
-  ] = useState(false)
-  const [hasScreenshotPrivacy, setHasScreenshotPrivacy] = useState<
-    boolean | undefined
-  >(false)
+  const [encryptionPolictChangeInProgress, setEncryptionPolictChangeInProgress] = useState(false)
+  const [hasScreenshotPrivacy, setHasScreenshotPrivacy] = useState<boolean | undefined>(false)
   const [hasBiometrics, setHasBiometrics] = useState(false)
   const [supportsBiometrics, setSupportsBiometrics] = useState(false)
   const [biometricsTimingOptions, setBiometricsTimingOptions] = useState(() =>
@@ -57,8 +43,7 @@ export const SecuritySection = (props: Props) => {
   useEffect(() => {
     let mounted = true
     const getHasScreenshotPrivacy = async () => {
-      const hasScreenshotPrivacyEnabled = await application?.getAppState()
-        .screenshotPrivacyEnabled
+      const hasScreenshotPrivacyEnabled = await application?.getAppState().screenshotPrivacyEnabled
       if (mounted) {
         setHasScreenshotPrivacy(hasScreenshotPrivacyEnabled)
       }
@@ -88,9 +73,7 @@ export const SecuritySection = (props: Props) => {
   useFocusEffect(
     useCallback(() => {
       if (props.hasPasscode) {
-        setPasscodeTimingOptions(() =>
-          application!.getAppState().getPasscodeTimingOptions()
-        )
+        setPasscodeTimingOptions(() => application!.getAppState().getPasscodeTimingOptions())
       }
     }, [application, props.hasPasscode])
   )
@@ -103,16 +86,12 @@ export const SecuritySection = (props: Props) => {
     if (encryptionPolicy === StorageEncryptionPolicy.Default) {
       setEncryptionPolictChangeInProgress(true)
       setEncryptionPolicy(StorageEncryptionPolicy.Disabled)
-      await application?.setStorageEncryptionPolicy(
-        StorageEncryptionPolicy.Disabled
-      )
+      await application?.setStorageEncryptionPolicy(StorageEncryptionPolicy.Disabled)
       setEncryptionPolictChangeInProgress(false)
     } else if (encryptionPolicy === StorageEncryptionPolicy.Disabled) {
       setEncryptionPolictChangeInProgress(true)
       setEncryptionPolicy(StorageEncryptionPolicy.Default)
-      await application?.setStorageEncryptionPolicy(
-        StorageEncryptionPolicy.Default
-      )
+      await application?.setStorageEncryptionPolicy(StorageEncryptionPolicy.Default)
       setEncryptionPolictChangeInProgress(false)
     }
   }
@@ -124,8 +103,7 @@ export const SecuritySection = (props: Props) => {
       : 'Enable Storage Encryption'
     : 'Storage Encryption'
 
-  let storageSubText =
-    "Encrypts your data before saving to your device's local storage."
+  let storageSubText = "Encrypts your data before saving to your device's local storage."
 
   if (props.encryptionAvailable) {
     storageSubText +=
@@ -133,8 +111,7 @@ export const SecuritySection = (props: Props) => {
         ? ' Disable to improve app start-up speed.'
         : ' May decrease app start-up speed.'
   } else {
-    storageSubText +=
-      ' Sign in, register, or add a local passcode to enable this option.'
+    storageSubText += ' Sign in, register, or add a local passcode to enable this option.'
   }
 
   if (encryptionPolictChangeInProgress) {
@@ -142,34 +119,24 @@ export const SecuritySection = (props: Props) => {
   }
 
   const screenshotPrivacyFeatureText =
-    Platform.OS === 'ios'
-      ? 'Multitasking Privacy'
-      : 'Multitasking/Screenshot Privacy'
+    Platform.OS === 'ios' ? 'Multitasking Privacy' : 'Multitasking/Screenshot Privacy'
 
   const screenshotPrivacyTitle = hasScreenshotPrivacy
     ? `Disable ${screenshotPrivacyFeatureText}`
     : `Enable ${screenshotPrivacyFeatureText}`
 
-  const passcodeTitle = props.hasPasscode
-    ? 'Disable Passcode Lock'
-    : 'Enable Passcode Lock'
+  const passcodeTitle = props.hasPasscode ? 'Disable Passcode Lock' : 'Enable Passcode Lock'
 
-  const biometricTitle = hasBiometrics
-    ? 'Disable Biometrics Lock'
-    : 'Enable Biometrics Lock'
+  const biometricTitle = hasBiometrics ? 'Disable Biometrics Lock' : 'Enable Biometrics Lock'
 
   const setBiometricsTiming = async (timing: UnlockTiming) => {
     await application?.getAppState().setBiometricsTiming(timing)
-    setBiometricsTimingOptions(() =>
-      application!.getAppState().getBiometricsTimingOptions()
-    )
+    setBiometricsTimingOptions(() => application!.getAppState().getBiometricsTimingOptions())
   }
 
   const setPasscodeTiming = async (timing: UnlockTiming) => {
     await application?.getAppState().setPasscodeTiming(timing)
-    setPasscodeTimingOptions(() =>
-      application!.getAppState().getPasscodeTimingOptions()
-    )
+    setPasscodeTimingOptions(() => application!.getAppState().getPasscodeTimingOptions())
   }
 
   const onScreenshotPrivacyPress = async () => {
@@ -246,20 +213,11 @@ export const SecuritySection = (props: Props) => {
     <TableSection>
       <SectionHeader title={props.title} />
 
-      <ButtonCell
-        first
-        leftAligned
-        title={storageEncryptionTitle}
-        onPress={toggleEncryptionPolicy}
-      >
+      <ButtonCell first leftAligned title={storageEncryptionTitle} onPress={toggleEncryptionPolicy}>
         <Title>{storageSubText}</Title>
       </ButtonCell>
 
-      <ButtonCell
-        leftAligned
-        title={screenshotPrivacyTitle}
-        onPress={onScreenshotPrivacyPress}
-      />
+      <ButtonCell leftAligned title={screenshotPrivacyTitle} onPress={onScreenshotPrivacyPress} />
 
       <ButtonCell leftAligned title={passcodeTitle} onPress={onPasscodePress} />
 
@@ -276,9 +234,7 @@ export const SecuritySection = (props: Props) => {
           leftAligned
           title={'Require Passcode'}
           options={passcodeTimingOptions}
-          onPress={(option: Option) =>
-            setPasscodeTiming(option.key as UnlockTiming)
-          }
+          onPress={(option: Option) => setPasscodeTiming(option.key as UnlockTiming)}
         />
       )}
 
@@ -287,9 +243,7 @@ export const SecuritySection = (props: Props) => {
           leftAligned
           title={'Require Biometrics'}
           options={biometricsTimingOptions}
-          onPress={(option: Option) =>
-            setBiometricsTiming(option.key as UnlockTiming)
-          }
+          onPress={(option: Option) => setBiometricsTiming(option.key as UnlockTiming)}
         />
       )}
     </TableSection>

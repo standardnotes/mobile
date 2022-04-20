@@ -62,9 +62,7 @@ export class MobileApplication extends SNApplication {
           with: ComponentManager,
         },
       ],
-      defaultHost: IsDev
-        ? 'https://api-dev.standardnotes.com'
-        : 'https://api.standardnotes.com',
+      defaultHost: IsDev ? 'https://api-dev.standardnotes.com' : 'https://api.standardnotes.com',
       appVersion: version,
       webSocketUrl: IsDev
         ? 'wss://sockets-dev.standardnotes.com'
@@ -118,15 +116,10 @@ export class MobileApplication extends SNApplication {
 
     if (previouslyLaunched && biometricsTiming === UnlockTiming.OnQuit) {
       const filteredPrompts = challenge.prompts.filter(
-        (prompt: ChallengePrompt) =>
-          prompt.validation !== ChallengeValidation.Biometric
+        (prompt: ChallengePrompt) => prompt.validation !== ChallengeValidation.Biometric
       )
 
-      return new Challenge(
-        filteredPrompts,
-        ChallengeReason.ApplicationUnlock,
-        false
-      )
+      return new Challenge(filteredPrompts, ChallengeReason.ApplicationUnlock, false)
     }
 
     return challenge

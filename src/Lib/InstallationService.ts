@@ -18,21 +18,15 @@ export class InstallationService extends ApplicationService {
   }
 
   async markApplicationAsRan() {
-    return this.application?.setValue(
-      FIRST_RUN_KEY,
-      false,
-      StorageValueModes.Nonwrapped
-    )
+    return this.application?.setValue(FIRST_RUN_KEY, false, StorageValueModes.Nonwrapped)
   }
 
   async needsWipe() {
     // Needs wipe if has keys but no data. However, since "no data" can be incorrectly reported by underlying
     // AsyncStorage failures, we want to confirm with the user before deleting anything.
 
-    const hasNormalKeys =
-      this.application?.hasAccount() || this.application?.hasPasscode()
-    const keychainKey =
-      await this.application?.deviceInterface?.getRawKeychainValue()
+    const hasNormalKeys = this.application?.hasAccount() || this.application?.hasPasscode()
+    const keychainKey = await this.application?.deviceInterface?.getRawKeychainValue()
     const hasKeychainValue = !(
       isNullOrUndefined(keychainKey) ||
       (typeof keychainKey === 'object' && Object.keys(keychainKey).length === 0)
@@ -47,10 +41,9 @@ export class InstallationService extends ApplicationService {
      * Because of migration failure first run key might not be in non wrapped storage
      */
     if (firstRunKeyMissing) {
-      const fallbackFirstRunValue =
-        await this.application?.deviceInterface?.getRawStorageValue(
-          FIRST_RUN_KEY
-        )
+      const fallbackFirstRunValue = await this.application?.deviceInterface?.getRawStorageValue(
+        FIRST_RUN_KEY
+      )
       firstRunKeyMissing = isNullOrUndefined(fallbackFirstRunValue)
     }
     return !hasNormalKeys && hasKeychainValue && firstRunKeyMissing

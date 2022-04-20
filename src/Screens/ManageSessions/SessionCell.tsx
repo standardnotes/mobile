@@ -50,17 +50,11 @@ export const SubTitleText = styled.Text<{ current: boolean }>`
 `
 
 export const SessionCell: React.FC<Props> = props => (
-  <Container
-    testID={props.testID}
-    disabled={props.disabled}
-    onPress={props.onPress}
-  >
+  <Container testID={props.testID} disabled={props.disabled} onPress={props.onPress}>
     <ButtonContainer>
       <ButtonLabel disabled={props.disabled}>{props.title}</ButtonLabel>
       <SubTitleText current={props.currentSession}>
-        {props.currentSession
-          ? 'Current session'
-          : 'Signed in on ' + props.subTitle}
+        {props.currentSession ? 'Current session' : 'Signed in on ' + props.subTitle}
       </SubTitleText>
     </ButtonContainer>
   </Container>

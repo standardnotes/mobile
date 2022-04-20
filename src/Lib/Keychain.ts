@@ -8,11 +8,9 @@ export default class Keychain {
       /* iOS only */
       accessible: RCTKeychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     }
-    return RCTKeychain.setGenericPassword(
-      'sn',
-      JSON.stringify(keys),
-      options
-    ).then(function (result) {
+    return RCTKeychain.setGenericPassword('sn', JSON.stringify(keys), options).then(function (
+      result
+    ) {
       console.log('Credentials saved successfully!', result)
     })
   }
@@ -29,10 +27,7 @@ export default class Keychain {
         }
       })
       .catch(function (error) {
-        console.error(
-          "Keychain couldn't be accessed! Maybe no value set?",
-          error
-        )
+        console.error("Keychain couldn't be accessed! Maybe no value set?", error)
         return undefined
       })
   }

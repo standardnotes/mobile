@@ -6,13 +6,7 @@ import { AppStackNavigationProp } from '@Root/AppStack'
 import { SCREEN_NOTES } from '@Root/Screens/screens'
 import { ButtonType, ComponentViewer } from '@standardnotes/snjs'
 import { ThemeServiceContext } from '@Style/ThemeService'
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 import { WebView } from 'react-native-webview'
 import {
@@ -71,12 +65,9 @@ export const ComponentView = ({
   // Ref
   const didLoadRootUrl = useRef<boolean>(false)
   const webViewRef = useRef<WebView>(null)
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined
-  )
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
-  const navigation =
-    useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
+  const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
 
   useEffect(() => {
     const removeBlurScreenListener = navigation.addListener('blur', () => {
@@ -152,10 +143,7 @@ export const ComponentView = ({
         clearTimeout(timeoutRef.current)
       }
 
-      onLoadError(
-        ComponentLoadingError.Unknown,
-        error?.nativeEvent?.description
-      )
+      onLoadError(ComponentLoadingError.Unknown, error?.nativeEvent?.description)
     },
     [onLoadError, timeoutRef]
   )
@@ -170,9 +158,7 @@ export const ComponentView = ({
       const asyncFunc = async () => {
         if (await componentManager.doesComponentNeedDownload(component)) {
           onDownloadEditorStart()
-          const error = await componentManager.downloadComponentOffline(
-            component
-          )
+          const error = await componentManager.downloadComponentOffline(component)
           log('Download component error', error)
           onDownloadEditorEnd()
           if (error) {
@@ -237,35 +223,34 @@ export const ComponentView = ({
     onLoadStart()
   }
 
-  const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest =
-    request => {
-      log('Setting last iframe URL to', request.url)
-      /** The first request can typically be 'about:blank', which we want to ignore */
-      if (!didLoadRootUrl.current) {
-        didLoadRootUrl.current = request.url === componentViewer.url!
-      }
-      /**
-       * We want to handle link clicks within an editor by opening the browser
-       * instead of loading inline. On iOS, onShouldStartLoadWithRequest is
-       * called for all requests including the initial request to load the editor.
-       * On iOS, clicks in the editors have a navigationType of 'click', but on
-       * Android, this is not the case (no navigationType).
-       * However, on Android, this function is not called for the initial request.
-       * So that might be one way to determine if this request is a click or the
-       * actual editor load request. But I don't think it's safe to rely on this
-       * being the case in the future. So on Android, we'll handle url loads only
-       * if the url isn't equal to the editor url.
-       */
-
-      if (
-        (Platform.OS === 'ios' && request.navigationType === 'click') ||
-        (Platform.OS === 'android' && request.url !== componentViewer.url!)
-      ) {
-        application!.deviceInterface!.openUrl(request.url)
-        return false
-      }
-      return true
+  const onShouldStartLoadWithRequest: OnShouldStartLoadWithRequest = request => {
+    log('Setting last iframe URL to', request.url)
+    /** The first request can typically be 'about:blank', which we want to ignore */
+    if (!didLoadRootUrl.current) {
+      didLoadRootUrl.current = request.url === componentViewer.url!
     }
+    /**
+     * We want to handle link clicks within an editor by opening the browser
+     * instead of loading inline. On iOS, onShouldStartLoadWithRequest is
+     * called for all requests including the initial request to load the editor.
+     * On iOS, clicks in the editors have a navigationType of 'click', but on
+     * Android, this is not the case (no navigationType).
+     * However, on Android, this function is not called for the initial request.
+     * So that might be one way to determine if this request is a click or the
+     * actual editor load request. But I don't think it's safe to rely on this
+     * being the case in the future. So on Android, we'll handle url loads only
+     * if the url isn't equal to the editor url.
+     */
+
+    if (
+      (Platform.OS === 'ios' && request.navigationType === 'click') ||
+      (Platform.OS === 'android' && request.url !== componentViewer.url!)
+    ) {
+      application!.deviceInterface!.openUrl(request.url)
+      return false
+    }
+    return true
+  }
 
   const defaultInjectedJavaScript = () => {
     return `(function() {
@@ -290,8 +275,8 @@ export const ComponentView = ({
         <LockedContainer>
           <StyledIcon />
           <LockedText>
-            Subscription expired. Editors are in a read-only state. To edit
-            immediately, please switch to the Plain Editor.
+            Subscription expired. Editors are in a read-only state. To edit immediately, please
+            switch to the Plain Editor.
           </LockedText>
         </LockedContainer>
       )}
@@ -299,9 +284,7 @@ export const ComponentView = ({
       {componentViewer.component.isDeprecated && (
         <DeprecatedContainer>
           <DeprecatedIcon />
-          <DeprecatedText>
-            {deprecationMessage || 'This extension is deprecated.'}
-          </DeprecatedText>
+          <DeprecatedText>{deprecationMessage || 'This extension is deprecated.'}</DeprecatedText>
         </DeprecatedContainer>
       )}
 
