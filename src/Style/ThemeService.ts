@@ -12,27 +12,20 @@ import {
   UuidString,
 } from '@standardnotes/snjs'
 import React from 'react'
-import {
-  Alert,
-  Appearance,
-  Platform,
-  StatusBar,
-  TextStyle,
-  ViewStyle,
-} from 'react-native'
-import {
-  DARK_CONTENT,
-  getColorLuminosity,
-  keyboardColorForTheme,
-  LIGHT_CONTENT,
-  statusBarColorForTheme,
-} from './/utils'
+import { Alert, Appearance, Platform, StatusBar, TextStyle, ViewStyle } from 'react-native'
 import CSSParser from './CssParser'
 import { MobileTheme } from './MobileTheme'
 import THEME_DARK_JSON from './Themes/blue-dark.json'
 import THEME_BLUE_JSON from './Themes/blue.json'
 import THEME_RED_JSON from './Themes/red.json'
 import { MobileThemeVariables } from './Themes/styled-components'
+import {
+  DARK_CONTENT,
+  getColorLuminosity,
+  keyboardColorForTheme,
+  LIGHT_CONTENT,
+  statusBarColorForTheme,
+} from './Utils'
 
 const LIGHT_THEME_KEY = 'lightThemeKey'
 const DARK_THEME_KEY = 'darkThemeKey'
@@ -48,9 +41,7 @@ enum SystemThemeTint {
   Red = 'Red',
 }
 
-export const ThemeServiceContext = React.createContext<
-  ThemeService | undefined
->(undefined)
+export const ThemeServiceContext = React.createContext<ThemeService | undefined>(undefined)
 
 /**
  * Components might use current theme by using of two ways:
@@ -93,22 +84,20 @@ export class ThemeService {
   }
 
   private registerObservers() {
-    this.unsubsribeAppEventObserver = this.application?.addEventObserver(
-      async event => {
-        /**
-         * If there are any migrations we need to set default theme to start UI
-         */
-        if (event === ApplicationEvent.MigrationsLoaded) {
-          if (await this.application?.hasPendingMigrations()) {
-            this.setDefaultTheme()
-          }
-        }
-        if (event === ApplicationEvent.Launched) {
-          // Resolve initial theme after app launched
-          void this.resolveInitialThemeForMode()
+    this.unsubsribeAppEventObserver = this.application?.addEventObserver(async event => {
+      /**
+       * If there are any migrations we need to set default theme to start UI
+       */
+      if (event === ApplicationEvent.MigrationsLoaded) {
+        if (await this.application?.hasPendingMigrations()) {
+          this.setDefaultTheme()
         }
       }
-    )
+      if (event === ApplicationEvent.Launched) {
+        // Resolve initial theme after app launched
+        void this.resolveInitialThemeForMode()
+      }
+    })
   }
 
   private findOrCreateTheme(themeId: string, variables?: MobileThemeVariables) {
@@ -146,8 +135,7 @@ export class ThemeService {
         ...option.variables,
         ...ThemeService.constants,
       }
-      variables.statusBar =
-        Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT
+      variables.statusBar = Platform.OS === 'android' ? LIGHT_CONTENT : DARK_CONTENT
 
       const currentDate = new Date()
       const payload = new DecryptedPayload<ComponentContent>({
@@ -163,9 +151,7 @@ export class ThemeService {
           },
           name: option.name,
           variables,
-          luminosity: getColorLuminosity(
-            variables.stylekitContrastBackgroundColor
-          ),
+          luminosity: getColorLuminosity(variables.stylekitContrastBackgroundColor),
           isSystemTheme: true,
           isInitial: Boolean(option.isInitial),
         } as unknown as ComponentContent),
@@ -226,10 +212,7 @@ export class ThemeService {
     }
   }
 
-  public async assignExternalThemeForMode(
-    theme: SNTheme,
-    mode: 'light' | 'dark'
-  ) {
+  public async assignExternalThemeForMode(theme: SNTheme, mode: 'light' | 'dark') {
     const data = this.findOrCreateTheme(theme.uuid)
     if (!Object.prototype.hasOwnProperty.call(data, 'variables')) {
       if ((await this.downloadThemeAndReload(theme)) === false) {
@@ -278,9 +261,7 @@ export class ThemeService {
 
   private setDefaultTheme() {
     const defaultThemeId =
-      this.getColorScheme() === 'dark'
-        ? SystemThemeTint.Dark
-        : SystemThemeTint.Blue
+      this.getColorScheme() === 'dark' ? SystemThemeTint.Dark : SystemThemeTint.Blue
 
     this.setActiveTheme(defaultThemeId)
   }
@@ -288,9 +269,7 @@ export class ThemeService {
   private async resolveInitialThemeForMode() {
     try {
       const savedThemeId = await this.getThemeForMode(this.getColorScheme())
-      const matchingThemeId = Object.keys(this.themes).find(
-        themeId => themeId === savedThemeId
-      )
+      const matchingThemeId = Object.keys(this.themes).find(themeId => themeId === savedThemeId)
       if (matchingThemeId) {
         this.setActiveTheme(matchingThemeId)
       } else {
@@ -403,9 +382,7 @@ export class ThemeService {
     )
   }
 
-  private async downloadTheme(
-    theme: SNTheme
-  ): Promise<ThemeVariables | undefined> {
+  private async downloadTheme(theme: SNTheme): Promise<ThemeVariables | undefined> {
     const componentManager = this.application?.mobileComponentManager
     if (componentManager?.isComponentDownloadable(theme)) {
       if (await componentManager.doesComponentNeedDownload(theme)) {
@@ -474,9 +451,7 @@ export class ThemeService {
         content: {
           ...theme.payload.content,
           variables: finalVariables,
-          luminosity: getColorLuminosity(
-            finalVariables.stylekitContrastBackgroundColor
-          ),
+          luminosity: getColorLuminosity(finalVariables.stylekitContrastBackgroundColor),
           isSystemTheme: false,
           isInitial: false,
           package_info: {
@@ -502,14 +477,9 @@ export class ThemeService {
 
   private async loadCachedThemes() {
     const rawValue =
-      (await this.application!.getValue(
-        CACHED_THEMES_KEY,
-        StorageValueModes.Nonwrapped
-      )) || []
+      (await this.application!.getValue(CACHED_THEMES_KEY, StorageValueModes.Nonwrapped)) || []
 
-    const themes = (
-      rawValue as DecryptedTransferPayload<ComponentContent>[]
-    ).map(rawPayload => {
+    const themes = (rawValue as DecryptedTransferPayload<ComponentContent>[]).map(rawPayload => {
       const payload = new DecryptedPayload<ComponentContent>(rawPayload)
 
       return new MobileTheme(payload)
