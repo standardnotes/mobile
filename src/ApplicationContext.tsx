@@ -1,4 +1,4 @@
-import { MobileApplication } from '@Lib/application'
+import { MobileApplication } from '@Lib/Application'
 import React from 'react'
 
 export const ApplicationContext = React.createContext<

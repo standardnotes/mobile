@@ -20,7 +20,7 @@
     "target": "esnext",
     "typeRoots": [
       "node_modules/@types",
-      "./src/types/*"
+      "./src/Types/*"
     ],
     "paths": {
       "@Components/*": [

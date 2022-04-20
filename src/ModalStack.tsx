@@ -1,16 +1,16 @@
-import { BlockingModal } from '@Components/BlockingModal'
-import { HeaderTitleView } from '@Components/HeaderTitleView'
-import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton'
 import { RouteProp } from '@react-navigation/native'
 import {
   createStackNavigator,
   StackNavigationProp,
 } from '@react-navigation/stack'
-import { Authenticate } from '@Screens/Authenticate/Authenticate'
-import { FileInputModal } from '@Screens/InputModal/FileInputModal'
-import { PasscodeInputModal } from '@Screens/InputModal/PasscodeInputModal'
-import { TagInputModal } from '@Screens/InputModal/TagInputModal'
-import { ManageSessions } from '@Screens/ManageSessions/ManageSessions'
+import { BlockingModal } from '@Root/Components/BlockingModal'
+import { HeaderTitleView } from '@Root/Components/HeaderTitleView'
+import { IoniconsHeaderButton } from '@Root/Components/IoniconsHeaderButton'
+import { Authenticate } from '@Root/Screens/Authenticate/Authenticate'
+import { FileInputModal } from '@Root/Screens/InputModal/FileInputModal'
+import { PasscodeInputModal } from '@Root/Screens/InputModal/PasscodeInputModal'
+import { TagInputModal } from '@Root/Screens/InputModal/TagInputModal'
+import { ManageSessions } from '@Root/Screens/ManageSessions/ManageSessions'
 import {
   MODAL_BLOCKING_ALERT,
   SCREEN_AUTHENTICATE,
@@ -20,13 +20,13 @@ import {
   SCREEN_MANAGE_SESSIONS,
   SCREEN_SETTINGS,
   SCREEN_UPLOADED_FILES_LIST,
-} from '@Screens/screens'
-import { Settings } from '@Screens/Settings/Settings'
-import { UploadedFileItemAction } from '@Screens/UploadedFilesList/UploadedFileItemAction'
-import { UploadedFilesList } from '@Screens/UploadedFilesList/UploadedFilesList'
+} from '@Root/Screens/screens'
+import { Settings } from '@Root/Screens/Settings/Settings'
+import { UploadedFileItemAction } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
+import { UploadedFilesList } from '@Root/Screens/UploadedFilesList/UploadedFilesList'
+import { ICON_CHECKMARK, ICON_CLOSE } from '@Root/Style/icons'
+import { ThemeService } from '@Root/Style/theme_service'
 import { Challenge, DeinitSource, SNFile, SNNote } from '@standardnotes/snjs'
-import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/icons'
-import { ThemeService } from '@Style/theme_service'
 import React, { memo, useContext } from 'react'
 import { Platform } from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'

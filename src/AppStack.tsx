@@ -1,30 +1,30 @@
-import { HeaderTitleView } from '@Components/HeaderTitleView'
-import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton'
 import {
   AppStateEventType,
   AppStateType,
   TabletModeChangeData,
-} from '@Lib/application_state'
-import { useHasEditor, useIsLocked } from '@Lib/snjs_helper_hooks'
-import { ScreenStatus } from '@Lib/status_manager'
+} from '@Lib/ApplicationState'
+import { useHasEditor, useIsLocked } from '@Lib/SnjsHelperHooks'
+import { ScreenStatus } from '@Lib/StatusManager'
 import { CompositeNavigationProp, RouteProp } from '@react-navigation/native'
 import {
   createStackNavigator,
   StackNavigationProp,
 } from '@react-navigation/stack'
-import { Compose } from '@Screens/Compose/Compose'
-import { Root } from '@Screens/Root'
+import { HeaderTitleView } from '@Root/Components/HeaderTitleView'
+import { IoniconsHeaderButton } from '@Root/Components/IoniconsHeaderButton'
+import { Compose } from '@Root/Screens/Compose/Compose'
+import { Root } from '@Root/Screens/Root'
 import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
   SCREEN_VIEW_PROTECTED_NOTE,
-} from '@Screens/screens'
-import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu'
-import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu'
-import { ViewProtectedNote } from '@Screens/ViewProtectedNote/ViewProtectedNote'
-import { ICON_MENU } from '@Style/icons'
-import { ThemeService } from '@Style/theme_service'
-import { getDefaultDrawerWidth } from '@Style/utils'
+} from '@Root/Screens/screens'
+import { MainSideMenu } from '@Root/Screens/SideMenu/MainSideMenu'
+import { NoteSideMenu } from '@Root/Screens/SideMenu/NoteSideMenu'
+import { ViewProtectedNote } from '@Root/Screens/ViewProtectedNote/ViewProtectedNote'
+import { ICON_MENU } from '@Root/Style/icons'
+import { ThemeService } from '@Root/Style/theme_service'
+import { getDefaultDrawerWidth } from '@Root/Style/utils'
 import React, {
   useCallback,
   useContext,

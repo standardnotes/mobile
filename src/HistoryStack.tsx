@@ -1,19 +1,19 @@
-import { HeaderTitleView } from '@Components/HeaderTitleView'
-import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton'
 import { RouteProp } from '@react-navigation/native'
 import {
   createStackNavigator,
   StackNavigationProp,
 } from '@react-navigation/stack'
-import { NoteHistory } from '@Screens/NoteHistory/NoteHistory'
-import { NoteHistoryPreview } from '@Screens/NoteHistory/NoteHistoryPreview'
+import { HeaderTitleView } from '@Root/Components/HeaderTitleView'
+import { IoniconsHeaderButton } from '@Root/Components/IoniconsHeaderButton'
+import { NoteHistory } from '@Root/Screens/NoteHistory/NoteHistory'
+import { NoteHistoryPreview } from '@Root/Screens/NoteHistory/NoteHistoryPreview'
 import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
-} from '@Screens/screens'
+} from '@Root/Screens/screens'
+import { ICON_CHECKMARK } from '@Root/Style/icons'
+import { ThemeService } from '@Root/Style/theme_service'
 import { NoteHistoryEntry } from '@standardnotes/snjs'
-import { ICON_CHECKMARK } from '@Style/icons'
-import { ThemeService } from '@Style/theme_service'
 import React, { useContext } from 'react'
 import { Platform } from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
