@@ -1,10 +1,14 @@
-import { ApplicationService, ButtonType, Platform } from '@standardnotes/snjs'
-import { Base64 } from 'js-base64'
-import { Alert, PermissionsAndroid, Share } from 'react-native'
-import FileViewer from 'react-native-file-viewer'
-import RNFS from 'react-native-fs'
-import Mailer from 'react-native-mail'
-import { MobileApplication } from './application'
+import {
+  ApplicationService,
+  ButtonType,
+  Platform,
+} from '@standardnotes/snjs';
+import { Base64 } from 'js-base64';
+import { Alert, PermissionsAndroid, Share } from 'react-native';
+import FileViewer from 'react-native-file-viewer';
+import RNFS from 'react-native-fs';
+import Mailer from 'react-native-mail';
+import { MobileApplication } from './application';
 
 export class BackupsService extends ApplicationService {
   /*
@@ -16,29 +20,29 @@ export class BackupsService extends ApplicationService {
     the path the file was saved to.
    */
 
-  async export(encrypted: boolean): Promise<boolean | void> {
+  async export(encrypted: boolean) {
     const data = encrypted
-      ? await this.application.createEncryptedBackupFile(true)
-      : await this.application.createDecryptedBackupFile()
-    const prettyPrint = 2
-    const stringifiedData = JSON.stringify(data, null, prettyPrint)
+      ? await this.application.createEncryptedBackupFile()
+      : await this.application.createDecryptedBackupFile();
+    const prettyPrint = 2;
+    const stringifiedData = JSON.stringify(data, null, prettyPrint);
 
-    const modifier = encrypted ? 'Encrypted' : 'Decrypted'
-    const filename = `Standard Notes ${modifier} Backup - ${this.formattedDate()}.txt`
+    const modifier = encrypted ? 'Encrypted' : 'Decrypted';
+    const filename = `Standard Notes ${modifier} Backup - ${this.formattedDate()}.txt`;
     if (data) {
       if (this.application?.platform === Platform.Ios) {
-        return this.exportIOS(filename, stringifiedData)
+        return this.exportIOS(filename, stringifiedData);
       } else {
-        const result = await this.showAndroidEmailOrSaveOption()
+        const result = await this.showAndroidEmailOrSaveOption();
         if (result === 'email') {
           return this.exportViaEmailAndroid(
             Base64.encode(stringifiedData),
             filename
-          )
+          );
         } else if (result === 'save') {
-          await this.exportAndroid(filename, stringifiedData)
+          await this.exportAndroid(filename, stringifiedData);
         } else {
-          return
+          return;
         }
       }
     }
@@ -52,50 +56,50 @@ export class BackupsService extends ApplicationService {
         'Email',
         ButtonType.Info,
         'Save to Disk'
-      )
+      );
       if (confirmed) {
-        return 'email'
+        return 'email';
       } else {
-        return 'save'
+        return 'save';
       }
     } catch (e) {
-      return undefined
+      return undefined;
     }
   }
 
   private async exportIOS(filename: string, data: string) {
     return new Promise<boolean>(resolve => {
-      ;(this.application! as MobileApplication)
+      (this.application! as MobileApplication)
         .getAppState()
         .performActionWithoutStateChangeImpact(async () => {
           Share.share({
             title: filename,
-            message: data
+            message: data,
           })
             .then(result => {
-              resolve(result.action !== Share.dismissedAction)
+              resolve(result.action !== Share.dismissedAction);
             })
             .catch(() => {
-              resolve(false)
-            })
-        })
-    })
+              resolve(false);
+            });
+        });
+    });
   }
 
   private async exportAndroid(filename: string, data: string) {
     try {
-      let filepath = `${RNFS.ExternalDirectoryPath}/${filename}`
-      const granted = await this.requestStoragePermissionsAndroid()
+      let filepath = `${RNFS.ExternalDirectoryPath}/${filename}`;
+      const granted = await this.requestStoragePermissionsAndroid();
       if (granted) {
-        filepath = `${RNFS.DownloadDirectoryPath}/${filename}`
+        filepath = `${RNFS.DownloadDirectoryPath}/${filename}`;
       }
-      await RNFS.writeFile(filepath, data)
-      this.showFileSavePromptAndroid(filepath)
+      await RNFS.writeFile(filepath, data);
+      this.showFileSavePromptAndroid(filepath);
     } catch (err) {
-      console.error('Error exporting backup', err)
+      console.error('Error exporting backup', err);
       this.application.alertService.alert(
         'There was an issue exporting your backup.'
-      )
+      );
     }
   }
 
@@ -103,12 +107,12 @@ export class BackupsService extends ApplicationService {
     return FileViewer.open(filepath)
       .then(() => {
         // success
-        return true
+        return true;
       })
       .catch(error => {
-        console.error('Error opening file', error)
-        return false
-      })
+        console.error('Error opening file', error);
+        return false;
+      });
   }
 
   private async showFileSavePromptAndroid(filepath: string) {
@@ -118,54 +122,54 @@ export class BackupsService extends ApplicationService {
       'Open File',
       ButtonType.Info,
       'Done'
-    )
+    );
     if (confirmed) {
-      this.openFileAndroid(filepath)
+      this.openFileAndroid(filepath);
     }
-    return true
+    return true;
   }
 
   private async exportViaEmailAndroid(data: string, filename: string) {
     return new Promise<boolean>(resolve => {
-      const fileType = '.json' // Android creates a tmp file and expects dot with extension
+      const fileType = '.json'; // Android creates a tmp file and expects dot with extension
 
-      let resolved = false
+      let resolved = false;
       Mailer.mail(
         {
           subject: 'Standard Notes Backup',
           recipients: [''],
           body: '',
           isHTML: true,
-          attachment: { data, type: fileType, name: filename }
+          attachment: { data, type: fileType, name: filename },
         },
         (error: any) => {
           if (error) {
-            Alert.alert('Error', 'Unable to send email.')
+            Alert.alert('Error', 'Unable to send email.');
           }
-          resolved = true
-          resolve(false)
+          resolved = true;
+          resolve(false);
         }
-      )
+      );
 
       // On Android the Mailer callback event isn't always triggered.
       setTimeout(function () {
         if (!resolved) {
-          resolve(true)
+          resolve(true);
         }
-      }, 2500)
-    })
+      }, 2500);
+    });
   }
 
   private async requestStoragePermissionsAndroid() {
     const writeStorageGranted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-    )
-    return writeStorageGranted === PermissionsAndroid.RESULTS.GRANTED
+    );
+    return writeStorageGranted === PermissionsAndroid.RESULTS.GRANTED;
   }
 
   /* Utils */
 
   private formattedDate() {
-    return new Date().getTime()
+    return new Date().getTime();
   }
 }
