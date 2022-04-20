@@ -11,7 +11,7 @@ import {
   SubText,
   TextContainer,
   Touchable,
-  UserIcon
+  UserIcon,
 } from './OfflineBanner.styled'
 
 const NOT_BACKED_UP_TEXT = 'Data not backed up'

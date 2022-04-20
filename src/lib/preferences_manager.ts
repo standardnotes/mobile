@@ -1,7 +1,7 @@
 import {
   ApplicationService,
   isNullOrUndefined,
-  removeFromArray
+  removeFromArray,
 } from '@standardnotes/snjs'
 import { MobileApplication } from './application'
 
@@ -14,7 +14,7 @@ export enum PrefKey {
   LastExportDate = 'lastExportDate',
   DoNotShowAgainUnsupportedEditors = 'doNotShowAgainUnsupportedEditors',
   SelectedTagUuid = 'selectedTagUuid',
-  NotesHideEditorIcon = 'hideEditorIcon'
+  NotesHideEditorIcon = 'hideEditorIcon',
 }
 
 type Preferences = Record<PrefKey, any>
@@ -28,8 +28,8 @@ export class PreferencesManager extends ApplicationService {
 
   /** @override */
   override async onAppLaunch() {
-    super.onAppLaunch()
-    this.loadPreferences()
+    void super.onAppLaunch()
+    void this.loadPreferences()
   }
 
   override deinit() {
@@ -49,7 +49,7 @@ export class PreferencesManager extends ApplicationService {
 
   notifyObserversOfPreferencesLoaded() {
     for (const observer of this.observers) {
-      observer()
+      void observer()
     }
   }
 

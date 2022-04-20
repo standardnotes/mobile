@@ -54,7 +54,7 @@ const OptionsContainer = styled.View`
 `
 
 const ButtonTouchable = styled.TouchableHighlight.attrs(props => ({
-  underlayColor: props.theme.stylekitBorderColor
+  underlayColor: props.theme.stylekitBorderColor,
 }))`
   border-left-color: ${props => props.theme.stylekitBorderColor};
   border-left-width: 1px;
@@ -64,10 +64,11 @@ const ButtonTouchable = styled.TouchableHighlight.attrs(props => ({
 `
 
 const ButtonTitle = styled.Text<{ selected: boolean }>`
-  color: ${props =>
-    props.selected
+  color: ${props => {
+    return props.selected
       ? props.theme.stylekitInfoColor
-      : props.theme.stylekitNeutralColor};
+      : props.theme.stylekitNeutralColor
+  }};
   font-size: 16px;
   text-align: center;
   width: 100%;

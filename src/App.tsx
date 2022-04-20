@@ -57,7 +57,7 @@ const AppComponent: React.FC<{
         navigationReady.current = true
       }
       if (navigationReady.current && appReady.current) {
-        application.launch()
+        void application.launch()
       }
     },
     [application]
@@ -71,13 +71,13 @@ const AppComponent: React.FC<{
       await application?.prepareForLaunch({
         receiveChallenge: async challenge => {
           application!.promptForChallenge(challenge)
-        }
+        },
       })
       await themeServiceInstance.init()
       launchApp(true, false)
     }
 
-    loadApplication()
+    void loadApplication()
 
     return () => {
       themeServiceInstance?.deinit()
@@ -100,8 +100,8 @@ const AppComponent: React.FC<{
         colors: {
           ...DefaultTheme.colors,
           background: activeTheme.stylekitBackgroundColor,
-          border: activeTheme.stylekitBorderColor
-        }
+          border: activeTheme.stylekitBorderColor,
+        },
       }}
       ref={navigationRef}
     >
@@ -127,7 +127,7 @@ const AppComponent: React.FC<{
  * so it is created outside of a component
  */
 const AppGroupInstance = new ApplicationGroup()
-AppGroupInstance.initialize()
+void AppGroupInstance.initialize()
 
 export const App = (props: { env: TEnvironment }) => {
   const applicationGroupRef = useRef(AppGroupInstance)

@@ -60,7 +60,7 @@ export function getColorLuminosity(hexCode: string) {
 }
 
 export function shadeBlend(p: number, c0: string, c1?: string) {
-  let n = p < 0 ? p * -1 : p,
+  const n = p < 0 ? p * -1 : p,
     u = Math.round,
     w = parseInt
   if (c0.length > 7) {
@@ -139,7 +139,7 @@ export const getTintColorForEditor = (
     stylekitCorn,
     stylekitPurpleHeart,
     stylekitMountainMeadow,
-    stylekitJaffa
+    stylekitJaffa,
   } = theme
 
   const tintColorsMap = new Map([
@@ -148,7 +148,7 @@ export const getTintColorForEditor = (
     [3, stylekitCorn],
     [4, stylekitPurpleHeart],
     [5, stylekitMountainMeadow],
-    [6, stylekitJaffa]
+    [6, stylekitJaffa],
   ])
   return tintColorsMap.get(tint)
 }

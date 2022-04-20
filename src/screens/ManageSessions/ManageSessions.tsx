@@ -4,7 +4,7 @@ import {
   ButtonType,
   RemoteSession,
   SessionStrings,
-  UuidString
+  UuidString,
 } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/custom_action_sheet'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
@@ -57,7 +57,7 @@ const useSessions = (): [
   }, [getSessions])
 
   useEffect(() => {
-    refreshSessions()
+    void refreshSessions()
   }, [application, refreshSessions])
 
   async function revokeSession(uuid: UuidString) {
@@ -79,7 +79,7 @@ const useSessions = (): [
     refreshSessions,
     refreshing,
     revokeSession,
-    errorMessage
+    errorMessage,
   ]
 }
 
@@ -96,7 +96,7 @@ export const ManageSessions: React.FC = () => {
     refreshSessions,
     refreshing,
     revokeSession,
-    errorMessage
+    errorMessage,
   ] = useSessions()
 
   const onItemPress = (item: RemoteSession) => {
@@ -106,9 +106,9 @@ export const ManageSessions: React.FC = () => {
         {
           text: 'Revoke',
           destructive: true,
-          callback: () => showRevokeSessionAlert(item)
-        }
-      ]
+          callback: () => showRevokeSessionAlert(item),
+        },
+      ],
     })
   }
 
@@ -126,7 +126,9 @@ export const ManageSessions: React.FC = () => {
           await revokeSession(item.uuid)
           getSessions()
         } catch (e) {
-          application?.alertService.alert('Action failed. Please try again.')
+          void application?.alertService.alert(
+            'Action failed. Please try again.'
+          )
         }
       }
     },
@@ -134,7 +136,7 @@ export const ManageSessions: React.FC = () => {
   )
 
   const RenderItem: ListRenderItem<RemoteSession> | null | undefined = ({
-    item
+    item,
   }) => {
     return (
       <SessionCell

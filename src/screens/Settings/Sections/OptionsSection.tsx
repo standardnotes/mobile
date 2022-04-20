@@ -41,23 +41,23 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
 
   const lastExportData = useMemo(() => {
     if (lastExportDate) {
-      let formattedDate = moment(lastExportDate).format('lll')
+      const formattedDate = moment(lastExportDate).format('lll')
       const lastExportString = `Last exported on ${formattedDate}`
 
       // Date is stale if more than 7 days ago
-      let staleThreshold = 7 * 86400
-      // @ts-ignore date type issue
+      const staleThreshold = 7 * 86400
       const stale =
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore date type issue
         (new Date() - new Date(lastExportDate)) / 1000 > staleThreshold
       return {
         lastExportString,
-        stale
+        stale,
       }
     }
     return {
       lastExportString: 'Your data has not yet been backed up.',
-      stale: false
+      stale: false,
     }
   }, [lastExportDate])
 
@@ -74,9 +74,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       {
         title: 'Encrypted',
         key: 'encrypted',
-        selected: encryptionAvailable
+        selected: encryptionAvailable,
       },
-      { title: 'Decrypted', key: 'decrypted', selected: true }
+      { title: 'Decrypted', key: 'decrypted', selected: true },
     ]
   }, [encryptionAvailable])
 
@@ -100,7 +100,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       if (result) {
         const exportDate = new Date()
         setLastExportDate(exportDate)
-        application
+        void application
           ?.getLocalPreferences()
           .setUserPrefValue(PrefKey.LastExportDate, exportDate)
       }
@@ -113,7 +113,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     return RNFS.readFile(fileUri)
       .then(result => JSON.parse(result))
       .catch(() => {
-        application!.alertService!.alert(
+        void application!.alertService!.alert(
           'Unable to open file. Ensure it is a proper JSON file and try again.'
         )
       })
@@ -124,14 +124,14 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     if (!result) {
       return
     } else if ('error' in result) {
-      application!.alertService!.alert(result.error.text)
+      void application!.alertService!.alert(result.error.text)
     } else if (result.errorCount) {
-      application!.alertService!.alert(
+      void application!.alertService!.alert(
         `Import complete. ${result.errorCount} items were not imported because ` +
           'there was an error decrypting them. Make sure the password is correct and try again.'
       )
     } else {
-      application!.alertService!.alert(
+      void application!.alertService!.alert(
         'Your data has been successfully imported.'
       )
     }
@@ -140,7 +140,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   const onImportPress = async () => {
     try {
       const selectedFiles = await DocumentPicker.pick({
-        type: [DocumentPicker.types.plainText]
+        type: [DocumentPicker.types.plainText],
       })
       const selectedFile = selectedFiles[0]
       const selectedFileURI =
@@ -160,7 +160,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         ) {
           await performImport(data)
         } else {
-          application!.alertService.alert(
+          void application!.alertService.alert(
             'This backup file was created using an unsupported version of the application ' +
               'and cannot be imported here. Please update your application and try again.'
           )
@@ -175,16 +175,16 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
 
   const onExportPress = useCallback(
     async (option: { key: string }) => {
-      let encrypted = option.key === 'encrypted'
+      const encrypted = option.key === 'encrypted'
       if (encrypted && !encryptionAvailable) {
-        application?.alertService!.alert(
+        void application?.alertService!.alert(
           'You must be signed in, or have a local passcode set, to generate an encrypted export file.',
           'Not Available',
           'OK'
         )
         return
       }
-      exportData(encrypted)
+      void exportData(encrypted)
     },
     [application?.alertService, encryptionAvailable, exportData]
   )
@@ -194,7 +194,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   }, [navigation])
 
   const showDataBackupAlert = useCallback(() => {
-    application?.alertService.alert(
+    void application?.alertService.alert(
       'Because you are using the app offline without a sync account, it is your responsibility to keep your data safe and backed up. It is recommended you export a backup of your data at least once a week, or, to sign up for a sync account so that your data is backed up automatically.',
       'No Backups Created',
       'OK'
@@ -244,7 +244,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         <SectionedAccessoryTableCell
           testID="lastExportDate"
           onPress={() => {
-            ;(!lastExportDate || lastExportData.stale) && showDataBackupAlert()
+            (!lastExportDate || lastExportData.stale) && showDataBackupAlert()
           }}
           tinted={!lastExportDate || lastExportData.stale}
           text={lastExportData.lastExportString}

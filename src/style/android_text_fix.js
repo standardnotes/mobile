@@ -9,15 +9,15 @@ export function enableAndroidFontFix() {
 
   const styles = StyleSheet.create({
     text: {
-      fontFamily: 'Roboto'
-    }
+      fontFamily: 'Roboto',
+    },
   })
 
   let __render = Text.render
   Text.render = function (...args) {
     let origin = __render.call(this, ...args)
     return React.cloneElement(origin, {
-      style: [styles.text, origin.props.style]
+      style: [styles.text, origin.props.style],
     })
   }
 }

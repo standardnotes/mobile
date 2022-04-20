@@ -14,11 +14,11 @@ import {
   SubTextContainer,
   Text,
   TextContainer,
-  Touchable
+  Touchable,
 } from './SideMenuCell.styled'
 import {
   SideMenuOption,
-  SideMenuOptionIconDescriptionType
+  SideMenuOptionIconDescriptionType,
 } from './SideMenuSection'
 
 const renderIcon = (desc: SideMenuOption['iconDesc'], color: string) => {
@@ -62,7 +62,7 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
     return {
       info: theme.stylekitInfoColor,
       danger: theme.stylekitDangerColor,
-      warning: theme.stylekitWarningColor
+      warning: theme.stylekitWarningColor,
     }[textClass]
   }
 

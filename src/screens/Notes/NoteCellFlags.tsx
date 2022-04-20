@@ -13,8 +13,9 @@ const FlagsContainer = styled.View`
   margin-bottom: 8px;
 `
 const FlagContainer = styled.View<{ color: string; selected: boolean }>`
-  background-color: ${({ theme, selected, color }) =>
-    selected ? theme.stylekitInfoContrastColor : color};
+  background-color: ${({ theme, selected, color }) => {
+    return selected ? theme.stylekitInfoContrastColor : color
+  }};
   padding: 4px;
   padding-left: 6px;
   padding-right: 6px;
@@ -22,27 +23,28 @@ const FlagContainer = styled.View<{ color: string; selected: boolean }>`
   margin-right: 4px;
 `
 const FlagLabel = styled.Text<{ selected: boolean }>`
-  color: ${({ theme, selected }) =>
-    selected ? theme.stylekitInfoColor : theme.stylekitInfoContrastColor};
+  color: ${({ theme, selected }) => {
+    return selected ? theme.stylekitInfoColor : theme.stylekitInfoContrastColor
+  }};
   font-size: 10px;
   font-weight: bold;
 `
 
 export const NoteCellFlags = ({
   note,
-  highlight
+  highlight,
 }: {
   note: SNNote
   highlight: boolean
 }) => {
   const theme = useContext(ThemeContext)
 
-  let flags: NoteFlag[] = []
+  const flags: NoteFlag[] = []
 
   if (note.conflictOf) {
     flags.push({
       text: 'Conflicted Copy',
-      color: theme.stylekitDangerColor
+      color: theme.stylekitDangerColor,
     })
   }
 

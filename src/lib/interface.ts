@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import {
   AbstractDevice,
   ApplicationIdentifier,
-  TransferPayload
+  TransferPayload,
 } from '@standardnotes/snjs'
 import { Alert, Linking, Platform } from 'react-native'
 import FingerprintScanner from 'react-native-fingerprint-scanner'
@@ -239,7 +239,7 @@ export class MobileDeviceInterface extends AbstractDevice {
     }
     return Keychain.setKeys({
       ...keychain,
-      [identifier]: value
+      [identifier]: value,
     })
   }
 

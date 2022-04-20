@@ -62,7 +62,7 @@ const ICONS: Partial<TIcons> = {
   'file-xls': FileXlsIcon,
   'file-zip': FileZipIcon,
   'clear-circle-filled': ClearCircleFilledIcon,
-  'lock-filled': LockIconFilled
+  'lock-filled': LockIconFilled,
 }
 
 type Props = {
@@ -87,13 +87,13 @@ export const SnIcon = ({ type, fill, width, height, style = {} }: Props) => {
   if (width !== undefined) {
     customSizes = {
       ...customSizes,
-      width
+      width,
     }
   }
   if (height !== undefined) {
     customSizes = {
       ...customSizes,
-      height
+      height,
     }
   }
 

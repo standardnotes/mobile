@@ -46,5 +46,5 @@ export {
   ForwardIcon,
   TextContainer,
   BoldText,
-  SubText
+  SubText,
 }

@@ -10,7 +10,7 @@ import {
   SideMenuCellShowAllFiles,
   SideMenuCellStyled,
   SNIconStyled,
-  styles
+  styles,
 } from '@Screens/SideMenu/Files.styled'
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection'
 import { SNNote } from '@standardnotes/snjs'
@@ -62,7 +62,7 @@ export const Files: FC<Props> = ({ note }) => {
                     )}
                     <SNIconStyled type={iconType} width={16} height={16} />
                   </IconsContainer>
-                )
+                ),
               }}
               cellContentStyle={styles.cellContentStyle}
             />

@@ -3,21 +3,21 @@ import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton'
 import {
   AppStateEventType,
   AppStateType,
-  TabletModeChangeData
+  TabletModeChangeData,
 } from '@Lib/application_state'
 import { useHasEditor, useIsLocked } from '@Lib/snjs_helper_hooks'
 import { ScreenStatus } from '@Lib/status_manager'
 import { CompositeNavigationProp, RouteProp } from '@react-navigation/native'
 import {
   createStackNavigator,
-  StackNavigationProp
+  StackNavigationProp,
 } from '@react-navigation/stack'
 import { Compose } from '@Screens/Compose/Compose'
 import { Root } from '@Screens/Root'
 import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
-  SCREEN_VIEW_PROTECTED_NOTE
+  SCREEN_VIEW_PROTECTED_NOTE,
 } from '@Screens/screens'
 import { MainSideMenu } from '@Screens/SideMenu/MainSideMenu'
 import { NoteSideMenu } from '@Screens/SideMenu/NoteSideMenu'
@@ -30,11 +30,11 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState
+  useState,
 } from 'react'
 import { Dimensions, Keyboard, ScaledSize } from 'react-native'
 import DrawerLayout, {
-  DrawerState
+  DrawerState,
 } from 'react-native-gesture-handler/DrawerLayout'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 import { ThemeContext } from 'styled-components'
@@ -187,12 +187,12 @@ export const AppStackComponent = (
         <AppStack.Navigator
           screenOptions={() => ({
             headerStyle: {
-              backgroundColor: theme.stylekitContrastBackgroundColor
+              backgroundColor: theme.stylekitContrastBackgroundColor,
             },
             headerTintColor: theme.stylekitInfoColor,
             headerTitle: ({ children }) => {
               return <HeaderTitleView title={children || ''} />
-            }
+            },
           })}
           initialRouteName={SCREEN_NOTES}
         >
@@ -247,7 +247,7 @@ export const AppStackComponent = (
                       }}
                     />
                   </HeaderButtons>
-                )
+                ),
             })}
             component={Root}
           />
@@ -277,14 +277,14 @@ export const AppStackComponent = (
                       }}
                     />
                   </HeaderButtons>
-                )
+                ),
             })}
             component={Compose}
           />
           <AppStack.Screen
             name={SCREEN_VIEW_PROTECTED_NOTE}
             options={() => ({
-              title: 'View Protected Note'
+              title: 'View Protected Note',
             })}
             component={ViewProtectedNote}
           />

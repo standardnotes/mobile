@@ -1,6 +1,6 @@
 import {
   Props as TableCellProps,
-  SectionedTableCellTouchableHighlight
+  SectionedTableCellTouchableHighlight,
 } from '@Components/SectionedTableCell'
 import React from 'react'
 import styled, { css } from 'styled-components/native'
@@ -16,7 +16,7 @@ type Props = {
 }
 
 const Container = styled(SectionedTableCellTouchableHighlight).attrs(props => ({
-  underlayColor: props.theme.stylekitBorderColor
+  underlayColor: props.theme.stylekitBorderColor,
 }))<TableCellProps>`
   padding-top: ${12}px;
   justify-content: center;

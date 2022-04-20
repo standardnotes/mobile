@@ -14,7 +14,7 @@ import {
   ChallengeReason,
   ChallengeValidation,
   ChallengeValue,
-  ProtectionSessionDurations
+  ProtectionSessionDurations,
 } from '@standardnotes/snjs'
 import { ICON_CLOSE } from '@Style/icons'
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service'
@@ -25,7 +25,7 @@ import React, {
   useMemo,
   useReducer,
   useRef,
-  useState
+  useState,
 } from 'react'
 import {
   Alert,
@@ -33,7 +33,7 @@ import {
   Keyboard,
   Platform,
   ScrollView,
-  TextInput
+  TextInput,
 } from 'react-native'
 import FingerprintScanner from 'react-native-fingerprint-scanner'
 import { hide } from 'react-native-privacy-snapshot'
@@ -49,7 +49,7 @@ import {
   StyledSectionedTableCell,
   StyledTableSection,
   Subtitle,
-  Title
+  Title,
 } from './Authenticate.styled'
 import {
   authenticationReducer,
@@ -57,7 +57,7 @@ import {
   findIndexInObject,
   getChallengePromptTitle,
   getLabelForStateAndType,
-  isInActiveState
+  isInActiveState,
 } from './helpers'
 
 type Props = ModalStackNavigationProp<typeof SCREEN_AUTHENTICATE>
@@ -73,9 +73,9 @@ function isValidChallengeValue(challengeValue: ChallengeValue): boolean {
 
 export const Authenticate = ({
   route: {
-    params: { challenge }
+    params: { challenge },
   },
-  navigation
+  navigation,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext)
@@ -100,7 +100,7 @@ export const Authenticate = ({
       challengeValues: challenge.prompts.reduce((map, current) => {
         map[current.id] = {
           prompt: current,
-          value: current.initialValue ?? null
+          value: current.initialValue ?? null,
         } as ChallengeValue
         return map
       }, {} as Record<string, ChallengeValue>),
@@ -111,7 +111,7 @@ export const Authenticate = ({
           map[current.id] = AuthenticationValueStateType.WaitingTurn
         }
         return map
-      }, {} as Record<string, AuthenticationValueStateType>)
+      }, {} as Record<string, AuthenticationValueStateType>),
     },
     undefined
   )
@@ -145,7 +145,7 @@ export const Authenticate = ({
               }}
             />
           </HeaderButtons>
-        )
+        ),
       })
     }
   }, [navigation, challenge, application, pending])
@@ -169,7 +169,7 @@ export const Authenticate = ({
           return
         }
         return application?.submitValuesForChallenge(challenge, [
-          challengeValue
+          challengeValue,
         ])
       }
     },
@@ -178,7 +178,7 @@ export const Authenticate = ({
       singleValidation,
       challengeValues,
       application,
-      challenge
+      challenge,
     ]
   )
 
@@ -186,14 +186,14 @@ export const Authenticate = ({
     dispatch({
       type: 'setState',
       id: challengeValue.prompt.id.toString(),
-      state: AuthenticationValueStateType.Locked
+      state: AuthenticationValueStateType.Locked,
     })
 
     setTimeout(() => {
       dispatch({
         type: 'setState',
         id: challengeValue.prompt.id.toString(),
-        state: AuthenticationValueStateType.WaitingTurn
+        state: AuthenticationValueStateType.WaitingTurn,
       })
     }, 30 * 1000)
   }, [])
@@ -223,7 +223,7 @@ export const Authenticate = ({
         dispatch({
           type: 'setState',
           id: challengeValue.prompt.id.toString(),
-          state: AuthenticationValueStateType.Fail
+          state: AuthenticationValueStateType.Fail,
         })
         Alert.alert(
           'Unsuccessful',
@@ -235,7 +235,7 @@ export const Authenticate = ({
       dispatch({
         type: 'setState',
         id: challengeValue.prompt.id.toString(),
-        state: AuthenticationValueStateType.Pending
+        state: AuthenticationValueStateType.Pending,
       })
 
       if (application?.getAppState().screenshotPrivacyEnabled) {
@@ -248,9 +248,10 @@ export const Authenticate = ({
           .performActionWithoutStateChangeImpact(async () => {
             isAuthenticating.current = true
             FingerprintScanner.authenticate({
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore ts type does not exist for deviceCredentialAllowed
               deviceCredentialAllowed: true,
-              description: 'Biometrics are required to access your notes.'
+              description: 'Biometrics are required to access your notes.',
             })
               .then(() => {
                 FingerprintScanner.release()
@@ -271,7 +272,7 @@ export const Authenticate = ({
                   dispatch({
                     type: 'setState',
                     id: challengeValue.prompt.id.toString(),
-                    state: AuthenticationValueStateType.Fail
+                    state: AuthenticationValueStateType.Fail,
                   })
                   Alert.alert(
                     'Unsuccessful',
@@ -291,7 +292,7 @@ export const Authenticate = ({
             isAuthenticating.current = true
             FingerprintScanner.authenticate({
               fallbackEnabled: true,
-              description: 'This is required to access your notes.'
+              description: 'This is required to access your notes.',
             })
               .then(() => {
                 FingerprintScanner.release()
@@ -316,7 +317,7 @@ export const Authenticate = ({
                 dispatch({
                   type: 'setState',
                   id: challengeValue.prompt.id.toString(),
-                  state: AuthenticationValueStateType.Fail
+                  state: AuthenticationValueStateType.Fail,
                 })
               })
               .finally(() => {
@@ -330,7 +331,7 @@ export const Authenticate = ({
       checkForBiometrics,
       onValueLocked,
       supportsBiometrics,
-      validateChallengeValue
+      validateChallengeValue,
     ]
   )
 
@@ -354,7 +355,11 @@ export const Authenticate = ({
           completedChallengeValue.prompt.id.toString()
         )
 
-        if (!Object.keys(challengeValues).hasOwnProperty(index + 1)) {
+        const hasNextItem = Object.prototype.hasOwnProperty.call(
+          Object.keys(challengeValues),
+          index + 1
+        )
+        if (!hasNextItem) {
           return
         }
         const nextItemId = Object.keys(challengeValues)[index + 1]
@@ -377,7 +382,7 @@ export const Authenticate = ({
         !isLosingFocusOrInBackground
       ) {
         /** Begin authentication right away, we're not waiting for any input */
-        authenticateBiometrics(challengeValue)
+        void authenticateBiometrics(challengeValue)
       } else {
         const index = findIndexInObject(
           challengeValues,
@@ -402,7 +407,7 @@ export const Authenticate = ({
       dispatch({
         type: 'setState',
         id: challengeValue.prompt.id.toString(),
-        state: AuthenticationValueStateType.WaitingInput
+        state: AuthenticationValueStateType.WaitingInput,
       })
     },
     [application, authenticateBiometrics, challengeValues, firstNotSuccessful]
@@ -419,7 +424,7 @@ export const Authenticate = ({
         dispatch({
           type: 'setState',
           id: firstNotSuccessful!,
-          state: AuthenticationValueStateType.WaitingInput
+          state: AuthenticationValueStateType.WaitingInput,
         })
       }
     })
@@ -428,7 +433,7 @@ export const Authenticate = ({
     application,
     beginAuthenticatingForNextChallengeReason,
     challengeValueStates,
-    firstNotSuccessful
+    firstNotSuccessful,
   ])
 
   const onValidValue = useCallback(
@@ -437,7 +442,7 @@ export const Authenticate = ({
       dispatch({
         type: 'setState',
         id: value.prompt.id.toString(),
-        state: AuthenticationValueStateType.Success
+        state: AuthenticationValueStateType.Success,
       })
       beginAuthenticatingForNextChallengeReason(value)
     },
@@ -449,11 +454,12 @@ export const Authenticate = ({
     dispatch({
       type: 'setState',
       id: value.prompt.id.toString(),
-      state: AuthenticationValueStateType.Fail
+      state: AuthenticationValueStateType.Fail,
     })
   }
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     let removeObserver: () => void = () => {}
     if (application?.addChallengeObserver) {
       removeObserver = application?.addChallengeObserver(challenge, {
@@ -464,7 +470,7 @@ export const Authenticate = ({
         },
         onCancel: () => {
           navigation.goBack()
-        }
+        },
       })
     }
     return removeObserver
@@ -480,14 +486,14 @@ export const Authenticate = ({
         }
       }
     }
-    setBiometricsAsync()
+    void setBiometricsAsync()
     const setInitialPasscodeKeyboardType = async () => {
       const initialPasscodeKeyboardType = await checkPasscodeKeyboardType()
       if (mounted) {
         setPasscodeKeyboardType(initialPasscodeKeyboardType)
       }
     }
-    setInitialPasscodeKeyboardType()
+    void setInitialPasscodeKeyboardType()
     return () => {
       mounted = false
     }
@@ -516,7 +522,8 @@ export const Authenticate = ({
     const biometricChallengeValue = Object.values(challengeValues).find(
       value => value.prompt.validation === ChallengeValidation.Biometric
     )
-    const state = challengeValueStates[biometricChallengeValue?.prompt.id!]
+    const state =
+      challengeValueStates[biometricChallengeValue?.prompt.id as number]
     if (
       state === AuthenticationValueStateType.Locked ||
       state === AuthenticationValueStateType.Success
@@ -527,10 +534,7 @@ export const Authenticate = ({
     beginAuthenticatingForNextChallengeReason()
   }
 
-  const onValueChange = (
-    newValue: ChallengeValue,
-    dismissKeyboard: boolean = false
-  ) => {
+  const onValueChange = (newValue: ChallengeValue, dismissKeyboard = false) => {
     if (dismissKeyboard) {
       Keyboard.dismiss()
     }
@@ -538,7 +542,7 @@ export const Authenticate = ({
     dispatch({
       type: 'setValue',
       id: newValue.prompt.id.toString(),
-      value: newValue.value
+      value: newValue.value,
     })
   }
 
@@ -562,7 +566,7 @@ export const Authenticate = ({
       return
     }
     if (singleValidation) {
-      validateChallengeValue(challengeValue)
+      void validateChallengeValue(challengeValue)
     } else {
       const state = challengeValueStates[firstNotSuccessful!]
       if (
@@ -573,7 +577,7 @@ export const Authenticate = ({
         beginAuthenticatingForNextChallengeReason()
         return
       }
-      validateChallengeValue(challengeValue)
+      void validateChallengeValue(challengeValue)
     }
   }
 
@@ -638,7 +642,7 @@ export const Authenticate = ({
               ChallengeValidation.LocalPasscode
                 ? {
                     color: theme.stylekitNeutralColor,
-                    fontSize: theme.mainTextFontSize - 5
+                    fontSize: theme.mainTextFontSize - 5,
                   }
                 : undefined
             }
@@ -671,7 +675,7 @@ export const Authenticate = ({
                   onSubmitEditing={
                     !singleValidation
                       ? () => {
-                          validateChallengeValue(challengeValue)
+                          void validateChallengeValue(challengeValue)
                         }
                       : undefined
                   }
@@ -707,7 +711,7 @@ export const Authenticate = ({
                     onValueChange(
                       {
                         ...challengeValue,
-                        value: duration.valueInSeconds
+                        value: duration.valueInSeconds,
                       },
                       true
                     )

@@ -4,7 +4,7 @@ import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton'
 import { RouteProp } from '@react-navigation/native'
 import {
   createStackNavigator,
-  StackNavigationProp
+  StackNavigationProp,
 } from '@react-navigation/stack'
 import { Authenticate } from '@Screens/Authenticate/Authenticate'
 import { FileInputModal } from '@Screens/InputModal/FileInputModal'
@@ -19,7 +19,7 @@ import {
   SCREEN_INPUT_MODAL_TAG,
   SCREEN_MANAGE_SESSIONS,
   SCREEN_SETTINGS,
-  SCREEN_UPLOADED_FILES_LIST
+  SCREEN_UPLOADED_FILES_LIST,
 } from '@Screens/screens'
 import { Settings } from '@Screens/Settings/Settings'
 import { UploadedFileItemAction } from '@Screens/UploadedFilesList/UploadedFileItemAction'
@@ -88,21 +88,21 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
         gestureEnabled: false,
         presentation: 'modal',
         headerStyle: {
-          backgroundColor: theme.stylekitContrastBackgroundColor
-        }
+          backgroundColor: theme.stylekitContrastBackgroundColor,
+        },
       }}
       initialRouteName="AppStack"
     >
       <MainStack.Screen
         name={'AppStack'}
         options={{
-          headerShown: false
+          headerShown: false,
         }}
         component={MemoizedAppStackComponent}
       />
       <MainStack.Screen
         options={{
-          headerShown: false
+          headerShown: false,
         }}
         name="HistoryStack"
         component={HistoryStack}
@@ -144,7 +144,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                   }}
                 />
               </HeaderButtons>
-            )
+            ),
         })}
         component={Settings}
       />
@@ -169,7 +169,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          )
+          ),
         })}
         component={ManageSessions}
       />
@@ -194,7 +194,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          )
+          ),
         }}
         component={PasscodeInputModal}
       />
@@ -224,7 +224,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          )
+          ),
         })}
         component={TagInputModal}
       />
@@ -254,7 +254,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          )
+          ),
         })}
         component={FileInputModal}
       />
@@ -266,7 +266,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
           headerLeft: () => undefined,
           headerTitle: ({ children }) => (
             <HeaderTitleView title={route.params?.title ?? (children || '')} />
-          )
+          ),
         })}
         component={Authenticate}
       />
@@ -288,7 +288,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 onPress={onPress}
               />
             </HeaderButtons>
-          )
+          ),
         })}
         component={UploadedFilesList}
       />
@@ -302,17 +302,17 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
             cardStyle: {
               opacity: progress.interpolate({
                 inputRange: [0, 0.5, 0.9, 1],
-                outputRange: [0, 0.25, 0.7, 1]
-              })
+                outputRange: [0, 0.25, 0.7, 1],
+              }),
             },
             overlayStyle: {
               opacity: progress.interpolate({
                 inputRange: [0, 1],
                 outputRange: [0, 0.5],
-                extrapolate: 'clamp'
-              })
-            }
-          })
+                extrapolate: 'clamp',
+              }),
+            },
+          }),
         })}
         component={BlockingModal}
       />

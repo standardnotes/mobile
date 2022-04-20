@@ -26,10 +26,11 @@ const Container = styled.View<Pick<Props, 'backgroundColor'>>`
 const TitleContainer = styled.View``
 const Title = styled.Text<Pick<Props, 'tinted'>>`
   background-color: ${props => props.theme.stylekitBackgroundColor};
-  font-size: ${props =>
-    Platform.OS === 'android'
+  font-size: ${props => {
+    return Platform.OS === 'android'
       ? props.theme.mainTextFontSize - 2
-      : props.theme.mainTextFontSize - 4}px;
+      : props.theme.mainTextFontSize - 4
+  }}px;
   padding-left: ${props => props.theme.paddingLeft}px;
   color: ${props => {
     if (props.tinted) {
@@ -65,7 +66,7 @@ export const SectionHeader: React.FC<Props> = props => (
         <Title>
           {Platform.select({
             ios: props.title.toUpperCase(),
-            android: props.title
+            android: props.title,
           })}
         </Title>
       )}

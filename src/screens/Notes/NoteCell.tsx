@@ -2,7 +2,7 @@ import { SnIcon } from '@Components/SnIcon'
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
-  useProtectOrUnprotectNote
+  useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { NoteCellIconFlags } from '@Screens/Notes/NoteCellIconFlags'
@@ -11,11 +11,11 @@ import {
   CollectionSortProperty,
   IconType,
   isNullOrUndefined,
-  SNNote
+  SNNote,
 } from '@standardnotes/snjs'
 import {
   CustomActionSheetOption,
-  useCustomActionSheet
+  useCustomActionSheet,
 } from '@Style/custom_action_sheet'
 import { getTintColorForEditor } from '@Style/utils'
 import React, { useContext, useRef, useState } from 'react'
@@ -30,7 +30,7 @@ import {
   NoteText,
   styles,
   TitleText,
-  TouchableContainer
+  TouchableContainer,
 } from './NoteCell.styled'
 import { NoteCellFlags } from './NoteCellFlags'
 
@@ -51,7 +51,7 @@ export const NoteCell = ({
   sortType,
   hideDates,
   hidePreviews,
-  hideEditorIcon
+  hideEditorIcon,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext)
@@ -75,7 +75,7 @@ export const NoteCell = ({
       await application?.mutator.deleteItem(note)
     },
     () => {
-      changeNote(mutator => {
+      void changeNote(mutator => {
         mutator.trashed = true
       }, false)
     },
@@ -106,10 +106,10 @@ export const NoteCell = ({
         title: note.title,
         options: [
           {
-            text: 'Note Protected'
-          }
+            text: 'Note Protected',
+          },
         ],
-        anchor: elementRef.current ?? undefined
+        anchor: elementRef.current ?? undefined,
       })
     } else {
       let options: CustomActionSheetOption[] = []
@@ -120,7 +120,7 @@ export const NoteCell = ({
         callback: () =>
           changeNote(mutator => {
             mutator.pinned = !note.pinned
-          }, false)
+          }, false),
       })
 
       options.push({
@@ -128,7 +128,7 @@ export const NoteCell = ({
         key: 'archive',
         callback: () => {
           if (note.locked) {
-            application?.alertService.alert(
+            void application?.alertService.alert(
               `This note has editing disabled. If you'd like to ${
                 note.archived ? 'unarchive' : 'archive'
               } it, enable editing on it, and try again.`
@@ -136,10 +136,10 @@ export const NoteCell = ({
             return
           }
 
-          changeNote(mutator => {
+          void changeNote(mutator => {
             mutator.archived = !note.archived
           }, false)
-        }
+        },
       })
 
       options.push({
@@ -148,13 +148,13 @@ export const NoteCell = ({
         callback: () =>
           changeNote(mutator => {
             mutator.locked = !note.locked
-          }, false)
+          }, false),
       })
 
       options.push({
         text: note.protected ? 'Unprotect' : 'Protect',
         key: 'protect',
-        callback: async () => await protectOrUnprotectNote()
+        callback: async () => await protectOrUnprotectNote(),
       })
 
       if (!note.trashed) {
@@ -162,7 +162,7 @@ export const NoteCell = ({
           text: 'Move to Trash',
           key: 'trash',
           destructive: true,
-          callback: async () => deleteNote(false)
+          callback: async () => deleteNote(false),
         })
       } else {
         options = options.concat([
@@ -170,23 +170,23 @@ export const NoteCell = ({
             text: 'Restore',
             key: 'restore-note',
             callback: () => {
-              changeNote(mutator => {
+              void changeNote(mutator => {
                 mutator.trashed = false
               }, false)
-            }
+            },
           },
           {
             text: 'Delete permanently',
             key: 'delete-forever',
             destructive: true,
-            callback: async () => deleteNote(true)
-          }
+            callback: async () => deleteNote(true),
+          },
         ])
       }
       showActionSheet({
         title: note.title,
         options,
-        anchor: elementRef.current ?? undefined
+        anchor: elementRef.current ?? undefined,
       })
     }
   }

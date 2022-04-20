@@ -11,7 +11,7 @@ import {
   NoteGroupController,
   platformFromString,
   SNApplication,
-  SNComponentManager
+  SNComponentManager,
 } from '@standardnotes/snjs'
 import { Platform } from 'react-native'
 import VersionInfo from 'react-native-version-info'
@@ -44,9 +44,9 @@ export class MobileApplication extends SNApplication {
   private MobileServices!: MobileServices
   public editorGroup: NoteGroupController
   public iconsController: IconsController
-  private startedDeinit: boolean = false
+  private startedDeinit = false
   public Uuid: string // UI remounts when Uuid changes
-  static previouslyLaunched: boolean = false
+  static previouslyLaunched = false
 
   constructor(deviceInterface: MobileDeviceInterface, identifier: string) {
     super({
@@ -59,8 +59,8 @@ export class MobileApplication extends SNApplication {
       swapClasses: [
         {
           swap: SNComponentManager,
-          with: ComponentManager
-        }
+          with: ComponentManager,
+        },
       ],
       defaultHost: IsDev
         ? 'https://api-dev.standardnotes.com'
@@ -68,12 +68,12 @@ export class MobileApplication extends SNApplication {
       appVersion: version,
       webSocketUrl: IsDev
         ? 'wss://sockets-dev.standardnotes.com'
-        : 'wss://sockets.standardnotes.com'
+        : 'wss://sockets.standardnotes.com',
     })
     this.Uuid = Math.random().toString()
     this.editorGroup = new NoteGroupController(this)
     this.iconsController = new IconsController()
-    this.mobileComponentManager.initialize(this.protocolService)
+    void this.mobileComponentManager.initialize(this.protocolService)
   }
 
   get mobileComponentManager(): ComponentManager {

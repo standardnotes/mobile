@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import Icon from 'react-native-vector-icons/Ionicons'
 import {
   HeaderButton,
-  HeaderButtonProps
+  HeaderButtonProps,
 } from 'react-navigation-header-buttons'
 import { ThemeContext } from 'styled-components'
 

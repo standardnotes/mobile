@@ -1,7 +1,7 @@
 import { ButtonCell } from '@Components/ButtonCell'
 import {
   Option,
-  SectionedOptionsTableCell
+  SectionedOptionsTableCell,
 } from '@Components/SectionedOptionsTableCell'
 import { SectionedTableCell } from '@Components/SectionedTableCell'
 import { TableSection } from '@Components/TableSection'
@@ -44,7 +44,7 @@ export const PasscodeInputModal = (props: Props) => {
     }
     setSettingPassocode(true)
     if (text !== confirmText) {
-      application?.alertService?.alert(
+      void application?.alertService?.alert(
         'The two values you entered do not match. Please try again.',
         'Invalid Confirmation',
         'OK'
@@ -66,13 +66,13 @@ export const PasscodeInputModal = (props: Props) => {
       {
         title: 'General',
         key: 'default' as PasscodeKeyboardType,
-        selected: keyboardType === 'default'
+        selected: keyboardType === 'default',
       },
       {
         title: 'Numeric',
         key: 'numeric' as PasscodeKeyboardType,
-        selected: keyboardType === 'numeric'
-      }
+        selected: keyboardType === 'numeric',
+      },
     ],
     [keyboardType]
   )

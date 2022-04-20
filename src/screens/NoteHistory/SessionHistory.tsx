@@ -33,7 +33,7 @@ export const SessionHistory: React.FC<Props> = ({ note, onPress }) => {
   )
 
   const RenderItem: ListRenderItem<NoteHistoryEntry> | null | undefined = ({
-    item
+    item,
   }) => {
     return (
       <NoteHistoryCell

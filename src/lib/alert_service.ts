@@ -2,7 +2,7 @@ import { MODAL_BLOCKING_ALERT } from '@Screens/screens'
 import {
   ButtonType,
   DismissBlockingDialog,
-  SNAlertService
+  SNAlertService,
 } from '@standardnotes/snjs'
 import { Alert, AlertButton } from 'react-native'
 import { goBack, navigate } from './navigation_service'
@@ -19,16 +19,16 @@ export class AlertService implements SNAlertService {
   alert(text: string, title: string, closeButtonText?: string) {
     return new Promise<void>(resolve => {
       // On iOS, confirm should go first. On Android, cancel should go first.
-      let buttons = [
+      const buttons = [
         {
           text: closeButtonText,
           onPress: async () => {
             resolve()
-          }
-        }
+          },
+        },
       ]
       Alert.alert(title, text, buttons, {
-        cancelable: true
+        cancelable: true,
       })
     })
   }
@@ -42,13 +42,13 @@ export class AlertService implements SNAlertService {
   ) {
     return new Promise<boolean>((resolve, reject) => {
       // On iOS, confirm should go first. On Android, cancel should go first.
-      let buttons: AlertButton[] = [
+      const buttons: AlertButton[] = [
         {
           text: cancelButtonText,
           style: 'cancel',
           onPress: async () => {
             resolve(false)
-          }
+          },
         },
         {
           text: confirmButtonText,
@@ -56,14 +56,14 @@ export class AlertService implements SNAlertService {
             confirmButtonType === ButtonType.Danger ? 'destructive' : 'default',
           onPress: async () => {
             resolve(true)
-          }
-        }
+          },
+        },
       ]
       Alert.alert(title, text, buttons, {
         cancelable: true,
         onDismiss: async () => {
           reject()
-        }
+        },
       })
     })
   }

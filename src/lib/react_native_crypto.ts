@@ -6,7 +6,7 @@ import {
   SodiumConstant,
   StreamDecryptorResult,
   timingSafeEqual,
-  Utf8String
+  Utf8String,
 } from '@standardnotes/sncrypto-common'
 import { NativeModules } from 'react-native'
 import * as Sodium from 'react-native-sodium-jsi'
@@ -14,6 +14,7 @@ import * as Sodium from 'react-native-sodium-jsi'
 const { Aes } = NativeModules
 
 export class SNReactNativeCrypto implements SNPureCrypto {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   deinit(): void {}
   public timingSafeEqual(a: string, b: string) {
     return timingSafeEqual(a, b)
@@ -185,7 +186,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
 
     return {
       message: new Uint8Array(result.message),
-      tag: result.tag
+      tag: result.tag,
     }
   }
 

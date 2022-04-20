@@ -5,7 +5,7 @@ import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Screens/screens'
 import { TAppStackNavigationProp } from '@Screens/UploadedFilesList/UploadedFileItem'
 import {
   UploadedFileItemAction,
-  UploadedFileItemActionType
+  UploadedFileItemActionType,
 } from '@Screens/UploadedFilesList/UploadedFileItemAction'
 import {
   ButtonType,
@@ -13,18 +13,18 @@ import {
   ClientDisplayableError,
   ContentType,
   SNFile,
-  SNNote
+  SNNote,
 } from '@standardnotes/snjs'
 import {
   CustomActionSheetOption,
-  useCustomActionSheet
+  useCustomActionSheet,
 } from '@Style/custom_action_sheet'
 import { useCallback, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import DocumentPicker, {
   DocumentPickerResponse,
   isInProgress,
-  pickMultiple
+  pickMultiple,
 } from 'react-native-document-picker'
 import FileViewer from 'react-native-file-viewer'
 import RNFS, { exists } from 'react-native-fs'
@@ -32,7 +32,7 @@ import {
   Asset,
   launchCamera,
   launchImageLibrary,
-  MediaType
+  MediaType,
 } from 'react-native-image-picker'
 import RNShare from 'react-native-share'
 import Toast from 'react-native-toast-message'
@@ -95,13 +95,15 @@ export const useFiles = ({ note }: Props) => {
       if (await exists(path)) {
         await RNFS.unlink(path)
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error(err)
+    }
   }, [])
 
   const downloadFileAndReturnLocalPath = useCallback(
     async ({
       file,
-      saveInTempLocation = false
+      saveInTempLocation = false,
     }: TDownloadFileAndReturnLocalPathParams): Promise<string | undefined> => {
       if (isDownloading) {
         return
@@ -119,12 +121,12 @@ export const useFiles = ({ note }: Props) => {
           type: Info,
           text1: 'Downloading file...',
           autoHide: false,
-          onPress: Toast.hide
+          onPress: Toast.hide,
         })
 
         const path = filesService.getDestinationPath({
           fileName: file.name,
-          saveInTempLocation
+          saveInTempLocation,
         })
 
         await deleteFileAtPath(path)
@@ -134,7 +136,7 @@ export const useFiles = ({ note }: Props) => {
           type: Success,
           text1: 'Success',
           text2: 'Successfully downloaded file',
-          onPress: Toast.hide
+          onPress: Toast.hide,
         })
 
         return path
@@ -143,7 +145,7 @@ export const useFiles = ({ note }: Props) => {
           type: Error,
           text1: 'Error',
           text2: 'An error occurred while downloading the file',
-          onPress: Toast.hide
+          onPress: Toast.hide,
         })
         return
       } finally {
@@ -166,12 +168,12 @@ export const useFiles = ({ note }: Props) => {
     async (file: SNFile) => {
       const downloadedFilePath = await downloadFileAndReturnLocalPath({
         file,
-        saveInTempLocation: true
+        saveInTempLocation: true,
       })
       if (!downloadedFilePath) {
         return
       }
-      application
+      await application
         .getAppState()
         .performActionWithoutStateChangeImpact(async () => {
           try {
@@ -179,7 +181,7 @@ export const useFiles = ({ note }: Props) => {
             //  https://github.com/react-native-share/react-native-share/issues/1059
             const shareDialogResponse = await RNShare.open({
               url: `file://${downloadedFilePath}`,
-              failOnCancel: false
+              failOnCancel: false,
             })
 
             // On iOS the user can store files locally from "Share" screen, so we don't show "Download" option there.
@@ -191,14 +193,14 @@ export const useFiles = ({ note }: Props) => {
               Toast.show({
                 type: Success,
                 text1: 'Successfully exported file',
-                onPress: Toast.hide
+                onPress: Toast.hide,
               })
             }
           } catch (error) {
             Toast.show({
               type: Error,
               text1: 'An error occurred while trying to share this file',
-              onPress: Toast.hide
+              onPress: Toast.hide,
             })
           }
         })
@@ -208,7 +210,7 @@ export const useFiles = ({ note }: Props) => {
       Success,
       application,
       cleanupTempFileOnAndroid,
-      downloadFileAndReturnLocalPath
+      downloadFileAndReturnLocalPath,
     ]
   )
 
@@ -220,7 +222,7 @@ export const useFiles = ({ note }: Props) => {
         Toast.show({
           type: Success,
           text1: 'Successfully attached file to note',
-          onPress: Toast.hide
+          onPress: Toast.hide,
         })
       }
     },
@@ -233,7 +235,7 @@ export const useFiles = ({ note }: Props) => {
       Toast.show({
         type: Success,
         text1: 'Successfully detached file from note',
-        onPress: Toast.hide
+        onPress: Toast.hide,
       })
     },
     [Success, application, note]
@@ -298,7 +300,7 @@ export const useFiles = ({ note }: Props) => {
 
         downloadedFilePath = await downloadFileAndReturnLocalPath({
           file,
-          saveInTempLocation: true
+          saveInTempLocation: true,
         })
 
         if (!downloadedFilePath) {
@@ -307,7 +309,7 @@ export const useFiles = ({ note }: Props) => {
         await FileViewer.open(downloadedFilePath, {
           onDismiss: async () => {
             await cleanupTempFileOnAndroid(downloadedFilePath as string)
-          }
+          },
         })
 
         return true
@@ -335,21 +337,21 @@ export const useFiles = ({ note }: Props) => {
       if (shouldDelete) {
         Toast.show({
           type: Info,
-          text2: `Deleting "${file.name}"...`
+          text1: `Deleting "${file.name}"...`,
         })
         const response = await application.files.deleteFile(file)
 
         if (response instanceof ClientDisplayableError) {
           Toast.show({
             type: Error,
-            text1: response.text
+            text1: response.text,
           })
           return
         }
 
         Toast.show({
           type: Success,
-          text2: `Successfully deleted "${file.name}"`
+          text1: `Successfully deleted "${file.name}"`,
         })
       }
     },
@@ -363,12 +365,12 @@ export const useFiles = ({ note }: Props) => {
       Toast.show({
         type: Info,
         text2:
-          'Multiple pickers were opened; only the last one will be considered.'
+          'Multiple pickers were opened; only the last one will be considered.',
       })
     } else {
       Toast.show({
         type: Error,
-        text1: 'An error occurred while attempting to select files.'
+        text1: 'An error occurred while attempting to select files.',
       })
     }
   }
@@ -377,7 +379,7 @@ export const useFiles = ({ note }: Props) => {
     Toast.show({
       type: Error,
       text1: 'Error',
-      text2: 'An error occurred while uploading file(s).'
+      text2: 'An error occurred while uploading file(s).',
     })
   }
 
@@ -387,7 +389,7 @@ export const useFiles = ({ note }: Props) => {
 
       return selectedFiles
     } catch (error) {
-      handlePickFilesError(error)
+      await handlePickFilesError(error)
     }
   }
 
@@ -399,7 +401,7 @@ export const useFiles = ({ note }: Props) => {
       Toast.show({
         type: Info,
         text1: `Uploading "${fileName}"...`,
-        autoHide: false
+        autoHide: false,
       })
 
       const operation = await application.files.beginNewFileUpload()
@@ -407,7 +409,7 @@ export const useFiles = ({ note }: Props) => {
       if (operation instanceof ClientDisplayableError) {
         Toast.show({
           type: Error,
-          text1: operation.text
+          text1: operation.text,
         })
         return
       }
@@ -433,13 +435,13 @@ export const useFiles = ({ note }: Props) => {
       if (fileObj instanceof ClientDisplayableError) {
         Toast.show({
           type: Error,
-          text1: fileObj.text
+          text1: fileObj.text,
         })
         return
       }
       return fileObj
     } catch (error) {
-      handleUploadError()
+      await handleUploadError()
     }
   }
 
@@ -459,7 +461,7 @@ export const useFiles = ({ note }: Props) => {
           Toast.show({
             type: Error,
             text1: 'Error',
-            text2: `An error occurred while uploading ${file.name}.`
+            text2: `An error occurred while uploading ${file.name}.`,
           })
           continue
         }
@@ -473,13 +475,13 @@ export const useFiles = ({ note }: Props) => {
 
       return uploadedFiles
     } catch (error) {
-      handleUploadError()
+      await handleUploadError()
     }
   }
 
   const uploadFileFromCameraOrImageGallery = async ({
     uploadFromGallery = false,
-    mediaType = 'photo'
+    mediaType = 'photo',
   }: TUploadFileFromCameraOrImageGalleryParams): Promise<SNFile | void> => {
     try {
       const result = uploadFromGallery
@@ -498,7 +500,7 @@ export const useFiles = ({ note }: Props) => {
         Toast.show({
           type: Error,
           text1: 'Error',
-          text2: `An error occurred while uploading ${file.fileName}.`
+          text2: `An error occurred while uploading ${file.fileName}.`,
         })
         return
       }
@@ -506,7 +508,7 @@ export const useFiles = ({ note }: Props) => {
 
       return fileObject
     } catch (error) {
-      handleUploadError()
+      await handleUploadError()
     }
   }
 
@@ -562,7 +564,7 @@ export const useFiles = ({ note }: Props) => {
           break
       }
 
-      application.sync.sync()
+      await application.sync.sync()
       return true
     },
     [
@@ -575,7 +577,7 @@ export const useFiles = ({ note }: Props) => {
       previewFile,
       renameFile,
       shareFile,
-      toggleFileProtection
+      toggleFileProtection,
     ]
   )
 
@@ -604,71 +606,74 @@ export const useFiles = ({ note }: Props) => {
         {
           text: isAttachedToNote ? 'Detach from note' : 'Attach to note',
           callback: isAttachedToNote
-            ? () =>
-                handleFileAction({
+            ? async () => {
+                await handleFileAction({
                   type: UploadedFileItemActionType.DetachFileToNote,
-                  payload: file
+                  payload: file,
                 })
-            : () =>
-                handleFileAction({
+              }
+            : async () => {
+                await handleFileAction({
                   type: UploadedFileItemActionType.AttachFileToNote,
-                  payload: file
+                  payload: file,
                 })
+              },
         },
         {
           text: `${file.protected ? 'Disable' : 'Enable'} password protection`,
-          callback: () => {
-            handleFileAction({
+          callback: async () => {
+            await handleFileAction({
               type: UploadedFileItemActionType.ToggleFileProtection,
-              payload: file
+              payload: file,
             })
-          }
+          },
         },
         {
           text: 'Preview',
-          callback: () => {
-            handleFileAction({
+          callback: async () => {
+            await handleFileAction({
               type: UploadedFileItemActionType.PreviewFile,
-              payload: file
+              payload: file,
             })
-          }
+          },
         },
         {
           text: Platform.OS === 'ios' ? 'Export' : 'Share',
-          callback: () => {
-            handleFileAction({
+          callback: async () => {
+            await handleFileAction({
               type: UploadedFileItemActionType.ShareFile,
-              payload: file
+              payload: file,
             })
-          }
+          },
         },
         {
           text: 'Download',
-          callback: () => {
-            handleFileAction({
+          callback: async () => {
+            await handleFileAction({
               type: UploadedFileItemActionType.DownloadFile,
-              payload: file
+              payload: file,
             })
-          }
+          },
         },
         {
           text: 'Rename',
-          callback: () =>
+          callback: () => {
             navigation.navigate(SCREEN_INPUT_MODAL_FILE_NAME, {
               file,
-              handleFileAction
+              handleFileAction,
             })
+          },
         },
         {
           text: 'Delete permanently',
-          callback: () => {
-            handleFileAction({
+          callback: async () => {
+            await handleFileAction({
               type: UploadedFileItemActionType.DeleteFile,
-              payload: file
+              payload: file,
             })
           },
-          destructive: true
-        }
+          destructive: true,
+        },
       ]
       const osDependentActions =
         Platform.OS === 'ios'
@@ -679,9 +684,9 @@ export const useFiles = ({ note }: Props) => {
         options: osDependentActions,
         styles: {
           titleTextStyle: {
-            fontWeight: 'bold'
-          }
-        }
+            fontWeight: 'bold',
+          },
+        },
       })
     },
     [attachedFiles, handleFileAction, navigation, showActionSheet]
@@ -693,6 +698,6 @@ export const useFiles = ({ note }: Props) => {
     allFiles,
     uploadFiles,
     uploadFileFromCameraOrImageGallery,
-    attachFileToNote
+    attachFileToNote,
   }
 }

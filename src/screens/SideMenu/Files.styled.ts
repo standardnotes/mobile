@@ -5,8 +5,8 @@ import styled from 'styled-components/native'
 
 export const styles = StyleSheet.create({
   cellContentStyle: {
-    flexShrink: 0
-  }
+    flexShrink: 0,
+  },
 })
 export const SNIconStyled = styled(SnIcon)`
   margin-left: 8px;

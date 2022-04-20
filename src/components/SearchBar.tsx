@@ -23,7 +23,7 @@ export const SearchBar: FC<Props> = ({
   androidSearchBarInputRef,
   onSearchFocusCallback,
   onSearchBlurCallback,
-  collapseSearchBarOnBlur = true
+  collapseSearchBarOnBlur = true,
 }) => {
   const theme = useContext(ThemeContext)
   const themeService = useContext(ThemeServiceContext)
@@ -82,8 +82,8 @@ export const SearchBar: FC<Props> = ({
             searchBarStyles.androidSearch,
             {
               color: theme.stylekitForegroundColor,
-              backgroundColor: theme.stylekitContrastBackgroundColor
-            }
+              backgroundColor: theme.stylekitContrastBackgroundColor,
+            },
           ]}
           placeholderExpandedMargin={25}
           searchIconCollapsedMargin={30}

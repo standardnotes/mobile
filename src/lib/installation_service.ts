@@ -3,7 +3,7 @@ import {
   ApplicationService,
   ButtonType,
   isNullOrUndefined,
-  StorageValueModes
+  StorageValueModes,
 } from '@standardnotes/snjs'
 
 const FIRST_RUN_KEY = 'first_run'
@@ -13,7 +13,7 @@ export class InstallationService extends ApplicationService {
     if (await this.needsWipe()) {
       await this.wipeData()
     } else {
-      this.markApplicationAsRan()
+      void this.markApplicationAsRan()
     }
   }
 
@@ -38,7 +38,7 @@ export class InstallationService extends ApplicationService {
       (typeof keychainKey === 'object' && Object.keys(keychainKey).length === 0)
     )
 
-    let firstRunKey = await this.application?.getValue(
+    const firstRunKey = await this.application?.getValue(
       FIRST_RUN_KEY,
       StorageValueModes.Nonwrapped
     )

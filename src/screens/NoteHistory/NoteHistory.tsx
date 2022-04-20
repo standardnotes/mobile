@@ -3,7 +3,7 @@ import { ApplicationContext } from '@Root/ApplicationContext'
 import { HistoryStackNavigationProp } from '@Root/HistoryStack'
 import {
   SCREEN_NOTE_HISTORY,
-  SCREEN_NOTE_HISTORY_PREVIEW
+  SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens'
 import { NoteHistoryEntry, SNNote } from '@standardnotes/snjs'
 import { ThemeServiceContext } from '@Style/theme_service'
@@ -14,7 +14,7 @@ import {
   Route,
   SceneRendererProps,
   TabBar,
-  TabView
+  TabView,
 } from 'react-native-tab-view'
 import { ThemeContext } from 'styled-components'
 import { IosTabBarContainer } from './NoteHistory.styled'
@@ -36,7 +36,7 @@ export const NoteHistory = (props: Props) => {
   )
   const [routes] = React.useState([
     { key: 'session', title: 'Session' },
-    { key: 'remote', title: 'Remote' }
+    { key: 'remote', title: 'Remote' },
   ])
   const [index, setIndex] = useState(0)
 
@@ -48,12 +48,12 @@ export const NoteHistory = (props: Props) => {
     props.navigation.navigate(SCREEN_NOTE_HISTORY_PREVIEW, {
       title,
       revision,
-      originalNoteUuid: note.uuid
+      originalNoteUuid: note.uuid,
     })
   }
 
   const renderScene = ({
-    route
+    route,
   }: {
     route: { key: string; title: string }
   }) => {
@@ -79,7 +79,7 @@ export const NoteHistory = (props: Props) => {
           backgroundColor={theme.stylekitContrastBackgroundColor}
           appearance={themeService?.keyboardColorForActiveTheme()}
           fontStyle={{
-            color: theme.stylekitForegroundColor
+            color: theme.stylekitForegroundColor,
           }}
           values={routes.map(route => route.title)}
           selectedIndex={tabBarProps.navigationState.index}
@@ -96,7 +96,7 @@ export const NoteHistory = (props: Props) => {
         activeColor={theme.stylekitInfoColor}
         style={{
           backgroundColor: theme.stylekitBackgroundColor,
-          shadowColor: theme.stylekitShadowColor
+          shadowColor: theme.stylekitShadowColor,
         }}
         labelStyle={{ color: theme.stylekitInfoColor }}
       />

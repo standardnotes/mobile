@@ -4,14 +4,14 @@ import styled, { css } from 'styled-components/native'
 // no support for generic types in Flatlist
 export const styles = StyleSheet.create({
   list: {
-    height: '100%'
+    height: '100%',
   },
   inputStyle: {
-    height: 30
+    height: 30,
   },
   androidSearch: {
-    height: 30
-  }
+    height: 30,
+  },
 })
 
 export const Container = styled.View`

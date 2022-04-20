@@ -9,12 +9,12 @@ import {
   HeaderTabItem,
   TabText,
   UploadFilesListContainer,
-  useUploadedFilesListStyles
+  useUploadedFilesListStyles,
 } from '@Screens/UploadedFilesList/UploadedFilesList.styled'
 import { SNFile } from '@standardnotes/snjs'
 import {
   CustomActionSheetOption,
-  useCustomActionSheet
+  useCustomActionSheet,
 } from '@Style/custom_action_sheet'
 import { ICON_ATTACH } from '@Style/icons'
 import { ThemeService } from '@Style/theme_service'
@@ -25,7 +25,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from 'react'
 import { FlatList, ListRenderItem, Platform, Text, View } from 'react-native'
 import FAB from 'react-native-fab'
@@ -36,7 +36,7 @@ import { ThemeContext } from 'styled-components'
 
 enum Tabs {
   AttachedFiles,
-  AllFiles
+  AllFiles,
 }
 
 type Props = ModalStackNavigationProp<typeof SCREEN_UPLOADED_FILES_LIST>
@@ -63,9 +63,9 @@ export const UploadedFilesList: FC<Props> = props => {
     allFiles,
     uploadFiles,
     uploadFileFromCameraOrImageGallery,
-    attachFileToNote
+    attachFileToNote,
   } = useFiles({
-    note
+    note,
   })
 
   const filesList = currentTab === Tabs.AttachedFiles ? attachedFiles : allFiles
@@ -85,7 +85,7 @@ export const UploadedFilesList: FC<Props> = props => {
       screenTitle = `${filesCount} search result${filesCount !== 1 ? 's' : ''}`
     }
     navigation.setOptions({
-      title: screenTitle
+      title: screenTitle,
     })
   }, [filteredList.length, navigation, searchString])
 
@@ -110,7 +110,7 @@ export const UploadedFilesList: FC<Props> = props => {
     header,
     headerTabContainer,
     noAttachmentsIcon,
-    noAttachmentsIconContainer
+    noAttachmentsIconContainer,
   } = styles
 
   const onScroll = () => {
@@ -126,30 +126,30 @@ export const UploadedFilesList: FC<Props> = props => {
         text: 'Photo',
         callback: async () => {
           const uploadedFile = await uploadFileFromCameraOrImageGallery({
-            mediaType: 'photo'
+            mediaType: 'photo',
           })
           if (!uploadedFile) {
             return
           }
-          attachFileToNote(uploadedFile, false)
-        }
+          await attachFileToNote(uploadedFile, false)
+        },
       },
       {
         text: 'Video',
         callback: async () => {
           const uploadedFile = await uploadFileFromCameraOrImageGallery({
-            mediaType: 'video'
+            mediaType: 'video',
           })
           if (!uploadedFile) {
             return
           }
-          attachFileToNote(uploadedFile, false)
-        }
-      }
+          await attachFileToNote(uploadedFile, false)
+        },
+      },
     ]
     showActionSheet({
       title: 'Choose file type',
-      options
+      options,
     })
   }
 
@@ -166,28 +166,28 @@ export const UploadedFilesList: FC<Props> = props => {
           if (currentTab === AttachedFiles) {
             uploadedFiles.forEach(file => attachFileToNote(file, false))
           }
-        }
+        },
       },
       {
         text: 'Attach from Photo Library',
         key: 'library',
         callback: async () => {
           const uploadedFile = await uploadFileFromCameraOrImageGallery({
-            uploadFromGallery: true
+            uploadFromGallery: true,
           })
           if (!uploadedFile) {
             return
           }
-          attachFileToNote(uploadedFile, false)
-        }
+          await attachFileToNote(uploadedFile, false)
+        },
       },
       {
         text: 'Attach from Camera',
         key: 'camera',
         callback: async () => {
           handleAttachFromCamera()
-        }
-      }
+        },
+      },
     ]
     const osSpecificOptions =
       Platform.OS === 'android'
@@ -195,7 +195,7 @@ export const UploadedFilesList: FC<Props> = props => {
         : options
     showActionSheet({
       title: 'Choose action',
-      options: osSpecificOptions
+      options: osSpecificOptions,
     })
   }
 

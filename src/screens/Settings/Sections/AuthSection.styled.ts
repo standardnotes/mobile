@@ -12,7 +12,7 @@ export const RegistrationDescription = styled.Text`
 
 export const RegistrationInput = styled.TextInput.attrs(({ theme }) => ({
   underlineColorAndroid: 'transparent',
-  placeholderTextColor: theme.stylekitNeutralColor
+  placeholderTextColor: theme.stylekitNeutralColor,
 }))`
   font-size: ${({ theme }) => theme.mainTextFontSize}px;
   padding: 0px;

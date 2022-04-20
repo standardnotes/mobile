@@ -3,13 +3,13 @@ import { IoniconsHeaderButton } from '@Components/IoniconsHeaderButton'
 import { RouteProp } from '@react-navigation/native'
 import {
   createStackNavigator,
-  StackNavigationProp
+  StackNavigationProp,
 } from '@react-navigation/stack'
 import { NoteHistory } from '@Screens/NoteHistory/NoteHistory'
 import { NoteHistoryPreview } from '@Screens/NoteHistory/NoteHistoryPreview'
 import {
   SCREEN_NOTE_HISTORY,
-  SCREEN_NOTE_HISTORY_PREVIEW
+  SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens'
 import { NoteHistoryEntry } from '@standardnotes/snjs'
 import { ICON_CHECKMARK } from '@Style/icons'
@@ -46,8 +46,8 @@ export const HistoryStack = () => {
     <MainStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: theme.stylekitContrastBackgroundColor
-        }
+          backgroundColor: theme.stylekitContrastBackgroundColor,
+        },
       }}
       initialRouteName={SCREEN_NOTE_HISTORY}
     >
@@ -79,7 +79,7 @@ export const HistoryStack = () => {
                 subtitleColor={route.params?.subTitleColor}
               />
             )
-          }
+          },
         })}
         component={NoteHistory}
       />
@@ -96,7 +96,7 @@ export const HistoryStack = () => {
                 subtitleColor={route.params?.subTitleColor || undefined}
               />
             )
-          }
+          },
         })}
         component={NoteHistoryPreview}
       />

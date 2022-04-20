@@ -7,7 +7,7 @@ import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext
 import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
-  SCREEN_VIEW_PROTECTED_NOTE
+  SCREEN_VIEW_PROTECTED_NOTE,
 } from '@Screens/screens'
 import {
   CollectionSort,
@@ -17,7 +17,7 @@ import {
   SmartView,
   SNNote,
   SNTag,
-  SystemViewId
+  SystemViewId,
 } from '@standardnotes/snjs'
 import { ICON_ADD } from '@Style/icons'
 import { ThemeService } from '@Style/theme_service'
@@ -26,7 +26,7 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState
+  useState,
 } from 'react'
 import FAB from 'react-native-fab'
 import { ThemeContext } from 'styled-components'
@@ -42,7 +42,7 @@ type SearchOptions = {
 export const Notes = React.memo(
   ({
     shouldSplitLayout,
-    keyboardHeight
+    keyboardHeight,
   }: {
     shouldSplitLayout: boolean | undefined
     keyboardHeight: number | undefined
@@ -133,22 +133,22 @@ export const Notes = React.memo(
 
         navigation.setParams({
           title,
-          subTitle
+          subTitle,
         })
       },
       [application, navigation, searchText]
     )
 
     const openCompose = useCallback(
-      (newNote: boolean, replaceScreen: boolean = false) => {
+      (newNote: boolean, replaceScreen = false) => {
         if (!shouldSplitLayout) {
           if (replaceScreen) {
             navigation.replace(SCREEN_COMPOSE, {
-              title: newNote ? 'Compose' : 'Note'
+              title: newNote ? 'Compose' : 'Note',
             })
           } else {
             navigation.navigate(SCREEN_COMPOSE, {
-              title: newNote ? 'Compose' : 'Note'
+              title: newNote ? 'Compose' : 'Note',
             })
           }
         }
@@ -157,7 +157,7 @@ export const Notes = React.memo(
     )
 
     const openNote = useCallback(
-      async (noteUuid: SNNote['uuid'], replaceScreen: boolean = false) => {
+      async (noteUuid: SNNote['uuid'], replaceScreen = false) => {
         await application.getAppState().openEditor(noteUuid)
         openCompose(false, replaceScreen)
       },
@@ -170,11 +170,11 @@ export const Notes = React.memo(
         if (note) {
           if (note.protected && !application.hasProtectionSources()) {
             return navigation.navigate(SCREEN_VIEW_PROTECTED_NOTE, {
-              onPressView: () => openNote(noteUuid, true)
+              onPressView: () => openNote(noteUuid, true),
             })
           }
           if (await application.authorizeNoteAccess(note)) {
-            openNote(noteUuid)
+            void openNote(noteUuid)
           }
         }
       },
@@ -233,7 +233,7 @@ export const Notes = React.memo(
             ? {
                 query: searchFilter?.toLowerCase() ?? searchText.toLowerCase(),
                 includeProtectedNoteText:
-                  includeProtected ?? includeProtectedNoteText
+                  includeProtected ?? includeProtectedNoteText,
               }
             : undefined
 
@@ -254,7 +254,7 @@ export const Notes = React.memo(
           includeArchived:
             applyFilters && (includeArchived ?? includeArchivedNotes),
           includeTrashed:
-            applyFilters && (includeTrashed ?? includeTrashedNotes)
+            applyFilters && (includeTrashed ?? includeTrashedNotes),
         })
         application.items.setNotesDisplayCriteria(criteria)
       },
@@ -265,7 +265,7 @@ export const Notes = React.memo(
         includeTrashedNotes,
         sortBy,
         sortReverse,
-        searchText
+        searchText,
       ]
     )
 
@@ -324,8 +324,8 @@ export const Notes = React.memo(
         {
           label: 'Include Protected Contents',
           selected: includeProtectedNoteText,
-          onPress: toggleIncludeProtected
-        }
+          onPress: toggleIncludeProtected,
+        },
       ]
 
       const isArchiveView =
@@ -340,13 +340,13 @@ export const Notes = React.memo(
           {
             label: 'Archived',
             selected: includeArchivedNotes,
-            onPress: toggleIncludeArchived
+            onPress: toggleIncludeArchived,
           },
           {
             label: 'Trashed',
             selected: includeTrashedNotes,
-            onPress: toggleIncludeTrashed
-          }
+            onPress: toggleIncludeTrashed,
+          },
         ])
       } else {
         setSearchOptions(options)
@@ -358,7 +358,7 @@ export const Notes = React.memo(
       includeTrashedNotes,
       toggleIncludeProtected,
       toggleIncludeArchived,
-      toggleIncludeTrashed
+      toggleIncludeTrashed,
     ])
 
     const getFirstSelectableNote = useCallback(
@@ -370,7 +370,7 @@ export const Notes = React.memo(
       (newNotes: SNNote[]) => {
         const note = getFirstSelectableNote(newNotes)
         if (note && !loading && !decrypting) {
-          onNoteSelect(note.uuid)
+          void onNoteSelect(note.uuid)
         }
       },
       [decrypting, getFirstSelectableNote, loading, onNoteSelect]
@@ -380,7 +380,7 @@ export const Notes = React.memo(
       (newNotes: SNNote[]) => {
         const note = getFirstSelectableNote(newNotes)
         if (note) {
-          onNoteSelect(note.uuid)
+          void onNoteSelect(note.uuid)
         } else {
           application.getAppState().closeActiveEditor()
         }
@@ -404,7 +404,7 @@ export const Notes = React.memo(
         }
 
         const newNotes = application.items.getDisplayableNotes()
-        let renderedNotes: SNNote[] = newNotes
+        const renderedNotes: SNNote[] = newNotes
 
         setNotes(renderedNotes)
         reloadTitle(renderedNotes, searchFilter)
@@ -441,12 +441,12 @@ export const Notes = React.memo(
         reloadSearchOptions,
         reloadTitle,
         selectFirstNote,
-        selectNextOrCreateNew
+        selectNextOrCreateNew,
       ]
     )
 
     const onNoteCreate = useCallback(async () => {
-      let title = application.getAppState().isTabletDevice
+      const title = application.getAppState().isTabletDevice
         ? `Note ${notes.length + 1}`
         : undefined
       await application.getAppState().createEditor(title)
@@ -522,7 +522,7 @@ export const Notes = React.memo(
       if (displayOptionsChanged) {
         reloadNotesDisplayOptions(undefined, {
           sortBy: newSortBy,
-          sortReverse: newSortReverse
+          sortReverse: newSortReverse,
         })
       }
       reloadNotes()
@@ -534,12 +534,12 @@ export const Notes = React.memo(
       hideDates,
       hideEditorIcon,
       reloadNotes,
-      reloadNotesDisplayOptions
+      reloadNotesDisplayOptions,
     ])
 
     const onRefresh = useCallback(() => {
       startRefreshing()
-      application.sync.sync()
+      void application.sync.sync()
     }, [application, startRefreshing])
 
     const onSearchChange = useCallback(
@@ -553,7 +553,7 @@ export const Notes = React.memo(
 
     useFocusEffect(
       useCallback(() => {
-        reloadPreferences()
+        void reloadPreferences()
         const removeAppStateChangeHandler = application
           .getAppState()
           .addStateChangeObserver(state => {
@@ -562,7 +562,7 @@ export const Notes = React.memo(
               reloadNotes(true, true)
             }
             if (state === AppStateType.PreferencesChanged) {
-              reloadPreferences()
+              void reloadPreferences()
             }
           })
         const removeStreams = streamNotesAndTags()
@@ -576,7 +576,7 @@ export const Notes = React.memo(
         reloadNotes,
         reloadNotesDisplayOptions,
         reloadPreferences,
-        streamNotesAndTags
+        streamNotesAndTags,
       ])
     )
 
@@ -607,6 +607,7 @@ export const Notes = React.memo(
           setShouldFocusSearch={setShouldFocusSearch}
         />
         <FAB
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore style prop does not exist in types
           style={
             application.getAppState().isInTabletMode

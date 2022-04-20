@@ -11,25 +11,25 @@ export const useUploadedFilesListStyles = () => {
       alignItems: 'center',
       flexShrink: 1,
       flexGrow: 1,
-      paddingBottom: insets.bottom
+      paddingBottom: insets.bottom,
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: 4
+      marginBottom: 4,
     },
     headerTabContainer: {
-      flexDirection: 'row'
+      flexDirection: 'row',
     },
     noAttachmentsIconContainer: {
       alignItems: 'center',
-      marginTop: 24
+      marginTop: 24,
     },
     noAttachmentsIcon: {
       marginTop: 24,
-      marginBottom: 24
-    }
+      marginBottom: 24,
+    },
   })
 }
 
@@ -47,8 +47,9 @@ export const HeaderTabItem = styled.View<{
   align-items: center;
   padding: 8px;
   flex-grow: 1;
-  background-color: ${({ theme, isActive }) =>
-    isActive ? theme.stylekitInfoColor : theme.stylekitInfoContrastColor};
+  background-color: ${({ theme, isActive }) => {
+    return isActive ? theme.stylekitInfoColor : theme.stylekitInfoContrastColor
+  }};
   border-width: 1px;
   border-color: ${({ theme }) => theme.stylekitInfoColor};
   border-top-right-radius: ${({ isLeftTab }) => (isLeftTab ? 0 : '8px')};
@@ -59,6 +60,7 @@ export const HeaderTabItem = styled.View<{
 `
 export const TabText = styled.Text<{ isActive: boolean }>`
   font-weight: bold;
-  color: ${({ isActive, theme }) =>
-    isActive ? theme.stylekitInfoContrastColor : theme.stylekitInfoColor};
+  color: ${({ isActive, theme }) => {
+    return isActive ? theme.stylekitInfoContrastColor : theme.stylekitInfoColor
+  }};
 `

@@ -8,7 +8,7 @@ import {
   NoteMutator,
   NoteViewController,
   SNNote,
-  StorageEncryptionPolicy
+  StorageEncryptionPolicy,
 } from '@standardnotes/snjs'
 import React, { useCallback, useEffect } from 'react'
 import { LockStateType } from './application_state'
@@ -32,10 +32,10 @@ export const useSignedIn = (
         setSignedIn(!application.noAccount())
       }
     }
-    getSignedIn()
+    void getSignedIn()
     const removeSignedInObserver = application.addEventObserver(async event => {
       if (event === ApplicationEvent.Launched) {
-        getSignedIn()
+        void getSignedIn()
       }
       if (event === ApplicationEvent.SignedIn) {
         setSignedIn(true)
@@ -70,7 +70,7 @@ export const useOutOfSync = () => {
         setOutOfSync(Boolean(outOfSyncInitial))
       }
     }
-    getOutOfSync()
+    void getOutOfSync()
     return () => {
       isMounted = false
     }
@@ -241,11 +241,11 @@ export const useSyncStatus = () => {
           setLoading(false)
           updateSyncStatus()
         } else if (eventName === ApplicationEvent.LocalDatabaseReadError) {
-          application!.alertService!.alert(
+          void application!.alertService!.alert(
             'Unable to load local storage. Please restart the app and try again.'
           )
         } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
-          application!.alertService!.alert(
+          void application!.alertService!.alert(
             'Unable to write to local storage. Please restart the app and try again.'
           )
         } else if (eventName === ApplicationEvent.SignedIn) {
@@ -260,7 +260,7 @@ export const useSyncStatus = () => {
     completedInitialSync,
     setStatus,
     updateLocalDataStatus,
-    updateSyncStatus
+    updateSyncStatus,
   ])
 
   const startRefreshing = () => {
@@ -303,7 +303,7 @@ export const useDeleteNoteWithPrivileges = (
     const title = `Delete ${note!.title}`
     const message = 'Are you sure you want to permanently delete this note?'
     if (editor?.isTemplateNote) {
-      application?.alertService!.alert(
+      void application?.alertService!.alert(
         'This note is a placeholder and cannot be deleted. To remove from your list, simply navigate to a different note.'
       )
       return
@@ -322,21 +322,21 @@ export const useDeleteNoteWithPrivileges = (
     application?.alertService,
     editor?.isTemplateNote,
     note,
-    onDeleteCallback
+    onDeleteCallback,
   ])
 
   const deleteNote = useCallback(
     async (permanently: boolean) => {
       if (note?.locked) {
-        application?.alertService.alert(
+        void application?.alertService.alert(
           "This note has editing disabled. If you'd like to delete it, enable editing on it, and try again."
         )
         return
       }
       if (permanently) {
-        deleteNotePermanently()
+        void deleteNotePermanently()
       } else {
-        trashNote()
+        void trashNote()
       }
     },
     [application, deleteNotePermanently, note?.locked, trashNote]
@@ -360,7 +360,7 @@ export const useProtectionSessionExpiry = () => {
         if (isSameDay(protectionExpiry, now)) {
           f = new Intl.DateTimeFormat(undefined, {
             hour: 'numeric',
-            minute: 'numeric'
+            minute: 'numeric',
           })
         } else {
           f = new Intl.DateTimeFormat(undefined, {
@@ -368,7 +368,7 @@ export const useProtectionSessionExpiry = () => {
             day: 'numeric',
             month: 'short',
             hour: 'numeric',
-            minute: 'numeric'
+            minute: 'numeric',
           })
         }
 
@@ -394,7 +394,7 @@ export const useProtectionSessionExpiry = () => {
         if (
           [
             ApplicationEvent.UnprotectedSessionBegan,
-            ApplicationEvent.UnprotectedSessionExpired
+            ApplicationEvent.UnprotectedSessionExpired,
           ].includes(event)
         ) {
           setProtectionsDisabledUntil(getProtectionsDisabledUntil())
@@ -426,7 +426,7 @@ export const useChangeNoteChecks = (
     }
 
     if (!application.items.findItem(note.uuid)) {
-      application.alertService!.alert(
+      void application.alertService!.alert(
         "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
       )
       return false
@@ -482,7 +482,7 @@ export const useProtectOrUnprotectNote = (
       if (note!.protected) {
         await application?.mutator.unprotectNote(note!)
       } else {
-        application?.mutator.protectNote(note!)
+        await application?.mutator.protectNote(note!)
       }
     }
   }, [application, note, canChangeNote])

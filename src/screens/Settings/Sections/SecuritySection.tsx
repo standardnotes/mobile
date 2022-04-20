@@ -1,7 +1,7 @@
 import { ButtonCell } from '@Components/ButtonCell'
 import {
   Option,
-  SectionedOptionsTableCell
+  SectionedOptionsTableCell,
 } from '@Components/SectionedOptionsTableCell'
 import { SectionHeader } from '@Components/SectionHeader'
 import { TableSection } from '@Components/TableSection'
@@ -20,7 +20,7 @@ type Props = {
   title: string
   hasPasscode: boolean
   encryptionAvailable: boolean
-  updateProtectionsAvailable: Function
+  updateProtectionsAvailable: (...args: unknown[]) => unknown
 }
 
 export const SecuritySection = (props: Props) => {
@@ -37,7 +37,7 @@ export const SecuritySection = (props: Props) => {
   )
   const [
     encryptionPolictChangeInProgress,
-    setEncryptionPolictChangeInProgress
+    setEncryptionPolictChangeInProgress,
   ] = useState(false)
   const [hasScreenshotPrivacy, setHasScreenshotPrivacy] = useState<
     boolean | undefined
@@ -60,14 +60,14 @@ export const SecuritySection = (props: Props) => {
         setHasScreenshotPrivacy(hasScreenshotPrivacyEnabled)
       }
     }
-    getHasScreenshotPrivacy()
+    void getHasScreenshotPrivacy()
     const getHasBiometrics = async () => {
       const appHasBiometrics = await application!.hasBiometrics()
       if (mounted) {
         setHasBiometrics(appHasBiometrics)
       }
     }
-    getHasBiometrics()
+    void getHasBiometrics()
     const hasBiometricsSupport = async () => {
       const hasBiometricsAvailable = await (
         application?.deviceInterface as MobileDeviceInterface
@@ -76,7 +76,7 @@ export const SecuritySection = (props: Props) => {
         setSupportsBiometrics(hasBiometricsAvailable)
       }
     }
-    hasBiometricsSupport()
+    void hasBiometricsSupport()
     return () => {
       mounted = false
     }
@@ -177,7 +177,7 @@ export const SecuritySection = (props: Props) => {
 
   const onPasscodePress = async () => {
     if (props.hasPasscode) {
-      disableAuthentication('passcode')
+      void disableAuthentication('passcode')
     } else {
       navigation.push(SCREEN_INPUT_MODAL_PASSCODE)
     }
@@ -185,7 +185,7 @@ export const SecuritySection = (props: Props) => {
 
   const onBiometricsPress = async () => {
     if (hasBiometrics) {
-      disableAuthentication('biometrics')
+      void disableAuthentication('biometrics')
     } else {
       setHasBiometrics(true)
       await application?.enableBiometrics()
@@ -227,11 +227,11 @@ export const SecuritySection = (props: Props) => {
     async (authenticationMethod: 'passcode' | 'biometrics') => {
       switch (authenticationMethod) {
         case 'biometrics': {
-          disableBiometrics()
+          void disableBiometrics()
           break
         }
         case 'passcode': {
-          disablePasscode()
+          void disablePasscode()
           break
         }
       }

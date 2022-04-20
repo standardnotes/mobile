@@ -14,11 +14,11 @@ type HeaderStatusObserverCallback = (status: StatusState) => void
 export class StatusManager extends ApplicationService {
   private messages: StatusState = {
     [SCREEN_NOTES]: {
-      status: ''
+      status: '',
     },
     [SCREEN_COMPOSE]: {
-      status: ''
-    }
+      status: '',
+    },
   }
   private observers: HeaderStatusObserverCallback[] = []
 
@@ -26,11 +26,11 @@ export class StatusManager extends ApplicationService {
     this.observers = []
     this.messages = {
       [SCREEN_NOTES]: {
-        status: ''
+        status: '',
       },
       [SCREEN_COMPOSE]: {
-        status: ''
-      }
+        status: '',
+      },
     }
   }
 
@@ -52,7 +52,7 @@ export class StatusManager extends ApplicationService {
   ) {
     this.messages[screen] = {
       status: message,
-      color
+      color,
     }
     this.notifyObservers()
   }

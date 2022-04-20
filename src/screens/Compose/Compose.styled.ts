@@ -58,7 +58,7 @@ export const LoadingWebViewContainer = styled.View<{ locked?: boolean }>`
   height: 100%;
   width: 100%;
   top: ${({ locked }) =>
-    locked ? NOTE_TITLE_HEIGHT + 26 : NOTE_TITLE_HEIGHT}px;
+    (locked ? NOTE_TITLE_HEIGHT + 26 : NOTE_TITLE_HEIGHT)}px;
   bottom: 0px;
   z-index: 300;
   display: flex;

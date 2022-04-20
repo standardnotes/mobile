@@ -8,8 +8,8 @@ export const NotesContainer = styled.View<{
   shouldSplitLayout?: boolean
   notesListCollapsed?: boolean
 }>`
-  ${({ shouldSplitLayout, notesListCollapsed, theme }) =>
-    shouldSplitLayout
+  ${({ shouldSplitLayout, notesListCollapsed, theme }) => {
+    return shouldSplitLayout
       ? css`
           border-right-color: ${theme.stylekitBorderColor};
           border-right-width: ${notesListCollapsed ? 0 : 1}px;
@@ -17,14 +17,15 @@ export const NotesContainer = styled.View<{
         `
       : css`
           flex: 1;
-        `}
+        `
+  }}
 `
 export const ComposeContainer = styled.View`
   flex: 1;
 `
 
 export const ExpandTouchable = styled.TouchableHighlight.attrs(({ theme }) => ({
-  underlayColor: theme.stylekitBackgroundColor
+  underlayColor: theme.stylekitBackgroundColor,
 }))`
   justify-content: center;
   position: absolute;
@@ -37,5 +38,5 @@ export const ExpandTouchable = styled.TouchableHighlight.attrs(({ theme }) => ({
 
 export const iconNames = {
   md: ['arrow-dropright', 'arrow-dropleft'],
-  ios: ['arrow-forward', 'arrow-back']
+  ios: ['arrow-forward', 'arrow-back'],
 }

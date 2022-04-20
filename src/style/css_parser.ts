@@ -92,7 +92,7 @@ export default class CSSParser {
     const comps = string.split('-')
     let result = ''
     for (let i = 0; i < comps.length; i++) {
-      let part = comps[i]
+      const part = comps[i]
       if (i === 0) {
         result += part
       } else {

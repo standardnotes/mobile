@@ -26,7 +26,7 @@ export const Subtitle = styled.Text`
 `
 
 export const Input = styled.TextInput.attrs(({ theme }) => ({
-  placeholderTextColor: theme.stylekitNeutralColor
+  placeholderTextColor: theme.stylekitNeutralColor,
 }))`
   font-size: ${({ theme }) => theme.mainTextFontSize}px;
   padding: 0px;

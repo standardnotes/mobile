@@ -1,7 +1,8 @@
+import FeatureChecksums from '@standardnotes/components/dist/checksums.json'
 import {
   FeatureDescription,
   FeatureIdentifier,
-  GetFeatures
+  GetFeatures,
 } from '@standardnotes/features'
 import {
   ComponentMutator,
@@ -13,7 +14,7 @@ import {
   SNComponent,
   SNComponentManager,
   SNLog,
-  SNNote
+  SNNote,
 } from '@standardnotes/snjs'
 import { objectToCss } from '@Style/css_parser'
 import { MobileTheme } from '@Style/MobileTheme'
@@ -23,15 +24,20 @@ import StaticServer from 'react-native-static-server'
 import { unzip } from 'react-native-zip-archive'
 import { MobileThemeContent } from './../style/MobileTheme'
 
+type TFeatureChecksums = {
+  [key in FeatureIdentifier]: {
+    version: string
+    base64: string
+    binary: string
+  }
+}
 export enum ComponentLoadingError {
   FailedDownload = 'FailedDownload',
   ChecksumMismatch = 'ChecksumMismatch',
   LocalServerFailure = 'LocalServerFailure',
   DoesntExist = 'DoesntExist',
-  Unknown = 'Unknown'
+  Unknown = 'Unknown',
 }
-
-const FeatureChecksums = require('@standardnotes/components/dist/checksums.json')
 
 const STATIC_SERVER_PORT = 8080
 const BASE_DOCUMENTS_PATH = DocumentDirectoryPath
@@ -53,17 +59,15 @@ export class ComponentManager extends SNComponentManager {
 
   private async createServer() {
     const path = `${BASE_DOCUMENTS_PATH}${COMPONENTS_PATH}`
-    let server: StaticServer
-
-    server = new StaticServer(STATIC_SERVER_PORT, path, {
-      localOnly: true
+    const server = new StaticServer(STATIC_SERVER_PORT, path, {
+      localOnly: true,
     })
     try {
       const serverUrl = await server.start()
       this.staticServer = server
       this.staticServerUrl = serverUrl
     } catch (e) {
-      this.alertService.alert(
+      void this.alertService.alert(
         'Unable to start component server. ' +
           'Editors other than the Plain Editor will fail to load. ' +
           'Please restart the app and try again.'
@@ -74,7 +78,7 @@ export class ComponentManager extends SNComponentManager {
 
   override deinit() {
     super.deinit()
-    this.staticServer!.stop()
+    void this.staticServer!.stop()
   }
 
   public isComponentDownloadable(component: SNComponent): boolean {
@@ -183,7 +187,9 @@ export class ComponentManager extends SNComponentManager {
     const zipContents = await RNFS.readFile(filePath, 'base64')
     const checksum = await this.protocolService.crypto.sha256(zipContents)
 
-    const desiredChecksum = FeatureChecksums[featureIdentifier]?.base64
+    const desiredChecksum = (FeatureChecksums as TFeatureChecksums)[
+      featureIdentifier
+    ]?.base64
     if (!desiredChecksum) {
       this.log(
         `Checksum is missing for ${featureIdentifier}; aborting installation`
@@ -225,7 +231,7 @@ export class ComponentManager extends SNComponentManager {
 
     const result = await RNFS.downloadFile({
       fromUrl: downloadUrl,
-      toFile: tmpLocation
+      toFile: tmpLocation,
     }).promise
 
     if (!String(result.statusCode).startsWith('2')) {

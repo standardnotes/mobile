@@ -9,12 +9,12 @@ import {
   StyledSectionedTableCell,
   SubText,
   Subtitle,
-  Title
+  Title,
 } from './ProtectionsSection.styled'
 
 type Props = {
   title: string
-  protectionsAvailable?: Boolean
+  protectionsAvailable?: boolean
 }
 
 export const ProtectionsSection = (props: Props) => {
@@ -31,7 +31,7 @@ export const ProtectionsSection = (props: Props) => {
     'Actions like viewing protected notes, exporting decrypted backups, or revoking an active session, require additional authentication like entering your account password or application passcode.'
 
   const enableProtections = () => {
-    application?.clearProtectionSession()
+    void application?.clearProtectionSession()
   }
 
   return (

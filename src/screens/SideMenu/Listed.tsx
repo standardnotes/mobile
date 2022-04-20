@@ -4,7 +4,7 @@ import {
   CantLoadActionsText,
   CreateBlogContainer,
   ListedItemRow,
-  styles
+  styles,
 } from '@Screens/SideMenu/Listed.styled'
 import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell'
 import { SideMenuOptionIconDescriptionType } from '@Screens/SideMenu/SideMenuSection'
@@ -13,7 +13,7 @@ import {
   ButtonType,
   ListedAccount,
   ListedAccountInfo,
-  SNNote
+  SNNote,
 } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/custom_action_sheet'
 import React, { FC, useCallback, useEffect, useState } from 'react'
@@ -91,7 +91,7 @@ export const Listed: FC<TProps> = ({ note }) => {
           ButtonType.Info,
           'Later'
         )
-        reloadListedAccounts()
+        void reloadListedAccounts()
 
         if (openSettings) {
           const info = await application.getListedAccountInfo(account)
@@ -103,14 +103,14 @@ export const Listed: FC<TProps> = ({ note }) => {
       setIsRequestingAccount(false)
     }
 
-    requestAccount()
+    void requestAccount()
   }, [application, isRequestingAccount, reloadListedAccounts])
 
   useEffect(() => {
     const loadListedData = async () => {
       await reloadListedAccounts()
     }
-    loadListedData()
+    void loadListedData()
   }, [reloadListedAccounts])
 
   const doesListedItemHaveActions = (
@@ -121,7 +121,7 @@ export const Listed: FC<TProps> = ({ note }) => {
 
   const showActionsMenu = (item: TListedAccountItem, index: number) => {
     if (!doesListedItemHaveActions(item)) {
-      application.alertService.alert('Unable to load actions.')
+      void application.alertService.alert('Unable to load actions.')
       return
     }
 
@@ -151,8 +151,8 @@ export const Listed: FC<TProps> = ({ note }) => {
           showActionsMenu(listedDetails[index], index)
           setIsActionInProgress(false)
           setAuthorUrlWithInProgressAction(null)
-        }
-      }))
+        },
+      })),
     })
   }
 
@@ -177,7 +177,7 @@ export const Listed: FC<TProps> = ({ note }) => {
                       type: SideMenuOptionIconDescriptionType.CustomComponent,
                       value: (
                         <SnIcon type={'notes'} style={styles.blogItemIcon} />
-                      )
+                      ),
                     }}
                   />
                   {isActionInProgress &&
@@ -208,7 +208,7 @@ export const Listed: FC<TProps> = ({ note }) => {
             iconDesc={{
               side: 'left',
               type: SideMenuOptionIconDescriptionType.CustomComponent,
-              value: <SnIcon type={'user-add'} style={styles.blogItemIcon} />
+              value: <SnIcon type={'user-add'} style={styles.blogItemIcon} />,
             }}
           />
           {isRequestingAccount && (
@@ -224,7 +224,7 @@ export const Listed: FC<TProps> = ({ note }) => {
             iconDesc={{
               side: 'left',
               type: SideMenuOptionIconDescriptionType.CustomComponent,
-              value: <SnIcon type={'open-in'} style={styles.blogItemIcon} />
+              value: <SnIcon type={'open-in'} style={styles.blogItemIcon} />,
             }}
           />
         </ListedItemRow>

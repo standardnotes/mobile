@@ -12,7 +12,7 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState
+  useState,
 } from 'react'
 import { TextInput } from 'react-native'
 import { Container, Input } from './InputModal.styled'
@@ -74,14 +74,14 @@ export const TagInputModal = (props: Props) => {
       }
     }
 
-    application?.sync.sync()
+    void application?.sync.sync()
     props.navigation.goBack()
   }, [
     application,
     props.navigation,
     props.route.params.noteUuid,
     props.route.params.tagUuid,
-    text
+    text,
   ])
 
   return (

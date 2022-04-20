@@ -4,7 +4,7 @@ import { HistoryStackNavigationProp } from '@Root/HistoryStack'
 import {
   SCREEN_COMPOSE,
   SCREEN_NOTES,
-  SCREEN_NOTE_HISTORY_PREVIEW
+  SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Screens/screens'
 import { ButtonType, PayloadEmitSource, SNNote } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/custom_action_sheet'
@@ -18,19 +18,19 @@ import {
   StyledTextView,
   TextContainer,
   Title,
-  TitleContainer
+  TitleContainer,
 } from './NoteHistoryPreview.styled'
 
 LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state'
+  'Non-serializable values were found in the navigation state',
 ])
 
 type Props = HistoryStackNavigationProp<typeof SCREEN_NOTE_HISTORY_PREVIEW>
 export const NoteHistoryPreview = ({
   navigation,
   route: {
-    params: { revision, title, originalNoteUuid }
-  }
+    params: { revision, title, originalNoteUuid },
+  },
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext)
@@ -49,9 +49,10 @@ export const NoteHistoryPreview = ({
             ...revision.payload.content,
             title: revision.payload.content.title
               ? revision.payload.content.title + ' (copy)'
-              : undefined
+              : undefined,
           })
 
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-expect-error
           navigation.navigate(SCREEN_NOTES)
         } else {
@@ -64,9 +65,11 @@ export const NoteHistoryPreview = ({
             PayloadEmitSource.RemoteRetrieved
           )
           if (application?.getAppState().isTabletDevice) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
             navigation.navigate(SCREEN_NOTES)
           } else {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
             navigation.navigate(SCREEN_COMPOSE)
           }
@@ -75,7 +78,7 @@ export const NoteHistoryPreview = ({
 
       if (!asCopy) {
         if (originalNote.locked) {
-          application?.alertService.alert(
+          void application?.alertService.alert(
             "This note has editing disabled. If you'd like to restore it to a previous revision, enable editing and try again."
           )
           return
@@ -87,10 +90,10 @@ export const NoteHistoryPreview = ({
           ButtonType.Info
         )
         if (confirmed) {
-          run()
+          void run()
         }
       } else {
-        run()
+        void run()
       }
     },
     [application, navigation, originalNoteUuid, revision.payload.content]
@@ -102,13 +105,13 @@ export const NoteHistoryPreview = ({
       options: [
         {
           text: 'Restore',
-          callback: () => restore(false)
+          callback: () => restore(false),
         },
         {
           text: 'Restore as copy',
-          callback: async () => restore(true)
-        }
-      ]
+          callback: async () => restore(true),
+        },
+      ],
     })
   }, [showActionSheet, title, restore])
 
@@ -125,7 +128,7 @@ export const NoteHistoryPreview = ({
             onPress={onPress}
           />
         </HeaderButtons>
-      )
+      ),
     })
   }, [navigation, onPress])
 

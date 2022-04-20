@@ -26,8 +26,8 @@ export const useStyles = (theme: DefaultTheme) => {
         sections: {
           padding: 15,
           flex: 1,
-          backgroundColor: theme.stylekitBackgroundColor
-        }
+          backgroundColor: theme.stylekitBackgroundColor,
+        },
       }),
     [theme.stylekitBackgroundColor]
   )

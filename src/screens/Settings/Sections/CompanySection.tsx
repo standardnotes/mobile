@@ -16,8 +16,8 @@ const URLS = {
   help: 'https://standardnotes.com/help',
   rate: Platform.select({
     ios: 'https://itunes.apple.com/us/app/standard-notes/id1285392450?ls=1&mt=8',
-    android: 'market://details?id=com.standardnotes'
-  }) as string
+    android: 'market://details?id=com.standardnotes',
+  }) as string,
 }
 
 type Props = {
@@ -40,9 +40,11 @@ export const CompanySection = (props: Props) => {
     if (Platform.OS === 'android') {
       message += '\n\nhttps://standardnotes.com/why-encrypted'
     }
-    application?.getAppState().performActionWithoutStateChangeImpact(() => {
-      Share.share({ title: title, message: message, url: url })
-    })
+    void application
+      ?.getAppState()
+      .performActionWithoutStateChangeImpact(() => {
+        void Share.share({ title: title, message: message, url: url })
+      })
   }
 
   const shareWithFriend = () => {
@@ -54,9 +56,11 @@ export const CompanySection = (props: Props) => {
     if (Platform.OS === 'android') {
       message += '\n\nhttps://standardnotes.com'
     }
-    application?.getAppState().performActionWithoutStateChangeImpact(() => {
-      Share.share({ title: title, message: message, url: url })
-    })
+    void application
+      ?.getAppState()
+      .performActionWithoutStateChangeImpact(() => {
+        void Share.share({ title: title, message: message, url: url })
+      })
   }
 
   return (

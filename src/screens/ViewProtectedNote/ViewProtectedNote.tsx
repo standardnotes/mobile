@@ -10,9 +10,9 @@ type Props = AppStackNavigationProp<typeof SCREEN_VIEW_PROTECTED_NOTE>
 
 export const ViewProtectedNote = ({
   route: {
-    params: { onPressView }
+    params: { onPressView },
   },
-  navigation
+  navigation,
 }: Props) => {
   const application = useContext(ApplicationContext)
 

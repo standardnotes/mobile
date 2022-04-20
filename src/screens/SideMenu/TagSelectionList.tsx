@@ -9,7 +9,7 @@ import {
   ContentType,
   FindItem,
   SmartView,
-  SNTag
+  SNTag,
 } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/custom_action_sheet'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -31,7 +31,7 @@ export const TagSelectionList = React.memo(
     onTagSelect,
     selectedTags,
     emptyPlaceholder,
-    hasBottomPadding
+    hasBottomPadding,
   }: Props) => {
     // Context
     const application = useSafeApplicationContext()
@@ -42,11 +42,11 @@ export const TagSelectionList = React.memo(
     const { showActionSheet } = useCustomActionSheet()
 
     // State
-    const [tags, setTags] = useState<SNTag[] | SmartView[]>(() =>
-      contentType === ContentType.SmartView
+    const [tags, setTags] = useState<SNTag[] | SmartView[]>(() => {
+      return contentType === ContentType.SmartView
         ? application!.items.getSmartViews()
         : []
-    )
+    })
     const displayOptionsSet = useRef<boolean>(false)
 
     const reloadTags = useCallback(() => {
@@ -96,8 +96,8 @@ export const TagSelectionList = React.memo(
             text: 'Rename',
             callback: () =>
               navigation.navigate(SCREEN_INPUT_MODAL_TAG, {
-                tagUuid: tag.uuid
-              })
+                tagUuid: tag.uuid,
+              }),
           },
           {
             text: 'Delete',
@@ -112,9 +112,9 @@ export const TagSelectionList = React.memo(
               if (confirmed) {
                 await application!.mutator.deleteItem(tag)
               }
-            }
-          }
-        ]
+            },
+          },
+        ],
       })
     }
 
@@ -127,7 +127,7 @@ export const TagSelectionList = React.memo(
       : tags
 
     const renderItem: ListRenderItem<SNTag | SmartView> = ({ item }) => {
-      let title = item.title
+      const title = item.title
 
       let children: SNTag[] = []
 
@@ -153,7 +153,7 @@ export const TagSelectionList = React.memo(
             iconDesc={{
               side: 'left',
               type: SideMenuOptionIconDescriptionType.Ascii,
-              value: '#'
+              value: '#',
             }}
             key={item.uuid}
             selected={isSelected}
@@ -162,7 +162,7 @@ export const TagSelectionList = React.memo(
             <FlatList
               // eslint-disable-next-line react-native/no-inline-styles
               style={{
-                paddingLeft: 25
+                paddingLeft: 25,
               }}
               initialNumToRender={10}
               windowSize={10}

@@ -10,7 +10,7 @@ import { Keyboard } from 'react-native'
 import {
   RegistrationDescription,
   RegistrationInput,
-  RegularView
+  RegularView,
 } from './AuthSection.styled'
 
 const DEFAULT_SIGN_IN_TEXT = 'Sign In'
@@ -44,7 +44,7 @@ export const AuthSection = (props: Props) => {
       const host = await application?.getHost()
       setServer(host!)
     }
-    getServer()
+    void getServer()
   }, [application])
 
   const updateServer = useCallback(
@@ -60,7 +60,7 @@ export const AuthSection = (props: Props) => {
 
   const validate = () => {
     if (!email) {
-      application?.alertService?.alert(
+      void application?.alertService?.alert(
         'Please enter a valid email address.',
         'Missing Email',
         'OK'
@@ -69,7 +69,7 @@ export const AuthSection = (props: Props) => {
     }
 
     if (!password) {
-      application?.alertService?.alert(
+      void application?.alertService?.alert(
         'Please enter your password.',
         'Missing Password',
         'OK'
@@ -98,7 +98,7 @@ export const AuthSection = (props: Props) => {
 
     if (result?.error) {
       if (result?.error.message) {
-        application?.alertService?.alert(result?.error.message)
+        void application?.alertService?.alert(result?.error.message)
       }
       setSigningIn(false)
       return
@@ -119,7 +119,7 @@ export const AuthSection = (props: Props) => {
   const register = async () => {
     setRegistering(true)
     if (password !== passwordConfirmation) {
-      application?.alertService?.alert(
+      void application?.alertService?.alert(
         'The passwords you entered do not match. Please try again.',
         "Passwords Don't Match",
         'OK'
@@ -133,7 +133,7 @@ export const AuthSection = (props: Props) => {
         true
       )
       if (result?.error) {
-        application?.alertService?.alert(result.error.message)
+        void application?.alertService?.alert(result.error.message)
       }
     }
     setRegistering(false)

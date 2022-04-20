@@ -11,14 +11,14 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState
+  useState,
 } from 'react'
 import { Platform } from 'react-native'
 import { WebView } from 'react-native-webview'
 import {
   OnShouldStartLoadWithRequest,
   WebViewErrorEvent,
-  WebViewMessageEvent
+  WebViewMessageEvent,
 } from 'react-native-webview/lib/WebViewTypes'
 import {
   DeprecatedContainer,
@@ -28,7 +28,7 @@ import {
   LockedContainer,
   LockedText,
   StyledIcon,
-  StyledWebview
+  StyledWebview,
 } from './ComponentView.styled'
 
 type Props = {
@@ -57,7 +57,7 @@ export const ComponentView = ({
   onLoadStart,
   onDownloadEditorStart,
   onDownloadEditorEnd,
-  componentViewer
+  componentViewer,
 }: Props) => {
   // Context
   const application = useContext(ApplicationContext)
@@ -135,14 +135,14 @@ export const ComponentView = ({
         )
 
         if (confirmed) {
-          application
+          void application
             ?.getLocalPreferences()
             .setUserPrefValue(PrefKey.DoNotShowAgainUnsupportedEditors, true)
         }
       }
     }
 
-    warnIfUnsupportedEditors()
+    void warnIfUnsupportedEditors()
   }, [application])
 
   const onLoadErrorHandler = useCallback(
@@ -181,7 +181,7 @@ export const ComponentView = ({
         }
         setLocalEditorReady(true)
       }
-      asyncFunc()
+      void asyncFunc()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

@@ -2,7 +2,7 @@ import { associateComponentWithNote } from '@Lib/component_manager'
 import {
   useChangeNote,
   useDeleteNoteWithPrivileges,
-  useProtectOrUnprotectNote
+  useProtectOrUnprotectNote,
 } from '@Lib/snjs_helper_hooks'
 import { isUnfinishedFeaturesEnabled } from '@Lib/utils'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
@@ -12,7 +12,7 @@ import { useSafeApplicationContext } from '@Root/hooks/useSafeApplicationContext
 import {
   SCREEN_COMPOSE,
   SCREEN_INPUT_MODAL_TAG,
-  SCREEN_NOTE_HISTORY
+  SCREEN_NOTE_HISTORY,
 } from '@Screens/screens'
 import { Files } from '@Screens/SideMenu/Files'
 import { Listed } from '@Screens/SideMenu/Listed'
@@ -31,7 +31,7 @@ import {
   SmartView,
   SNComponent,
   SNNote,
-  SNTag
+  SNTag,
 } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/custom_action_sheet'
 import {
@@ -43,7 +43,7 @@ import {
   ICON_MEDICAL,
   ICON_PRICE_TAG,
   ICON_SHARE,
-  ICON_TRASH
+  ICON_TRASH,
 } from '@Style/icons'
 import { ThemeService } from '@Style/theme_service'
 import React, {
@@ -51,7 +51,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState
+  useState,
 } from 'react'
 import { Platform, Share } from 'react-native'
 import FAB from 'react-native-fab'
@@ -63,14 +63,14 @@ import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled'
 import {
   SideMenuOption,
   SideMenuOptionIconDescriptionType,
-  SideMenuSection
+  SideMenuSection,
 } from './SideMenuSection'
 import { TagSelectionList } from './TagSelectionList'
 
 function sortAlphabetically(array: SNComponent[]): SNComponent[] {
-  return array.sort((a, b) =>
-    a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
-  )
+  return array.sort((a, b) => {
+    return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+  })
 }
 
 type Props = {
@@ -153,7 +153,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
     },
     () => {
-      changeNote(mutator => {
+      void changeNote(mutator => {
         mutator.trashed = true
       }, false)
       props.drawerRef?.closeDrawer()
@@ -280,7 +280,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         return
       }
       if (note?.locked) {
-        application?.alertService.alert(
+        void application?.alertService.alert(
           "This note has editing disabled. If you'd like to edit its options, enable editing on it, and try again."
         )
         return
@@ -328,14 +328,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
         await associateComponentWithNote(application, selectedComponent, note)
       }
       /** Dirtying can happen above */
-      application?.sync.sync()
+      void application?.sync.sync()
     },
     [
       application,
       disassociateComponentWithCurrentNote,
       editor,
       note,
-      props.drawerRef
+      props.drawerRef,
     ]
   )
 
@@ -365,14 +365,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
       const setAsDefault = () => {
         if (currentDefault) {
-          application!.mutator.changeItem(currentDefault, m => {
+          void application!.mutator.changeItem(currentDefault, m => {
             const mutator = m as ComponentMutator
             mutator.isMobileDefault = false
           })
         }
 
         if (component) {
-          application!.mutator.changeAndSaveItem(component, m => {
+          void application!.mutator.changeAndSaveItem(component, m => {
             const mutator = m as ComponentMutator
             mutator.isMobileDefault = true
           })
@@ -380,7 +380,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
 
       const removeAsDefault = () => {
-        application!.mutator.changeItem(currentDefault, m => {
+        void application!.mutator.changeItem(currentDefault, m => {
           const mutator = m as ComponentMutator
           mutator.isMobileDefault = false
         })
@@ -401,9 +401,9 @@ export const NoteSideMenu = React.memo((props: Props) => {
                   setAsDefault()
                 }
               }
-            }
-          }
-        ]
+            },
+          },
+        ],
       })
     },
     [application, showActionSheet]
@@ -420,12 +420,12 @@ export const NoteSideMenu = React.memo((props: Props) => {
         key: 'plain-editor',
         selected: !componentEditor,
         onSelect: () => {
-          onEditorPress(undefined)
+          void onEditorPress(undefined)
         },
         onLongPress: () => {
-          onEdtiorLongPress(undefined)
-        }
-      }
+          void onEdtiorLongPress(undefined)
+        },
+      },
     ]
     components.map(component => {
       options.push({
@@ -434,11 +434,11 @@ export const NoteSideMenu = React.memo((props: Props) => {
         key: component.uuid || component.name,
         selected: component.uuid === componentEditor?.uuid,
         onSelect: () => {
-          onEditorPress(component)
+          void onEditorPress(component)
         },
         onLongPress: () => {
-          onEdtiorLongPress(component)
-        }
+          void onEdtiorLongPress(component)
+        },
       })
     })
     if (options.length === 1) {
@@ -449,13 +449,13 @@ export const NoteSideMenu = React.memo((props: Props) => {
           type: SideMenuOptionIconDescriptionType.Icon,
           name: ThemeService.nameForIcon(ICON_MEDICAL),
           side: 'right',
-          size: 17
+          size: 17,
         },
         onSelect: () => {
           application?.deviceInterface?.openUrl(
             'https://standardnotes.com/plans'
           )
-        }
+        },
       })
     }
     return options
@@ -497,12 +497,12 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const archiveOption = note.archived ? 'Unarchive' : 'Archive'
     const archiveEvent = () => {
       if (note.locked) {
-        application?.alertService.alert(
+        void application?.alertService.alert(
           `This note has editing disabled. If you'd like to ${archiveOption.toLowerCase()} it, enable editing on it, and try again.`
         )
         return
       }
-      changeNote(mutator => {
+      void changeNote(mutator => {
         mutator.archived = !note.archived
       }, false)
       leaveEditor()
@@ -520,22 +520,25 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const openSessionHistory = () => {
       if (!editor?.isTemplateNote) {
         props.drawerRef?.closeDrawer()
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         navigation.navigate('HistoryStack', {
           screen: SCREEN_NOTE_HISTORY,
-          params: { noteUuid: note.uuid }
+          params: { noteUuid: note.uuid },
         })
       }
     }
 
     const shareNote = () => {
       if (note) {
-        application?.getAppState().performActionWithoutStateChangeImpact(() => {
-          Share.share({
-            title: note.title,
-            message: note.text
+        void application
+          ?.getAppState()
+          .performActionWithoutStateChangeImpact(() => {
+            void Share.share({
+              title: note.title,
+              message: note.text,
+            })
           })
-        })
       }
     }
 
@@ -547,16 +550,16 @@ export const NoteSideMenu = React.memo((props: Props) => {
       {
         text: 'History',
         onSelect: openSessionHistory,
-        icon: ICON_HISTORY
+        icon: ICON_HISTORY,
       },
-      { text: 'Share', onSelect: shareNote, icon: ICON_SHARE }
+      { text: 'Share', onSelect: shareNote, icon: ICON_SHARE },
     ]
 
     if (!note.trashed) {
       rawOptions.push({
         text: 'Move to Trash',
         onSelect: async () => deleteNote(false),
-        icon: ICON_TRASH
+        icon: ICON_TRASH,
       })
     }
 
@@ -565,10 +568,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
       key: rawOption.icon,
       iconDesc: {
         type: SideMenuOptionIconDescriptionType.Icon,
-        side: 'right' as 'right',
-        name: ThemeService.nameForIcon(rawOption.icon)
+        side: 'right' as const,
+        name: ThemeService.nameForIcon(rawOption.icon),
       },
-      onSelect: rawOption.onSelect
+      onSelect: rawOption.onSelect,
     }))
 
     if (note.trashed) {
@@ -577,20 +580,20 @@ export const NoteSideMenu = React.memo((props: Props) => {
           text: 'Restore',
           key: 'restore-note',
           onSelect: () => {
-            changeNote(mutator => {
+            void changeNote(mutator => {
               mutator.trashed = false
             }, false)
-          }
+          },
         },
         {
           text: 'Delete permanently',
-          textClass: 'danger' as 'danger',
+          textClass: 'danger' as const,
           key: 'delete-forever',
-          onSelect: async () => deleteNote(true)
+          onSelect: async () => deleteNote(true),
         },
         {
           text: 'Empty Trash',
-          textClass: 'danger' as 'danger',
+          textClass: 'danger' as const,
           key: 'empty trash',
           onSelect: async () => {
             const count = application?.items.trashedItems.length
@@ -606,10 +609,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
               if (!application.getAppState().isInTabletMode) {
                 navigation.popToTop()
               }
-              application?.sync.sync()
+              void application?.sync.sync()
             }
-          }
-        }
+          },
+        },
       ])
     }
 
@@ -623,7 +626,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     navigation,
     note,
     props.drawerRef,
-    protectOrUnprotectNote
+    protectOrUnprotectNote,
   ])
 
   const onTagSelect = useCallback(
@@ -646,7 +649,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         }
       }
       reloadTags()
-      application?.sync.sync()
+      void application?.sync.sync()
     },
     [application, note, reloadTags, selectedTags]
   )
@@ -660,7 +663,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     OptionsSection = 'options-section',
     EditorsSection = 'editors-section',
     ListedSection = 'listed-section',
-    TagsSection = 'tags-section'
+    TagsSection = 'tags-section',
   }
 
   return (
@@ -672,7 +675,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           noteOptions,
           editorComponents: editors,
           onTagSelect,
-          selectedTags
+          selectedTags,
         }))}
         renderItem={({ item }) => {
           const {
@@ -680,7 +683,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             EditorsSection,
             ListedSection,
             TagsSection,
-            FilesSection
+            FilesSection,
           } = MenuSections
 
           if (

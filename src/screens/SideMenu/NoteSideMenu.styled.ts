@@ -21,8 +21,8 @@ export const useStyles = (theme: DefaultTheme) => {
       StyleSheet.create({
         sections: {
           padding: 15,
-          backgroundColor: theme.stylekitBackgroundColor
-        }
+          backgroundColor: theme.stylekitBackgroundColor,
+        },
       }),
     [theme.stylekitBackgroundColor]
   )

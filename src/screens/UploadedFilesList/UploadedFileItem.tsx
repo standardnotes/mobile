@@ -15,7 +15,7 @@ import {
   FileDetailsWithExtraIconsContainer,
   FileIconContainer,
   FileName,
-  uploadedFileItemStyles
+  uploadedFileItemStyles,
 } from './UploadedFileItem.styled'
 
 export type UploadedFileItemProps = {

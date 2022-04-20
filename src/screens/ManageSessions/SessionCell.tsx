@@ -1,6 +1,6 @@
 import {
   Props as TableCellProps,
-  SectionedTableCellTouchableHighlight
+  SectionedTableCellTouchableHighlight,
 } from '@Components/SectionedTableCell'
 import React from 'react'
 import styled, { css } from 'styled-components/native'
@@ -15,7 +15,7 @@ type Props = {
 }
 
 const Container = styled(SectionedTableCellTouchableHighlight).attrs(props => ({
-  underlayColor: props.theme.stylekitBorderColor
+  underlayColor: props.theme.stylekitBorderColor,
 }))<TableCellProps>`
   padding-top: ${12}px;
   justify-content: center;
@@ -42,8 +42,9 @@ const ButtonLabel = styled.Text<ButtonLabelProps>`
 export const SubTitleText = styled.Text<{ current: boolean }>`
   font-size: 14px;
   margin-top: 4px;
-  color: ${({ theme, current }) =>
-    current ? theme.stylekitInfoColor : theme.stylekitForegroundColor};
+  color: ${({ theme, current }) => {
+    return current ? theme.stylekitInfoColor : theme.stylekitForegroundColor
+  }};
   opacity: 0.8;
   line-height: 21px;
 `

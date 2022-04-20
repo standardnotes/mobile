@@ -6,7 +6,7 @@ import WebView from 'react-native-webview'
 import styled, { css } from 'styled-components/native'
 
 export const FlexContainer = styled(SafeAreaView).attrs(() => ({
-  edges: ['bottom']
+  edges: ['bottom'],
 }))`
   flex: 1;
   background-color: ${({ theme }) => theme.stylekitBackgroundColor};
@@ -43,7 +43,7 @@ export const StyledWebview = styled(WebView)<{ showWebView: boolean }>`
 export const StyledIcon = styled(Icon).attrs(({ theme }) => ({
   color: theme.stylekitBackgroundColor,
   size: 16,
-  name: ThemeService.nameForIcon(ICON_LOCK)
+  name: ThemeService.nameForIcon(ICON_LOCK),
 }))``
 
 export const DeprecatedContainer = styled.View`
@@ -66,5 +66,5 @@ export const DeprecatedText = styled.Text`
 export const DeprecatedIcon = styled(Icon).attrs(({ theme }) => ({
   color: theme.stylekitBackgroundColor,
   size: 16,
-  name: ThemeService.nameForIcon(ICON_ALERT)
+  name: ThemeService.nameForIcon(ICON_ALERT),
 }))``

@@ -12,7 +12,7 @@ export class ReviewService extends ApplicationService {
       return
     }
     const runCount = await this.getRunCount()
-    this.setRunCount(runCount + 1)
+    void this.setRunCount(runCount + 1)
     if (RUN_COUNTS_BEFORE_REVIEW.includes(runCount)) {
       setTimeout(function () {
         StoreReview.requestReview()

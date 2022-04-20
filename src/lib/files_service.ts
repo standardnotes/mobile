@@ -1,7 +1,7 @@
 import {
   ByteChunker,
   FileSelectionResponse,
-  OnChunkCallback
+  OnChunkCallback,
 } from '@standardnotes/filepicker'
 import { ApplicationService, SNFile } from '@standardnotes/snjs'
 import { Buffer } from 'buffer'
@@ -12,7 +12,7 @@ import RNFS, {
   CachesDirectoryPath,
   DocumentDirectoryPath,
   DownloadDirectoryPath,
-  read
+  read,
 } from 'react-native-fs'
 import { Asset } from 'react-native-image-picker'
 
@@ -26,7 +26,7 @@ export class FilesService extends ApplicationService {
 
   getDestinationPath({
     fileName,
-    saveInTempLocation = false
+    saveInTempLocation = false,
   }: TGetFileDestinationPath): string {
     let directory = DocumentDirectoryPath
 
@@ -108,7 +108,7 @@ export class FilesService extends ApplicationService {
 
     return {
       name: fileName,
-      mimeType: file.type || ''
+      mimeType: file.type || '',
     }
   }
 }

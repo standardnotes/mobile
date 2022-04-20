@@ -24,7 +24,7 @@ const Title = styled.Text`
 `
 const SubTitle = styled.Text.attrs(() => ({
   adjustsFontSizeToFit: true,
-  numberOfLines: 1
+  numberOfLines: 1,
 }))<{ color?: string }>`
   color: ${props => props.color ?? props.theme.stylekitForegroundColor};
   opacity: ${props => (props.color ? 1 : 0.6)};

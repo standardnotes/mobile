@@ -24,7 +24,7 @@ type Props = {
 
 const TouchableContainer = styled(SectionedTableCellTouchableHighlight).attrs(
   props => ({
-    underlayColor: props.theme.stylekitBorderColor
+    underlayColor: props.theme.stylekitBorderColor,
   })
 )`
   flex-direction: column;
@@ -35,8 +35,9 @@ const TouchableContainer = styled(SectionedTableCellTouchableHighlight).attrs(
 `
 const ContentContainer = styled.View<Pick<Props, 'leftAlignIcon'>>`
   flex: 1;
-  justify-content: ${props =>
-    props.leftAlignIcon ? 'flex-start' : 'space-between'};
+  justify-content: ${props => {
+    return props.leftAlignIcon ? 'flex-start' : 'space-between'
+  }};
   flex-direction: row;
   align-items: center;
 `
@@ -59,7 +60,7 @@ const Label = styled.Text<LabelProps>`
       color = props.theme.stylekitNeutralColor
     }
     if (props.color) {
-      color = color
+      color = props.color
     }
     return color
   }};

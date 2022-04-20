@@ -7,7 +7,7 @@ export enum SideMenuOptionIconDescriptionType {
   Icon = 'icon',
   Ascii = 'ascii',
   Circle = 'circle',
-  CustomComponent = 'custom-component'
+  CustomComponent = 'custom-component',
 }
 
 export type SideMenuOption = {

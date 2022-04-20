@@ -37,37 +37,37 @@ export const PreferencesSection = () => {
     return [
       { key: CollectionSort.CreatedAt, label: 'Date Added' },
       { key: CollectionSort.UpdatedAt, label: 'Date Modified' },
-      { key: CollectionSort.Title, label: 'Title' }
+      { key: CollectionSort.Title, label: 'Title' },
     ]
   }, [])
 
   const toggleReverseSort = () => {
-    application
+    void application
       ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.SortNotesReverse, !sortReverse)
     setSortReverse(value => !value)
   }
 
   const changeSortOption = (key: CollectionSortProperty) => {
-    application
+    void application
       ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.SortNotesBy, key)
     setSortBy(key)
   }
   const toggleNotesPreviewHidden = () => {
-    application
+    void application
       ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.NotesHideNotePreview, !hidePreviews)
     setHidePreviews(value => !value)
   }
   const toggleNotesDateHidden = () => {
-    application
+    void application
       ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.NotesHideDate, !hideDates)
     setHideDates(value => !value)
   }
   const toggleNotesEditorIconHidden = () => {
-    application
+    void application
       ?.getLocalPreferences()
       .setUserPrefValue(PrefKey.NotesHideEditorIcon, !hideEditorIcon)
     setHideEditorIcon(value => !value)

@@ -8,7 +8,7 @@ import {
   BaseView,
   StyledSectionedTableCell,
   Subtitle,
-  Title
+  Title,
 } from './EncryptionSection.styled'
 
 type Props = {
@@ -33,7 +33,7 @@ export const EncryptionSection = (props: Props) => {
         setProtocolDisplayName(displayName)
       }
     }
-    getProtocolDisplayName()
+    void getProtocolDisplayName()
     return () => {
       mounted = false
     }
@@ -61,7 +61,7 @@ export const EncryptionSection = (props: Props) => {
 
     const items = application!.items.getItems([
       ContentType.Note,
-      ContentType.Tag
+      ContentType.Tag,
     ])
     const itemsStatus =
       items.length + '/' + items.length + ' notes and tags encrypted'
@@ -69,7 +69,7 @@ export const EncryptionSection = (props: Props) => {
     return {
       encryptionStatus,
       sourceString,
-      itemsStatus
+      itemsStatus,
     }
   }, [application, props.encryptionAvailable, isLocked, protocolDisplayName])
 

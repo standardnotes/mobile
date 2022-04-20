@@ -12,7 +12,7 @@ import {
   OutOfSyncLabel,
   SubTitle,
   Title,
-  Touchable
+  Touchable,
 } from './SideMenuHero.styled'
 
 type Props = {
@@ -56,7 +56,7 @@ export const SideMenuHero: React.FC<Props> = props => {
         title: 'Data Not Backed Up',
         text: hasEncryption
           ? 'Sign in or register to enable sync to your other devices.'
-          : 'Sign in or register to add encryption and enable sync to your other devices.'
+          : 'Sign in or register to add encryption and enable sync to your other devices.',
       }
     } else if (!isLocked) {
       const user = application?.getUser()
@@ -65,7 +65,7 @@ export const SideMenuHero: React.FC<Props> = props => {
         itemsCount + '/' + itemsCount + ' notes and tags encrypted'
       return {
         title: email,
-        text: itemsStatus
+        text: itemsStatus,
       }
     } else {
       return { text: '', title: '' }

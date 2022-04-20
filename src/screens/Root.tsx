@@ -1,7 +1,7 @@
 import {
   AppStateEventType,
   AppStateType,
-  TabletModeChangeData
+  TabletModeChangeData,
 } from '@Lib/application_state'
 import { useHasEditor, useIsLocked } from '@Lib/snjs_helper_hooks'
 import { ApplicationContext } from '@Root/ApplicationContext'
@@ -19,7 +19,7 @@ import {
   Container,
   ExpandTouchable,
   iconNames,
-  NotesContainer
+  NotesContainer,
 } from './Root.styled'
 
 export const Root = () => {
@@ -50,7 +50,7 @@ export const Root = () => {
       ?.getAppState()
       .addStateChangeObserver(state => {
         if (state === AppStateType.GainingFocus) {
-          application.sync.sync()
+          void application.sync.sync()
         }
       })
     const removeApplicationStateEventHandler = application

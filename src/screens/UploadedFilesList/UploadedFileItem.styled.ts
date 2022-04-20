@@ -4,8 +4,8 @@ import styled from 'styled-components/native'
 
 export const uploadedFileItemStyles = StyleSheet.create({
   lockIcon: {
-    marginLeft: 8
-  }
+    marginLeft: 8,
+  },
 })
 
 export const FileDataContainer = styled.View`

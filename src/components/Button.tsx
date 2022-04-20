@@ -10,7 +10,7 @@ type Props = {
 }
 
 const PrimaryButtonContainer = styled.TouchableOpacity.attrs({
-  activeOpacity: 0.84
+  activeOpacity: 0.84,
 })<{
   fullWidth?: boolean
   last?: boolean
@@ -31,7 +31,7 @@ const PrimaryButtonContainer = styled.TouchableOpacity.attrs({
 const SecondaryButtonContainer = styled.TouchableHighlight.attrs(
   ({ theme }) => ({
     activeOpacity: 0.84,
-    underlayColor: theme.stylekitBorderColor
+    underlayColor: theme.stylekitBorderColor,
   })
 )<{
   fullWidth?: boolean
@@ -54,8 +54,11 @@ const ButtonLabel = styled.Text<{ primary?: boolean }>`
   text-align: center;
   text-align-vertical: center;
   font-weight: bold;
-  color: ${({ theme, primary }) =>
-    primary ? theme.stylekitInfoContrastColor : theme.stylekitForegroundColor};
+  color: ${({ theme, primary }) => {
+    return primary
+      ? theme.stylekitInfoContrastColor
+      : theme.stylekitForegroundColor
+  }};
   font-size: ${props => props.theme.mainTextFontSize}px;
 `
 
@@ -64,7 +67,7 @@ export const Button: React.FC<Props> = ({
   label,
   primary,
   fullWidth,
-  last
+  last,
 }: Props) => {
   if (primary) {
     return (

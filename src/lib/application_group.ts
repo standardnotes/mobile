@@ -3,7 +3,7 @@ import { InternalEventBus } from '@standardnotes/services'
 import {
   ApplicationDescriptor,
   DeviceInterface,
-  SNApplicationGroup
+  SNApplicationGroup,
 } from '@standardnotes/snjs'
 import { MobileApplication } from './application'
 import { ApplicationState } from './application_state'
@@ -21,7 +21,7 @@ export class ApplicationGroup extends SNApplicationGroup {
 
   override async initialize(_callback?: any): Promise<void> {
     await super.initialize({
-      applicationCreator: this.createApplication
+      applicationCreator: this.createApplication,
     })
   }
 
@@ -51,7 +51,7 @@ export class ApplicationGroup extends SNApplicationGroup {
       prefsService,
       installationService,
       statusManager,
-      filesService
+      filesService,
     })
     return application
   }

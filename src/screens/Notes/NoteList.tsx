@@ -14,13 +14,13 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState
+  useState,
 } from 'react'
 import {
   Animated,
   FlatList,
   ListRenderItem,
-  RefreshControl
+  RefreshControl,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import IosSearchBar from 'react-native-search-bar'
@@ -34,7 +34,7 @@ import {
   LoadingText,
   SearchBarContainer,
   SearchOptionsContainer,
-  styles
+  styles,
 } from './NoteList.styled'
 import { OfflineBanner } from './OfflineBanner'
 
@@ -155,13 +155,13 @@ export const NoteList = (props: Props) => {
       Animated.timing(opacityAnimationValue, {
         toValue: showOptions ? 1 : 0,
         duration: 200,
-        useNativeDriver: false
+        useNativeDriver: false,
       }),
       Animated.timing(marginTopAnimationValue, {
         toValue: showOptions ? 0 : -40,
         duration: 200,
-        useNativeDriver: false
-      })
+        useNativeDriver: false,
+      }),
     ]).start()
   }
 
@@ -220,7 +220,7 @@ export const NoteList = (props: Props) => {
           keyboardShouldPersistTaps={'always'}
           style={{
             opacity: opacityAnimationValue,
-            marginTop: marginTopAnimationValue
+            marginTop: marginTopAnimationValue,
           }}
         >
           {props.searchOptions.map(({ selected, onPress, label }, index) => (
@@ -240,18 +240,18 @@ export const NoteList = (props: Props) => {
         keyExtractor={item => item.uuid}
         contentContainerStyle={[
           { paddingBottom: insets.bottom },
-          props.notes.length > 0 ? {} : { height: '100%' }
+          props.notes.length > 0 ? {} : { height: '100%' },
         ]}
         initialNumToRender={6}
         windowSize={6}
         maxToRenderPerBatch={6}
-        ListEmptyComponent={() =>
-          placeholderText.length > 0 ? (
+        ListEmptyComponent={() => {
+          return placeholderText.length > 0 ? (
             <LoadingContainer>
               <LoadingText>{placeholderText}</LoadingText>
             </LoadingContainer>
           ) : null
-        }
+        }}
         keyboardDismissMode={'interactive'}
         keyboardShouldPersistTaps={'never'}
         refreshControl={

@@ -18,7 +18,7 @@ import {
   StorageKey,
   StorageValueModes,
   SystemViewId,
-  Uuid
+  Uuid,
 } from '@standardnotes/snjs'
 import {
   AppState,
@@ -29,16 +29,15 @@ import {
   KeyboardEventListener,
   NativeEventSubscription,
   NativeModules,
-  Platform
+  Platform,
 } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
 import { hide, show } from 'react-native-privacy-snapshot'
 import VersionInfo from 'react-native-version-info'
+import pjson from '../../package.json'
 import { MobileApplication } from './application'
 import { associateComponentWithNote } from './component_manager'
 import { PrefKey } from './preferences_manager'
-
-const pjson = require('../../package.json')
 const { PlatformConstants } = NativeModules
 
 export enum AppStateType {
@@ -48,18 +47,18 @@ export enum AppStateType {
   ResumingFromBackground = 4,
   TagChanged = 5,
   EditorClosed = 6,
-  PreferencesChanged = 7
+  PreferencesChanged = 7,
 }
 
 export enum LockStateType {
   Locked = 1,
-  Unlocked = 2
+  Unlocked = 2,
 }
 
 export enum AppStateEventType {
   KeyboardChangeEvent = 1,
   TabletModeChange = 2,
-  DrawerOpen = 3
+  DrawerOpen = 3,
 }
 
 export type TabletModeChangeData = {
@@ -69,16 +68,16 @@ export type TabletModeChangeData = {
 
 export enum UnlockTiming {
   Immediately = 'immediately',
-  OnQuit = 'on-quit'
+  OnQuit = 'on-quit',
 }
 
 export enum PasscodeKeyboardType {
   Default = 'default',
-  Numeric = 'numeric'
+  Numeric = 'numeric',
 }
 
 export enum MobileStorageKey {
-  PasscodeKeyboardTypeKey = 'passcodeKeyboardType'
+  PasscodeKeyboardTypeKey = 'passcodeKeyboardType',
 }
 
 type EventObserverCallback = (
@@ -104,10 +103,10 @@ export class ApplicationState extends ApplicationService {
   selectedTagRestored = false
   selectedTag: SNTag | SmartView = this.application.items.getSmartViews()[0]
   userPreferences?: SNUserPrefs
-  tabletMode: boolean = false
-  ignoreStateChanges: boolean = false
+  tabletMode = false
+  ignoreStateChanges = false
   mostRecentState?: AppStateType
-  authenticationInProgress: boolean = false
+  authenticationInProgress = false
   multiEditorEnabled = false
   screenshotPrivacyEnabled?: boolean
   passcodeTiming?: UnlockTiming
@@ -189,7 +188,7 @@ export class ApplicationState extends ApplicationService {
     MobileApplication.setPreviouslyLaunched()
     this.screenshotPrivacyEnabled =
       (await this.getScreenshotPrivacyEnabled()) ?? true
-    this.setAndroidScreenshotPrivacy(this.screenshotPrivacyEnabled)
+    void this.setAndroidScreenshotPrivacy(this.screenshotPrivacyEnabled)
   }
 
   /**
@@ -237,7 +236,7 @@ export class ApplicationState extends ApplicationService {
     this.mostRecentState = state
 
     for (const observer of this.observers) {
-      observer(state, data)
+      void observer(state, data)
     }
   }
 
@@ -249,7 +248,7 @@ export class ApplicationState extends ApplicationService {
     data?: TabletModeChangeData
   ) {
     for (const observer of this.stateObservers) {
-      observer(event, data)
+      void observer(event, data)
     }
   }
 
@@ -258,7 +257,7 @@ export class ApplicationState extends ApplicationService {
    */
   private notifyLockStateObservers(event: LockStateType) {
     for (const observer of this.lockStateObservers) {
-      observer(event)
+      void observer(event)
     }
   }
 
@@ -312,8 +311,8 @@ export class ApplicationState extends ApplicationService {
     await this.application.editorGroup.createNoteView(noteUuid)
 
     if (note && note.conflictOf) {
-      InteractionManager.runAfterInteractions(() => {
-        this.application?.mutator.changeAndSaveItem(note, mutator => {
+      void InteractionManager.runAfterInteractions(() => {
+        void this.application?.mutator.changeAndSaveItem(note, mutator => {
           mutator.conflictOf = undefined
         })
       })
@@ -458,7 +457,7 @@ export class ApplicationState extends ApplicationService {
   /**
    * Set selected @SNTag
    */
-  public setSelectedTag(tag: SNTag | SmartView, saveSelection: boolean = true) {
+  public setSelectedTag(tag: SNTag | SmartView, saveSelection = true) {
     if (this.selectedTag.uuid === tag.uuid) {
       return
     }
@@ -466,14 +465,14 @@ export class ApplicationState extends ApplicationService {
     this.selectedTag = tag
 
     if (saveSelection) {
-      this.application
+      void this.application
         .getLocalPreferences()
         .setUserPrefValue(PrefKey.SelectedTagUuid, tag.uuid)
     }
 
     this.notifyOfStateChange(AppStateType.TagChanged, {
       tag,
-      previousTag
+      previousTag,
     })
   }
 
@@ -521,7 +520,7 @@ export class ApplicationState extends ApplicationService {
       this.tabletMode = enabledTabletMode
       this.notifyEventObservers(AppStateEventType.TabletModeChange, {
         new_isInTabletMode: enabledTabletMode,
-        old_isInTabletMode: !enabledTabletMode
+        old_isInTabletMode: !enabledTabletMode,
       })
     }
   }
@@ -531,13 +530,13 @@ export class ApplicationState extends ApplicationService {
       {
         title: 'Immediately',
         key: UnlockTiming.Immediately,
-        selected: this.passcodeTiming === UnlockTiming.Immediately
+        selected: this.passcodeTiming === UnlockTiming.Immediately,
       },
       {
         title: 'On Quit',
         key: UnlockTiming.OnQuit,
-        selected: this.passcodeTiming === UnlockTiming.OnQuit
-      }
+        selected: this.passcodeTiming === UnlockTiming.OnQuit,
+      },
     ]
   }
 
@@ -546,13 +545,13 @@ export class ApplicationState extends ApplicationService {
       {
         title: 'Immediately',
         key: UnlockTiming.Immediately,
-        selected: this.biometricsTiming === UnlockTiming.Immediately
+        selected: this.biometricsTiming === UnlockTiming.Immediately,
       },
       {
         title: 'On Quit',
         key: UnlockTiming.OnQuit,
-        selected: this.biometricsTiming === UnlockTiming.OnQuit
-      }
+        selected: this.biometricsTiming === UnlockTiming.OnQuit,
+      },
     ]
   }
 
@@ -573,7 +572,7 @@ export class ApplicationState extends ApplicationService {
           ChallengeReason.ApplicationUnlock,
           false
         )
-        this.application.promptForCustomChallenge(challenge)
+        void this.application.promptForCustomChallenge(challenge)
 
         this.locked = true
         this.notifyLockStateObservers(LockStateType.Locked)
@@ -581,7 +580,7 @@ export class ApplicationState extends ApplicationService {
           onComplete: () => {
             this.locked = false
             this.notifyLockStateObservers(LockStateType.Unlocked)
-          }
+          },
         })
       }
     }
@@ -645,7 +644,7 @@ export class ApplicationState extends ApplicationService {
         AppStateType.LosingFocus,
         AppStateType.EnteringBackground,
         AppStateType.GainingFocus,
-        AppStateType.ResumingFromBackground
+        AppStateType.ResumingFromBackground,
       ] as Array<AppStateType>
     ).includes(state)
   }
@@ -678,7 +677,7 @@ export class ApplicationState extends ApplicationService {
       StorageValueModes.Default
     )
     this.screenshotPrivacyEnabled = enabled
-    this.setAndroidScreenshotPrivacy(enabled)
+    void this.setAndroidScreenshotPrivacy(enabled)
   }
 
   public async setPasscodeTiming(timing: UnlockTiming) {
@@ -728,7 +727,7 @@ export class ApplicationState extends ApplicationService {
   ) {
     this.ignoreStateChanges = true
     if (notAwaited) {
-      block()
+      void block()
     } else {
       await block()
     }

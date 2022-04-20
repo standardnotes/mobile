@@ -28,25 +28,25 @@ export const NoteCellIconFlags = ({ note }: Props) => {
   if (note.archived) {
     flagIcons.push({
       icon: 'archive',
-      fillColor: stylekitCorn
+      fillColor: stylekitCorn,
     })
   }
   if (note.locked) {
     flagIcons.push({
       icon: 'pencil-off',
-      fillColor: stylekitInfoColor
+      fillColor: stylekitInfoColor,
     })
   }
   if (note.trashed) {
     flagIcons.push({
       icon: 'trash-filled',
-      fillColor: stylekitDangerColor
+      fillColor: stylekitDangerColor,
     })
   }
   if (note.pinned) {
     flagIcons.push({
       icon: 'pin-filled',
-      fillColor: stylekitInfoColor
+      fillColor: stylekitInfoColor,
     })
   }
   return flagIcons.length ? (

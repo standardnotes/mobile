@@ -1,7 +1,7 @@
 import {
   ChallengePrompt,
   ChallengeValidation,
-  ChallengeValue
+  ChallengeValue,
 } from '@standardnotes/snjs'
 
 export const isInActiveState = (state: AuthenticationValueStateType) =>
@@ -14,7 +14,7 @@ export enum AuthenticationValueStateType {
   Success = 2,
   Fail = 3,
   Pending = 4,
-  Locked = 5
+  Locked = 5,
 }
 
 type ChallengeValueState = {
@@ -43,8 +43,8 @@ export const authenticationReducer = (
         ...state,
         challengeValueStates: {
           ...state.challengeValueStates,
-          [action.id]: action.state
-        }
+          [action.id]: action.state,
+        },
       }
     }
     case 'setValue': {
@@ -55,9 +55,9 @@ export const authenticationReducer = (
           ...state.challengeValues,
           [action.id]: {
             ...updatedChallengeValue,
-            value: action.value
-          }
-        }
+            value: action.value,
+          },
+        },
       }
     }
     default:

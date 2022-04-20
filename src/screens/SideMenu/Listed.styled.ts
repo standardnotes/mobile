@@ -3,20 +3,20 @@ import styled from 'styled-components/native'
 
 export const styles = StyleSheet.create({
   blogItemIcon: {
-    marginTop: Platform.OS === 'ios' ? -6 : -3
+    marginTop: Platform.OS === 'ios' ? -6 : -3,
   },
   loadingIndicator: {
-    alignSelf: 'flex-start'
+    alignSelf: 'flex-start',
   },
   blogActionInProgressIndicator: {
     marginTop: -5,
     marginLeft: 6,
     transform: [
       {
-        scale: 0.8
-      }
-    ]
-  }
+        scale: 0.8,
+      },
+    ],
+  },
 })
 export const CreateBlogContainer = styled.View`
   margin-bottom: 8px;

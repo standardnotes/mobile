@@ -54,7 +54,7 @@ export const Chip: React.FC<Props> = ({ selected, onPress, label, last }) => {
     Animated.timing(animationValue, {
       toValue: selected ? 1 : 0,
       duration: 100,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start()
   }, [animationValue, selected])
 
@@ -71,14 +71,14 @@ export const Chip: React.FC<Props> = ({ selected, onPress, label, last }) => {
         as={Animated.View}
         last={last}
         style={{
-          opacity: animationValue
+          opacity: animationValue,
         }}
       >
         <ActiveLabel
           as={Animated.Text}
           selected={selected}
           style={{
-            opacity: animationValue
+            opacity: animationValue,
           }}
         >
           {label}
@@ -90,8 +90,8 @@ export const Chip: React.FC<Props> = ({ selected, onPress, label, last }) => {
         style={{
           opacity: animationValue.interpolate({
             inputRange: [0, 1],
-            outputRange: [1, 0]
-          })
+            outputRange: [1, 0],
+          }),
         }}
       >
         <InactiveLabel
@@ -100,8 +100,8 @@ export const Chip: React.FC<Props> = ({ selected, onPress, label, last }) => {
           style={{
             opacity: animationValue.interpolate({
               inputRange: [0, 1],
-              outputRange: [1, 0]
-            })
+              outputRange: [1, 0],
+            }),
           }}
         >
           {label}

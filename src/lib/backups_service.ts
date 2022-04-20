@@ -65,12 +65,12 @@ export class BackupsService extends ApplicationService {
 
   private async exportIOS(filename: string, data: string) {
     return new Promise<boolean>(resolve => {
-      ;(this.application! as MobileApplication)
+      void (this.application! as MobileApplication)
         .getAppState()
         .performActionWithoutStateChangeImpact(async () => {
           Share.share({
             title: filename,
-            message: data
+            message: data,
           })
             .then(result => {
               resolve(result.action !== Share.dismissedAction)
@@ -90,10 +90,10 @@ export class BackupsService extends ApplicationService {
         filepath = `${RNFS.DownloadDirectoryPath}/${filename}`
       }
       await RNFS.writeFile(filepath, data)
-      this.showFileSavePromptAndroid(filepath)
+      void this.showFileSavePromptAndroid(filepath)
     } catch (err) {
       console.error('Error exporting backup', err)
-      this.application.alertService.alert(
+      void this.application.alertService.alert(
         'There was an issue exporting your backup.'
       )
     }
@@ -120,7 +120,7 @@ export class BackupsService extends ApplicationService {
       'Done'
     )
     if (confirmed) {
-      this.openFileAndroid(filepath)
+      void this.openFileAndroid(filepath)
     }
     return true
   }
@@ -136,7 +136,7 @@ export class BackupsService extends ApplicationService {
           recipients: [''],
           body: '',
           isHTML: true,
-          attachment: { data, type: fileType, name: filename }
+          attachment: { data, type: fileType, name: filename },
         },
         (error: any) => {
           if (error) {

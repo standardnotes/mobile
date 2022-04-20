@@ -33,10 +33,10 @@ export const FileInputModal: FC<Props> = props => {
       type: UploadedFileItemActionType.RenameFile,
       payload: {
         file,
-        name: trimmedFileName
-      }
+        name: trimmedFileName,
+      },
     })
-    application.sync.sync()
+    void application.sync.sync()
     props.navigation.goBack()
   }
 

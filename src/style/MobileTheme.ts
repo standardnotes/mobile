@@ -4,7 +4,7 @@ import {
   DecryptedPayload,
   FillItemContent,
   SNTheme,
-  ThemeDockIcon
+  ThemeDockIcon,
 } from '@standardnotes/snjs'
 import { MobileThemeVariables } from './Themes/styled-components'
 
@@ -34,12 +34,12 @@ export class MobileTheme extends SNTheme {
         content: FillItemContent<MobileThemeContent>({
           variables: variables || ({} as MobileThemeVariables),
           isSystemTheme: false,
-          isInitial: false
+          isInitial: false,
         }),
         created_at: currentDate,
         created_at_timestamp: currentDate.getTime(),
         updated_at: currentDate,
-        updated_at_timestamp: currentDate.getTime()
+        updated_at_timestamp: currentDate.getTime(),
       })
     )
   }

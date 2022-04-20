@@ -1,6 +1,6 @@
 import {
   ActionSheetOptions,
-  useActionSheet
+  useActionSheet,
 } from '@expo/react-native-action-sheet'
 import React, { useContext } from 'react'
 import { findNodeHandle } from 'react-native'
@@ -28,6 +28,7 @@ type TShowActionSheetParams = {
   styles?: Partial<ActionSheetOptions>
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export const createActionSheetOptions = () => {}
 
 export const useCustomActionSheet = () => {
@@ -37,17 +38,18 @@ export const useCustomActionSheet = () => {
   const showActionSheet = ({
     title,
     options,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     onCancel = () => {},
     anchor,
-    styles = {}
+    styles = {},
   }: TShowActionSheetParams) => {
     const cancelOption: CustomActionSheetOption[] = [
       {
         text: 'Cancel',
         callback: onCancel,
         key: 'CancelItem',
-        destructive: false
-      }
+        destructive: false,
+      },
     ]
     const tempOptions = options.concat(cancelOption)
     const destructiveIndex = tempOptions.findIndex(item => item.destructive)
@@ -61,20 +63,20 @@ export const useCustomActionSheet = () => {
         title,
         containerStyle: {
           backgroundColor: theme.stylekitBorderColor,
-          ...styles?.containerStyle
+          ...styles?.containerStyle,
         },
         textStyle: {
           color: theme.stylekitForegroundColor,
-          ...styles.textStyle
+          ...styles.textStyle,
         },
         titleTextStyle: {
           color: theme.stylekitForegroundColor,
-          ...styles.titleTextStyle
+          ...styles.titleTextStyle,
         },
-        anchor: anchor ? findNodeHandle(anchor) ?? undefined : undefined
+        anchor: anchor ? findNodeHandle(anchor) ?? undefined : undefined,
       },
       buttonIndex => {
-        let option = tempOptions[buttonIndex!]
+        const option = tempOptions[buttonIndex!]
         option.callback && option.callback(option)
       }
     )

@@ -3,7 +3,7 @@ import { LoadingContainer, LoadingText } from '@Screens/Notes/NoteList.styled'
 import {
   NoteHistoryEntry,
   RevisionListEntry,
-  SNNote
+  SNNote,
 } from '@standardnotes/snjs'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
@@ -38,7 +38,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
         }
       }
     }
-    fetchRemoteHistoryList()
+    void fetchRemoteHistoryList()
 
     return () => {
       isMounted = false
@@ -56,7 +56,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
           new Date(item.updated_at).toLocaleString()
         )
       } else {
-        application?.alertService!.alert(
+        void application?.alertService!.alert(
           'The remote revision could not be loaded. Please try again later.',
           'Error'
         )
@@ -67,7 +67,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   )
 
   const renderItem: ListRenderItem<RevisionListEntry> | null | undefined = ({
-    item
+    item,
   }) => {
     return (
       <NoteHistoryCell

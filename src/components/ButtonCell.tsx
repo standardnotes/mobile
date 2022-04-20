@@ -3,7 +3,7 @@ import { Platform } from 'react-native'
 import styled, { css } from 'styled-components/native'
 import {
   Props as TableCellProps,
-  SectionedTableCellTouchableHighlight
+  SectionedTableCellTouchableHighlight,
 } from './SectionedTableCell'
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
 
 type ContainerProps = Pick<Props, 'maxHeight'> & TableCellProps
 const Container = styled(SectionedTableCellTouchableHighlight).attrs(props => ({
-  underlayColor: props.theme.stylekitBorderColor
+  underlayColor: props.theme.stylekitBorderColor,
 }))<ContainerProps>`
   padding-top: ${12}px;
   justify-content: center;

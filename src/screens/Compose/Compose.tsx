@@ -1,5 +1,5 @@
 import { AppStateEventType } from '@Lib/application_state'
-import { ComponentLoadingError } from '@Lib/component_manager'
+import { ComponentLoadingError, ComponentManager } from '@Lib/component_manager'
 import { isNullOrUndefined } from '@Lib/utils'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { SCREEN_COMPOSE } from '@Screens/screens'
@@ -14,7 +14,7 @@ import {
   ItemMutator,
   NoteMutator,
   PayloadEmitSource,
-  SNComponent
+  SNComponent,
 } from '@standardnotes/snjs'
 import { ICON_ALERT, ICON_LOCK } from '@Style/icons'
 import { ThemeService, ThemeServiceContext } from '@Style/theme_service'
@@ -34,7 +34,7 @@ import {
   StyledTextView,
   TextContainer,
   WebViewReloadButton,
-  WebViewReloadButtonText
+  WebViewReloadButtonText,
 } from './Compose.styled'
 
 const NOTE_PREVIEW_CHAR_LIMIT = 80
@@ -56,12 +56,12 @@ type State = {
 const EditingIsDisabledText =
   'This note has editing disabled. Please enable editing on this note to make changes.'
 
-export class Compose extends React.Component<{}, State> {
+export class Compose extends React.Component<Record<string, unknown>, State> {
   static override contextType = ApplicationContext
   override context: React.ContextType<typeof ApplicationContext>
   editorViewRef: React.RefObject<SNTextView> = createRef()
   saveTimeout: ReturnType<typeof setTimeout> | undefined
-  alreadySaved: boolean = false
+  alreadySaved = false
   statusTimeout: ReturnType<typeof setTimeout> | undefined
   downloadingMessageTimeout: ReturnType<typeof setTimeout> | undefined
   removeNoteInnerValueObserver?: () => void
@@ -72,7 +72,7 @@ export class Compose extends React.Component<{}, State> {
   removeComponentHandler?: () => void
 
   constructor(
-    props: {},
+    props: Record<string, unknown>,
     context: React.ContextType<typeof ApplicationContext>
   ) {
     super(props)
@@ -85,7 +85,7 @@ export class Compose extends React.Component<{}, State> {
       saveError: false,
       webViewError: undefined,
       loadingWebview: false,
-      downloadingEditor: false
+      downloadingEditor: false,
     }
   }
 
@@ -95,7 +95,7 @@ export class Compose extends React.Component<{}, State> {
         if (isPayloadSourceRetrieved(source!)) {
           this.setState({
             title: note.title,
-            text: note.text
+            text: note.text,
           })
         }
 
@@ -135,7 +135,7 @@ export class Compose extends React.Component<{}, State> {
           return
         }
 
-        this.reloadComponentEditorState()
+        void this.reloadComponentEditorState()
       }
     )
 
@@ -221,7 +221,7 @@ export class Compose extends React.Component<{}, State> {
     return this.note.locked
   }
 
-  setStatus = (status: string, color?: string, wait: boolean = true) => {
+  setStatus = (status: string, color?: string, wait = true) => {
     if (this.statusTimeout) {
       clearTimeout(this.statusTimeout)
     }
@@ -244,7 +244,7 @@ export class Compose extends React.Component<{}, State> {
 
   showAllChangesSavedStatus = () => {
     this.setState({
-      saveError: false
+      saveError: false,
     })
     const offlineStatus = this.context?.hasAccount() ? '' : ' (offline)'
     this.setStatus('All changes saved' + offlineStatus)
@@ -252,7 +252,7 @@ export class Compose extends React.Component<{}, State> {
 
   showErrorStatus = (message: string) => {
     this.setState({
-      saveError: true
+      saveError: true,
     })
     this.setStatus(message)
   }
@@ -271,7 +271,7 @@ export class Compose extends React.Component<{}, State> {
   }
 
   get componentManager() {
-    return this.context?.mobileComponentManager!
+    return this.context?.mobileComponentManager as ComponentManager
   }
 
   async associateComponentWithCurrentNote(component: SNComponent) {
@@ -290,7 +290,7 @@ export class Compose extends React.Component<{}, State> {
     this.setState({
       downloadingEditor: false,
       loadingWebview: false,
-      webViewError: undefined
+      webViewError: undefined,
     })
 
     const associatedEditor = this.componentManager.editorForNote(this.note!)
@@ -298,7 +298,7 @@ export class Compose extends React.Component<{}, State> {
     /** Editors cannot interact with template notes so the note must be inserted */
     if (associatedEditor && this.editor?.isTemplateNote) {
       await this.editor?.insertTemplatedNote()
-      this.associateComponentWithCurrentNote(associatedEditor)
+      void this.associateComponentWithCurrentNote(associatedEditor)
     }
 
     if (!associatedEditor) {
@@ -328,7 +328,7 @@ export class Compose extends React.Component<{}, State> {
       componentViewer: this.componentManager.createComponentViewer(
         component,
         this.note?.uuid
-      )
+      ),
     })
   }
 
@@ -340,7 +340,7 @@ export class Compose extends React.Component<{}, State> {
     this.setState({
       componentViewer: undefined,
       loadingWebview: false,
-      webViewError: undefined
+      webViewError: undefined,
     })
 
     const associatedEditor = this.componentManager.editorForNote(this.note!)
@@ -368,7 +368,7 @@ export class Compose extends React.Component<{}, State> {
     }
 
     if (!this.context?.items.findItem(note!.uuid)) {
-      this.context?.alertService!.alert(
+      void this.context?.alertService!.alert(
         'Attempting to save this note has failed. The note cannot be found.'
       )
       return
@@ -400,7 +400,7 @@ export class Compose extends React.Component<{}, State> {
       ? SAVE_TIMEOUT_NO_DEBOUNCE
       : SAVE_TIMEOUT_DEBOUNCE
     this.saveTimeout = setTimeout(() => {
-      this.context?.sync.sync()
+      void this.context?.sync.sync()
       if (closeAfterSync) {
         this.context?.getAppState().closeEditor(editor!)
       }
@@ -409,12 +409,12 @@ export class Compose extends React.Component<{}, State> {
 
   onTitleChange = (newTitle: string) => {
     if (this.note?.locked) {
-      this.context?.alertService?.alert(EditingIsDisabledText)
+      void this.context?.alertService?.alert(EditingIsDisabledText)
       return
     }
     this.setState(
       {
-        title: newTitle
+        title: newTitle,
       },
       () => this.saveNote(false, true, true, false)
     )
@@ -422,22 +422,22 @@ export class Compose extends React.Component<{}, State> {
 
   onContentChange = (text: string) => {
     if (this.note?.locked) {
-      this.context?.alertService?.alert(EditingIsDisabledText)
+      void this.context?.alertService?.alert(EditingIsDisabledText)
       return
     }
-    this.saveNote(false, true, false, false, text)
+    void this.saveNote(false, true, false, false, text)
   }
 
   onLoadWebViewStart = () => {
     this.setState({
       loadingWebview: true,
-      webViewError: undefined
+      webViewError: undefined,
     })
   }
 
   onLoadWebViewEnd = () => {
     this.setState({
-      loadingWebview: false
+      loadingWebview: false,
     })
   }
 
@@ -445,13 +445,13 @@ export class Compose extends React.Component<{}, State> {
     this.setState({
       loadingWebview: false,
       webViewError: error,
-      webViewErrorDesc: desc
+      webViewErrorDesc: desc,
     })
   }
 
   onDownloadEditorStart = () => {
     this.setState({
-      downloadingEditor: true
+      downloadingEditor: true,
     })
   }
 
@@ -463,7 +463,7 @@ export class Compose extends React.Component<{}, State> {
     this.downloadingMessageTimeout = setTimeout(
       () =>
         this.setState({
-          downloadingEditor: false
+          downloadingEditor: false,
         }),
       this.state.webViewError ? 0 : 200
     )
@@ -533,7 +533,7 @@ export class Compose extends React.Component<{}, State> {
                   </LockedText>
                   <WebViewReloadButton
                     onPress={() => {
-                      this.forceReloadExistingEditor()
+                      void this.forceReloadExistingEditor()
                     }}
                   >
                     <WebViewReloadButtonText>Reload</WebViewReloadButtonText>
