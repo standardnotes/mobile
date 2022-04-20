@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const helpers = require('../../helpers')
+const helpers = require('../../Helpers')
 import { by, device, element, expect, waitFor } from 'detox'
-import { openSettingsScreen } from '../../helpers'
+import { openSettingsScreen } from '../../Helpers'
 console.log('aaaa is', helpers)
 // console.log('bbbb is', helpers2)
 console.log('cccc is', helpers.openSettingsScreen === openSettingsScreen)

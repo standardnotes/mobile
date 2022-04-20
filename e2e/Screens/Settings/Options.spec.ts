@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const helpers = require('../../helpers')
+const helpers = require('../../Helpers')
 import { by, device, element, expect } from 'detox'
 
 describe('Options section', () => {

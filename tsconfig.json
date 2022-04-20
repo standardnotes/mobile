@@ -24,16 +24,16 @@
     ],
     "paths": {
       "@Components/*": [
-        "./components/*"
+        "./Components/*"
       ],
       "@Lib/*": [
-        "./lib/*"
+        "./Lib/*"
       ],
       "@Screens/*": [
-        "./screens/*"
+        "./Screens/*"
       ],
       "@Style/*": [
-        "./style/*"
+        "./Style/*"
       ],
       "@Root/*": [
         "./*"
