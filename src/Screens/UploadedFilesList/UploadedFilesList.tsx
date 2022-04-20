@@ -11,13 +11,13 @@ import {
   UploadFilesListContainer,
   useUploadedFilesListStyles,
 } from '@Root/Screens/UploadedFilesList/UploadedFilesList.styled'
+import { SNFile } from '@standardnotes/snjs'
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
-} from '@Root/Style/custom_action_sheet'
-import { ICON_ATTACH } from '@Root/Style/icons'
-import { ThemeService } from '@Root/Style/theme_service'
-import { SNFile } from '@standardnotes/snjs'
+} from '@Style/CustomActionSheet'
+import { ICON_ATTACH } from '@Style/Icons'
+import { ThemeService } from '@Style/ThemeService'
 import React, {
   FC,
   useCallback,

@@ -4,7 +4,7 @@ import { SectionedAccessoryTableCell } from '@Root/Components/SectionedAccessory
 import { SectionedTableCell } from '@Root/Components/SectionedTableCell'
 import { SectionHeader } from '@Root/Components/SectionHeader'
 import { TableSection } from '@Root/Components/TableSection'
-import { ThemeServiceContext } from '@Root/Style/theme_service'
+import { ThemeServiceContext } from '@Style/ThemeService'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Keyboard } from 'react-native'
 import {

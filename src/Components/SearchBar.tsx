@@ -1,4 +1,4 @@
-import { ThemeServiceContext } from '@Root/Style/theme_service'
+import { ThemeServiceContext } from '@Style/ThemeService'
 import React, { FC, RefObject, useCallback, useContext } from 'react'
 import { Platform } from 'react-native'
 import IosSearchBar from 'react-native-search-bar'

@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { SCREEN_SETTINGS } from '@Root/Screens/screens'
-import { ICON_FORWARD, ICON_USER } from '@Root/Style/icons'
-import { ThemeService } from '@Root/Style/theme_service'
+import { ICON_FORWARD, ICON_USER } from '@Style/Icons'
+import { ThemeService } from '@Style/ThemeService'
 import React from 'react'
 import {
   BoldText,

@@ -5,8 +5,8 @@ import { SectionedTableCell } from '@Root/Components/SectionedTableCell'
 import { TableSection } from '@Root/Components/TableSection'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
 import { SCREEN_INPUT_MODAL_TAG } from '@Root/Screens/screens'
-import { ThemeServiceContext } from '@Root/Style/theme_service'
 import { SNTag, TagMutator } from '@standardnotes/snjs'
+import { ThemeServiceContext } from '@Style/ThemeService'
 import React, {
   useCallback,
   useContext,

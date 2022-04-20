@@ -2,14 +2,14 @@ import { AppStateType } from '@Lib/ApplicationState'
 import { useNavigation } from '@react-navigation/native'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { SCREEN_SETTINGS } from '@Root/Screens/screens'
+import { MobileTheme } from '@Root/Style/MobileTheme'
+import { ContentType, SmartView, SNTag, SNTheme } from '@standardnotes/snjs'
 import {
   CustomActionSheetOption,
   useCustomActionSheet,
-} from '@Root/Style/custom_action_sheet'
-import { ICON_BRUSH, ICON_SETTINGS } from '@Root/Style/icons'
-import { MobileTheme } from '@Root/Style/MobileTheme'
-import { ThemeService, ThemeServiceContext } from '@Root/Style/theme_service'
-import { ContentType, SmartView, SNTag, SNTheme } from '@standardnotes/snjs'
+} from '@Style/CustomActionSheet'
+import { ICON_BRUSH, ICON_SETTINGS } from '@Style/Icons'
+import { ThemeService, ThemeServiceContext } from '@Style/ThemeService'
 import React, {
   Fragment,
   useCallback,

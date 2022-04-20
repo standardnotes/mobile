@@ -4,8 +4,8 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { SCREEN_NOTES } from '@Root/Screens/screens'
-import { ThemeServiceContext } from '@Root/Style/theme_service'
 import { ButtonType, ComponentViewer } from '@standardnotes/snjs'
+import { ThemeServiceContext } from '@Style/ThemeService'
 import React, {
   useCallback,
   useContext,

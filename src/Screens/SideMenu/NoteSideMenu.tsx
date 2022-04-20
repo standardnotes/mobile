@@ -16,19 +16,6 @@ import {
 } from '@Root/Screens/screens'
 import { Files } from '@Root/Screens/SideMenu/Files'
 import { Listed } from '@Root/Screens/SideMenu/Listed'
-import { useCustomActionSheet } from '@Root/Style/custom_action_sheet'
-import {
-  ICON_ARCHIVE,
-  ICON_BOOKMARK,
-  ICON_FINGER_PRINT,
-  ICON_HISTORY,
-  ICON_LOCK,
-  ICON_MEDICAL,
-  ICON_PRICE_TAG,
-  ICON_SHARE,
-  ICON_TRASH,
-} from '@Root/Style/icons'
-import { ThemeService } from '@Root/Style/theme_service'
 import { FeatureIdentifier } from '@standardnotes/features'
 import {
   ApplicationEvent,
@@ -46,6 +33,19 @@ import {
   SNNote,
   SNTag,
 } from '@standardnotes/snjs'
+import { useCustomActionSheet } from '@Style/CustomActionSheet'
+import {
+  ICON_ARCHIVE,
+  ICON_BOOKMARK,
+  ICON_FINGER_PRINT,
+  ICON_HISTORY,
+  ICON_LOCK,
+  ICON_MEDICAL,
+  ICON_PRICE_TAG,
+  ICON_SHARE,
+  ICON_TRASH,
+} from '@Style/Icons'
+import { ThemeService } from '@Style/ThemeService'
 import React, {
   useCallback,
   useContext,

@@ -8,10 +8,6 @@ import {
   UploadedFileItemActionType,
 } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
 import {
-  CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Root/Style/custom_action_sheet'
-import {
   ButtonType,
   ChallengeReason,
   ClientDisplayableError,
@@ -19,6 +15,10 @@ import {
   SNFile,
   SNNote,
 } from '@standardnotes/snjs'
+import {
+  CustomActionSheetOption,
+  useCustomActionSheet,
+} from '@Style/CustomActionSheet'
 import { useCallback, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import DocumentPicker, {

@@ -1,4 +1,3 @@
-import { objectToCss } from '@Root/Style/css_parser'
 import { MobileTheme } from '@Root/Style/MobileTheme'
 import FeatureChecksums from '@standardnotes/components/dist/checksums.json'
 import {
@@ -18,6 +17,7 @@ import {
   SNLog,
   SNNote,
 } from '@standardnotes/snjs'
+import { objectToCss } from '@Style/CssParser'
 import { Base64 } from 'js-base64'
 import RNFS, { DocumentDirectoryPath } from 'react-native-fs'
 import StaticServer from 'react-native-static-server'

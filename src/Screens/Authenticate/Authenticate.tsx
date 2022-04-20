@@ -10,14 +10,14 @@ import { SectionedTableCell } from '@Root/Components/SectionedTableCell'
 import { SectionHeader } from '@Root/Components/SectionHeader'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
 import { SCREEN_AUTHENTICATE } from '@Root/Screens/screens'
-import { ICON_CLOSE } from '@Root/Style/icons'
-import { ThemeService, ThemeServiceContext } from '@Root/Style/theme_service'
 import {
   ChallengeReason,
   ChallengeValidation,
   ChallengeValue,
   ProtectionSessionDurations,
 } from '@standardnotes/snjs'
+import { ICON_CLOSE } from '@Style/Icons'
+import { ThemeService, ThemeServiceContext } from '@Style/ThemeService'
 import React, {
   useCallback,
   useContext,

@@ -6,10 +6,10 @@ import {
   SCREEN_NOTES,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Root/Screens/screens'
-import { useCustomActionSheet } from '@Root/Style/custom_action_sheet'
-import { ELIPSIS } from '@Root/Style/icons'
-import { ThemeService } from '@Root/Style/theme_service'
 import { ButtonType, PayloadEmitSource, SNNote } from '@standardnotes/snjs'
+import { useCustomActionSheet } from '@Style/CustomActionSheet'
+import { ELIPSIS } from '@Style/Icons'
+import { ThemeService } from '@Style/ThemeService'
 import React, { useCallback, useContext, useLayoutEffect } from 'react'
 import { LogBox } from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'

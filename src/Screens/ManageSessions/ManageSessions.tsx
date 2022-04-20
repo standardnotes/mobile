@@ -3,13 +3,13 @@ import {
   LoadingContainer,
   LoadingText,
 } from '@Root/Screens/Notes/NoteList.styled'
-import { useCustomActionSheet } from '@Root/Style/custom_action_sheet'
 import {
   ButtonType,
   RemoteSession,
   SessionStrings,
   UuidString,
 } from '@standardnotes/snjs'
+import { useCustomActionSheet } from '@Style/CustomActionSheet'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { FlatList, ListRenderItem, RefreshControl } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'

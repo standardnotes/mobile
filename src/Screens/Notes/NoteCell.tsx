@@ -7,17 +7,17 @@ import { ApplicationContext } from '@Root/ApplicationContext'
 import { SnIcon } from '@Root/Components/SnIcon'
 import { NoteCellIconFlags } from '@Root/Screens/Notes/NoteCellIconFlags'
 import {
-  CustomActionSheetOption,
-  useCustomActionSheet,
-} from '@Root/Style/custom_action_sheet'
-import { getTintColorForEditor } from '@Root/Style/utils'
-import {
   CollectionSort,
   CollectionSortProperty,
   IconType,
   isNullOrUndefined,
   SNNote,
 } from '@standardnotes/snjs'
+import {
+  CustomActionSheetOption,
+  useCustomActionSheet,
+} from '@Style/CustomActionSheet'
+import { getTintColorForEditor } from '@Style/Utils'
 import React, { useContext, useRef, useState } from 'react'
 import { Text, View } from 'react-native'
 import { ThemeContext } from 'styled-components'

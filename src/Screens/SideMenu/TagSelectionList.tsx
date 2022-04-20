@@ -3,7 +3,6 @@ import { AppStackNavigationProp } from '@Root/AppStack'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
 import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Root/Screens/screens'
 import { SideMenuOptionIconDescriptionType } from '@Root/Screens/SideMenu/SideMenuSection'
-import { useCustomActionSheet } from '@Root/Style/custom_action_sheet'
 import {
   ButtonType,
   CollectionSort,
@@ -12,6 +11,7 @@ import {
   SmartView,
   SNTag,
 } from '@standardnotes/snjs'
+import { useCustomActionSheet } from '@Style/CustomActionSheet'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
 import { SideMenuCell } from './SideMenuCell'

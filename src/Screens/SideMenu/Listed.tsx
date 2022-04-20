@@ -8,7 +8,6 @@ import {
 } from '@Root/Screens/SideMenu/Listed.styled'
 import { SideMenuCell } from '@Root/Screens/SideMenu/SideMenuCell'
 import { SideMenuOptionIconDescriptionType } from '@Root/Screens/SideMenu/SideMenuSection'
-import { useCustomActionSheet } from '@Root/Style/custom_action_sheet'
 import {
   Action,
   ButtonType,
@@ -16,6 +15,7 @@ import {
   ListedAccountInfo,
   SNNote,
 } from '@standardnotes/snjs'
+import { useCustomActionSheet } from '@Style/CustomActionSheet'
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, FlatList, View } from 'react-native'
 

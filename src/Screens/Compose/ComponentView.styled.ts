@@ -1,5 +1,5 @@
-import { ICON_ALERT, ICON_LOCK } from '@Root/Style/icons'
-import { ThemeService } from '@Root/Style/theme_service'
+import { ICON_ALERT, ICON_LOCK } from '@Style/Icons'
+import { ThemeService } from '@Style/ThemeService'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/Ionicons'
 import WebView from 'react-native-webview'

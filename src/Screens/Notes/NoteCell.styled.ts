@@ -1,4 +1,4 @@
-import { hexToRGBA } from '@Root/Style/utils'
+import { hexToRGBA } from '@Style/Utils'
 import { StyleSheet } from 'react-native'
 import styled from 'styled-components/native'
 

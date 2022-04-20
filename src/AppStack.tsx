@@ -22,9 +22,9 @@ import {
 import { MainSideMenu } from '@Root/Screens/SideMenu/MainSideMenu'
 import { NoteSideMenu } from '@Root/Screens/SideMenu/NoteSideMenu'
 import { ViewProtectedNote } from '@Root/Screens/ViewProtectedNote/ViewProtectedNote'
-import { ICON_MENU } from '@Root/Style/icons'
-import { ThemeService } from '@Root/Style/theme_service'
-import { getDefaultDrawerWidth } from '@Root/Style/utils'
+import { ICON_MENU } from '@Style/Icons'
+import { ThemeService } from '@Style/ThemeService'
+import { getDefaultDrawerWidth } from '@Style/Utils'
 import React, {
   useCallback,
   useContext,

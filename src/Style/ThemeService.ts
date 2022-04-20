@@ -20,7 +20,6 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native'
-import CSSParser from './/css_parser'
 import {
   DARK_CONTENT,
   getColorLuminosity,
@@ -28,6 +27,7 @@ import {
   LIGHT_CONTENT,
   statusBarColorForTheme,
 } from './/utils'
+import CSSParser from './CssParser'
 import { MobileTheme } from './MobileTheme'
 import THEME_DARK_JSON from './Themes/blue-dark.json'
 import THEME_BLUE_JSON from './Themes/blue.json'

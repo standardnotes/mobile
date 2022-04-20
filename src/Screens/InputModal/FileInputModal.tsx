@@ -5,7 +5,7 @@ import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext
 import { ModalStackNavigationProp } from '@Root/ModalStack'
 import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Root/Screens/screens'
 import { UploadedFileItemActionType } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
-import { ThemeServiceContext } from '@Root/Style/theme_service'
+import { ThemeServiceContext } from '@Style/ThemeService'
 import React, { FC, useContext, useEffect, useRef, useState } from 'react'
 import { TextInput } from 'react-native'
 import { Container, Input } from './InputModal.styled'

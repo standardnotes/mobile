@@ -9,8 +9,6 @@ import {
   SCREEN_NOTES,
   SCREEN_VIEW_PROTECTED_NOTE,
 } from '@Root/Screens/screens'
-import { ICON_ADD } from '@Root/Style/icons'
-import { ThemeService } from '@Root/Style/theme_service'
 import {
   CollectionSort,
   CollectionSortProperty,
@@ -21,6 +19,8 @@ import {
   SNTag,
   SystemViewId,
 } from '@standardnotes/snjs'
+import { ICON_ADD } from '@Style/Icons'
+import { ThemeService } from '@Style/ThemeService'
 import React, {
   useCallback,
   useContext,

@@ -3,9 +3,6 @@ import { ComponentLoadingError, ComponentManager } from '@Lib/ComponentManager'
 import { isNullOrUndefined } from '@Lib/Utils'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { SCREEN_COMPOSE } from '@Root/Screens/screens'
-import { ICON_ALERT, ICON_LOCK } from '@Root/Style/icons'
-import { ThemeService, ThemeServiceContext } from '@Root/Style/theme_service'
-import { lighten } from '@Root/Style/utils'
 import SNTextView from '@standardnotes/react-native-textview'
 import {
   ApplicationEvent,
@@ -19,6 +16,9 @@ import {
   PayloadEmitSource,
   SNComponent,
 } from '@standardnotes/snjs'
+import { ICON_ALERT, ICON_LOCK } from '@Style/Icons'
+import { ThemeService, ThemeServiceContext } from '@Style/ThemeService'
+import { lighten } from '@Style/Utils'
 import React, { createRef } from 'react'
 import { Keyboard, Platform, View } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'

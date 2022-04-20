@@ -11,9 +11,9 @@ import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Root/Screens/screens'
-import { ICON_CHECKMARK } from '@Root/Style/icons'
-import { ThemeService } from '@Root/Style/theme_service'
 import { NoteHistoryEntry } from '@standardnotes/snjs'
+import { ICON_CHECKMARK } from '@Style/Icons'
+import { ThemeService } from '@Style/ThemeService'
 import React, { useContext } from 'react'
 import { Platform } from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'

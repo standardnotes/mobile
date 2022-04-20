@@ -5,8 +5,8 @@ import {
   SCREEN_NOTE_HISTORY,
   SCREEN_NOTE_HISTORY_PREVIEW,
 } from '@Root/Screens/screens'
-import { ThemeServiceContext } from '@Root/Style/theme_service'
 import { NoteHistoryEntry, SNNote } from '@standardnotes/snjs'
+import { ThemeServiceContext } from '@Style/ThemeService'
 import React, { useContext, useState } from 'react'
 import { Dimensions, Platform } from 'react-native'
 import {
