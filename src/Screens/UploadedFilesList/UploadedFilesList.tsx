@@ -30,20 +30,23 @@ export enum Tabs {
 type Props = ModalStackNavigationProp<typeof SCREEN_UPLOADED_FILES_LIST>
 
 export const UploadedFilesList: FC<Props> = props => {
+  const { AttachedFiles, AllFiles } = Tabs
+  const { note, shouldShowAllFiles } = props.route.params
+
   const theme = useContext(ThemeContext)
 
   const styles = useUploadedFilesListStyles()
   const navigation = useNavigation()
 
-  const [currentTab, setCurrentTab] = useState(Tabs.AttachedFiles)
+  const [currentTab, setCurrentTab] = useState(() => {
+    return shouldShowAllFiles ? AllFiles : AttachedFiles
+  })
   const [searchString, setSearchString] = useState('')
   const [filesListScrolled, setFilesListScrolled] = useState(false)
 
   const iosSearchBarInputRef = useRef<IosSearchBar>(null)
   const androidSearchBarInputRef = useRef<typeof AndroidSearchBar>(null)
   const filesListRef = useRef<FlatList>(null)
-
-  const note = props.route.params.note
 
   const { attachedFiles, allFiles, handlePressAttachFile } = useFiles({
     note,
@@ -83,7 +86,6 @@ export const UploadedFilesList: FC<Props> = props => {
     [scrollListToTop]
   )
 
-  const { AttachedFiles, AllFiles } = Tabs
   const {
     centeredView,
     header,

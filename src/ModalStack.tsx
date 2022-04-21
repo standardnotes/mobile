@@ -48,6 +48,7 @@ export type ModalStackNavigatorParamList = {
   }
   [SCREEN_UPLOADED_FILES_LIST]: HeaderTitleParams & {
     note: SNNote
+    shouldShowAllFiles: boolean
   }
   [SCREEN_INPUT_MODAL_PASSCODE]: undefined
   [SCREEN_AUTHENTICATE]: {

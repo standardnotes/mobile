@@ -29,8 +29,8 @@ export const Files: FC<Props> = ({ note }) => {
   const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
   const { showActionsMenu, handlePressAttachFile, attachedFiles } = useFiles({ note })
 
-  const openFilesScreen = () => {
-    navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note })
+  const openFilesScreen = (shouldShowAllFiles: boolean) => {
+    navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note, shouldShowAllFiles })
   }
 
   const isFilesListTruncated = attachedFiles.length > MaximumVisibleFilesCount
@@ -67,7 +67,7 @@ export const Files: FC<Props> = ({ note }) => {
       />
       <SideMenuCellShowAllFiles
         text={isFilesListTruncated ? 'Show all attached files' : 'Show all files'}
-        onSelect={openFilesScreen}
+        onSelect={() => openFilesScreen(!isFilesListTruncated)}
         cellContentStyle={styles.cellContentStyle}
       />
     </FilesContainer>
