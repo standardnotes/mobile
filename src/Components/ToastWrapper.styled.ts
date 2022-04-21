@@ -6,6 +6,9 @@ export const useToastStyles = (theme: DefaultTheme) => {
     info: {
       borderLeftColor: theme.stylekitInfoColor,
     },
+    success: {
+      borderLeftColor: theme.stylekitSuccessColor,
+    },
     error: {
       borderLeftColor: theme.stylekitWarningColor,
     },
