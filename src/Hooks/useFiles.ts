@@ -111,7 +111,7 @@ export const useFiles = ({ note }: Props) => {
       try {
         Toast.show({
           type: Info,
-          text1: 'Downloading file...',
+          text1: 'Downloading and decrypting file...',
           autoHide: false,
           onPress: Toast.hide,
         })
