@@ -36,6 +36,7 @@ type Props = {
 type TDownloadFileAndReturnLocalPathParams = {
   file: SNFile
   saveInTempLocation?: boolean
+  showSuccessToast?: boolean
 }
 
 type TUploadFileFromCameraOrImageGalleryParams = {
@@ -95,6 +96,7 @@ export const useFiles = ({ note }: Props) => {
     async ({
       file,
       saveInTempLocation = false,
+      showSuccessToast = true,
     }: TDownloadFileAndReturnLocalPathParams): Promise<string | undefined> => {
       if (isDownloading) {
         return
@@ -122,12 +124,16 @@ export const useFiles = ({ note }: Props) => {
         await deleteFileAtPath(path)
         await filesService.downloadFileInChunks(file, path)
 
-        Toast.show({
-          type: Success,
-          text1: 'Success',
-          text2: 'Successfully downloaded file',
-          onPress: Toast.hide,
-        })
+        if (showSuccessToast) {
+          Toast.show({
+            type: Success,
+            text1: 'Success',
+            text2: 'Successfully downloaded file',
+            onPress: Toast.hide,
+          })
+        } else {
+          Toast.hide()
+        }
 
         return path
       } catch (error) {
@@ -159,6 +165,7 @@ export const useFiles = ({ note }: Props) => {
       const downloadedFilePath = await downloadFileAndReturnLocalPath({
         file,
         saveInTempLocation: true,
+        showSuccessToast: false,
       })
       if (!downloadedFilePath) {
         return
@@ -282,6 +289,7 @@ export const useFiles = ({ note }: Props) => {
         downloadedFilePath = await downloadFileAndReturnLocalPath({
           file,
           saveInTempLocation: true,
+          showSuccessToast: false,
         })
 
         if (!downloadedFilePath) {
