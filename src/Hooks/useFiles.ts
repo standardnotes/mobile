@@ -206,6 +206,7 @@ export const useFiles = ({ note }: Props) => {
   const attachFileToNote = useCallback(
     async (file: SNFile, showToastAfterAction = true) => {
       await application.items.associateFileWithNote(file, note)
+      void application.sync.sync()
 
       if (showToastAfterAction) {
         Toast.show({
@@ -221,6 +222,7 @@ export const useFiles = ({ note }: Props) => {
   const detachFileFromNote = useCallback(
     async (file: SNFile) => {
       await application.items.disassociateFileWithNote(file, note)
+      void application.sync.sync()
       Toast.show({
         type: Success,
         text1: 'Successfully detached file from note',
@@ -411,7 +413,6 @@ export const useFiles = ({ note }: Props) => {
         })
         return
       }
-      void application.sync.sync()
       return fileObj
     } catch (error) {
       await handleUploadError()
