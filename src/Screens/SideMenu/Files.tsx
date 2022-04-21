@@ -66,7 +66,7 @@ export const Files: FC<Props> = ({ note }) => {
         onSelect={() => handlePressAttachFile()}
       />
       <SideMenuCellShowAllFiles
-        text={isFilesListTruncated ? 'Show all attached files' : 'Show other files'}
+        text={isFilesListTruncated ? 'Show all attached files' : 'Show all files'}
         onSelect={openFilesScreen}
         cellContentStyle={styles.cellContentStyle}
       />
