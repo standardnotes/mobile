@@ -7,6 +7,7 @@ import {
   UploadedFileItemAction,
   UploadedFileItemActionType,
 } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
+import { Tabs } from '@Screens/UploadedFilesList/UploadedFilesList'
 import {
   ButtonType,
   ChallengeReason,
@@ -442,6 +443,91 @@ export const useFiles = ({ note }: Props) => {
     }
   }
 
+  const handleAttachFromCamera = (currentTab: Tabs | undefined) => {
+    const options = [
+      {
+        text: 'Photo',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery({
+            mediaType: 'photo',
+          })
+          if (!uploadedFile) {
+            return
+          }
+          if (shouldAttachToNote(currentTab)) {
+            await attachFileToNote(uploadedFile, false)
+          }
+        },
+      },
+      {
+        text: 'Video',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery({
+            mediaType: 'video',
+          })
+          if (!uploadedFile) {
+            return
+          }
+          await attachFileToNote(uploadedFile, false)
+        },
+      },
+    ]
+    showActionSheet({
+      title: 'Choose file type',
+      options,
+    })
+  }
+
+  const shouldAttachToNote = (currentTab: Tabs | undefined) => {
+    return currentTab === undefined || currentTab === Tabs.AttachedFiles
+  }
+
+  const handlePressAttachFile = (currentTab?: Tabs) => {
+    const options: CustomActionSheetOption[] = [
+      {
+        text: 'Attach from files',
+        key: 'files',
+        callback: async () => {
+          const uploadedFiles = await uploadFiles()
+          if (!uploadedFiles) {
+            return
+          }
+          if (shouldAttachToNote(currentTab)) {
+            uploadedFiles.forEach(file => attachFileToNote(file, false))
+          }
+        },
+      },
+      {
+        text: 'Attach from Photo Library',
+        key: 'library',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery({
+            uploadFromGallery: true,
+          })
+          if (!uploadedFile) {
+            return
+          }
+          if (shouldAttachToNote(currentTab)) {
+            await attachFileToNote(uploadedFile, false)
+          }
+        },
+      },
+      {
+        text: 'Attach from Camera',
+        key: 'camera',
+        callback: async () => {
+          handleAttachFromCamera(currentTab)
+        },
+      },
+    ]
+    const osSpecificOptions =
+      Platform.OS === 'android' ? options.filter(option => option.key !== 'library') : options
+    showActionSheet({
+      title: 'Choose action',
+      options: osSpecificOptions,
+    })
+  }
+
   const uploadFileFromCameraOrImageGallery = async ({
     uploadFromGallery = false,
     mediaType = 'photo',
@@ -649,7 +735,7 @@ export const useFiles = ({ note }: Props) => {
     showActionsMenu,
     attachedFiles,
     allFiles,
-    uploadFiles,
+    handlePressAttachFile,
     uploadFileFromCameraOrImageGallery,
     attachFileToNote,
   }

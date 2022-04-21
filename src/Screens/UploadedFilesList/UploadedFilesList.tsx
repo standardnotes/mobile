@@ -12,18 +12,17 @@ import {
   useUploadedFilesListStyles,
 } from '@Root/Screens/UploadedFilesList/UploadedFilesList.styled'
 import { SNFile } from '@standardnotes/snjs'
-import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
 import { ICON_ATTACH } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
 import React, { FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { FlatList, ListRenderItem, Platform, Text, View } from 'react-native'
+import { FlatList, ListRenderItem, Text, View } from 'react-native'
 import FAB from 'react-native-fab'
 import IosSearchBar from 'react-native-search-bar'
 import AndroidSearchBar from 'react-native-search-box'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { ThemeContext } from 'styled-components'
 
-enum Tabs {
+export enum Tabs {
   AttachedFiles,
   AllFiles,
 }
@@ -35,7 +34,6 @@ export const UploadedFilesList: FC<Props> = props => {
 
   const styles = useUploadedFilesListStyles()
   const navigation = useNavigation()
-  const { showActionSheet } = useCustomActionSheet()
 
   const [currentTab, setCurrentTab] = useState(Tabs.AttachedFiles)
   const [searchString, setSearchString] = useState('')
@@ -47,13 +45,7 @@ export const UploadedFilesList: FC<Props> = props => {
 
   const note = props.route.params.note
 
-  const {
-    attachedFiles,
-    allFiles,
-    uploadFiles,
-    uploadFileFromCameraOrImageGallery,
-    attachFileToNote,
-  } = useFiles({
+  const { attachedFiles, allFiles, handlePressAttachFile } = useFiles({
     note,
   })
 
@@ -105,83 +97,6 @@ export const UploadedFilesList: FC<Props> = props => {
       return
     }
     setFilesListScrolled(true)
-  }
-
-  const handleAttachFromCamera = () => {
-    const options = [
-      {
-        text: 'Photo',
-        callback: async () => {
-          const uploadedFile = await uploadFileFromCameraOrImageGallery({
-            mediaType: 'photo',
-          })
-          if (!uploadedFile) {
-            return
-          }
-          await attachFileToNote(uploadedFile, false)
-        },
-      },
-      {
-        text: 'Video',
-        callback: async () => {
-          const uploadedFile = await uploadFileFromCameraOrImageGallery({
-            mediaType: 'video',
-          })
-          if (!uploadedFile) {
-            return
-          }
-          await attachFileToNote(uploadedFile, false)
-        },
-      },
-    ]
-    showActionSheet({
-      title: 'Choose file type',
-      options,
-    })
-  }
-
-  const handlePressAttach = () => {
-    const options: CustomActionSheetOption[] = [
-      {
-        text: 'Attach from files',
-        key: 'files',
-        callback: async () => {
-          const uploadedFiles = await uploadFiles()
-          if (!uploadedFiles) {
-            return
-          }
-          if (currentTab === AttachedFiles) {
-            uploadedFiles.forEach(file => attachFileToNote(file, false))
-          }
-        },
-      },
-      {
-        text: 'Attach from Photo Library',
-        key: 'library',
-        callback: async () => {
-          const uploadedFile = await uploadFileFromCameraOrImageGallery({
-            uploadFromGallery: true,
-          })
-          if (!uploadedFile) {
-            return
-          }
-          await attachFileToNote(uploadedFile, false)
-        },
-      },
-      {
-        text: 'Attach from Camera',
-        key: 'camera',
-        callback: async () => {
-          handleAttachFromCamera()
-        },
-      },
-    ]
-    const osSpecificOptions =
-      Platform.OS === 'android' ? options.filter(option => option.key !== 'library') : options
-    showActionSheet({
-      title: 'Choose action',
-      options: osSpecificOptions,
-    })
   }
 
   const renderItem: ListRenderItem<SNFile> = ({ item }) => {
@@ -241,7 +156,7 @@ export const UploadedFilesList: FC<Props> = props => {
         <FAB
           buttonColor={theme.stylekitInfoColor}
           iconTextColor={theme.stylekitInfoContrastColor}
-          onClickAction={handlePressAttach}
+          onClickAction={() => handlePressAttachFile(currentTab)}
           visible={true}
           size={30}
           iconTextComponent={<Icon name={ThemeService.nameForIcon(ICON_ATTACH)} />}
