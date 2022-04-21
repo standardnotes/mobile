@@ -128,7 +128,7 @@ export const useFiles = ({ note }: Props) => {
           Toast.show({
             type: Success,
             text1: 'Success',
-            text2: 'Successfully downloaded. Press to open the file.',
+            text2: 'Successfully downloaded. Press here to open the file.',
             position: 'bottom',
             onPress: async () => {
               await FileViewer.open(path)
@@ -190,7 +190,7 @@ export const useFiles = ({ note }: Props) => {
           if (shareDialogResponse.success) {
             Toast.show({
               type: Success,
-              text1: 'Successfully exported. Press to open the file.',
+              text1: 'Successfully exported. Press here to open the file.',
               position: 'bottom',
               onPress: async () => {
                 await FileViewer.open(downloadedFilePath)
