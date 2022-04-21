@@ -131,7 +131,7 @@ export const useFiles = ({ note }: Props) => {
             text2: 'Successfully downloaded. Press here to open the file.',
             position: 'bottom',
             onPress: async () => {
-              await FileViewer.open(path)
+              await FileViewer.open(path, { showOpenWithDialog: true })
             },
           })
         } else {
