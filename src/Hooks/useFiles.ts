@@ -411,6 +411,7 @@ export const useFiles = ({ note }: Props) => {
         })
         return
       }
+      void application.sync.sync()
       return fileObj
     } catch (error) {
       await handleUploadError()
