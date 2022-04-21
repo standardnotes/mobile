@@ -39,6 +39,8 @@ export const FileName = styled.Text`
   color: ${({ theme }) => theme.stylekitCodGray};
 `
 export const FileDateAndSizeContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
   color: ${({ theme }) => theme.stylekitAbbey};
   font-size: 12px;
 `

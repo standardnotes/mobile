@@ -54,17 +54,17 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({ file, note }) => {
                 <Text>
                   {file.created_at.toLocaleString()} · {formatSizeToReadableString(file.size)}
                 </Text>
+                {file.protected && (
+                  <SnIcon
+                    type={'lock-filled'}
+                    width={12}
+                    height={12}
+                    fill={theme.stylekitPalSky}
+                    style={uploadedFileItemStyles.lockIcon}
+                  />
+                )}
               </FileDateAndSizeContainer>
             </FileDetailsContainer>
-            {file.protected && (
-              <SnIcon
-                type={'lock-filled'}
-                width={12}
-                height={12}
-                fill={theme.stylekitPalSky}
-                style={uploadedFileItemStyles.lockIcon}
-              />
-            )}
           </FileDetailsWithExtraIconsContainer>
         </FileDataContainer>
       </View>
