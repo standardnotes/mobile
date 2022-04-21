@@ -19,7 +19,6 @@ import {
   SCREEN_UPLOADED_FILES_LIST,
 } from '@Root/Screens/screens'
 import { Settings } from '@Root/Screens/Settings/Settings'
-import { UploadedFileItemAction } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
 import { UploadedFilesList } from '@Root/Screens/UploadedFilesList/UploadedFilesList'
 import { Challenge, DeinitSource, SNFile, SNNote } from '@standardnotes/snjs'
 import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/Icons'
@@ -44,10 +43,11 @@ export type ModalStackNavigatorParamList = {
   }
   [SCREEN_INPUT_MODAL_FILE_NAME]: HeaderTitleParams & {
     file: SNFile
-    handleFileAction: (action: UploadedFileItemAction) => Promise<boolean>
+    renameFile: (file: SNFile, fileName: string) => Promise<void>
   }
   [SCREEN_UPLOADED_FILES_LIST]: HeaderTitleParams & {
     note: SNNote
+    shouldShowAllFiles: boolean
   }
   [SCREEN_INPUT_MODAL_PASSCODE]: undefined
   [SCREEN_AUTHENTICATE]: {

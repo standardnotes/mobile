@@ -230,7 +230,9 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         <SectionedAccessoryTableCell
           testID="lastExportDate"
           onPress={() => {
-            (!lastExportDate || lastExportData.stale) && showDataBackupAlert()
+            if (!lastExportDate || lastExportData.stale) {
+              showDataBackupAlert()
+            }
           }}
           tinted={!lastExportDate || lastExportData.stale}
           text={lastExportData.lastExportString}

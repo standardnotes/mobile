@@ -24,6 +24,7 @@ export const FileDetailsWithExtraIconsContainer = styled.View`
   align-items: center;
   border-bottom-color: ${({ theme }) => theme.stylekitIron};
   border-bottom-width: 1px;
+  padding-bottom: 12px;
 `
 export const LockIconStyled = styled(SnIcon)`
   background-color: green;
@@ -38,7 +39,8 @@ export const FileName = styled.Text`
   color: ${({ theme }) => theme.stylekitCodGray};
 `
 export const FileDateAndSizeContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
   color: ${({ theme }) => theme.stylekitAbbey};
   font-size: 12px;
-  padding-bottom: 12px;
 `

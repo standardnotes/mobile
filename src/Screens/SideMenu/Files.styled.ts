@@ -24,6 +24,9 @@ export const IconsContainer = styled.View`
 export const SideMenuCellStyled = styled(SideMenuCell)`
   min-height: 22px;
 `
+export const SideMenuCellAttachNewFile = styled(SideMenuCellStyled)`
+  margin-bottom: 14px;
+`
 export const SideMenuCellShowAllFiles = styled(SideMenuCellStyled)`
   margin-bottom: 8px;
 `

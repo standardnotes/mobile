@@ -4,7 +4,6 @@ import { TableSection } from '@Root/Components/TableSection'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
 import { SCREEN_INPUT_MODAL_FILE_NAME } from '@Root/Screens/screens'
-import { UploadedFileItemActionType } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
 import { ThemeServiceContext } from '@Style/ThemeService'
 import React, { FC, useContext, useEffect, useRef, useState } from 'react'
 import { TextInput } from 'react-native'
@@ -13,7 +12,7 @@ import { Container, Input } from './InputModal.styled'
 type Props = ModalStackNavigationProp<typeof SCREEN_INPUT_MODAL_FILE_NAME>
 
 export const FileInputModal: FC<Props> = props => {
-  const { file, handleFileAction } = props.route.params
+  const { file, renameFile } = props.route.params
   const themeService = useContext(ThemeServiceContext)
   const application = useSafeApplicationContext()
 
@@ -29,13 +28,7 @@ export const FileInputModal: FC<Props> = props => {
       fileNameInputRef.current?.focus()
       return
     }
-    await handleFileAction({
-      type: UploadedFileItemActionType.RenameFile,
-      payload: {
-        file,
-        name: trimmedFileName,
-      },
-    })
+    await renameFile(file, trimmedFileName)
     void application.sync.sync()
     props.navigation.goBack()
   }

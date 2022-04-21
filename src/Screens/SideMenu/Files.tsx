@@ -7,6 +7,7 @@ import {
   FileItemContainer,
   FilesContainer,
   IconsContainer,
+  SideMenuCellAttachNewFile,
   SideMenuCellShowAllFiles,
   SideMenuCellStyled,
   SNIconStyled,
@@ -26,10 +27,10 @@ export const Files: FC<Props> = ({ note }) => {
   const application = useSafeApplicationContext()
 
   const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
-  const { showActionsMenu, attachedFiles } = useFiles({ note })
+  const { showActionsMenu, handlePressAttachFile, attachedFiles } = useFiles({ note })
 
-  const openFilesScreen = () => {
-    navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note })
+  const openFilesScreen = (shouldShowAllFiles: boolean) => {
+    navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note, shouldShowAllFiles })
   }
 
   const isFilesListTruncated = attachedFiles.length > MaximumVisibleFilesCount
@@ -60,9 +61,13 @@ export const Files: FC<Props> = ({ note }) => {
           </FileItemContainer>
         )
       })}
+      <SideMenuCellAttachNewFile
+        text={'Attach new file'}
+        onSelect={() => handlePressAttachFile()}
+      />
       <SideMenuCellShowAllFiles
-        text={isFilesListTruncated ? 'Show all attached files' : 'Show other files'}
-        onSelect={openFilesScreen}
+        text={isFilesListTruncated ? 'Show more files' : 'Show all files'}
+        onSelect={() => openFilesScreen(!isFilesListTruncated)}
         cellContentStyle={styles.cellContentStyle}
       />
     </FilesContainer>

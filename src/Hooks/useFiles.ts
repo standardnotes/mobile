@@ -7,6 +7,7 @@ import {
   UploadedFileItemAction,
   UploadedFileItemActionType,
 } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
+import { Tabs } from '@Screens/UploadedFilesList/UploadedFilesList'
 import {
   ButtonType,
   ChallengeReason,
@@ -35,6 +36,7 @@ type Props = {
 type TDownloadFileAndReturnLocalPathParams = {
   file: SNFile
   saveInTempLocation?: boolean
+  showSuccessToast?: boolean
 }
 
 type TUploadFileFromCameraOrImageGalleryParams = {
@@ -94,6 +96,7 @@ export const useFiles = ({ note }: Props) => {
     async ({
       file,
       saveInTempLocation = false,
+      showSuccessToast = true,
     }: TDownloadFileAndReturnLocalPathParams): Promise<string | undefined> => {
       if (isDownloading) {
         return
@@ -108,7 +111,7 @@ export const useFiles = ({ note }: Props) => {
       try {
         Toast.show({
           type: Info,
-          text1: 'Downloading file...',
+          text1: 'Downloading and decrypting file...',
           autoHide: false,
           onPress: Toast.hide,
         })
@@ -121,12 +124,16 @@ export const useFiles = ({ note }: Props) => {
         await deleteFileAtPath(path)
         await filesService.downloadFileInChunks(file, path)
 
-        Toast.show({
-          type: Success,
-          text1: 'Success',
-          text2: 'Successfully downloaded file',
-          onPress: Toast.hide,
-        })
+        if (showSuccessToast) {
+          Toast.show({
+            type: Success,
+            text1: 'Success',
+            text2: 'Successfully downloaded file',
+            onPress: Toast.hide,
+          })
+        } else {
+          Toast.hide()
+        }
 
         return path
       } catch (error) {
@@ -158,6 +165,7 @@ export const useFiles = ({ note }: Props) => {
       const downloadedFilePath = await downloadFileAndReturnLocalPath({
         file,
         saveInTempLocation: true,
+        showSuccessToast: false,
       })
       if (!downloadedFilePath) {
         return
@@ -198,6 +206,7 @@ export const useFiles = ({ note }: Props) => {
   const attachFileToNote = useCallback(
     async (file: SNFile, showToastAfterAction = true) => {
       await application.items.associateFileWithNote(file, note)
+      void application.sync.sync()
 
       if (showToastAfterAction) {
         Toast.show({
@@ -213,6 +222,7 @@ export const useFiles = ({ note }: Props) => {
   const detachFileFromNote = useCallback(
     async (file: SNFile) => {
       await application.items.disassociateFileWithNote(file, note)
+      void application.sync.sync()
       Toast.show({
         type: Success,
         text1: 'Successfully detached file from note',
@@ -281,6 +291,7 @@ export const useFiles = ({ note }: Props) => {
         downloadedFilePath = await downloadFileAndReturnLocalPath({
           file,
           saveInTempLocation: true,
+          showSuccessToast: false,
         })
 
         if (!downloadedFilePath) {
@@ -442,6 +453,91 @@ export const useFiles = ({ note }: Props) => {
     }
   }
 
+  const handleAttachFromCamera = (currentTab: Tabs | undefined) => {
+    const options = [
+      {
+        text: 'Photo',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery({
+            mediaType: 'photo',
+          })
+          if (!uploadedFile) {
+            return
+          }
+          if (shouldAttachToNote(currentTab)) {
+            await attachFileToNote(uploadedFile, false)
+          }
+        },
+      },
+      {
+        text: 'Video',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery({
+            mediaType: 'video',
+          })
+          if (!uploadedFile) {
+            return
+          }
+          await attachFileToNote(uploadedFile, false)
+        },
+      },
+    ]
+    showActionSheet({
+      title: 'Choose file type',
+      options,
+    })
+  }
+
+  const shouldAttachToNote = (currentTab: Tabs | undefined) => {
+    return currentTab === undefined || currentTab === Tabs.AttachedFiles
+  }
+
+  const handlePressAttachFile = (currentTab?: Tabs) => {
+    const options: CustomActionSheetOption[] = [
+      {
+        text: 'Attach from files',
+        key: 'files',
+        callback: async () => {
+          const uploadedFiles = await uploadFiles()
+          if (!uploadedFiles) {
+            return
+          }
+          if (shouldAttachToNote(currentTab)) {
+            uploadedFiles.forEach(file => attachFileToNote(file, false))
+          }
+        },
+      },
+      {
+        text: 'Attach from Photo Library',
+        key: 'library',
+        callback: async () => {
+          const uploadedFile = await uploadFileFromCameraOrImageGallery({
+            uploadFromGallery: true,
+          })
+          if (!uploadedFile) {
+            return
+          }
+          if (shouldAttachToNote(currentTab)) {
+            await attachFileToNote(uploadedFile, false)
+          }
+        },
+      },
+      {
+        text: 'Attach from Camera',
+        key: 'camera',
+        callback: async () => {
+          handleAttachFromCamera(currentTab)
+        },
+      },
+    ]
+    const osSpecificOptions =
+      Platform.OS === 'android' ? options.filter(option => option.key !== 'library') : options
+    showActionSheet({
+      title: 'Choose action',
+      options: osSpecificOptions,
+    })
+  }
+
   const uploadFileFromCameraOrImageGallery = async ({
     uploadFromGallery = false,
     mediaType = 'photo',
@@ -477,8 +573,7 @@ export const useFiles = ({ note }: Props) => {
 
   const handleFileAction = useCallback(
     async (action: UploadedFileItemAction) => {
-      const file =
-        action.type !== UploadedFileItemActionType.RenameFile ? action.payload : action.payload.file
+      const file = action.payload
       let isAuthorizedForAction = true
 
       if (file.protected && action.type !== UploadedFileItemActionType.ToggleFileProtection) {
@@ -510,7 +605,10 @@ export const useFiles = ({ note }: Props) => {
           break
         }
         case UploadedFileItemActionType.RenameFile:
-          await renameFile(file, action.payload.name)
+          navigation.navigate(SCREEN_INPUT_MODAL_FILE_NAME, {
+            file,
+            renameFile,
+          })
           break
         case UploadedFileItemActionType.PreviewFile:
           await previewFile(file)
@@ -532,6 +630,7 @@ export const useFiles = ({ note }: Props) => {
       deleteFile,
       detachFileFromNote,
       downloadFileAndReturnLocalPath,
+      navigation,
       previewFile,
       renameFile,
       shareFile,
@@ -559,6 +658,15 @@ export const useFiles = ({ note }: Props) => {
 
       const actions: CustomActionSheetOption[] = [
         {
+          text: 'Preview',
+          callback: async () => {
+            await handleFileAction({
+              type: UploadedFileItemActionType.PreviewFile,
+              payload: file,
+            })
+          },
+        },
+        {
           text: isAttachedToNote ? 'Detach from note' : 'Attach to note',
           callback: isAttachedToNote
             ? async () => {
@@ -584,15 +692,6 @@ export const useFiles = ({ note }: Props) => {
           },
         },
         {
-          text: 'Preview',
-          callback: async () => {
-            await handleFileAction({
-              type: UploadedFileItemActionType.PreviewFile,
-              payload: file,
-            })
-          },
-        },
-        {
           text: Platform.OS === 'ios' ? 'Export' : 'Share',
           callback: async () => {
             await handleFileAction({
@@ -612,10 +711,10 @@ export const useFiles = ({ note }: Props) => {
         },
         {
           text: 'Rename',
-          callback: () => {
-            navigation.navigate(SCREEN_INPUT_MODAL_FILE_NAME, {
-              file,
-              handleFileAction,
+          callback: async () => {
+            await handleFileAction({
+              type: UploadedFileItemActionType.RenameFile,
+              payload: file,
             })
           },
         },
@@ -642,14 +741,14 @@ export const useFiles = ({ note }: Props) => {
         },
       })
     },
-    [attachedFiles, handleFileAction, navigation, showActionSheet]
+    [attachedFiles, handleFileAction, showActionSheet]
   )
 
   return {
     showActionsMenu,
     attachedFiles,
     allFiles,
-    uploadFiles,
+    handlePressAttachFile,
     uploadFileFromCameraOrImageGallery,
     attachFileToNote,
   }
