@@ -559,6 +559,15 @@ export const useFiles = ({ note }: Props) => {
 
       const actions: CustomActionSheetOption[] = [
         {
+          text: 'Preview',
+          callback: async () => {
+            await handleFileAction({
+              type: UploadedFileItemActionType.PreviewFile,
+              payload: file,
+            })
+          },
+        },
+        {
           text: isAttachedToNote ? 'Detach from note' : 'Attach to note',
           callback: isAttachedToNote
             ? async () => {
@@ -579,15 +588,6 @@ export const useFiles = ({ note }: Props) => {
           callback: async () => {
             await handleFileAction({
               type: UploadedFileItemActionType.ToggleFileProtection,
-              payload: file,
-            })
-          },
-        },
-        {
-          text: 'Preview',
-          callback: async () => {
-            await handleFileAction({
-              type: UploadedFileItemActionType.PreviewFile,
               payload: file,
             })
           },
