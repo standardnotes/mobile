@@ -571,8 +571,7 @@ export const useFiles = ({ note }: Props) => {
 
   const handleFileAction = useCallback(
     async (action: UploadedFileItemAction) => {
-      const file =
-        action.type !== UploadedFileItemActionType.RenameFile ? action.payload : action.payload.file
+      const file = action.payload
       let isAuthorizedForAction = true
 
       if (file.protected && action.type !== UploadedFileItemActionType.ToggleFileProtection) {
@@ -604,7 +603,10 @@ export const useFiles = ({ note }: Props) => {
           break
         }
         case UploadedFileItemActionType.RenameFile:
-          await renameFile(file, action.payload.name)
+          navigation.navigate(SCREEN_INPUT_MODAL_FILE_NAME, {
+            file,
+            renameFile,
+          })
           break
         case UploadedFileItemActionType.PreviewFile:
           await previewFile(file)
@@ -626,6 +628,7 @@ export const useFiles = ({ note }: Props) => {
       deleteFile,
       detachFileFromNote,
       downloadFileAndReturnLocalPath,
+      navigation,
       previewFile,
       renameFile,
       shareFile,
@@ -706,10 +709,10 @@ export const useFiles = ({ note }: Props) => {
         },
         {
           text: 'Rename',
-          callback: () => {
-            navigation.navigate(SCREEN_INPUT_MODAL_FILE_NAME, {
-              file,
-              handleFileAction,
+          callback: async () => {
+            await handleFileAction({
+              type: UploadedFileItemActionType.RenameFile,
+              payload: file,
             })
           },
         },
@@ -736,7 +739,7 @@ export const useFiles = ({ note }: Props) => {
         },
       })
     },
-    [attachedFiles, handleFileAction, navigation, showActionSheet]
+    [attachedFiles, handleFileAction, showActionSheet]
   )
 
   return {
