@@ -45,7 +45,10 @@ export class MobileApplication extends SNApplication {
   public editorGroup: NoteGroupController
   public iconsController: IconsController
   private startedDeinit = false
-  public Uuid: string // UI remounts when Uuid changes
+
+  // UI remounts when Uuid changes
+  public Uuid: string
+
   static previouslyLaunched = false
 
   constructor(deviceInterface: MobileDeviceInterface, identifier: string) {
@@ -64,13 +67,13 @@ export class MobileApplication extends SNApplication {
       ],
       defaultHost: IsDev ? 'https://api-dev.standardnotes.com' : 'https://api.standardnotes.com',
       appVersion: version,
-      webSocketUrl: IsDev
-        ? 'wss://sockets-dev.standardnotes.com'
-        : 'wss://sockets.standardnotes.com',
+      webSocketUrl: IsDev ? 'wss://sockets-dev.standardnotes.com' : 'wss://sockets.standardnotes.com',
     })
+
     this.Uuid = Math.random().toString()
     this.editorGroup = new NoteGroupController(this)
     this.iconsController = new IconsController()
+
     void this.mobileComponentManager.initialize(this.protocolService)
   }
 

@@ -1,10 +1,6 @@
 module.exports = {
   root: true,
-  extends: [
-    '@react-native-community',
-    'prettier',
-    './node_modules/@standardnotes/config/src/.eslintrc',
-  ],
+  extends: ['@react-native-community', 'prettier', './node_modules/@standardnotes/config/src/.eslintrc'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: __dirname,
@@ -21,6 +17,8 @@ module.exports = {
         '@typescript-eslint/no-explicit-any': 'warn',
         'no-invalid-this': 'warn',
         'no-console': 'warn',
+        eqeqeq: ['warn', 'smart'],
+        'no-void': 'off',
       },
     },
   ],
