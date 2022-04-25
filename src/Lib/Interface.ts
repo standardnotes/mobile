@@ -1,5 +1,13 @@
 import AsyncStorage from '@react-native-community/async-storage'
-import { AbstractDevice, ApplicationIdentifier, TransferPayload } from '@standardnotes/snjs'
+import {
+  ApplicationIdentifier,
+  DeviceInterface,
+  Environment,
+  LegacyRawKeychainValue,
+  NamespacedRootKeyInKeychain,
+  RawKeychainValue,
+  TransferPayload,
+} from '@standardnotes/snjs'
 import { Alert, Linking, Platform } from 'react-native'
 import FingerprintScanner from 'react-native-fingerprint-scanner'
 import Keychain from './Keychain'
@@ -35,17 +43,26 @@ const showLoadFailForItemIds = (failedItemIds: string[]) => {
   Alert.alert('Unable to load item(s)', text)
 }
 
-export class MobileDeviceInterface extends AbstractDevice {
-  constructor() {
-    super(setTimeout, setInterval)
+export class MobileDeviceInterface implements DeviceInterface {
+  environment: Environment.Mobile = Environment.Mobile
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  deinit() {}
+
+  async setLegacyRawKeychainValue(value: LegacyRawKeychainValue): Promise<void> {
+    await Keychain.setKeys(value)
   }
 
-  override deinit() {
-    super.deinit()
-  }
-
-  legacy_setRawKeychainValue(value: any): Promise<void> {
-    return Keychain.setKeys(value)
+  public async getJsonParsedRawStorageValue(key: string): Promise<unknown | undefined> {
+    const value = await this.getRawStorageValue(key)
+    if (value == undefined) {
+      return undefined
+    }
+    try {
+      return JSON.parse(value)
+    } catch (e) {
+      return value
+    }
   }
 
   private getDatabaseKeyPrefix(identifier: ApplicationIdentifier) {
@@ -78,7 +95,7 @@ export class MobileDeviceInterface extends AbstractDevice {
             results.push({ key, value: item })
           }
         } catch (e) {
-          console.log('Error getting item', key, e)
+          console.error('Error getting item', key, e)
         }
       }
     } else {
@@ -89,7 +106,7 @@ export class MobileDeviceInterface extends AbstractDevice {
           }
         }
       } catch (e) {
-        console.log('Error getting items', e)
+        console.error('Error getting items', e)
       }
     }
     return results
@@ -151,15 +168,19 @@ export class MobileDeviceInterface extends AbstractDevice {
     const keys = await AsyncStorage.getAllKeys()
     return this.getRawStorageKeyValues(keys)
   }
-  setRawStorageValue(key: string, value: any): Promise<void> {
+
+  setRawStorageValue(key: string, value: string): Promise<void> {
     return AsyncStorage.setItem(key, JSON.stringify(value))
   }
+
   removeRawStorageValue(key: string): Promise<void> {
     return AsyncStorage.removeItem(key)
   }
+
   removeAllRawStorageValues(): Promise<void> {
     return AsyncStorage.clear()
   }
+
   openDatabase(): Promise<{ isNewDatabase?: boolean | undefined } | undefined> {
     return Promise.resolve({ isNewDatabase: false })
   }
@@ -171,20 +192,17 @@ export class MobileDeviceInterface extends AbstractDevice {
     return this.getDatabaseKeyValues(keys) as Promise<T[]>
   }
 
-  saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void> {
+  saveRawDatabasePayload(payload: TransferPayload, identifier: ApplicationIdentifier): Promise<void> {
     return this.saveRawDatabasePayloads([payload], identifier)
   }
 
-  async saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void> {
+  async saveRawDatabasePayloads(payloads: TransferPayload[], identifier: ApplicationIdentifier): Promise<void> {
     if (payloads.length === 0) {
       return
     }
     await Promise.all(
       payloads.map(item => {
-        return AsyncStorage.setItem(
-          this.keyForPayloadId(item.uuid, identifier),
-          JSON.stringify(item)
-        )
+        return AsyncStorage.setItem(this.keyForPayloadId(item.uuid, identifier), JSON.stringify(item))
       })
     )
   }
@@ -196,41 +214,55 @@ export class MobileDeviceInterface extends AbstractDevice {
     return AsyncStorage.multiRemove(keys)
   }
 
-  async getNamespacedKeychainValue(identifier: ApplicationIdentifier) {
+  async getNamespacedKeychainValue(
+    identifier: ApplicationIdentifier
+  ): Promise<NamespacedRootKeyInKeychain | undefined> {
     const keychain = await this.getRawKeychainValue()
+
     if (isLegacyIdentifier(identifier)) {
-      return keychain
+      return keychain as unknown as NamespacedRootKeyInKeychain
     }
+
     if (!keychain) {
       return
     }
-    return (keychain as any)[identifier]
+
+    return keychain[identifier]
   }
 
-  async setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier) {
+  async setNamespacedKeychainValue(
+    value: NamespacedRootKeyInKeychain,
+    identifier: ApplicationIdentifier
+  ): Promise<void> {
     if (isLegacyIdentifier(identifier)) {
-      return Keychain.setKeys(value)
+      await Keychain.setKeys(value)
     }
+
     let keychain = await this.getRawKeychainValue()
+
     if (!keychain) {
       keychain = {}
     }
-    return Keychain.setKeys({
+
+    await Keychain.setKeys({
       ...keychain,
       [identifier]: value,
     })
   }
 
-  async clearNamespacedKeychainValue(identifier: ApplicationIdentifier) {
+  async clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void> {
     if (isLegacyIdentifier(identifier)) {
-      return this.clearRawKeychainValue()
+      await this.clearRawKeychainValue()
     }
+
     const keychain = await this.getRawKeychainValue()
+
     if (!keychain) {
       return
     }
+
     delete keychain[identifier]
-    return Keychain.setKeys(keychain)
+    await Keychain.setKeys(keychain)
   }
 
   async getDeviceBiometricsAvailability() {
@@ -242,12 +274,12 @@ export class MobileDeviceInterface extends AbstractDevice {
     }
   }
 
-  getRawKeychainValue() {
+  getRawKeychainValue(): Promise<RawKeychainValue | null | undefined> {
     return Keychain.getKeys()
   }
 
-  clearRawKeychainValue() {
-    return Keychain.clearKeys()
+  async clearRawKeychainValue(): Promise<void> {
+    await Keychain.clearKeys()
   }
 
   openUrl(url: string) {
