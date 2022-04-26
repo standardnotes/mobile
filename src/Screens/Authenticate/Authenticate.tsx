@@ -10,28 +10,15 @@ import { SectionedTableCell } from '@Root/Components/SectionedTableCell'
 import { SectionHeader } from '@Root/Components/SectionHeader'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
 import { SCREEN_AUTHENTICATE } from '@Root/Screens/screens'
-import {
-  ChallengeReason,
-  ChallengeValidation,
-  ChallengeValue,
-  ProtectionSessionDurations,
-} from '@standardnotes/snjs'
+import { ChallengeReason, ChallengeValidation, ChallengeValue, ProtectionSessionDurations } from '@standardnotes/snjs'
 import { ICON_CLOSE } from '@Style/Icons'
 import { ThemeService, ThemeServiceContext } from '@Style/ThemeService'
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Alert, BackHandler, Keyboard, Platform, ScrollView, TextInput } from 'react-native'
 import FingerprintScanner from 'react-native-fingerprint-scanner'
 import { hide } from 'react-native-privacy-snapshot'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
-import { ThemeContext } from 'styled-components'
+import styled, { ThemeContext } from 'styled-components'
 import {
   BaseView,
   Input,
@@ -64,6 +51,10 @@ function isValidChallengeValue(challengeValue: ChallengeValue): boolean {
   }
 }
 
+const ItemStyled = styled(Item)`
+  width: 100px;
+`
+
 export const Authenticate = ({
   route: {
     params: { challenge },
@@ -77,12 +68,10 @@ export const Authenticate = ({
 
   // State
   const [supportsBiometrics, setSupportsBiometrics] = useState<boolean | undefined>(undefined)
-  const [passcodeKeyboardType, setPasscodeKeyboardType] = useState<
-    PasscodeKeyboardType | undefined
-  >(PasscodeKeyboardType.Default)
-  const [singleValidation] = useState(
-    () => !(challenge.prompts.filter(prompt => prompt.validates).length > 0)
+  const [passcodeKeyboardType, setPasscodeKeyboardType] = useState<PasscodeKeyboardType | undefined>(
+    PasscodeKeyboardType.Default
   )
+  const [singleValidation] = useState(() => !(challenge.prompts.filter(prompt => prompt.validates).length > 0))
   const [showSwitchKeyboard, setShowSwitchKeyboard] = useState<boolean>(false)
 
   const [{ challengeValues, challengeValueStates }, dispatch] = useReducer(
@@ -120,7 +109,7 @@ export const Authenticate = ({
       navigation.setOptions({
         headerLeft: ({ disabled }) => (
           <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-            <Item
+            <ItemStyled
               testID="headerButton"
               disabled={disabled || pending}
               title={Platform.OS === 'ios' ? 'Cancel' : ''}
@@ -175,8 +164,7 @@ export const Authenticate = ({
   }, [])
 
   const checkForBiometrics = useCallback(
-    async () =>
-      (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(),
+    async () => (application?.deviceInterface as MobileDeviceInterface).getDeviceBiometricsAvailability(),
     [application]
   )
 
@@ -199,10 +187,7 @@ export const Authenticate = ({
           id: challengeValue.prompt.id.toString(),
           state: AuthenticationValueStateType.Fail,
         })
-        Alert.alert(
-          'Unsuccessful',
-          'This device either does not have a biometric sensor or it may not configured.'
-        )
+        Alert.alert('Unsuccessful', 'This device either does not have a biometric sensor or it may not configured.')
         return
       }
 
@@ -305,15 +290,9 @@ export const Authenticate = ({
       if (completedChallengeValue === undefined) {
         challengeValue = challengeValues[firstNotSuccessful!]
       } else {
-        const index = findIndexInObject(
-          challengeValues,
-          completedChallengeValue.prompt.id.toString()
-        )
+        const index = findIndexInObject(challengeValues, completedChallengeValue.prompt.id.toString())
 
-        const hasNextItem = Object.prototype.hasOwnProperty.call(
-          Object.keys(challengeValues),
-          index + 1
-        )
+        const hasNextItem = Object.prototype.hasOwnProperty.call(Object.keys(challengeValues), index + 1)
         if (!hasNextItem) {
           return
         }
@@ -330,10 +309,7 @@ export const Authenticate = ({
         application?.getAppState().getMostRecentState() === AppStateType.LosingFocus ||
         application?.getAppState().getMostRecentState() === AppStateType.EnteringBackground
 
-      if (
-        challengeValue.prompt.validation === ChallengeValidation.Biometric &&
-        !isLosingFocusOrInBackground
-      ) {
+      if (challengeValue.prompt.validation === ChallengeValidation.Biometric && !isLosingFocusOrInBackground) {
         /** Begin authentication right away, we're not waiting for any input */
         void authenticateBiometrics(challengeValue)
       } else {
@@ -379,12 +355,7 @@ export const Authenticate = ({
       }
     })
     return remove
-  }, [
-    application,
-    beginAuthenticatingForNextChallengeReason,
-    challengeValueStates,
-    firstNotSuccessful,
-  ])
+  }, [application, beginAuthenticatingForNextChallengeReason, challengeValueStates, firstNotSuccessful])
 
   const onValidValue = useCallback(
     (value: ChallengeValue) => {
@@ -472,10 +443,7 @@ export const Authenticate = ({
       value => value.prompt.validation === ChallengeValidation.Biometric
     )
     const state = challengeValueStates[biometricChallengeValue?.prompt.id as number]
-    if (
-      state === AuthenticationValueStateType.Locked ||
-      state === AuthenticationValueStateType.Success
-    ) {
+    if (state === AuthenticationValueStateType.Locked || state === AuthenticationValueStateType.Success) {
       return
     }
 
@@ -518,8 +486,7 @@ export const Authenticate = ({
       const state = challengeValueStates[firstNotSuccessful!]
       if (
         challengeValue.prompt.validation === ChallengeValidation.Biometric &&
-        (state === AuthenticationValueStateType.Locked ||
-          state === AuthenticationValueStateType.Fail)
+        (state === AuthenticationValueStateType.Locked || state === AuthenticationValueStateType.Fail)
       ) {
         beginAuthenticatingForNextChallengeReason()
         return
@@ -558,9 +525,7 @@ export const Authenticate = ({
 
     const keyboardType =
       challengeValue.prompt.keyboardType ??
-      (challengeValue.prompt.validation === ChallengeValidation.LocalPasscode
-        ? passcodeKeyboardType
-        : 'default')
+      (challengeValue.prompt.validation === ChallengeValidation.LocalPasscode ? passcodeKeyboardType : 'default')
 
     return (
       <SourceContainer key={challengeValue.prompt.id}>
@@ -570,8 +535,7 @@ export const Authenticate = ({
             subtitle={isInput ? stateLabel : undefined}
             tinted={active}
             buttonText={
-              challengeValue.prompt.validation === ChallengeValidation.LocalPasscode &&
-              showSwitchKeyboard
+              challengeValue.prompt.validation === ChallengeValidation.LocalPasscode && showSwitchKeyboard
                 ? 'Change Keyboard'
                 : undefined
             }
@@ -590,11 +554,7 @@ export const Authenticate = ({
               <SectionedTableCell textInputCell={true} first={true}>
                 <Input
                   key={Platform.OS === 'android' ? keyboardType : undefined}
-                  ref={
-                    Array.of(firstInputRef, secondInputRef, thirdInputRef, fourthInputRef)[
-                      index
-                    ] as any
-                  }
+                  ref={Array.of(firstInputRef, secondInputRef, thirdInputRef, fourthInputRef)[index] as any}
                   placeholder={challengeValue.prompt.placeholder}
                   onChangeText={text => {
                     onValueChange({ ...challengeValue, value: text })
@@ -661,10 +621,7 @@ export const Authenticate = ({
   }
 
   const isPending = useMemo(
-    () =>
-      Object.values(challengeValueStates).findIndex(
-        state => state === AuthenticationValueStateType.Pending
-      ) >= 0,
+    () => Object.values(challengeValueStates).findIndex(state => state === AuthenticationValueStateType.Pending) >= 0,
     [challengeValueStates]
   )
 
