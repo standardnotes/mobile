@@ -4,12 +4,7 @@ import { Buffer } from 'buffer'
 import { Base64 } from 'js-base64'
 import { PermissionsAndroid, Platform } from 'react-native'
 import { DocumentPickerResponse } from 'react-native-document-picker'
-import RNFS, {
-  CachesDirectoryPath,
-  DocumentDirectoryPath,
-  DownloadDirectoryPath,
-  read,
-} from 'react-native-fs'
+import RNFS, { CachesDirectoryPath, DocumentDirectoryPath, DownloadDirectoryPath, read } from 'react-native-fs'
 import { Asset } from 'react-native-image-picker'
 
 type TGetFileDestinationPath = {
@@ -33,9 +28,7 @@ export class FilesService extends ApplicationService {
     if (Platform.OS !== 'android') {
       return true
     }
-    const grantedStatus = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-    )
+    const grantedStatus = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
     if (grantedStatus === PermissionsAndroid.RESULTS.GRANTED) {
       return true
     }
@@ -60,10 +53,7 @@ export class FilesService extends ApplicationService {
     return file.fileName as string
   }
 
-  async readFile(
-    file: DocumentPickerResponse | Asset,
-    onChunk: OnChunkCallback
-  ): Promise<FileSelectionResponse> {
+  async readFile(file: DocumentPickerResponse | Asset, onChunk: OnChunkCallback): Promise<FileSelectionResponse> {
     const fileUri = (Platform.OS === 'ios' ? decodeURI(file.uri!) : file.uri) as string
 
     let positionShift = 0
@@ -88,5 +78,9 @@ export class FilesService extends ApplicationService {
       name: fileName,
       mimeType: file.type || '',
     }
+  }
+
+  sortByName(file1: SNFile, file2: SNFile): number {
+    return file1.name.toLocaleLowerCase() > file2.name.toLocaleLowerCase() ? 1 : -1
   }
 }

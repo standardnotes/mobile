@@ -47,7 +47,6 @@ export type ModalStackNavigatorParamList = {
   }
   [SCREEN_UPLOADED_FILES_LIST]: HeaderTitleParams & {
     note: SNNote
-    shouldShowAllFiles: boolean
   }
   [SCREEN_INPUT_MODAL_PASSCODE]: undefined
   [SCREEN_AUTHENTICATE]: {
@@ -113,9 +112,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 testID="headerButton"
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Done' : ''}
-                iconName={
-                  Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CHECKMARK)
-                }
+                iconName={Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CHECKMARK)}
                 onPress={onPress}
               />
             </HeaderButtons>
@@ -128,9 +125,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                   title={'Destroy Data'}
                   onPress={async () => {
                     await application?.deviceInterface?.removeAllRawStorageValues()
-                    await application?.deviceInterface?.removeAllRawDatabasePayloads(
-                      application?.identifier
-                    )
+                    await application?.deviceInterface?.removeAllRawDatabasePayloads(application?.identifier)
                     application?.deinit(DeinitSource.SignOut)
                   }}
                 />
@@ -152,9 +147,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                 testID="headerButton"
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Done' : ''}
-                iconName={
-                  Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CHECKMARK)
-                }
+                iconName={Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CHECKMARK)}
                 onPress={onPress}
               />
             </HeaderButtons>
@@ -233,15 +226,13 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
         options={({ route }) => ({
           title: 'Authenticate',
           headerLeft: () => undefined,
-          headerTitle: ({ children }) => (
-            <HeaderTitleView title={route.params?.title ?? (children || '')} />
-          ),
+          headerTitle: ({ children }) => <HeaderTitleView title={route.params?.title ?? (children || '')} />,
         })}
         component={Authenticate}
       />
       <MainStack.Screen
         name={SCREEN_UPLOADED_FILES_LIST}
-        options={() => ({
+        options={({ route }) => ({
           title: 'Files',
           headerLeft: ({ disabled, onPress }) => (
             <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
@@ -254,6 +245,9 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
               />
             </HeaderButtons>
           ),
+          headerTitle: ({ children }) => {
+            return <HeaderTitleView title={route.params?.title ?? (children || '')} />
+          },
         })}
         component={UploadedFilesList}
       />

@@ -31,16 +31,14 @@ type Props = ModalStackNavigationProp<typeof SCREEN_UPLOADED_FILES_LIST>
 
 export const UploadedFilesList: FC<Props> = props => {
   const { AttachedFiles, AllFiles } = Tabs
-  const { note, shouldShowAllFiles } = props.route.params
+  const { note } = props.route.params
 
   const theme = useContext(ThemeContext)
 
   const styles = useUploadedFilesListStyles()
   const navigation = useNavigation()
 
-  const [currentTab, setCurrentTab] = useState(() => {
-    return shouldShowAllFiles ? AllFiles : AttachedFiles
-  })
+  const [currentTab, setCurrentTab] = useState(AllFiles)
   const [searchString, setSearchString] = useState('')
   const [filesListScrolled, setFilesListScrolled] = useState(false)
 
@@ -86,13 +84,7 @@ export const UploadedFilesList: FC<Props> = props => {
     [scrollListToTop]
   )
 
-  const {
-    centeredView,
-    header,
-    headerTabContainer,
-    noAttachmentsIcon,
-    noAttachmentsIconContainer,
-  } = styles
+  const { centeredView, header, headerTabContainer, noAttachmentsIcon, noAttachmentsIconContainer } = styles
 
   const onScroll = () => {
     if (filesListScrolled) {
@@ -102,14 +94,7 @@ export const UploadedFilesList: FC<Props> = props => {
   }
 
   const renderItem: ListRenderItem<SNFile> = ({ item }) => {
-    return (
-      <UploadedFileItem
-        key={item.uuid}
-        file={item}
-        note={note}
-        isAttachedToNote={attachedFiles.includes(item)}
-      />
-    )
+    return <UploadedFileItem key={item.uuid} file={item} note={note} isAttachedToNote={attachedFiles.includes(item)} />
   }
 
   return (
@@ -124,10 +109,7 @@ export const UploadedFilesList: FC<Props> = props => {
             >
               <TabText isActive={currentTab === AttachedFiles}>Attached</TabText>
             </HeaderTabItem>
-            <HeaderTabItem
-              isActive={currentTab === AllFiles}
-              onTouchEnd={() => setCurrentTab(AllFiles)}
-            >
+            <HeaderTabItem isActive={currentTab === AllFiles} onTouchEnd={() => setCurrentTab(AllFiles)}>
               <TabText isActive={currentTab === AllFiles}>All files</TabText>
             </HeaderTabItem>
           </View>

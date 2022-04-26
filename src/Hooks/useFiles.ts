@@ -8,22 +8,11 @@ import {
   UploadedFileItemActionType,
 } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
 import { Tabs } from '@Screens/UploadedFilesList/UploadedFilesList'
-import {
-  ButtonType,
-  ChallengeReason,
-  ClientDisplayableError,
-  ContentType,
-  SNFile,
-  SNNote,
-} from '@standardnotes/snjs'
+import { ButtonType, ChallengeReason, ClientDisplayableError, ContentType, SNFile, SNNote } from '@standardnotes/snjs'
 import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
 import { useCallback, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
-import DocumentPicker, {
-  DocumentPickerResponse,
-  isInProgress,
-  pickMultiple,
-} from 'react-native-document-picker'
+import DocumentPicker, { DocumentPickerResponse, isInProgress, pickMultiple } from 'react-native-document-picker'
 import FileViewer from 'react-native-file-viewer'
 import RNFS, { exists } from 'react-native-fs'
 import { Asset, launchCamera, launchImageLibrary, MediaType } from 'react-native-image-picker'
@@ -69,18 +58,12 @@ export const useFiles = ({ note }: Props) => {
   const filesService = application.getFilesService()
 
   const reloadAttachedFiles = useCallback(() => {
-    setAttachedFiles(
-      application.items.getFilesForNote(note).sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
-    )
-  }, [application, note])
+    setAttachedFiles(application.items.getFilesForNote(note).sort(filesService.sortByName))
+  }, [application.items, filesService.sortByName, note])
 
   const reloadAllFiles = useCallback(() => {
-    setAllFiles(
-      application.items
-        .getItems(ContentType.File)
-        .sort((a, b) => (a.created_at < b.created_at ? 1 : -1)) as SNFile[]
-    )
-  }, [application])
+    setAllFiles(application.items.getItems<SNFile>(ContentType.File).sort(filesService.sortByName) as SNFile[])
+  }, [application.items, filesService.sortByName])
 
   const deleteFileAtPath = useCallback(async (path: string) => {
     try {
@@ -259,10 +242,7 @@ export const useFiles = ({ note }: Props) => {
 
   const authorizeProtectedActionForFile = useCallback(
     async (file: SNFile, challengeReason: ChallengeReason) => {
-      const authorizedFiles = await application.protections.authorizeProtectedActionForFiles(
-        [file],
-        challengeReason
-      )
+      const authorizedFiles = await application.protections.authorizeProtectedActionForFiles([file], challengeReason)
       return authorizedFiles.length > 0 && authorizedFiles.includes(file)
     },
     [application]
@@ -536,8 +516,7 @@ export const useFiles = ({ note }: Props) => {
         },
       },
     ]
-    const osSpecificOptions =
-      Platform.OS === 'android' ? options.filter(option => option.key !== 'library') : options
+    const osSpecificOptions = Platform.OS === 'android' ? options.filter(option => option.key !== 'library') : options
     showActionSheet({
       title: 'Choose action',
       options: osSpecificOptions,
@@ -583,10 +562,7 @@ export const useFiles = ({ note }: Props) => {
       let isAuthorizedForAction = true
 
       if (file.protected && action.type !== UploadedFileItemActionType.ToggleFileProtection) {
-        isAuthorizedForAction = await authorizeProtectedActionForFile(
-          file,
-          ChallengeReason.AccessProtectedFile
-        )
+        isAuthorizedForAction = await authorizeProtectedActionForFile(file, ChallengeReason.AccessProtectedFile)
       }
 
       if (!isAuthorizedForAction) {
@@ -754,6 +730,7 @@ export const useFiles = ({ note }: Props) => {
     showActionsMenu,
     attachedFiles,
     allFiles,
+    handleFileAction,
     handlePressAttachFile,
     uploadFileFromCameraOrImageGallery,
     attachFileToNote,

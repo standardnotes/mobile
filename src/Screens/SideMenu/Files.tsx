@@ -14,6 +14,7 @@ import {
   styles,
 } from '@Root/Screens/SideMenu/Files.styled'
 import { SideMenuOptionIconDescriptionType } from '@Root/Screens/SideMenu/SideMenuSection'
+import { UploadedFileItemActionType } from '@Screens/UploadedFilesList/UploadedFileItemAction'
 import { SNNote } from '@standardnotes/snjs'
 import React, { FC } from 'react'
 
@@ -21,23 +22,20 @@ type Props = {
   note: SNNote
 }
 
-const MaximumVisibleFilesCount = 3
-
 export const Files: FC<Props> = ({ note }) => {
   const application = useSafeApplicationContext()
+  const filesService = application.getFilesService()
 
   const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
-  const { showActionsMenu, handlePressAttachFile, attachedFiles } = useFiles({ note })
+  const { showActionsMenu, handlePressAttachFile, attachedFiles, handleFileAction } = useFiles({ note })
 
-  const openFilesScreen = (shouldShowAllFiles: boolean) => {
-    navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note, shouldShowAllFiles })
+  const openFilesScreen = () => {
+    navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note })
   }
-
-  const isFilesListTruncated = attachedFiles.length > MaximumVisibleFilesCount
 
   return (
     <FilesContainer>
-      {attachedFiles.slice(0, MaximumVisibleFilesCount).map(file => {
+      {attachedFiles.sort(filesService.sortByName).map(file => {
         const iconType = application.iconsController.getIconForFileType(file.mimeType)
 
         return (
@@ -45,7 +43,13 @@ export const Files: FC<Props> = ({ note }) => {
             <SideMenuCellStyled
               text={file.name}
               key={file.uuid}
-              onSelect={() => showActionsMenu(file)}
+              onSelect={() => {
+                void handleFileAction({
+                  type: UploadedFileItemActionType.PreviewFile,
+                  payload: file,
+                })
+              }}
+              onLongPress={() => showActionsMenu(file)}
               iconDesc={{
                 side: 'right',
                 type: SideMenuOptionIconDescriptionType.CustomComponent,
@@ -61,13 +65,10 @@ export const Files: FC<Props> = ({ note }) => {
           </FileItemContainer>
         )
       })}
-      <SideMenuCellAttachNewFile
-        text={'Attach new file'}
-        onSelect={() => handlePressAttachFile()}
-      />
+      <SideMenuCellAttachNewFile text={'Upload new file'} onSelect={() => handlePressAttachFile()} />
       <SideMenuCellShowAllFiles
-        text={isFilesListTruncated ? 'Show more files' : 'Show all files'}
-        onSelect={() => openFilesScreen(!isFilesListTruncated)}
+        text={'Show all files'}
+        onSelect={() => openFilesScreen()}
         cellContentStyle={styles.cellContentStyle}
       />
     </FilesContainer>
