@@ -1,4 +1,5 @@
 import { SnIcon } from '@Root/Components/SnIcon'
+import { Text } from '@Screens/SideMenu/SideMenuCell.styled'
 import { StyleSheet } from 'react-native'
 import styled from 'styled-components/native'
 
@@ -33,10 +34,10 @@ export const LockIconStyled = styled(SnIcon)`
 export const FileDetailsContainer = styled.View`
   flex-shrink: 1;
 `
-export const FileName = styled.Text`
+export const FileName = styled(Text)`
+  font-weight: normal;
   font-size: 16px;
   margin-bottom: 4px;
-  color: ${({ theme }) => theme.stylekitCodGray};
 `
 export const FileDateAndSizeContainer = styled.View`
   flex-direction: row;
