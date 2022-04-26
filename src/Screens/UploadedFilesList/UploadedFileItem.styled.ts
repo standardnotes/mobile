@@ -42,6 +42,9 @@ export const FileName = styled(Text)`
 export const FileDateAndSizeContainer = styled.View`
   flex-direction: row;
   align-items: center;
+`
+export const FileDateAndSize = styled(Text)`
   color: ${({ theme }) => theme.stylekitAbbey};
+  font-weight: normal;
   font-size: 12px;
 `

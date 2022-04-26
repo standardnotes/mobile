@@ -7,10 +7,11 @@ import { UploadedFileItemActionType } from '@Screens/UploadedFilesList/UploadedF
 import { formatSizeToReadableString } from '@standardnotes/filepicker'
 import { SNFile, SNNote } from '@standardnotes/snjs'
 import React, { FC, useContext, useEffect, useState } from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { ThemeContext } from 'styled-components'
 import {
   FileDataContainer,
+  FileDateAndSize,
   FileDateAndSizeContainer,
   FileDetailsContainer,
   FileDetailsWithExtraIconsContainer,
@@ -60,9 +61,9 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({ file, note }) => {
             <FileDetailsContainer>
               <FileName>{fileName}</FileName>
               <FileDateAndSizeContainer>
-                <Text>
+                <FileDateAndSize>
                   {file.created_at.toLocaleString()} · {formatSizeToReadableString(file.size)}
-                </Text>
+                </FileDateAndSize>
                 {file.protected && (
                   <SnIcon
                     type={'lock-filled'}
