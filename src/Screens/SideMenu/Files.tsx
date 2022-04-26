@@ -23,6 +23,7 @@ type Props = {
 
 export const Files: FC<Props> = ({ note }) => {
   const application = useSafeApplicationContext()
+  const filesService = application.getFilesService()
 
   const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
   const { showActionsMenu, handlePressAttachFile, attachedFiles } = useFiles({ note })
@@ -33,7 +34,7 @@ export const Files: FC<Props> = ({ note }) => {
 
   return (
     <FilesContainer>
-      {attachedFiles.map(file => {
+      {attachedFiles.sort(filesService.sortByName).map(file => {
         const iconType = application.iconsController.getIconForFileType(file.mimeType)
 
         return (
