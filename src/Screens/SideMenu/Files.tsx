@@ -14,6 +14,7 @@ import {
   styles,
 } from '@Root/Screens/SideMenu/Files.styled'
 import { SideMenuOptionIconDescriptionType } from '@Root/Screens/SideMenu/SideMenuSection'
+import { UploadedFileItemActionType } from '@Screens/UploadedFilesList/UploadedFileItemAction'
 import { SNNote } from '@standardnotes/snjs'
 import React, { FC } from 'react'
 
@@ -26,7 +27,7 @@ export const Files: FC<Props> = ({ note }) => {
   const filesService = application.getFilesService()
 
   const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
-  const { showActionsMenu, handlePressAttachFile, attachedFiles } = useFiles({ note })
+  const { showActionsMenu, handlePressAttachFile, attachedFiles, handleFileAction } = useFiles({ note })
 
   const openFilesScreen = () => {
     navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note })
@@ -42,7 +43,13 @@ export const Files: FC<Props> = ({ note }) => {
             <SideMenuCellStyled
               text={file.name}
               key={file.uuid}
-              onSelect={() => showActionsMenu(file)}
+              onSelect={() => {
+                void handleFileAction({
+                  type: UploadedFileItemActionType.PreviewFile,
+                  payload: file,
+                })
+              }}
+              onLongPress={() => showActionsMenu(file)}
               iconDesc={{
                 side: 'right',
                 type: SideMenuOptionIconDescriptionType.CustomComponent,

@@ -730,6 +730,7 @@ export const useFiles = ({ note }: Props) => {
     showActionsMenu,
     attachedFiles,
     allFiles,
+    handleFileAction,
     handlePressAttachFile,
     uploadFileFromCameraOrImageGallery,
     attachFileToNote,

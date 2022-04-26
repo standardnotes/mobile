@@ -3,6 +3,7 @@ import { SnIcon } from '@Root/Components/SnIcon'
 import { useFiles } from '@Root/Hooks/useFiles'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
 import { SCREEN_COMPOSE } from '@Root/Screens/screens'
+import { UploadedFileItemActionType } from '@Screens/UploadedFilesList/UploadedFileItemAction'
 import { formatSizeToReadableString } from '@standardnotes/filepicker'
 import { SNFile, SNNote } from '@standardnotes/snjs'
 import React, { FC, useContext, useEffect, useState } from 'react'
@@ -30,7 +31,7 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({ file, note }) => {
   const application = useSafeApplicationContext()
   const theme = useContext(ThemeContext)
 
-  const { showActionsMenu } = useFiles({ note })
+  const { showActionsMenu, handleFileAction } = useFiles({ note })
 
   const [fileName, setFileName] = useState(file.name)
 
@@ -41,7 +42,15 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({ file, note }) => {
   const iconType = application.iconsController.getIconForFileType(file.mimeType)
 
   return (
-    <TouchableOpacity onPress={() => showActionsMenu(file)}>
+    <TouchableOpacity
+      onPress={() => {
+        void handleFileAction({
+          type: UploadedFileItemActionType.PreviewFile,
+          payload: file,
+        })
+      }}
+      onLongPress={() => showActionsMenu(file)}
+    >
       <View>
         <FileDataContainer>
           <FileIconContainer>
