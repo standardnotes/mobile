@@ -62,7 +62,7 @@ export const useFiles = ({ note }: Props) => {
   }, [application.items, filesService.sortByName, note])
 
   const reloadAllFiles = useCallback(() => {
-    setAllFiles((application.items.getItems(ContentType.File) as SNFile[]).sort(filesService.sortByName) as SNFile[])
+    setAllFiles(application.items.getItems<SNFile>(ContentType.File).sort(filesService.sortByName) as SNFile[])
   }, [application.items, filesService.sortByName])
 
   const deleteFileAtPath = useCallback(async (path: string) => {
