@@ -62,7 +62,7 @@ export const UploadedFileItem: FC<UploadedFileItemProps> = ({ file, note }) => {
               <FileName>{fileName}</FileName>
               <FileDateAndSizeContainer>
                 <FileDateAndSize>
-                  {file.created_at.toLocaleString()} · {formatSizeToReadableString(file.size)}
+                  {file.created_at.toLocaleString()} · {formatSizeToReadableString(file.decryptedSize)}
                 </FileDateAndSize>
                 {file.protected && (
                   <SnIcon

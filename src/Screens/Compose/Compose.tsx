@@ -1,7 +1,8 @@
 import { AppStateEventType } from '@Lib/ApplicationState'
 import { ComponentLoadingError, ComponentManager } from '@Lib/ComponentManager'
 import { isNullOrUndefined } from '@Lib/Utils'
-import { ApplicationContext } from '@Root/ApplicationContext'
+import { ApplicationContext, SafeApplicationContext } from '@Root/ApplicationContext'
+import { AppStackNavigationProp } from '@Root/AppStack'
 import { SCREEN_COMPOSE } from '@Root/Screens/screens'
 import SNTextView from '@standardnotes/react-native-textview'
 import {
@@ -13,8 +14,10 @@ import {
   isPayloadSourceRetrieved,
   ItemMutator,
   NoteMutator,
+  NoteViewController,
   PayloadEmitSource,
   SNComponent,
+  UuidString,
 } from '@standardnotes/snjs'
 import { ICON_ALERT, ICON_LOCK } from '@Style/Icons'
 import { ThemeService, ThemeServiceContext } from '@Style/ThemeService'
@@ -53,11 +56,18 @@ type State = {
   componentViewer?: ComponentViewer
 }
 
+type PropsWhenNavigating = AppStackNavigationProp<typeof SCREEN_COMPOSE>
+
+type PropsWhenRenderingDirectly = {
+  noteUuid: UuidString
+}
+
 const EditingIsDisabledText = 'This note has editing disabled. Please enable editing on this note to make changes.'
 
-export class Compose extends React.Component<Record<string, unknown>, State> {
+export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRenderingDirectly, State> {
   static override contextType = ApplicationContext
   override context: React.ContextType<typeof ApplicationContext>
+  editor: NoteViewController
   editorViewRef: React.RefObject<SNTextView> = createRef()
   saveTimeout: ReturnType<typeof setTimeout> | undefined
   alreadySaved = false
@@ -70,13 +80,24 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
   removeAppEventObserver?: () => void
   removeComponentHandler?: () => void
 
-  constructor(props: Record<string, unknown>, context: React.ContextType<typeof ApplicationContext>) {
+  constructor(
+    props: PropsWhenNavigating | PropsWhenRenderingDirectly,
+    context: React.ContextType<typeof SafeApplicationContext>
+  ) {
     super(props)
     this.context = context
-    const initialEditor = context?.editorGroup.activeNoteViewController
+
+    const noteUuid = 'noteUuid' in props ? props.noteUuid : props.route.params.noteUuid
+    const editor = this.context.editorGroup.noteControllers.find(c => c.note.uuid === noteUuid)
+    if (!editor) {
+      throw 'Unable to to find note controller'
+    }
+
+    this.editor = editor
+
     this.state = {
-      title: initialEditor?.note?.title ?? '',
-      text: initialEditor?.note?.text ?? '',
+      title: this.editor.note.title,
+      text: this.editor.note.text,
       componentViewer: undefined,
       saveError: false,
       webViewError: undefined,
@@ -86,8 +107,8 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
   }
 
   override componentDidMount() {
-    this.removeNoteInnerValueObserver = this.editor?.addNoteInnerValueChangeObserver((note, source) => {
-      if (isPayloadSourceRetrieved(source!)) {
+    this.removeNoteInnerValueObserver = this.editor.addNoteInnerValueChangeObserver((note, source) => {
+      if (isPayloadSourceRetrieved(source)) {
         this.setState({
           title: note.title,
           text: note.text,
@@ -101,11 +122,12 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
 
       if (note.lastSyncBegan || note.dirty) {
         if (note.lastSyncEnd) {
-          if (note.dirty || note.lastSyncBegan!.getTime() > note.lastSyncEnd.getTime()) {
+          if (note.dirty || (note.lastSyncBegan && note.lastSyncBegan.getTime() > note.lastSyncEnd.getTime())) {
             this.showSavingStatus()
           } else if (
             this.context?.getStatusManager().hasMessage(SCREEN_COMPOSE) &&
-            note.lastSyncEnd.getTime() > note.lastSyncBegan!.getTime()
+            note.lastSyncBegan &&
+            note.lastSyncEnd.getTime() > note.lastSyncBegan.getTime()
           ) {
             this.showAllChangesSavedStatus()
           }
@@ -130,7 +152,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
     this.removeAppEventObserver = this.context?.addEventObserver(async eventName => {
       if (eventName === ApplicationEvent.CompletedFullSync) {
         /** if we're still dirty, don't change status, a sync is likely upcoming. */
-        if (!this.note?.dirty && this.state.saveError) {
+        if (!this.note.dirty && this.state.saveError) {
           this.showAllChangesSavedStatus()
         }
       } else if (eventName === ApplicationEvent.FailedSync) {
@@ -139,7 +161,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
          * Otherwise, it means the originating sync came from somewhere else
          * and we don't want to display an error here.
          */
-        if (this.note?.dirty) {
+        if (this.note.dirty) {
           this.showErrorStatus('Sync Unavailable (changes saved offline)')
         }
       } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
@@ -156,7 +178,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
       }
     })
 
-    if (this.editor?.isTemplateNote && Platform.OS === 'ios') {
+    if (this.editor.isTemplateNote && Platform.OS === 'ios') {
       setTimeout(() => {
         this.editorViewRef?.current?.focus()
       }, 0)
@@ -238,11 +260,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
   }
 
   get note() {
-    return this.editor?.note
-  }
-
-  get editor() {
-    return this.context?.editorGroup?.activeNoteViewController
+    return this.editor.note
   }
 
   dismissKeyboard = () => {
@@ -273,11 +291,11 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
       webViewError: undefined,
     })
 
-    const associatedEditor = this.componentManager.editorForNote(this.note!)
+    const associatedEditor = this.componentManager.editorForNote(this.note)
 
     /** Editors cannot interact with template notes so the note must be inserted */
-    if (associatedEditor && this.editor?.isTemplateNote) {
-      await this.editor?.insertTemplatedNote()
+    if (associatedEditor && this.editor.isTemplateNote) {
+      await this.editor.insertTemplatedNote()
       void this.associateComponentWithCurrentNote(associatedEditor)
     }
 
@@ -299,7 +317,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
 
   loadComponentViewer(component: SNComponent) {
     this.setState({
-      componentViewer: this.componentManager.createComponentViewer(component, this.note?.uuid),
+      componentViewer: this.componentManager.createComponentViewer(component, this.note.uuid),
     })
   }
 
@@ -314,7 +332,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
       webViewError: undefined,
     })
 
-    const associatedEditor = this.componentManager.editorForNote(this.note!)
+    const associatedEditor = this.componentManager.editorForNote(this.note)
     if (associatedEditor) {
       this.loadComponentViewer(associatedEditor)
     }
@@ -327,30 +345,31 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
     closeAfterSync: boolean,
     newNoteText?: string
   ) => {
-    const { editor, note } = this
+    if (!this.note) {
+      return
+    }
+
+    const editor = this.editor
     const { title } = this.state
+    const text = newNoteText || this.note.text
 
-    if (!note) {
+    if (editor.isTemplateNote) {
+      await editor.insertTemplatedNote()
+    }
+
+    if (!this.context?.items.findItem(this.note.uuid)) {
+      void this.context?.alertService.alert('Attempting to save this note has failed. The note cannot be found.')
       return
     }
 
-    if (editor?.isTemplateNote) {
-      await editor?.insertTemplatedNote()
-    }
-
-    if (!this.context?.items.findItem(note!.uuid)) {
-      void this.context?.alertService!.alert('Attempting to save this note has failed. The note cannot be found.')
-      return
-    }
-
-    await this.context!.mutator.changeItem(
-      note,
+    await this.context.mutator.changeItem(
+      this.note,
       mutator => {
         const noteMutator = mutator as NoteMutator
-        noteMutator.title = title!
-        noteMutator.text = newNoteText ?? note.text
+        noteMutator.title = title
+        noteMutator.text = text
+
         if (!dontUpdatePreviews) {
-          const text = newNoteText ?? ''
           const truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT
           const substring = text.substring(0, NOTE_PREVIEW_CHAR_LIMIT)
           const previewPlain = substring + (truncate ? '...' : '')
@@ -369,13 +388,13 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
     this.saveTimeout = setTimeout(() => {
       void this.context?.sync.sync()
       if (closeAfterSync) {
-        this.context?.getAppState().closeEditor(editor!)
+        this.context?.getAppState().closeEditor(editor)
       }
     }, syncDebouceMs)
   }
 
   onTitleChange = (newTitle: string) => {
-    if (this.note?.locked) {
+    if (this.note.locked) {
       void this.context?.alertService?.alert(EditingIsDisabledText)
       return
     }
@@ -388,7 +407,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
   }
 
   onContentChange = (text: string) => {
-    if (this.note?.locked) {
+    if (this.note.locked) {
       void this.context?.alertService?.alert(EditingIsDisabledText)
       return
     }
@@ -467,7 +486,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
 
   override render() {
     const shouldDisplayEditor =
-      this.state.componentViewer && Boolean(this.note) && !this.note?.prefersPlainEditor && !this.state.webViewError
+      this.state.componentViewer && Boolean(this.note) && !this.note.prefersPlainEditor && !this.state.webViewError
 
     return (
       <Container>
@@ -520,10 +539,10 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
                       </LoadingWebViewContainer>
                     )}
                     {/* setting webViewError to false on onLoadEnd will cause an infinite loop on Android upon webview error, so, don't do that. */}
-                    {shouldDisplayEditor && (
+                    {shouldDisplayEditor && this.state.componentViewer && (
                       <ComponentView
                         key={this.state.componentViewer?.identifier}
-                        componentViewer={this.state.componentViewer!}
+                        componentViewer={this.state.componentViewer}
                         onLoadStart={this.onLoadWebViewStart}
                         onLoadEnd={this.onLoadWebViewEnd}
                         onLoadError={this.onLoadWebViewError}
@@ -548,7 +567,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
                     )}
                     {/* Empty wrapping view fixes native textview crashing */}
                     {!shouldDisplayEditor && Platform.OS === 'ios' && (
-                      <View key={this.note?.uuid}>
+                      <View key={this.note.uuid}>
                         <StyledTextView
                           testID="noteContentField"
                           ref={this.editorViewRef}

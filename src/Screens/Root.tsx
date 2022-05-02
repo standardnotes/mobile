@@ -1,7 +1,7 @@
 import { AppStateEventType, AppStateType, TabletModeChangeData } from '@Lib/ApplicationState'
-import { useHasEditor, useIsLocked } from '@Lib/SnjsHelperHooks'
+import { useIsLocked } from '@Lib/SnjsHelperHooks'
 import { ApplicationContext } from '@Root/ApplicationContext'
-import { UuidString } from '@standardnotes/snjs'
+import { NoteViewController } from '@standardnotes/snjs'
 import { ThemeService } from '@Style/ThemeService'
 import { hexToRGBA } from '@Style/Utils'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
@@ -22,9 +22,8 @@ export const Root = () => {
   const [, setWidth] = useState<number | undefined>(undefined)
   const [height, setHeight] = useState<number | undefined>(undefined)
   const [, setX] = useState<number | undefined>(undefined)
-  const [hasEditor] = useHasEditor()
   const [noteListCollapsed, setNoteListCollapsed] = useState<boolean>(false)
-  const [activeNoteId, setActiveNoteId] = useState<UuidString | undefined>()
+  const [activeNoteView, setActiveNoteView] = useState<NoteViewController | undefined>()
   const [shouldSplitLayout, setShouldSplitLayout] = useState<boolean | undefined>(false)
   const [keyboardHeight, setKeyboardHeight] = useState<number | undefined>(undefined)
 
@@ -57,8 +56,9 @@ export const Root = () => {
         }
       })
     const removeNoteObserver = application?.editorGroup.addActiveControllerChangeObserver(activeController => {
-      setActiveNoteId(activeController?.note.uuid)
+      setActiveNoteView(activeController)
     })
+
     return () => {
       if (removeApplicationStateEventHandler) {
         removeApplicationStateEventHandler()
@@ -115,9 +115,9 @@ export const Root = () => {
       <NotesContainer notesListCollapsed={noteListCollapsed} shouldSplitLayout={shouldSplitLayout}>
         <Notes keyboardHeight={keyboardHeight} shouldSplitLayout={shouldSplitLayout} />
       </NotesContainer>
-      {activeNoteId && hasEditor && shouldSplitLayout && (
+      {activeNoteView && shouldSplitLayout && (
         <ComposeContainer>
-          <Compose key={activeNoteId} />
+          <Compose noteUuid={activeNoteView.note.uuid} />
           <ExpandTouchable style={{ bottom: collapseIconBottomPosition }} onPress={toggleNoteList}>
             <Icon name={collapseIconName} size={24} color={hexToRGBA(theme.stylekitInfoColor, 0.85)} />
           </ExpandTouchable>
