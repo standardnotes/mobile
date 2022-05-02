@@ -3,14 +3,7 @@ import { AppStackNavigationProp } from '@Root/AppStack'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
 import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Root/Screens/screens'
 import { SideMenuOptionIconDescriptionType } from '@Root/Screens/SideMenu/SideMenuSection'
-import {
-  ButtonType,
-  CollectionSort,
-  ContentType,
-  FindItem,
-  SmartView,
-  SNTag,
-} from '@standardnotes/snjs'
+import { ButtonType, CollectionSort, ContentType, FindItem, SmartView, SNTag } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/CustomActionSheet'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
@@ -117,9 +110,7 @@ export const TagSelectionList = React.memo(
         children = (tags as SNTag[]).filter((tag: SNTag) => rawChildren.includes(tag.uuid))
       }
 
-      const isSelected = selectedTags.some(
-        (selectedTag: SNTag | SmartView) => selectedTag.uuid === item.uuid
-      )
+      const isSelected = selectedTags.some((selectedTag: SNTag | SmartView) => selectedTag.uuid === item.uuid)
 
       return (
         <>

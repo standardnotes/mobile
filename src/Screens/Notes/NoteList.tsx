@@ -7,15 +7,7 @@ import { Chip } from '@Root/Components/Chip'
 import { SearchBar } from '@Root/Components/SearchBar'
 import { SCREEN_NOTES } from '@Root/Screens/screens'
 import { CollectionSortProperty, SNNote } from '@standardnotes/snjs'
-import React, {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { Dispatch, SetStateAction, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Animated, FlatList, ListRenderItem, RefreshControl } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import IosSearchBar from 'react-native-search-bar'
@@ -90,13 +82,11 @@ export const NoteList = (props: Props) => {
   })
 
   useEffect(() => {
-    const unsubscribeStateEventObserver = application
-      ?.getAppState()
-      .addStateEventObserver(state => {
-        if (state === AppStateEventType.DrawerOpen) {
-          dismissKeyboard()
-        }
-      })
+    const unsubscribeStateEventObserver = application?.getAppState().addStateEventObserver(state => {
+      if (state === AppStateEventType.DrawerOpen) {
+        dismissKeyboard()
+      }
+    })
 
     return unsubscribeStateEventObserver
   }, [application])
@@ -109,13 +99,11 @@ export const NoteList = (props: Props) => {
   }, [noteListScrolled, props.notes])
 
   useEffect(() => {
-    const unsubscribeTagChangedEventObserver = application
-      ?.getAppState()
-      .addStateChangeObserver(event => {
-        if (event === AppStateType.TagChanged) {
-          scrollListToTop()
-        }
-      })
+    const unsubscribeTagChangedEventObserver = application?.getAppState().addStateChangeObserver(event => {
+      if (event === AppStateType.TagChanged) {
+        scrollListToTop()
+      }
+    })
 
     return unsubscribeTagChangedEventObserver
   }, [application, scrollListToTop])
@@ -232,10 +220,7 @@ export const NoteList = (props: Props) => {
         ref={noteListRef}
         style={styles.list}
         keyExtractor={item => item.uuid}
-        contentContainerStyle={[
-          { paddingBottom: insets.bottom },
-          props.notes.length > 0 ? {} : { height: '100%' },
-        ]}
+        contentContainerStyle={[{ paddingBottom: insets.bottom }, props.notes.length > 0 ? {} : { height: '100%' }]}
         initialNumToRender={6}
         windowSize={6}
         maxToRenderPerBatch={6}
@@ -260,9 +245,7 @@ export const NoteList = (props: Props) => {
         data={props.notes}
         renderItem={renderItem}
         extraData={signedIn}
-        ListHeaderComponent={() => (
-          <HeaderContainer>{!signedIn && <OfflineBanner />}</HeaderContainer>
-        )}
+        ListHeaderComponent={() => <HeaderContainer>{!signedIn && <OfflineBanner />}</HeaderContainer>}
         onScroll={onScroll}
       />
     </Container>

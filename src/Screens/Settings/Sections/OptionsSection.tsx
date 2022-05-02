@@ -106,9 +106,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     return RNFS.readFile(fileUri)
       .then(result => JSON.parse(result))
       .catch(() => {
-        void application!.alertService!.alert(
-          'Unable to open file. Ensure it is a proper JSON file and try again.'
-        )
+        void application!.alertService!.alert('Unable to open file. Ensure it is a proper JSON file and try again.')
       })
   }
 
@@ -134,8 +132,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
         type: [DocumentPicker.types.plainText],
       })
       const selectedFile = selectedFiles[0]
-      const selectedFileURI =
-        Platform.OS === 'ios' ? decodeURIComponent(selectedFile.uri) : selectedFile.uri
+      const selectedFileURI = Platform.OS === 'ios' ? decodeURIComponent(selectedFile.uri) : selectedFile.uri
       const data = await readImportFile(selectedFileURI)
       if (!data) {
         return

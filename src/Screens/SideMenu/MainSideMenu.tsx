@@ -16,11 +16,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import { ThemeContext } from 'styled-components'
 import { FirstSafeAreaView, MainSafeAreaView, useStyles } from './MainSideMenu.styled'
 import { SideMenuHero } from './SideMenuHero'
-import {
-  SideMenuOption,
-  SideMenuOptionIconDescriptionType,
-  SideMenuSection,
-} from './SideMenuSection'
+import { SideMenuOption, SideMenuOptionIconDescriptionType, SideMenuSection } from './SideMenuSection'
 import { TagSelectionList } from './TagSelectionList'
 
 type Props = {
@@ -252,11 +248,7 @@ export const MainSideMenu = React.memo(({ drawerRef }: Props) => {
     <Fragment>
       <FirstSafeAreaView />
       <MainSafeAreaView>
-        <SideMenuHero
-          testID="settingsButton"
-          onPress={openSettings}
-          onOutOfSyncPress={outOfSyncPressed}
-        />
+        <SideMenuHero testID="settingsButton" onPress={openSettings} onOutOfSyncPress={outOfSyncPressed} />
         <FlatList
           style={styles.sections}
           data={['themes-section', 'views-section', 'tags-section'].map(key => ({

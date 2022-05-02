@@ -1,7 +1,4 @@
-import {
-  Props as TableCellProps,
-  SectionedTableCellTouchableHighlight,
-} from '@Root/Components/SectionedTableCell'
+import { Props as TableCellProps, SectionedTableCellTouchableHighlight } from '@Root/Components/SectionedTableCell'
 import React from 'react'
 import styled, { css } from 'styled-components/native'
 

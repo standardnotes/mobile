@@ -41,9 +41,7 @@ export type AppStackNavigationProp<T extends keyof AppStackNavigatorParamList> =
 
 const AppStack = createStackNavigator<AppStackNavigatorParamList>()
 
-export const AppStackComponent = (
-  props: ModalStackNavigationProp<'AppStack'> & { env: TEnvironment }
-) => {
+export const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'> & { env: TEnvironment }) => {
   // Context
   const application = useContext(ApplicationContext)
   const theme = useContext(ThemeContext)
@@ -52,9 +50,7 @@ export const AppStackComponent = (
 
   // State
   const [dimensions, setDimensions] = useState(() => Dimensions.get('window'))
-  const [isInTabletMode, setIsInTabletMode] = useState(
-    () => application?.getAppState().isInTabletMode
-  )
+  const [isInTabletMode, setIsInTabletMode] = useState(() => application?.getAppState().isInTabletMode)
   const [notesStatus, setNotesStatus] = useState<ScreenStatus>()
   const [composeStatus, setComposeStatus] = useState<ScreenStatus>()
   const [noteDrawerOpen, setNoteDrawerOpen] = useState(false)
@@ -96,18 +92,16 @@ export const AppStackComponent = (
   }, [])
 
   useEffect(() => {
-    const remoteTabletModeSubscription = application
-      ?.getAppState()
-      .addStateEventObserver((event, data) => {
-        if (event === AppStateEventType.TabletModeChange) {
-          const eventData = data as TabletModeChangeData
-          if (eventData.new_isInTabletMode && !eventData.old_isInTabletMode) {
-            setIsInTabletMode(true)
-          } else if (!eventData.new_isInTabletMode && eventData.old_isInTabletMode) {
-            setIsInTabletMode(false)
-          }
+    const remoteTabletModeSubscription = application?.getAppState().addStateEventObserver((event, data) => {
+      if (event === AppStateEventType.TabletModeChange) {
+        const eventData = data as TabletModeChangeData
+        if (eventData.new_isInTabletMode && !eventData.old_isInTabletMode) {
+          setIsInTabletMode(true)
+        } else if (!eventData.new_isInTabletMode && eventData.old_isInTabletMode) {
+          setIsInTabletMode(false)
         }
-      })
+      }
+    })
 
     return remoteTabletModeSubscription
   }, [application])
@@ -141,13 +135,7 @@ export const AppStackComponent = (
         drawerType="slide"
         drawerLockMode={hasEditor ? 'unlocked' : 'locked-closed'}
         renderNavigationView={() =>
-          hasEditor && (
-            <NoteSideMenu
-              drawerOpen={noteDrawerOpen}
-              drawerRef={noteDrawerRef.current}
-              env={props.env}
-            />
-          )
+          hasEditor && <NoteSideMenu drawerOpen={noteDrawerOpen} drawerRef={noteDrawerRef.current} env={props.env} />
         }
       >
         <AppStack.Navigator
@@ -170,17 +158,9 @@ export const AppStackComponent = (
                 const screenStatus = isInTabletMode ? composeStatus || notesStatus : notesStatus
 
                 const title = route.params?.title ?? (children || '')
-                const subtitle = [screenStatus?.status, route.params?.subTitle]
-                  .filter(x => !!x)
-                  .join(' • ')
+                const subtitle = [screenStatus?.status, route.params?.subTitle].filter(x => !!x).join(' • ')
 
-                return (
-                  <HeaderTitleView
-                    title={title}
-                    subtitle={subtitle}
-                    subtitleColor={screenStatus?.color}
-                  />
-                )
+                return <HeaderTitleView title={title} subtitle={subtitle} subtitleColor={screenStatus?.color} />
               },
               headerLeft: () => (
                 <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>

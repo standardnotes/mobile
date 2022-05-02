@@ -56,11 +56,7 @@ export const AuthSection = (props: Props) => {
 
   const validate = () => {
     if (!email) {
-      void application?.alertService?.alert(
-        'Please enter a valid email address.',
-        'Missing Email',
-        'OK'
-      )
+      void application?.alertService?.alert('Please enter a valid email address.', 'Missing Email', 'OK')
       return false
     }
 
@@ -125,8 +121,8 @@ export const AuthSection = (props: Props) => {
         <SectionHeader title={'Confirm Password'} />
 
         <RegistrationDescription>
-          Due to the nature of our encryption, Standard Notes cannot offer password reset
-          functionality. If you forget your password, you will permanently lose access to your data.
+          Due to the nature of our encryption, Standard Notes cannot offer password reset functionality. If you forget
+          your password, you will permanently lose access to your data.
         </RegistrationDescription>
 
         <SectionedTableCell first textInputCell>
@@ -241,11 +237,7 @@ export const AuthSection = (props: Props) => {
         />
 
         {!showAdvanced && (
-          <ButtonCell
-            testID="advancedOptionsButton"
-            title="Advanced Options"
-            onPress={() => setShowAdvanced(true)}
-          />
+          <ButtonCell testID="advancedOptionsButton" title="Advanced Options" onPress={() => setShowAdvanced(true)} />
         )}
       </TableSection>
     )

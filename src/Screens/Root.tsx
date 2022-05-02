@@ -10,13 +10,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import { ThemeContext } from 'styled-components'
 import { Compose } from './Compose/Compose'
 import { Notes } from './Notes/Notes'
-import {
-  ComposeContainer,
-  Container,
-  ExpandTouchable,
-  iconNames,
-  NotesContainer,
-} from './Root.styled'
+import { ComposeContainer, Container, ExpandTouchable, iconNames, NotesContainer } from './Root.styled'
 
 export const Root = () => {
   // Context
@@ -62,11 +56,9 @@ export const Root = () => {
           }
         }
       })
-    const removeNoteObserver = application?.editorGroup.addActiveControllerChangeObserver(
-      activeController => {
-        setActiveNoteId(activeController?.note.uuid)
-      }
-    )
+    const removeNoteObserver = application?.editorGroup.addActiveControllerChangeObserver(activeController => {
+      setActiveNoteId(activeController?.note.uuid)
+    })
     return () => {
       if (removeApplicationStateEventHandler) {
         removeApplicationStateEventHandler()
@@ -112,8 +104,7 @@ export const Root = () => {
     setNoteListCollapsed(value => !value)
   }
 
-  const collapseIconBottomPosition =
-    (keyboardHeight ?? 0) > (height ?? 0) / 2 ? (keyboardHeight ?? 0) + 40 : '50%'
+  const collapseIconBottomPosition = (keyboardHeight ?? 0) > (height ?? 0) / 2 ? (keyboardHeight ?? 0) + 40 : '50%'
 
   if (isLocked) {
     return null
@@ -128,11 +119,7 @@ export const Root = () => {
         <ComposeContainer>
           <Compose key={activeNoteId} />
           <ExpandTouchable style={{ bottom: collapseIconBottomPosition }} onPress={toggleNoteList}>
-            <Icon
-              name={collapseIconName}
-              size={24}
-              color={hexToRGBA(theme.stylekitInfoColor, 0.85)}
-            />
+            <Icon name={collapseIconName} size={24} color={hexToRGBA(theme.stylekitInfoColor, 0.85)} />
           </ExpandTouchable>
         </ComposeContainer>
       )}

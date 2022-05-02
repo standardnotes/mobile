@@ -1,18 +1,8 @@
-import {
-  useChangeNote,
-  useDeleteNoteWithPrivileges,
-  useProtectOrUnprotectNote,
-} from '@Lib/SnjsHelperHooks'
+import { useChangeNote, useDeleteNoteWithPrivileges, useProtectOrUnprotectNote } from '@Lib/SnjsHelperHooks'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { SnIcon } from '@Root/Components/SnIcon'
 import { NoteCellIconFlags } from '@Root/Screens/Notes/NoteCellIconFlags'
-import {
-  CollectionSort,
-  CollectionSortProperty,
-  IconType,
-  isNullOrUndefined,
-  SNNote,
-} from '@standardnotes/snjs'
+import { CollectionSort, CollectionSortProperty, IconType, isNullOrUndefined, SNNote } from '@standardnotes/snjs'
 import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
 import { getTintColorForEditor } from '@Style/Utils'
 import React, { useContext, useRef, useState } from 'react'
@@ -194,9 +184,10 @@ export const NoteCell = ({
   const showDetails = !hideDates || note.protected
 
   const editorForNote = application?.componentManager.editorForNote(note)
-  const [icon, tint] = application?.iconsController.getIconAndTintForEditor(
-    editorForNote?.identifier
-  ) as [IconType, number]
+  const [icon, tint] = application?.iconsController.getIconAndTintForEditor(editorForNote?.identifier) as [
+    IconType,
+    number
+  ]
 
   return (
     <TouchableContainer
@@ -207,19 +198,13 @@ export const NoteCell = ({
       delayPressIn={150}
     >
       <Container ref={elementRef as any} selected={highlight} distance={padding}>
-        {!hideEditorIcon && (
-          <SnIcon type={icon} fill={getTintColorForEditor(theme, tint)} style={styles.editorIcon} />
-        )}
+        {!hideEditorIcon && <SnIcon type={icon} fill={getTintColorForEditor(theme, tint)} style={styles.editorIcon} />}
         <NoteDataContainer distance={padding}>
           <NoteCellFlags note={note} highlight={highlight} />
 
           <FlexContainer>
             <NoteContentsContainer>
-              {note.title.length > 0 ? (
-                <TitleText selected={highlight}>{note.title}</TitleText>
-              ) : (
-                <View />
-              )}
+              {note.title.length > 0 ? <TitleText selected={highlight}>{note.title}</TitleText> : <View />}
               {hasPlainPreview && showPreview && (
                 <NoteText selected={highlight} numberOfLines={2}>
                   {note.preview_plain}
@@ -245,9 +230,7 @@ export const NoteCell = ({
               )}
               {!hideDates && (
                 <Text>
-                  {sortType === CollectionSort.UpdatedAt
-                    ? 'Modified ' + note.updatedAtString
-                    : note.createdAtString}
+                  {sortType === CollectionSort.UpdatedAt ? 'Modified ' + note.updatedAtString : note.createdAtString}
                 </Text>
               )}
             </DetailsText>

@@ -88,11 +88,7 @@ export const SectionedAccessoryTableCell: React.FC<Props> = props => {
   }
 
   const checkmarkName = Platform.OS === 'android' ? 'md-checkbox' : 'ios-checkmark-circle'
-  const iconName = props.iconName
-    ? props.iconName
-    : props.selected && props.selected()
-    ? checkmarkName
-    : null
+  const iconName = props.iconName ? props.iconName : props.selected && props.selected() ? checkmarkName : null
 
   const left = props.leftAlignIcon
   let iconSize = left ? 25 : 30
@@ -129,15 +125,8 @@ export const SectionedAccessoryTableCell: React.FC<Props> = props => {
   )
 
   return (
-    <TouchableContainer
-      first={props.first}
-      last={props.last}
-      onPress={onPress}
-      onLongPress={onLongPress}
-    >
-      <ContentContainer>
-        {props.leftAlignIcon ? [icon, textWrapper] : [textWrapper, icon]}
-      </ContentContainer>
+    <TouchableContainer first={props.first} last={props.last} onPress={onPress} onLongPress={onLongPress}>
+      <ContentContainer>{props.leftAlignIcon ? [icon, textWrapper] : [textWrapper, icon]}</ContentContainer>
     </TouchableContainer>
   )
 }

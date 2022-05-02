@@ -24,12 +24,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     return
   }
 
-  pbkdf2(
-    password: Utf8String,
-    salt: Utf8String,
-    iterations: number,
-    length: number
-  ): Promise<string | null> {
+  pbkdf2(password: Utf8String, salt: Utf8String, iterations: number, length: number): Promise<string | null> {
     return Aes.pbkdf2(password, salt, iterations, length)
   }
 
@@ -43,11 +38,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     return Aes.encrypt(plaintext, key, iv)
   }
 
-  async aes256CbcDecrypt(
-    ciphertext: Base64String,
-    iv: HexString,
-    key: HexString
-  ): Promise<Utf8String | null> {
+  async aes256CbcDecrypt(ciphertext: Base64String, iv: HexString, key: HexString): Promise<Utf8String | null> {
     try {
       return Aes.decrypt(ciphertext, key, iv)
     } catch (e) {
@@ -71,29 +62,11 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     return Aes.sha1(text)
   }
 
-  public argon2(
-    password: Utf8String,
-    salt: HexString,
-    iterations: number,
-    bytes: number,
-    length: number
-  ): HexString {
-    return Sodium.crypto_pwhash(
-      length,
-      password,
-      salt,
-      iterations,
-      bytes,
-      Sodium.constants.crypto_pwhash_ALG_DEFAULT
-    )
+  public argon2(password: Utf8String, salt: HexString, iterations: number, bytes: number, length: number): HexString {
+    return Sodium.crypto_pwhash(length, password, salt, iterations, bytes, Sodium.constants.crypto_pwhash_ALG_DEFAULT)
   }
 
-  xchacha20Encrypt(
-    plaintext: Utf8String,
-    nonce: HexString,
-    key: HexString,
-    assocData: Utf8String
-  ): Base64String {
+  xchacha20Encrypt(plaintext: Utf8String, nonce: HexString, key: HexString, assocData: Utf8String): Base64String {
     return Sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(plaintext, nonce, key, assocData)
   }
 
@@ -104,12 +77,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     assocData: Utf8String
   ): string | null {
     try {
-      const result = Sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
-        ciphertext,
-        nonce,
-        key,
-        assocData
-      )
+      const result = Sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(ciphertext, nonce, key, assocData)
       return result
     } catch (e) {
       return null
@@ -136,10 +104,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     return new Uint8Array(encryptedBuffer)
   }
 
-  public xchacha20StreamInitDecryptor(
-    header: Base64String,
-    key: HexString
-  ): Sodium.MobileStreamDecryptor {
+  public xchacha20StreamInitDecryptor(header: Base64String, key: HexString): Sodium.MobileStreamDecryptor {
     const decryptor = Sodium.crypto_secretstream_xchacha20poly1305_init_pull(header, key)
     return decryptor
   }
@@ -153,11 +118,7 @@ export class SNReactNativeCrypto implements SNPureCrypto {
       throw new Error('Invalid ciphertext size')
     }
 
-    const result = Sodium.crypto_secretstream_xchacha20poly1305_pull(
-      decryptor,
-      encryptedBuffer.buffer,
-      assocData
-    )
+    const result = Sodium.crypto_secretstream_xchacha20poly1305_pull(decryptor, encryptedBuffer.buffer, assocData)
 
     if (!result) {
       return false

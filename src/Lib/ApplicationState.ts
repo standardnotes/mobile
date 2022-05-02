@@ -80,10 +80,7 @@ export enum MobileStorageKey {
   PasscodeKeyboardTypeKey = 'passcodeKeyboardType',
 }
 
-type EventObserverCallback = (
-  event: AppStateEventType,
-  data?: TabletModeChangeData
-) => void | Promise<void>
+type EventObserverCallback = (event: AppStateEventType, data?: TabletModeChangeData) => void | Promise<void>
 type ObserverCallback = (event: AppStateType, data?: any) => void | Promise<void>
 type LockStateObserverCallback = (event: LockStateType) => void | Promise<void>
 
@@ -147,10 +144,7 @@ export class ApplicationState extends ApplicationService {
     if (this.selectedTagRestored) {
       return
     }
-    const savedTagUuid: string | undefined = this.prefService.getValue(
-      PrefKey.SelectedTagUuid,
-      undefined
-    )
+    const savedTagUuid: string | undefined = this.prefService.getValue(PrefKey.SelectedTagUuid, undefined)
 
     if (isNullOrUndefined(savedTagUuid)) {
       this.selectedTagRestored = true
@@ -275,11 +269,7 @@ export class ApplicationState extends ApplicationService {
 
     const defaultEditor = this.application.componentManager.getDefaultEditor()
     if (defaultEditor) {
-      await associateComponentWithNote(
-        this.application,
-        defaultEditor,
-        this.getActiveNoteController().note!
-      )
+      await associateComponentWithNote(this.application, defaultEditor, this.getActiveNoteController().note!)
     }
   }
 
@@ -356,10 +346,7 @@ export class ApplicationState extends ApplicationService {
     this.removeItemChangesListener = this.application.streamItems<SNNote | SNTag>(
       [ContentType.Note, ContentType.Tag],
       async ({ changed, inserted, removed, source }) => {
-        if (
-          source === PayloadEmitSource.PreSyncSave ||
-          source === PayloadEmitSource.RemoteRetrieved
-        ) {
+        if (source === PayloadEmitSource.PreSyncSave || source === PayloadEmitSource.RemoteRetrieved) {
           const removedNotes = removed.filter(i => i.content_type === ContentType.Note)
           for (const removedNote of removedNotes) {
             const editor = this.editorForNote(removedNote.uuid)
@@ -368,17 +355,13 @@ export class ApplicationState extends ApplicationService {
             }
           }
 
-          const notes = [...changed, ...inserted].filter(
-            candidate => candidate.content_type === ContentType.Note
-          )
+          const notes = [...changed, ...inserted].filter(candidate => candidate.content_type === ContentType.Note)
 
           const isBrowswingTrashedNotes =
-            this.selectedTag instanceof SmartView &&
-            this.selectedTag.uuid === SystemViewId.TrashedNotes
+            this.selectedTag instanceof SmartView && this.selectedTag.uuid === SystemViewId.TrashedNotes
 
           const isBrowsingArchivedNotes =
-            this.selectedTag instanceof SmartView &&
-            this.selectedTag.uuid === SystemViewId.ArchivedNotes
+            this.selectedTag instanceof SmartView && this.selectedTag.uuid === SystemViewId.ArchivedNotes
 
           for (const note of notes) {
             const editor = this.editorForNote(note.uuid)
@@ -395,9 +378,7 @@ export class ApplicationState extends ApplicationService {
         }
 
         if (this.selectedTag) {
-          const matchingTag = [...changed, ...inserted].find(
-            candidate => candidate.uuid === this.selectedTag!.uuid
-          )
+          const matchingTag = [...changed, ...inserted].find(candidate => candidate.uuid === this.selectedTag!.uuid)
           if (matchingTag) {
             this.selectedTag = matchingTag as SNTag
           }
@@ -441,9 +422,7 @@ export class ApplicationState extends ApplicationService {
     this.selectedTag = tag
 
     if (saveSelection) {
-      void this.application
-        .getLocalPreferences()
-        .setUserPrefValue(PrefKey.SelectedTagUuid, tag.uuid)
+      void this.application.getLocalPreferences().setUserPrefValue(PrefKey.SelectedTagUuid, tag.uuid)
     }
 
     this.notifyOfStateChange(AppStateType.TagChanged, {
@@ -538,11 +517,7 @@ export class ApplicationState extends ApplicationService {
       const hasPasscode = this.application.hasPasscode()
       if (hasPasscode && this.passcodeTiming === UnlockTiming.Immediately) {
         await this.application.lock()
-      } else if (
-        hasBiometrics &&
-        this.biometricsTiming === UnlockTiming.Immediately &&
-        !this.locked
-      ) {
+      } else if (hasBiometrics && this.biometricsTiming === UnlockTiming.Immediately && !this.locked) {
         const challenge = new Challenge(
           [new ChallengePrompt(ChallengeValidation.Biometric)],
           ChallengeReason.ApplicationUnlock,
@@ -574,8 +549,7 @@ export class ApplicationState extends ApplicationService {
     // from inactive to active, which doesn't really happen unless you, say, swipe
     // notification center in iOS down then back up. We don't want to lock on this state change.
     const isResuming = nextAppState === 'active'
-    const isResumingFromBackground =
-      isResuming && this.mostRecentState === AppStateType.EnteringBackground
+    const isResumingFromBackground = isResuming && this.mostRecentState === AppStateType.EnteringBackground
     const isEnteringBackground = nextAppState === 'background'
     const isLosingFocus = nextAppState === 'inactive'
 
@@ -624,51 +598,36 @@ export class ApplicationState extends ApplicationService {
   }
 
   private async getScreenshotPrivacyEnabled(): Promise<boolean | undefined> {
-    return this.application.getValue(
-      StorageKey.MobileScreenshotPrivacyEnabled,
-      StorageValueModes.Default
-    ) as Promise<boolean | undefined>
+    return this.application.getValue(StorageKey.MobileScreenshotPrivacyEnabled, StorageValueModes.Default) as Promise<
+      boolean | undefined
+    >
   }
 
   private async getPasscodeTiming(): Promise<UnlockTiming | undefined> {
-    return this.application.getValue(
-      StorageKey.MobilePasscodeTiming,
-      StorageValueModes.Nonwrapped
-    ) as Promise<UnlockTiming | undefined>
+    return this.application.getValue(StorageKey.MobilePasscodeTiming, StorageValueModes.Nonwrapped) as Promise<
+      UnlockTiming | undefined
+    >
   }
 
   private async getBiometricsTiming(): Promise<UnlockTiming | undefined> {
-    return this.application.getValue(
-      StorageKey.MobileBiometricsTiming,
-      StorageValueModes.Nonwrapped
-    ) as Promise<UnlockTiming | undefined>
+    return this.application.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped) as Promise<
+      UnlockTiming | undefined
+    >
   }
 
   public async setScreenshotPrivacyEnabled(enabled: boolean) {
-    await this.application.setValue(
-      StorageKey.MobileScreenshotPrivacyEnabled,
-      enabled,
-      StorageValueModes.Default
-    )
+    await this.application.setValue(StorageKey.MobileScreenshotPrivacyEnabled, enabled, StorageValueModes.Default)
     this.screenshotPrivacyEnabled = enabled
     void this.setAndroidScreenshotPrivacy(enabled)
   }
 
   public async setPasscodeTiming(timing: UnlockTiming) {
-    await this.application.setValue(
-      StorageKey.MobilePasscodeTiming,
-      timing,
-      StorageValueModes.Nonwrapped
-    )
+    await this.application.setValue(StorageKey.MobilePasscodeTiming, timing, StorageValueModes.Nonwrapped)
     this.passcodeTiming = timing
   }
 
   public async setBiometricsTiming(timing: UnlockTiming) {
-    await this.application.setValue(
-      StorageKey.MobileBiometricsTiming,
-      timing,
-      StorageValueModes.Nonwrapped
-    )
+    await this.application.setValue(StorageKey.MobileBiometricsTiming, timing, StorageValueModes.Nonwrapped)
     this.biometricsTiming = timing
   }
 
@@ -680,11 +639,7 @@ export class ApplicationState extends ApplicationService {
   }
 
   public async setPasscodeKeyboardType(type: PasscodeKeyboardType) {
-    await this.application.setValue(
-      MobileStorageKey.PasscodeKeyboardTypeKey,
-      type,
-      StorageValueModes.Nonwrapped
-    )
+    await this.application.setValue(MobileStorageKey.PasscodeKeyboardTypeKey, type, StorageValueModes.Nonwrapped)
   }
 
   public onDrawerOpen() {
@@ -695,10 +650,7 @@ export class ApplicationState extends ApplicationService {
   Allows other parts of the code to perform external actions without triggering state change notifications.
   This is useful on Android when you present a share sheet and dont want immediate authentication to appear.
   */
-  async performActionWithoutStateChangeImpact(
-    block: () => void | Promise<void>,
-    notAwaited?: boolean
-  ) {
+  async performActionWithoutStateChangeImpact(block: () => void | Promise<void>, notAwaited?: boolean) {
     this.ignoreStateChanges = true
     if (notAwaited) {
       void block()

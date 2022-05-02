@@ -78,8 +78,7 @@ export const ManageSessions: React.FC = () => {
   const theme = useContext(ThemeContext)
   const insets = useSafeAreaInsets()
 
-  const [sessions, getSessions, refreshSessions, refreshing, revokeSession, errorMessage] =
-    useSessions()
+  const [sessions, getSessions, refreshSessions, refreshing, revokeSession, errorMessage] = useSessions()
 
   const onItemPress = (item: RemoteSession) => {
     showActionSheet({

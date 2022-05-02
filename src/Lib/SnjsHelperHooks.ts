@@ -93,9 +93,7 @@ export const useIsLocked = () => {
   const application = React.useContext(ApplicationContext)
 
   // State
-  const [isLocked, setIsLocked] = React.useState<boolean>(() =>
-    Boolean(application?.getAppState().locked)
-  )
+  const [isLocked, setIsLocked] = React.useState<boolean>(() => Boolean(application?.getAppState().locked))
 
   useEffect(() => {
     let isMounted = true
@@ -127,11 +125,9 @@ export const useHasEditor = () => {
   const [hasEditor, setHasEditor] = React.useState<boolean>(false)
 
   useEffect(() => {
-    const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(
-      newEditor => {
-        setHasEditor(Boolean(newEditor))
-      }
-    )
+    const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(newEditor => {
+      setHasEditor(Boolean(newEditor))
+    })
     return removeEditorObserver
   }, [application])
 
@@ -208,10 +204,7 @@ export const useSyncStatus = () => {
     const unsubscribeAppEvents = application?.addEventObserver(async eventName => {
       if (eventName === ApplicationEvent.LocalDataIncrementalLoad) {
         updateLocalDataStatus()
-      } else if (
-        eventName === ApplicationEvent.SyncStatusChanged ||
-        eventName === ApplicationEvent.FailedSync
-      ) {
+      } else if (eventName === ApplicationEvent.SyncStatusChanged || eventName === ApplicationEvent.FailedSync) {
         updateSyncStatus()
       } else if (eventName === ApplicationEvent.LocalDataLoaded) {
         setDecrypting(false)
@@ -226,13 +219,9 @@ export const useSyncStatus = () => {
         setLoading(false)
         updateSyncStatus()
       } else if (eventName === ApplicationEvent.LocalDatabaseReadError) {
-        void application!.alertService!.alert(
-          'Unable to load local storage. Please restart the app and try again.'
-        )
+        void application!.alertService!.alert('Unable to load local storage. Please restart the app and try again.')
       } else if (eventName === ApplicationEvent.LocalDatabaseWriteError) {
-        void application!.alertService!.alert(
-          'Unable to write to local storage. Please restart the app and try again.'
-        )
+        void application!.alertService!.alert('Unable to write to local storage. Please restart the app and try again.')
       } else if (eventName === ApplicationEvent.SignedIn) {
         setLoading(true)
       }
@@ -245,12 +234,7 @@ export const useSyncStatus = () => {
     setRefreshing(true)
   }
 
-  return [loading, decrypting, refreshing, startRefreshing] as [
-    boolean,
-    boolean,
-    boolean,
-    () => void
-  ]
+  return [loading, decrypting, refreshing, startRefreshing] as [boolean, boolean, boolean, () => void]
 }
 
 export const useDeleteNoteWithPrivileges = (
@@ -266,12 +250,7 @@ export const useDeleteNoteWithPrivileges = (
     const title = 'Move to Trash'
     const message = 'Are you sure you want to move this note to the trash?'
 
-    const confirmed = await application?.alertService?.confirm(
-      message,
-      title,
-      'Confirm',
-      ButtonType.Danger
-    )
+    const confirmed = await application?.alertService?.confirm(message, title, 'Confirm', ButtonType.Danger)
     if (confirmed) {
       onTrashCallback()
     }
@@ -286,13 +265,7 @@ export const useDeleteNoteWithPrivileges = (
       )
       return
     }
-    const confirmed = await application?.alertService?.confirm(
-      message,
-      title,
-      'Delete',
-      ButtonType.Danger,
-      'Cancel'
-    )
+    const confirmed = await application?.alertService?.confirm(message, title, 'Delete', ButtonType.Danger, 'Cancel')
     if (confirmed) {
       onDeleteCallback()
     }
@@ -358,18 +331,11 @@ export const useProtectionSessionExpiry = () => {
   }, [application])
 
   // State
-  const [protectionsDisabledUntil, setProtectionsDisabledUntil] = React.useState(
-    getProtectionsDisabledUntil()
-  )
+  const [protectionsDisabledUntil, setProtectionsDisabledUntil] = React.useState(getProtectionsDisabledUntil())
 
   useEffect(() => {
     const removeProtectionLengthSubscriber = application?.addEventObserver(async event => {
-      if (
-        [
-          ApplicationEvent.UnprotectedSessionBegan,
-          ApplicationEvent.UnprotectedSessionExpired,
-        ].includes(event)
-      ) {
+      if ([ApplicationEvent.UnprotectedSessionBegan, ApplicationEvent.UnprotectedSessionExpired].includes(event)) {
         setProtectionsDisabledUntil(getProtectionsDisabledUntil())
       }
     })
@@ -381,10 +347,7 @@ export const useProtectionSessionExpiry = () => {
   return [protectionsDisabledUntil]
 }
 
-export const useChangeNoteChecks = (
-  note: SNNote | undefined,
-  editor: NoteViewController | undefined = undefined
-) => {
+export const useChangeNoteChecks = (note: SNNote | undefined, editor: NoteViewController | undefined = undefined) => {
   // Context
   const application = useSafeApplicationContext()
 
@@ -410,10 +373,7 @@ export const useChangeNoteChecks = (
   return [canChangeNote]
 }
 
-export const useChangeNote = (
-  note: SNNote | undefined,
-  editor: NoteViewController | undefined = undefined
-) => {
+export const useChangeNote = (note: SNNote | undefined, editor: NoteViewController | undefined = undefined) => {
   const application = React.useContext(ApplicationContext)
 
   const [canChangeNote] = useChangeNoteChecks(note, editor)

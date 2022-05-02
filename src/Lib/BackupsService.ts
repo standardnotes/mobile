@@ -62,20 +62,18 @@ export class BackupsService extends ApplicationService {
 
   private async exportIOS(filename: string, data: string) {
     return new Promise<boolean>(resolve => {
-      void (this.application! as MobileApplication)
-        .getAppState()
-        .performActionWithoutStateChangeImpact(async () => {
-          Share.share({
-            title: filename,
-            message: data,
-          })
-            .then(result => {
-              resolve(result.action !== Share.dismissedAction)
-            })
-            .catch(() => {
-              resolve(false)
-            })
+      void (this.application! as MobileApplication).getAppState().performActionWithoutStateChangeImpact(async () => {
+        Share.share({
+          title: filename,
+          message: data,
         })
+          .then(result => {
+            resolve(result.action !== Share.dismissedAction)
+          })
+          .catch(() => {
+            resolve(false)
+          })
+      })
     })
   }
 
@@ -152,9 +150,7 @@ export class BackupsService extends ApplicationService {
   }
 
   private async requestStoragePermissionsAndroid() {
-    const writeStorageGranted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-    )
+    const writeStorageGranted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
     return writeStorageGranted === PermissionsAndroid.RESULTS.GRANTED
   }
 

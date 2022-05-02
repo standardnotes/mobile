@@ -4,10 +4,7 @@ import { Alert, AlertButton } from 'react-native'
 import { goBack, navigate } from './NavigationService'
 
 export class AlertService implements SNAlertService {
-  blockingDialog(
-    text: string,
-    title?: string
-  ): DismissBlockingDialog | Promise<DismissBlockingDialog> {
+  blockingDialog(text: string, title?: string): DismissBlockingDialog | Promise<DismissBlockingDialog> {
     navigate(MODAL_BLOCKING_ALERT, { text, title })
 
     return goBack

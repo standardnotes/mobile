@@ -9,13 +9,7 @@ import { ThemeService } from '@Style/ThemeService'
 import React, { useCallback, useContext, useLayoutEffect } from 'react'
 import { LogBox } from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
-import {
-  Container,
-  StyledTextView,
-  TextContainer,
-  Title,
-  TitleContainer,
-} from './NoteHistoryPreview.styled'
+import { Container, StyledTextView, TextContainer, Title, TitleContainer } from './NoteHistoryPreview.styled'
 
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state'])
 
@@ -40,9 +34,7 @@ export const NoteHistoryPreview = ({
         if (asCopy) {
           await application?.mutator.duplicateItem(originalNote!, {
             ...revision.payload.content,
-            title: revision.payload.content.title
-              ? revision.payload.content.title + ' (copy)'
-              : undefined,
+            title: revision.payload.content.title ? revision.payload.content.title + ' (copy)' : undefined,
           })
 
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment

@@ -5,15 +5,7 @@ import { ContentType } from '@standardnotes/snjs'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { ViewProps } from 'react-native'
 import { ThemeContext } from 'styled-components'
-import {
-  Cell,
-  IconCircle,
-  OutOfSyncContainer,
-  OutOfSyncLabel,
-  SubTitle,
-  Title,
-  Touchable,
-} from './SideMenuHero.styled'
+import { Cell, IconCircle, OutOfSyncContainer, OutOfSyncLabel, SubTitle, Title, Touchable } from './SideMenuHero.styled'
 
 type Props = {
   onPress: () => void
@@ -78,11 +70,7 @@ export const SideMenuHero: React.FC<Props> = props => {
       {isOutOfSync && (
         <OutOfSyncContainer onPress={props.onOutOfSyncPress}>
           <IconCircle>
-            <Circle
-              size={10}
-              backgroundColor={theme.stylekitWarningColor}
-              borderColor={theme.stylekitWarningColor}
-            />
+            <Circle size={10} backgroundColor={theme.stylekitWarningColor} borderColor={theme.stylekitWarningColor} />
           </IconCircle>
           <OutOfSyncLabel>Potentially Out of Sync</OutOfSyncLabel>
         </OutOfSyncContainer>

@@ -126,9 +126,7 @@ export const ComponentView = ({
         )
 
         if (confirmed) {
-          void application
-            ?.getLocalPreferences()
-            .setUserPrefValue(PrefKey.DoNotShowAgainUnsupportedEditors, true)
+          void application?.getLocalPreferences().setUserPrefValue(PrefKey.DoNotShowAgainUnsupportedEditors, true)
         }
       }
     }
@@ -275,8 +273,8 @@ export const ComponentView = ({
         <LockedContainer>
           <StyledIcon />
           <LockedText>
-            Subscription expired. Editors are in a read-only state. To edit immediately, please
-            switch to the Plain Editor.
+            Subscription expired. Editors are in a read-only state. To edit immediately, please switch to the Plain
+            Editor.
           </LockedText>
         </LockedContainer>
       )}
@@ -308,9 +306,7 @@ export const ComponentView = ({
           setSupportMultipleWindows={false}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
           cacheEnabled={true}
-          autoManageStatusBarEnabled={
-            false /* To prevent StatusBar from changing colors when focusing */
-          }
+          autoManageStatusBarEnabled={false /* To prevent StatusBar from changing colors when focusing */}
           injectedJavaScript={defaultInjectedJavaScript()}
           onContentProcessDidTerminate={() => onLoadErrorHandler()}
         />

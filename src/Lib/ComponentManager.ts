@@ -108,15 +108,12 @@ export class ComponentManager extends SNComponentManager {
     this.log('Existing package version', existingVersion)
     this.log('Latest package version', version)
 
-    const shouldDownload =
-      !existingPackageJson || isRightVersionGreaterThanLeft(existingVersion, version!)
+    const shouldDownload = !existingPackageJson || isRightVersionGreaterThanLeft(existingVersion, version!)
 
     return shouldDownload
   }
 
-  public async downloadComponentOffline(
-    component: SNComponent
-  ): Promise<ComponentLoadingError | undefined> {
+  public async downloadComponentOffline(component: SNComponent): Promise<ComponentLoadingError | undefined> {
     const identifier = component.identifier
     const nativeFeature = this.nativeFeatureForIdentifier(identifier)
     const downloadUrl = nativeFeature?.download_url || component.package_info?.download_url
@@ -170,9 +167,7 @@ export class ComponentManager extends SNComponentManager {
       return false
     }
     if (checksum !== desiredChecksum) {
-      this.log(
-        `Checksums don't match for ${featureIdentifier}; ${checksum} != ${desiredChecksum}; aborting install`
-      )
+      this.log(`Checksums don't match for ${featureIdentifier}; ${checksum} != ${desiredChecksum}; aborting install`)
       return false
     }
     this.log(`Checksum ${checksum} matches ${desiredChecksum} for ${featureIdentifier}`)
@@ -191,14 +186,7 @@ export class ComponentManager extends SNComponentManager {
       await RNFS.unlink(tmpLocation)
     }
 
-    this.log(
-      'Downloading component',
-      identifier,
-      'from url',
-      downloadUrl,
-      'to location',
-      tmpLocation
-    )
+    this.log('Downloading component', identifier, 'from url', downloadUrl, 'to location', tmpLocation)
 
     const result = await RNFS.downloadFile({
       fromUrl: downloadUrl,
@@ -338,11 +326,7 @@ export class ComponentManager extends SNComponentManager {
   }
 }
 
-export async function associateComponentWithNote(
-  application: SNApplication,
-  component: SNComponent,
-  note: SNNote
-) {
+export async function associateComponentWithNote(application: SNApplication, component: SNComponent, note: SNNote) {
   return application.mutator.changeItem<ComponentMutator>(component, mutator => {
     mutator.removeDisassociatedItemId(note.uuid)
     mutator.associateWithItem(note.uuid)

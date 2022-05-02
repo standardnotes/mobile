@@ -35,10 +35,7 @@ const ButtonLabel = styled.Text<ButtonLabelProps>`
   text-align: ${props => (props.leftAligned ? 'left' : 'center')};
   text-align-vertical: center;
   color: ${props => {
-    let color =
-      Platform.OS === 'android'
-        ? props.theme.stylekitForegroundColor
-        : props.theme.stylekitInfoColor
+    let color = Platform.OS === 'android' ? props.theme.stylekitForegroundColor : props.theme.stylekitInfoColor
     if (props.disabled) {
       color = 'gray'
     } else if (props.important) {

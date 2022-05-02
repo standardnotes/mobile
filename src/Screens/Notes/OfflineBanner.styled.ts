@@ -38,13 +38,4 @@ const SubText = styled.Text`
   color: ${props => props.theme.stylekitNeutralColor};
 `
 
-export {
-  Touchable,
-  Container,
-  CenterContainer,
-  UserIcon,
-  ForwardIcon,
-  TextContainer,
-  BoldText,
-  SubText,
-}
+export { Touchable, Container, CenterContainer, UserIcon, ForwardIcon, TextContainer, BoldText, SubText }

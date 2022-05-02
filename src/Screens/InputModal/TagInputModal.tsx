@@ -85,13 +85,7 @@ export const TagInputModal = (props: Props) => {
           />
         </SectionedTableCell>
 
-        <ButtonCell
-          maxHeight={45}
-          disabled={text.length === 0}
-          title={'Save'}
-          bold
-          onPress={onSubmit}
-        />
+        <ButtonCell maxHeight={45} disabled={text.length === 0} title={'Save'} bold onPress={onSubmit} />
       </TableSection>
     </Container>
   )

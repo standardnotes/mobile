@@ -22,9 +22,7 @@ export const NoteHistory = (props: Props) => {
   const themeService = useContext(ThemeServiceContext)
 
   // State
-  const [note] = useState<SNNote>(
-    () => application?.items.findItem(props.route.params.noteUuid) as SNNote
-  )
+  const [note] = useState<SNNote>(() => application?.items.findItem(props.route.params.noteUuid) as SNNote)
   const [routes] = React.useState([
     { key: 'session', title: 'Session' },
     { key: 'remote', title: 'Remote' },

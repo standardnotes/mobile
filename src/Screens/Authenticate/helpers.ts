@@ -1,8 +1,7 @@
 import { ChallengePrompt, ChallengeValidation, ChallengeValue } from '@standardnotes/snjs'
 
 export const isInActiveState = (state: AuthenticationValueStateType) =>
-  state !== AuthenticationValueStateType.WaitingInput &&
-  state !== AuthenticationValueStateType.Success
+  state !== AuthenticationValueStateType.WaitingInput && state !== AuthenticationValueStateType.Success
 
 export enum AuthenticationValueStateType {
   WaitingTurn = 0,
@@ -29,10 +28,7 @@ type SetChallengeValue = {
 }
 
 type Action = SetChallengeValueState | SetChallengeValue
-export const authenticationReducer = (
-  state: ChallengeValueState,
-  action: Action
-): ChallengeValueState => {
+export const authenticationReducer = (state: ChallengeValueState, action: Action): ChallengeValueState => {
   switch (action.type) {
     case 'setState': {
       return {
@@ -68,10 +64,7 @@ export const findIndexInObject = (
   return Object.keys(map).indexOf(id)
 }
 
-export const getChallengePromptTitle = (
-  prompt: ChallengePrompt,
-  state: AuthenticationValueStateType
-) => {
+export const getChallengePromptTitle = (prompt: ChallengePrompt, state: AuthenticationValueStateType) => {
   const title = prompt.title
   switch (state) {
     case AuthenticationValueStateType.WaitingTurn:
@@ -83,10 +76,7 @@ export const getChallengePromptTitle = (
   }
 }
 
-export const getLabelForStateAndType = (
-  validation: ChallengeValidation,
-  state: AuthenticationValueStateType
-) => {
+export const getLabelForStateAndType = (validation: ChallengeValidation, state: AuthenticationValueStateType) => {
   switch (validation) {
     case ChallengeValidation.Biometric: {
       switch (state) {

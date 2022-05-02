@@ -43,11 +43,7 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
     async (item: RevisionListEntry) => {
       const remoteRevision = await application?.historyManager!.fetchRemoteRevision(note, item)
       if (remoteRevision) {
-        onPress(
-          item.uuid,
-          remoteRevision as NoteHistoryEntry,
-          new Date(item.updated_at).toLocaleString()
-        )
+        onPress(item.uuid, remoteRevision as NoteHistoryEntry, new Date(item.updated_at).toLocaleString())
       } else {
         void application?.alertService!.alert(
           'The remote revision could not be loaded. Please try again later.',
@@ -60,19 +56,10 @@ export const RemoteHistory: React.FC<Props> = ({ note, onPress }) => {
   )
 
   const renderItem: ListRenderItem<RevisionListEntry> | null | undefined = ({ item }) => {
-    return (
-      <NoteHistoryCell
-        onPress={() => onItemPress(item)}
-        title={new Date(item.updated_at).toLocaleString()}
-      />
-    )
+    return <NoteHistoryCell onPress={() => onItemPress(item)} title={new Date(item.updated_at).toLocaleString()} />
   }
 
-  if (
-    fetchingRemoteHistory ||
-    !remoteHistoryList ||
-    (remoteHistoryList && remoteHistoryList.length === 0)
-  ) {
+  if (fetchingRemoteHistory || !remoteHistoryList || (remoteHistoryList && remoteHistoryList.length === 0)) {
     const placeholderText = fetchingRemoteHistory ? 'Loading entries...' : 'No entries.'
     return (
       <LoadingContainer>

@@ -20,12 +20,8 @@ export const Settings = (props: Props) => {
 
   // State
   const [hasPasscode, setHasPasscode] = useState(() => Boolean(application?.hasPasscode()))
-  const [protectionsAvailable, setProtectionsAvailable] = useState(
-    application?.hasProtectionSources()
-  )
-  const [encryptionAvailable, setEncryptionAvailable] = useState(() =>
-    application?.isEncryptionAvailable()
-  )
+  const [protectionsAvailable, setProtectionsAvailable] = useState(application?.hasProtectionSources())
+  const [encryptionAvailable, setEncryptionAvailable] = useState(() => application?.isEncryptionAvailable())
 
   const updateProtectionsAvailable = useCallback(() => {
     setProtectionsAvailable(application?.hasProtectionSources())

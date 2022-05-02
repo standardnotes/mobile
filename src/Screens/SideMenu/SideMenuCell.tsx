@@ -71,9 +71,7 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
     >
       <CellContent iconSide={iconSide} style={props.cellContentStyle || {}}>
         {iconSide === 'left' && (
-          <IconContainerLeft>
-            {renderIcon(props.iconDesc, theme.stylekitInfoColor)}
-          </IconContainerLeft>
+          <IconContainerLeft>{renderIcon(props.iconDesc, theme.stylekitInfoColor)}</IconContainerLeft>
         )}
 
         <TextContainer selected={props.selected} isSubtext={Boolean(props.subtext)}>
@@ -88,9 +86,7 @@ export const SideMenuCell: React.FC<SideMenuOption> = props => {
         {props.children}
 
         {iconSide === 'right' && (
-          <IconContainerRight>
-            {renderIcon(props.iconDesc, theme.stylekitInfoColor)}
-          </IconContainerRight>
+          <IconContainerRight>{renderIcon(props.iconDesc, theme.stylekitInfoColor)}</IconContainerRight>
         )}
       </CellContent>
     </Touchable>

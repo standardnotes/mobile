@@ -15,9 +15,7 @@ import { ThemeContext } from 'styled-components'
 import { HeaderTitleParams } from './App'
 
 type HistoryStackNavigatorParamList = {
-  [SCREEN_NOTE_HISTORY]:
-    | (HeaderTitleParams & { noteUuid: string })
-    | (undefined & { noteUuid: string })
+  [SCREEN_NOTE_HISTORY]: (HeaderTitleParams & { noteUuid: string }) | (undefined & { noteUuid: string })
   [SCREEN_NOTE_HISTORY_PREVIEW]: HeaderTitleParams & {
     revision: NoteHistoryEntry
     originalNoteUuid: string
@@ -54,9 +52,7 @@ export const HistoryStack = () => {
                 testID="headerButton"
                 disabled={disabled}
                 title={Platform.OS === 'ios' ? 'Done' : ''}
-                iconName={
-                  Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CHECKMARK)
-                }
+                iconName={Platform.OS === 'ios' ? undefined : ThemeService.nameForIcon(ICON_CHECKMARK)}
                 onPress={onPress}
               />
             </HeaderButtons>

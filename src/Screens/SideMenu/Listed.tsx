@@ -1,11 +1,6 @@
 import { SnIcon } from '@Root/Components/SnIcon'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
-import {
-  CantLoadActionsText,
-  CreateBlogContainer,
-  ListedItemRow,
-  styles,
-} from '@Root/Screens/SideMenu/Listed.styled'
+import { CantLoadActionsText, CreateBlogContainer, ListedItemRow, styles } from '@Root/Screens/SideMenu/Listed.styled'
 import { SideMenuCell } from '@Root/Screens/SideMenu/SideMenuCell'
 import { SideMenuOptionIconDescriptionType } from '@Root/Screens/SideMenu/SideMenuSection'
 import { Action, ButtonType, ListedAccount, ListedAccountInfo, SNNote } from '@standardnotes/snjs'
@@ -28,9 +23,7 @@ export const Listed: FC<TProps> = ({ note }) => {
 
   const [listedAccounts, setListedAccounts] = useState<ListedAccount[]>([])
   const [listedAccountDetails, setListedAccountDetails] = useState<TListedAccountItem[]>([])
-  const [authorUrlWithInProgressAction, setAuthorUrlWithInProgressAction] = useState<string | null>(
-    null
-  )
+  const [authorUrlWithInProgressAction, setAuthorUrlWithInProgressAction] = useState<string | null>(null)
 
   const { showActionSheet } = useCustomActionSheet()
 
@@ -41,9 +34,7 @@ export const Listed: FC<TProps> = ({ note }) => {
       for (const listedAccountItem of accounts) {
         const listedItemInfo = await application.getListedAccountInfo(listedAccountItem, note?.uuid)
 
-        listedAccountsArray.push(
-          listedItemInfo ? listedItemInfo : { display_name: listedAccountItem.authorId }
-        )
+        listedAccountsArray.push(listedItemInfo ? listedItemInfo : { display_name: listedAccountItem.authorId })
       }
       return listedAccountsArray
     },
@@ -124,9 +115,7 @@ export const Listed: FC<TProps> = ({ note }) => {
             setAuthorUrlWithInProgressAction(null)
             return
           }
-          const listedDetails = (await getListedAccountsDetails(
-            listedAccounts
-          )) as TListedAccountItem[]
+          const listedDetails = (await getListedAccountsDetails(listedAccounts)) as TListedAccountItem[]
           setListedAccountDetails(listedDetails)
 
           showActionsMenu(listedDetails[index], index)
@@ -159,10 +148,9 @@ export const Listed: FC<TProps> = ({ note }) => {
                       value: <SnIcon type={'notes'} style={styles.blogItemIcon} />,
                     }}
                   />
-                  {isActionInProgress &&
-                    (item as ListedAccountInfo).author_url === authorUrlWithInProgressAction && (
-                      <ActivityIndicator style={styles.blogActionInProgressIndicator} />
-                    )}
+                  {isActionInProgress && (item as ListedAccountInfo).author_url === authorUrlWithInProgressAction && (
+                    <ActivityIndicator style={styles.blogActionInProgressIndicator} />
+                  )}
                 </ListedItemRow>
                 {!isLoading && !doesListedItemHaveActions(item) && (
                   <CantLoadActionsText>Unable to load actions</CantLoadActionsText>
@@ -183,9 +171,7 @@ export const Listed: FC<TProps> = ({ note }) => {
               value: <SnIcon type={'user-add'} style={styles.blogItemIcon} />,
             }}
           />
-          {isRequestingAccount && (
-            <ActivityIndicator style={styles.blogActionInProgressIndicator} />
-          )}
+          {isRequestingAccount && <ActivityIndicator style={styles.blogActionInProgressIndicator} />}
         </ListedItemRow>
         <ListedItemRow>
           <SideMenuCell

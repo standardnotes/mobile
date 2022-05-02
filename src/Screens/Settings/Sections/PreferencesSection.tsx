@@ -45,9 +45,7 @@ export const PreferencesSection = () => {
     setSortBy(key)
   }
   const toggleNotesPreviewHidden = () => {
-    void application
-      ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.NotesHideNotePreview, !hidePreviews)
+    void application?.getLocalPreferences().setUserPrefValue(PrefKey.NotesHideNotePreview, !hidePreviews)
     setHidePreviews(value => !value)
   }
   const toggleNotesDateHidden = () => {
@@ -55,9 +53,7 @@ export const PreferencesSection = () => {
     setHideDates(value => !value)
   }
   const toggleNotesEditorIconHidden = () => {
-    void application
-      ?.getLocalPreferences()
-      .setUserPrefValue(PrefKey.NotesHideEditorIcon, !hideEditorIcon)
+    void application?.getLocalPreferences().setUserPrefValue(PrefKey.NotesHideEditorIcon, !hideEditorIcon)
     setHideEditorIcon(value => !value)
   }
 

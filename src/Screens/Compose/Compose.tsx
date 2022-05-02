@@ -53,8 +53,7 @@ type State = {
   componentViewer?: ComponentViewer
 }
 
-const EditingIsDisabledText =
-  'This note has editing disabled. Please enable editing on this note to make changes.'
+const EditingIsDisabledText = 'This note has editing disabled. Please enable editing on this note to make changes.'
 
 export class Compose extends React.Component<Record<string, unknown>, State> {
   static override contextType = ApplicationContext
@@ -71,10 +70,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
   removeAppEventObserver?: () => void
   removeComponentHandler?: () => void
 
-  constructor(
-    props: Record<string, unknown>,
-    context: React.ContextType<typeof ApplicationContext>
-  ) {
+  constructor(props: Record<string, unknown>, context: React.ContextType<typeof ApplicationContext>) {
     super(props)
     this.context = context
     const initialEditor = context?.editorGroup.activeNoteViewController
@@ -90,52 +86,46 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
   }
 
   override componentDidMount() {
-    this.removeNoteInnerValueObserver = this.editor?.addNoteInnerValueChangeObserver(
-      (note, source) => {
-        if (isPayloadSourceRetrieved(source!)) {
-          this.setState({
-            title: note.title,
-            text: note.text,
-          })
-        }
+    this.removeNoteInnerValueObserver = this.editor?.addNoteInnerValueChangeObserver((note, source) => {
+      if (isPayloadSourceRetrieved(source!)) {
+        this.setState({
+          title: note.title,
+          text: note.text,
+        })
+      }
 
-        const isTemplateNoteInsertedToBeInteractableWithEditor =
-          source === PayloadEmitSource.LocalInserted && note.dirty
-        if (isTemplateNoteInsertedToBeInteractableWithEditor) {
-          return
-        }
+      const isTemplateNoteInsertedToBeInteractableWithEditor = source === PayloadEmitSource.LocalInserted && note.dirty
+      if (isTemplateNoteInsertedToBeInteractableWithEditor) {
+        return
+      }
 
-        if (note.lastSyncBegan || note.dirty) {
-          if (note.lastSyncEnd) {
-            if (note.dirty || note.lastSyncBegan!.getTime() > note.lastSyncEnd.getTime()) {
-              this.showSavingStatus()
-            } else if (
-              this.context?.getStatusManager().hasMessage(SCREEN_COMPOSE) &&
-              note.lastSyncEnd.getTime() > note.lastSyncBegan!.getTime()
-            ) {
-              this.showAllChangesSavedStatus()
-            }
-          } else {
+      if (note.lastSyncBegan || note.dirty) {
+        if (note.lastSyncEnd) {
+          if (note.dirty || note.lastSyncBegan!.getTime() > note.lastSyncEnd.getTime()) {
             this.showSavingStatus()
+          } else if (
+            this.context?.getStatusManager().hasMessage(SCREEN_COMPOSE) &&
+            note.lastSyncEnd.getTime() > note.lastSyncBegan!.getTime()
+          ) {
+            this.showAllChangesSavedStatus()
           }
+        } else {
+          this.showSavingStatus()
         }
       }
-    )
+    })
 
-    this.removeStreamComponents = this.context?.streamItems(
-      ContentType.Component,
-      async ({ source }) => {
-        if (isPayloadSourceInternalChange(source)) {
-          return
-        }
-
-        if (!this.note) {
-          return
-        }
-
-        void this.reloadComponentEditorState()
+    this.removeStreamComponents = this.context?.streamItems(ContentType.Component, async ({ source }) => {
+      if (isPayloadSourceInternalChange(source)) {
+        return
       }
-    )
+
+      if (!this.note) {
+        return
+      }
+
+      void this.reloadComponentEditorState()
+    })
 
     this.removeAppEventObserver = this.context?.addEventObserver(async eventName => {
       if (eventName === ApplicationEvent.CompletedFullSync) {
@@ -349,9 +339,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
     }
 
     if (!this.context?.items.findItem(note!.uuid)) {
-      void this.context?.alertService!.alert(
-        'Attempting to save this note has failed. The note cannot be found.'
-      )
+      void this.context?.alertService!.alert('Attempting to save this note has failed. The note cannot be found.')
       return
     }
 
@@ -479,10 +467,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
 
   override render() {
     const shouldDisplayEditor =
-      this.state.componentViewer &&
-      Boolean(this.note) &&
-      !this.note?.prefersPlainEditor &&
-      !this.state.webViewError
+      this.state.componentViewer && Boolean(this.note) && !this.note?.prefersPlainEditor && !this.state.webViewError
 
     return (
       <Container>
@@ -491,24 +476,15 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
             <>
               {this.noteLocked && (
                 <LockedContainer>
-                  <Icon
-                    name={ThemeService.nameForIcon(ICON_LOCK)}
-                    size={16}
-                    color={theme.stylekitBackgroundColor}
-                  />
+                  <Icon name={ThemeService.nameForIcon(ICON_LOCK)} size={16} color={theme.stylekitBackgroundColor} />
                   <LockedText>Note Editing Disabled</LockedText>
                 </LockedContainer>
               )}
               {this.state.webViewError && (
                 <LockedContainer>
-                  <Icon
-                    name={ThemeService.nameForIcon(ICON_ALERT)}
-                    size={16}
-                    color={theme.stylekitBackgroundColor}
-                  />
+                  <Icon name={ThemeService.nameForIcon(ICON_ALERT)} size={16} color={theme.stylekitBackgroundColor} />
                   <LockedText>
-                    Unable to load {this.state.componentViewer?.component.name} —{' '}
-                    {this.getErrorText()}
+                    Unable to load {this.state.componentViewer?.component.name} — {this.getErrorText()}
                   </LockedText>
                   <WebViewReloadButton
                     onPress={() => {
@@ -535,8 +511,7 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
                       autoCapitalize={'sentences'}
                     />
                     {(this.state.downloadingEditor ||
-                      (this.state.loadingWebview &&
-                        themeService?.isLikelyUsingDarkColorTheme())) && (
+                      (this.state.loadingWebview && themeService?.isLikelyUsingDarkColorTheme())) && (
                       <LoadingWebViewContainer locked={this.noteLocked}>
                         <LoadingText>
                           {'Loading '}
@@ -557,22 +532,20 @@ export class Compose extends React.Component<Record<string, unknown>, State> {
                       />
                     )}
 
-                    {!shouldDisplayEditor &&
-                      !isNullOrUndefined(this.note) &&
-                      Platform.OS === 'android' && (
-                        <TextContainer>
-                          <StyledTextView
-                            testID="noteContentField"
-                            ref={this.editorViewRef}
-                            autoFocus={false}
-                            value={this.state.text}
-                            selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
-                            handlesColor={theme.stylekitInfoColor}
-                            onChangeText={this.onContentChange}
-                            errorState={false}
-                          />
-                        </TextContainer>
-                      )}
+                    {!shouldDisplayEditor && !isNullOrUndefined(this.note) && Platform.OS === 'android' && (
+                      <TextContainer>
+                        <StyledTextView
+                          testID="noteContentField"
+                          ref={this.editorViewRef}
+                          autoFocus={false}
+                          value={this.state.text}
+                          selectionColor={lighten(theme.stylekitInfoColor, 0.35)}
+                          handlesColor={theme.stylekitInfoColor}
+                          onChangeText={this.onContentChange}
+                          errorState={false}
+                        />
+                      </TextContainer>
+                    )}
                     {/* Empty wrapping view fixes native textview crashing */}
                     {!shouldDisplayEditor && Platform.OS === 'ios' && (
                       <View key={this.note?.uuid}>

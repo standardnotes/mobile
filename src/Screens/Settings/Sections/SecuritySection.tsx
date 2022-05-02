@@ -26,9 +26,7 @@ export const SecuritySection = (props: Props) => {
   const application = useContext(ApplicationContext)
 
   // State
-  const [encryptionPolicy, setEncryptionPolicy] = useState(() =>
-    application?.getStorageEncryptionPolicy()
-  )
+  const [encryptionPolicy, setEncryptionPolicy] = useState(() => application?.getStorageEncryptionPolicy())
   const [encryptionPolictChangeInProgress, setEncryptionPolictChangeInProgress] = useState(false)
   const [hasScreenshotPrivacy, setHasScreenshotPrivacy] = useState<boolean | undefined>(false)
   const [hasBiometrics, setHasBiometrics] = useState(false)
@@ -178,8 +176,7 @@ export const SecuritySection = (props: Props) => {
       message =
         'Are you sure you want to disable your local passcode? This will not affect your encryption status, as your data is currently being encrypted through your sync account keys.'
     } else {
-      message =
-        'Are you sure you want to disable your local passcode? This will disable encryption on your data.'
+      message = 'Are you sure you want to disable your local passcode? This will disable encryption on your data.'
     }
 
     const confirmed = await application?.alertService?.confirm(

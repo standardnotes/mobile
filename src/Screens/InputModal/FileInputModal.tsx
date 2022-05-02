@@ -54,13 +54,7 @@ export const FileInputModal: FC<Props> = props => {
           />
         </SectionedTableCell>
 
-        <ButtonCell
-          maxHeight={45}
-          disabled={fileName.length === 0}
-          title={'Save'}
-          bold
-          onPress={onSubmit}
-        />
+        <ButtonCell maxHeight={45} disabled={fileName.length === 0} title={'Save'} bold onPress={onSubmit} />
       </TableSection>
     </Container>
   )

@@ -8,9 +8,9 @@ import { Platform, Share } from 'react-native'
 import { ContentContainer, Label } from './CompanySection.styled'
 
 const URLS = {
-  feedback: `mailto:help@standardnotes.com?subject=${
-    Platform.OS === 'android' ? 'Android' : 'iOS'
-  } app feedback (v${ApplicationState.version})`,
+  feedback: `mailto:help@standardnotes.com?subject=${Platform.OS === 'android' ? 'Android' : 'iOS'} app feedback (v${
+    ApplicationState.version
+  })`,
   learn_more: 'https://standardnotes.com',
   privacy: 'https://standardnotes.com/privacy',
   help: 'https://standardnotes.com/help',
@@ -47,8 +47,7 @@ export const CompanySection = (props: Props) => {
 
   const shareWithFriend = () => {
     const title = 'Standard Notes'
-    let message =
-      'Check out Standard Notes, a free, open-source, and completely encrypted notes app.'
+    let message = 'Check out Standard Notes, a free, open-source, and completely encrypted notes app.'
     const url = 'https://standardnotes.com'
     // Android ignores url. iOS ignores title.
     if (Platform.OS === 'android') {
@@ -80,19 +79,11 @@ export const CompanySection = (props: Props) => {
         <Label>Share Standard Notes with a friend.</Label>
       </ButtonCell>
 
-      <ButtonCell
-        leftAligned={true}
-        title="Learn About Standard Notes"
-        onPress={() => openUrl('learn_more')}
-      >
+      <ButtonCell leftAligned={true} title="Learn About Standard Notes" onPress={() => openUrl('learn_more')}>
         <Label>https://standardnotes.com</Label>
       </ButtonCell>
 
-      <ButtonCell
-        leftAligned={true}
-        title="Our Privacy Manifesto"
-        onPress={() => openUrl('privacy')}
-      >
+      <ButtonCell leftAligned={true} title="Our Privacy Manifesto" onPress={() => openUrl('privacy')}>
         <Label>https://standardnotes.com/privacy</Label>
       </ButtonCell>
 

@@ -19,13 +19,7 @@ import THEME_DARK_JSON from './Themes/blue-dark.json'
 import THEME_BLUE_JSON from './Themes/blue.json'
 import THEME_RED_JSON from './Themes/red.json'
 import { MobileThemeVariables } from './Themes/styled-components'
-import {
-  DARK_CONTENT,
-  getColorLuminosity,
-  keyboardColorForTheme,
-  LIGHT_CONTENT,
-  statusBarColorForTheme,
-} from './Utils'
+import { DARK_CONTENT, getColorLuminosity, keyboardColorForTheme, LIGHT_CONTENT, statusBarColorForTheme } from './Utils'
 
 const LIGHT_THEME_KEY = 'lightThemeKey'
 const DARK_THEME_KEY = 'darkThemeKey'
@@ -243,10 +237,7 @@ export class ThemeService {
   }
 
   public async getThemeForMode(mode: 'light' | 'dark') {
-    return this.application?.getValue(
-      mode === 'dark' ? DARK_THEME_KEY : LIGHT_THEME_KEY,
-      StorageValueModes.Nonwrapped
-    )
+    return this.application?.getValue(mode === 'dark' ? DARK_THEME_KEY : LIGHT_THEME_KEY, StorageValueModes.Nonwrapped)
   }
 
   /**
@@ -260,8 +251,7 @@ export class ThemeService {
   }
 
   private setDefaultTheme() {
-    const defaultThemeId =
-      this.getColorScheme() === 'dark' ? SystemThemeTint.Dark : SystemThemeTint.Blue
+    const defaultThemeId = this.getColorScheme() === 'dark' ? SystemThemeTint.Dark : SystemThemeTint.Blue
 
     this.setActiveTheme(defaultThemeId)
   }
@@ -321,9 +311,7 @@ export class ThemeService {
       ...theme.mobileContent.variables,
       ...baseVariables,
     }
-    const luminosity =
-      theme.mobileContent.luminosity ||
-      getColorLuminosity(variables.stylekitContrastBackgroundColor)
+    const luminosity = theme.mobileContent.luminosity || getColorLuminosity(variables.stylekitContrastBackgroundColor)
     return new MobileTheme(
       theme.payload.copy({
         content: {
@@ -372,9 +360,7 @@ export class ThemeService {
           if (Platform.Version <= 22) {
             StatusBar.setBackgroundColor('#000000')
           } else {
-            StatusBar.setBackgroundColor(
-              theme.mobileContent.variables.stylekitContrastBackgroundColor
-            )
+            StatusBar.setBackgroundColor(theme.mobileContent.variables.stylekitContrastBackgroundColor)
           }
         }
       },
@@ -476,8 +462,7 @@ export class ThemeService {
   }
 
   private async loadCachedThemes() {
-    const rawValue =
-      (await this.application!.getValue(CACHED_THEMES_KEY, StorageValueModes.Nonwrapped)) || []
+    const rawValue = (await this.application!.getValue(CACHED_THEMES_KEY, StorageValueModes.Nonwrapped)) || []
 
     const themes = (rawValue as DecryptedTransferPayload<ComponentContent>[]).map(rawPayload => {
       const payload = new DecryptedPayload<ComponentContent>(rawPayload)

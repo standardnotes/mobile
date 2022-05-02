@@ -1,9 +1,5 @@
 import { associateComponentWithNote } from '@Lib/ComponentManager'
-import {
-  useChangeNote,
-  useDeleteNoteWithPrivileges,
-  useProtectOrUnprotectNote,
-} from '@Lib/SnjsHelperHooks'
+import { useChangeNote, useDeleteNoteWithPrivileges, useProtectOrUnprotectNote } from '@Lib/SnjsHelperHooks'
 import { isUnfinishedFeaturesEnabled } from '@Lib/Utils'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { TEnvironment } from '@Root/App'
@@ -50,11 +46,7 @@ import DrawerLayout from 'react-native-gesture-handler/DrawerLayout'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { ThemeContext } from 'styled-components'
 import { SafeAreaContainer, useStyles } from './NoteSideMenu.styled'
-import {
-  SideMenuOption,
-  SideMenuOptionIconDescriptionType,
-  SideMenuSection,
-} from './SideMenuSection'
+import { SideMenuOption, SideMenuOptionIconDescriptionType, SideMenuSection } from './SideMenuSection'
 import { TagSelectionList } from './TagSelectionList'
 
 function sortAlphabetically(array: SNComponent[]): SNComponent[] {
@@ -74,9 +66,7 @@ function useEditorComponents(): SNComponent[] {
   const [components, setComponents] = useState<SNComponent[]>([])
   useEffect(() => {
     const removeComponentsObserver = application.streamItems(ContentType.Component, () => {
-      const displayComponents = sortAlphabetically(
-        application.componentManager.componentsForArea(ComponentArea.Editor)
-      )
+      const displayComponents = sortAlphabetically(application.componentManager.componentsForArea(ComponentArea.Editor))
       setComponents(displayComponents)
     })
     return () => {
@@ -108,12 +98,9 @@ export const NoteSideMenu = React.memo((props: Props) => {
   )
 
   useEffect(() => {
-    const removeEventObserver = application.addSingleEventObserver(
-      ApplicationEvent.PreferencesChanged,
-      async () => {
-        setShouldAddTagHierachy(application.getPreference(PrefKey.NoteAddToParentFolders, true))
-      }
-    )
+    const removeEventObserver = application.addSingleEventObserver(ApplicationEvent.PreferencesChanged, async () => {
+      setShouldAddTagHierachy(application.getPreference(PrefKey.NoteAddToParentFolders, true))
+    })
 
     return () => {
       removeEventObserver()
@@ -276,10 +263,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             false
           )
         }
-        if (
-          activeEditorComponent?.isExplicitlyEnabledForItem(note!.uuid) ||
-          activeEditorComponent?.isMobileDefault
-        ) {
+        if (activeEditorComponent?.isExplicitlyEnabledForItem(note!.uuid) || activeEditorComponent?.isMobileDefault) {
           await disassociateComponentWithCurrentNote(activeEditorComponent)
         }
       } else if (selectedComponent.area === ComponentArea.Editor) {
@@ -632,19 +616,15 @@ export const NoteSideMenu = React.memo((props: Props) => {
           selectedTags,
         }))}
         renderItem={({ item }) => {
-          const { OptionsSection, EditorsSection, ListedSection, TagsSection, FilesSection } =
-            MenuSections
+          const { OptionsSection, EditorsSection, ListedSection, TagsSection, FilesSection } = MenuSections
 
-          if (
-            item.key === FilesSection &&
-            (isEntitledToFiles || isUnfinishedFeaturesEnabled(props.env))
-          ) {
+          if (item.key === FilesSection && (isEntitledToFiles || isUnfinishedFeaturesEnabled(props.env))) {
             return (
               <SideMenuSection
                 title={'Files'}
-                customCollapsedLabel={`${
-                  attachedFilesLength ? `${attachedFilesLength}` : 'No'
-                } attached file${attachedFilesLength === 1 ? '' : 's'}`}
+                customCollapsedLabel={`${attachedFilesLength ? `${attachedFilesLength}` : 'No'} attached file${
+                  attachedFilesLength === 1 ? '' : 's'
+                }`}
                 collapsed={false}
               >
                 <Files note={note} />
@@ -655,9 +635,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             return <SideMenuSection title="Options" options={item.noteOptions} />
           }
           if (item.key === EditorsSection) {
-            return (
-              <SideMenuSection title="Editors" options={item.editorComponents} collapsed={true} />
-            )
+            return <SideMenuSection title="Editors" options={item.editorComponents} collapsed={true} />
           }
           if (item.key === ListedSection) {
             return (
@@ -674,9 +652,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
                   contentType={ContentType.Tag}
                   onTagSelect={tag => item.onTagSelect(tag, shouldAddTagHierarchy)}
                   selectedTags={item.selectedTags}
-                  emptyPlaceholder={
-                    'Create a new tag using the tag button in the bottom right corner.'
-                  }
+                  emptyPlaceholder={'Create a new tag using the tag button in the bottom right corner.'}
                 />
               </SideMenuSection>
             )
