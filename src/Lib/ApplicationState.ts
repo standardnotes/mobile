@@ -81,7 +81,7 @@ export enum MobileStorageKey {
 }
 
 type EventObserverCallback = (event: AppStateEventType, data?: TabletModeChangeData) => void | Promise<void>
-type ObserverCallback = (event: AppStateType, data?: any) => void | Promise<void>
+type ObserverCallback = (event: AppStateType, data?: unknown) => void | Promise<void>
 type LockStateObserverCallback = (event: LockStateType) => void | Promise<void>
 
 export class ApplicationState extends ApplicationService {
@@ -93,7 +93,7 @@ export class ApplicationState extends ApplicationService {
   keyboardDidShowListener?: EmitterSubscription
   keyboardDidHideListener?: EmitterSubscription
   keyboardHeight?: number
-  appEventObersever: any
+  removeAppEventObserver!: () => void
   selectedTagRestored = false
   selectedTag: SNTag | SmartView = this.application.items.getSmartViews()[0]
   userPreferences?: SNUserPrefs
@@ -126,7 +126,9 @@ export class ApplicationState extends ApplicationService {
   }
 
   override deinit() {
-    this.appEventObersever()
+    this.removeAppEventObserver()
+    ;(this.removeAppEventObserver as unknown) = undefined
+
     this.removeHandleReactNativeAppStateChangeListener.remove()
     if (this.removeItemChangesListener) {
       this.removeItemChangesListener()
@@ -134,7 +136,7 @@ export class ApplicationState extends ApplicationService {
     if (this.removePreferencesLoadedListener) {
       this.removePreferencesLoadedListener()
     }
-    this.appEventObersever = undefined
+
     this.observers.length = 0
     this.keyboardDidShowListener = undefined
     this.keyboardDidHideListener = undefined
@@ -210,7 +212,7 @@ export class ApplicationState extends ApplicationService {
   /**
    * Notify observers of ApplicationState change
    */
-  private notifyOfStateChange(state: AppStateType, data?: any) {
+  private notifyOfStateChange(state: AppStateType, data?: unknown) {
     if (this.ignoreStateChanges) {
       return
     }
@@ -265,22 +267,24 @@ export class ApplicationState extends ApplicationService {
 
     this.application.editorGroup.closeActiveNoteView()
 
-    await this.application.editorGroup.createNoteView(undefined, title, selectedTagUuid)
+    const noteView = await this.application.editorGroup.createNoteView(undefined, title, selectedTagUuid)
 
     const defaultEditor = this.application.componentManager.getDefaultEditor()
     if (defaultEditor) {
-      await associateComponentWithNote(this.application, defaultEditor, this.getActiveNoteController().note!)
+      await associateComponentWithNote(this.application, defaultEditor, this.getActiveNoteController().note)
     }
+
+    return noteView
   }
 
-  async openEditor(noteUuid: string) {
+  async openEditor(noteUuid: string): Promise<NoteViewController> {
     const note = this.application.items.findItem(noteUuid) as SNNote
     const activeEditor = this.getActiveNoteController()
     if (activeEditor) {
       this.application.editorGroup.closeActiveNoteView()
     }
 
-    await this.application.editorGroup.createNoteView(noteUuid)
+    const noteView = await this.application.editorGroup.createNoteView(noteUuid)
 
     if (note && note.conflictOf) {
       void InteractionManager.runAfterInteractions(() => {
@@ -289,6 +293,8 @@ export class ApplicationState extends ApplicationService {
         })
       })
     }
+
+    return noteView
   }
 
   getActiveNoteController() {
@@ -378,7 +384,7 @@ export class ApplicationState extends ApplicationService {
         }
 
         if (this.selectedTag) {
-          const matchingTag = [...changed, ...inserted].find(candidate => candidate.uuid === this.selectedTag!.uuid)
+          const matchingTag = [...changed, ...inserted].find(candidate => candidate.uuid === this.selectedTag.uuid)
           if (matchingTag) {
             this.selectedTag = matchingTag as SNTag
           }
@@ -391,7 +397,7 @@ export class ApplicationState extends ApplicationService {
    * Registers for MobileApplication events
    */
   private handleApplicationEvents() {
-    this.appEventObersever = this.application.addEventObserver(async eventName => {
+    this.removeAppEventObserver = this.application.addEventObserver(async eventName => {
       switch (eventName) {
         case ApplicationEvent.LocalDataIncrementalLoad:
         case ApplicationEvent.LocalDataLoaded: {
@@ -672,7 +678,6 @@ export class ApplicationState extends ApplicationService {
 
   public getEnvironment() {
     const bundleId = VersionInfo.bundleIdentifier
-    console.log(bundleId && bundleId.includes('dev'))
     return bundleId && bundleId.includes('dev') ? 'dev' : 'prod'
   }
 }

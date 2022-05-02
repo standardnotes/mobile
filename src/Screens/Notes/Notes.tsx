@@ -14,6 +14,7 @@ import {
   SNNote,
   SNTag,
   SystemViewId,
+  UuidString,
 } from '@standardnotes/snjs'
 import { ICON_ADD } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
@@ -107,15 +108,17 @@ export const Notes = React.memo(
     )
 
     const openCompose = useCallback(
-      (newNote: boolean, replaceScreen = false) => {
+      (newNote: boolean, noteUuid: UuidString, replaceScreen = false) => {
         if (!shouldSplitLayout) {
           if (replaceScreen) {
             navigation.replace(SCREEN_COMPOSE, {
               title: newNote ? 'Compose' : 'Note',
+              noteUuid,
             })
           } else {
             navigation.navigate(SCREEN_COMPOSE, {
               title: newNote ? 'Compose' : 'Note',
+              noteUuid,
             })
           }
         }
@@ -126,7 +129,7 @@ export const Notes = React.memo(
     const openNote = useCallback(
       async (noteUuid: SNNote['uuid'], replaceScreen = false) => {
         await application.getAppState().openEditor(noteUuid)
-        openCompose(false, replaceScreen)
+        openCompose(false, noteUuid, replaceScreen)
       },
       [application, openCompose]
     )
@@ -209,7 +212,7 @@ export const Notes = React.memo(
 
         const criteria = NotesDisplayCriteria.Create({
           sortProperty: sortOptions?.sortBy ?? sortBy,
-          sortDirection: sortOptions?.sortReverse ?? sortReverse! ? 'asc' : 'dsc',
+          sortDirection: sortOptions?.sortReverse ?? sortReverse ? 'asc' : 'dsc',
           tags: tag instanceof SNTag ? [tag] : [],
           views: tag instanceof SmartView ? [tag] : [],
           searchQuery: searchQuery,
@@ -377,8 +380,8 @@ export const Notes = React.memo(
 
     const onNoteCreate = useCallback(async () => {
       const title = application.getAppState().isTabletDevice ? `Note ${notes.length + 1}` : undefined
-      await application.getAppState().createEditor(title)
-      openCompose(true)
+      const noteView = await application.getAppState().createEditor(title)
+      openCompose(true, noteView.note.uuid)
       reloadNotes(true)
     }, [application, notes.length, openCompose, reloadNotes])
 

@@ -367,16 +367,17 @@ export const useFiles = ({ note }: Props) => {
     }
   }
 
-  const uploadSingleFile = async (file: DocumentPickerResponse | Asset): Promise<SNFile | void> => {
+  const uploadSingleFile = async (file: DocumentPickerResponse | Asset, size: number): Promise<SNFile | void> => {
     try {
       const fileName = filesService.getFileName(file)
+
       Toast.show({
         type: Info,
         text1: `Uploading "${fileName}"...`,
         autoHide: false,
       })
 
-      const operation = await application.files.beginNewFileUpload()
+      const operation = await application.files.beginNewFileUpload(size)
 
       if (operation instanceof ClientDisplayableError) {
         Toast.show({
@@ -416,7 +417,7 @@ export const useFiles = ({ note }: Props) => {
         if (!file.uri || !file.size) {
           continue
         }
-        const fileObject = await uploadSingleFile(file)
+        const fileObject = await uploadSingleFile(file, file.size)
         if (!fileObject) {
           Toast.show({
             type: Error,
@@ -536,7 +537,7 @@ export const useFiles = ({ note }: Props) => {
         return
       }
       const file = result.assets[0]
-      const fileObject = await uploadSingleFile(file)
+      const fileObject = await uploadSingleFile(file, file.fileSize || 0)
       if (!file.uri || !file.fileSize) {
         return
       }

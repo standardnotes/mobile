@@ -15,7 +15,7 @@ import {
 import { Platform } from 'react-native'
 import VersionInfo from 'react-native-version-info'
 import { version } from '../../package.json'
-import { AlertService } from './AlertService'
+import { MobileAlertService } from './AlertService'
 import { ApplicationState, UnlockTiming } from './ApplicationState'
 import { BackupsService } from './BackupsService'
 import { ComponentManager } from './ComponentManager'
@@ -57,7 +57,7 @@ export class MobileApplication extends SNApplication {
       platform: platformFromString(Platform.OS),
       deviceInterface: deviceInterface,
       crypto: new SNReactNativeCrypto(),
-      alertService: new AlertService(),
+      alertService: new MobileAlertService(),
       identifier,
       swapClasses: [
         {
@@ -95,13 +95,18 @@ export class MobileApplication extends SNApplication {
 
   override deinit(source: DeinitSource): void {
     this.startedDeinit = true
-    for (const key of Object.keys(this.MobileServices)) {
-      const service = (this.MobileServices as any)[key]
+
+    for (const service of Object.values(this.MobileServices)) {
       if (service.deinit) {
         service.deinit()
       }
-      service.application = undefined
+
+      if ('application' in service) {
+        const typedService = service as { application?: MobileApplication }
+        typedService.application = undefined
+      }
     }
+
     this.MobileServices = {} as MobileServices
     this.editorGroup.deinit()
     super.deinit(source)

@@ -85,6 +85,10 @@ export class MobileDeviceInterface implements DeviceInterface {
     return filtered
   }
 
+  getDatabaseKeys(): Promise<string[]> {
+    return AsyncStorage.getAllKeys()
+  }
+
   private async getRawStorageKeyValues(keys: string[]) {
     const results: { key: string; value: unknown }[] = []
     if (Platform.OS === 'android') {

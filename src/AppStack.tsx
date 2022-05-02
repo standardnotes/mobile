@@ -11,6 +11,7 @@ import { SCREEN_COMPOSE, SCREEN_NOTES, SCREEN_VIEW_PROTECTED_NOTE } from '@Root/
 import { MainSideMenu } from '@Root/Screens/SideMenu/MainSideMenu'
 import { NoteSideMenu } from '@Root/Screens/SideMenu/NoteSideMenu'
 import { ViewProtectedNote } from '@Root/Screens/ViewProtectedNote/ViewProtectedNote'
+import { UuidString } from '@standardnotes/snjs'
 import { ICON_MENU } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
 import { getDefaultDrawerWidth } from '@Style/Utils'
@@ -25,7 +26,9 @@ import { ModalStackNavigationProp } from './ModalStack'
 
 export type AppStackNavigatorParamList = {
   [SCREEN_NOTES]: HeaderTitleParams
-  [SCREEN_COMPOSE]: HeaderTitleParams | undefined
+  [SCREEN_COMPOSE]: HeaderTitleParams & {
+    noteUuid: UuidString
+  }
   [SCREEN_VIEW_PROTECTED_NOTE]: {
     onPressView: () => void
   }
@@ -39,7 +42,7 @@ export type AppStackNavigationProp<T extends keyof AppStackNavigatorParamList> =
   route: RouteProp<AppStackNavigatorParamList, T>
 }
 
-const AppStack = createStackNavigator<AppStackNavigatorParamList>()
+export const AppStack = createStackNavigator<AppStackNavigatorParamList>()
 
 export const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'> & { env: TEnvironment }) => {
   // Context

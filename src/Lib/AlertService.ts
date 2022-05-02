@@ -1,9 +1,9 @@
 import { MODAL_BLOCKING_ALERT } from '@Root/Screens/screens'
-import { ButtonType, DismissBlockingDialog, SNAlertService } from '@standardnotes/snjs'
+import { AlertService, ButtonType, DismissBlockingDialog } from '@standardnotes/snjs'
 import { Alert, AlertButton } from 'react-native'
 import { goBack, navigate } from './NavigationService'
 
-export class AlertService implements SNAlertService {
+export class MobileAlertService extends AlertService {
   blockingDialog(text: string, title?: string): DismissBlockingDialog | Promise<DismissBlockingDialog> {
     navigate(MODAL_BLOCKING_ALERT, { text, title })
 

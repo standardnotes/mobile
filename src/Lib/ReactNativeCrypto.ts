@@ -1,8 +1,7 @@
-/* eslint-disable no-bitwise */
 import {
   Base64String,
   HexString,
-  SNPureCrypto,
+  PureCryptoInterface,
   SodiumConstant,
   StreamDecryptorResult,
   timingSafeEqual,
@@ -13,7 +12,7 @@ import * as Sodium from 'react-native-sodium-jsi'
 
 const { Aes } = NativeModules
 
-export class SNReactNativeCrypto implements SNPureCrypto {
+export class SNReactNativeCrypto implements PureCryptoInterface {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   deinit(): void {}
   public timingSafeEqual(a: string, b: string) {
@@ -142,7 +141,9 @@ export class SNReactNativeCrypto implements SNPureCrypto {
     let idx = -1
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       idx++
+      // eslint-disable-next-line no-bitwise
       const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15
+      // eslint-disable-next-line no-bitwise
       const v = c === 'x' ? r : (r & 0x3) | 0x8
       return v.toString(16)
     })
