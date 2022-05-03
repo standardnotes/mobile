@@ -94,7 +94,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const [attachedFilesLength, setAttachedFilesLength] = useState(0)
 
   const [shouldAddTagHierarchy, setShouldAddTagHierachy] = useState(() =>
-    application!.getPreference(PrefKey.NoteAddToParentFolders, true)
+    application.getPreference(PrefKey.NoteAddToParentFolders, true)
   )
 
   useEffect(() => {
@@ -184,7 +184,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   const reloadTags = useCallback(() => {
     if (note) {
-      const tags = application!.getAppState().getNoteTags(note)
+      const tags = application.getAppState().getNoteTags(note)
       setSelectedTags(tags)
     }
   }, [application, note])
@@ -250,12 +250,12 @@ export const NoteSideMenu = React.memo((props: Props) => {
       if (editor?.isTemplateNote) {
         await editor?.insertTemplatedNote()
       }
-      const activeEditorComponent = application.componentManager!.editorForNote(note!)
+      const activeEditorComponent = application.componentManager.editorForNote(note)
       props.drawerRef?.closeDrawer()
       if (!selectedComponent) {
         if (!note?.prefersPlainEditor) {
           await application?.mutator.changeItem(
-            note!,
+            note,
             mutator => {
               const noteMutator = mutator as NoteMutator
               noteMutator.prefersPlainEditor = true
@@ -263,7 +263,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             false
           )
         }
-        if (activeEditorComponent?.isExplicitlyEnabledForItem(note!.uuid) || activeEditorComponent?.isMobileDefault) {
+        if (activeEditorComponent?.isExplicitlyEnabledForItem(note.uuid) || activeEditorComponent?.isMobileDefault) {
           await disassociateComponentWithCurrentNote(activeEditorComponent)
         }
       } else if (selectedComponent.area === ComponentArea.Editor) {
@@ -271,10 +271,10 @@ export const NoteSideMenu = React.memo((props: Props) => {
         if (currentEditor && selectedComponent !== currentEditor) {
           await disassociateComponentWithCurrentNote(currentEditor)
         }
-        const prefersPlain = note!.prefersPlainEditor
+        const prefersPlain = note.prefersPlainEditor
         if (prefersPlain) {
           await application?.mutator.changeItem(
-            note!,
+            note,
             mutator => {
               const noteMutator = mutator as NoteMutator
               noteMutator.prefersPlainEditor = false
@@ -292,8 +292,8 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   const onEdtiorLongPress = useCallback(
     async (component?: SNComponent) => {
-      const currentDefault = application!
-        .componentManager!.componentsForArea(ComponentArea.Editor)
+      const currentDefault = application.componentManager
+        .componentsForArea(ComponentArea.Editor)
         .filter(e => e.isMobileDefault)[0]
 
       let isDefault = false
@@ -314,14 +314,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
       const setAsDefault = () => {
         if (currentDefault) {
-          void application!.mutator.changeItem(currentDefault, m => {
+          void application.mutator.changeItem(currentDefault, m => {
             const mutator = m as ComponentMutator
             mutator.isMobileDefault = false
           })
         }
 
         if (component) {
-          void application!.mutator.changeAndSaveItem(component, m => {
+          void application.mutator.changeAndSaveItem(component, m => {
             const mutator = m as ComponentMutator
             mutator.isMobileDefault = true
           })
@@ -329,14 +329,14 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
 
       const removeAsDefault = () => {
-        void application!.mutator.changeItem(currentDefault, m => {
+        void application.mutator.changeItem(currentDefault, m => {
           const mutator = m as ComponentMutator
           mutator.isMobileDefault = false
         })
       }
 
       showActionSheet({
-        title: component?.name ?? 'Plain editor',
+        title: component?.name ?? 'Plain text',
         options: [
           {
             text: action,
@@ -365,7 +365,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const componentEditor = application.componentManager.editorForNote(note)
     const options: SideMenuOption[] = [
       {
-        text: 'Plain Editor',
+        text: 'Plain text',
         key: 'plain-editor',
         selected: !componentEditor,
         onSelect: () => {
@@ -392,7 +392,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     })
     if (options.length === 1) {
       options.push({
-        text: 'Get More Editors',
+        text: 'Unlock More Types',
         key: 'get-editors',
         iconDesc: {
           type: SideMenuOptionIconDescriptionType.Icon,
@@ -460,7 +460,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         mutator.locked = !note.locked
       }, false)
 
-    const protectOption = note.protected ? 'Unprotect' : 'Protect'
+    const protectOption = note.protected ? 'Remove password protection' : 'Password protect'
     const protectEvent = async () => await protectOrUnprotectNote()
 
     const openSessionHistory = () => {
@@ -635,7 +635,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
             return <SideMenuSection title="Options" options={item.noteOptions} />
           }
           if (item.key === EditorsSection) {
-            return <SideMenuSection title="Editors" options={item.editorComponents} collapsed={true} />
+            return <SideMenuSection title="Note Type" options={item.editorComponents} collapsed={true} />
           }
           if (item.key === ListedSection) {
             return (
