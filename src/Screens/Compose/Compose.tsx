@@ -338,23 +338,9 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
     }
   }
 
-  saveNote = async (
-    bypassDebouncer: boolean,
-    isUserModified: boolean,
-    dontUpdatePreviews: boolean,
-    closeAfterSync: boolean,
-    newNoteText?: string
-  ) => {
-    if (!this.note) {
-      return
-    }
-
-    const editor = this.editor
-    const { title } = this.state
-    const text = newNoteText || this.note.text
-
-    if (editor.isTemplateNote) {
-      await editor.insertTemplatedNote()
+  saveNote = async (params: { newTitle?: string; newText?: string }) => {
+    if (this.editor.isTemplateNote) {
+      await this.editor.insertTemplatedNote()
     }
 
     if (!this.context?.items.findItem(this.note.uuid)) {
@@ -362,34 +348,38 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
       return
     }
 
+    const { newTitle, newText } = params
+
     await this.context.mutator.changeItem(
       this.note,
       mutator => {
         const noteMutator = mutator as NoteMutator
-        noteMutator.title = title
-        noteMutator.text = text
 
-        if (!dontUpdatePreviews) {
-          const truncate = text.length > NOTE_PREVIEW_CHAR_LIMIT
-          const substring = text.substring(0, NOTE_PREVIEW_CHAR_LIMIT)
-          const previewPlain = substring + (truncate ? '...' : '')
+        if (newTitle != null) {
+          noteMutator.title = newTitle
+        }
+
+        if (newText != null) {
+          noteMutator.text = newText
+
+          const substring = newText.substring(0, NOTE_PREVIEW_CHAR_LIMIT)
+          const shouldTruncate = newText.length > NOTE_PREVIEW_CHAR_LIMIT
+          const previewPlain = substring + (shouldTruncate ? '...' : '')
           noteMutator.preview_plain = previewPlain
           noteMutator.preview_html = undefined
         }
       },
-      isUserModified
+      true
     )
 
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout)
     }
-    const noDebounce = bypassDebouncer || this.context?.noAccount()
+    const noDebounce = this.context?.noAccount()
     const syncDebouceMs = noDebounce ? SAVE_TIMEOUT_NO_DEBOUNCE : SAVE_TIMEOUT_DEBOUNCE
+
     this.saveTimeout = setTimeout(() => {
       void this.context?.sync.sync()
-      if (closeAfterSync) {
-        this.context?.getAppState().closeEditor(editor)
-      }
     }, syncDebouceMs)
   }
 
@@ -398,11 +388,12 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
       void this.context?.alertService?.alert(EditingIsDisabledText)
       return
     }
+
     this.setState(
       {
         title: newTitle,
       },
-      () => this.saveNote(false, true, true, false)
+      () => this.saveNote({ newTitle: newTitle })
     )
   }
 
@@ -411,7 +402,8 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
       void this.context?.alertService?.alert(EditingIsDisabledText)
       return
     }
-    void this.saveNote(false, true, false, false, text)
+
+    void this.saveNote({ newText: text })
   }
 
   onLoadWebViewStart = () => {
