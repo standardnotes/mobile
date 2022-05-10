@@ -35,8 +35,18 @@ export const ToastWrapper: FC = () => {
         </View>
       )
     },
-    success: props => <SuccessToast {...props} style={styles(props.props).success} />,
-    error: props => <ErrorToast {...props} style={styles(props.props).error} />,
+    success: props => {
+      const percentComplete = props.props?.percentComplete || 0
+      updateProgressBar(percentComplete)
+
+      return <SuccessToast {...props} style={styles(props.props).success} />
+    },
+    error: props => {
+      const percentComplete = props.props?.percentComplete || 0
+      updateProgressBar(percentComplete)
+
+      return <ErrorToast {...props} style={styles(props.props).error} />
+    },
   }
 
   return <Toast config={toastStyles} />

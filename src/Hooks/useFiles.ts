@@ -94,18 +94,21 @@ export const useFiles = ({ note }: Props) => {
     [Info, filesService]
   )
 
-  const showUploadToastWithProgressBar = useCallback((fileName: string, percentComplete: number | undefined) => {
-    const percentCompleteFormatted = filesService.formatCompletedPercent(percentComplete)
+  const showUploadToastWithProgressBar = useCallback(
+    (fileName: string, percentComplete: number | undefined) => {
+      const percentCompleteFormatted = filesService.formatCompletedPercent(percentComplete)
 
-    Toast.show({
-      type: Info,
-      text1: `Uploading "${fileName}"... (${percentCompleteFormatted}%)`,
-      autoHide: false,
-      props: {
-        percentComplete: percentCompleteFormatted,
-      },
-    })
-  }, [Info, filesService])
+      Toast.show({
+        type: Info,
+        text1: `Uploading "${fileName}"... (${percentCompleteFormatted}%)`,
+        autoHide: false,
+        props: {
+          percentComplete: percentCompleteFormatted,
+        },
+      })
+    },
+    [Info, filesService]
+  )
 
   const resetProgressState = useCallback(
     (isDownload: boolean, fileName = '') => {
