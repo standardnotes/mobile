@@ -110,17 +110,15 @@ export const useFiles = ({ note }: Props) => {
     [Info, filesService]
   )
 
-  const resetProgressState = useCallback(
-    (isDownload: boolean, fileName = '') => {
-      if (isDownload) {
-        showDownloadToastWithProgressBar(0)
-      } else {
-        showUploadToastWithProgressBar(fileName, 0)
-      }
-      Toast.hide()
-    },
-    [showDownloadToastWithProgressBar, showUploadToastWithProgressBar]
-  )
+  const resetProgressState = useCallback(() => {
+    Toast.show({
+      type: Info,
+      props: {
+        percentComplete: 0,
+      },
+      onShow: Toast.hide,
+    })
+  }, [Info])
 
   const updateProgressPercentOnDownload = useCallback(
     (progress: FileDownloadProgress | undefined) => {
@@ -156,7 +154,7 @@ export const useFiles = ({ note }: Props) => {
         await deleteFileAtPath(path)
         const response = await filesService.downloadFileInChunks(file, path, updateProgressPercentOnDownload)
 
-        resetProgressState(true)
+        resetProgressState()
 
         if (response instanceof ClientDisplayableError) {
           Toast.show({
@@ -463,7 +461,7 @@ export const useFiles = ({ note }: Props) => {
       const fileResult = await filesService.readFile(file, onChunk)
       const fileObj = await application.files.finishUpload(operation, fileResult)
 
-      resetProgressState(false, fileName)
+      resetProgressState()
 
       if (fileObj instanceof ClientDisplayableError) {
         Toast.show({
