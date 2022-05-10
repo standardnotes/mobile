@@ -1,3 +1,4 @@
+import { ErrorMessage } from '@Lib/constants'
 import { ToastType } from '@Lib/Types'
 import { useNavigation } from '@react-navigation/native'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
@@ -8,6 +9,7 @@ import {
   UploadedFileItemActionType,
 } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
 import { Tabs } from '@Screens/UploadedFilesList/UploadedFilesList'
+import { FileDownloadProgress } from '@standardnotes/files/dist/Domain/Types/FileDownloadProgress'
 import { ButtonType, ChallengeReason, ClientDisplayableError, ContentType, SNFile, SNNote } from '@standardnotes/snjs'
 import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
 import { useCallback, useEffect, useState } from 'react'
@@ -53,6 +55,7 @@ export const useFiles = ({ note }: Props) => {
   const [allFiles, setAllFiles] = useState<SNFile[]>([])
   const [isDownloading, setIsDownloading] = useState(false)
 
+  const { GeneralText } = ErrorMessage
   const { Success, Info, Error } = ToastType
 
   const filesService = application.getFilesService()
@@ -75,6 +78,55 @@ export const useFiles = ({ note }: Props) => {
     }
   }, [])
 
+  const showDownloadToastWithProgressBar = useCallback(
+    (percentComplete: number | undefined) => {
+      const percentCompleteFormatted = filesService.formatCompletedPercent(percentComplete)
+
+      Toast.show({
+        type: Info,
+        text1: `Downloading and decrypting file... (${percentCompleteFormatted}%)`,
+        props: {
+          percentComplete: percentCompleteFormatted,
+        },
+        autoHide: false,
+      })
+    },
+    [Info, filesService]
+  )
+
+  const showUploadToastWithProgressBar = useCallback(
+    (fileName: string, percentComplete: number | undefined) => {
+      const percentCompleteFormatted = filesService.formatCompletedPercent(percentComplete)
+
+      Toast.show({
+        type: Info,
+        text1: `Uploading "${fileName}"... (${percentCompleteFormatted}%)`,
+        autoHide: false,
+        props: {
+          percentComplete: percentCompleteFormatted,
+        },
+      })
+    },
+    [Info, filesService]
+  )
+
+  const resetProgressState = useCallback(() => {
+    Toast.show({
+      type: Info,
+      props: {
+        percentComplete: 0,
+      },
+      onShow: Toast.hide,
+    })
+  }, [Info])
+
+  const updateProgressPercentOnDownload = useCallback(
+    (progress: FileDownloadProgress | undefined) => {
+      showDownloadToastWithProgressBar(progress?.percentComplete)
+    },
+    [showDownloadToastWithProgressBar]
+  )
+
   const downloadFileAndReturnLocalPath = useCallback(
     async ({
       file,
@@ -92,12 +144,7 @@ export const useFiles = ({ note }: Props) => {
       setIsDownloading(true)
 
       try {
-        Toast.show({
-          type: Info,
-          text1: 'Downloading and decrypting file...',
-          autoHide: false,
-          onPress: Toast.hide,
-        })
+        showDownloadToastWithProgressBar(0)
 
         const path = filesService.getDestinationPath({
           fileName: file.name,
@@ -105,7 +152,18 @@ export const useFiles = ({ note }: Props) => {
         })
 
         await deleteFileAtPath(path)
-        await filesService.downloadFileInChunks(file, path)
+        const response = await filesService.downloadFileInChunks(file, path, updateProgressPercentOnDownload)
+
+        resetProgressState()
+
+        if (response instanceof ClientDisplayableError) {
+          Toast.show({
+            type: Error,
+            text1: 'Error',
+            text2: response.text || GeneralText,
+          })
+          return
+        }
 
         if (showSuccessToast) {
           Toast.show({
@@ -134,7 +192,17 @@ export const useFiles = ({ note }: Props) => {
         setIsDownloading(false)
       }
     },
-    [Error, Info, Success, deleteFileAtPath, filesService, isDownloading]
+    [
+      Error,
+      GeneralText,
+      Success,
+      deleteFileAtPath,
+      filesService,
+      isDownloading,
+      resetProgressState,
+      showDownloadToastWithProgressBar,
+      updateProgressPercentOnDownload,
+    ]
   )
 
   const cleanupTempFileOnAndroid = useCallback(
@@ -319,7 +387,8 @@ export const useFiles = ({ note }: Props) => {
         if (response instanceof ClientDisplayableError) {
           Toast.show({
             type: Error,
-            text1: response.text,
+            text1: 'Error',
+            text2: response.text || GeneralText,
           })
           return
         }
@@ -330,7 +399,7 @@ export const useFiles = ({ note }: Props) => {
         })
       }
     },
-    [Error, Info, Success, application.alertService, application.files]
+    [Error, GeneralText, Info, Success, application.alertService, application.files]
   )
 
   const handlePickFilesError = async (error: unknown) => {
@@ -370,13 +439,6 @@ export const useFiles = ({ note }: Props) => {
   const uploadSingleFile = async (file: DocumentPickerResponse | Asset, size: number): Promise<SNFile | void> => {
     try {
       const fileName = filesService.getFileName(file)
-
-      Toast.show({
-        type: Info,
-        text1: `Uploading "${fileName}"...`,
-        autoHide: false,
-      })
-
       const operation = await application.files.beginNewFileUpload(size)
 
       if (operation instanceof ClientDisplayableError) {
@@ -387,12 +449,20 @@ export const useFiles = ({ note }: Props) => {
         return
       }
 
+      const initialPercentComplete = operation.getProgress().percentComplete
+
+      showUploadToastWithProgressBar(fileName, initialPercentComplete)
+
       const onChunk = async (chunk: Uint8Array, index: number, isLast: boolean) => {
         await application.files.pushBytesForUpload(operation, chunk, index, isLast)
+        showUploadToastWithProgressBar(fileName, operation.getProgress().percentComplete)
       }
 
       const fileResult = await filesService.readFile(file, onChunk)
       const fileObj = await application.files.finishUpload(operation, fileResult)
+
+      resetProgressState()
+
       if (fileObj instanceof ClientDisplayableError) {
         Toast.show({
           type: Error,

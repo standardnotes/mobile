@@ -1,4 +1,6 @@
 import { ByteChunker, FileSelectionResponse, OnChunkCallback } from '@standardnotes/filepicker'
+import { FileDownloadProgress } from '@standardnotes/files/dist/Domain/Types/FileDownloadProgress'
+import { ClientDisplayableError } from '@standardnotes/responses'
 import { ApplicationService, SNFile } from '@standardnotes/snjs'
 import { Buffer } from 'buffer'
 import { Base64 } from 'js-base64'
@@ -38,12 +40,18 @@ export class FilesService extends ApplicationService {
     return false
   }
 
-  async downloadFileInChunks(file: SNFile, path: string): Promise<void> {
-    await this.application.files.downloadFile(file, async (decryptedBytes: Uint8Array) => {
+  async downloadFileInChunks(
+    file: SNFile,
+    path: string,
+    handleOnChunk: (progress: FileDownloadProgress | undefined) => unknown
+  ): Promise<ClientDisplayableError | undefined> {
+    const response = await this.application.files.downloadFile(file, async (decryptedBytes: Uint8Array, progress) => {
       const base64String = new Buffer(decryptedBytes).toString('base64')
+      handleOnChunk(progress)
 
       await RNFS.appendFile(path, base64String, 'base64')
     })
+    return response
   }
 
   getFileName(file: DocumentPickerResponse | Asset) {
@@ -82,5 +90,9 @@ export class FilesService extends ApplicationService {
 
   sortByName(file1: SNFile, file2: SNFile): number {
     return file1.name.toLocaleLowerCase() > file2.name.toLocaleLowerCase() ? 1 : -1
+  }
+
+  formatCompletedPercent(percent: number | undefined) {
+    return Math.round(percent || 0)
   }
 }
