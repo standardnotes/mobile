@@ -1,8 +1,6 @@
 import { associateComponentWithNote } from '@Lib/ComponentManager'
 import { useChangeNote, useDeleteNoteWithPrivileges, useProtectOrUnprotectNote } from '@Lib/SnjsHelperHooks'
-import { isUnfinishedFeaturesEnabled } from '@Lib/Utils'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
-import { TEnvironment } from '@Root/App'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
 import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG, SCREEN_NOTE_HISTORY } from '@Root/Screens/screens'
@@ -58,7 +56,6 @@ function sortAlphabetically(array: SNComponent[]): SNComponent[] {
 type Props = {
   drawerRef: DrawerLayout | null
   drawerOpen: boolean
-  env: TEnvironment
 }
 
 function useEditorComponents(): SNComponent[] {
@@ -427,7 +424,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   }, [props.drawerRef, navigation])
 
   const isEntitledToFiles =
-    application?.features.getFeatureStatus(FeatureIdentifier.FilesBeta) === FeatureStatus.Entitled
+    application?.features.getFeatureStatus(FeatureIdentifier.Files) === FeatureStatus.Entitled
 
   const noteOptions = useMemo(() => {
     if (!note) {
@@ -618,7 +615,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         renderItem={({ item }) => {
           const { OptionsSection, EditorsSection, ListedSection, TagsSection, FilesSection } = MenuSections
 
-          if (item.key === FilesSection && (isEntitledToFiles || isUnfinishedFeaturesEnabled(props.env))) {
+          if (item.key === FilesSection && isEntitledToFiles) {
             return (
               <SideMenuSection
                 title={'Files'}
