@@ -1,9 +1,11 @@
 import { useSignedIn } from '@Lib/SnjsHelperHooks'
-import { ApplicationContext } from '@Root/ApplicationContext'
+import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
 import { SCREEN_SETTINGS } from '@Root/Screens/screens'
-import { ApplicationEvent } from '@standardnotes/snjs'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { FilesSection } from '@Screens/Settings/Sections/FilesSection'
+import { FeatureIdentifier } from '@standardnotes/features'
+import { ApplicationEvent, FeatureStatus } from '@standardnotes/snjs'
+import React, { useCallback, useEffect, useState } from 'react'
 import { AuthSection } from './Sections/AuthSection'
 import { CompanySection } from './Sections/CompanySection'
 import { EncryptionSection } from './Sections/EncryptionSection'
@@ -16,23 +18,23 @@ import { Container } from './Settings.styled'
 type Props = ModalStackNavigationProp<typeof SCREEN_SETTINGS>
 export const Settings = (props: Props) => {
   // Context
-  const application = useContext(ApplicationContext)
+  const application = useSafeApplicationContext()
 
   // State
-  const [hasPasscode, setHasPasscode] = useState(() => Boolean(application?.hasPasscode()))
-  const [protectionsAvailable, setProtectionsAvailable] = useState(application?.hasProtectionSources())
-  const [encryptionAvailable, setEncryptionAvailable] = useState(() => application?.isEncryptionAvailable())
+  const [hasPasscode, setHasPasscode] = useState(() => Boolean(application.hasPasscode()))
+  const [protectionsAvailable, setProtectionsAvailable] = useState(application.hasProtectionSources())
+  const [encryptionAvailable, setEncryptionAvailable] = useState(() => application.isEncryptionAvailable())
 
   const updateProtectionsAvailable = useCallback(() => {
-    setProtectionsAvailable(application?.hasProtectionSources())
+    setProtectionsAvailable(application.hasProtectionSources())
   }, [application])
 
   useEffect(() => {
-    const removeApplicationEventSubscriber = application?.addEventObserver(async event => {
+    const removeApplicationEventSubscriber = application.addEventObserver(async event => {
       if (event === ApplicationEvent.KeyStatusChanged) {
-        setHasPasscode(Boolean(application?.hasPasscode()))
+        setHasPasscode(Boolean(application.hasPasscode()))
         updateProtectionsAvailable()
-        setEncryptionAvailable(() => application?.isEncryptionAvailable())
+        setEncryptionAvailable(() => application.isEncryptionAvailable())
       }
     })
     return () => {
@@ -46,11 +48,14 @@ export const Settings = (props: Props) => {
 
   const [signedIn] = useSignedIn(goBack)
 
+  const isEntitledToFiles = application.features.getFeatureStatus(FeatureIdentifier.Files) === FeatureStatus.Entitled
+
   return (
     <Container keyboardShouldPersistTaps={'always'} keyboardDismissMode={'interactive'}>
       <AuthSection title="Account" signedIn={signedIn} />
       <OptionsSection encryptionAvailable={!!encryptionAvailable} title="Options" />
       <PreferencesSection />
+      {application.hasAccount() && isEntitledToFiles && <FilesSection />}
       <SecuritySection
         encryptionAvailable={!!encryptionAvailable}
         hasPasscode={hasPasscode}

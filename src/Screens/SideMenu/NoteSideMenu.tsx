@@ -1,8 +1,6 @@
 import { associateComponentWithNote } from '@Lib/ComponentManager'
 import { useChangeNote, useDeleteNoteWithPrivileges, useProtectOrUnprotectNote } from '@Lib/SnjsHelperHooks'
-import { isUnfinishedFeaturesEnabled } from '@Lib/Utils'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
-import { TEnvironment } from '@Root/App'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
 import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG, SCREEN_NOTE_HISTORY } from '@Root/Screens/screens'
@@ -58,7 +56,6 @@ function sortAlphabetically(array: SNComponent[]): SNComponent[] {
 type Props = {
   drawerRef: DrawerLayout | null
   drawerOpen: boolean
-  env: TEnvironment
 }
 
 function useEditorComponents(): SNComponent[] {
@@ -83,6 +80,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   // Context
   const theme = useContext(ThemeContext)
   const application = useSafeApplicationContext()
+
   const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
   const { showActionSheet } = useCustomActionSheet()
   const styles = useStyles(theme)
@@ -115,7 +113,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const [deleteNote] = useDeleteNoteWithPrivileges(
     note!,
     async () => {
-      await application?.mutator.deleteItem(note!)
+      await application.mutator.deleteItem(note!)
       props.drawerRef?.closeDrawer()
       if (!application.getAppState().isInTabletMode) {
         navigation.popToTop()
@@ -156,7 +154,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   useEffect(() => {
     let mounted = true
     if ((!editor || props.drawerOpen) && mounted) {
-      const initialEditor = application?.editorGroup.activeNoteViewController
+      const initialEditor = application.editorGroup.activeNoteViewController
       const tempNote = initialEditor?.note
       setEditor(initialEditor)
       setNote(tempNote)
@@ -168,9 +166,9 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   useEffect(() => {
     let mounted = true
-    const removeEditorObserver = application?.editorGroup.addActiveControllerChangeObserver(() => {
+    const removeEditorObserver = application.editorGroup.addActiveControllerChangeObserver(() => {
       if (mounted) {
-        const activeController = application?.editorGroup.activeNoteViewController
+        const activeController = application.editorGroup.activeNoteViewController
         setNote(activeController?.note)
         setEditor(activeController)
       }
@@ -208,7 +206,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
   useEffect(() => {
     let isMounted = true
-    const removeTagsObserver = application?.streamItems(ContentType.Tag, () => {
+    const removeTagsObserver = application.streamItems(ContentType.Tag, () => {
       if (!note) {
         return
       }
@@ -225,7 +223,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const disassociateComponentWithCurrentNote = useCallback(
     async (component: SNComponent) => {
       if (note) {
-        return application?.mutator.changeItem(component, m => {
+        return application.mutator.changeItem(component, m => {
           const mutator = m as ComponentMutator
           mutator.removeAssociatedItemId(note.uuid)
           mutator.disassociateWithItem(note.uuid)
@@ -242,7 +240,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         return
       }
       if (note?.locked) {
-        void application?.alertService.alert(
+        void application.alertService.alert(
           "This note has editing disabled. If you'd like to edit its options, enable editing on it, and try again."
         )
         return
@@ -254,7 +252,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       props.drawerRef?.closeDrawer()
       if (!selectedComponent) {
         if (!note?.prefersPlainEditor) {
-          await application?.mutator.changeItem(
+          await application.mutator.changeItem(
             note,
             mutator => {
               const noteMutator = mutator as NoteMutator
@@ -273,7 +271,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         }
         const prefersPlain = note.prefersPlainEditor
         if (prefersPlain) {
-          await application?.mutator.changeItem(
+          await application.mutator.changeItem(
             note,
             mutator => {
               const noteMutator = mutator as NoteMutator
@@ -285,7 +283,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         await associateComponentWithNote(application, selectedComponent, note)
       }
       /** Dirtying can happen above */
-      void application?.sync.sync()
+      void application.sync.sync()
     },
     [application, disassociateComponentWithCurrentNote, editor, note, props.drawerRef]
   )
@@ -401,7 +399,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
           size: 17,
         },
         onSelect: () => {
-          application?.deviceInterface?.openUrl('https://standardnotes.com/plans')
+          application.deviceInterface?.openUrl('https://standardnotes.com/plans')
         },
       })
     }
@@ -426,8 +424,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     navigation.goBack()
   }, [props.drawerRef, navigation])
 
-  const isEntitledToFiles =
-    application?.features.getFeatureStatus(FeatureIdentifier.FilesBeta) === FeatureStatus.Entitled
+  const isEntitledToFiles = application.features.getFeatureStatus(FeatureIdentifier.Files) === FeatureStatus.Entitled
 
   const noteOptions = useMemo(() => {
     if (!note) {
@@ -443,7 +440,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const archiveOption = note.archived ? 'Unarchive' : 'Archive'
     const archiveEvent = () => {
       if (note.locked) {
-        void application?.alertService.alert(
+        void application.alertService.alert(
           `This note has editing disabled. If you'd like to ${archiveOption.toLowerCase()} it, enable editing on it, and try again.`
         )
         return
@@ -477,7 +474,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
     const shareNote = () => {
       if (note) {
-        void application?.getAppState().performActionWithoutStateChangeImpact(() => {
+        void application.getAppState().performActionWithoutStateChangeImpact(() => {
           void Share.share({
             title: note.title,
             message: note.text,
@@ -540,20 +537,20 @@ export const NoteSideMenu = React.memo((props: Props) => {
           textClass: 'danger' as const,
           key: 'empty trash',
           onSelect: async () => {
-            const count = application?.items.trashedItems.length
-            const confirmed = await application?.alertService?.confirm(
+            const count = application.items.trashedItems.length
+            const confirmed = await application.alertService?.confirm(
               `Are you sure you want to permanently delete ${count} notes?`,
               'Empty Trash',
               'Delete',
               ButtonType.Danger
             )
             if (confirmed) {
-              await application?.mutator.emptyTrash()
+              await application.mutator.emptyTrash()
               props.drawerRef?.closeDrawer()
               if (!application.getAppState().isInTabletMode) {
                 navigation.popToTop()
               }
-              void application?.sync.sync()
+              void application.sync.sync()
             }
           },
         },
@@ -579,15 +576,15 @@ export const NoteSideMenu = React.memo((props: Props) => {
 
       if (note) {
         if (isSelected) {
-          await application?.mutator.changeItem(tag, mutator => {
+          await application.mutator.changeItem(tag, mutator => {
             mutator.removeItemAsRelationship(note)
           })
         } else {
-          await application?.items.addTagToNote(note, tag as SNTag, addTagHierachy)
+          await application.items.addTagToNote(note, tag as SNTag, addTagHierachy)
         }
       }
       reloadTags()
-      void application?.sync.sync()
+      void application.sync.sync()
     },
     [application, note, reloadTags, selectedTags]
   )
@@ -618,7 +615,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         renderItem={({ item }) => {
           const { OptionsSection, EditorsSection, ListedSection, TagsSection, FilesSection } = MenuSections
 
-          if (item.key === FilesSection && (isEntitledToFiles || isUnfinishedFeaturesEnabled(props.env))) {
+          if (item.key === FilesSection && isEntitledToFiles) {
             return (
               <SideMenuSection
                 title={'Files'}

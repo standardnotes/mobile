@@ -20,7 +20,7 @@ import { Dimensions, Keyboard, ScaledSize } from 'react-native'
 import DrawerLayout, { DrawerState } from 'react-native-gesture-handler/DrawerLayout'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 import { ThemeContext } from 'styled-components'
-import { HeaderTitleParams, TEnvironment } from './App'
+import { HeaderTitleParams } from './App'
 import { ApplicationContext } from './ApplicationContext'
 import { ModalStackNavigationProp } from './ModalStack'
 
@@ -44,7 +44,7 @@ export type AppStackNavigationProp<T extends keyof AppStackNavigatorParamList> =
 
 export const AppStack = createStackNavigator<AppStackNavigatorParamList>()
 
-export const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'> & { env: TEnvironment }) => {
+export const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'>) => {
   // Context
   const application = useContext(ApplicationContext)
   const theme = useContext(ThemeContext)
@@ -138,7 +138,7 @@ export const AppStackComponent = (props: ModalStackNavigationProp<'AppStack'> & 
         drawerType="slide"
         drawerLockMode={hasEditor ? 'unlocked' : 'locked-closed'}
         renderNavigationView={() =>
-          hasEditor && <NoteSideMenu drawerOpen={noteDrawerOpen} drawerRef={noteDrawerRef.current} env={props.env} />
+          hasEditor && <NoteSideMenu drawerOpen={noteDrawerOpen} drawerRef={noteDrawerRef.current} />
         }
       >
         <AppStack.Navigator

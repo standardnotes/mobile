@@ -71,7 +71,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
   const theme = useContext(ThemeContext)
 
   const MemoizedAppStackComponent = memo((props: ModalStackNavigationProp<'AppStack'>) => (
-    <AppStackComponent {...props} env={env} />
+    <AppStackComponent {...props} />
   ))
 
   return (
