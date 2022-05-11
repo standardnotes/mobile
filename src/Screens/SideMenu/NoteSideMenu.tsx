@@ -423,8 +423,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     navigation.goBack()
   }, [props.drawerRef, navigation])
 
-  const isEntitledToFiles =
-    application?.features.getFeatureStatus(FeatureIdentifier.Files) === FeatureStatus.Entitled
+  const isEntitledToFiles = application?.features.getFeatureStatus(FeatureIdentifier.Files) === FeatureStatus.Entitled
 
   const noteOptions = useMemo(() => {
     if (!note) {
