@@ -10,7 +10,7 @@ import {
 import { formatSizeToReadableString } from '@standardnotes/filepicker'
 import { SubscriptionSettingName } from '@standardnotes/snjs'
 import React, { FC, useContext, useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import { ThemeContext } from 'styled-components'
 
 export const FilesSection: FC = () => {
@@ -47,7 +47,7 @@ export const FilesSection: FC = () => {
             {formatSizeToReadableString(filesUsedQuota)} of {formatSizeToReadableString(filesTotalQuota)} used
           </SubTitle>
           <View style={styles.progressBarContainer}>
-            <View style={[StyleSheet.absoluteFill, { ...styles.progressBar, width: `${usedQuotaRatioPercent}%` }]} />
+            <View style={{ ...styles.progressBar, width: `${usedQuotaRatioPercent}%` }} />
           </View>
         </View>
       </StyledSectionedTableCell>
