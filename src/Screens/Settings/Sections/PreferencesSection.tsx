@@ -1,30 +1,29 @@
-import { PrefKey } from '@Lib/PreferencesManager'
-import { ApplicationContext } from '@Root/ApplicationContext'
 import { SectionedAccessoryTableCell } from '@Root/Components/SectionedAccessoryTableCell'
 import { SectionHeader } from '@Root/Components/SectionHeader'
 import { TableSection } from '@Root/Components/TableSection'
-import { CollectionSort, CollectionSortProperty } from '@standardnotes/snjs'
-import React, { useContext, useMemo, useState } from 'react'
+import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
+import { CollectionSort, CollectionSortProperty, PrefKey } from '@standardnotes/snjs'
+import React, { useMemo, useState } from 'react'
 
 export const PreferencesSection = () => {
   // Context
-  const application = useContext(ApplicationContext)
+  const application = useSafeApplicationContext()
 
   // State
   const [sortBy, setSortBy] = useState<CollectionSortProperty>(() =>
-    application!.getLocalPreferences().getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
+    application.getPreference(PrefKey.MobileSortNotesBy, CollectionSort.CreatedAt)
   )
   const [sortReverse, setSortReverse] = useState<boolean>(() =>
-    application!.getLocalPreferences().getValue(PrefKey.SortNotesReverse, false)
+    application.getLocalPreferences().getValue(PrefKey.MobileSortNotesReverse, false)
   )
   const [hideDates, setHideDates] = useState<boolean>(() =>
-    application!.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
+    application.getLocalPreferences().getValue(PrefKey.MobileNotesHideDate, false)
   )
   const [hideEditorIcon, setHideEditorIcon] = useState<boolean>(() =>
-    application!.getLocalPreferences().getValue(PrefKey.NotesHideEditorIcon, false)
+    application.getLocalPreferences().getValue(PrefKey.MobileNotesHideEditorIcon, false)
   )
   const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
-    application!.getLocalPreferences().getValue(PrefKey.NotesHideNotePreview, false)
+    application.getLocalPreferences().getValue(PrefKey.MobileNotesHideNotePreview, false)
   )
 
   const sortOptions = useMemo(() => {
@@ -36,24 +35,24 @@ export const PreferencesSection = () => {
   }, [])
 
   const toggleReverseSort = () => {
-    void application?.getLocalPreferences().setUserPrefValue(PrefKey.SortNotesReverse, !sortReverse)
+    void application.getLocalPreferences().setUserPrefValue(PrefKey.MobileSortNotesReverse, !sortReverse)
     setSortReverse(value => !value)
   }
 
   const changeSortOption = (key: CollectionSortProperty) => {
-    void application?.getLocalPreferences().setUserPrefValue(PrefKey.SortNotesBy, key)
+    void application.getLocalPreferences().setUserPrefValue(PrefKey.MobileSortNotesBy, key)
     setSortBy(key)
   }
   const toggleNotesPreviewHidden = () => {
-    void application?.getLocalPreferences().setUserPrefValue(PrefKey.NotesHideNotePreview, !hidePreviews)
+    void application.getLocalPreferences().setUserPrefValue(PrefKey.MobileNotesHideNotePreview, !hidePreviews)
     setHidePreviews(value => !value)
   }
   const toggleNotesDateHidden = () => {
-    void application?.getLocalPreferences().setUserPrefValue(PrefKey.NotesHideDate, !hideDates)
+    void application.getLocalPreferences().setUserPrefValue(PrefKey.MobileNotesHideDate, !hideDates)
     setHideDates(value => !value)
   }
   const toggleNotesEditorIconHidden = () => {
-    void application?.getLocalPreferences().setUserPrefValue(PrefKey.NotesHideEditorIcon, !hideEditorIcon)
+    void application.getLocalPreferences().setUserPrefValue(PrefKey.MobileNotesHideEditorIcon, !hideEditorIcon)
     setHideEditorIcon(value => !value)
   }
 

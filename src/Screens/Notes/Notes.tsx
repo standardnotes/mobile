@@ -1,15 +1,16 @@
 import { AppStateType } from '@Lib/ApplicationState'
-import { PrefKey } from '@Lib/PreferencesManager'
 import { useSignedIn, useSyncStatus } from '@Lib/SnjsHelperHooks'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
 import { SCREEN_COMPOSE, SCREEN_NOTES, SCREEN_VIEW_PROTECTED_NOTE } from '@Root/Screens/screens'
 import {
+  ApplicationEvent,
   CollectionSort,
   CollectionSortProperty,
   ContentType,
   NotesDisplayCriteria,
+  PrefKey,
   SmartView,
   SNNote,
   SNTag,
@@ -51,19 +52,19 @@ export const Notes = React.memo(
 
     // State
     const [sortBy, setSortBy] = useState<CollectionSortProperty>(() =>
-      application.getLocalPreferences().getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
+      application.getLocalPreferences().getValue(PrefKey.MobileSortNotesBy, CollectionSort.CreatedAt)
     )
     const [sortReverse, setSortReverse] = useState<boolean>(() =>
-      application.getLocalPreferences().getValue(PrefKey.SortNotesReverse, false)
+      application.getLocalPreferences().getValue(PrefKey.MobileSortNotesReverse, false)
     )
     const [hideDates, setHideDates] = useState<boolean>(() =>
-      application.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
+      application.getLocalPreferences().getValue(PrefKey.MobileNotesHideDate, false)
     )
     const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
-      application.getLocalPreferences().getValue(PrefKey.NotesHideNotePreview, false)
+      application.getLocalPreferences().getValue(PrefKey.MobileNotesHideNotePreview, false)
     )
     const [hideEditorIcon, setHideEditorIcon] = useState<boolean>(() =>
-      application.getLocalPreferences().getValue(PrefKey.NotesHideEditorIcon, false)
+      application.getLocalPreferences().getValue(PrefKey.MobileNotesHideEditorIcon, false)
     )
     const [notes, setNotes] = useState<SNNote[]>([])
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>()
@@ -405,13 +406,17 @@ export const Notes = React.memo(
     }, [application, reloadNotes, reloadNotesDisplayOptions])
 
     const reloadPreferences = useCallback(async () => {
-      const newSortBy = application.getLocalPreferences().getValue(PrefKey.SortNotesBy, CollectionSort.CreatedAt)
-      let displayOptionsChanged = false
+      let newSortBy = application.getLocalPreferences().getValue(PrefKey.MobileSortNotesBy, CollectionSort.CreatedAt)
 
-      const newSortReverse = application.getLocalPreferences().getValue(PrefKey.SortNotesReverse, false)
-      const newHidePreview = application.getLocalPreferences().getValue(PrefKey.NotesHideNotePreview, false)
-      const newHideDate = application.getLocalPreferences().getValue(PrefKey.NotesHideDate, false)
-      const newHideEditorIcon = application.getLocalPreferences().getValue(PrefKey.NotesHideEditorIcon, false)
+      if (newSortBy === CollectionSort.UpdatedAt || (newSortBy as string) === 'client_updated_at') {
+        /** Use UserUpdatedAt instead */
+        newSortBy = CollectionSort.UpdatedAt
+      }
+      let displayOptionsChanged = false
+      const newSortReverse = application.getLocalPreferences().getValue(PrefKey.MobileSortNotesReverse, false)
+      const newHidePreview = application.getLocalPreferences().getValue(PrefKey.MobileNotesHideNotePreview, false)
+      const newHideDate = application.getLocalPreferences().getValue(PrefKey.MobileNotesHideDate, false)
+      const newHideEditorIcon = application.getLocalPreferences().getValue(PrefKey.MobileNotesHideEditorIcon, false)
 
       if (sortBy !== newSortBy) {
         setSortBy(newSortBy)
@@ -465,6 +470,16 @@ export const Notes = React.memo(
       },
       [reloadNotes, reloadNotesDisplayOptions]
     )
+
+    useEffect(() => {
+      const removeEventObserver = application?.addSingleEventObserver(ApplicationEvent.PreferencesChanged, async () => {
+        await reloadPreferences()
+      })
+
+      return () => {
+        removeEventObserver?.()
+      }
+    }, [application, reloadPreferences])
 
     useFocusEffect(
       useCallback(() => {
