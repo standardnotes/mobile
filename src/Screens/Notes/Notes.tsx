@@ -409,7 +409,6 @@ export const Notes = React.memo(
       let newSortBy = application.getLocalPreferences().getValue(PrefKey.MobileSortNotesBy, CollectionSort.CreatedAt)
 
       if (newSortBy === CollectionSort.UpdatedAt || (newSortBy as string) === 'client_updated_at') {
-        /** Use UserUpdatedAt instead */
         newSortBy = CollectionSort.UpdatedAt
       }
       let displayOptionsChanged = false
