@@ -262,6 +262,7 @@ export class ThemeService {
       const matchingThemeId = Object.keys(this.themes).find(themeId => themeId === savedThemeId)
       if (matchingThemeId) {
         this.setActiveTheme(matchingThemeId)
+        void this.preloadThirdPartyThemeIndexPath(matchingThemeId)
       } else {
         this.setDefaultTheme()
       }
@@ -323,8 +324,13 @@ export class ThemeService {
     )
   }
 
-  private async preloadThirdPartyThemeIndexPath(theme: MobileTheme) {
+  private async preloadThirdPartyThemeIndexPath(themeId: string) {
     if (!this.application?.mobileComponentManager) {
+      return
+    }
+
+    const theme = this.themes[themeId]
+    if (!theme) {
       return
     }
 
@@ -341,7 +347,6 @@ export class ThemeService {
     this.variables = updatedTheme.mobileContent.variables
     if (this.application?.isLaunched() && this.application.componentManager) {
       this.application.mobileComponentManager.setMobileActiveTheme(updatedTheme)
-      void this.preloadThirdPartyThemeIndexPath(updatedTheme)
     }
     this.activeThemeId = themeId
     this.updateDeviceForTheme(themeId)
