@@ -323,6 +323,17 @@ export class ThemeService {
     )
   }
 
+  private async preloadThirdPartyThemeIndexPath(theme: MobileTheme) {
+    if (!this.application?.mobileComponentManager) {
+      return
+    }
+
+    const { identifier } = theme
+    if (this.application.mobileComponentManager.isComponentThirdParty(identifier)) {
+      await this.application.mobileComponentManager.preloadThirdPartyIndexPathFromDisk(identifier)
+    }
+  }
+
   setActiveTheme(themeId: string) {
     const theme = this.findOrCreateTheme(themeId)
     const updatedTheme = this.buildTheme(theme)
@@ -330,6 +341,7 @@ export class ThemeService {
     this.variables = updatedTheme.mobileContent.variables
     if (this.application?.isLaunched() && this.application.componentManager) {
       this.application.mobileComponentManager.setMobileActiveTheme(updatedTheme)
+      void this.preloadThirdPartyThemeIndexPath(updatedTheme)
     }
     this.activeThemeId = themeId
     this.updateDeviceForTheme(themeId)

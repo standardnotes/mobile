@@ -308,10 +308,6 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
       if (this.state.componentViewer) {
         this.componentManager.destroyComponentViewer(this.state.componentViewer)
       }
-      const activeTheme = this.componentManager.getActiveThemes().pop()
-      if (activeTheme && this.componentManager.isComponentThirdParty(activeTheme.identifier)) {
-        await this.componentManager.preloadThirdPartyIndexPathFromDisk(activeTheme.identifier)
-      }
       if (this.componentManager.isComponentThirdParty(associatedEditor.identifier)) {
         await this.componentManager.preloadThirdPartyIndexPathFromDisk(associatedEditor.identifier)
       }
