@@ -20,7 +20,7 @@ import {
 } from '@Root/Screens/screens'
 import { Settings } from '@Root/Screens/Settings/Settings'
 import { UploadedFilesList } from '@Root/Screens/UploadedFilesList/UploadedFilesList'
-import { Challenge, DeinitSource, FileItem, SNNote } from '@standardnotes/snjs'
+import { Challenge, DeinitMode, DeinitSource, FileItem, SNNote } from '@standardnotes/snjs'
 import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
 import React, { memo, useContext } from 'react'
@@ -126,7 +126,7 @@ export const MainStackComponent = ({ env }: { env: TEnvironment }) => {
                   onPress={async () => {
                     await application?.deviceInterface?.removeAllRawStorageValues()
                     await application?.deviceInterface?.removeAllRawDatabasePayloads(application?.identifier)
-                    application?.deinit(DeinitSource.SignOut)
+                    application?.deinit(DeinitMode.Soft, DeinitSource.SignOut)
                   }}
                 />
               </HeaderButtons>
