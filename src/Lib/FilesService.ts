@@ -1,7 +1,7 @@
 import { ByteChunker, FileSelectionResponse, OnChunkCallback } from '@standardnotes/filepicker'
 import { FileDownloadProgress } from '@standardnotes/files/dist/Domain/Types/FileDownloadProgress'
 import { ClientDisplayableError } from '@standardnotes/responses'
-import { ApplicationService, SNFile } from '@standardnotes/snjs'
+import { ApplicationService, FileItem } from '@standardnotes/snjs'
 import { Buffer } from 'buffer'
 import { Base64 } from 'js-base64'
 import { PermissionsAndroid, Platform } from 'react-native'
@@ -41,7 +41,7 @@ export class FilesService extends ApplicationService {
   }
 
   async downloadFileInChunks(
-    file: SNFile,
+    file: FileItem,
     path: string,
     handleOnChunk: (progress: FileDownloadProgress | undefined) => unknown
   ): Promise<ClientDisplayableError | undefined> {
@@ -88,7 +88,7 @@ export class FilesService extends ApplicationService {
     }
   }
 
-  sortByName(file1: SNFile, file2: SNFile): number {
+  sortByName(file1: FileItem, file2: FileItem): number {
     return file1.name.toLocaleLowerCase() > file2.name.toLocaleLowerCase() ? 1 : -1
   }
 

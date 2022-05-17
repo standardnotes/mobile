@@ -210,9 +210,11 @@ export class MobileDeviceInterface implements DeviceInterface {
       })
     )
   }
+
   removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void> {
     return this.removeRawStorageValue(this.keyForPayloadId(id, identifier))
   }
+
   async removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void> {
     const keys = await this.getAllDatabaseKeys(identifier)
     return AsyncStorage.multiRemove(keys)
@@ -301,5 +303,15 @@ export class MobileDeviceInterface implements DeviceInterface {
         }
       })
       .catch(() => showAlert())
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  performSoftReset() {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  performHardReset() {}
+
+  isDeviceDestroyed() {
+    return false
   }
 }
