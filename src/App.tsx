@@ -5,7 +5,7 @@ import { ApplicationGroup } from '@Lib/ApplicationGroup'
 import { navigationRef } from '@Lib/NavigationService'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { MobileThemeVariables } from '@Root/Style/Themes/styled-components'
-import { DeinitSource } from '@standardnotes/snjs'
+import { ApplicationGroupEvent, DeinitMode, DeinitSource } from '@standardnotes/snjs'
 import { ThemeService, ThemeServiceContext } from '@Style/ThemeService'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { StatusBar } from 'react-native'
@@ -66,11 +66,13 @@ const AppComponent: React.FC<{
     const loadApplication = async () => {
       themeServiceInstance = new ThemeService(application)
       setThemeServiceRef(themeServiceInstance)
-      await application?.prepareForLaunch({
+
+      await application.prepareForLaunch({
         receiveChallenge: async challenge => {
-          application!.promptForChallenge(challenge)
+          application.promptForChallenge(challenge)
         },
       })
+
       await themeServiceInstance.init()
       launchApp(true, false)
     }
@@ -80,8 +82,9 @@ const AppComponent: React.FC<{
     return () => {
       themeServiceInstance?.deinit()
       setThemeServiceRef(undefined)
+
       if (!application.hasStartedDeinit()) {
-        application.deinit(DeinitSource.Lock)
+        application.deinit(DeinitMode.Soft, DeinitSource.Lock)
       }
     }
   }, [application, application.Uuid, env, launchApp, setThemeServiceRef])
@@ -120,28 +123,34 @@ const AppComponent: React.FC<{
   )
 }
 
-/**
- * AppGroupInstance is only created once per application lifetime
- * so it is created outside of a component
- */
-const AppGroupInstance = new ApplicationGroup()
-void AppGroupInstance.initialize()
-
 export const App = (props: { env: TEnvironment }) => {
-  const applicationGroupRef = useRef(AppGroupInstance)
   const [application, setApplication] = useState<MobileApplication | undefined>()
 
+  const createNewAppGroup = useCallback(() => {
+    const group = new ApplicationGroup()
+    void group.initialize()
+    return group
+  }, [])
+
+  const [appGroup, setAppGroup] = useState<ApplicationGroup>(() => createNewAppGroup())
+
   useEffect(() => {
-    const removeAppChangeObserver = applicationGroupRef.current.addApplicationChangeObserver(() => {
-      const mobileApplication = applicationGroupRef.current.primaryApplication as MobileApplication
-      setApplication(mobileApplication)
+    const removeAppChangeObserver = appGroup.addEventObserver(event => {
+      if (event === ApplicationGroupEvent.PrimaryApplicationSet) {
+        const mobileApplication = appGroup.primaryApplication as MobileApplication
+        setApplication(mobileApplication)
+      } else if (event === ApplicationGroupEvent.DeviceWillRestart) {
+        setApplication(undefined)
+        setAppGroup(createNewAppGroup())
+      }
     })
     return removeAppChangeObserver
-  }, [applicationGroupRef.current.primaryApplication])
+  }, [appGroup, appGroup.primaryApplication, setAppGroup, createNewAppGroup])
 
   if (!application) {
     return null
   }
+
   return (
     <ApplicationContext.Provider value={application}>
       <AppComponent env={props.env} key={application.Uuid} application={application} />
