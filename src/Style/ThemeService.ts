@@ -262,7 +262,7 @@ export class ThemeService {
       const matchingThemeId = Object.keys(this.themes).find(themeId => themeId === savedThemeId)
       if (matchingThemeId) {
         this.setActiveTheme(matchingThemeId)
-        void this.preloadThirdPartyThemeIndexPath(matchingThemeId)
+        void this.application?.mobileComponentManager.preloadThirdPartyThemeIndexPath()
       } else {
         this.setDefaultTheme()
       }
@@ -322,22 +322,6 @@ export class ThemeService {
         } as unknown as ComponentContent,
       })
     )
-  }
-
-  private async preloadThirdPartyThemeIndexPath(themeId: string) {
-    if (!this.application?.mobileComponentManager) {
-      return
-    }
-
-    const theme = this.themes[themeId]
-    if (!theme) {
-      return
-    }
-
-    const { identifier } = theme
-    if (this.application.mobileComponentManager.isComponentThirdParty(identifier)) {
-      await this.application.mobileComponentManager.preloadThirdPartyIndexPathFromDisk(identifier)
-    }
   }
 
   setActiveTheme(themeId: string) {

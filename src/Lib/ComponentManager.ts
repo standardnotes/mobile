@@ -64,8 +64,8 @@ export class ComponentManager extends SNComponentManager {
     } catch (e) {
       void this.alertService.alert(
         'Unable to start component server. ' +
-          'Editors other than the Plain Editor will fail to load. ' +
-          'Please restart the app and try again.'
+        'Editors other than the Plain Editor will fail to load. ' +
+        'Please restart the app and try again.'
       )
       SNLog.error(e as any)
     }
@@ -315,6 +315,18 @@ export class ComponentManager extends SNComponentManager {
       return [this.mobileActiveTheme]
     } else {
       return []
+    }
+  }
+
+  public async preloadThirdPartyThemeIndexPath() {
+    const theme = this.mobileActiveTheme
+    if (!theme) {
+      return
+    }
+
+    const { identifier } = theme
+    if (this.isComponentThirdParty(identifier)) {
+      await this.preloadThirdPartyIndexPathFromDisk(identifier)
     }
   }
 }
