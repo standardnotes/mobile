@@ -1,4 +1,4 @@
-import { SNFile } from '@standardnotes/snjs'
+import { FileItem } from '@standardnotes/snjs'
 
 export enum UploadedFileItemActionType {
   AttachFileToNote,
@@ -13,5 +13,5 @@ export enum UploadedFileItemActionType {
 
 export type UploadedFileItemAction = {
   type: UploadedFileItemActionType
-  payload: SNFile
+  payload: FileItem
 }

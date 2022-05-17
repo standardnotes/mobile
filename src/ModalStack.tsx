@@ -20,7 +20,7 @@ import {
 } from '@Root/Screens/screens'
 import { Settings } from '@Root/Screens/Settings/Settings'
 import { UploadedFilesList } from '@Root/Screens/UploadedFilesList/UploadedFilesList'
-import { Challenge, DeinitSource, SNFile, SNNote } from '@standardnotes/snjs'
+import { Challenge, DeinitSource, FileItem, SNNote } from '@standardnotes/snjs'
 import { ICON_CHECKMARK, ICON_CLOSE } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
 import React, { memo, useContext } from 'react'
@@ -42,8 +42,8 @@ export type ModalStackNavigatorParamList = {
     noteUuid?: string
   }
   [SCREEN_INPUT_MODAL_FILE_NAME]: HeaderTitleParams & {
-    file: SNFile
-    renameFile: (file: SNFile, fileName: string) => Promise<void>
+    file: FileItem
+    renameFile: (file: FileItem, fileName: string) => Promise<void>
   }
   [SCREEN_UPLOADED_FILES_LIST]: HeaderTitleParams & {
     note: SNNote

@@ -11,7 +11,7 @@ import {
   UploadFilesListContainer,
   useUploadedFilesListStyles,
 } from '@Root/Screens/UploadedFilesList/UploadedFilesList.styled'
-import { SNFile } from '@standardnotes/snjs'
+import { FileItem } from '@standardnotes/snjs'
 import { ICON_ATTACH } from '@Style/Icons'
 import { ThemeService } from '@Style/ThemeService'
 import React, { FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
@@ -93,7 +93,7 @@ export const UploadedFilesList: FC<Props> = props => {
     setFilesListScrolled(true)
   }
 
-  const renderItem: ListRenderItem<SNFile> = ({ item }) => {
+  const renderItem: ListRenderItem<FileItem> = ({ item }) => {
     return <UploadedFileItem key={item.uuid} file={item} note={note} isAttachedToNote={attachedFiles.includes(item)} />
   }
 
