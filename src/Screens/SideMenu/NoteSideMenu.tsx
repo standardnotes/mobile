@@ -615,15 +615,16 @@ export const NoteSideMenu = React.memo((props: Props) => {
         renderItem={({ item }) => {
           const { OptionsSection, EditorsSection, ListedSection, TagsSection, FilesSection } = MenuSections
 
-          if (item.key === FilesSection && isEntitledToFiles) {
+          if (item.key === FilesSection) {
+            let collapsedLabel = 'Tap to expand'
+
+            if (isEntitledToFiles) {
+              collapsedLabel = `${attachedFilesLength ? `${attachedFilesLength}` : 'No'} attached file${
+                attachedFilesLength === 1 ? '' : 's'
+              }`
+            }
             return (
-              <SideMenuSection
-                title={'Files'}
-                customCollapsedLabel={`${attachedFilesLength ? `${attachedFilesLength}` : 'No'} attached file${
-                  attachedFilesLength === 1 ? '' : 's'
-                }`}
-                collapsed={false}
-              >
+              <SideMenuSection title={'Files'} customCollapsedLabel={collapsedLabel} collapsed={false}>
                 <Files note={note} />
               </SideMenuSection>
             )
