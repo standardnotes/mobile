@@ -305,6 +305,14 @@ export class MobileDeviceInterface implements DeviceInterface {
       .catch(() => showAlert())
   }
 
+  async clearAllDataFromDevice(_workspaceIdentifiers: string[]): Promise<{ killsApplication: boolean }> {
+    await this.clearRawKeychainValue()
+
+    await this.removeAllRawStorageValues()
+
+    return { killsApplication: false }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   performSoftReset() {}
 
