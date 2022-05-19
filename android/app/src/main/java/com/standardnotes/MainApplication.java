@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.webkit.WebView;
 
-import com.bugsnag.android.BreadcrumbType;
-import com.bugsnag.android.Configuration;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
@@ -16,23 +14,16 @@ import com.facebook.soloader.SoLoader;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
 import java.util.List;
 
-import com.bugsnag.android.Bugsnag;
 import com.facebook.react.modules.network.OkHttpClientProvider;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.database.CursorWindow;
 import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.kristiansorens.flagsecure.FlagSecure;
-
-import org.standardnotes.SNReactNative.SNReactNativePackage;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -73,24 +64,6 @@ public class MainApplication extends Application implements ReactApplication {
     }
 
     rebuildOkHtttp();
-
-    Configuration config = Configuration.load(this);
-    config.setEnabledBreadcrumbTypes(new HashSet<BreadcrumbType>() {{
-      add(BreadcrumbType.NAVIGATION);
-      add(BreadcrumbType.STATE);
-      add(BreadcrumbType.PROCESS);
-      add(BreadcrumbType.MANUAL);
-      add(BreadcrumbType.USER);
-      add(BreadcrumbType.LOG);
-      add(BreadcrumbType.ERROR);
-    }});
-
-    SharedPreferences settings = getApplicationContext().getSharedPreferences("react-native", Context.MODE_PRIVATE);
-    String bugsnagOptOut = settings.getString("bugsnagoptout", "true");
-
-    if (!bugsnagOptOut.equals("true")) {
-      Bugsnag.start(this, config);
-    }
 
     SoLoader.init(this, /* native exopackage */ false);
 

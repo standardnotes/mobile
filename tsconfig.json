@@ -1,36 +1,49 @@
 {
+  "extends": "@standardnotes/config/src/tsconfig.json",
   "compilerOptions": {
-    /* Basic Options */
-    "target": "esnext",
-    "module": "ESNext",
-    "lib": ["ESNext"],
     "allowJs": true,
-    "jsx": "react-native",
-    "noEmit": true,
-    "isolatedModules": false,
-    "strict": true,
-    "skipLibCheck": true,
-    // "noImplicitAny": false,
-    "moduleResolution": "node",
-    "baseUrl": "src",
     "allowSyntheticDefaultImports": true,
+    "baseUrl": "src",
     "esModuleInterop": true,
+    "isolatedModules": true,
+    "jsx": "react-native",
+    "lib": [
+      "ESNext"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "noImplicitAny": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "esnext",
+    "typeRoots": [
+      "node_modules/@types",
+      "./src/Types/*"
+    ],
     "paths": {
-      "@Components/*": ["./components/*"],
-      "@Lib/*": ["./lib/*"],
-      "@Screens/*": ["./screens/*"],
-      "@Style/*": ["./style/*"],
-      "@Root/*": ["./*"]
-    },
-    "types": ["jest"],
-    "typeRoots": ["./src/types/*", "node_modules/@types"],
-    "resolveJsonModule": true
+      "@Components/*": [
+        "./Components/*"
+      ],
+      "@Lib/*": [
+        "./Lib/*"
+      ],
+      "@Screens/*": [
+        "./Screens/*"
+      ],
+      "@Style/*": [
+        "./Style/*"
+      ],
+      "@Root/*": [
+        "./*"
+      ]
+    }
   },
   "exclude": [
     "node_modules",
     "babel.config.js",
     "metro.config.js",
-    "jest.config.js",
-    "types"
+    "jest.config.js"
   ]
 }

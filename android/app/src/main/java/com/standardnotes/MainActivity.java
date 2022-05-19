@@ -27,13 +27,6 @@ public class MainActivity extends ReactActivity {
             String packageName = this.getContext().getPackageName();
             Bundle props = new Bundle();
             SharedPreferences settings = this.getContext().getSharedPreferences("react-native", Context.MODE_PRIVATE);
-            String bugsnagOptOut = settings.getString("bugsnagoptout", "true");
-            props.putBoolean("bugsnagOptOut", bugsnagOptOut.equals("true"));
-            if (packageName.equals("com.standardnotes.dev")) {
-                props.putString("env", "dev");
-            } else {
-                props.putString("env", "prod");
-            }
             return props;
         }
     }

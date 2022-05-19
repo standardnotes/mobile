@@ -81,7 +81,6 @@ platform :ios do
       version: ENV['PACKAGE_VERSION'],
       build_number: ENV['BUILD_NUMBER']
     ) # Download dSYM files from iTC
-    upload_symbols_to_bugsnag # Upload them to Bugsnag
   end
 end
 
@@ -100,6 +99,7 @@ platform :android do
   end
 
   def deploy_android(variant, versionCode, track = 'internal')
+    sh("yarn run android:bundle")
     build_android(variant, versionCode)
     upload_to_play_store(
       track: track,
@@ -118,10 +118,6 @@ platform :android do
       apk_output_path: "android/app/build/outputs/apk/#{variant}/release/app-#{variant}-release.apk",
       verbose: true
     )
-    # code here runs in the parent directory
-    Dir.chdir('..') do
-      sh("yarn bugsnag-sourcemaps upload --api-key=#{ENV['BUGSNAG_APIKEY']} --app-version=#{versionCode} --minifiedFile=android/app/build/generated/assets/react/#{variant}/release/index.android.bundle --source-map=android/app/build/generated/sourcemaps/react/#{variant}/release/index.android.bundle.map --minified-url=index.android.bundle --upload-sources")
-    end
   end
 
   desc 'Deploy dev app'
