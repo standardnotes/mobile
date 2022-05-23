@@ -184,10 +184,9 @@ export const NoteCell = ({
   const showDetails = !hideDates || note.protected
 
   const editorForNote = application?.componentManager.editorForNote(note)
-  const [icon, tint] = application?.iconsController.getIconAndTintForEditor(editorForNote?.identifier) as [
-    IconType,
-    number
-  ]
+  const [icon, tint] = application?.iconsController.getIconAndTintForNoteType(
+    editorForNote?.package_info.note_type
+  ) as [IconType, number]
 
   return (
     <TouchableContainer

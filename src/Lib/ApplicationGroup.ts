@@ -21,7 +21,7 @@ export class ApplicationGroup extends SNApplicationGroup {
     })
   }
 
-  private createApplication = (descriptor: ApplicationDescriptor, deviceInterface: DeviceInterface) => {
+  private createApplication = async (descriptor: ApplicationDescriptor, deviceInterface: DeviceInterface) => {
     const application = new MobileApplication(deviceInterface as MobileDeviceInterface, descriptor.identifier)
     const internalEventBus = new InternalEventBus()
     const applicationState = new ApplicationState(application)

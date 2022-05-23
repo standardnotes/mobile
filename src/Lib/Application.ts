@@ -4,6 +4,7 @@ import {
   ChallengePrompt,
   ChallengeReason,
   ChallengeValidation,
+  DeinitMode,
   DeinitSource,
   Environment,
   IconsController,
@@ -93,7 +94,7 @@ export class MobileApplication extends SNApplication {
     return this.startedDeinit
   }
 
-  override deinit(source: DeinitSource): void {
+  override deinit(mode: DeinitMode, source: DeinitSource): void {
     this.startedDeinit = true
 
     for (const service of Object.values(this.MobileServices)) {
@@ -109,7 +110,7 @@ export class MobileApplication extends SNApplication {
 
     this.MobileServices = {} as MobileServices
     this.editorGroup.deinit()
-    super.deinit(source)
+    super.deinit(mode, source)
   }
 
   override getLaunchChallenge() {

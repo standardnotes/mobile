@@ -93,7 +93,13 @@ export const useIsLocked = () => {
   const application = React.useContext(ApplicationContext)
 
   // State
-  const [isLocked, setIsLocked] = React.useState<boolean>(() => Boolean(application?.getAppState().locked))
+  const [isLocked, setIsLocked] = React.useState<boolean>(() => {
+    if (!application || !application.getAppState()) {
+      return true
+    }
+
+    return Boolean(application?.getAppState().locked)
+  })
 
   useEffect(() => {
     let isMounted = true

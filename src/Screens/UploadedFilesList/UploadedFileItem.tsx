@@ -5,7 +5,7 @@ import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext
 import { SCREEN_COMPOSE } from '@Root/Screens/screens'
 import { UploadedFileItemActionType } from '@Screens/UploadedFilesList/UploadedFileItemAction'
 import { formatSizeToReadableString } from '@standardnotes/filepicker'
-import { SNFile, SNNote } from '@standardnotes/snjs'
+import { FileItem, SNNote } from '@standardnotes/snjs'
 import React, { FC, useContext, useEffect, useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { ThemeContext } from 'styled-components'
@@ -21,7 +21,7 @@ import {
 } from './UploadedFileItem.styled'
 
 export type UploadedFileItemProps = {
-  file: SNFile
+  file: FileItem
   note: SNNote
   isAttachedToNote: boolean
 }

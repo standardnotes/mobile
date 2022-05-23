@@ -1,3 +1,4 @@
+import { SnIcon } from '@Components/SnIcon'
 import { useNavigation } from '@react-navigation/native'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { useFiles } from '@Root/Hooks/useFiles'
@@ -14,8 +15,10 @@ import {
   styles,
 } from '@Root/Screens/SideMenu/Files.styled'
 import { SideMenuOptionIconDescriptionType } from '@Root/Screens/SideMenu/SideMenuSection'
+import { SideMenuCell } from '@Screens/SideMenu/SideMenuCell'
 import { UploadedFileItemActionType } from '@Screens/UploadedFilesList/UploadedFileItemAction'
-import { SNNote } from '@standardnotes/snjs'
+import { FeatureIdentifier } from '@standardnotes/features'
+import { FeatureStatus, SNNote } from '@standardnotes/snjs'
 import React, { FC } from 'react'
 
 type Props = {
@@ -29,8 +32,24 @@ export const Files: FC<Props> = ({ note }) => {
   const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_COMPOSE>['navigation']>()
   const { showActionsMenu, handlePressAttachFile, attachedFiles, handleFileAction } = useFiles({ note })
 
+  const isEntitledToFiles = application.features.getFeatureStatus(FeatureIdentifier.Files) === FeatureStatus.Entitled
+
   const openFilesScreen = () => {
     navigation.navigate(SCREEN_UPLOADED_FILES_LIST, { note })
+  }
+
+  if (!isEntitledToFiles) {
+    return (
+      <SideMenuCell
+        text={'Learn more'}
+        onSelect={() => application.deviceInterface.openUrl('https://standardnotes.com/plans')}
+        iconDesc={{
+          side: 'left',
+          type: SideMenuOptionIconDescriptionType.CustomComponent,
+          value: <SnIcon type={'open-in'} style={styles.learnMoreIcon} />,
+        }}
+      />
+    )
   }
 
   return (

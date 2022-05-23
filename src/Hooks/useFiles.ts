@@ -10,7 +10,7 @@ import {
 } from '@Root/Screens/UploadedFilesList/UploadedFileItemAction'
 import { Tabs } from '@Screens/UploadedFilesList/UploadedFilesList'
 import { FileDownloadProgress } from '@standardnotes/files/dist/Domain/Types/FileDownloadProgress'
-import { ButtonType, ChallengeReason, ClientDisplayableError, ContentType, SNFile, SNNote } from '@standardnotes/snjs'
+import { ButtonType, ChallengeReason, ClientDisplayableError, ContentType, FileItem, SNNote } from '@standardnotes/snjs'
 import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
 import { useCallback, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
@@ -25,7 +25,7 @@ type Props = {
   note: SNNote
 }
 type TDownloadFileAndReturnLocalPathParams = {
-  file: SNFile
+  file: FileItem
   saveInTempLocation?: boolean
   showSuccessToast?: boolean
 }
@@ -51,8 +51,8 @@ export const useFiles = ({ note }: Props) => {
   const { showActionSheet } = useCustomActionSheet()
   const navigation = useNavigation<TAppStackNavigationProp>()
 
-  const [attachedFiles, setAttachedFiles] = useState<SNFile[]>([])
-  const [allFiles, setAllFiles] = useState<SNFile[]>([])
+  const [attachedFiles, setAttachedFiles] = useState<FileItem[]>([])
+  const [allFiles, setAllFiles] = useState<FileItem[]>([])
   const [isDownloading, setIsDownloading] = useState(false)
 
   const { GeneralText } = ErrorMessage
@@ -65,7 +65,7 @@ export const useFiles = ({ note }: Props) => {
   }, [application.items, filesService.sortByName, note])
 
   const reloadAllFiles = useCallback(() => {
-    setAllFiles(application.items.getItems<SNFile>(ContentType.File).sort(filesService.sortByName) as SNFile[])
+    setAllFiles(application.items.getItems<FileItem>(ContentType.File).sort(filesService.sortByName) as FileItem[])
   }, [application.items, filesService.sortByName])
 
   const deleteFileAtPath = useCallback(async (path: string) => {
@@ -215,7 +215,7 @@ export const useFiles = ({ note }: Props) => {
   )
 
   const shareFile = useCallback(
-    async (file: SNFile) => {
+    async (file: FileItem) => {
       const downloadedFilePath = await downloadFileAndReturnLocalPath({
         file,
         saveInTempLocation: true,
@@ -261,7 +261,7 @@ export const useFiles = ({ note }: Props) => {
   )
 
   const attachFileToNote = useCallback(
-    async (file: SNFile, showToastAfterAction = true) => {
+    async (file: FileItem, showToastAfterAction = true) => {
       await application.items.associateFileWithNote(file, note)
       void application.sync.sync()
 
@@ -277,7 +277,7 @@ export const useFiles = ({ note }: Props) => {
   )
 
   const detachFileFromNote = useCallback(
-    async (file: SNFile) => {
+    async (file: FileItem) => {
       await application.items.disassociateFileWithNote(file, note)
       void application.sync.sync()
       Toast.show({
@@ -290,9 +290,9 @@ export const useFiles = ({ note }: Props) => {
   )
 
   const toggleFileProtection = useCallback(
-    async (file: SNFile) => {
+    async (file: FileItem) => {
       try {
-        let result: SNFile | undefined
+        let result: FileItem | undefined
         if (file.protected) {
           result = await application.mutator.unprotectFile(file)
         } else {
@@ -309,7 +309,7 @@ export const useFiles = ({ note }: Props) => {
   )
 
   const authorizeProtectedActionForFile = useCallback(
-    async (file: SNFile, challengeReason: ChallengeReason) => {
+    async (file: FileItem, challengeReason: ChallengeReason) => {
       const authorizedFiles = await application.protections.authorizeProtectedActionForFiles([file], challengeReason)
       return authorizedFiles.length > 0 && authorizedFiles.includes(file)
     },
@@ -317,14 +317,14 @@ export const useFiles = ({ note }: Props) => {
   )
 
   const renameFile = useCallback(
-    async (file: SNFile, fileName: string) => {
+    async (file: FileItem, fileName: string) => {
       await application.items.renameFile(file, fileName)
     },
     [application]
   )
 
   const previewFile = useCallback(
-    async (file: SNFile) => {
+    async (file: FileItem) => {
       let downloadedFilePath: string | undefined = ''
       try {
         const isPreviewable = isFileTypePreviewable(file.mimeType)
@@ -369,7 +369,7 @@ export const useFiles = ({ note }: Props) => {
   )
 
   const deleteFile = useCallback(
-    async (file: SNFile) => {
+    async (file: FileItem) => {
       const shouldDelete = await application.alertService.confirm(
         `Are you sure you want to permanently delete "${file.name}"?`,
         undefined,
@@ -436,7 +436,7 @@ export const useFiles = ({ note }: Props) => {
     }
   }
 
-  const uploadSingleFile = async (file: DocumentPickerResponse | Asset, size: number): Promise<SNFile | void> => {
+  const uploadSingleFile = async (file: DocumentPickerResponse | Asset, size: number): Promise<FileItem | void> => {
     try {
       const fileName = filesService.getFileName(file)
       const operation = await application.files.beginNewFileUpload(size)
@@ -476,13 +476,13 @@ export const useFiles = ({ note }: Props) => {
     }
   }
 
-  const uploadFiles = async (): Promise<SNFile[] | void> => {
+  const uploadFiles = async (): Promise<FileItem[] | void> => {
     try {
       const selectedFiles = await pickFiles()
       if (!selectedFiles || selectedFiles.length === 0) {
         return
       }
-      const uploadedFiles: SNFile[] = []
+      const uploadedFiles: FileItem[] = []
       for (const file of selectedFiles) {
         if (!file.uri || !file.size) {
           continue
@@ -597,7 +597,7 @@ export const useFiles = ({ note }: Props) => {
   const uploadFileFromCameraOrImageGallery = async ({
     uploadFromGallery = false,
     mediaType = 'photo',
-  }: TUploadFileFromCameraOrImageGalleryParams): Promise<SNFile | void> => {
+  }: TUploadFileFromCameraOrImageGalleryParams): Promise<FileItem | void> => {
     try {
       const result = uploadFromGallery
         ? await launchImageLibrary({ mediaType: 'mixed' })
@@ -703,7 +703,7 @@ export const useFiles = ({ note }: Props) => {
   }, [application, reloadAllFiles, reloadAttachedFiles])
 
   const showActionsMenu = useCallback(
-    (file: SNFile | undefined) => {
+    (file: FileItem | undefined) => {
       if (!file) {
         return
       }

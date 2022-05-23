@@ -317,6 +317,18 @@ export class ComponentManager extends SNComponentManager {
       return []
     }
   }
+
+  public async preloadThirdPartyThemeIndexPath() {
+    const theme = this.mobileActiveTheme
+    if (!theme) {
+      return
+    }
+
+    const { identifier } = theme
+    if (this.isComponentThirdParty(identifier)) {
+      await this.preloadThirdPartyIndexPathFromDisk(identifier)
+    }
+  }
 }
 
 export async function associateComponentWithNote(application: SNApplication, component: SNComponent, note: SNNote) {
