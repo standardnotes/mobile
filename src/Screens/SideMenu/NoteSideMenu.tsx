@@ -6,7 +6,7 @@ import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext
 import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG, SCREEN_NOTE_HISTORY } from '@Root/Screens/screens'
 import { Files } from '@Root/Screens/SideMenu/Files'
 import { Listed } from '@Root/Screens/SideMenu/Listed'
-import { FeatureIdentifier } from '@standardnotes/features'
+import { FeatureIdentifier, FindNativeFeature } from '@standardnotes/features'
 import {
   ApplicationEvent,
   ButtonType,
@@ -49,7 +49,9 @@ import { TagSelectionList } from './TagSelectionList'
 
 function sortAlphabetically(array: SNComponent[]): SNComponent[] {
   return array.sort((a, b) => {
-    return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+    const aName = FindNativeFeature(a.identifier)?.name || a.name
+    const bName = FindNativeFeature(b.identifier)?.name || b.name
+    return aName.toLowerCase() < bName.toLowerCase() ? -1 : 1
   })
 }
 
@@ -376,7 +378,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     ]
     components.map(component => {
       options.push({
-        text: component.name,
+        text: FindNativeFeature(component.identifier)?.name || component.name,
         subtext: component.isMobileDefault ? 'Mobile Default' : undefined,
         key: component.uuid || component.name,
         selected: component.uuid === componentEditor?.uuid,

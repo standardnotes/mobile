@@ -64,8 +64,8 @@ export class ComponentManager extends SNComponentManager {
     } catch (e) {
       void this.alertService.alert(
         'Unable to start component server. ' +
-        'Editors other than the Plain Editor will fail to load. ' +
-        'Please restart the app and try again.'
+          'Editors other than the Plain Editor will fail to load. ' +
+          'Please restart the app and try again.'
       )
       SNLog.error(e as any)
     }
