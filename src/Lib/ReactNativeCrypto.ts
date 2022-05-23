@@ -157,6 +157,10 @@ export class SNReactNativeCrypto implements PureCryptoInterface {
     return Sodium.from_base64(base64String)
   }
 
+  public base64URLEncode(text: string): string {
+    return Sodium.to_base64(text)
+  }
+
   public hmac1(): Promise<HexString | null> {
     throw new Error('hmac1 is not implemented on mobile')
   }

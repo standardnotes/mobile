@@ -47,7 +47,7 @@ export const TagInputModal = (props: Props) => {
         if (props.route.params.noteUuid) {
           const note = application.items.findItem(props.route.params.noteUuid)
           if (note) {
-            tagMutator.addItemAsRelationship(note)
+            tagMutator.e2ePendingRefactor_addItemAsRelationship(note)
           }
         }
       })
@@ -58,7 +58,7 @@ export const TagInputModal = (props: Props) => {
           const tagMutator = mutator as TagMutator
           const note = application.items.findItem(props.route.params.noteUuid!)
           if (note) {
-            tagMutator.addItemAsRelationship(note)
+            tagMutator.e2ePendingRefactor_addItemAsRelationship(note)
           }
         })
       }
