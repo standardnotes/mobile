@@ -158,7 +158,7 @@ export class SNReactNativeCrypto implements PureCryptoInterface {
   }
 
   public base64URLEncode(text: string): string {
-    return Sodium.to_base64(text)
+    return Sodium.to_base64(text, Sodium.constants.base64_variant_VARIANT_URLSAFE_NO_PADDING)
   }
 
   public hmac1(): Promise<HexString | null> {

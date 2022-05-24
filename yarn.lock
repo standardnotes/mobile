@@ -8416,10 +8416,10 @@ react-native-share@^7.3.7:
   resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-7.3.7.tgz#f5eed0bf657ec8c5c45e3fe7a88611d28cc8f734"
   integrity sha512-WYXAqyNZeKKk3Kvsv4N3tJuLNw8k+HM+ymKnWFRomoSerD5syJqmBHgw1HwED8iV3zH11lXJw3rha9+H80XUHQ==
 
-react-native-sodium-jsi@1.1.7:
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/react-native-sodium-jsi/-/react-native-sodium-jsi-1.1.7.tgz#b2f9e76fb1b3bc47cb862a99b321f49b2dc60868"
-  integrity sha512-b5/TvE797rmVraydKk42xxlLSdN3XsPmDwXrCH1E5CiG+DEUcLIZAMg6roZZE/bGepK5uXVIRvnB/g0YuAT3uw==
+react-native-sodium-jsi@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-sodium-jsi/-/react-native-sodium-jsi-1.2.0.tgz#1081d3057d20c2b1755d3ff0af9c4b694cbcee74"
+  integrity sha512-bSluUR3ZTdNPiMZmplvmLAqbRe75sJ9HT+gifobJ3PGtwbxHm3PuZfHQ8yYVImqVWnch/MGpNPz4G2ueRGVong==
   dependencies:
     "@standardnotes/sncrypto-common" "^1.7.1"
 
