@@ -5,7 +5,7 @@ import { SCREEN_COMPOSE, SCREEN_INPUT_MODAL_TAG } from '@Root/Screens/screens'
 import { SideMenuOptionIconDescriptionType } from '@Root/Screens/SideMenu/SideMenuSection'
 import { ButtonType, ContentType, FindItem, SmartView, SNTag } from '@standardnotes/snjs'
 import { useCustomActionSheet } from '@Style/CustomActionSheet'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
 import { SideMenuCell } from './SideMenuCell'
 import { EmptyPlaceholder } from './TagSelectionList.styled'
@@ -29,7 +29,6 @@ export const TagSelectionList = React.memo(
     const [tags, setTags] = useState<SNTag[] | SmartView[]>(() => {
       return contentType === ContentType.SmartView ? application.items.getSmartViews() : []
     })
-    const displayOptionsSet = useRef<boolean>(false)
 
     const reloadTags = useCallback(() => {
       if (contentType === ContentType.SmartView) {
@@ -54,11 +53,6 @@ export const TagSelectionList = React.memo(
     )
 
     useEffect(() => {
-      if (!displayOptionsSet.current) {
-        application.items.setPrimaryItemDisplayOptions({ sortBy: 'title', sortDirection: 'dsc' })
-        displayOptionsSet.current = true
-      }
-
       const removeStreamTags = streamTags()
 
       return removeStreamTags
