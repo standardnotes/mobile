@@ -1,10 +1,9 @@
 import { ComponentLoadingError } from '@Lib/ComponentManager'
-import { PrefKey } from '@Lib/PreferencesManager'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { ApplicationContext } from '@Root/ApplicationContext'
 import { AppStackNavigationProp } from '@Root/AppStack'
 import { SCREEN_NOTES } from '@Root/Screens/screens'
-import { ButtonType, ComponentViewer } from '@standardnotes/snjs'
+import { ButtonType, ComponentViewer, PrefKey } from '@standardnotes/snjs'
 import { ThemeServiceContext } from '@Style/ThemeService'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
@@ -109,7 +108,7 @@ export const ComponentView = ({
 
       const doNotShowAgainUnsupportedEditors = application
         ?.getLocalPreferences()
-        .getValue(PrefKey.DoNotShowAgainUnsupportedEditors, false)
+        .getValue(PrefKey.MobileDoNotShowAgainUnsupportedEditors, false)
 
       if (!doNotShowAgainUnsupportedEditors) {
         const alertText =
@@ -126,7 +125,7 @@ export const ComponentView = ({
         )
 
         if (confirmed) {
-          void application?.getLocalPreferences().setUserPrefValue(PrefKey.DoNotShowAgainUnsupportedEditors, true)
+          void application?.getLocalPreferences().setUserPrefValue(PrefKey.MobileDoNotShowAgainUnsupportedEditors, true)
         }
       }
     }

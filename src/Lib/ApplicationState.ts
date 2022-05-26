@@ -10,6 +10,7 @@ import {
   isNullOrUndefined,
   NoteViewController,
   PayloadEmitSource,
+  PrefKey,
   removeFromArray,
   SmartView,
   SNNote,
@@ -37,7 +38,6 @@ import VersionInfo from 'react-native-version-info'
 import pjson from '../../package.json'
 import { MobileApplication } from './Application'
 import { associateComponentWithNote } from './ComponentManager'
-import { PrefKey } from './PreferencesManager'
 const { PlatformConstants } = NativeModules
 
 export enum AppStateType {
@@ -146,7 +146,7 @@ export class ApplicationState extends ApplicationService {
     if (this.selectedTagRestored) {
       return
     }
-    const savedTagUuid: string | undefined = this.prefService.getValue(PrefKey.SelectedTagUuid, undefined)
+    const savedTagUuid: string | undefined = this.prefService.getValue(PrefKey.MobileSelectedTagUuid, undefined)
 
     if (isNullOrUndefined(savedTagUuid)) {
       this.selectedTagRestored = true
@@ -428,7 +428,7 @@ export class ApplicationState extends ApplicationService {
     this.selectedTag = tag
 
     if (saveSelection) {
-      void this.application.getLocalPreferences().setUserPrefValue(PrefKey.SelectedTagUuid, tag.uuid)
+      void this.application.getLocalPreferences().setUserPrefValue(PrefKey.MobileSelectedTagUuid, tag.uuid)
     }
 
     this.notifyOfStateChange(AppStateType.TagChanged, {
