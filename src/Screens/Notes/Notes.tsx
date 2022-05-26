@@ -9,7 +9,6 @@ import {
   CollectionSort,
   CollectionSortProperty,
   ContentType,
-  NotesDisplayCriteria,
   PrefKey,
   SmartView,
   SNNote,
@@ -211,8 +210,8 @@ export const Notes = React.memo(
           applyFilters = searchText !== ''
         }
 
-        const criteria = NotesDisplayCriteria.Create({
-          sortProperty: sortOptions?.sortBy ?? sortBy,
+        application.items.setPrimaryItemDisplayOptions({
+          sortBy: sortOptions?.sortBy ?? sortBy,
           sortDirection: sortOptions?.sortReverse ?? sortReverse ? 'asc' : 'dsc',
           tags: tag instanceof SNTag ? [tag] : [],
           views: tag instanceof SmartView ? [tag] : [],
@@ -220,7 +219,6 @@ export const Notes = React.memo(
           includeArchived: applyFilters && (includeArchived ?? includeArchivedNotes),
           includeTrashed: applyFilters && (includeTrashed ?? includeTrashedNotes),
         })
-        application.items.setNotesDisplayCriteria(criteria)
       },
       [
         application,

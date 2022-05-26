@@ -310,7 +310,7 @@ export const useFiles = ({ note }: Props) => {
 
   const authorizeProtectedActionForFile = useCallback(
     async (file: FileItem, challengeReason: ChallengeReason) => {
-      const authorizedFiles = await application.protections.authorizeProtectedActionForFiles([file], challengeReason)
+      const authorizedFiles = await application.protections.authorizeProtectedActionForItems([file], challengeReason)
       return authorizedFiles.length > 0 && authorizedFiles.includes(file)
     },
     [application]

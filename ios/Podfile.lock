@@ -295,7 +295,7 @@ PODS:
     - ReactCommon/turbomodule/core
   - react-native-segmented-control (2.2.2):
     - React-Core
-  - react-native-sodium-jsi (1.1.7):
+  - react-native-sodium-jsi (1.2.0):
     - React-Core
   - react-native-static-server (0.5.0):
     - GCDWebServer (~> 3.0)
@@ -716,7 +716,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: b1914469643f40042e65d78cbf3d3dfebd6fb0d9
   react-native-safe-area-context: da2d11bd7df9bf7779e9bdc85081c141cfa544f4
   react-native-segmented-control: 65df6cd0619b780b3843d574a72d4c7cec396097
-  react-native-sodium-jsi: 42be5954ce2e66a56f1907e35e2561bcc54a0472
+  react-native-sodium-jsi: c8901320767d00385f9111bc95ba25aaa9a29890
   react-native-static-server: 201b2a945a35096be3ae7f43e367c65bcbd61343
   react-native-version-info: a106f23009ac0db4ee00de39574eb546682579b9
   react-native-webview: 380c1a03ec94b7ed764dac8db1e7c9952d08c93a
