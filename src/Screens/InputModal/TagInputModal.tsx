@@ -5,7 +5,7 @@ import { SectionedTableCell } from '@Root/Components/SectionedTableCell'
 import { TableSection } from '@Root/Components/TableSection'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
 import { SCREEN_INPUT_MODAL_TAG } from '@Root/Screens/screens'
-import { SNTag, TagMutator } from '@standardnotes/snjs'
+import { SNNote, SNTag, TagMutator } from '@standardnotes/snjs'
 import { ThemeServiceContext } from '@Style/ThemeService'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { TextInput } from 'react-native'
@@ -47,7 +47,7 @@ export const TagInputModal = (props: Props) => {
         if (props.route.params.noteUuid) {
           const note = application.items.findItem(props.route.params.noteUuid)
           if (note) {
-            tagMutator.addItemAsRelationship(note)
+            tagMutator.addNote(note as SNNote)
           }
         }
       })
@@ -58,7 +58,7 @@ export const TagInputModal = (props: Props) => {
           const tagMutator = mutator as TagMutator
           const note = application.items.findItem(props.route.params.noteUuid!)
           if (note) {
-            tagMutator.addItemAsRelationship(note)
+            tagMutator.addNote(note as SNNote)
           }
         })
       }
