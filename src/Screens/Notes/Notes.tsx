@@ -31,14 +31,7 @@ type SearchOptions = {
 }[]
 
 export const Notes = React.memo(
-  ({
-    shouldSplitLayout,
-    keyboardHeight,
-  }: {
-    shouldSplitLayout: boolean | undefined
-    keyboardHeight: number | undefined
-  }) => {
-    // Context
+  ({ isInTabletMode, keyboardHeight }: { isInTabletMode: boolean | undefined; keyboardHeight: number | undefined }) => {
     const application = useSafeApplicationContext()
     const theme = useContext(ThemeContext)
     const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
@@ -51,26 +44,26 @@ export const Notes = React.memo(
 
     // State
     const [sortBy, setSortBy] = useState<CollectionSortProperty>(() =>
-      application.getLocalPreferences().getValue(PrefKey.MobileSortNotesBy, CollectionSort.CreatedAt)
+      application.getLocalPreferences().getValue(PrefKey.MobileSortNotesBy, CollectionSort.CreatedAt),
     )
     const [sortReverse, setSortReverse] = useState<boolean>(() =>
-      application.getLocalPreferences().getValue(PrefKey.MobileSortNotesReverse, false)
+      application.getLocalPreferences().getValue(PrefKey.MobileSortNotesReverse, false),
     )
     const [hideDates, setHideDates] = useState<boolean>(() =>
-      application.getLocalPreferences().getValue(PrefKey.MobileNotesHideDate, false)
+      application.getLocalPreferences().getValue(PrefKey.MobileNotesHideDate, false),
     )
     const [hidePreviews, setHidePreviews] = useState<boolean>(() =>
-      application.getLocalPreferences().getValue(PrefKey.MobileNotesHideNotePreview, false)
+      application.getLocalPreferences().getValue(PrefKey.MobileNotesHideNotePreview, false),
     )
     const [hideEditorIcon, setHideEditorIcon] = useState<boolean>(() =>
-      application.getLocalPreferences().getValue(PrefKey.MobileNotesHideEditorIcon, false)
+      application.getLocalPreferences().getValue(PrefKey.MobileNotesHideEditorIcon, false),
     )
     const [notes, setNotes] = useState<SNNote[]>([])
     const [selectedNoteId, setSelectedNoteId] = useState<SNNote['uuid']>()
     const [searchText, setSearchText] = useState('')
     const [searchOptions, setSearchOptions] = useState<SearchOptions>([])
     const [includeProtectedNoteText, setIncludeProtectedNoteText] = useState<boolean>(
-      () => !(application.hasProtectionSources() && !application.hasUnprotectedAccessSession())
+      () => !(application.hasProtectionSources() && !application.hasUnprotectedAccessSession()),
     )
     const [includeArchivedNotes, setIncludeArchivedNotes] = useState<boolean>(false)
     const [includeTrashedNotes, setIncludeTrashedNotes] = useState<boolean>(false)
@@ -104,12 +97,12 @@ export const Notes = React.memo(
           subTitle,
         })
       },
-      [application, navigation, searchText]
+      [application, navigation, searchText],
     )
 
     const openCompose = useCallback(
       (newNote: boolean, noteUuid: UuidString, replaceScreen = false) => {
-        if (!shouldSplitLayout) {
+        if (!isInTabletMode) {
           if (replaceScreen) {
             navigation.replace(SCREEN_COMPOSE, {
               title: newNote ? 'Compose' : 'Note',
@@ -123,7 +116,7 @@ export const Notes = React.memo(
           }
         }
       },
-      [navigation, shouldSplitLayout]
+      [navigation, isInTabletMode],
     )
 
     const openNote = useCallback(
@@ -131,7 +124,7 @@ export const Notes = React.memo(
         await application.getAppState().openEditor(noteUuid)
         openCompose(false, noteUuid, replaceScreen)
       },
-      [application, openCompose]
+      [application, openCompose],
     )
 
     const onNoteSelect = useCallback(
@@ -148,7 +141,7 @@ export const Notes = React.memo(
           }
         }
       },
-      [application, navigation, openNote]
+      [application, navigation, openNote],
     )
 
     useEffect(() => {
@@ -192,7 +185,7 @@ export const Notes = React.memo(
         },
         includeProtected?: boolean,
         includeArchived?: boolean,
-        includeTrashed?: boolean
+        includeTrashed?: boolean,
       ) => {
         const tag = application.getAppState().selectedTag
         const searchQuery =
@@ -228,7 +221,7 @@ export const Notes = React.memo(
         sortBy,
         sortReverse,
         searchText,
-      ]
+      ],
     )
 
     const toggleIncludeProtected = useCallback(async () => {
@@ -315,7 +308,7 @@ export const Notes = React.memo(
           void onNoteSelect(note.uuid)
         }
       },
-      [decrypting, getFirstSelectableNote, loading, onNoteSelect]
+      [decrypting, getFirstSelectableNote, loading, onNoteSelect],
     )
 
     const selectNextOrCreateNew = useCallback(
@@ -327,19 +320,19 @@ export const Notes = React.memo(
           application.getAppState().closeActiveEditor()
         }
       },
-      [application, getFirstSelectableNote, onNoteSelect]
+      [application, getFirstSelectableNote, onNoteSelect],
     )
 
     const reloadNotes = useCallback(
       (reselectNote?: boolean, tagChanged?: boolean, searchFilter?: string) => {
         const tag = application.getAppState().selectedTag
+
         if (!tag) {
           return
         }
 
         reloadSearchOptions()
 
-        /** If no display options we set them initially */
         if (!haveDisplayOptions.current) {
           haveDisplayOptions.current = true
           reloadNotesDisplayOptions()
@@ -351,30 +344,40 @@ export const Notes = React.memo(
         setNotes(renderedNotes)
         reloadTitle(renderedNotes, searchFilter)
 
-        if (reselectNote && application.getAppState().isTabletDevice) {
-          if (tagChanged) {
-            if (renderedNotes.length > 0) {
-              selectFirstNote(renderedNotes)
-            } else {
-              application.getAppState().closeActiveEditor()
+        if (!application.getAppState().isTabletDevice || !reselectNote) {
+          return
+        }
+
+        if (tagChanged) {
+          if (renderedNotes.length > 0) {
+            selectFirstNote(renderedNotes)
+          } else {
+            application.getAppState().closeActiveEditor()
+          }
+        } else {
+          const activeNote = application.getAppState().getActiveNoteController()?.note
+
+          if (activeNote) {
+            const isTrashView =
+              application.getAppState().selectedTag instanceof SmartView &&
+              application.getAppState().selectedTag.uuid === SystemViewId.TrashedNotes
+
+            if (activeNote.trashed && !isTrashView) {
+              selectNextOrCreateNew(renderedNotes)
             }
           } else {
-            const activeNote = application.getAppState().getActiveNoteController()?.note
-
-            if (activeNote) {
-              const isTrashView =
-                application.getAppState().selectedTag instanceof SmartView &&
-                application.getAppState().selectedTag.uuid === SystemViewId.TrashedNotes
-              if (activeNote.trashed && !isTrashView) {
-                selectNextOrCreateNew(renderedNotes)
-              }
-            } else {
-              selectFirstNote(renderedNotes)
-            }
+            selectFirstNote(renderedNotes)
           }
         }
       },
-      [application, reloadNotesDisplayOptions, reloadSearchOptions, reloadTitle, selectFirstNote, selectNextOrCreateNew]
+      [
+        application,
+        reloadNotesDisplayOptions,
+        reloadSearchOptions,
+        reloadTitle,
+        selectFirstNote,
+        selectNextOrCreateNew,
+      ],
     )
 
     const onNoteCreate = useCallback(async () => {
@@ -383,25 +386,6 @@ export const Notes = React.memo(
       openCompose(true, noteView.note.uuid)
       reloadNotes(true)
     }, [application, notes.length, openCompose, reloadNotes])
-
-    const streamNotesAndTags = useCallback(() => {
-      const removeStreamNotes = application.streamItems([ContentType.Note], async () => {
-        /** If a note changes, it will be queried against the existing filter;
-         * we dont need to reload display options */
-        reloadNotes(true)
-      })
-
-      const removeStreamTags = application.streamItems([ContentType.Tag], async () => {
-        /** A tag could have changed its relationships, so we need to reload the filter */
-        reloadNotesDisplayOptions()
-        reloadNotes()
-      })
-
-      return () => {
-        removeStreamNotes()
-        removeStreamTags()
-      }
-    }, [application, reloadNotes, reloadNotesDisplayOptions])
 
     const reloadPreferences = useCallback(async () => {
       let newSortBy = application.getLocalPreferences().getValue(PrefKey.MobileSortNotesBy, CollectionSort.CreatedAt)
@@ -465,7 +449,7 @@ export const Notes = React.memo(
         setSearchText(filter)
         reloadNotes(undefined, undefined, filter)
       },
-      [reloadNotes, reloadNotesDisplayOptions]
+      [reloadNotes, reloadNotesDisplayOptions],
     )
 
     useEffect(() => {
@@ -481,23 +465,39 @@ export const Notes = React.memo(
     useFocusEffect(
       useCallback(() => {
         void reloadPreferences()
-        const removeAppStateChangeHandler = application.getAppState().addStateChangeObserver(state => {
-          if (state === AppStateType.TagChanged) {
-            reloadNotesDisplayOptions()
-            reloadNotes(true, true)
-          }
-          if (state === AppStateType.PreferencesChanged) {
-            void reloadPreferences()
-          }
-        })
-        const removeStreams = streamNotesAndTags()
-
-        return () => {
-          removeAppStateChangeHandler()
-          removeStreams()
-        }
-      }, [application, reloadNotes, reloadNotesDisplayOptions, reloadPreferences, streamNotesAndTags])
+      }, [reloadPreferences]),
     )
+
+    useEffect(() => {
+      const removeAppStateChangeHandler = application.getAppState().addStateChangeObserver(state => {
+        if (state === AppStateType.TagChanged) {
+          reloadNotesDisplayOptions()
+          reloadNotes(true, true)
+        }
+        if (state === AppStateType.PreferencesChanged) {
+          void reloadPreferences()
+        }
+      })
+
+      const removeStreamNotes = application.streamItems([ContentType.Note], async () => {
+        /** If a note changes, it will be queried against the existing filter;
+         * we dont need to reload display options */
+        reloadNotes(true)
+      })
+
+      const removeStreamTags = application.streamItems([ContentType.Tag], async () => {
+        /** A tag could have changed its relationships, so we need to reload the filter */
+        reloadNotesDisplayOptions()
+        reloadNotes()
+      })
+
+      return () => {
+        removeStreamNotes()
+        removeStreamTags()
+        removeAppStateChangeHandler()
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     return (
       <>
@@ -534,5 +534,5 @@ export const Notes = React.memo(
         />
       </>
     )
-  }
+  },
 )
