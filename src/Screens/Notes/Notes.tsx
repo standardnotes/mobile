@@ -137,11 +137,18 @@ export const Notes = React.memo(
             })
           }
           if (await application.authorizeNoteAccess(note)) {
-            void openNote(noteUuid)
+            if (!isInTabletMode) {
+              await openNote(noteUuid)
+            } else {
+              // TODO: remove setTimeout after https://github.com/standardnotes/private-snjs/pull/80
+              setTimeout(async () => {
+                await openNote(noteUuid)
+              })
+            }
           }
         }
       },
-      [application, navigation, openNote],
+      [application, isInTabletMode, navigation, openNote],
     )
 
     useEffect(() => {
@@ -496,8 +503,7 @@ export const Notes = React.memo(
         removeStreamTags()
         removeAppStateChangeHandler()
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [application, reloadNotes, reloadNotesDisplayOptions, reloadPreferences])
 
     return (
       <>
