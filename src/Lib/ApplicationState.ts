@@ -118,7 +118,7 @@ export class ApplicationState extends ApplicationService {
 
     this.removeHandleReactNativeAppStateChangeListener = AppState.addEventListener(
       'change',
-      this.handleReactNativeAppStateChange
+      this.handleReactNativeAppStateChange,
     )
 
     this.keyboardDidShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardDidShow)
@@ -389,7 +389,7 @@ export class ApplicationState extends ApplicationService {
             this.selectedTag = matchingTag as SNTag
           }
         }
-      }
+      },
     )
   }
 
@@ -527,7 +527,7 @@ export class ApplicationState extends ApplicationService {
         const challenge = new Challenge(
           [new ChallengePrompt(ChallengeValidation.Biometric)],
           ChallengeReason.ApplicationUnlock,
-          false
+          false,
         )
         void this.application.promptForCustomChallenge(challenge)
 
@@ -640,7 +640,7 @@ export class ApplicationState extends ApplicationService {
   public async getPasscodeKeyboardType(): Promise<PasscodeKeyboardType> {
     return this.application.getValue(
       MobileStorageKey.PasscodeKeyboardTypeKey,
-      StorageValueModes.Nonwrapped
+      StorageValueModes.Nonwrapped,
     ) as Promise<PasscodeKeyboardType>
   }
 

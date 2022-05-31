@@ -13,23 +13,18 @@ import { Notes } from './Notes/Notes'
 import { ComposeContainer, Container, ExpandTouchable, iconNames, NotesContainer } from './Root.styled'
 
 export const Root = () => {
-  // Context
   const application = useContext(ApplicationContext)
   const theme = useContext(ThemeContext)
   const [isLocked] = useIsLocked()
 
-  // State
   const [, setWidth] = useState<number | undefined>(undefined)
   const [height, setHeight] = useState<number | undefined>(undefined)
   const [, setX] = useState<number | undefined>(undefined)
   const [noteListCollapsed, setNoteListCollapsed] = useState<boolean>(false)
   const [activeNoteView, setActiveNoteView] = useState<NoteViewController | undefined>()
-  const [shouldSplitLayout, setShouldSplitLayout] = useState<boolean | undefined>(false)
+  const [isInTabletMode, setIsInTabletMode] = useState<boolean | undefined>(application?.getAppState().isInTabletMode)
   const [keyboardHeight, setKeyboardHeight] = useState<number | undefined>(undefined)
 
-  /**
-   * Register observers
-   */
   useEffect(() => {
     const removeStateObserver = application?.getAppState().addStateChangeObserver(state => {
       if (state === AppStateType.GainingFocus) {
@@ -42,9 +37,9 @@ export const Root = () => {
         if (event === AppStateEventType.TabletModeChange) {
           const eventData = data as TabletModeChangeData
           if (eventData.new_isInTabletMode && !eventData.old_isInTabletMode) {
-            setShouldSplitLayout(true)
+            setIsInTabletMode(true)
           } else if (!eventData.new_isInTabletMode && eventData.old_isInTabletMode) {
-            setShouldSplitLayout(false)
+            setIsInTabletMode(false)
           }
         }
         if (event === AppStateEventType.KeyboardChangeEvent) {
@@ -96,7 +91,7 @@ export const Root = () => {
     setWidth(tempWidth)
     setHeight(e.nativeEvent.layout.height)
     setX(e.nativeEvent.layout.x)
-    setShouldSplitLayout(application?.getAppState().isInTabletMode)
+    setIsInTabletMode(application?.getAppState().isInTabletMode)
     setKeyboardHeight(application?.getAppState().getKeyboardHeight())
   }
 
@@ -112,10 +107,10 @@ export const Root = () => {
 
   return (
     <Container testID="rootView" onLayout={onLayout}>
-      <NotesContainer notesListCollapsed={noteListCollapsed} shouldSplitLayout={shouldSplitLayout}>
-        <Notes keyboardHeight={keyboardHeight} shouldSplitLayout={shouldSplitLayout} />
+      <NotesContainer notesListCollapsed={noteListCollapsed} isInTabletMode={isInTabletMode}>
+        <Notes keyboardHeight={keyboardHeight} isInTabletMode={isInTabletMode} />
       </NotesContainer>
-      {activeNoteView && shouldSplitLayout && (
+      {activeNoteView && !activeNoteView.dealloced && isInTabletMode && (
         <ComposeContainer>
           <Compose noteUuid={activeNoteView.note.uuid} />
           <ExpandTouchable style={{ bottom: collapseIconBottomPosition }} onPress={toggleNoteList}>
