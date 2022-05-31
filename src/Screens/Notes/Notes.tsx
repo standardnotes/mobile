@@ -136,7 +136,10 @@ export const Notes = React.memo(
             if (!isInTabletMode) {
               await openNote(noteUuid)
             } else {
-              // TODO: remove setTimeout after https://github.com/standardnotes/private-snjs/pull/80
+              /**
+               * @TODO: remove setTimeout after SNJS navigation feature
+               * https://app.asana.com/0/1201653402817596/1202360754617865
+               */
               setTimeout(async () => {
                 await openNote(noteUuid)
               })
