@@ -36,13 +36,9 @@ export const Notes = React.memo(
     const theme = useContext(ThemeContext)
     const navigation = useNavigation<AppStackNavigationProp<typeof SCREEN_NOTES>['navigation']>()
 
-    /**
-     * Update sync status
-     */
     const [loading, decrypting, refreshing, startRefreshing] = useSyncStatus()
     const [signedIn] = useSignedIn()
 
-    // State
     const [sortBy, setSortBy] = useState<CollectionSortProperty>(() =>
       application.getLocalPreferences().getValue(PrefKey.MobileSortNotesBy, CollectionSort.CreatedAt),
     )
