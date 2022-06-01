@@ -82,7 +82,7 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
 
   constructor(
     props: PropsWhenNavigating | PropsWhenRenderingDirectly,
-    context: React.ContextType<typeof SafeApplicationContext>
+    context: React.ContextType<typeof SafeApplicationContext>,
   ) {
     super(props)
     this.context = context
@@ -330,12 +330,40 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
       componentViewer: undefined,
       loadingWebview: false,
       webViewError: undefined,
+      webViewErrorDesc: undefined,
     })
 
     const associatedEditor = this.componentManager.editorForNote(this.note)
     if (associatedEditor) {
       this.loadComponentViewer(associatedEditor)
     }
+  }
+
+  async forceReloadExistingThirdPartyEditor() {
+    const associatedEditor = this.componentManager.editorForNote(this.note)
+    if (!associatedEditor) {
+      return
+    }
+
+    const { identifier } = associatedEditor
+
+    if (!this.componentManager.isComponentThirdParty(identifier)) {
+      return
+    }
+
+    if (this.state.componentViewer) {
+      this.componentManager.destroyComponentViewer(this.state.componentViewer)
+    }
+
+    this.setState({
+      componentViewer: undefined,
+      loadingWebview: false,
+      webViewError: undefined,
+      webViewErrorDesc: undefined,
+    })
+
+    await this.componentManager.preloadThirdPartyIndexPathFromDisk(identifier)
+    this.loadComponentViewer(associatedEditor)
   }
 
   saveNote = async (params: { newTitle?: string; newText?: string }) => {
@@ -369,7 +397,7 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
           noteMutator.preview_html = undefined
         }
       },
-      true
+      true,
     )
 
     if (this.saveTimeout) {
@@ -393,7 +421,7 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
       {
         title: newTitle,
       },
-      () => this.saveNote({ newTitle: newTitle })
+      () => this.saveNote({ newTitle: newTitle }),
     )
   }
 
@@ -410,6 +438,7 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
     this.setState({
       loadingWebview: true,
       webViewError: undefined,
+      webViewErrorDesc: undefined,
     })
   }
 
@@ -443,8 +472,10 @@ export class Compose extends React.Component<PropsWhenNavigating | PropsWhenRend
         this.setState({
           downloadingEditor: false,
         }),
-      this.state.webViewError ? 0 : 200
+      this.state.webViewError ? 0 : 200,
     )
+
+    void this.forceReloadExistingThirdPartyEditor()
   }
 
   getErrorText(): string {
