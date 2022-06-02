@@ -20,6 +20,10 @@ export const EncryptionSection = (props: Props) => {
   const [protocolDisplayName, setProtocolDisplayName] = useState('')
 
   useEffect(() => {
+    if (!props.encryptionAvailable) {
+      return
+    }
+
     let mounted = true
     const getProtocolDisplayName = async () => {
       const displayName = (await application?.getProtocolEncryptionDisplayName()) ?? ''
@@ -39,7 +43,7 @@ export const EncryptionSection = (props: Props) => {
     if (props.encryptionAvailable) {
       encryptionStatus += ` | ${encryptionType}`
     } else {
-      encryptionStatus += '. ' // to connect sentence
+      encryptionStatus += '. '
       encryptionStatus +=
         application?.getStorageEncryptionPolicy() === StorageEncryptionPolicy.Default
           ? 'To enable encryption, sign in, register, or enable storage encryption.'

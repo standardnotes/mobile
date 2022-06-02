@@ -7,6 +7,9 @@ export const styles = StyleSheet.create({
   cellContentStyle: {
     flexShrink: 0,
   },
+  learnMoreIcon: {
+    marginTop: Platform.OS === 'ios' ? -6 : -3,
+  },
 })
 export const SNIconStyled = styled(SnIcon)`
   margin-left: 8px;

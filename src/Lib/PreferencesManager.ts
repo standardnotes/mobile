@@ -1,17 +1,5 @@
-import { ApplicationService, isNullOrUndefined, removeFromArray } from '@standardnotes/snjs'
+import { ApplicationService, isNullOrUndefined, PrefKey, removeFromArray } from '@standardnotes/snjs'
 import { MobileApplication } from './Application'
-
-export enum PrefKey {
-  SortNotesBy = 'sortBy',
-  SortNotesReverse = 'sortReverse',
-  NotesHideNotePreview = 'hideNotePreview',
-  NotesHideDate = 'hideDate',
-  NotesHideTags = 'hideTags',
-  LastExportDate = 'lastExportDate',
-  DoNotShowAgainUnsupportedEditors = 'doNotShowAgainUnsupportedEditors',
-  SelectedTagUuid = 'selectedTagUuid',
-  NotesHideEditorIcon = 'hideEditorIcon',
-}
 
 type Preferences = Record<PrefKey, any>
 type PreferencesObserver = () => Promise<void> | void
@@ -63,16 +51,21 @@ export class PreferencesManager extends ApplicationService {
     return this.application.setValue(PREFS_KEY, this.userPreferences)
   }
 
+  private async savePreference(key: PrefKey, value: any) {
+    return this.application.setPreference(key, value)
+  }
+
   getValue(key: PrefKey, defaultValue?: any) {
     if (!this.userPreferences) {
       return defaultValue
     }
-    const value = this.userPreferences[key]
+    const value = this.application.getPreference(key)
     return !isNullOrUndefined(value) ? value : defaultValue
   }
 
   async setUserPrefValue(key: PrefKey, value: any) {
     this.userPreferences[key] = value
     await this.saveSingleton()
+    await this.savePreference(key, value)
   }
 }

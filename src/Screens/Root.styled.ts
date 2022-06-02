@@ -5,11 +5,11 @@ export const Container = styled.View`
   flex-direction: row;
 `
 export const NotesContainer = styled.View<{
-  shouldSplitLayout?: boolean
+  isInTabletMode?: boolean
   notesListCollapsed?: boolean
 }>`
-  ${({ shouldSplitLayout, notesListCollapsed, theme }) => {
-    return shouldSplitLayout
+  ${({ isInTabletMode, notesListCollapsed, theme }) => {
+    return isInTabletMode
       ? css`
           border-right-color: ${theme.stylekitBorderColor};
           border-right-width: ${notesListCollapsed ? 0 : 1}px;

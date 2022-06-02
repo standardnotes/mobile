@@ -94,7 +94,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
   const [attachedFilesLength, setAttachedFilesLength] = useState(0)
 
   const [shouldAddTagHierarchy, setShouldAddTagHierachy] = useState(() =>
-    application.getPreference(PrefKey.NoteAddToParentFolders, true)
+    application.getPreference(PrefKey.NoteAddToParentFolders, true),
   )
 
   useEffect(() => {
@@ -130,7 +130,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         navigation.popToTop()
       }
     },
-    editor
+    editor,
   )
 
   useEffect(() => {
@@ -233,7 +233,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
       return
     },
-    [application, note]
+    [application, note],
   )
 
   const onEditorPress = useCallback(
@@ -243,7 +243,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       }
       if (note?.locked) {
         void application.alertService.alert(
-          "This note has editing disabled. If you'd like to edit its options, enable editing on it, and try again."
+          "This note has editing disabled. If you'd like to edit its options, enable editing on it, and try again.",
         )
         return
       }
@@ -260,7 +260,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
               const noteMutator = mutator as NoteMutator
               noteMutator.prefersPlainEditor = true
             },
-            false
+            false,
           )
         }
         if (activeEditorComponent?.isExplicitlyEnabledForItem(note.uuid) || activeEditorComponent?.isMobileDefault) {
@@ -279,7 +279,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
               const noteMutator = mutator as NoteMutator
               noteMutator.prefersPlainEditor = false
             },
-            false
+            false,
           )
         }
         await associateComponentWithNote(application, selectedComponent, note)
@@ -287,7 +287,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       /** Dirtying can happen above */
       void application.sync.sync()
     },
-    [application, disassociateComponentWithCurrentNote, editor, note, props.drawerRef]
+    [application, disassociateComponentWithCurrentNote, editor, note, props.drawerRef],
   )
 
   const onEdtiorLongPress = useCallback(
@@ -355,7 +355,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
         ],
       })
     },
-    [application, showActionSheet]
+    [application, showActionSheet],
   )
 
   const editors = useMemo(() => {
@@ -418,7 +418,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       return () => {
         mounted = false
       }
-    }, [reloadTags])
+    }, [reloadTags]),
   )
 
   const leaveEditor = useCallback(() => {
@@ -443,7 +443,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
     const archiveEvent = () => {
       if (note.locked) {
         void application.alertService.alert(
-          `This note has editing disabled. If you'd like to ${archiveOption.toLowerCase()} it, enable editing on it, and try again.`
+          `This note has editing disabled. If you'd like to ${archiveOption.toLowerCase()} it, enable editing on it, and try again.`,
         )
         return
       }
@@ -544,7 +544,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
               `Are you sure you want to permanently delete ${count} notes?`,
               'Empty Trash',
               'Delete',
-              ButtonType.Danger
+              ButtonType.Danger,
             )
             if (confirmed) {
               await application.mutator.emptyTrash()
@@ -588,7 +588,7 @@ export const NoteSideMenu = React.memo((props: Props) => {
       reloadTags()
       void application.sync.sync()
     },
-    [application, note, reloadTags, selectedTags]
+    [application, note, reloadTags, selectedTags],
   )
 
   if (!editor || !note) {
@@ -617,15 +617,16 @@ export const NoteSideMenu = React.memo((props: Props) => {
         renderItem={({ item }) => {
           const { OptionsSection, EditorsSection, ListedSection, TagsSection, FilesSection } = MenuSections
 
-          if (item.key === FilesSection && isEntitledToFiles) {
+          if (item.key === FilesSection) {
+            let collapsedLabel = 'Tap to expand'
+
+            if (isEntitledToFiles) {
+              collapsedLabel = `${attachedFilesLength ? `${attachedFilesLength}` : 'No'} attached file${
+                attachedFilesLength === 1 ? '' : 's'
+              }`
+            }
             return (
-              <SideMenuSection
-                title={'Files'}
-                customCollapsedLabel={`${attachedFilesLength ? `${attachedFilesLength}` : 'No'} attached file${
-                  attachedFilesLength === 1 ? '' : 's'
-                }`}
-                collapsed={false}
-              >
+              <SideMenuSection title={'Files'} customCollapsedLabel={collapsedLabel} collapsed={false}>
                 <Files note={note} />
               </SideMenuSection>
             )

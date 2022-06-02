@@ -1,4 +1,3 @@
-import { PrefKey } from '@Lib/PreferencesManager'
 import { useSignedIn } from '@Lib/SnjsHelperHooks'
 import { useNavigation } from '@react-navigation/native'
 import { ApplicationContext } from '@Root/ApplicationContext'
@@ -9,7 +8,7 @@ import { SectionHeader } from '@Root/Components/SectionHeader'
 import { TableSection } from '@Root/Components/TableSection'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
 import { SCREEN_MANAGE_SESSIONS, SCREEN_SETTINGS } from '@Root/Screens/screens'
-import { ButtonType } from '@standardnotes/snjs'
+import { ButtonType, PrefKey } from '@standardnotes/snjs'
 import moment from 'moment'
 import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { Platform } from 'react-native'
@@ -31,7 +30,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
   const [importing, setImporting] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [lastExportDate, setLastExportDate] = useState<Date | undefined>(() =>
-    application?.getLocalPreferences().getValue(PrefKey.LastExportDate, undefined)
+    application?.getLocalPreferences().getValue(PrefKey.MobileLastExportDate, undefined)
   )
 
   const lastExportData = useMemo(() => {
@@ -95,7 +94,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       if (result) {
         const exportDate = new Date()
         setLastExportDate(exportDate)
-        void application?.getLocalPreferences().setUserPrefValue(PrefKey.LastExportDate, exportDate)
+        void application?.getLocalPreferences().setUserPrefValue(PrefKey.MobileLastExportDate, exportDate)
       }
       setExporting(false)
     },
