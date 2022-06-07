@@ -106,10 +106,11 @@ export const AuthSection = (props: Props) => {
         'OK'
       )
     } else {
-      Keyboard.dismiss()
-      const result = await application!.register(email, password, undefined, true)
-      if (result?.error) {
-        void application?.alertService?.alert(result.error.message)
+      try {
+        Keyboard.dismiss()
+        await application!.register(email, password, undefined, true)
+      } catch (error) {
+        void application?.alertService?.alert((error as Error).message)
       }
     }
     setRegistering(false)
