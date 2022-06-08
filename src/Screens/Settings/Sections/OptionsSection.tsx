@@ -57,45 +57,6 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       removeAppGroupObserver()
     }
   }, [appGroup])
-  /*useEffect(() => {
-    let descriptors = appGroup.getDescriptors()
-    setApplicationDescriptors(descriptors)
-
-    // const removeAppGroupObserver = appGroup.addEventObserver(event => {
-    const removeAppGroupObserver = appGroup.addEventObserver(async event => {
-      if (event === ApplicationGroupEvent.DescriptorsDataChanged) {
-        // const applicationDescriptors = appGroup.getDescriptors()
-        descriptors = appGroup.getDescriptors()
-        setApplicationDescriptors(descriptors)
-        console.log('setting xxx to', JSON.stringify(descriptors))
-        // application.setValue('xxx', JSON.stringify(descriptors))
-        // await application.setValue('xxx', JSON.stringify(descriptors), StorageValueModes.Nonwrapped)
-        // await application.setValue('xxx', JSON.stringify(descriptors), StorageValueModes.Default)
-        console.log('here, application.isEphemeralSession()', application.isEphemeralSession())
-        application.setValue('xxx', JSON.stringify(descriptors))
-        // const aaa = await application.getAppState().setXxx(JSON.stringify(descriptors))
-        console.log(1111);
-        await application.getAppState().setXxx(JSON.stringify(descriptors))
-        console.log('0000');
-        console.log('1.5-1.5', await application.getValue('xxx'));
-        console.log(222);
-        const storedValue = await application.getAppState().getXxx()
-        console.log(333);
-        console.log('right after setting, storedValue is ', storedValue)
-
-        /!*setTimeout(() => {
-          console.log('going to read the value');
-          console.log('and the set value is', application.getValue('xxx'), 100);
-          console.log('after reading');
-        })*!/
-      }
-    })
-
-    return () => {
-      removeAppGroupObserver()
-    }
-    // }, [appGroup])
-  }, [appGroup, application])*/
 
   const lastExportData = useMemo(() => {
     if (lastExportDate) {
@@ -239,68 +200,126 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     navigation.push(SCREEN_MANAGE_SESSIONS)
   }, [navigation])
 
+  enum WorkspaceAction {
+    AddAnother = 'Add another workspace',
+    Open = 'Open',
+    Rename = 'Rename',
+    Remove = 'Remove',
+    SignOutAll = 'Sign out all workspaces',
+  }
+
+  const { AddAnother, Open, Rename, Remove, SignOutAll } = WorkspaceAction
+
+  const getWorkspaceActionConfirmation = useCallback(
+    async (action: WorkspaceAction): Promise<boolean> => {
+      const { Info, Danger } = ButtonType
+      let message = ''
+      let buttonText = ''
+      let buttonType = Info
+
+      switch (action) {
+        case Open:
+        case AddAnother:
+          message = 'Your new workspace will be ready for you when you come back.'
+          buttonText = 'Quit App'
+          break
+        case SignOutAll:
+          message = 'Are you sure you want to sign out of all workspaces on this device?'
+          buttonText = 'Sign Out All'
+          break
+        case Remove:
+          message =
+            'This action will remove this workspace and its related data from this device. Your synced data will not be affected.'
+          buttonText = 'Delete Workspace'
+          buttonType = Danger
+          break
+        default:
+          break
+      }
+      return application.alertService.confirm(message, undefined, buttonText, buttonType)
+    },
+    [AddAnother, Open, Remove, SignOutAll, application.alertService],
+  )
+
   const getSingleWorkspaceItemOptions = useCallback(
     (descriptor: ApplicationDescriptor) => {
-      const worskspaceItemOptions: CustomActionSheetOption[] = [
-        {
-          text: 'Open',
+      const worskspaceItemOptions: CustomActionSheetOption[] = []
+      if (descriptor.primary) {
+        worskspaceItemOptions.push(
+          {
+            // text: 'Rename',
+            text: Rename,
+            callback: async () => {
+              console.log('implement rename...')
+              // await appGroup.unloadCurrentAndCreateNewDescriptor()
+            },
+          },
+          {
+            // text: 'Remove',
+            text: Remove,
+            destructive: true,
+            callback: async () => {
+              /*const confirmed = await application.alertService.confirm(
+                'This action will remove this workspace and its related data from this device. Your synced data will not be affected.',
+                undefined,
+                'Quit App',
+                ButtonType.Danger,
+              )*/
+              const confirmed = await getWorkspaceActionConfirmation(Remove)
+
+              if (!confirmed) {
+                return
+              }
+
+              console.log(
+                'implement remove and destroy the workspace (and probably call `SNReactNative.exitApp()` as well)...',
+              )
+              // application.user.signOut().catch(console.error)
+              try {
+                await application.user.signOut() // TODO: do I need to call `SNReactNative.exitApp()` here as well?
+              } catch (error) {
+                console.error(error)
+              }
+
+              // await appGroup.unloadCurrentAndCreateNewDescriptor()
+            },
+          },
+        )
+      } else {
+        worskspaceItemOptions.push({
+          text: Open,
           callback: async () => {
+            const confirmed = await getWorkspaceActionConfirmation(Open)
+            if (!confirmed) {
+              return
+            }
+
+            // await application.getInstallationService().customWipeData()
             await appGroup.unloadCurrentAndActivateDescriptor(descriptor)
             // TODO: find a way to check if there are memory leaks *without* the below call.
             SNReactNative.exitApp()
           },
-        },
-        {
-          text: 'Rename',
-          callback: async () => {
-            console.log('rename')
-            // await appGroup.unloadCurrentAndCreateNewDescriptor()
-          },
-        },
-        {
-          text: 'Remove',
-          destructive: true,
-          callback: async () => {
-            console.log('remove')
-            // await appGroup.unloadCurrentAndCreateNewDescriptor()
-          },
-        },
-      ]
+        })
+      }
+
       return worskspaceItemOptions
     },
-    [appGroup],
+    [Open, Remove, Rename, appGroup, application, getWorkspaceActionConfirmation],
   )
 
   const getActiveWorkspaceItems = useCallback(() => {
-    /*const descriptorItemOptions: [CustomActionSheetOption] = [{
-      text: 'Add another workspace',
-      callback: async () => {
-        console.log('add another worskpace')
-        await appGroup.unloadCurrentAndCreateNewDescriptor()
-      },
-    },]*/
     const descriptorItemOptions: CustomActionSheetOption[] = []
 
     applicationDescriptors.forEach(descriptor => {
       descriptorItemOptions.push({
-        text: descriptor.label,
+        text: `${descriptor.label}${descriptor.primary ? ' *' : ''}`,
+
         callback: async () => {
           const singleItemOptions = getSingleWorkspaceItemOptions(descriptor)
 
-          // console.log(`${descriptor.label} workspace click`)
           showActionSheet({
             title: '',
             options: singleItemOptions,
-            /*styles: {
-              titleTextStyle: {
-                fontWeight: descriptor.primary ? 'bold' : 'normal',
-                color: 'yellow !important',
-              },
-              textStyle: {
-                fontWeight: descriptor.primary ? 'bold' : 'normal',
-                color: 'green !important',
-              },
-            },*/
           })
         },
       })
@@ -309,48 +328,49 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     return descriptorItemOptions
   }, [applicationDescriptors, getSingleWorkspaceItemOptions, showActionSheet])
 
-  const handleSwitchWorkspaceClick = useCallback(() => {
-    /*const activeDescriptors = applicationDescriptors.map(descriptor => {
-      return {
-        text: descriptor.label,
-        callback: async () => {
-          console.log(`${descriptor.label} workspace click`)
-        },
+  /*const customSignOut = useCallback(async () => {
+    try {
+      const confirmed = await getWorkspaceActionConfirmation(SignOutAll)
+      if (!confirmed) {
+        return
       }
-    })*/
+      await appGroup.signOutAllWorkspaces()
+
+      // TODO: do we need `exitApp` here as well?
+      SNReactNative.exitApp()
+    } catch (error) {
+      console.error(error)
+    }
+  }, [SignOutAll, appGroup, getWorkspaceActionConfirmation])*/
+
+  const handleSwitchWorkspaceClick = useCallback(() => {
     const activeDescriptors = getActiveWorkspaceItems()
     const options: CustomActionSheetOption[] = [
-      // TODO: show currently active descriptor as bold (or otherwise distinguishable)
       ...activeDescriptors,
-      /*{
-        text: 'Main Workspace',
-        callback: async () => {
-          console.log('main workspace click')
-        },
-      },*/
       {
-        text: 'Add another workspace',
+        text: AddAnother,
         callback: async () => {
-          console.log('add another worskpace')
+          const confirmed = await getWorkspaceActionConfirmation(AddAnother)
+          if (!confirmed) {
+            return
+          }
+          // await application.getInstallationService().wipeData()
+          // await application.getInstallationService().customWipeData()
           await appGroup.unloadCurrentAndCreateNewDescriptor()
           SNReactNative.exitApp()
         },
       },
       {
-        text: 'Sign out all workspaces',
+        text: SignOutAll,
         callback: async () => {
           try {
-            const confirmed = await application.alertService.confirm(
-              'Are you sure you want to sign out of all workspaces on this device?',
-              undefined,
-              'Sign out all',
-              ButtonType.Danger,
-            )
+            const confirmed = await getWorkspaceActionConfirmation(SignOutAll)
             if (!confirmed) {
               return
             }
             await appGroup.signOutAllWorkspaces()
-            // TODO: do we need this here as well?
+
+            // TODO: do we need `exitApp` here as well?
             SNReactNative.exitApp()
           } catch (error) {
             console.error(error)
@@ -359,7 +379,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       },
     ]
     showActionSheet({ title: '', options })
-  }, [appGroup, application.alertService, getActiveWorkspaceItems, showActionSheet])
+  }, [AddAnother, SignOutAll, appGroup, getActiveWorkspaceItems, getWorkspaceActionConfirmation, showActionSheet])
 
   const showDataBackupAlert = useCallback(() => {
     void application.alertService.alert(
