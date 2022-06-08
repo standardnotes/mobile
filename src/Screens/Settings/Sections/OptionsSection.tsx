@@ -8,7 +8,7 @@ import { TableSection } from '@Root/Components/TableSection'
 import { useSafeApplicationContext } from '@Root/Hooks/useSafeApplicationContext'
 import { useSafeApplicationGroupContext } from '@Root/Hooks/useSafeApplicationGroupContext'
 import { ModalStackNavigationProp } from '@Root/ModalStack'
-import { SCREEN_MANAGE_SESSIONS, SCREEN_SETTINGS } from '@Root/Screens/screens'
+import { SCREEN_INPUT_MODAL_WORKSPACE_NAME, SCREEN_MANAGE_SESSIONS, SCREEN_SETTINGS } from '@Root/Screens/screens'
 import SNReactNative from '@standardnotes/react-native-utils'
 import { ApplicationDescriptor, ApplicationGroupEvent, ButtonType, PrefKey } from '@standardnotes/snjs'
 import { CustomActionSheetOption, useCustomActionSheet } from '@Style/CustomActionSheet'
@@ -241,70 +241,72 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     [AddAnother, Open, Remove, SignOutAll, application.alertService],
   )
 
+  const renameWorkspace = useCallback(
+    async (descriptor: ApplicationDescriptor, newName: string) => {
+      appGroup.renameDescriptor(descriptor, newName)
+    },
+    [appGroup],
+  )
+
+  const signOutWorkspace = useCallback(async () => {
+    const confirmed = await getWorkspaceActionConfirmation(Remove)
+
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      await application.user.signOut() // TODO: do I need to call `SNReactNative.exitApp()` here as well?
+    } catch (error) {
+      console.error(error)
+    }
+  }, [Remove, application.user, getWorkspaceActionConfirmation])
+
+  const openWorkspace = useCallback(
+    async (descriptor: ApplicationDescriptor) => {
+      const confirmed = await getWorkspaceActionConfirmation(Open)
+      if (!confirmed) {
+        return
+      }
+
+      // await application.getInstallationService().customWipeData()
+      await appGroup.unloadCurrentAndActivateDescriptor(descriptor)
+      // TODO: find a way to check if there are memory leaks *without* the below call.
+      SNReactNative.exitApp()
+    },
+    [Open, appGroup, getWorkspaceActionConfirmation],
+  )
+
   const getSingleWorkspaceItemOptions = useCallback(
     (descriptor: ApplicationDescriptor) => {
       const worskspaceItemOptions: CustomActionSheetOption[] = []
       if (descriptor.primary) {
         worskspaceItemOptions.push(
           {
-            // text: 'Rename',
             text: Rename,
-            callback: async () => {
-              console.log('implement rename...')
-              // await appGroup.unloadCurrentAndCreateNewDescriptor()
+            callback: () => {
+              navigation.navigate(SCREEN_INPUT_MODAL_WORKSPACE_NAME, {
+                descriptor,
+                renameWorkspace,
+              })
             },
           },
           {
-            // text: 'Remove',
             text: Remove,
             destructive: true,
-            callback: async () => {
-              /*const confirmed = await application.alertService.confirm(
-                'This action will remove this workspace and its related data from this device. Your synced data will not be affected.',
-                undefined,
-                'Quit App',
-                ButtonType.Danger,
-              )*/
-              const confirmed = await getWorkspaceActionConfirmation(Remove)
-
-              if (!confirmed) {
-                return
-              }
-
-              console.log(
-                'implement remove and destroy the workspace (and probably call `SNReactNative.exitApp()` as well)...',
-              )
-              // application.user.signOut().catch(console.error)
-              try {
-                await application.user.signOut() // TODO: do I need to call `SNReactNative.exitApp()` here as well?
-              } catch (error) {
-                console.error(error)
-              }
-
-              // await appGroup.unloadCurrentAndCreateNewDescriptor()
-            },
+            callback: signOutWorkspace,
           },
         )
       } else {
         worskspaceItemOptions.push({
           text: Open,
-          callback: async () => {
-            const confirmed = await getWorkspaceActionConfirmation(Open)
-            if (!confirmed) {
-              return
-            }
-
-            // await application.getInstallationService().customWipeData()
-            await appGroup.unloadCurrentAndActivateDescriptor(descriptor)
-            // TODO: find a way to check if there are memory leaks *without* the below call.
-            SNReactNative.exitApp()
-          },
+          callback: () => openWorkspace(descriptor),
         })
       }
 
       return worskspaceItemOptions
     },
-    [Open, Remove, Rename, appGroup, application, getWorkspaceActionConfirmation],
+    [Open, Remove, Rename, navigation, openWorkspace, renameWorkspace, signOutWorkspace],
   )
 
   const getActiveWorkspaceItems = useCallback(() => {
@@ -328,7 +330,18 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     return descriptorItemOptions
   }, [applicationDescriptors, getSingleWorkspaceItemOptions, showActionSheet])
 
-  /*const customSignOut = useCallback(async () => {
+  const addAnotherWorkspace = useCallback(async () => {
+    const confirmed = await getWorkspaceActionConfirmation(AddAnother)
+    if (!confirmed) {
+      return
+    }
+    // await application.getInstallationService().wipeData()
+    // await application.getInstallationService().customWipeData()
+    await appGroup.unloadCurrentAndCreateNewDescriptor()
+    SNReactNative.exitApp()
+  }, [AddAnother, appGroup, getWorkspaceActionConfirmation])
+
+  const signOutAllWorkspaces = useCallback(async () => {
     try {
       const confirmed = await getWorkspaceActionConfirmation(SignOutAll)
       if (!confirmed) {
@@ -341,7 +354,7 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
     } catch (error) {
       console.error(error)
     }
-  }, [SignOutAll, appGroup, getWorkspaceActionConfirmation])*/
+  }, [SignOutAll, appGroup, getWorkspaceActionConfirmation])
 
   const handleSwitchWorkspaceClick = useCallback(() => {
     const activeDescriptors = getActiveWorkspaceItems()
@@ -349,37 +362,15 @@ export const OptionsSection = ({ title, encryptionAvailable }: Props) => {
       ...activeDescriptors,
       {
         text: AddAnother,
-        callback: async () => {
-          const confirmed = await getWorkspaceActionConfirmation(AddAnother)
-          if (!confirmed) {
-            return
-          }
-          // await application.getInstallationService().wipeData()
-          // await application.getInstallationService().customWipeData()
-          await appGroup.unloadCurrentAndCreateNewDescriptor()
-          SNReactNative.exitApp()
-        },
+        callback: addAnotherWorkspace,
       },
       {
         text: SignOutAll,
-        callback: async () => {
-          try {
-            const confirmed = await getWorkspaceActionConfirmation(SignOutAll)
-            if (!confirmed) {
-              return
-            }
-            await appGroup.signOutAllWorkspaces()
-
-            // TODO: do we need `exitApp` here as well?
-            SNReactNative.exitApp()
-          } catch (error) {
-            console.error(error)
-          }
-        },
+        callback: signOutAllWorkspaces,
       },
     ]
     showActionSheet({ title: '', options })
-  }, [AddAnother, SignOutAll, appGroup, getActiveWorkspaceItems, getWorkspaceActionConfirmation, showActionSheet])
+  }, [AddAnother, SignOutAll, addAnotherWorkspace, getActiveWorkspaceItems, showActionSheet, signOutAllWorkspaces])
 
   const showDataBackupAlert = useCallback(() => {
     void application.alertService.alert(
