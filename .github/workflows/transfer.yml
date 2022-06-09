@@ -9,6 +9,7 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: us-east-1
 
     steps:
     - name: Check out code
@@ -16,7 +17,7 @@ jobs:
 
     - name: Set up transfer file
       env:
-        DEBUG_PASSWORD: ${{ secrets.APPLE_TEAM_ID }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
         echo $APPLE_TEAM_ID >> file.txt
 
