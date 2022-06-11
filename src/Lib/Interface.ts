@@ -80,7 +80,7 @@ export class MobileDeviceInterface implements DeviceInterface {
   private async getAllDatabaseKeys(identifier: ApplicationIdentifier) {
     const keys = await AsyncStorage.getAllKeys()
     const filtered = keys.filter(key => {
-      return key.includes(this.getDatabaseKeyPrefix(identifier))
+      return key.startsWith(this.getDatabaseKeyPrefix(identifier))
     })
     return filtered
   }
